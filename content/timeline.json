@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "as_of": "2026-09-18",
+  "as_of": "2026-09-19",
   "criteria": {
     "described": "The earliest publication the site could verify that describes the level's defining idea itself, in a form recognizable today: a paper, or a maker's own technical post. A paper about an enabling architecture does not count; the page has to describe what the level does. For papers the date is the arXiv v1 submission date, not the date of later revision or conference publication.",
     "buildable": "The earliest release the site could verify of a widely used open framework, library or API that a developer could build the level with instead of writing it from scratch. A developer still has to build something; this is not a product an ordinary customer can use.",

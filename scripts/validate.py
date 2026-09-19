@@ -986,6 +986,8 @@ def validate_timeline(timeline: dict, taxonomy: dict, landscape: dict | None) ->
     2. Every milestone's `level` is one of the taxonomy's tier orders (0..7 today).
     3. `date` matches its declared `precision` (day, month or year).
     4. No milestone `date` is after `as_of`.
+    4a. No milestone's `checked` date is after `as_of` either: the page prints `as_of` as the
+        date the timeline was verified, so it may not be older than the newest check.
     5. Each entry in `levels` names a level at most once; its `described`, `buildable` and
        `available` each resolve to a milestone actually AT that level, or are null and carry a
        `note` explaining why (level 0 has no maker announcing availability; level 7 has no open
@@ -1021,6 +1023,27 @@ def validate_timeline(timeline: dict, taxonomy: dict, landscape: dict | None) ->
         errors.append(f"timeline: as_of {as_of!r} is not a YYYY-MM-DD date")
     else:
         as_of_key = _date_key(as_of)
+        # Rule 4a, the same defect as the registry's above and found the same way. The timeline
+        # page prints this date as what the site could verify "as of" it, and labels the chart's
+        # right edge with it, while each milestone carries its own `checked`. A pass that
+        # re-checks a handful of milestones moves their `checked` and not this, and the page then
+        # understates how current it is, with nothing looking wrong. Fourteen milestones were a
+        # day ahead of `as_of` when this rule was written.
+        newest_checked = max(
+            (
+                milestone["checked"]
+                for milestone in timeline.get("milestones", [])
+                if isinstance(milestone.get("checked"), str)
+                and DATE_PATTERNS["day"].match(milestone["checked"])
+            ),
+            default="",
+        )
+        if newest_checked > as_of:
+            errors.append(
+                f"timeline: as_of is {as_of!r} but a milestone was checked on {newest_checked!r}; "
+                f"the page prints as_of as the date the timeline was verified, so it may not be "
+                f"older than the newest checked date"
+            )
 
     tier_orders = {tier["order"] for tier in taxonomy.get("tiers", [])}
     level_pages, track_pages, tracks = page_ids(taxonomy)
