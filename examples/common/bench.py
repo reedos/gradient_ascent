@@ -22,7 +22,13 @@ Three pieces:
    Wiring is explicit: `Bench` connects the supply to the DUT input and the load to the DUT
    output, and every measurement is computed from the DUT model through that wiring.
 
-3. `SafetyEnvelope`, `Approval`, `GuardedSupply` and `GuardedLoad` -- the code-side limits. The
+3. The measurement model: `AccuracySpec`, the MDN-6100's accuracy table as its programming
+   manual prints it, and the pure functions that turn it into an uncertainty budget. A reported
+   measurement on this bench is a value, an expanded uncertainty and the range and calibration
+   interval it was taken under. None of that arithmetic involves a model, and neither does the
+   guardbanded verdict `guarded_verdict` computes from it.
+
+4. `SafetyEnvelope`, `Approval`, `GuardedSupply` and `GuardedLoad` -- the code-side limits. The
    model never drives an instrument directly in any example on this site: it proposes a command,
    code checks it against the envelope, a person approves the enable, and only then does the
    (simulated) instrument act. Both commands that energize a board go through the same gate:
@@ -38,6 +44,8 @@ from __future__ import annotations
 
 import math
 import re
+import statistics
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 
 # ---------------------------------------------------------------------------
@@ -63,6 +71,18 @@ UVLO_FALLING_V = 7.8
 #: line and load regulation figures are computed from; see docs/THE-BENCH.md.
 LINE_COEFF_V_PER_V = 0.00025
 LOAD_COEFF_V_PER_A = 0.00700
+
+#: Ambient temperature the datasheet's numbers are quoted at, and the two coefficients that move
+#: them when a characterization sweep leaves it. Both are small, and the soak data is why: in
+#: `evals/bench/data/soak-2026-08-27.csv` a healthy board's output falls 1.2 mV to 2.5 mV while
+#: its case rises about 36 degC, so the whole board's output coefficient is a few tens of
+#: microvolts per degree, not a few hundred. `VOUT_TEMPCO_V_PER_C` is -50 uV/degC, which is
+#: -10 ppm/degC of a 5 V output: reference drift plus divider mismatch, and nothing more.
+#: `R_LOSS_TEMPCO_PER_C` is the conduction path, copper and two FET channels, at 0.35 %/degC; it
+#: shows up twice, as a little more loss and as a little more droop under load.
+T_REF_C = 25.0
+VOUT_TEMPCO_V_PER_C = -0.00005
+R_LOSS_TEMPCO_PER_C = 0.0035
 
 #: Loss terms. `R_LOSS_OHM` is the conduction path (inductor DCR plus the two FETs plus board
 #: and connector resistance); `K_SW_W_PER_VA` is switching loss, which grows with both the input
@@ -95,6 +115,14 @@ class Dut:
     ilim_a: float = ILIM_NOM_A
     r_loss_ohm: float = R_LOSS_OHM
     ringing_v: float = RINGING_V
+    #: The regulation coefficients, per board rather than per design. A production population
+    #: leaves these at the datasheet's own numbers; a handful of prototypes does not, and
+    #: `evals/bench/make_characterization.py` is where that matters: one board's line regulation
+    #: sits close to its limit and moves with temperature, which is the kind of thing design
+    #: verification exists to find and a sample of one typical board never shows.
+    line_coeff_v_per_v: float = LINE_COEFF_V_PER_V
+    load_coeff_v_per_a: float = LOAD_COEFF_V_PER_A
+    vout_tempco_v_per_c: float = VOUT_TEMPCO_V_PER_C
     #: Set on a board whose output is dead: no output at any input voltage.
     dead: bool = False
     #: DC resistance the first test step measures, input to return and output to return. A good
@@ -119,8 +147,8 @@ class Dut:
             return 0.0
         ideal = (
             VOUT_NOM_V
-            + LINE_COEFF_V_PER_V * (vin_v - 24.0)
-            - LOAD_COEFF_V_PER_A * iout_a
+            + self.line_coeff_v_per_v * (vin_v - 24.0)
+            - self.load_coeff_v_per_a * iout_a
             + self.vout_offset_v
         )
         if iout_a > self.ilim_a:
@@ -149,6 +177,49 @@ class Dut:
         if pin <= 0.0:
             return 0.0
         return 100.0 * self.vout_v(vin_v, iout_a) * iout_a / pin
+
+    # -- the same operating point, at an ambient other than 25 degC ---------
+
+    def vout_at_c(self, vin_v: float, iout_a: float, tamb_c: float) -> float:
+        """Output voltage at this input voltage, load current and ambient temperature.
+
+        Two terms move it away from the 25 degC number: the board's own output coefficient, and
+        the extra droop a warmer conduction path produces at the same current. At `T_REF_C` this
+        returns exactly what `vout_v` returns, which is what keeps the datasheet true.
+        """
+        ideal = self.vout_v(vin_v, iout_a)
+        if ideal <= 0.0:
+            return ideal
+        rise = tamb_c - T_REF_C
+        droop = self.load_coeff_v_per_a * iout_a * R_LOSS_TEMPCO_PER_C * rise
+        return ideal + self.vout_tempco_v_per_c * rise - droop
+
+    def r_loss_at_c(self, tamb_c: float) -> float:
+        """Conduction path resistance at this ambient: copper and two FET channels warm up."""
+        return self.r_loss_ohm * (1.0 + R_LOSS_TEMPCO_PER_C * (tamb_c - T_REF_C))
+
+    def loss_at_c(self, vin_v: float, iout_a: float, tamb_c: float) -> float:
+        """Power lost in the board at this ambient. Only the conduction term moves."""
+        if not self.powered(vin_v):
+            return 0.0
+        quiescent = vin_v * (IQ_A + IQ_PER_V_A * vin_v)
+        switching = K_SW_W_PER_VA * vin_v * iout_a
+        conduction = self.r_loss_at_c(tamb_c) * iout_a * iout_a
+        return quiescent + switching + conduction
+
+    def iin_at_c(self, vin_v: float, iout_a: float, tamb_c: float) -> float:
+        """Input current at this ambient: output power plus losses, over the input voltage."""
+        if not self.powered(vin_v) or vin_v <= 0.0:
+            return 0.0
+        pout = self.vout_at_c(vin_v, iout_a, tamb_c) * iout_a
+        return (pout + self.loss_at_c(vin_v, iout_a, tamb_c)) / vin_v
+
+    def efficiency_at_c(self, vin_v: float, iout_a: float, tamb_c: float) -> float:
+        """Output power over input power at this ambient, as a percentage."""
+        pin = vin_v * self.iin_at_c(vin_v, iout_a, tamb_c)
+        if pin <= 0.0:
+            return 0.0
+        return 100.0 * self.vout_at_c(vin_v, iout_a, tamb_c) * iout_a / pin
 
     # -- ripple ----------------------------------------------------------
 
@@ -1279,9 +1350,414 @@ class GuardedLoad:
             raise SafetyRefusal(f"the load rejected a checked command: {error}")
 
 
+# ---------------------------------------------------------------------------
+# Measurement uncertainty
+# ---------------------------------------------------------------------------
+#
+# A reading is a number. A measurement is a number with an uncertainty, a range and a calibration
+# interval attached to it, and nothing on this bench reports one without the other three. The
+# arithmetic below is the standard treatment: every influence is reduced to a standard uncertainty
+# (a one-sigma equivalent), the standard uncertainties are combined by root sum of squares, and
+# the result is multiplied by a coverage factor of 2 for roughly 95 percent coverage. That is the
+# GUM method, used the way an accredited calibration laboratory uses it, and every step of it is
+# arithmetic that a model has no business anywhere near.
+
+#: An accuracy specification is a limit, not a distribution. Nothing says where inside the limit
+#: a particular instrument sits, so the standard treatment is a rectangular distribution: a
+#: half-width `a` becomes a standard uncertainty of `a / sqrt(3)`.
+RECTANGULAR_DIVISOR = math.sqrt(3.0)
+
+#: k = 2, about 95 percent coverage for a budget with several contributions. Quoting an expanded
+#: uncertainty without saying which k it used is the single most common way two laboratories
+#: disagree about the same measurement by a factor of two.
+COVERAGE_FACTOR = 2.0
+
+#: The temperature band an accuracy specification is quoted inside, and the band the 24 hour
+#: specification is quoted inside, as `mdn6100-programming-manual.md` section 2 prints them.
+CAL_BAND_C = (18.0, 28.0)
+CAL_BAND_24H_C = (22.0, 24.0)
+
+#: Displayed counts on a 6 1/2 digit reading: the least significant digit is the range over a
+#: million, so the 10 V range resolves 10 uV and the 100 mV range resolves 100 nV.
+MDN6100_COUNTS = 1_000_000
+
+#: The three verdicts a limit check can honestly return once the measurement has an uncertainty.
+#: The third one is the whole reason guardbanding exists: a value inside the limit by less than
+#: the expanded uncertainty has not been shown to be inside the limit.
+VERDICT_PASS = "pass"
+VERDICT_FAIL = "fail"
+VERDICT_UNKNOWN = "cannot say"
+
+#: The half-width of the test-lead and connection contribution on this bench, from
+#: `calibration-procedure.md` section 5: a verified fixture path agrees with the meter's direct
+#: reading of the same node to within 200 uV. It is a systematic offset, so it cancels in a
+#: difference of two readings taken through the same path, which is why the line and load
+#: regulation budgets leave it out and an absolute voltage budget does not.
+LEAD_HALF_WIDTH_V = 200e-6
+
+
+@dataclass(frozen=True)
+class AccuracySpec:
+    """One row of an instrument's accuracy table: +/-(ppm of reading + ppm of range).
+
+    Bench instruments state accuracy this way because the two terms behave differently. The
+    reading term scales with what is being measured; the range term does not, so it dominates
+    whenever a reading sits low on its range, and choosing a range ten times too large multiplies
+    that term by ten while the reading term barely moves. `interval` and `band_c` are part of the
+    specification and not decoration: the same meter has three different accuracy tables
+    depending on how long ago it was calibrated, and all of them assume an ambient inside the
+    band. Outside it, the temperature coefficient applies per degree outside, not per degree.
+    """
+
+    range_value: float
+    ppm_of_reading: float
+    ppm_of_range: float
+    tempco_ppm_of_reading_per_c: float = 0.0
+    tempco_ppm_of_range_per_c: float = 0.0
+    interval: str = "1 year"
+    band_c: tuple[float, float] = CAL_BAND_C
+
+    def limit(self, reading: float, ambient_c: float = 23.0) -> float:
+        """The +/- limit this row allows on one reading, in the reading's own unit.
+
+        Raises ValueError for a reading larger than the range, which is an overload and not a
+        measurement: the MDN-6100 answers one with `+9.900000E+37` and an empty error queue, so
+        refusing to price it as a reading is the whole point.
+        """
+        value = abs(float(reading))
+        if not math.isfinite(value):
+            raise ValueError(f"not a finite reading: {reading!r}")
+        if value > self.range_value:
+            raise ValueError(
+                f"{value} is over the {self.range_value} range: an overload, not a reading"
+            )
+        limit = (self.ppm_of_reading * value + self.ppm_of_range * self.range_value) * 1e-6
+        outside = max(0.0, ambient_c - self.band_c[1], self.band_c[0] - ambient_c)
+        if outside > 0.0:
+            limit += (
+                outside
+                * (
+                    self.tempco_ppm_of_reading_per_c * value
+                    + self.tempco_ppm_of_range_per_c * self.range_value
+                )
+                * 1e-6
+            )
+        return limit
+
+
+def _dc_row(
+    range_v: float, ppm_reading: float, ppm_range: float, interval: str
+) -> AccuracySpec:
+    """One MDN-6100 DC volts row. The temperature coefficient is a property of the meter rather
+    than of the interval, and the manual states it as one tenth of the one-year specification per
+    degree, so every row of every interval carries the same pair."""
+    tempco = MDN6100_DC_TEMPCO[range_v]
+    band = CAL_BAND_24H_C if interval == "24 hour" else CAL_BAND_C
+    return AccuracySpec(range_v, ppm_reading, ppm_range, tempco[0], tempco[1], interval, band)
+
+
+#: Temperature coefficient per degree outside the band, per range: (ppm of reading, ppm of range).
+MDN6100_DC_TEMPCO = {
+    0.1: (4.0, 3.5),
+    1.0: (3.0, 0.5),
+    10.0: (3.5, 0.5),
+    100.0: (4.5, 0.6),
+    1000.0: (5.0, 0.6),
+}
+
+#: `mdn6100-programming-manual.md` section 2, DC volts, as ppm of reading + ppm of range. The one
+#: year column is the same specification the manual has always printed in percent: 35 ppm of
+#: reading is 0.0035 percent and 5 ppm of range is 0.0005 percent, and `tests/test_bench.py`
+#: pins that the two spellings agree.
+MDN6100_DC_ACCURACY: dict[str, dict[float, AccuracySpec]] = {
+    "24 hour": {
+        0.1: _dc_row(0.1, 15.0, 30.0, "24 hour"),
+        1.0: _dc_row(1.0, 10.0, 3.0, "24 hour"),
+        10.0: _dc_row(10.0, 12.0, 2.0, "24 hour"),
+        100.0: _dc_row(100.0, 15.0, 3.0, "24 hour"),
+        1000.0: _dc_row(1000.0, 20.0, 3.0, "24 hour"),
+    },
+    "90 day": {
+        0.1: _dc_row(0.1, 25.0, 35.0, "90 day"),
+        1.0: _dc_row(1.0, 20.0, 5.0, "90 day"),
+        10.0: _dc_row(10.0, 25.0, 4.0, "90 day"),
+        100.0: _dc_row(100.0, 30.0, 5.0, "90 day"),
+        1000.0: _dc_row(1000.0, 35.0, 5.0, "90 day"),
+    },
+    "1 year": {
+        0.1: _dc_row(0.1, 40.0, 35.0, "1 year"),
+        1.0: _dc_row(1.0, 30.0, 5.0, "1 year"),
+        10.0: _dc_row(10.0, 35.0, 5.0, "1 year"),
+        100.0: _dc_row(100.0, 45.0, 6.0, "1 year"),
+        1000.0: _dc_row(1000.0, 50.0, 6.0, "1 year"),
+    },
+}
+
+#: The supply's and the load's readback specifications, from their own manuals, in the same row
+#: shape. Those manuals state accuracy as a percent of reading plus a fixed offset, which is the
+#: same thing: a fixed offset is a ppm-of-range term, because the range is fixed.
+#: `+/-(0.05% of reading + 5 mV)` on a 40 V readback is 500 ppm of reading and
+#: `5 mV / 40 V = 125 ppm` of range.
+#:
+#: These are the readback rows and not the programming rows, because a measurement is what an
+#: instrument reports and not what it was told to do. They are here so a recipe that reports a
+#: current or an efficiency can price it, and so that the gap is visible in numbers: at 3 A the
+#: supply's current readback is good to 6 mA, which is 0.2 percent, while the meter reads 5 V to
+#: 45 ppm. That gap is why `calibration-procedure.md` section 2 calibrates nothing against the
+#: supply's own readback, and why an efficiency figure from this bench is a percent-level number
+#: however many digits the arithmetic produces.
+MDN4010_VOLT_READBACK = AccuracySpec(40.0, 500.0, 125.0, interval="1 year")
+MDN4010_CURR_READBACK = AccuracySpec(10.0, 1000.0, 300.0, interval="1 year")
+TRN2400_CURR_READBACK = AccuracySpec(30.0, 1000.0, 5.0e-3 / 30.0 * 1e6, interval="1 year")
+
+
+def dc_range_for(volts: float, ranges: Sequence[float] = Multimeter.DC_RANGES_V) -> float:
+    """The smallest DC volts range that holds this reading, the way `VOLT:DC:RANG` picks one."""
+    value = abs(float(volts))
+    for candidate in sorted(ranges):
+        if candidate >= value:
+            return candidate
+    raise ValueError(f"{volts} is over the largest range, {max(ranges)}")
+
+
+def meter_spec(range_v: float, interval: str = "1 year") -> AccuracySpec:
+    """The MDN-6100 DC volts row for this range and calibration interval."""
+    try:
+        table = MDN6100_DC_ACCURACY[interval]
+    except KeyError:
+        raise ValueError(
+            f"no such calibration interval: {interval!r}; "
+            f"the manual states {', '.join(sorted(MDN6100_DC_ACCURACY))}"
+        ) from None
+    try:
+        return table[range_v]
+    except KeyError:
+        raise ValueError(f"no such DC volts range: {range_v!r}") from None
+
+
+def meter_accuracy_limit_v(
+    reading_v: float,
+    range_v: float | None = None,
+    *,
+    interval: str = "1 year",
+    ambient_c: float = 23.0,
+) -> float:
+    """The +/- accuracy limit on one DC volts reading, in volts.
+
+    With no range given it prices the reading on the range the meter would have selected, which
+    is the best case. Pass the range the reading was actually taken on: a reading taken on the
+    wrong range is the most common way a careful measurement turns out to be ten times worse than
+    the person taking it believed.
+    """
+    chosen = dc_range_for(reading_v) if range_v is None else float(range_v)
+    return meter_spec(chosen, interval).limit(reading_v, ambient_c)
+
+
+def reading_resolution(range_value: float, counts: int = MDN6100_COUNTS) -> float:
+    """The value of the least significant displayed digit on this range."""
+    if counts <= 0:
+        raise ValueError("counts must be positive")
+    return float(range_value) / counts
+
+
+def standard_uncertainty(half_width: float, divisor: float = RECTANGULAR_DIVISOR) -> float:
+    """A limit of +/-`half_width` as a standard uncertainty. Rectangular unless told otherwise."""
+    if half_width < 0.0:
+        raise ValueError("a half width is not negative")
+    if divisor <= 0.0:
+        raise ValueError("a divisor is positive")
+    return half_width / divisor
+
+
+def resolution_uncertainty(range_value: float, counts: int = MDN6100_COUNTS) -> float:
+    """The standard uncertainty of the display's own quantization on this range.
+
+    One least significant digit spans the range's resolution, so the half-width is half of it and
+    the distribution is rectangular: `(r / 2) / sqrt(3)`.
+    """
+    return standard_uncertainty(reading_resolution(range_value, counts) / 2.0)
+
+
+def repeatability_uncertainty(readings: Sequence[float]) -> float:
+    """The standard uncertainty of the mean of n readings: the sample standard deviation over
+    the square root of n. This is the one contribution the bench measures rather than looks up,
+    and it is the only one that gets smaller by taking more readings."""
+    values = [float(v) for v in readings]
+    if len(values) < 2:
+        raise ValueError("repeatability needs at least two readings")
+    return statistics.stdev(values) / math.sqrt(len(values))
+
+
+@dataclass(frozen=True)
+class Contribution:
+    """One named line of an uncertainty budget, already reduced to a standard uncertainty.
+
+    The name is not decoration. A budget whose lines are named is a budget somebody can argue
+    with: the usual outcome of writing one down is discovering that one line is most of the
+    total and that it is not the line anybody expected.
+    """
+
+    name: str
+    standard_uncertainty: float
+    note: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.name.strip():
+            raise ValueError("a contribution has a name")
+        if not math.isfinite(self.standard_uncertainty) or self.standard_uncertainty < 0.0:
+            raise ValueError(f"not a standard uncertainty: {self.standard_uncertainty!r}")
+
+
+def combined_uncertainty(contributions: Iterable[Contribution]) -> float:
+    """The combined standard uncertainty: the root sum of squares of the contributions.
+
+    Squares, so a contribution half the size of another adds a quarter as much, and the largest
+    line is almost the whole answer. That is the practical reason to write the budget out: it
+    says which single thing to improve, and it is usually not the instrument.
+    """
+    squares = [c.standard_uncertainty**2 for c in contributions]
+    if not squares:
+        raise ValueError("an empty budget is not an uncertainty")
+    return math.sqrt(sum(squares))
+
+
+def expanded_uncertainty(combined: float, coverage_factor: float = COVERAGE_FACTOR) -> float:
+    """The expanded uncertainty, `k * uc`. State the k with the number, always."""
+    if combined < 0.0:
+        raise ValueError("a combined uncertainty is not negative")
+    if coverage_factor <= 0.0:
+        raise ValueError("a coverage factor is positive")
+    return coverage_factor * combined
+
+
+def guardbanded_limit(limit: float, expanded: float, *, side: str) -> float:
+    """The acceptance limit that guardbands a specification limit by the expanded uncertainty.
+
+    For an upper limit the acceptance limit is below it; for a lower limit, above it. This is the
+    simple, widely used guardband: the band is the expanded uncertainty itself, so a value inside
+    the acceptance limit is inside the specification with the same confidence k was chosen for.
+    """
+    if expanded < 0.0:
+        raise ValueError("an expanded uncertainty is not negative")
+    if side == "upper":
+        return limit - expanded
+    if side == "lower":
+        return limit + expanded
+    raise ValueError(f"side is 'upper' or 'lower', not {side!r}")
+
+
+def margin_to_limit(value: float, limit: float, *, side: str) -> float:
+    """How much room is left to a limit: positive is inside it, negative is over it."""
+    if side == "upper":
+        return limit - value
+    if side == "lower":
+        return value - limit
+    raise ValueError(f"side is 'upper' or 'lower', not {side!r}")
+
+
+def guarded_verdict(
+    value: float,
+    expanded: float,
+    *,
+    lower: float | None = None,
+    upper: float | None = None,
+) -> str:
+    """Pass, fail, or cannot say, from a value, its expanded uncertainty and its limits.
+
+    Inside every limit by more than the expanded uncertainty is a pass. Outside one by more than
+    the expanded uncertainty is a fail. Anywhere else the measurement has not decided the
+    question, and the honest answer is `cannot say`: measure it better, or move the limit, or
+    accept the risk deliberately. Calling that band a pass is how a wrong unit ships, and calling
+    it a fail is how a good one is scrapped.
+    """
+    if lower is None and upper is None:
+        raise ValueError("a verdict needs at least one limit")
+    if expanded < 0.0:
+        raise ValueError("an expanded uncertainty is not negative")
+    if upper is not None and value > upper + expanded:
+        return VERDICT_FAIL
+    if lower is not None and value < lower - expanded:
+        return VERDICT_FAIL
+    inside = True
+    if upper is not None and value > guardbanded_limit(upper, expanded, side="upper"):
+        inside = False
+    if lower is not None and value < guardbanded_limit(lower, expanded, side="lower"):
+        inside = False
+    return VERDICT_PASS if inside else VERDICT_UNKNOWN
+
+
+def dc_voltage_budget(
+    readings: Sequence[float],
+    *,
+    range_v: float | None = None,
+    interval: str = "1 year",
+    ambient_c: float = 23.0,
+    lead_half_width_v: float | None = LEAD_HALF_WIDTH_V,
+) -> tuple[Contribution, ...]:
+    """The four-line budget for one DC voltage measured on this bench, in volts.
+
+    Meter accuracy at the mean of the readings, the display's resolution, the repeatability of
+    the readings themselves, and the test-lead and connection contribution. Pass
+    `lead_half_width_v=None` for a measurement the leads cancel out of, which is every
+    measurement that is the difference of two readings through the same path.
+    """
+    values = [float(v) for v in readings]
+    if not values:
+        raise ValueError("a budget needs at least one reading")
+    mean = statistics.fmean(values)
+    chosen = dc_range_for(mean) if range_v is None else float(range_v)
+    lines = [
+        Contribution(
+            "meter accuracy",
+            standard_uncertainty(
+                meter_spec(chosen, interval).limit(mean, ambient_c)
+            ),
+            f"{interval} specification, {chosen} V range, {ambient_c} degC",
+        ),
+        Contribution(
+            "resolution",
+            resolution_uncertainty(chosen),
+            f"{reading_resolution(chosen) * 1e6:g} uV per count",
+        ),
+    ]
+    if len(values) > 1:
+        lines.append(
+            Contribution(
+                "repeatability",
+                repeatability_uncertainty(values),
+                f"{len(values)} readings",
+            )
+        )
+    if lead_half_width_v:
+        lines.append(
+            Contribution(
+                "leads and connections",
+                standard_uncertainty(lead_half_width_v),
+                f"+/-{lead_half_width_v * 1e6:g} uV, from the fixture record",
+            )
+        )
+    return tuple(lines)
+
+
 __all__ = [
+    "AccuracySpec",
     "Approval",
     "Bench",
+    "CAL_BAND_24H_C",
+    "CAL_BAND_C",
+    "COVERAGE_FACTOR",
+    "Contribution",
+    "LEAD_HALF_WIDTH_V",
+    "MDN4010_CURR_READBACK",
+    "MDN4010_VOLT_READBACK",
+    "MDN6100_COUNTS",
+    "MDN6100_DC_ACCURACY",
+    "MDN6100_DC_TEMPCO",
+    "RECTANGULAR_DIVISOR",
+    "TRN2400_CURR_READBACK",
+    "VERDICT_FAIL",
+    "VERDICT_PASS",
+    "VERDICT_UNKNOWN",
     "Dut",
     "ElectronicLoad",
     "GuardedLoad",
@@ -1295,6 +1771,19 @@ __all__ = [
     "SafetyRefusal",
     "ScpiError",
     "Wiring",
+    "combined_uncertainty",
+    "dc_range_for",
+    "dc_voltage_budget",
+    "expanded_uncertainty",
+    "guardbanded_limit",
+    "guarded_verdict",
     "is_read_only",
+    "margin_to_limit",
+    "meter_accuracy_limit_v",
+    "meter_spec",
     "parse_number",
+    "reading_resolution",
+    "repeatability_uncertainty",
+    "resolution_uncertainty",
+    "standard_uncertainty",
 ]

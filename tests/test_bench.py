@@ -15,6 +15,7 @@ Three things are being pinned here, and they are different kinds of claim.
 from __future__ import annotations
 
 import math
+import statistics
 import sys
 import unittest
 from pathlib import Path
@@ -24,7 +25,35 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from examples.common.bench import (  # noqa: E402
+    CAL_BAND_C,
     COUT_F,
+    COVERAGE_FACTOR,
+    LEAD_HALF_WIDTH_V,
+    MDN4010_CURR_READBACK,
+    MDN4010_VOLT_READBACK,
+    MDN6100_DC_ACCURACY,
+    R_LOSS_TEMPCO_PER_C,
+    TRN2400_CURR_READBACK,
+    T_REF_C,
+    VERDICT_FAIL,
+    VERDICT_PASS,
+    VERDICT_UNKNOWN,
+    VOUT_TEMPCO_V_PER_C,
+    AccuracySpec,
+    Contribution,
+    combined_uncertainty,
+    dc_range_for,
+    dc_voltage_budget,
+    expanded_uncertainty,
+    guardbanded_limit,
+    guarded_verdict,
+    margin_to_limit,
+    meter_accuracy_limit_v,
+    meter_spec,
+    reading_resolution,
+    repeatability_uncertainty,
+    resolution_uncertainty,
+    standard_uncertainty,
     ERR_ILLEGAL_VALUE,
     ERR_MISSING_PARAM,
     ERR_OUT_OF_RANGE,
@@ -173,6 +202,366 @@ class TestDutAgreesWithDatasheet(unittest.TestCase):
         # the ESR term and the usual edge ringing.
         self.assertAlmostEqual(1000.0 * marginal.lc_ripple_v(24.0, 3.0), 31.1, delta=0.2)
         self.assertAlmostEqual(1000.0 * marginal.measured_ripple_v(24.0, 3.0), 43.6, delta=0.5)
+
+
+class TestDutOverTemperature(unittest.TestCase):
+    """The two temperature terms, and the soak data that fixes how big they are allowed to be."""
+
+    def setUp(self) -> None:
+        self.dut = Dut()
+
+    def test_the_datasheet_point_is_unchanged_at_twenty_five_degrees(self) -> None:
+        for vin, iout in ((24.0, 1.0), (9.0, 3.0), (32.0, 0.1), (12.0, 2.0)):
+            self.assertAlmostEqual(
+                self.dut.vout_at_c(vin, iout, T_REF_C), self.dut.vout_v(vin, iout), places=12
+            )
+            self.assertAlmostEqual(
+                self.dut.efficiency_at_c(vin, iout, T_REF_C),
+                self.dut.efficiency_pct(vin, iout),
+                places=12,
+            )
+
+    def test_the_output_coefficient_is_the_one_the_soak_data_allows(self) -> None:
+        """soak-2026-08-27.csv: a healthy board falls 1.2 mV to 2.5 mV over a 36 degC case rise.
+
+        Anything like a few hundred microvolts per degree would have shown up there as tens of
+        millivolts, so the bench cannot claim one in a characterization sweep either.
+        """
+        drop_v = abs(VOUT_TEMPCO_V_PER_C) * 36.0
+        self.assertGreater(drop_v, 0.0012)
+        self.assertLess(drop_v, 0.0025)
+
+    def test_output_falls_with_ambient_by_the_two_stated_terms(self) -> None:
+        # At 70 degC, 45 degrees above the reference: the output coefficient plus the extra droop
+        # a 0.35 %/degC conduction path produces at this current.
+        vin, iout, tamb = 9.0, 3.0, 70.0
+        rise = tamb - T_REF_C
+        expected = (
+            self.dut.vout_v(vin, iout)
+            + VOUT_TEMPCO_V_PER_C * rise
+            - self.dut.load_coeff_v_per_a * iout * R_LOSS_TEMPCO_PER_C * rise
+        )
+        self.assertAlmostEqual(self.dut.vout_at_c(vin, iout, tamb), expected, places=12)
+        self.assertAlmostEqual(1000.0 * (self.dut.vout_v(vin, iout) - expected), 5.56, places=2)
+
+    def test_the_worst_corner_is_hot_low_line_and_full_load(self) -> None:
+        corners = [
+            (vin, iout, tamb)
+            for vin in (9.0, 12.0, 24.0, 32.0)
+            for iout in (0.1, 1.0, 3.0)
+            for tamb in (0.0, 25.0, 70.0)
+        ]
+        worst = min(corners, key=lambda c: self.dut.vout_at_c(*c))
+        self.assertEqual(worst, (9.0, 3.0, 70.0))
+        self.assertGreater(self.dut.vout_at_c(*worst), 4.900)
+
+    def test_a_warmer_board_loses_a_little_more_and_draws_a_little_more(self) -> None:
+        cold = self.dut.loss_at_c(24.0, 3.0, 0.0)
+        hot = self.dut.loss_at_c(24.0, 3.0, 70.0)
+        self.assertGreater(hot, cold)
+        # Only the conduction term moves: 0.065 ohm * 9 A^2 * 0.35 %/degC * 70 degrees.
+        self.assertAlmostEqual(hot - cold, 0.065 * 9.0 * R_LOSS_TEMPCO_PER_C * 70.0, places=9)
+        self.assertLess(self.dut.efficiency_at_c(24.0, 3.0, 70.0), self.dut.efficiency_pct(24.0, 3.0))
+
+    def test_a_board_carries_its_own_regulation_coefficients(self) -> None:
+        """A population of prototypes is not a population of one design's typical numbers."""
+        marginal = Dut(line_coeff_v_per_v=0.000651)
+        line_reg_pct = 100.0 * (marginal.vout_v(32.0, 1.0) - marginal.vout_v(9.0, 1.0)) / 5.000
+        self.assertAlmostEqual(line_reg_pct, 0.2995, places=4)
+        typical = 100.0 * (self.dut.vout_v(32.0, 1.0) - self.dut.vout_v(9.0, 1.0)) / 5.000
+        self.assertAlmostEqual(typical, 0.115, places=3)
+
+
+class TestMeterAccuracySpecification(unittest.TestCase):
+    """Every figure in `mdn6100-programming-manual.md` section 2, recomputed from the table."""
+
+    READING_V = 4.9930
+
+    def uv(self, volts: float) -> float:
+        return volts * 1e6
+
+    def test_ppm_and_percent_are_the_same_specification(self) -> None:
+        spec = meter_spec(10.0, "1 year")
+        by_percent = 0.000035 * self.READING_V + 0.000005 * 10.0
+        self.assertAlmostEqual(spec.limit(self.READING_V), by_percent, places=12)
+
+    def test_the_three_calibration_intervals(self) -> None:
+        # Section 2: 79.9 uV, 164.8 uV and 224.8 uV for the same 4.9930 V reading.
+        expected = {"24 hour": 79.9, "90 day": 164.8, "1 year": 224.8}
+        for interval, micro in expected.items():
+            self.assertAlmostEqual(
+                self.uv(meter_spec(10.0, interval).limit(self.READING_V)), micro, places=1
+            )
+
+    def test_the_wrong_range_costs_what_the_table_says(self) -> None:
+        """Section 2: 824.7 uV on the 100 V range against 224.8 uV on the 10 V range."""
+        on_10 = meter_spec(10.0).limit(self.READING_V)
+        on_100 = meter_spec(100.0).limit(self.READING_V)
+        self.assertAlmostEqual(self.uv(on_10), 224.8, places=1)
+        self.assertAlmostEqual(self.uv(on_100), 824.7, places=1)
+        self.assertAlmostEqual(on_100 / on_10, 3.67, places=2)
+        # All of the difference is the range term, which grew twelvefold: 600 uV against 50 uV.
+        self.assertAlmostEqual(self.uv(5.0e-6 * 10.0), 50.0, places=6)
+        self.assertAlmostEqual(self.uv(6.0e-6 * 100.0), 600.0, places=6)
+        # while the reading term barely moved: 174.8 uV against 224.7 uV.
+        self.assertAlmostEqual(self.uv(35e-6 * self.READING_V), 174.8, places=1)
+        self.assertAlmostEqual(self.uv(45e-6 * self.READING_V), 224.7, places=1)
+
+    def test_the_temperature_coefficient_applies_per_degree_outside_the_band(self) -> None:
+        # Section 8: at 35 degC, seven degrees outside, the limit goes 224.8 uV -> 382.1 uV.
+        inside = meter_spec(10.0).limit(self.READING_V, 23.0)
+        outside = meter_spec(10.0).limit(self.READING_V, 35.0)
+        per_degree = (3.5e-6 * self.READING_V + 0.5e-6 * 10.0)
+        self.assertAlmostEqual(self.uv(outside - inside), self.uv(7.0 * per_degree), places=6)
+        self.assertAlmostEqual(self.uv(outside - inside), 157.3, places=1)
+        self.assertAlmostEqual(self.uv(outside), 382.1, places=1)
+
+    def test_the_band_edges_add_nothing(self) -> None:
+        low, high = CAL_BAND_C
+        base = meter_spec(10.0).limit(self.READING_V, 23.0)
+        for ambient in (low, high, 23.0):
+            self.assertAlmostEqual(meter_spec(10.0).limit(self.READING_V, ambient), base, places=12)
+        self.assertGreater(meter_spec(10.0).limit(self.READING_V, low - 0.5), base)
+
+    def test_the_twenty_four_hour_row_has_its_own_narrower_band(self) -> None:
+        """23 +/-1 degC, not 18 to 28: a tighter specification comes with a tighter band."""
+        self.assertEqual(meter_spec(10.0, "24 hour").band_c, (22.0, 24.0))
+        self.assertEqual(meter_spec(10.0, "1 year").band_c, CAL_BAND_C)
+        self.assertGreater(
+            meter_spec(10.0, "24 hour").limit(self.READING_V, 26.0),
+            meter_spec(10.0, "24 hour").limit(self.READING_V, 23.0),
+        )
+
+    def test_every_row_of_every_interval_is_present_and_gets_looser_with_time(self) -> None:
+        for range_v in (0.1, 1.0, 10.0, 100.0, 1000.0):
+            day, quarter, year = (
+                meter_spec(range_v, interval) for interval in ("24 hour", "90 day", "1 year")
+            )
+            probe = range_v / 2.0
+            self.assertLess(day.limit(probe), quarter.limit(probe), range_v)
+            self.assertLess(quarter.limit(probe), year.limit(probe), range_v)
+        self.assertEqual(set(MDN6100_DC_ACCURACY), {"24 hour", "90 day", "1 year"})
+
+    def test_an_unknown_interval_or_range_is_refused(self) -> None:
+        with self.assertRaises(ValueError):
+            meter_spec(10.0, "5 year")
+        with self.assertRaises(ValueError):
+            meter_spec(3.0)
+
+    def test_a_reading_over_the_range_is_an_overload_and_not_a_measurement(self) -> None:
+        with self.assertRaises(ValueError):
+            meter_spec(0.1).limit(4.9930)
+        with self.assertRaises(ValueError):
+            meter_spec(10.0).limit(float("nan"))
+
+    def test_the_range_the_meter_would_pick(self) -> None:
+        self.assertEqual(dc_range_for(4.9930), 10.0)
+        self.assertEqual(dc_range_for(0.022), 0.1)
+        self.assertEqual(dc_range_for(-24.0), 100.0)
+        with self.assertRaises(ValueError):
+            dc_range_for(1200.0)
+        # and `meter_accuracy_limit_v` uses it when no range is given
+        self.assertAlmostEqual(
+            meter_accuracy_limit_v(4.9930), meter_spec(10.0).limit(4.9930), places=12
+        )
+        self.assertAlmostEqual(
+            meter_accuracy_limit_v(4.9930, 100.0), meter_spec(100.0).limit(4.9930), places=12
+        )
+
+    def test_resolution_is_the_range_over_a_million(self) -> None:
+        self.assertAlmostEqual(reading_resolution(10.0), 10e-6, places=12)
+        self.assertAlmostEqual(reading_resolution(0.1), 100e-9, places=15)
+        self.assertAlmostEqual(reading_resolution(100.0), 100e-6, places=12)
+
+    def test_the_supply_and_load_readback_rows_match_their_own_manuals(self) -> None:
+        # mdn4010-programming-manual.md section 2: +/-(0.05% of reading + 5 mV) and
+        # +/-(0.1% of reading + 3 mA). trn2400: +/-(0.1% of reading + 5 mA).
+        self.assertAlmostEqual(MDN4010_VOLT_READBACK.limit(24.0), 0.0005 * 24.0 + 0.005, places=12)
+        self.assertAlmostEqual(MDN4010_CURR_READBACK.limit(3.0), 0.001 * 3.0 + 0.003, places=12)
+        self.assertAlmostEqual(TRN2400_CURR_READBACK.limit(3.0), 0.001 * 3.0 + 0.005, places=12)
+
+    def test_the_supply_readback_is_orders_coarser_than_the_meter(self) -> None:
+        """Why `calibration-procedure.md` section 2 calibrates nothing against it."""
+        supply = MDN4010_VOLT_READBACK.limit(5.0)
+        meter = meter_spec(10.0).limit(5.0)
+        self.assertGreater(supply / meter, 25.0)
+
+
+class TestUncertaintyBudget(unittest.TestCase):
+    """Section 8 of the manual, line by line, recomputed from the functions."""
+
+    READING_V = 4.9930
+    SD_V = 60e-6
+    N = 10
+
+    def readings(self, n: int | None = None, sd: float | None = None) -> list[float]:
+        """n readings with exactly the stated sample standard deviation, symmetric about the mean.
+
+        Built rather than drawn: the budget's arithmetic is what is under test, not a generator.
+        """
+        count = self.N if n is None else n
+        spread = self.SD_V if sd is None else sd
+        base = [float(i) - (count - 1) / 2.0 for i in range(count)]
+        scale = spread / statistics.stdev(base)
+        return [self.READING_V + value * scale for value in base]
+
+    def uv(self, volts: float) -> float:
+        return volts * 1e6
+
+    def test_the_four_lines_of_the_worked_example(self) -> None:
+        budget = dc_voltage_budget(self.readings(), range_v=10.0, interval="1 year", ambient_c=23.0)
+        lines = {c.name: self.uv(c.standard_uncertainty) for c in budget}
+        self.assertEqual(
+            set(lines), {"meter accuracy", "resolution", "repeatability", "leads and connections"}
+        )
+        self.assertAlmostEqual(lines["meter accuracy"], 129.8, places=1)
+        self.assertAlmostEqual(lines["resolution"], 2.9, places=1)
+        self.assertAlmostEqual(lines["repeatability"], 19.0, places=1)
+        self.assertAlmostEqual(lines["leads and connections"], 115.5, places=1)
+
+    def test_the_combined_and_expanded_uncertainty(self) -> None:
+        budget = dc_voltage_budget(self.readings(), range_v=10.0)
+        combined = combined_uncertainty(budget)
+        self.assertAlmostEqual(self.uv(combined), 174.8, places=1)
+        self.assertAlmostEqual(self.uv(expanded_uncertainty(combined)), 349.5, places=1)
+        self.assertEqual(COVERAGE_FACTOR, 2.0)
+        self.assertAlmostEqual(expanded_uncertainty(combined), 2.0 * combined, places=12)
+
+    def test_each_line_is_the_stated_distribution(self) -> None:
+        self.assertAlmostEqual(
+            standard_uncertainty(224.755e-6), 224.755e-6 / math.sqrt(3.0), places=15
+        )
+        self.assertAlmostEqual(resolution_uncertainty(10.0), 5e-6 / math.sqrt(3.0), places=15)
+        self.assertAlmostEqual(
+            repeatability_uncertainty(self.readings()), self.SD_V / math.sqrt(self.N), places=15
+        )
+        self.assertAlmostEqual(
+            standard_uncertainty(LEAD_HALF_WIDTH_V), 200e-6 / math.sqrt(3.0), places=15
+        )
+
+    def test_combining_is_a_root_sum_of_squares(self) -> None:
+        parts = [Contribution("a", 3e-6), Contribution("b", 4e-6)]
+        self.assertAlmostEqual(combined_uncertainty(parts), 5e-6, places=15)
+        with self.assertRaises(ValueError):
+            combined_uncertainty([])
+
+    def test_more_readings_move_the_total_hardly_at_all(self) -> None:
+        """The manual's claim: a hundred readings instead of ten is worth under 2 uV here."""
+        ten = combined_uncertainty(dc_voltage_budget(self.readings(), range_v=10.0))
+        hundred = combined_uncertainty(dc_voltage_budget(self.readings(100), range_v=10.0))
+        self.assertLess(self.uv(ten - hundred), 2.0)
+        self.assertGreater(ten, hundred)
+
+    def test_the_largest_line_is_the_meter_and_the_leads_are_close_behind(self) -> None:
+        budget = sorted(
+            dc_voltage_budget(self.readings(), range_v=10.0),
+            key=lambda c: c.standard_uncertainty,
+            reverse=True,
+        )
+        self.assertEqual(budget[0].name, "meter accuracy")
+        self.assertEqual(budget[1].name, "leads and connections")
+        self.assertLess(budget[0].standard_uncertainty / budget[1].standard_uncertainty, 1.2)
+
+    def test_the_same_reading_on_the_wrong_range(self) -> None:
+        """Section 8's first variation: 982.3 uV instead of 349.5 uV, for the same reading."""
+        wrong = dc_voltage_budget(self.readings(), range_v=100.0)
+        lines = {c.name: self.uv(c.standard_uncertainty) for c in wrong}
+        self.assertAlmostEqual(lines["meter accuracy"], 476.1, places=1)
+        self.assertAlmostEqual(lines["resolution"], 28.9, places=1)
+        expanded = expanded_uncertainty(combined_uncertainty(wrong))
+        self.assertAlmostEqual(self.uv(expanded), 982.3, places=1)
+        right = expanded_uncertainty(combined_uncertainty(dc_voltage_budget(self.readings(), range_v=10.0)))
+        self.assertAlmostEqual(expanded / right, 2.81, places=2)
+
+    def test_a_difference_measurement_drops_the_lead_contribution(self) -> None:
+        """A fixed offset cancels in a difference, which this bench already teaches from the
+        fixture story. The budget for a regulation figure says so by leaving the line out."""
+        budget = dc_voltage_budget(self.readings(5), range_v=10.0, lead_half_width_v=None)
+        self.assertNotIn("leads and connections", {c.name for c in budget})
+        per_reading = combined_uncertainty(budget)
+        self.assertAlmostEqual(self.uv(per_reading), 132.5, places=1)
+        # Two readings, uncorrelated: sqrt(2) * u, expanded at k=2, as a percentage of 5.000 V.
+        expanded_pct = 100.0 * expanded_uncertainty(per_reading * math.sqrt(2.0)) / 5.000
+        self.assertAlmostEqual(expanded_pct, 0.0075, places=4)
+
+    def test_one_reading_has_no_repeatability_line(self) -> None:
+        budget = dc_voltage_budget([self.READING_V], range_v=10.0)
+        self.assertNotIn("repeatability", {c.name for c in budget})
+        with self.assertRaises(ValueError):
+            repeatability_uncertainty([self.READING_V])
+
+
+class TestGuardbanding(unittest.TestCase):
+    """The three-outcome limit check, and the acceptance limits it comes from."""
+
+    def test_an_upper_limit_moves_down_and_a_lower_limit_moves_up(self) -> None:
+        self.assertAlmostEqual(guardbanded_limit(5.0500, 350e-6, side="upper"), 5.04965, places=6)
+        self.assertAlmostEqual(guardbanded_limit(4.9500, 350e-6, side="lower"), 4.95035, places=6)
+        with self.assertRaises(ValueError):
+            guardbanded_limit(5.0, 1e-6, side="either")
+
+    def test_the_manual_s_worked_reading_passes_with_room(self) -> None:
+        expanded = 349.5e-6
+        self.assertEqual(
+            guarded_verdict(4.9930, expanded, lower=4.9500, upper=5.0500), VERDICT_PASS
+        )
+        self.assertAlmostEqual(
+            margin_to_limit(4.9930, 4.9500, side="lower") / expanded, 123.0, places=0
+        )
+
+    def test_inside_the_limit_by_less_than_the_uncertainty_is_not_a_pass(self) -> None:
+        # 0.2995 percent against a 0.300 percent limit, with 0.0075 points of expanded
+        # uncertainty: inside the limit, and not shown to be inside it.
+        self.assertEqual(guarded_verdict(0.2995, 0.0075, upper=0.300), VERDICT_UNKNOWN)
+        self.assertAlmostEqual(margin_to_limit(0.2995, 0.300, side="upper"), 0.0005, places=6)
+        self.assertLess(margin_to_limit(0.2995, 0.300, side="upper"), 0.0075)
+
+    def test_outside_the_limit_by_more_than_the_uncertainty_is_a_fail(self) -> None:
+        self.assertEqual(guarded_verdict(0.3335, 0.0075, upper=0.300), VERDICT_FAIL)
+        self.assertEqual(guarded_verdict(4.8950, 350e-6, lower=4.9000), VERDICT_FAIL)
+
+    def test_the_two_boundaries_are_where_the_arithmetic_puts_them(self) -> None:
+        expanded = 0.010
+        # just inside the acceptance limit, just outside it, and just past the limit itself
+        self.assertEqual(guarded_verdict(0.2899, expanded, upper=0.300), VERDICT_PASS)
+        self.assertEqual(guarded_verdict(0.2901, expanded, upper=0.300), VERDICT_UNKNOWN)
+        self.assertEqual(guarded_verdict(0.3099, expanded, upper=0.300), VERDICT_UNKNOWN)
+        self.assertEqual(guarded_verdict(0.3101, expanded, upper=0.300), VERDICT_FAIL)
+
+    def test_a_verdict_needs_a_limit(self) -> None:
+        with self.assertRaises(ValueError):
+            guarded_verdict(1.0, 0.1)
+
+    def test_a_zero_uncertainty_collapses_to_an_ordinary_limit_check(self) -> None:
+        """The production log's own verdict column, which is this with the uncertainty left out."""
+        for value, verdict in ((4.9930, VERDICT_PASS), (5.0600, VERDICT_FAIL)):
+            self.assertEqual(
+                guarded_verdict(value, 0.0, lower=4.9500, upper=5.0500), verdict
+            )
+
+    def test_the_margin_sign_says_which_side_of_the_limit(self) -> None:
+        self.assertAlmostEqual(margin_to_limit(22.5, 50.0, side="upper"), 27.5, places=9)
+        self.assertAlmostEqual(margin_to_limit(52.0, 50.0, side="upper"), -2.0, places=9)
+        self.assertAlmostEqual(margin_to_limit(4.9930, 4.9500, side="lower"), 0.0430, places=9)
+
+
+class TestAccuracySpecIsGeneral(unittest.TestCase):
+    """The row type is not the MDN-6100's: any instrument that states ppm of reading plus ppm of
+    range fits it, which is what makes the budget functions portable off this bench."""
+
+    def test_a_row_for_some_other_instrument(self) -> None:
+        spec = AccuracySpec(1.0, 100.0, 20.0, 10.0, 2.0, interval="6 month", band_c=(20.0, 26.0))
+        self.assertAlmostEqual(spec.limit(0.5, 23.0), (100.0 * 0.5 + 20.0 * 1.0) * 1e-6, places=15)
+        self.assertAlmostEqual(
+            spec.limit(0.5, 30.0),
+            ((100.0 * 0.5 + 20.0) + 4.0 * (10.0 * 0.5 + 2.0 * 1.0)) * 1e-6,
+            places=15,
+        )
+
+    def test_a_contribution_has_a_name_and_a_non_negative_value(self) -> None:
+        for name, value in (("", 1e-6), ("   ", 1e-6), ("leads", -1e-6), ("leads", float("nan"))):
+            with self.assertRaises(ValueError, msg=f"{name!r} {value!r}"):
+                Contribution(name, value)
 
 
 class TestParseNumber(unittest.TestCase):
