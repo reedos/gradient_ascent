@@ -3,24 +3,24 @@ slug: order-zero
 level: 0
 run: order-zero
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Elasticsearch"
     url: "https://www.elastic.co/elasticsearch"
     publisher: "Elastic"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "OpenSearch"
     url: "https://opensearch.org/"
     publisher: "OpenSearch Software Foundation"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "scikit-learn: machine learning in Python"
     url: "https://scikit-learn.org/stable/"
     publisher: "scikit-learn"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "XGBoost Documentation"
     url: "https://xgboost.readthedocs.io/en/stable/"
     publisher: "XGBoost"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -62,29 +62,34 @@ file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-You already use level zero constantly without thinking of it that way. The search box on most
-documentation sites and helpdesks is keyword search (often Elasticsearch or OpenSearch running
-behind the scenes<Cite n={1}/><Cite n={2}/>) not a model reading every page for you. A form that
-asks "which appliance do you own" from a dropdown is a rule, not an AI feature, even on a site
-that also has a chatbot elsewhere. A spam filter is the textbook case of the third kind: one
-label predicted from past examples, millions of times a day, with no language model reading your
-mail: scikit-learn names spam detection as a classification job on its own front page<Cite n={3}/>.
+You already use level zero constantly without thinking of it that way. The search box on many
+documentation sites and helpdesks is keyword search, not a model reading every page for you:
+Elastic markets Elasticsearch for customer support search<Cite n={1}/>, and OpenSearch lists
+document search among its own capabilities<Cite n={2}/>. A form that asks "which appliance do you
+own" from a dropdown is a rule, not an AI feature, even on a site that also has a chatbot
+elsewhere. A spam filter is the textbook case of the third kind: one label predicted from past
+examples, no language model involved: scikit-learn names spam detection as a classification job
+on its own front page<Cite n={3}/>.
 
-The question that matters here is not "could a model do this" (a model can usually attempt
-almost anything). It is whether ordinary code already does it as well, for a fraction of the
-cost. Whether it does, on your own data, is something to measure rather than assume in either
-direction. Two checks settle most cases. First: can the input be described as a fixed set of shapes (a
-part number, a five-option dropdown, an email address) or a small, known vocabulary? If so, a
-rule or a form is often enough, and it can be tested exhaustively rather than sampled. Second, and
-the one people skip: what does a wrong answer cost, and how would you notice it? A keyword search
-that returns the wrong manual section is annoying but visible: the passage is right there, and a
-reader can see it doesn't answer the question. A language model that confidently answers from the
-wrong section, or states a plausible number that is not the right one, can look identical to a
-correct answer until someone checks it by hand. If a wrong answer is cheap to catch and cheap to
-be wrong about, level 0's failure mode (an obviously irrelevant result) is the safer one to
-ship, even if a model would get more questions right overall. If getting it wrong is expensive
-(money moves, a part gets ordered, a warranty claim is approved) that argues for a level with an
-explicit check built in, whichever level ends up doing the work.
+The question that matters is not whether a model could do this; it is whether ordinary code
+already does it as well, for a fraction of the cost, which is worth measuring on your own data
+rather than assuming. Two checks settle most cases. First: can the input be described as a
+fixed set of shapes (a part number, a five-option dropdown) or a small, known vocabulary? If so, a
+rule or a search is often enough. Second: what does a wrong answer cost, and how would you notice
+it? A keyword search that misses is visible, the passage is right there to check. A language
+model that confidently answers from the wrong section can look identical to a correct answer
+until someone checks it by hand. When a wrong answer is cheap to catch, level 0's obviously
+irrelevant failure mode is the safer one to ship, even if a model would get more questions right
+overall. When getting it wrong is expensive (money moves, a part gets ordered, a warranty claim is
+approved), an explicit check earns its cost, whichever level does the work.
+
+The same argument holds on a bench, across production test, engineering test at low volume, and
+precise measurement. A limit check is a comparison. A yield is a count. A Cpk is a mean, a
+standard deviation and a subtraction. A margin to a specification is a subtraction; an
+uncertainty budget is a root sum of squares. None of that needs a model, and a model never
+produces the reported measurement, the uncertainty, the margin or the verdict. This is the
+<Link href="/shapes/#look-up-or-calculate">look something up, or work it out from numbers you
+already have</Link> job shape, and level 0 is the whole of it.
 
 </Lane>
 <Lane name="build" title="Build it">
@@ -202,6 +207,7 @@ ever called.
   { lane: 'use', body: 'Find a search box you use often (a help center, a docs site, your email client) and try a question phrased with a synonym instead of the site\'s own vocabulary. Does it still find the right result?' },
   { lane: 'build', body: 'Run python -m examples.order_zero --question "How often should the DW-300\'s filter be cleaned?" from the repo root, then ask the same question about a fact the corpus never states. Compare the two scores.' },
   { lane: 'either', body: 'Pick a task you do by hand today and write down what a wrong answer would actually cost you, in money or time, and how long it would take you to notice. That number is most of the decision this page is about.' },
+  { lane: 'either', body: 'Take a limit check, a yield, or a Cpk you have seen at a bench, in production test, engineering test, or a precise measurement, and write down what actually computes it: a comparison, a count, a subtraction. Check that nowhere in that chain is a language model producing the number.' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

@@ -3,25 +3,25 @@ slug: chat
 level: 1
 run: chat
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Claude Sonnet 5"
     url: "https://platform.claude.com/docs/en/models/sonnet-5/overview"
     publisher: "Anthropic"
     date: "2026-06-30"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Claude"
     url: "https://claude.com/product/overview"
     publisher: "Anthropic"
-    accessed: "2026-09-18"
-  - title: "OpenAI API documentation"
-    url: "https://developers.openai.com/api/docs/overview"
+    accessed: "2026-09-19"
+  - title: "OpenAI API Platform Documentation"
+    url: "https://developers.openai.com/api/docs"
     publisher: "OpenAI"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Ollama"
     url: "https://ollama.com/"
     publisher: "Ollama"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -82,10 +82,9 @@ model answered you, which the product usually shows in a menu.
 A **tool** is something a developer builds with, not something a person chats in directly.
 OpenAI's API documentation points a developer at the API to "prompt a model and generate text" or
 to "build agents that use tools and computers"<Cite n={3}/>: code calls it; a person does not type
-into it directly. Ollama is a different kind of tool: it
-runs a model on your own machine instead of over the network, so that "nothing you run locally
-ever leaves your machine"<Cite n={4}/>. Neither is a product on its own; each is what someone
-else's product, or your own code, gets built on top of.
+into it directly. Ollama is a different kind of tool: it can run a model on your own machine, and
+states plainly, "Nothing you run locally ever leaves your machine"<Cite n={4}/>. Neither is a
+product on its own; each is what someone else's product, or your own code, gets built on top of.
 
 Once these four are apart, a lot of confusion resolves itself. "Is Claude as good as GPT-6 Astra"
 compares a product to a model, which is not quite the right question, since a product can run
@@ -209,6 +208,7 @@ run before spending anything on a real one.
   { lane: 'use', body: 'Open a chat app and check which model answered your last message, usually shown in a menu or settings panel. Ask it its own knowledge cutoff date and compare that against what the product\'s own documentation says.' },
   { lane: 'build', body: 'Run python -m examples.one_call --model stub --question "What voltage does a DR-210 need?" from the repo root, then ask it something real and common instead, like the boiling point of water, and compare how the two replies differ.' },
   { lane: 'either', body: 'Pick a name from the "Out there" list at the bottom of this page and say which of the four kinds it is: developer, model, product, or tool.' },
+  { lane: 'build', body: 'At a bench, paste a paragraph from an instrument programming manual into a chat app and ask it to summarize the paragraph: that is a safe use, since the text is right there for you to check. Then ask it, with nothing attached, to state a specific accuracy figure from memory, and notice that a fluent answer is not a reported measurement: a chat app never produces one.' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
