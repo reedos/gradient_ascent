@@ -76,41 +76,43 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-"Harness" is rarely a word a product shows you, but its effects are what you notice between two
-agents built on comparable models: one stops and asks before touching a file outside the project,
-one runs for an hour before checking in, one keeps a running account of a whole project and one
-starts fresh every session. None of that difference is the model's doing.
+If you use a chat app and will never run an agent, skip this page. A harness is the code wrapped
+around the model, written by whoever built the agent product, and there is no box for you to type
+in. The pages that are yours are <Link href="/techniques/coding-agents/">coding agents</Link> and
+<Link href="/techniques/agent-teammates/">always-on assistants</Link>.
 
-Four places to look for the harness in any agent product. **What it lets the model see:**
-Anthropic's Claude Agent SDK documents automatic compaction firing as a long session grows —
-"When the context window approaches its limit, the SDK automatically compacts the conversation: it
-summarizes older history to free space, keeping your most recent exchanges and key decisions
-intact"<Cite n={2}/>. Anthropic's engineering blog describes tool result clearing, a lighter version
-of the same idea, as one of the "safest lightest touch forms of compaction"<Cite n={3}/>. A product
-that never seems to forget anything is not necessarily running a bigger model; it may just be
-compacting well.
+If you do operate an agent product, one thing here earns your time: when an agent behaves badly,
+the fix is usually a setting rather than a better prompt. Four settings, and what each one looks
+like when it is the cause.
 
-**What it will let run.** Anthropic's SDK lets a hook "short-circuit the loop: a PreToolUse hook
-that rejects a tool call prevents it from executing, and Claude receives the rejection message
-instead"<Cite n={2}/>. This is the same veto shape this page's own example builds. OpenAI's Codex
-documents the same split from the sandbox side: "Sandboxing and approvals are different controls
-that work together. The sandbox defines technical boundaries. The approval policy decides when the
-agent must stop and ask before crossing them"<Cite n={6}/>: enforced on macOS "using the built-in Seatbelt
-framework"<Cite n={6}/>, and, between asking every time and never asking, a policy that can "keep
-specific approval prompt categories interactive while automatically rejecting others"<Cite n={7}/>.
+**What it remembers.** Anthropic's Claude Agent SDK documents automatic compaction firing as a
+long session grows: "When the context window approaches its limit, the SDK automatically compacts
+the conversation: it summarizes older history to free space, keeping your most recent exchanges
+and key decisions intact"<Cite n={2}/>. Anthropic's engineering blog describes tool result
+clearing, a lighter version of the same idea, as one of the "safest lightest touch forms of
+compaction"<Cite n={3}/>. An agent that dropped your constraint two hours into a session did not
+ignore it; it summarized it away. Restate the constraint in your next message rather than starting
+the whole task again.
 
-**What it costs to run past a demo.** A hard cap on steps or spend is a harness decision, not a
-model one: see <Link href="/techniques/single-agent/">single agent</Link> for what happens when
-one is hit.
+**What it may run without asking.** OpenAI's Codex documentation states the split: "Sandboxing and
+approvals are different controls that work together. The sandbox defines technical boundaries. The
+approval policy decides when the agent must stop and ask before crossing them"<Cite n={6}/>,
+enforced on macOS "using the built-in Seatbelt framework"<Cite n={6}/>. Between asking every time
+and never asking, a policy can "keep specific approval prompt categories interactive while
+automatically rejecting others"<Cite n={7}/>. Start on the setting that asks, and loosen one
+category at a time once you have watched what that category actually does.
 
-**What a session hands off.** Anthropic's engineering blog describes a subagent that may explore
-at length and return "only a condensed, distilled summary of its work"<Cite n={3}/> to the harness
-that spawned it: see <Link href="/techniques/long-horizon/">long-running tasks</Link> for the
-version that spans separate processes, and <Link href="/techniques/memory/">memory</Link> for what
-a harness keeps on purpose rather than by summary.
+**What it costs before it stops.** A cap on steps or spend is a harness decision, not a model one,
+and a run that hits one usually ends mid-task with no error: see
+<Link href="/techniques/single-agent/">single agent</Link>.
 
-None of this is a reason to distrust an agent product. It is a reason to read what its own
-documentation says about these four things before assuming a rough session was the model's fault.
+**What a session hands on.** A subagent may explore at length and return "only a condensed,
+distilled summary of its work"<Cite n={3}/> to the harness that spawned it. That is why an agent's
+account of what it did can be thinner than what it did, and why
+<Link href="/techniques/memory/">memory</Link> is a separate setting from the summary.
+
+Read those four in your own product's documentation before concluding a rough session was the
+model's fault.
 
 </Lane>
 <Lane name="build" title="Build it">

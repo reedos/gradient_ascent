@@ -65,36 +65,35 @@ yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Almost nothing you can subscribe to today is a genuine standing organization of agents; what
-exists and ships is a framework a developer assembles, not a product you turn on. MetaGPT is the
-one this page can name with a source: its own README states the idea outright, as
-"Assign different roles to GPTs to form a collaborative entity for complex tasks", and lists
+There is nothing here to sign up for. A standing organization of agents is a framework a developer
+assembles, not a product you turn on, and this site can name no service selling one today. If what
+you want is an assistant that keeps working while you are away, that is
+<Link href="/techniques/agent-teammates/">always-on assistants</Link>, and it is the one shape at
+this level you can actually buy.
+
+The nearest named thing is a developer's framework. MetaGPT's own README states the idea outright,
+as "Assign different roles to GPTs to form a collaborative entity for complex tasks", and lists
 "product managers / architects / project managers / engineers" as the roles it
 includes<Cite n={3}/>. That is a fixed roster running a fixed procedure on one task, closer to a
-simulated org chart than to agents that keep existing and deciding what to work on next.
+simulated org chart than to agents that keep existing and decide what to work on next.
 
-One thing about output from anything built this way is measured, and worth stating exactly as its
-authors do. A 2026 paper ran 500 cascades across 10 knowledge domains on three models, 1,250
-responses in all, passing each answer along a chain of agents that revise it. In three-agent
-chains the normalized hallucination score fell (from 0.422 at the first agent to 0.272 at the
-last) and factual accuracy fell with it, "from 0.789 to 0.769", which the authors call "a
-trade-off between hallucination suppression and factual preservation"<Cite n={4}/>. The chain does suppress
-hallucinations; it also shaves off correct material on the way. Both movements are small, over
-one benchmark, at one chain length, so read it as a direction rather than a rate.
+One measured finding does travel to any product that passes an answer through several agents
+before you see it, whatever the product calls that. A 2026 paper ran 500 cascades across 10
+knowledge domains on three models, 1,250 responses in all, passing each answer along a chain of
+agents that revise it. In three-agent chains the normalized hallucination score fell (from 0.422
+at the first agent to 0.272 at the last) and factual accuracy fell with it, "from 0.789 to 0.769",
+which the authors call "a trade-off between hallucination suppression and factual
+preservation"<Cite n={4}/>. Both movements are small, over one benchmark, at one chain length, so
+read it as a direction rather than a rate. What it means in a meeting: when a vendor says several
+agents checked the answer, ask what the chain dropped, not only what it caught.
 
-The rest of this section is the site's reasoning, not a finding. Four things have to be written
-down before a roster runs without a person in the room, and none come from the model: what
-persists between rounds (the board, the claims, each role's memory), what a role may do
-unattended, what stops for approval, and how the whole organization is halted at once: one
-switch that drains the board and refuses new claims, not a role-by-role hunt while the rest keep
-working.
-
-Accountability is the fifth and the one this page cannot settle. When a mistake reaches a person
-by way of two or three roles that each added something, who is responsible: the role that made
-the error, the one that passed it on, or whoever set the roster up? No maker's page or paper this
-site has read answers that. A calibration certificate carries the name of whoever signed it for
-exactly this reason, and a roster of agents has no equivalent unless someone builds one. Decide
-it on purpose, in writing, before relying on one for anything that matters.
+If someone proposes running a roster like this inside your organization, two questions settle it
+before any demo. "How is the whole thing stopped at once?" A roster needs one switch that drains
+the work and refuses new claims, not a role-by-role hunt while the rest keep working. And "when a
+mistake reaches a customer through three roles that each added something, whose name is on it?"
+No maker's page or paper this site has read answers the second one. A calibration certificate
+carries the name of whoever signed it for exactly this reason, and a roster of agents has no
+equivalent unless somebody writes one down. Get it in writing first, or do not start.
 
 </Lane>
 <Lane name="build" title="Build it">

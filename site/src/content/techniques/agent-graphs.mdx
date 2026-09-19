@@ -58,30 +58,31 @@ file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Agent graphs mostly runs where a reader cannot see it: inside a product's own orchestration layer,
-not as a feature with its own name. What is visible from outside is a multi-step assistant that
-changes strategy mid-task (a support conversation handed to a different specialist thread, or a
-coding agent whose plan clearly branches on what an earlier step found) rather than working
-through the same script every time.
+There is nothing on this page for you to turn on. Agent graphs run inside a product's own
+orchestration layer, assembled by whoever built it, and no product offers one as a feature with a
+name and a settings page. If you are choosing a product rather than writing one, the page you want
+is <Link href="/techniques/agent-teammates/">always-on assistants</Link>, and
+<Link href="/techniques/orchestrator-workers/">a lead and its workers</Link> is the version of
+this shape you can actually watch happen.
 
-The names behind that are ones a reader following the tooling, not a chat app, is more likely to
-meet. LangGraph, Microsoft Agent Framework, CrewAI and Google's Agent Development Kit are all
-registered against this technique. An open protocol exists for the case where agents built on
-different ones of those frameworks have to hand work to each other. Agent2Agent (A2A) states its
-purpose as "Connect agents built on different platforms (LangGraph, CrewAI, Semantic Kernel, custom
-solutions) to create powerful, composite AI systems."<Cite n={2}/> Its own site says A2A was
-"Originally developed by Google and now donated to the Linux Foundation"<Cite n={2}/>, and is at
-version 1.0.
+The names here belong to developers. LangGraph, Microsoft Agent Framework, CrewAI and Google's
+Agent Development Kit are all registered against this technique, and an open protocol exists for
+the case where agents built on different ones of them have to hand work to each other. Agent2Agent
+(A2A) states its purpose as "Connect agents built on different platforms (LangGraph, CrewAI,
+Semantic Kernel, custom solutions) to create powerful, composite AI systems."<Cite n={2}/> Its own
+site says A2A was "Originally developed by Google and now donated to the Linux
+Foundation"<Cite n={2}/>, and is at version 1.0. Microsoft's own framework documentation names the
+shape plainly: "graph-based workflows supporting sequential, concurrent, handoff, and group
+collaboration patterns; includes checkpointing, streaming, human-in-the-loop, and
+time-travel"<Cite n={3}/>: checkpointing and handoff, named together, are exactly the two things
+that separate a graph of agents from a plain loop.
 
-Microsoft's own framework documentation names the shape plainly: "graph-based workflows supporting
-sequential, concurrent, handoff, and group collaboration patterns; includes checkpointing,
-streaming, human-in-the-loop, and time-travel"<Cite n={3}/>: checkpointing and handoff, named
-together, are exactly the two things that separate a graph of agents from a plain loop.
-
-What is worth watching for, in anything built this way: whether a supervisor or router agent's
-choice of who handled a request is visible anywhere (a label, a log line, a named specialist in
-the reply) or whether the handoff is invisible and the only sign one happened is that the tone or
-the accuracy of the answer changes partway through, with nothing told to you about why.
+One consequence does reach you, and it is the only thing here to act on. When a multi-step
+assistant's tone or accuracy changes partway through one answer, a handoff happened. Ask the
+vendor whether the product labels them: "When more than one agent works on a request, does the
+answer or the log say which one produced which part?" A product that tells you gives you something
+to check. A product where the handoff is invisible gives you an answer whose author you cannot
+identify, which is worth weighing before you buy, not after a wrong answer you cannot trace.
 
 </Lane>
 <Lane name="build" title="Build it">

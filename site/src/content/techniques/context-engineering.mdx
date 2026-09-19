@@ -68,26 +68,42 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-If you have used a chat app's "project" or "custom instructions" feature (pinning files and
-instructions that apply to every conversation in that project, instead of retyping them each
-time) you have done context engineering by hand. Anthropic's Claude Projects keeps a project's
-files and instructions available to every conversation inside it: that pinned material is the
-stable part of the request, and what you type each turn is the part that changes<Cite n={5}/>.
-Other makers' chat apps have the same feature; the ones this site has checked are listed under
-Out there at the foot of this page.
+The feature to find is the one that saves instructions and files across conversations instead of
+inside one. Chat apps name it differently: a project, a space, custom instructions, a saved
+assistant. Look in the sidebar or the settings for anything that says the material will apply to
+every new conversation. Anthropic's Claude Projects keeps a project's files and instructions
+available to every conversation inside it: that pinned material is the stable part of the
+request, and what you type each turn is the part that changes<Cite n={5}/>. Other makers' chat
+apps have the same feature; the ones this site has checked are listed under Out there at the foot
+of this page.
 
-Two habits follow. First, put material worth reusing (a style guide, a product's specs, a
-policy document) into the part of the tool that stays fixed across the conversation, rather than
-pasting it into every message; that is both cheaper, if the product passes the saving on, and
-keeps your typed message focused on what actually changed. Second, do not assume a very long
-project or a chat you have been running for hours is still as reliable per turn as a short one,
-even though it technically still fits: more tokens in the request measurably costs answer
-quality, not just money<Cite n={3}/>.
+Pin three things, and nothing else.
 
-There is a ceiling on this habit. Once the material stops fitting comfortably in one request, a
+1. Who the answer is for and what shape it takes. "You are drafting for a twelve-person insurance
+   brokerage. Plain American English, short paragraphs, no bullet lists unless I ask for them."
+2. The rules that never change. "Never state a premium, a deadline or a policy number that is not
+   in the attached documents. If a document does not say, write 'not stated' rather than
+   estimating it."
+3. The reference files themselves: the style guide, the current rate sheet, the standard letter.
+
+Then type only what changed. "Draft the renewal letter for the account in today's file. It
+renews 3/14/2027."
+
+To check it worked, open a brand new conversation inside the project and ask something only the
+pinned material can answer, such as what your style guide says about bullet lists. An answer with
+nothing pasted in means the pinned material is reaching the model. No answer usually means what
+you wrote went into one conversation rather than into the project, which is a different box in
+most products.
+
+Two moves when the answers get worse instead of better. Start a fresh conversation rather than
+continuing one that has run for hours: more in the request measurably costs answer quality, not
+just money<Cite n={3}/>, and a new conversation keeps the pinned material while dropping the
+accumulated back-and-forth. And stop adding files once they stop fitting. Past that point a
 product stops sending all of it and starts searching instead, which is
-<Link href="/techniques/rag/">RAG</Link>; Claude Projects makes that switch on its own, and the
-RAG page quotes what Anthropic claims for it. Where the line falls is the next block down.
+<Link href="/techniques/rag/">RAG</Link>; Claude Projects makes that switch on its own.
+
+None of this is worth setting up for a question you will ask once, with nothing to reuse. Type
+the question.
 
 </Lane>
 <Lane name="build" title="Build it">

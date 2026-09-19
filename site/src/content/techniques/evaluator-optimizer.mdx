@@ -56,20 +56,41 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-No product in this site's registry is documented well enough yet to name here as a plain example
-of a person using this pattern from the outside: most of what looks like "the model checked its
-own work" in a chat app is either a single model reasoning at length before answering (a level-1
-technique) or an agent that runs a real test and decides what to do about a failure itself (level
-4 or 5), not a fixed, code-owned draft-check-revise loop with an outside cap. If you have used a
-tool that visibly shows a reviewing or double-checking step before the final answer appears, that
-is worth treating as an unverified claim until it is checked against how the product's own
-documentation describes it, not assumed to be this pattern.
+You can run this loop by hand in any chat app, and it is the move to reach for when a draft is
+nearly right and "make it better" has stopped changing anything. The one rule is that you write
+the criteria down before you read the draft. A criterion invented while looking at a draft is an
+opinion about that draft.
 
-What is worth watching for, in any product that claims to check its own output: whether the
-checking step is told a specific, testable thing to look for, or just asked whether the draft is
-good. The second version is common and mostly cosmetic: it adds a pause and a second cost, not a
-real check, because "is this good" is not something a second pass of the same kind of model can
-answer any more reliably than the first pass could.
+Three messages, in the same conversation.
+
+1. Ask for the draft. "Write a 200-word notice to tenants about the elevator being out from
+   4/6/2027 to 4/10/2027. Plain English, no apology longer than one sentence, say where the
+   freight elevator is."
+2. Hand over the checklist and ask for a verdict, not a rewrite. "Check the draft above against
+   these four rules. Answer each one yes or no and quote the line that proves it: (1) it gives
+   both dates, (2) it says where the freight elevator is, (3) it is under 220 words, (4) no
+   sentence runs past 25 words. Do not rewrite it."
+3. Fix only what failed. "Fix rules 2 and 4. Change nothing else."
+
+Stop after two rounds. If the same rule fails a third time, the rule is the problem rather than
+the draft: either nobody could tell yes from no by reading it, or what you actually want is
+something you have not written down yet.
+
+The check on the exercise itself is whether the verdict ever changes anything. If every rule comes
+back yes on the first pass, add a rule you expect the draft to break and see whether it catches
+it. A checker that never says no is not a check, it is a delay.
+
+Ask the same thing of any product advertising this. Does its checking step test something
+specific, or does it ask whether the draft is good? The second is common and mostly cosmetic: a
+pause and a second bill, not a check, because "is this good" is not something a second pass of the
+same kind of model answers more reliably than the first pass did. No product in this site's
+registry is documented well enough to name here as a ready-made version of this loop, so treat a
+visible "reviewing" step as an unverified claim until the product's documentation says what it
+tests.
+
+When one clear instruction gets it right first time, skip all of this. That is
+<Link href="/techniques/prompt-engineering/">prompt engineering</Link>, and it costs one message
+instead of three.
 
 </Lane>
 <Lane name="build" title="Build it">

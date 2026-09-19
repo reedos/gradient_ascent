@@ -50,35 +50,33 @@ number.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Most people who benefit from a gateway never call one directly; a company's own product calls it
-on their behalf. The sign one is in front of you is usually indirect: a product that keeps
-working when a provider has an outage, that seems to answer easy questions from a different,
-faster model than hard ones, or whose account has one bill covering several providers' usage.
-OpenRouter, a hosted service, calls itself "The Unified Interface For Every Model" on its front
-page and pitches "Better prices, better uptime, no subscriptions"; the feature it lists there for
+This one is not yours, and no amount of looking will make it visible. A gateway is a piece of a
+company's own plumbing: one entry point its code calls instead of calling each model provider
+directly. There is no setting for you to change, nothing to type, and no product feature that
+switches one on. Two things still land on you, though, and both are worth five minutes.
+
+The first is who sees your text. A gateway of either kind sees every prompt sent and every
+response returned, in full, because that is what routing and logging a call requires. A hosted one
+is a third party seeing that traffic on top of whatever the model provider itself sees, under its
+own logging and retention terms, not the model maker's. OpenRouter, a hosted service, calls itself
+"The Unified Interface For Every Model" on its front page, and the feature it lists there for
 outages is "Higher Availability", described as "Reliable AI models via our distributed
-infrastructure. Fall back to other providers when one goes down"<Cite n={1}/>. Those are the
-maker's words for what its product is for, not a result this site has checked.
+infrastructure. Fall back to other providers when one goes down"<Cite n={1}/>. Cloudflare AI
+Gateway is another, whose documented features include caching, rate limiting, logging and "model
+fallbacks in case of an error"<Cite n={3}/>. Those are the makers' words for what their products
+do, not results this site has checked. So when you are buying an AI product for your team, put one
+sentence in writing to the vendor: "Does our text pass through any service other than the model
+provider you name, and whose retention terms cover it?" A vendor who cannot answer that in a
+sentence has not thought about it. It is <Link href="/techniques/safety/">safety, privacy and
+governance</Link>'s question, asked of one more company on the route.
 
-What a gateway costs is a new component between you and the model, and a new question about who
-sees your traffic. A gateway of either kind sees every prompt sent and every response returned,
-in full, because that is what routing and logging a call requires. A hosted one (OpenRouter is
-one, and Cloudflare AI Gateway another, whose documented features include caching, rate limiting,
-logging and "model fallbacks in case of an error"<Cite n={3}/>) is a third party seeing that
-traffic on top of whatever the model provider itself sees, under its own logging and retention
-terms, not the model maker's. Check its documentation for what it stores, for how long, and
-whether logging prompt and response content can be turned off; see
-<Link href="/techniques/safety/">safety, privacy and governance</Link> for the same question
-asked of an intermediary in general. A self-hosted gateway, the mode LiteLLM's own proxy is built
-to run as, keeps that hop inside infrastructure you already control, at the cost of running and
-patching one more service yourself. Neither is strictly better: it is the same shape of trade-off
-<Link href="/techniques/local-inference/">running a model locally</Link> makes against calling an
-API, one layer up the stack.
+The second is what an outage looks like. A product that starts failing every request at once,
+rather than getting slower or dropping one feature, is showing a single component going down, not
+five providers failing together. Report it that way instead of spending an afternoon on your own
+account settings.
 
-If a product you use suddenly starts failing every request instead of degrading gracefully, a
-gateway outage is worth considering before assuming every provider behind it is down at once.
-That is the trade the entry point makes: one component in front of five providers replaces five
-integrations, and it also becomes the one thing whose going down takes all five with it.
+If you came here because you are paying the bill, the page you want is
+<Link href="/techniques/ops/">ops</Link>.
 
 </Lane>
 <Lane name="build" title="Build it">
