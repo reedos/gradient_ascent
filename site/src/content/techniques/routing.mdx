@@ -3,26 +3,26 @@ slug: routing
 level: 3
 run: routing
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Building effective agents"
     url: "https://www.anthropic.com/engineering/building-effective-agents"
     publisher: "Anthropic"
     date: "2024-12-19"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Paths"
     url: "https://zapier.com/features/paths"
     publisher: "Zapier"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "semantic-router"
     url: "https://github.com/aurelio-labs/semantic-router"
     publisher: "Aurelio Labs (GitHub README)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Introducing System One Models & Jev"
     url: "https://typesafe.ai/blog/introducing-system-one-models-and-jev"
     publisher: "TypeSafe AI"
     date: "2026-09-15"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -40,27 +40,22 @@ import Link from '../../components/page/Link.astro';
 import routingRun from '../../data/runs/routing.json';
 
 Routing looks at an input, decides which of several fixed kinds it is, and sends it down the
-path built for that kind. Anthropic's own description: "routing classifies an input and directs
-it to a specialized followup task," which lets you build "more specialized prompts" for each
-kind instead of one prompt that has to handle every case<Cite n={1}/>. Its other example spends
-the same idea on cost rather than on prompt content: easy questions to a smaller, cheaper model,
-hard ones to a larger, more capable one<Cite n={1}/>.
+path built for that kind. Anthropic's description is "Routing classifies an input and directs it
+to a specialized followup task", which it says allows separation of concerns and "building more
+specialized prompts"<Cite n={1}/>. Its second example spends the idea on cost instead: easy or
+common questions to smaller, cost-efficient models, hard or unusual ones to more capable
+ones<Cite n={1}/>.
 
-The classifying step is a code-owned decision even though a model produces the label. The model
-answers a narrow question with one word; your code reads that word and looks it up in a table of
-handlers it wrote in advance. The line to level 4 falls exactly there. At level 4 the model is
-offered a tool and its output invokes one directly; here the label is only a value your code
-branches on, the same as any other text a model returns.
+Routing sits at level 3, workflows. The classifying step is a code-owned decision even though a
+model produces the label: the model answers a narrow question with one word, and your code looks
+that word up in a table of handlers it wrote in advance. The line to level 4 falls there. At
+level 4 the model is offered a tool and its output invokes one directly; here the label is only a
+value your code branches on.
 
-Routing sits at level 3, workflows. Your code owns every handler, the mapping from label to
-handler, and the fallback when no label fits confidently.
-
-A model built for exactly this step appeared in September 2026. TypeSafe AI's Jev generates no
-text; it returns a typed choice with a probability, and TypeSafe lists "classify, route, score,
-extract, or branch where hand-written logic is too brittle" as what it is for, at "70ms-500ms" a
-call<Cite n={4}/>. A probability is useful to a router in a way a bare label is not: send the
-confident cases straight through and the doubtful ones to a person or a larger model. It is in
-early access, and the figures are TypeSafe's own, unmeasured here.
+A model built for exactly this step appeared in September 2026. TypeSafe AI's Jev returns a typed
+choice instead of text, with what TypeSafe calls "calibrated probabilities and confidence
+scores"<Cite n={4}/>. A probability is worth more to a router than a bare label. Jev is in early
+access, and that is TypeSafe's claim, not a measurement here.
 
 This page is marked draft, not published: routing has no recorded trace and no scored result
 file yet, so nothing below is measured. It is illustrated.
@@ -90,6 +85,20 @@ largest bucket, the router is not routing: it is mostly declining, and whatever 
 bucket needs to be a real path rather than a quiet drop, because "unclear" is usually where the
 questions that need a person's judgment end up. Sending that bucket to someone is <Link
 href="/techniques/human-in-the-loop/">human approval</Link>, the last technique at this level.
+A classifier that returns a confidence alongside the label gives you a second place to draw that
+line: the confident cases go straight through, and the doubtful ones go to a person or to a
+larger model.
+
+At a bench the same shape is failure triage. A failing unit carries the step it failed on and an
+operator's note in free text, and the failure analysis guide already lists the causes, so a
+classifier can sort the failure into one of them and route it. Two things stay in code: the pass
+or fail itself, and the rule that a listed cause starts an investigation rather than settling
+it, confirmed on the board before it is recorded. Below production volume the economics change:
+five prototypes on a characterization sweep do not produce enough failures for a classifier to
+earn its keep, and one careful measurement has nothing to sort.
+
+Routing is one of the techniques behind the <Link href="/shapes/#classify-and-route">sort
+incoming items and send each where it belongs</Link> job shape.
 
 </Lane>
 <Lane name="build" title="Build it">
@@ -110,9 +119,9 @@ is a plain dict the code wrote before the first question ever arrived. The model
 value comes out of `_parse_label`; it cannot add a fourth key to `ROUTES`.
 
 The fallback route matters as much as the working ones. `_numeric_route` calls the fallback
-itself when the label says "numeric" but no part number pattern actually appears in the question
-: the classifier can be confident about the wrong thing, and the honest response is to defer
-rather than to force an answer out of a handler that has nothing to work with.
+itself when the label says "numeric" but no part number pattern actually appears in the
+question. The classifier can be confident about the wrong thing, and the honest response is to
+defer rather than to force an answer out of a handler that has nothing to work with.
 
 <CodeFile file="examples/routing/run.py" start={24} end={97} expect="LEVEL = 3" />
 

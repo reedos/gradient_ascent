@@ -3,33 +3,33 @@ slug: parallelization
 level: 3
 run: parallelization
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Building effective agents"
     url: "https://www.anthropic.com/engineering/building-effective-agents"
     publisher: "Anthropic"
     date: "2024-12-19"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Introducing Replit Agent 4: Built for Creativity"
     url: "https://replit.com/blog/introducing-agent-4-built-for-creativity"
     publisher: "Replit"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Subagents"
     url: "https://code.claude.com/docs/en/subagents"
     publisher: "Anthropic (Claude Code documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Batch processing"
     url: "https://platform.claude.com/docs/en/build-with-claude/batch-processing"
     publisher: "Anthropic"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Batch API"
     url: "https://developers.openai.com/api/docs/guides/batch"
     publisher: "OpenAI"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Batch API"
     url: "https://ai.google.dev/gemini-api/docs/batch-api"
     publisher: "Google"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -47,7 +47,7 @@ import Link from '../../components/page/Link.astro';
 import parallelRun from '../../data/runs/parallelization.json';
 
 Parallel calls run more than one model call at the same time instead of one after another, and
-combine the results in code. Anthropic describes two distinct variations<Cite n={1}/>. **Sectioning**
+combine the results in code. Anthropic describes two variations<Cite n={1}/>. **Sectioning**
 breaks one task into independent subtasks that each run in parallel: one call screens a request
 for policy violations while another handles it, or several calls each evaluate a different
 aspect of the same output. **Voting** runs the *same* task several times and combines the
@@ -77,9 +77,11 @@ parallel, with progress visible and coordinated," and for larger jobs it "can sp
 into smaller pieces, work on them simultaneously with sub-agents, and recombine the
 results"<Cite n={2}/>.
 Claude Code's subagents feature documents the same pattern for research rather than code: "For
-independent investigations, spawn multiple subagents to work simultaneously"; then "each subagent
-explores its area independently, then Claude synthesizes the findings"<Cite n={3}/>. That is
-sectioning with a model doing the combining, which is the part that sits above this level.
+independent investigations, spawn multiple subagents to work simultaneously". The documentation
+then says that "Each subagent explores its area independently, then Claude synthesizes the
+findings", and adds that "This works best when the research paths don't depend on each
+other"<Cite n={3}/>. That is sectioning with a model doing the combining, which is the part that
+sits above this level.
 
 Voting is harder to spot from the outside: several runs of the same question, combined into one
 answer. It costs several times what asking once costs, so it earns its place only where a wrong
@@ -90,6 +92,15 @@ The habit worth building either way: before firing several calls at once, check 
 actually splits into genuinely independent parts. If two of the "sections" you're about to run in
 parallel actually depend on each other's answer, that is a sequence, and running it in parallel
 does not fix that; it just makes the dependency invisible until the combine step falls apart.
+
+Sectioning has a plain engineering version, and it is the <Link
+href="/shapes/#review-against-criteria">check a piece of work against written rules</Link> job
+shape: take one board's bill of materials and netlist summary, check it against the written
+design review rules one call per rule, and combine the findings in code. The rule list is known
+before any call runs, which is what keeps this at level 3. It reads the same on a production
+revision as on one of five prototypes being characterized. What it does not do is decide
+anything: a margin and a verdict stay arithmetic, and a finding that cites no rule text is
+dropped by code rather than argued with.
 
 </Lane>
 <Lane name="build" title="Build it">
