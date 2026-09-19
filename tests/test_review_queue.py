@@ -13,7 +13,7 @@ import datetime as dt
 import io
 import sys
 import unittest
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -281,8 +281,12 @@ class CliTests(unittest.TestCase):
         self.assertEqual(out1, out2)
 
     def test_an_invalid_today_value_is_reported_not_crashed(self) -> None:
-        code, _ = self._run(["--today", "not-a-date"])
+        # The message goes to stderr, so capture that too rather than leave it in the suite's log.
+        err = io.StringIO()
+        with redirect_stderr(err):
+            code, _ = self._run(["--today", "not-a-date"])
         self.assertEqual(code, 2)
+        self.assertIn("not-a-date", err.getvalue())
 
     def test_stale_only_omits_the_fresh_page(self) -> None:
         _, out = self._run(["--today", "2026-09-19", "--stale-only"])
@@ -350,8 +354,13 @@ class RealContentSmokeTest(unittest.TestCase):
             self.assertNotIn("\\", rec["path"], rec["path"])
 
     def test_running_the_script_over_real_content_exits_cleanly(self) -> None:
-        code = review_queue.main(["--today", "2026-09-19"])
+        # Captured, not printed: a test that dumps ninety rows into the suite's log makes the
+        # one line that matters, a failure, harder to find.
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            code = review_queue.main(["--today", "2026-09-19"])
         self.assertEqual(code, 0)
+        self.assertIn("page(s) checked", buf.getvalue())
 
 
 if __name__ == "__main__":

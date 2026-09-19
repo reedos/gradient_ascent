@@ -12,7 +12,7 @@
 //
 // Everything here is pure: data in, strings out. site/tests/changes.test.ts drives it under plain
 // `node --test`, including the Atom rendering, which is the part most likely to break quietly.
-import data from '../../../content/changes.json';
+import data from '../../../content/changes.json' with { type: 'json' };
 
 export interface ChangePage {
   label: string;

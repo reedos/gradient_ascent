@@ -12,8 +12,8 @@
 //
 // The rendering is pure: data in, string out, no Astro and no filesystem, so site/tests can
 // exercise it under plain `node --test`.
-import data from '../../../content/frontier.json';
-import { usDate } from './dates';
+import data from '../../../content/frontier.json' with { type: 'json' };
+import { usDate } from './dates.ts';
 
 export interface FrontierSource {
   title: string;
