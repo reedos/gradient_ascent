@@ -32,6 +32,12 @@ def main(argv: list[str] | None = None) -> int:
     model = build_cli_model(args.model, example="context_engineering", script=SCRIPTED)
     tracer = Tracer(example="context_engineering", level=LEVEL, model_id=model.model_id)
     answer = run(args.question, model, None, tracer)
+    # The answer alone could have come from any level. What makes this one level 2 rather than
+    # RAG is the size and the shape of the prompt it was assembled from, and that lives in the
+    # trace, so print those steps beside it.
+    for step in tracer.steps:
+        size = f" [{step.tokens_in} tokens in]" if step.tokens_in else ""
+        print(f"{step.title}{size}: {step.detail}")
     print(answer.text)
     return 0
 
