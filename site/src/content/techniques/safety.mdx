@@ -23,10 +23,10 @@ sources:
     url: "https://github.com/NVIDIA-NeMo/Guardrails"
     publisher: "NVIDIA"
     accessed: "2026-09-18"
-  - title: "Llama Guard 4"
-    url: "https://developer.meta.com/ai/docs/model-cards-and-prompt-formats/llama-guard-4/"
-    publisher: "Meta"
-    accessed: "2026-09-18"
+  - title: "Llama Guard 4 Model Card"
+    url: "https://huggingface.co/meta-llama/Llama-Guard-4-12B"
+    publisher: "Meta (model card)"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -147,12 +147,13 @@ injected requests refused against the share of legitimate ones permitted.
 
 Keeping the check outside the model is what the guardrail frameworks in this page's sources do
 too. NVIDIA's NeMo Guardrails describes itself as a toolkit for "adding programmable guardrails
-to LLM-based conversational systems," with input rails that "can reject the input," output rails
-on what the model generated, and execution rails "applied to input/output of custom actions
-(a.k.a. tools)"<Cite n={5}/>. Meta documents Llama Guard 4 as a separate safeguard model whose
-"guardrails can be applied both on the input and output of the model," answering `safe`, or
-`unsafe` with the categories it matched<Cite n={6}/>. Neither asks the model under test to
-police itself.
+to LLM-based conversational systems", with input rails that "can reject the input", output rails
+on what the model generated, and execution rails "applied to input/output of the custom actions
+(a.k.a. tools)"<Cite n={5}/>. Meta's own model card describes Llama Guard 4 as "a natively
+multimodal safety classifier" that "can be used to classify content in both LLM inputs (prompt
+classification) and in LLM responses (response classification)", generating text "that indicates
+whether a given prompt or response is safe or unsafe, and if unsafe, it also lists the content
+categories violated"<Cite n={6}/>. Neither asks the model under test to police itself.
 
 </Lane>
 </Lanes>

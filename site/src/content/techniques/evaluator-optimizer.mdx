@@ -33,9 +33,9 @@ import evalOptRun from '../../data/runs/evaluator-optimizer.json';
 Write and check runs two prompts against each other: one writes, a separate one checks the result
 against explicit criteria, and if it fails, the first revises and the check runs again. Anthropic
 describes it as "one LLM call generates a response while another provides evaluation and feedback
-in a loop," worth its cost "when we have clear evaluation criteria, and... iterative refinement
-provides measurable value": its examples are literary translation and a search task that takes
-several rounds to get right<Cite n={1}/>.
+in a loop", and calls the workflow "particularly effective when we have clear evaluation criteria,
+and when iterative refinement provides measurable value": its examples are literary translation
+and "Complex search tasks that require multiple rounds of searching and analysis"<Cite n={1}/>.
 
 "Clear evaluation criteria" is the load-bearing phrase. A checker asked whether an answer is
 "good" is a second draft with extra steps: with no fixed thing to test for, its verdict drifts

@@ -10,7 +10,7 @@ sources:
     publisher: "Anthropic"
     date: "2024-12-19"
     accessed: "2026-09-18"
-  - title: "Introducing Agent 4, built for creativity"
+  - title: "Introducing Replit Agent 4: Built for Creativity"
     url: "https://replit.com/blog/introducing-agent-4-built-for-creativity"
     publisher: "Replit"
     accessed: "2026-09-18"
@@ -125,15 +125,16 @@ Run it yourself:
 
 Real-time parallel calls like these are for when the answer is needed now. When it is not (a
 nightly re-score of every open ticket, a one-time pass over a large document set), the batch
-APIs three model makers publish do the same "many calls, one submission" idea asynchronously and
-cheaper: Anthropic's Message Batches API "reduc[es] costs by 50%... with most batches finishing
-in less than 1 hour"<Cite n={4}/>; OpenAI's Batch API gives "a 50% cost discount compared to
+APIs three model makers publish do the same many-calls-one-submission idea asynchronously and
+cheaper: Anthropic describes its Message Batches API as suited to tasks that do not need an
+immediate response, "with most batches finishing in less than 1 hour while reducing costs by 50%
+and increasing throughput"<Cite n={4}/>; OpenAI's Batch API gives a "50% cost discount compared to
 synchronous APIs" with each batch completing "within 24 hours (and often more quickly)"<Cite
 n={5}/>; Google states that its Gemini Batch API processes requests at "50% of the standard cost"
-and that "the target turnaround time is 24 hours, but in majority of cases, it is much
-quicker"<Cite n={6}/>. Each of those is the maker's own published figure, checked on the date in
-the source list below, and each is the same trade: give up the immediate response, halve the
-price.
+and says of the wait: "The target turnaround time is 24 hours, but in majority of cases, it is
+much quicker"<Cite n={6}/>. Each of those is the maker's own published figure, checked on the
+date in the source list below, and each is the same trade: give up the immediate response, halve
+the price.
 
 </Lane>
 </Lanes>

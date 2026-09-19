@@ -77,9 +77,10 @@ is showing you the trace this page's run diagram illustrates in miniature: check
 in the report actually traces back to one of the searches shown, the same way you would check
 RAG's citations, and watch for a report that cites a source it never appears to have opened.
 
-The loop also has a cap you do not see. OpenAI's API lets a developer set `max_tool_calls` "to
-control the total number of tool calls... that the model will make before returning a
-result"<Cite n={3}/>; the products built on this pattern have some version of the same limit. A
+The loop also has a cap you do not see. OpenAI documents a `max_tool_calls` parameter a developer
+can set when creating a deep research request, "to control the total number of tool calls (like to
+web search or an MCP server) that the model will make before returning a result"<Cite n={3}/>; the
+products built on this pattern have some version of the same limit. A
 report that reads as thinner than the question deserved, especially on something with several
 parts to it, may be a run that hit its cap rather than one that ran out of things to find.
 

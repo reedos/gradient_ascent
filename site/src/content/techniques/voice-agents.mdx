@@ -9,7 +9,7 @@ sources:
     url: "https://developers.openai.com/api/docs/guides/realtime-conversations"
     publisher: "OpenAI (API documentation)"
     accessed: "2026-09-18"
-  - title: "Get started with Live API"
+  - title: "Gemini Live API overview"
     url: "https://ai.google.dev/gemini-api/docs/live-api"
     publisher: "Google"
     accessed: "2026-09-18"
@@ -76,12 +76,13 @@ conversation.
 
 Turn detection is more than silence-counting in the systems that document it well. LiveKit ships a
 turn-detector model that "Predicts end of turn from both the meaning of speech and its acoustic
-properties, on top of VAD," and an endpointing delay that sets "how long the agent waits after
-speech... before treating the turn as complete"<Cite n={3}/>. Interruption handling has a similar
-subtlety: LiveKit says its framework "pauses the agent's speech whenever it detects user speech in
-the input audio," and offers an adaptive mode meant to tell "true interruptions from conversational
-backchanneling" apart (a caller saying "mm-hmm" should not cut the agent off) with the agent
-resuming "from where it left off" once a false interruption is detected<Cite n={3}/>.
+properties, on top of VAD", and an endpointing delay that controls "how long the agent waits after
+speech (or after an STT end-of-utterance signal) before treating the turn as
+complete"<Cite n={3}/>. Interruption handling has a similar subtlety: LiveKit says its framework
+"pauses the agent's speech whenever it detects user speech in the input audio", and offers an
+adaptive mode meant to tell "true interruptions from conversational backchanneling" apart (a
+caller saying "mm-hmm" should not cut the agent off), after which, it says, "By default, the agent
+resumes speaking from where it left off after a false interruption"<Cite n={3}/>.
 
 Disclosure is a rule some platforms impose on their own customers. ElevenLabs requires the
 organizations using its agents to tell callers "They are interacting with AI rather than a human"

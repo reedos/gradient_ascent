@@ -72,10 +72,11 @@ price for questions a smaller one would have answered.
 
 A product hitting its own rate limit looks, from the outside, like it's just slow or briefly
 broken. Anthropic's own API documentation describes its limits as requests, input tokens and
-output tokens per minute, enforced with a "token bucket algorithm" so "capacity is continuously
-replenished... rather than being reset at fixed intervals," with a 429 error naming which limit
-was hit<Cite n={1}/>. A product that retries a failed request quietly is doing you a favor; one
-that just errors during a spike is passing its own capacity problem on to you.
+output tokens per minute, enforced with a "token bucket algorithm" so that "your capacity is
+continuously replenished up to your maximum limit, rather than being reset at fixed intervals",
+with a 429 error naming which limit was hit<Cite n={1}/>. A product that retries a failed request
+quietly is doing you a favor; one that just errors during a spike is passing its own capacity
+problem on to you.
 
 Running a model on your own hardware instead of an API is its own trade-off, not a strictly
 better choice. Ollama, one tool built for this, says of running locally that "nothing you run
@@ -120,11 +121,11 @@ so the site's 60-question set does not score it, and `docs/EVALS.md` says so wit
 This site's `trace.json` is its own small format, built for stepping through one recorded run on
 a page, not for production monitoring across every call a system makes. A real deployment
 generally reaches for a shared standard instead: OpenTelemetry describes itself as "vendor- and
-tool-agnostic," an "observability framework and toolkit" for producing traces, metrics and logs
-that many different backends can read, explicitly leaving "the backend (storage) and the frontend
-(visualization)... to other tools"<Cite n={4}/>. These are the same tokens-in, tokens-out and wall-time
-fields this example reads out of a trace file, but emitted in a shape a tracing backend already
-knows how to store, query and alert on.
+tool-agnostic", an "observability framework and toolkit" for producing traces, metrics and logs
+that many different backends can read, and says that "The backend (storage) and the frontend
+(visualization) of telemetry data are intentionally left to other tools"<Cite n={4}/>. These are
+the same tokens-in, tokens-out and wall-time fields this example reads out of a trace file, but
+emitted in a shape a tracing backend already knows how to store, query and alert on.
 
 </Lane>
 </Lanes>

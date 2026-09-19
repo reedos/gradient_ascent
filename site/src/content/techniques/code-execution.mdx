@@ -75,9 +75,10 @@ model writes runs inside them, whatever it turns out to be.
 
 The same question about permission applies here as with any tool: if the sandbox can reach a
 service that needs a password or a key, where does that credential live? E2B, a sandbox product
-outside the chat apps, documents keeping "secrets in a vault that injects them at the egress
-proxy, so the value never enters the sandbox"<Cite n={3}/>: available to the network call the
-code makes, never to the code itself. If a product shows you the code it ran, read it before
+outside the chat apps, lists a "Secrets vault" whose description is "Keys your agent can use but
+never read", and says of the boundary around it that "the sandbox reaches out under your egress
+policy, never around it"<Cite n={3}/>: available to the network call the code makes, never to the
+code itself. If a product shows you the code it ran, read it before
 trusting the number or chart sitting next to it.
 
 </Lane>
