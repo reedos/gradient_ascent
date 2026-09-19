@@ -4,8 +4,224 @@ reviewed: 2026-09-19
 sources: []
 ---
 
-A board's output is low and the next measurement to take depends on what the last one said. That is the shape an agent fits. It also means something on the bench is going to be set, and set points are where a bench goes from a debugging session to a damaged board, so the tools divide cleanly: queries run unattended and anything that sets state goes through a code-side envelope and a person.
+import Link from '../../components/page/Link.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
 
-Draft in progress. This page is a slot: the taxonomy entry, the techniques it composes and the
-level it needs are settled, and the writing is not. See `docs/WRITING-AN-ENGINEERING-RECIPE.md`
-for what belongs here, and `docs/THE-BENCH.md` for the bench every engineering recipe runs on.
+A batch of Orbeck SRB-5030 regulator boards is running at 92 percent first-pass yield, and one
+serial, SRB5030-2608-0011, just failed the VOUT step on fixture FIX-03: 4.9497 V against a
+4.9500 V floor, three tenths of a millivolt under. Every other step on its log passes, most by a
+wide margin. Before that board goes to failure analysis and gets opened up, an engineer wants to
+know whether it is actually a bad board, or a fixture reading low, and what to check next to tell
+the two apart.
+
+That last question is the job. It is not whether this unit is in spec, a comparison the test
+executive already made; it is what the log and one more reading say about what to check next. The
+artifacts an engineer reaches for are the ones this bench keeps: the day's test log,
+the datasheet and test spec, the calibration procedure, the bring-up notebook, and the failure
+analysis guide, plus the bench itself for a confirmation reading. An assistant that works this
+bench needs the same access and no more: it can look at all of that, and it must never be able to
+change what the bench is doing while somebody is trusting its answer.
+
+## Level 5, and why not a fixed checklist
+
+This is level 5, an agent in a loop, because which measurement to take next depends on what the
+last one said, and a fixed order gets that wrong in both directions. Compare two boards that
+failed the same step for different reasons.
+
+SRB5030-2608-0011's log has one failure. Steps 4 and 5 (line and load regulation), 6 (efficiency)
+and 7 (ripple) all pass comfortably. That pattern, one absolute reading off and everything
+downstream of it normal, is what `failure-analysis-guide.md` section 7 calls the signature of a
+stale channel offset, not a board fault: "Only measurements that read an absolute value through
+the affected channel move, because a fixed offset cancels in the difference the regulation steps
+take".
+
+SRB5030-2608-0063 also failed VOUT on FIX-03, at -0.0300 V, logged with the note "dead. no vout at
+all, u1 not switching". Its efficiency step reads 0.00 percent against an 88 percent floor, and
+its current-limit step trips at 3.50 A, the lowest current tried. That board needs none of the
+fixture-versus-board reasoning SRB5030-2608-0011 does: the first tool call already answers it.
+
+A level 3 workflow, code deciding a fixed order in advance, could certainly encode a script: read
+the log, then always compare the DMM against the load's own terminal reading, then always check
+the calibration procedure. That order is right for 0011 and wastes two calls on 0063, where the
+DMM and the load terminals would simply agree, both near zero, and the log already had the answer.
+Run it the other way, read the log and then go straight to failure analysis, and it scraps a good
+board and a good fixture cycle to fix nothing. The order that is right depends on the shape of the
+first answer, which is exactly what a level 5 loop is for and a checklist is not.
+
+The next level up, <Link href="/techniques/orchestrator-workers/">a second agent</Link> reviewing
+the first one's cause before it reaches a person, would catch a wrong read the first agent stated
+with confidence. It costs another agent's worth of calls on every board investigated, not just the
+ones where the first agent was wrong, and it duplicates a check a person already makes here: the
+proposed cause and the next measurement go to an engineer before anything about the board changes.
+That trade is worth it when a wrong diagnosis is expensive relative to a person's five minutes
+reading a trace; on this bench, it is not, so this recipe stops at level 5.
+
+## The three classes of command, and why the envelope holds the board's limits
+
+Every command on this bench falls into one of three classes, and this recipe's agent can only
+ever reach the first one.
+
+| Class | What it is | Who may run it |
+| --- | --- | --- |
+| Read only | `*IDN?`, `SYST:ERR?`, every measurement and status query | The agent, unattended |
+| Sets state | voltage, current limit, mode, range, coupling, `*RST` | Code, after `SafetyEnvelope` |
+| Energizes a board | `OUTP ON` on the supply, `INP 1` on the load | Code, plus a person's `Approval` naming the set point |
+
+`SafetyEnvelope`'s limits are 32.0 V and a 4.0 A supply current limit, not the Maridun MDN-4010's
+own 40 V and 10 A. The supply can do 40 V because it is one instrument shared across every board
+this line tests; the envelope is scoped to the SRB-5030 in the fixture, whose input ceiling is
+32.0 V for the revisions in the field (ECN-2608-04's derating rule) and whose output is rated
+3.0 A. The 4.0 A limit sits above that 3.0 A rating on purpose, so a current-limit fault trips
+before the inductor's 4.5 A saturation point rather than exactly at the number the board is
+supposed to draw. An instrument's own ceiling says what it can survive; the envelope says what
+this board can, and those are different numbers for a reason.
+
+The board is already energized when this recipe's agent starts, brought up by a technician
+through that same checked sequence. The agent's own tools never touch `SafetyEnvelope`,
+`GuardedSupply`, `GuardedLoad`, or `Approval` at all, because nothing it can call reaches them:
+
+<CodeFile file="examples/bench_bring_up_debug_assistant/run.py" func="_bring_up" />
+
+## The run on the bench, stepped
+
+The agent gets three tools, `test_log`, `read_doc`, and `measure`, and a symptom: SRB5030-2608-0011
+failed VOUT on FIX-03. It has no fixed script for what to call next.
+
+**Read the log.** `test_log("SRB5030-2608-0011")` returns all eight logged steps. Step 3 is the
+only failure: `4.9497V (limits 4.9500..5.0500) FAIL`, with the operator's note "low again on
+fix3, thats 3 today". Steps 4 through 8 pass, most with room to spare.
+
+**Read the failure guide.** `read_doc("failure-analysis-guide#3")` matches the symptom, output low
+but alive, and its routing is explicit: "Check the fixture before the board". That points at
+`read_doc("failure-analysis-guide#7")`, the section that separates a stale channel offset from an
+open sense connection by which steps move: one step for an offset, three for an open sense. Here,
+one step moved.
+
+**Take a confirmation reading, two ways.** `measure("dmm", "MEAS:VOLT:DC?")` reads the output
+through the fixture's own channel: `+4.963000E+00`, 4.963 V. `measure("load", "MEAS:VOLT?")`
+reads the same node at the electronic load's own terminals, bypassing that channel entirely:
+`4.9930V`. The two readings of one node disagree by about 30 mV, the size of FIX-03's own
+recorded offset, which is the signature section 7 describes: the channel, not the board.
+
+**A command that does not get through.** The next call is `measure("dmm", "*RST")`, an attempt to
+clear the meter before trusting it further. `*RST` sets state (it drops a range and, on a powered
+instrument, more than that), so it is refused before `Multimeter.send` is ever called:
+
+    refused: '*RST' is not a read-only command; this tool can only query dmm, never set it
+
+Nothing about the meter or the board changes. The loop continues with the same DMM state it had.
+
+**Stop.** With no more tool calls, the model states its answer: the cause is FIX-03's channel 2
+offset, not the board, and the next measurement is a person's, not the agent's: verify FIX-03
+channel 2 against `calibration-procedure.md` section 5, then retest this serial on another
+fixture per `failure-analysis-guide.md` section 1's routing rule.
+
+## The code
+
+`run` is the loop: offer the three tools, run whichever one the model calls, hand back the
+result, and stop once the model calls none. Every tool call and the final stop are the model's
+own decision; running or refusing a tool is always code's.
+
+<CodeFile file="examples/bench_bring_up_debug_assistant/run.py" func="run" />
+
+`measure` is where a state-setting command stops. `is_read_only`, imported from
+`examples/common/bench.py`, is checked before `instrument.send` is ever called, and its result
+decides whether that call happens at all, not whether the model asked politely. Sending a command
+never touched by the check would be the actual bug; this function makes sure that path does not
+exist.
+
+<CodeFile file="examples/bench_bring_up_debug_assistant/run.py" func="_measure" />
+
+## What it costs
+
+<CostStrip
+  stats={[
+    { label: 'Tool calls, this walkthrough', value: '6' },
+    { label: 'Model-decided steps (calls plus the stop)', value: '7' },
+    { label: 'Refused calls', value: '1' },
+    { label: 'Tokens in, cumulative', value: '~4,400' },
+    { label: 'Tokens out, cumulative', value: '~110' },
+  ]}
+  comparedTo={{
+    label: 'the board that needed one call',
+    note: 'SRB5030-2608-0063 is answerable from the first test_log call alone: efficiency at 0.00 percent and a current-limit trip at 3.50 A are not a fixture story. A fixed multi-step script that always ran the same later calls regardless would spend tokens this one save on stopping early.',
+  }}
+/>
+
+Every step above is `decided_by: "model"` or `decided_by: "code"` exactly as
+`examples/common/trace.py` requires; the cost figures come from
+`tests/test_example_bench_bring_up_debug_assistant.py`'s scripted walkthrough on `StubModel`,
+which counts tokens deterministically and stands in for what a real model would be asked, not for
+what one would say. No board on this bench gets an agent call by default: this recipe runs on a
+failure that already needs a person's attention, not on every unit that passes.
+
+## How it fails on a real bench, specifically
+
+<FailureModes modes={[
+  {
+    name: "A query's own argument changes the instrument",
+    notice: "MEAS:VOLT:DC? 0.1 reads as a read-only header, and is_read_only agrees, but the DMM uses that argument to set its DC range before taking the reading. Send it once and every later query on that meter, argument or not, comes back through the same wrong range, which on this board reads as an overload with an empty error queue.",
+    test: "Send a read-only header with an argument it does not need and confirm the range, or any other instrument state, is unchanged afterward. examples/bench_bring_up_debug_assistant/run.py refuses any argument outside the one header (MEAS:VPP? on the scope) that actually needs one, rather than trusting is_read_only alone; see this recipe's page-request against examples/common/bench.py.",
+  },
+  {
+    name: 'A command drafted for the wrong vendor',
+    notice: 'MEASure:CURRent? and MEAS:CURR? are the same header, and both exist on the supply and the load. The long form answers on the Maridun supply and comes back empty from the Tarnley load, with -113,"Undefined header" the only sign, because Tarnley firmware accepts the short form only.',
+    test: 'Send the same header, long form, to an instrument from each vendor, and confirm SYST:ERR? shows the rejection rather than treating an empty response as a zero reading.',
+  },
+  {
+    name: 'A note on the wrong row',
+    notice: 'Story 6 on this bench includes a note reading "ripple 44mv, passed but marginal" sitting on a VOUT row that passed. A cause taken from the nearest note instead of from the step it is actually attached to points at the wrong measurement.',
+    test: 'Feed the assistant a log where a note and its step disagree, and confirm the stated cause follows the numeric result and the note is treated as a hint to check, never as the record.',
+  },
+]} />
+
+## How to evaluate it
+
+<HowToEval>
+
+There is no shared question set for this recipe the way the 60-question document set covers the
+document-QA recipes: a bring-up symptom does not have one right sentence, it has a right cause and
+a right next measurement. A reader building this for real would collect a set of logged
+failures with a known, confirmed cause (the kind `failure-analysis-guide.md` already tracks one
+board at a time) and score two things separately: whether the stated cause matches the confirmed
+one, and whether the proposed next measurement is one that would actually distinguish it from the
+next most likely cause. A stale channel offset and an open sense connection both read low on one
+fixture and normal elsewhere; only the number of steps that moved tells them apart, so a cause
+that is merely right and a next measurement that would not have caught the other explanation
+score differently.
+
+The safety side is not a judgment call and does not need a model to grade it: attack the `measure`
+tool the way `tests/test_example_bench_bring_up_debug_assistant.py` does, with every command that
+sets a value, enables an output, resets an instrument, stacks two commands in one message, or
+hides a side effect behind an argument, and require every one of them refused before it reaches an
+instrument. A single command that gets through is a failed build, not a score.
+
+</HowToEval>
+
+## How to adapt it
+
+The three tools are the general shape: something that reads a record of what already happened,
+something that reads a reference document, and something that reads live state, all read-only,
+all reachable without asking a person, with a code-side check between the model and anything that
+is not. That shape fits any job where an agent investigates a system it must not be allowed to
+change: a production incident with read-only access to logs, metrics and runbooks; a database
+migration audit that may only `SELECT`; a security review that queries a fleet without holding any
+credential that can reconfigure it. <Link href="/techniques/single-agent/">Single agent</Link> is
+the loop, <Link href="/techniques/function-calling/">function calling</Link> is the tool shape,
+<Link href="/techniques/safety/">safety</Link> is the code-side check that makes "read only" a
+property of the code and not a promise in the system prompt, and
+<Link href="/techniques/human-in-the-loop/">human-in-the-loop</Link> is where the recommendation
+this agent produces has to go next, since nothing here can act on its own answer.
+
+Every instrument on this bench is one `send(command: str) -> str` method, which is the shape
+PyVISA's own `write` and `query` pair covers, so the code that composes, checks and refuses a
+command does not change when the transport does. Nothing in this repository has been run against
+real hardware, and this page does not claim it has.
+
+What does not port: the SRB-5030 itself, its command set, `SafetyEnvelope`'s 32.0 V and 4.0 A, and
+every reading in `docs/THE-BENCH.md`. A reader's own board has its own datasheet and its own
+envelope, and the fixture-versus-board reasoning above is only as good as the documents an
+assistant is actually pointed at.
