@@ -435,7 +435,11 @@ instrument's datasheet does not: the leads are nearly as large as the meter, and
 readings instead of ten would move the total by under 2 uV. The lead contribution is a fixed
 offset, so it cancels in a difference of two readings through the same path, exactly the way
 FIX-03's calibration offset cancels in a regulation figure. A budget for line or load regulation
-therefore leaves it out and comes to 0.0075 percentage points.
+therefore leaves it out and comes to 0.0075 percentage points. That assumes both readings were
+taken on the same meter range, which is true of thirteen of the fifteen line regulation figures in
+the characterization data. The slipped-range window in story C crosses one end of two 25 degC
+sweeps (boards 3 and 4), and a difference is no better than the weaker half of it: those two come
+to 0.031 points.
 
 Once a measurement has an expanded uncertainty, a limit check has three outcomes, and
 `guarded_verdict` returns them: guardband the limit by the expanded uncertainty, pass inside the
@@ -525,8 +529,9 @@ limit is 0.2925 percent and the figure is over it. The honest statement is that 
 does not decide the question at 25 degC. Measure it better, with more readings and a measured
 lead contribution, or hold the board against the 70 degC row, which is not ambiguous.
 
-The other four boards are inside the limit by tens of times the uncertainty at every ambient, so
-this is one board and not a property of the design.
+Every other check in the scan is a clean pass, though not all by the same distance: boards 1, 2
+and 4 clear the limit by about 25 times the uncertainty and board 3 by nine, so this is one board
+and not a property of the design.
 
 ### Story C: repeatability that belongs to the meter's range
 
