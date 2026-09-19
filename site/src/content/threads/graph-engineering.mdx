@@ -6,7 +6,7 @@ reviewed: 2026-09-18
 import Link from '../../components/page/Link.astro';
 
 "Graph engineering" is not one thing. Two kinds of graph on this site share the same underlying
-data structure — nodes and edges — but connect completely different kinds of thing, are built by
+data structure (nodes and edges) but connect completely different kinds of thing, are built by
 completely different means, and sit at different levels. The confusion is reasonable: draw either
 one and you get a picture with boxes and arrows, and the picture alone does not say which you are
 looking at.
@@ -24,7 +24,7 @@ run time, for an agent graph.
 Someone who has read only one of the three pages here usually generalizes from it. A person who
 has built a knowledge graph pictures entity extraction and a query language. A person who has
 built a supervisor pattern pictures handoffs and a checkpoint after every node. Both are right
-about the piece they have seen, and wrong to assume the other piece works the same way — the data
+about the piece they have seen, and wrong to assume the other piece works the same way: the data
 structure is shared, almost nothing else is.
 
 ## Side by side
@@ -33,16 +33,16 @@ structure is shared, almost nothing else is.
 |---|---|---|---|
 | **Nodes are** | an entity: a person, a part, a place, a claim | one step of a process your code wrote in advance | an agent, not a fixed step: it brings its own tools and its own context |
 | **Edges are** | a stated relationship between two entities | a fixed rule: given this state, go here | a choice a model makes among a fixed list of named destinations |
-| **Created by** | extraction over documents — usually a model reading text and proposing entities and relationships, checked afterward | the person who designed the process, in code, before any run happens | the same code a workflow graph runs on, plus one node whose own output is the routing decision |
-| **Answers the question** | how are these things related, and what connects A to B? | what happens next, given this state — always the same answer for the same state | who should handle this next, given what the run has found so far |
-| **Level** | Level 2 · Context — your code decides to extract, and how to walk what comes back | Level 3 · Workflows — your code decides every transition in advance | Level 6 · Teams of agents — a model decides some transitions at run time |
-| **Costs to build and keep current** | extraction cost up front, and re-extraction whenever a source document changes; a graph nobody rebuilds goes stale the way an unindexed search does | cheap to write once; cheap to keep current only if the process itself does not change often | nothing to build ahead of the first run — the routing is decided live — but every run pays for the model call that decides it, and a supervisor that never converges pays for that call repeatedly |
+| **Created by** | extraction over documents: usually a model reading text and proposing entities and relationships, checked afterward | the person who designed the process, in code, before any run happens | the same code a workflow graph runs on, plus one node whose own output is the routing decision |
+| **Answers the question** | how are these things related, and what connects A to B? | what happens next, given this state: always the same answer for the same state | who should handle this next, given what the run has found so far |
+| **Level** | Level 2 · Context: your code decides to extract, and how to walk what comes back | Level 3 · Workflows: your code decides every transition in advance | Level 6 · Teams of agents: a model decides some transitions at run time |
+| **Costs to build and keep current** | extraction cost up front, and re-extraction whenever a source document changes; a graph nobody rebuilds goes stale the way an unindexed search does | cheap to write once; cheap to keep current only if the process itself does not change often | nothing to build ahead of the first run (the routing is decided live) but every run pays for the model call that decides it, and a supervisor that never converges pays for that call repeatedly |
 | **Fails by** | a missed or invented relationship, two names for one entity that never get merged, a stale edge joining two facts that used to both be true | a buggy edge function routing to the wrong node silently, or a node nothing ever reaches | a handoff to a destination outside the allowed list, or a supervisor that keeps sending work back to the same node without making progress |
 
 ## When you want one, the other, both, or neither
 
 Want a knowledge graph alone when questions need facts joined across documents and nothing about
-acting on the answer is automated — a research assistant that answers from a joined chain of
+acting on the answer is automated: a research assistant that answers from a joined chain of
 facts, with no agent deciding what to do next.
 
 Want a workflow graph alone when the process itself has more than one path worth drawing, but
@@ -58,7 +58,7 @@ that consults a knowledge graph instead of running its own search is composing t
 graph, not confusing them.
 
 Want neither when a single retrieval step answers the question, or the process has one path and
-nothing to route — see <Link href="/techniques/rag/">RAG</Link> and
+nothing to route: see <Link href="/techniques/rag/">RAG</Link> and
 <Link href="/techniques/prompt-chaining/">prompt chaining</Link> for what each of these graphs
 would otherwise be replacing.
 
