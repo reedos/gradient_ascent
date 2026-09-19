@@ -216,8 +216,8 @@ def run(
     approval_load: Approval | None = None,
 ) -> ScriptResult:
     envelope = envelope if envelope is not None else SafetyEnvelope()
-    approval_supply = approval_supply or Approval("R. Osaki", 24.0, 4.000, reason=task)
-    approval_load = approval_load or Approval("R. Osaki", 24.0, 1.000, reason=task)
+    approval_supply = approval_supply or Approval("the test engineer", 24.0, 4.000, reason=task)
+    approval_load = approval_load or Approval("the test engineer", 24.0, 1.000, reason=task)
 
     manual = _manual_excerpt()
     tracer.record(
@@ -250,7 +250,7 @@ def run(
     supply.output_on(approval_supply)
     tracer.record(
         kind="code", decided_by="code", title="Power the board",
-        detail="24.000 V, 4.000 A supply current limit, approved by R. Osaki",
+        detail="24.000 V, 4.000 A supply current limit, approved by the test engineer",
     )
 
     readings = _execute(commands, bench, load, approval_load)

@@ -69,7 +69,7 @@ class InstrumentScriptExampleTests(unittest.TestCase):
         result = run(TASK, model, tracer)
         self.assertAlmostEqual(result.readings["vout_v"], 4.9930, places=4)
         self.assertAlmostEqual(result.readings["iout_a"], 1.0000, places=4)
-        self.assertEqual(result.approver, "R. Osaki")
+        self.assertEqual(result.approver, "the test engineer")
 
     def test_a_draft_that_never_clears_stops_at_the_cap_with_no_readings(self) -> None:
         model = StubModel([StubResponse(text=BAD_DRAFT) for _ in range(4)])
@@ -88,13 +88,13 @@ class InstrumentScriptExampleTests(unittest.TestCase):
         model = StubModel([StubResponse(text=GOOD_DRAFT)])
         tracer = make_tracer()
         with self.assertRaises(SafetyRefusal):
-            run(TASK, model, tracer, approval_load=Approval("R. Osaki", 24.0, 4.5, reason="wrong set point"))
+            run(TASK, model, tracer, approval_load=Approval("the test engineer", 24.0, 4.5, reason="wrong set point"))
 
     def test_enabling_the_load_on_something_that_is_not_an_approval_is_refused(self) -> None:
         model = StubModel([StubResponse(text=GOOD_DRAFT)])
         tracer = make_tracer()
         with self.assertRaises(SafetyRefusal):
-            run(TASK, model, tracer, approval_load="R. Osaki said it was fine")  # type: ignore[arg-type]
+            run(TASK, model, tracer, approval_load="the test engineer said it was fine")  # type: ignore[arg-type]
 
     def test_a_load_current_over_the_envelope_never_reaches_the_instrument(self) -> None:
         over_limit = GOOD_DRAFT.replace("CURR 1.000", "CURR 4.600")
