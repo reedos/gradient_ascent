@@ -37,6 +37,17 @@ SCRIPTED = [
 ]
 
 
+PAUSE_STEP = "Pause for approval before booking"
+
+
+def _print_steps(tracer: Tracer, start: int) -> int:
+    """Print the trace steps recorded since `start`, and return the new end."""
+    for step in tracer.steps[start:]:
+        if step.title != PAUSE_STEP:
+            print(f"[{step.decided_by}] {step.title}: {step.detail}")
+    return len(tracer.steps)
+
+
 def main(argv: list[str] | None = None) -> int:
     raw = sys.argv[1:] if argv is None else argv
     reviewer, remaining = _REVIEWER_FLAGS.parse_known_args(raw)
@@ -50,6 +61,12 @@ def main(argv: list[str] | None = None) -> int:
     tracer = Tracer(example="trip_planning", level=LEVEL, model_id=model.model_id)
     result = run(args.question, model, tracer)
 
+    # Which lookups the model chose, and what each one came back with, are what this level is:
+    # the held booking alone shows none of it. The checkpoint step is skipped because the block
+    # below prints the same call with its fare and terms, and printing it twice reads as two
+    # bookings.
+    printed = _print_steps(tracer, 0)
+
     if isinstance(result, PendingBooking):
         print(f"PAUSED for approval: {result.call.detail}")
         print(f"${result.call.price_cents / 100:.2f} -- {result.call.cancellation}")
@@ -57,6 +74,7 @@ def main(argv: list[str] | None = None) -> int:
             print("(pass --decision approve|reject to resume)")
             return 0
         result = approve(result, reviewer.decision, tracer, note=reviewer.note)
+        _print_steps(tracer, printed)
 
     print(result.text)
     return 0

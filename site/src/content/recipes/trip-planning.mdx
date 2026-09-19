@@ -77,7 +77,11 @@ it.
 
 <CodeFile file="examples/trip_planning/run.py" func="run" />
 
-A real pass through it: `search_routes("Wrenfield", "Aldercliff")` returns two options, one landing
+A real pass through it, which is what the command prints, one lookup at a time:
+
+<CodeFile file="examples/trip_planning/README.md" start={17} end={17} lang="text" expect="python -m examples.trip_planning" />
+
+`search_routes("Wrenfield", "Aldercliff")` returns two options, one landing
 at 10:55 for $89.00 and a cheaper one landing at 20:25 for $64.00 with no refund. `search_stays`
 returns two places in Aldercliff. `opening_hours` answers for the museum: open 09:00 to 17:00,
 closed Mondays. Nothing here needed this order; the model chose it, and could have skipped the
@@ -100,8 +104,7 @@ matches.
 That check is what catches a checkpoint changed after approval. `tests/test_example_trip_planning.py`
 attacks it directly: take the pending booking `run` returned, replace its price or its date with
 `dataclasses.replace` while leaving the approved fingerprint in place, and call `approve`. Both
-attempts raise, since a fingerprint of the wrong call does not pass a check written against the
-right one. The untouched checkpoint, run through the same path, books `R1` for $89.00.
+attempts raise. The untouched checkpoint, run through the same path, books `R1` for $89.00.
 
 ## What it costs
 

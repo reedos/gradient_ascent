@@ -17,9 +17,11 @@ Run it:
 python -m examples.trip_planning --model stub:scripted
 ```
 
-The run searches, then reaches a `book` call, and stops there: what prints is the held call's
-fare and its cancellation terms, and nothing is bought. Add `--decision approve` to run the held
-booking in the same command.
+Every lookup the model chose for itself prints as it happens, with what came back: two routes,
+two places to stay, and the museum's hours. Then the `book` call stops the run, and what prints
+is the held call's fare and its cancellation terms. Nothing is bought. Add `--decision approve`
+to resume and run the held booking in the same command, or `--decision reject` to end with
+nothing booked.
 
 `--model stub` never calls a tool at all, so the same command prints a placeholder answer and
 never reaches the checkpoint.

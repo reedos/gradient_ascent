@@ -202,6 +202,31 @@ class TripPlanningExampleTests(unittest.TestCase):
 
         self.assertEqual(SCRIPTED, SEQUENCE)
 
+    def test_the_command_prints_every_lookup_and_what_it_returned(self) -> None:
+        """The README describes three searches before the pause. They live in the tracer, not in
+        the returned text, so `__main__` has to print them: without this the command showed only
+        the held booking and a reader saw none of the run that reached it."""
+        import io
+        from contextlib import redirect_stdout
+
+        from examples.trip_planning.__main__ import main as demo_main
+
+        out = io.StringIO()
+        with redirect_stdout(out):
+            code = demo_main(["--model", "stub:scripted"])
+        printed = out.getvalue()
+
+        self.assertEqual(code, 0)
+        for tool in ("search_routes", "search_stays", "opening_hours"):
+            self.assertIn(f"Model calls a tool: {tool}", printed)
+            self.assertIn(f"Run tool: {tool}", printed)
+        # What came back, not only that something was called.
+        self.assertIn("The Cormorant Inn", printed)
+        self.assertIn("open 09:00-17:00", printed)
+        # And the pause is still the last thing, printed once rather than twice.
+        self.assertEqual(printed.count("R1: Wrenfield -> Aldercliff, 2026-11-14 08:10-10:55\n"), 1)
+        self.assertIn("PAUSED for approval", printed)
+
     def test_the_token_budget_forces_a_stop_before_the_step_cap(self) -> None:
         def always_search(messages, tools):
             del messages, tools
