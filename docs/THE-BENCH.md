@@ -357,6 +357,190 @@ Notes are a source of hypotheses, never a record. The logged value, the limits a
 the record. `test-failure-triage` is the recipe that turns these into causes, and its first job is
 to be honest about how often the note says nothing.
 
+## Measuring on this bench: accuracy, uncertainty and guardbanding
+
+A reading is a number. A measurement is a number with an uncertainty, a range and a calibration
+interval attached, and the bench can produce one because the MDN-6100's manual carries a real
+accuracy specification and `examples/common/bench.py` carries the arithmetic that prices it.
+
+`mdn6100-programming-manual.md` section 2 states DC volts accuracy the way bench meters state it:
+plus or minus (ppm of reading + ppm of range), per range, for a 24 hour, a 90 day and a one year
+calibration interval, inside 18 to 28 degC, with a temperature coefficient per degree outside the
+band. The one year rows are the same numbers the manual printed before in percent: 35 ppm of
+reading is 0.0035 percent. Resolution is the range over a million, so the 10 V range resolves
+10 uV.
+
+Two properties of that form do most of the teaching, and both are arithmetic:
+
+- **The range term does not scale with the reading.** A 4.9930 V reading is good to 224.8 uV on
+  the 10 V range and 824.7 uV on the 100 V range. The reading term barely moved, from 174.8 uV to
+  224.7 uV. The range term went from 50 uV to 600 uV. Nothing is wrong with either reading and
+  the error queue stays empty in both cases.
+- **The interval is part of the specification.** The same reading is good to 79.9 uV on the 24
+  hour row, 164.8 uV on the 90 day and 224.8 uV on the one year. Quoting the tightest row for a
+  meter calibrated eleven months ago is not a better measurement.
+
+The budget is four lines, combined by root sum of squares, expanded at k = 2, all of it in
+`examples/common/bench.py` as pure functions and all of it recomputed in `tests/test_bench.py`.
+For ten readings of a 5 V rail on the 10 V range with a 60 uV spread and a 200 uV lead and
+connection contribution:
+
+| Contribution | Half-width or spread | Standard uncertainty |
+| --- | --- | --- |
+| Meter accuracy, 1 year, 10 V range | 224.8 uV | 129.8 uV |
+| Resolution, 10 uV per count | 5.0 uV | 2.9 uV |
+| Repeatability, 10 readings | s = 60 uV | 19.0 uV |
+| Leads and connections | 200 uV | 115.5 uV |
+| Combined | | 174.8 uV |
+| Expanded, k = 2 | | 349.5 uV |
+
+The lines are named because a named budget can be argued with, and this one says something the
+instrument's datasheet does not: the leads are nearly as large as the meter, and a hundred
+readings instead of ten would move the total by under 2 uV. The lead contribution is a fixed
+offset, so it cancels in a difference of two readings through the same path, exactly the way
+FIX-03's calibration offset cancels in a regulation figure. A budget for line or load regulation
+therefore leaves it out and comes to 0.0075 percentage points.
+
+Once a measurement has an expanded uncertainty, a limit check has three outcomes, and
+`guarded_verdict` returns them: guardband the limit by the expanded uncertainty, pass inside the
+acceptance limit, fail outside the limit by more than the uncertainty, and `cannot say` between
+the two. That third answer is a result. Calling it a pass is how a wrong unit ships; calling it a
+fail is how a good one is scrapped.
+
+The supply's and the load's readback rows are in the same form, from their own manuals, so an
+efficiency figure can be priced too. They are much coarser: at 3 A the supply's current readback
+is worth about 6 mA, which is 0.2 percent, against 45 ppm for a 5 V reading on the meter. Any
+efficiency from this bench is a percent-level number no matter how many digits the arithmetic
+produces.
+
+## The characterization data, and the four stories in it
+
+`evals/bench/make_characterization.py` writes `evals/bench/data/characterization-2026-09.csv`
+from seed 20260914, a separate generator with a separate random stream so the three production
+files above do not move by a byte. `tests/test_bench_characterization.py` proves the
+reproduction and each story below, and proves what is not there.
+
+| File | Rows | Contents |
+| --- | --- | --- |
+| `characterization-2026-09.csv` | 900 | 5 revision C prototypes, 4 input voltages, 3 load currents, 3 ambients, 5 readings a point |
+
+This is the engineering-test data set and it is a different shape from the production log on
+purpose. A production row carries limits and a `result` column. A characterization row carries
+neither: it has a serial, a condition, a reading number, the meter range the reading was taken
+on, an output voltage and an input current. The limits live in the datasheet, and what the reader
+computes is a margin, not a verdict.
+
+The session has a notebook, `evals/bench/corpus/characterization-notebook.md`: what was set up,
+what the sweep was, what happened on each of the three days, the uncertainty being quoted, and
+what is still open. It is working notes and it is honest about two things the data alone cannot
+say.
+
+The five boards, by what makes each one different:
+
+| Serial | Output at 24 V, 1 A, 25 degC | Line regulation | Load regulation | Note |
+| --- | --- | --- | --- | --- |
+| SRB5030-2609-0001 | 4.9972 V | 0.114% | 0.406% | typical |
+| SRB5030-2609-0002 | 4.9815 V | 0.115% | 0.406% | typical |
+| SRB5030-2609-0003 | 4.9585 V | 0.236% | 0.657% | low output, worst regulation of the five |
+| SRB5030-2609-0004 | 5.0018 V | 0.119% | 0.406% | typical |
+| SRB5030-2609-0005 | 4.9951 V | 0.299% | 0.406% | line regulation close to its limit |
+
+Regulation figures in that table are at 25 degC. Both limits are the datasheet's: 0.300 percent
+line, 0.800 percent load. Every board is inside both.
+
+### Story A: a margin that is thin at one corner and nowhere else
+
+Board SRB5030-2609-0003. At 9.0 V in, 3.000 A out and 70 degC, the corner where line, load and
+temperature all push the same way:
+
+| Serial | VOUT at the corner | Margin to the 4.900 V minimum |
+| --- | --- | --- |
+| SRB5030-2609-0001 | 4.97391 V | 73.9 mV |
+| SRB5030-2609-0002 | 4.95822 V | 58.2 mV |
+| SRB5030-2609-0003 | 4.92038 V | 20.4 mV |
+| SRB5030-2609-0004 | 4.97849 V | 78.5 mV |
+| SRB5030-2609-0005 | 4.96470 V | 64.7 mV |
+
+Board 3 passes. It passes every corner, and it passes every other datasheet limit, and no single
+parameter of it is out of specification: its output is 4.9585 V where the window is 4.950 to
+5.050, its load regulation is 0.657 percent against 0.800, its line regulation is 0.236 percent
+against 0.300. What it does not have is margin. At the one corner where all three push the same
+way it holds 20.4 mV where the other four hold 58 to 79.
+
+Against the measurement's own 0.35 mV that margin is not in doubt. The finding is not "this board
+is bad": it is that the design's worst-case corner is thinner than a typical board suggests, and
+that a sample of one board at 25 degC would have said nothing about it. That is the whole argument
+for sweeping the corners rather than testing the nominal point harder.
+
+### Story B: a margin smaller than the measurement, so the answer is cannot say
+
+Board SRB5030-2609-0005, line regulation over 9.0 V to 32.0 V at 1.000 A, against the 0.300
+percent maximum, with 0.0075 percentage points of expanded uncertainty:
+
+| Ambient | Line regulation | Margin | Verdict |
+| --- | --- | --- | --- |
+| 0 degC | 0.267% | 0.033 points | pass |
+| 25 degC | 0.299% | 0.0006 points | cannot say |
+| 70 degC | 0.334% | -0.034 points | fail |
+
+The middle row is the one this bench exists to teach. A limit check that compares 0.299 against
+0.300 returns a pass, and the pass is not supported by the measurement: the guardbanded acceptance
+limit is 0.2925 percent and the figure is over it. The honest statement is that this measurement
+does not decide the question at 25 degC. Measure it better, with more readings and a measured
+lead contribution, or hold the board against the 70 degC row, which is not ambiguous.
+
+The other four boards are inside the limit by tens of times the uncertainty at every ambient, so
+this is one board and not a property of the design.
+
+### Story C: repeatability that belongs to the meter's range
+
+Sixty readings, from the middle of board 3's 25 degC sweep to the middle of board 4's, were taken
+with the meter on the 100 V range instead of the 10 V range. The readings scatter about 414 uV
+against about 59 uV everywhere else, and they land on 100 uV steps, because that is the
+resolution of that range.
+
+Nothing about those readings is an error. The error queue is empty, the numbers are right, and
+they are worth about a quarter of the others: 824.7 uV of accuracy limit instead of 224.8 uV, and
+an expanded uncertainty 2.4 times larger.
+
+What makes this a story rather than a note is what it is not. It is not a board: the window
+crosses a board boundary, so two boards are affected and each only partly, and with those rows
+removed no board is noisier than any other. It is not a corner and not an ambient: all twelve
+corners of both boards are in the window, and the scatter at the other two ambients is flat. It
+is not settling either, which the notebook records trying first: a settling problem walks through
+the five readings of a point and gets better with a longer delay, and this one does neither. The
+scatter follows one column, `meter_range_v`, and grouping by that column is one line of work.
+
+### Story D: one point recorded at a condition it was not taken at
+
+Board SRB5030-2609-0001, 25 degC, the 12.0 V row at 3.000 A. The supply was still at 24.0 V from
+the block before it, and the notebook says the operator stepped away and could not tell.
+
+The output voltage gives nothing away, which is the point: the block sits within 0.6 mV of the
+same board's own 24.0 V block, and a genuine 12.0 V reading would have differed from a 24.0 V one
+by about 3 mV anyway. Holding the output steady while the input moves is the entire job of the
+part, so the output cannot tell you which input it was holding against.
+
+The input current can. That block reads 0.673 A where every other board at 12.0 V and 3.000 A
+reads about 1.312 A, and 0.673 A is exactly the 24 V figure. The check that finds it without
+knowing the story is the power balance: at the labeled 12.0 V the block computes an input power
+lower than its output power, which no board does. It is the only point in the file where that is
+true.
+
+No uncertainty budget would have caught this. Every reading in the block is a good reading, taken
+carefully, of a condition nobody asked for.
+
+### What is not in the characterization data
+
+- No board is outside the datasheet's 4.900 V to 5.100 V window at any corner, by more than the
+  expanded uncertainty or at all. Nothing here is a failing board.
+- No board has a repeatability problem. Once the 100 V range rows are set aside, the spread at
+  every point of every board at every ambient is the same within 30 percent.
+- Only one board is over a limit anywhere: board 5's line regulation at 70 degC.
+- Only one point is filed under the wrong condition.
+- There is no ripple in this file at all. Ripple is a scope measurement with its own setup, the
+  session did not do it, and the notebook says so rather than leaving a reader to assume.
+
 ## What this bench is for
 
 Two claims run through every engineering page built on it.

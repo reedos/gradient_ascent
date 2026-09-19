@@ -24,17 +24,22 @@ from pathlib import Path
 from evals.corpus import Section, load_documents, load_sections
 
 #: The bench documents: datasheet, test spec, four programming manuals, calibration procedure,
-#: engineering change notice, bring-up notebook, bill of materials, design-review rules and a
-#: failure-analysis guide. Same `## N. Title` format as `evals/corpus/`.
+#: engineering change notice, two notebooks (bring-up and characterization), bill of materials,
+#: design-review rules and a failure-analysis guide. Same `## N. Title` format as `evals/corpus/`.
 BENCH_CORPUS_DIR = Path(__file__).resolve().parent / "corpus"
 
-#: The generated CSVs. `make_data.py` writes them and `tests/test_bench_data.py` proves it
-#: reproduces them byte for byte.
+#: The generated CSVs. Two generators write them, with separate seeds and separate random
+#: streams: `make_data.py` writes the three production files and `make_characterization.py`
+#: writes the engineering-test one. `tests/test_bench_data.py` and
+#: `tests/test_bench_characterization.py` prove each reproduces byte for byte.
 BENCH_DATA_DIR = Path(__file__).resolve().parent / "data"
 
 PRODUCTION_CSV = BENCH_DATA_DIR / "production-run-2026-08.csv"
 SOAK_CSV = BENCH_DATA_DIR / "soak-2026-08-27.csv"
 RETEST_CSV = BENCH_DATA_DIR / "retest-2026-08-31.csv"
+#: Five revision C prototypes swept over line, load and temperature, with five readings a point:
+#: the engineering-test data, where a row is a reading rather than a verdict.
+CHARACTERIZATION_CSV = BENCH_DATA_DIR / "characterization-2026-09.csv"
 
 
 def load_bench_sections() -> dict[str, Section]:
@@ -50,6 +55,7 @@ def load_bench_documents() -> dict[str, str]:
 __all__ = [
     "BENCH_CORPUS_DIR",
     "BENCH_DATA_DIR",
+    "CHARACTERIZATION_CSV",
     "PRODUCTION_CSV",
     "RETEST_CSV",
     "SOAK_CSV",

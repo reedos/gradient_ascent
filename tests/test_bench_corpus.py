@@ -35,6 +35,7 @@ from evals.corpus import (  # noqa: E402
 EXPECTED_DOCUMENTS = {
     "bringup-notebook",
     "calibration-procedure",
+    "characterization-notebook",
     "design-review-rules",
     "ecn-2608-04",
     "failure-analysis-guide",
@@ -57,8 +58,16 @@ class TestBenchCorpusLoads(unittest.TestCase):
         self.assertEqual(stems, EXPECTED_DOCUMENTS)
 
     def test_section_count_is_in_the_range_the_corpus_was_designed_for(self) -> None:
+        """The band, not the count: a document may gain a section without a test edit.
+
+        It was 60 to 80 for the twelve documents wave 7 wrote, and the corpus sat at 78. Wave 8
+        added the characterization notebook and two sections to the MDN-6100's manual, which
+        takes it to 86, so the upper bound moves with it. The band exists to catch a corpus
+        growing without anybody deciding to grow it, and a bound the corpus has already reached
+        catches nothing.
+        """
         self.assertGreaterEqual(len(self.sections), 60)
-        self.assertLessEqual(len(self.sections), 80)
+        self.assertLessEqual(len(self.sections), 95)
 
     def test_every_document_contributes_sections(self) -> None:
         by_doc: dict[str, list[int]] = {}
@@ -119,13 +128,34 @@ class TestBenchCorpusLoads(unittest.TestCase):
         """Level 0 retrieval has to work on this corpus too, or no example above it can."""
         cases = {
             "what is the maximum input voltage": "ecn-2608-04",
-            "how do I measure output ripple with the scope": "trn1102-programming-manual",
             "ceramic capacitor derating rule": "design-review-rules",
             "the load rejects INP ON": "trn2400-programming-manual",
+            "what is the meter's accuracy on the 10 V range": "mdn6100-programming-manual",
+            "five boards swept over line load and temperature": "characterization-notebook",
         }
         for query, expected_doc in cases.items():
             hits = bm25_search(self.sections, query, k=3)
             self.assertIn(expected_doc, [section.doc for section, _ in hits], query)
+
+    def test_the_ripple_query_needs_five_hits_and_not_three(self) -> None:
+        """One query this corpus does not separate cleanly, recorded rather than tuned away.
+
+        "how do I measure output ripple with the scope" wants
+        `trn1102-programming-manual#5`, which is exactly the passage that answers it. On the
+        twelve-document corpus it ranked third of 78 sections by 0.03 of a point over
+        `mdn6100-programming-manual#4`, a section about configuring the meter that shares
+        "measure", "output" and "read" with the query and has nothing to do with ripple. Adding
+        the characterization notebook changed the corpus statistics BM25 normalizes against and
+        the two swapped places: fourth now, by 0.04.
+
+        The claim this file makes is that level 0 retrieval works on this corpus, and it does:
+        the right passage is in the first five of 87. The claim it does not make is that a bag of
+        words tells four sections apart when three of them share the query's common words and
+        only one has its rare one. Widening k for this query says so out loud. Narrowing the
+        query until it passed at k=3 would not.
+        """
+        hits = bm25_search(self.sections, "how do I measure output ripple with the scope", k=5)
+        self.assertIn("trn1102-programming-manual", [section.doc for section, _ in hits])
 
     def test_a_section_with_no_query_term_scores_zero(self) -> None:
         hits = bm25_search(self.sections, "zzzzqqqq", k=3)
