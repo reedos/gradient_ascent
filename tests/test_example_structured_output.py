@@ -14,6 +14,7 @@ if str(ROOT) not in sys.path:
 
 from examples.common.model import StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
+from examples.structured_output.__main__ import SCRIPTED  # noqa: E402
 from examples.structured_output.run import LEVEL, WARRANTY_SECTIONS, run  # noqa: E402
 
 QUESTION = "What is the DW-480's warranty?"
@@ -24,6 +25,10 @@ VALID_RECORD = {
     "limited_scope": "dishwasher motor and tub",
     "commercial_rental_days": 90,
 }
+SEQUENCE = [
+    json.dumps(dict(VALID_RECORD, full_warranty_years="two")),
+    json.dumps(VALID_RECORD),
+]
 
 
 class StructuredOutputExampleTests(unittest.TestCase):
@@ -75,6 +80,23 @@ class StructuredOutputExampleTests(unittest.TestCase):
     def test_declares_its_level_and_a_run_function(self) -> None:
         self.assertEqual(LEVEL, 1)
         self.assertTrue(callable(run))
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    """The sequence `python -m examples.structured_output --model stub:scripted` plays, run the
+    same way the CLI runs it, plus the guard that keeps the two in step."""
+
+    def test_the_scripted_sequence_fails_once_then_retries_into_a_valid_record(self) -> None:
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+        tracer = Tracer(example="structured_output", level=LEVEL, model_id="stub-1")
+        answer = run(QUESTION, model, tracer)
+        self.assertEqual(json.loads(answer.text), VALID_RECORD)
+        self.assertEqual(sum(1 for s in tracer.steps if s.kind == "model"), 2)
+
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
 
 
 if __name__ == "__main__":

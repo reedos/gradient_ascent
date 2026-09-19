@@ -29,10 +29,12 @@ from examples.common.model import (  # noqa: E402
     content_text,
 )
 from examples.common.trace import Tracer  # noqa: E402
+from examples.multimodal.__main__ import SCRIPTED  # noqa: E402
 from examples.multimodal.run import LEVEL, build_request, run  # noqa: E402
 
 QUESTION = "Read the model number and the serial number off this rating plate."
 PLATE = ImagePart(media_type="image/jpeg", data="ZmFrZQ==", label="rating-plate.jpg")
+SEQUENCE = ["MODEL: DW-480\nSERIAL: HLV480-22719"]
 
 
 def _tracer() -> Tracer:
@@ -91,6 +93,23 @@ class MultimodalExampleTests(unittest.TestCase):
         rec = record_trace.classify("multimodal")
         self.assertTrue(rec.ok, rec.reason)
         self.assertFalse(rec.takes_embedder)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    """The sequence `python -m examples.multimodal --model stub:scripted` plays, run the same
+    way the CLI runs it, plus the guard that keeps the two in step."""
+
+    def test_the_scripted_sequence_parses_into_the_two_fields(self) -> None:
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+        answer = run(QUESTION, model, _tracer(), image=PLATE)
+        self.assertIn("DW-480", answer.text)
+        self.assertIn("HLV480-22719", answer.text)
+        self.assertEqual(answer.citations, ["rating-plate.jpg"])
+
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
 
 
 class ContentPartsTests(unittest.TestCase):

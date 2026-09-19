@@ -12,9 +12,18 @@ if str(ROOT) not in sys.path:
 
 from examples.common.model import StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
+from examples.inference_time_reasoning.__main__ import SCRIPTED  # noqa: E402
 from examples.inference_time_reasoning.run import LEVEL, N_SAMPLES, run  # noqa: E402
 
 QUESTION = "What is the total price to replace the heating elements on both a DW-300 and a DW-480?"
+SEQUENCE = [
+    "Working through it...\nHLV-4471 (DW-300 heating element) is $38.50, and HLV-4472 (DW-480 "
+    "heating element) is $41.00. $38.50 + $41.00 = $79.50.\nAnswer: 79.50",
+    "Working through it...\n$38.50 + $41.00 = $79.50.\nAnswer: 79.50",
+    "Working through it...\nRounding as I go: about $38.50 + $41.00 comes to $79.00.\nAnswer: 79.00",
+    "Working through it...\n$38.50 + $41.00 = $79.50.\nAnswer: 79.50",
+    "Working through it...\nCarried a digit wrong: $38.50 + $41.00 = $80.50.\nAnswer: 80.50",
+]
 
 
 def _sample(text: str) -> StubResponse:
@@ -62,6 +71,23 @@ class InferenceTimeReasoningExampleTests(unittest.TestCase):
         self.assertEqual(LEVEL, 1)
         self.assertTrue(callable(run))
         self.assertEqual(N_SAMPLES, 5)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    """The sequence `python -m examples.inference_time_reasoning --model stub:scripted` plays,
+    run the same way the CLI runs it, plus the guard that keeps the two in step."""
+
+    def test_the_scripted_sequence_s_majority_lands_on_the_correct_total(self) -> None:
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+        tracer = Tracer(example="inference_time_reasoning", level=LEVEL, model_id="stub-1")
+        answer = run(QUESTION, model, tracer, n=5)
+        self.assertIn("79.50", answer.text)
+        self.assertIn("3/5", answer.text)
+
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
 
 
 if __name__ == "__main__":

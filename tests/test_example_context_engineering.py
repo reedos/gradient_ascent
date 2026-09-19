@@ -13,9 +13,11 @@ if str(ROOT) not in sys.path:
 from evals.corpus import DEFAULT_CORPUS_DIR  # noqa: E402
 from examples.common.model import Message, StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
+from examples.context_engineering.__main__ import SCRIPTED  # noqa: E402
 from examples.context_engineering.run import LEVEL, run  # noqa: E402
 
 QUESTION = "What is the DW-300's Normal cycle water use?"
+SEQUENCE = ["3.2 gallons per Normal cycle, per the DW-300 manual's cycles section."]
 
 
 def _make_history(n: int) -> list[Message]:
@@ -84,6 +86,22 @@ class ContextEngineeringTraceTests(unittest.TestCase):
         run(QUESTION, model, None, tracer, corpus_dir=DEFAULT_CORPUS_DIR, history=history, token_budget=0)
         fit_step = next(s for s in tracer.steps if "Fit conversation history" in s.title)
         self.assertIn("kept 0 of 4 turn(s)", fit_step.detail)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    """The sequence `python -m examples.context_engineering --model stub:scripted` plays, run
+    the same way the CLI runs it, plus the guard that keeps the two in step."""
+
+    def test_the_scripted_sequence_answers_the_question_it_was_written_for(self) -> None:
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+        tracer = Tracer(example="context_engineering", level=LEVEL, model_id="stub-1")
+        answer = run(QUESTION, model, None, tracer, corpus_dir=DEFAULT_CORPUS_DIR)
+        self.assertIn("3.2 gallons", answer.text)
+
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
 
 
 if __name__ == "__main__":

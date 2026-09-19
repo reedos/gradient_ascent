@@ -18,9 +18,12 @@ if str(ROOT) not in sys.path:
 
 from examples.common.model import StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
+from examples.prompt_engineering.__main__ import SCRIPTED, scripted  # noqa: E402
 from examples.prompt_engineering.run import LEVEL, run  # noqa: E402
 
 QUESTION = "What is the DW-480's drain pump part number and price?"
+STRUCTURED_SEQUENCE = ["PART: HLV-2205\nPRICE: $52.00"]
+BARE_SEQUENCE = ["I believe it's one of the HLV-22 series pumps, but I'm not certain of the exact price."]
 
 
 class PromptEngineeringExampleTests(unittest.TestCase):
@@ -77,6 +80,33 @@ class PromptEngineeringExampleTests(unittest.TestCase):
         rec = record_trace.classify("prompt_engineering")
         self.assertTrue(rec.ok, rec.reason)
         self.assertFalse(rec.takes_embedder)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    """The sequences `python -m examples.prompt_engineering --model stub:scripted` plays for
+    `--structured` and `--no-structured`, run the same way the CLI runs them, plus the guard that
+    keeps each in step with what `scripted()` in `__main__.py` returns."""
+
+    def test_the_structured_sequence_parses_and_cites_both_sources(self) -> None:
+        model = StubModel([StubResponse(text=t) for t in STRUCTURED_SEQUENCE])
+        tracer = Tracer(example="prompt_engineering", level=LEVEL, model_id="stub-1")
+        answer = run(QUESTION, model, tracer, structured=True)
+        self.assertEqual(answer.citations, ["dw480-manual#8", "parts-list#2"])
+
+    def test_the_bare_sequence_fails_the_check(self) -> None:
+        model = StubModel([StubResponse(text=t) for t in BARE_SEQUENCE])
+        tracer = Tracer(example="prompt_engineering", level=LEVEL, model_id="stub-1")
+        answer = run(QUESTION, model, tracer, structured=False)
+        self.assertEqual(answer.citations, [])
+
+    def test_the_command_s_default_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], STRUCTURED_SEQUENCE)
+
+    def test_scripted_returns_the_matching_sequence_for_each_flag(self) -> None:
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in scripted(structured=True)], STRUCTURED_SEQUENCE)
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in scripted(structured=False)], BARE_SEQUENCE)
 
 
 if __name__ == "__main__":

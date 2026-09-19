@@ -12,6 +12,7 @@ if str(ROOT) not in sys.path:
 
 from examples.common.model import StubEmbedder, StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
+from examples.memory.__main__ import SCRIPTED  # noqa: E402
 from examples.memory.run import LEVEL, MemoryStore, run  # noqa: E402
 
 FACTS = [
@@ -21,6 +22,10 @@ FACTS = [
     "Also owns a Halvorsen DR-520 dryer, electric version, purchased 2025-01-10.",
 ]
 QUESTION = "Is my dishwasher still covered under warranty?"
+SEQUENCE = [
+    "No. The DW-300 was purchased 2024-03-15 and is installed in a rental property, which limits "
+    "coverage to 90 days from the purchase date. That window closed months ago."
+]
 
 
 class MemoryStoreTests(unittest.TestCase):
@@ -88,6 +93,23 @@ class MemoryRunTraceTests(unittest.TestCase):
         tracer = Tracer(example="memory", level=LEVEL, model_id="stub-1")
         answer = run(QUESTION, model, StubEmbedder(), tracer, facts=FACTS, k=2)
         self.assertEqual(len(answer.citations), 2)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    """The sequence `python -m examples.memory --model stub:scripted` plays, run the same way
+    the CLI runs it, plus the guard that keeps the two in step."""
+
+    def test_the_scripted_sequence_answers_from_what_recall_actually_finds(self) -> None:
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+        tracer = Tracer(example="memory", level=LEVEL, model_id="stub-1")
+        answer = run(QUESTION, model, StubEmbedder(), tracer, facts=FACTS)
+        self.assertIn("90 days", answer.text)
+        self.assertEqual(answer.citations, ["m0", "m1", "m2"])
+
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
 
 
 if __name__ == "__main__":
