@@ -104,9 +104,10 @@ Nothing here is a model decision: the code generates, checks, asks and grades in
 every time, so every recorded step is `decided_by: "code"`. Against the real set, `python -m
 examples.synthetic_data --model stub:scripted --out .local/scratch/synthetic-data/questions.jsonl`
 keeps 28 and rejects 4, three for repeating text already seen and one at verification, with the
-counts coming from paraphrases written down in advance rather than from a model. The same command with `--model stub` keeps nothing and rejects all 32 at verification: the
-echoing stub's placeholder answer matches no real grading pattern. That is the check working on an
-input that was never trying to be right.
+counts coming from paraphrases written down in advance rather than from a model. The same command
+with `--model stub` keeps nothing and rejects all 32 at verification: the echoing stub's
+placeholder answer matches no real grading pattern. That is the check working on an input that was
+never trying to be right.
 
 How much it actually catches is worth being precise about, so the tests attack it. A paraphrase
 that changes a number ("with the top rack removed") is rejected, because the blind answer states

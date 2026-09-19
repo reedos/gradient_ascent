@@ -121,8 +121,8 @@ and the model's output never changes what happens next. This is the same rule `e
 follows for
 its own single model call. Against the real question set, `python -m examples.distillation --model
 stub:scripted --out .local/scratch/distillation/student.jsonl` keeps 30 of the 32 and names the two
-it dropped, L06 and N04, which is the shape of a capture worth keeping; the teacher's answers are a
-written-down fixture, so the 30 is not a pass rate anything was measured at. The same command with
+it dropped, L06 and N04: a filter doing its job on a teacher that is mostly right. Those answers
+are written down in advance, so the 30 is a count and not a pass rate. The same command with
 `--model stub` keeps nothing: the echoing stub's placeholder text matches no question's pattern, so
 all 32 are dropped. That is not a bug in the
 filter; it is what an honest filter does to an answer that was never actually trying to be right,
