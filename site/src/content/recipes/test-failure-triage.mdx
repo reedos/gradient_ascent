@@ -4,8 +4,178 @@ reviewed: 2026-09-19
 sources: []
 ---
 
-A day's failures arrive as measurements against limits plus whatever the operator typed, which ranges from a full diagnosis to a question mark. The causes are already written down in the failure analysis guide, so this is sorting into known classes and routing, not an investigation, and a person confirms before anything is scrapped.
+import CodeFile from '../../components/page/CodeFile.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import Link from '../../components/page/Link.astro';
 
-Draft in progress. This page is a slot: the taxonomy entry, the techniques it composes and the
-level it needs are settled, and the writing is not. See `docs/WRITING-AN-ENGINEERING-RECIPE.md`
-for what belongs here, and `docs/THE-BENCH.md` for the bench every engineering recipe runs on.
+Every day's failing units land in a queue with two things attached to each one: which limit it
+missed, and whatever the operator happened to type while the unit was on the bench. Orbeck's own
+failure analysis guide, `evals/bench/corpus/failure-analysis-guide.md`, already lists the causes
+and a routing table by step, so this is not an investigation that starts from nothing. It is
+sorting failures into causes the guide already names, and sending each one where the guide already
+says it goes.
+
+Two of those causes are visible before anyone reads a note at all: a fixture with a stale
+calibration offset, and a lot of output capacitors that measure short at bias, both found by
+grouping the day's failures the same way
+<Link href="/recipes/limits-without-a-model/">limits-without-a-model</Link> groups a whole month of
+measurements. What is left after that grouping is a genuine one-off, and the operator's free-text
+note is the only signal left for it, unevenly written and often blank. This recipe reads that note
+and sorts it into a cause; it never decides whether the unit passed. That was already decided by
+the test executive, at the fixture, against the limits in `evals/bench/corpus/srb5030-test-spec.md`,
+before any of this runs.
+
+## Why this level, and why not higher
+
+Three techniques compose this recipe: <Link href="/techniques/routing/">routing</Link> reads the
+operator's note and picks one of four causes the failure analysis guide already lists;
+<Link href="/techniques/structured-output/">structured output</Link> keeps that answer in a fixed
+shape, a cause plus the exact words that support it, so nothing downstream has to parse prose out
+of a note; <Link href="/techniques/human-in-the-loop/">human approval</Link> holds every result for
+a person before it becomes a disposition, whatever the cause. Level 3 is enough because the
+categories are fixed in advance and so is what happens once a unit lands in one, the same argument
+the routing page makes for choosing a rule or a classifier: try a rule first, and reach for a
+classifier once the wording varies too much for one to catch reliably. An operator's note is
+exactly that kind of wording.
+
+Most of the job is level 0 and never reaches a model. Which unit failed, and on which limit, is a
+column read out of `evals/bench/data/production-run-2026-08.csv`: 200 units, eight steps each,
+already scored PASS or FAIL by the test executive. The routing table in the guide's section 1 is a
+lookup by step number, no judgment involved. And grouping the day's VOUT failures by fixture, or
+by lot, is a count and a share: `_group_signature` finds that FIX-03 carries six of the month's
+eight VOUT failures, which is `limits-without-a-model`'s whole argument playing out inside one
+recipe rather than across it.
+
+<CodeFile file="examples/bench_test_failure_triage/run.py" func="_group_signature" />
+
+Only the note is left, and only reading it needs a model. Section 8 of the guide says plainly how
+uneven that source is: most failures carry no note at all, and the ones that do range from a full
+diagnosis to a question mark. The pass or fail decision itself never moves. A wrong cause routes a
+unit to the wrong first step at the bench; it does not change what the bench already measured.
+
+## The walkthrough, on the bench
+
+No recorded run exists for this recipe yet, so what follows is a stepped walkthrough of the code
+against the real production data, not a played trace: the site has no measured results, and this
+one is not claimed as one. Two units from `evals/bench/data/production-run-2026-08.csv` carry the
+whole argument.
+
+**SRB5030-2608-0011** failed VOUT at 4.9497 V against a 4.9500 V lower limit, on FIX-03, with the
+note "low again on fix3, thats 3 today." Grouping today's VOUT failures finds FIX-03 behind six of
+the eight, so `_group_signature` already returns `"fixture"` before the note is read. The note
+agrees, and the route comes out `hold_check_fixture`: check the calibration record, not the board.
+
+**SRB5030-2608-0063** also failed VOUT, on the same fixture, with the note "dead. no vout at all,
+u1 not switching." The group signature is identical: FIX-03, flagged. A rule that only ever asked
+"which fixture" would send this unit to the same calibration check as the one above, and it would
+be wrong. This board is not offset by a few tens of millivolts; it reads -0.0300 V, which a
+calibration offset of -0.030 V cannot produce on its own from a working board, only from one with
+no output at all. The classifier reads the note and returns `dead_board`, with the words "no vout
+at all, u1 not switching" quoted as evidence, and the route rule sends this one to
+`failure_analysis` instead, overriding the group signature it would otherwise trust.
+
+<CodeFile file="examples/bench_test_failure_triage/run.py" func="_route" />
+
+That override is where the asymmetric cost lives. Routing a real fixture problem to failure
+analysis by mistake costs an engineer an afternoon confirming a good board is good. Routing a real
+defect to a fixture check by mistake lets that board get retested, possibly pass, and ship. The
+guide's own default for an ungrouped VOUT failure, retest once and only escalate on a second
+failure, already leans toward catching the costlier mistake; `_route` keeps that lean everywhere
+else in the rule, letting a fixture claim skip failure analysis only when the day's own data backs
+it, and letting a dead-board claim through immediately because nothing else explains that reading.
+
+The whole thing is a checkpoint, never a disposition on its own:
+
+<CodeFile file="examples/bench_test_failure_triage/run.py" func="run" />
+
+`confirm` is where a person's decision is actually recorded, the same shape as the bench's own
+`OUTP ON`: nothing acts on a proposed route until it is confirmed, whatever the route was.
+
+<CodeFile file="examples/bench_test_failure_triage/run.py" func="confirm" />
+
+## What it costs
+
+<CostStrip
+  level={3}
+  stats={[
+    { label: 'Tokens in, one note', value: '244' },
+    { label: 'Tokens out, one note', value: '18' },
+    { label: 'Model calls, worst case', value: '2 (one retry)' },
+    { label: 'VOUT failures reaching the model, this run', value: '6 of 8' },
+  ]}
+  comparedTo={{
+    label: 'classifying every row instead of only the failures',
+    note:
+      'load_failures filters 200 rows to 8 before any note is read, and two of those eight carry no note and never reach the model either. Skipping that filter and asking the model about every row would spend roughly 244 tokens times 200, about 48,800 tokens a run, to answer the same 6 questions this recipe answers for about 1,570 (244 plus 18 tokens, six times).',
+  }}
+/>
+
+The 192 units that passed VOUT cost nothing here; they never reach this code at all. For a
+level-0 recipe like <Link href="/recipes/limits-without-a-model/">limits-without-a-model</Link>
+that grouping is the whole page; here it is one line among several, because the two failures with
+no note also cost nothing, and the two group-flagged failures whose notes agree with the group
+signature pay for a model call that changes no route. Only the genuine one-offs, like the dead
+board on FIX-03, are where the tokens buy something the grouping alone could not.
+
+## How it fails on a real bench, specifically
+
+<FailureModes modes={[
+  {
+    name: 'A note typed on the wrong row',
+    notice: 'A person reads the disposition for a failing row and the note field is empty or unrelated, while a different row for the same unit turns out to hold the sentence that actually explains it, filed under whichever step the operator happened to be looking at.',
+    test: 'Pull every note a serial has, across all eight of its rows, not just the note on the row that failed, and check by hand whether a person reading the full set would have reached a different cause than the code did reading one row alone. This recipe does not stitch notes across rows for that unit; a person confirming the disposition is what is meant to catch it.',
+  },
+  {
+    name: 'A group signature that is right about the fixture and wrong about the unit',
+    notice: 'A unit on the flagged fixture is not merely offset, it is dead, and a rule that only asked which fixture a failure landed on would send it to a calibration check that explains nothing about it.',
+    test: 'Run the recipe on SRB5030-2608-0063: FIX-03 is flagged as a fixture signature, and the note says the board never switches. The route has to come out failure_analysis, not hold_check_fixture, and tests/test_example_bench_test_failure_triage.py checks exactly this case by name.',
+  },
+  {
+    name: 'A cause asserted with nothing behind it',
+    notice: 'A disposition names a cause that a person, reading the note themselves, cannot find any support for.',
+    test: 'Feed the classifier a note like "FAIL" or "?". The schema requires a quoted evidence string for every cause except no_information, so a reply that names dead_board or board_low_general with empty evidence fails validation, gets one retry, and falls back to no_information rather than being accepted on a guess.',
+  },
+]} />
+
+## What to measure
+
+<HowToEval>
+
+Build the labeled set from the answer key: every VOUT failure in
+`evals/bench/data/production-run-2026-08.csv`, with the cause `docs/THE-BENCH.md` and the failure
+analysis guide actually assign it once someone has checked the fixture record and, where needed,
+the board. That is only eight rows this month, too few to trust a rate from; collect several
+months before tuning the group thresholds or the classify prompt, and add every disagreement
+between the recipe's route and the confirmed one to the set as it happens.
+
+The confusion that matters is not accuracy on four labels evenly. It is the two ways a `fixture`
+call and a `dead_board` or `board_low_general` call can be confused, and the two directions cost
+differently. Calling a real defect a fixture problem sends a bad board toward a calibration check
+instead of failure analysis, and a board that is only marginally bad can pass a retest and ship.
+Calling a real fixture problem a defect sends a good board to failure analysis for nothing, which
+costs an engineer's time and not a shipped unit. Score the first direction, a false `fixture` or
+`hold` call on a unit the confirmed record says was actually bad, as the number to drive toward
+zero, even if that means accepting more of the second, cheaper kind of mistake along the way.
+
+</HowToEval>
+
+## Variations
+
+- Swap the measurement from VOUT to RIPPLE and the causes to the ones section 4 of the guide
+  names, `lot_signature` in place of `fixture_signature`: the group check, the schema-and-retry
+  pattern and the confirmation gate carry over unchanged; only the cause list and the routing
+  table's targets are this measurement's own.
+- Retune `_group_signature`'s `min_count` and `min_share` once a few months of confirmed
+  dispositions exist, from what the confusion matrix above actually shows, not from a guess.
+- The same shape sorts a support ticket by product area or an incoming lead by fit: a small fixed
+  set of categories, a lookup from label to handler your code already wrote, and a model reading
+  only the part of the input a rule cannot, the free text. Swapping the labels and the routing
+  table is the whole port.
+- Move to <Link href="/techniques/human-in-the-loop/">human approval</Link>'s own threshold
+  pattern instead of always pausing, once confirmed data shows most dispositions agree with the
+  proposed route and only the disagreements are worth a person's time.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}
