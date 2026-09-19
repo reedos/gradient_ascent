@@ -11,10 +11,13 @@ import HowToEval from '../../components/page/HowToEval.astro';
 import Link from '../../components/page/Link.astro';
 
 The number going in the report is 0.299 percent against a 0.300 percent limit, and somebody is
-going to ask how good the measurement is. Answering that means turning the MDN-6100's accuracy
-specification, a table in section 2 of its programming manual, into something code can compute
-from: one row per DC volts range per calibration interval, in parts per million of reading plus
-parts per million of range, with a temperature band and a coefficient for every degree outside it.
+going to ask how good the measurement is. That is
+<Link href="/recipes/characterize-a-design/">board SRB5030-2609-0005 at 25 degC</Link>, and the
+answer decides whether the row reads pass or cannot say. Getting to it means turning the
+MDN-6100's accuracy specification, a table in section 2 of its programming manual, into something
+code can compute from: one row per DC volts range per calibration interval, in parts per million
+of reading plus parts per million of range, with a temperature band and a coefficient for every
+degree outside it.
 This is the precise-measurement setting: one number that has to be right, priced once and reused
 for however many readings that meter takes until it is next calibrated or its manual is next
 revised. `AccuracySpec` in `examples/common/bench.py` is that schema already; this recipe is what
@@ -35,15 +38,19 @@ loosened here the way human approval's own page allows when being wrong is cheap
 notice after the fact. A wrong row is neither. It is a real number, shaped exactly like the row
 next to it, and it stays wrong until somebody who has read the manual says so.
 
-Nothing here climbs past level 3. There is one document, one schema and one bounded retry; no
-step depends on what an earlier one found, which is the whole case an agent loop would need to
-make for itself. And once the table is confirmed, every budget built from it is arithmetic:
+Nothing here climbs past level 3. There is one document, one schema and one bounded retry, and
+nothing in it chooses which step happens next from what a step found: the retry is the same call
+again with the validation error appended, and it happens at most once. Choosing the next step
+from the last one's result is the case an agent loop has to be able to make for itself, and this
+recipe cannot make it. Once the table is confirmed, every budget built from it is arithmetic:
 `price_reading` calls `combined_uncertainty` and `expanded_uncertainty`, the same functions
 <Link href="/recipes/characterize-a-design/">characterize-a-design</Link> runs on the
 characterization data, and no model runs again. A model never produces a reported measurement, an
-uncertainty, a margin or a verdict, on this page or anywhere else on this bench; here it only ever
-proposes what the manual's table says, and code decides whether that proposal is even shaped like
-a table before a person is asked to read it against the real thing.
+uncertainty, a margin or a verdict, on this page or anywhere else on this bench, and
+<Link href="/recipes/limits-without-a-model/">limits without a model</Link> is the production-test
+case of the same rule. Here a model only ever proposes what the manual's table says, and code
+decides whether that proposal is even shaped like a table before a person is asked to read it
+against the real thing.
 
 Whether drafting is worth it at all is a question with an honest smaller answer: for one meter, a
 person reading the manual closely enough to check a drafted table could have typed 15 rows into a
@@ -64,10 +71,12 @@ illustrated because it is one.
 `run` reads `mdn6100-programming-manual.md` section 2 and asks for all 15 rows as one JSON array.
 A clean reply validates on the first pass: every row is shaped right, all 15 combinations are
 there once each, and every range's ppm numbers increase from the 24 hour row to the 1 year row.
-Two kinds of broken reply are easy for validation to catch and are not this page's argument: a
-missing row, and two intervals of the same range swapped for each other, which breaks the
-increasing sequence the same check already watches for. `tests/test_example_bench_accuracy_specs_from_the_manual.py`
-scripts both with `StubModel` and confirms validation rejects each one.
+Several kinds of broken reply are easy for validation to catch and are not this page's argument: a
+missing row, a duplicate, a negative or non-numeric field, and two intervals of the same range
+swapped for each other, which breaks the increasing sequence the same check already watches for.
+`tests/test_example_bench_accuracy_specs_from_the_manual.py` puts each of those through
+`_validate_table` and confirms it is reported, and scripts a reply that is not JSON at all
+through `StubModel` to show the one retry `run` allows.
 
 The reply this page is about validates too. The scripted mistake puts the 100 V range's numbers,
 45 ppm of reading plus 6 ppm of range, under the 10 V range's own 1 year row, which the manual
@@ -81,14 +90,25 @@ anywhere, and in the test that person finds the mismatch and calls `confirm_tabl
 `approved=False`.
 
 Once a table is confirmed, pricing a reading from it is arithmetic that never touches a model
-again, and it is exactly as easy to get wrong a second way. The manual works this out itself in
-section 2: a 4.9930 V reading on the 10 V range, one year specification, is good to 224.8 uV. The
-same reading is good to only 79.9 uV on the 24 hour row, which is the row for a meter calibrated
-in the last day, not eleven months ago, and to 824.7 uV if it were priced against the 100 V range
-instead of the 10 V range it was actually taken on. Both of those are real rows of the identical,
-correctly confirmed table; `price_reading` reaches the wrong one only when it is handed the wrong
-calibration age or the wrong range, which manual section 7 calls out by name as settings, not
-computed values, and squarely in the user's hands.
+again, and it is exactly as easy to get wrong a second way. Start with the meter alone, which is
+the first line of any budget built from this table and the one the wrong row moves. The manual
+works it out in section 2: a 4.9930 V reading on the 10 V range, one year specification, sits
+inside an accuracy limit of 224.8 uV. The same reading has a limit of only 79.9 uV on the 24 hour
+row, which is the row for a meter calibrated in the last day rather than eleven months ago, and
+824.7 uV if it is priced against the 100 V range instead of the 10 V range it was taken on.
+
+Those three are accuracy limits and not uncertainties, which is the distinction to keep hold of
+when reading them next to a budget. A limit says nothing about where inside it the meter sits, so
+it enters the budget as a rectangular contribution, divided by the square root of 3, alongside
+the display's resolution, the repeatability of the readings and whatever the leads contribute.
+`price_reading` combines those by root sum of squares and expands at k = 2, so its own answer for
+that single reading is 259.6 uV on the 10 V row and 954.0 uV on the 100 V row: the same mistake,
+carried through to the number that would go in a report.
+
+All three rows are real rows of the identical, correctly confirmed table. `price_reading` reaches
+the wrong one only when it is handed the wrong calibration age or the wrong range, which manual
+section 7 calls out by name as settings rather than computed values, and squarely in the user's
+hands.
 
 ## The code
 
@@ -134,19 +154,19 @@ per measurement, is what section 8 of the manual already works out by hand for o
 
 <FailureModes modes={[
   {
-    name: 'A row that borrowed the next range up',
-    notice: 'A range’s accuracy row is shaped correctly, is the only row for its slot, and increases across intervals the way every real row does, and it is still the wrong row: its two ppm numbers came from the range above it, which happens to make the same check pass.',
-    test: 'Run _validate_table on the table tests/test_example_bench_accuracy_specs_from_the_manual.py calls BAD_ROWS: it returns no problems. The recipe page exists because that test passes; the row-by-row read against mdn6100-programming-manual.md section 2 is what the confirm step is for, and confirm_table(result, False, tracer, note=...) is how the tests record it being caught.',
+    name: "A row that borrowed the next range up",
+    notice: "A range's accuracy row is shaped correctly, is the only row for its slot, and increases across intervals the way every real row does, and it is still the wrong row: its two ppm numbers came from the range above it, which happens to make the same check pass.",
+    test: "Run _validate_table on the table tests/test_example_bench_accuracy_specs_from_the_manual.py calls BAD_ROWS: it returns no problems. The recipe page exists because that test passes; the row-by-row read against mdn6100-programming-manual.md section 2 is what the confirm step is for, and confirm_table(result, False, tracer, note=...) is how the tests record it being caught.",
   },
   {
-    name: 'The calibration row for a meter that was not just calibrated',
-    notice: 'A reading priced against the 24 hour row looks tighter than the same reading priced against the row for how long ago the meter was actually last calibrated, and nothing about the smaller number looks wrong on its own.',
-    test: 'Call price_reading with days_since_cal=0.5 against a meter actually calibrated eleven months ago; it silently returns the 24 hour row’s number instead of the 1 year row’s. test_assuming_a_meter_was_just_calibrated_understates_the_uncertainty checks the expanded uncertainty comes out smaller, never that it raises: price_reading trusts the calibration age it is given.',
+    name: "The calibration row for a meter that was not just calibrated",
+    notice: "A reading priced against the 24 hour row looks tighter than the same reading priced against the row for how long ago the meter was actually last calibrated, and nothing about the smaller number looks wrong on its own.",
+    test: "Call price_reading with days_since_cal=0.5 against a meter actually calibrated eleven months ago and it returns the 24 hour row's budget, 92.5 uV expanded, where the honest one is 259.6 uV. test_assuming_a_meter_was_just_calibrated_understates_the_uncertainty checks that it comes out smaller and never that it raises: price_reading trusts the calibration age it is given.",
   },
   {
-    name: 'The range named is not the range the reading was taken on',
-    notice: 'A reading is priced against a bigger range than it was actually measured on, most plausibly because the meter auto-ranged up briefly and nobody logged it, and the result overstates the uncertainty by a real row of the same table rather than understating it.',
-    test: 'Call price_reading with range_v=100.0 for a reading actually taken on the 10 V range; the result is 824.7 uV against a true 224.8 uV, exactly the manual’s own worked comparison in section 2. test_naming_the_wrong_range_overstates_the_uncertainty checks it.',
+    name: "The range named is not the range the reading was taken on",
+    notice: "A reading is priced against a bigger range than it was actually measured on, most plausibly because the meter auto-ranged up briefly and nobody logged it, and the result overstates the uncertainty by a real row of the same table rather than understating it.",
+    test: "Call price_reading with range_v=100.0 for a 4.9930 V reading actually taken on the 10 V range and the budget comes to 954.0 uV expanded instead of 259.6 uV, on a meter accuracy limit of 824.7 uV instead of 224.8 uV, which is the manual's own worked comparison in section 2. test_naming_the_wrong_range_overstates_the_uncertainty checks it.",
   },
 ]} />
 

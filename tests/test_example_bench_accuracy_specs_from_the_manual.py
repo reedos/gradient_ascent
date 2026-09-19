@@ -309,6 +309,20 @@ class PriceReadingTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             price_reading(sparse, [4.9930], range_v=10.0, days_since_cal=335.0)
 
+    def test_the_expanded_uncertainties_the_page_quotes(self) -> None:
+        """The page quotes the meter's accuracy limits (224.8, 79.9 and 824.7 uV, above) next to
+        the expanded uncertainties a budget built on each of those rows actually produces. The two
+        are different numbers and the page says which is which; pin the second kind here so it
+        cannot drift into the first."""
+        cases = {
+            (10.0, 335.0): 259.6,
+            (100.0, 335.0): 954.0,
+            (10.0, 0.5): 92.5,
+        }
+        for (range_v, days), expected in cases.items():
+            priced = price_reading(self.table, [4.9930], range_v=range_v, days_since_cal=days)
+            self.assertEqual(round(priced.expanded_v * 1e6, 1), expected, (range_v, days))
+
     def test_assuming_a_meter_was_just_calibrated_understates_the_uncertainty(self) -> None:
         # The correct row for a meter calibrated eleven months ago is the 1 year row; assuming
         # the meter was just calibrated instead reaches for the 24 hour row, a real row of a
