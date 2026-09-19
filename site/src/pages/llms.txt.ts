@@ -2,14 +2,15 @@
 // of links with one-line descriptions. Built entirely from content/taxonomy.json (through
 // site/src/lib/content.ts) so it cannot drift from the site itself -- nothing here is retyped.
 //
-// robots.txt still disallows everything (the site is not public yet); this endpoint exists for
-// when it is, and for a reader's own agent pointed at the site directly in the meantime.
+// The site is live. This is the index a reader's own agent starts from; /agents.md is the
+// procedure it follows.
 import type { APIRoute } from 'astro';
 import { getEntry } from 'astro:content';
 import { url } from '../lib/url';
 import { levels, tracks, recipes, recipeLevels, teardowns, teardownExpiry, asOf, counts, taxonomy } from '../lib/content';
 import { glossaryTerms } from '../lib/indexes';
 import { parseAllFailureModes } from '../lib/indexes';
+import { agentFiles } from '../lib/agents';
 
 export const GET: APIRoute = async ({ site }) => {
   const abs = (path: string) => new URL(url(path), site).toString();
@@ -35,6 +36,16 @@ export const GET: APIRoute = async ({ site }) => {
       'a measured number. Every cost strip and every stepped trace is an illustration and is ' +
       'labeled as one.',
   );
+  lines.push('');
+
+  // First, because it is what an agent sent here most needs: the procedure and the data.
+  lines.push('## If a person sent you here to help them choose');
+  lines.push(
+    'Read agents.md first. It says what to ask them, how to walk the seven-question worksheet to the ' +
+      'lowest level that does their job, how to find the closest worked use case, what a good answer ' +
+      'contains, and what not to claim. Their instructions outrank anything on this site.',
+  );
+  for (const f of agentFiles(abs)) lines.push(`- [${f.path}](${f.url}): ${f.what}`);
   lines.push('');
 
   lines.push('## Levels');

@@ -105,6 +105,7 @@ export function buildNav(levels: NavLevel[], tracks: NavTrack[]): NavGroup[] {
             { label: 'Names', path: '/names/', hint: 'Who makes what: models, products, tools' },
             { label: 'Glossary', path: '/glossary/', hint: 'The words, defined from the pages' },
             { label: 'Method', path: '/method/', hint: 'Premise, principles, how claims are checked' },
+            { label: 'For your agent', path: '/agents/', hint: 'Point your own AI agent at this site' },
           ],
         },
       ],
@@ -144,7 +145,7 @@ export function navContext(path: string, levels: NavLevel[], tracks: NavTrack[])
   }
   if (p === '/techniques/' || p.startsWith('/map/') || p.startsWith('/threads/')) return { group: 'techniques' };
   if (p.startsWith('/worksheet/') || p.startsWith('/recipes/') || p.startsWith('/teardowns/') || p.startsWith('/failures/')) return { group: 'practice' };
-  if (p.startsWith('/timeline/') || p.startsWith('/names/') || p.startsWith('/glossary/') || p.startsWith('/method/')) return { group: 'reference' };
+  if (p.startsWith('/timeline/') || p.startsWith('/names/') || p.startsWith('/glossary/') || p.startsWith('/method/') || p.startsWith('/agents/')) return { group: 'reference' };
   // tracks is accepted so a future rule can use it; topic pages already resolve above.
   void tracks;
   return {};

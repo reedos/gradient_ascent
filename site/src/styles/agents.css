@@ -1,0 +1,25 @@
+/* /agents/: prompts to copy, the guide shown in full, the published files. */
+.agent-prompts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px }
+.agent-prompt { display: flex; flex-direction: column; gap: 12px; padding: 20px }
+.agent-prompt-top { display: flex; align-items: center; justify-content: space-between; gap: 12px }
+.agent-prompt h3 { font-size: 15px; letter-spacing: -.3px }
+.agent-copy { flex: 0 0 auto; height: 30px; padding: 0 13px; border: 1px solid var(--line-control); border-radius: 7px; font-size: 12px; font-weight: 600; color: var(--text); transition: background .15s }
+.agent-copy:hover { background: color-mix(in srgb, var(--accent) 18%, transparent) }
+.agent-prompt pre { margin: 0; flex: 1; white-space: pre-wrap; overflow-wrap: anywhere; font: 12.5px/1.65 var(--font); color: var(--muted); background: var(--bg); border: 1px solid var(--line); border-radius: 7px; padding: 14px }
+.agent-prompt pre:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+
+.agent-guide { display: flex; flex-direction: column; gap: 12px; max-width: 900px }
+.agent-guide-src { font-size: 12px; color: var(--muted); padding-bottom: 12px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere }
+.agent-guide-src a, .agent-guide a { color: var(--accent); overflow-wrap: anywhere }
+.agent-guide .agent-h2 { font-size: 17px; letter-spacing: -.4px; margin-top: 14px }
+.agent-guide p, .agent-guide li { font-size: 14px; line-height: 1.7; color: var(--muted); max-width: 78ch }
+.agent-guide strong { color: var(--text); font-weight: 600 }
+.agent-guide ol, .agent-guide ul { margin: 0; padding-left: 1.25rem; display: flex; flex-direction: column; gap: 9px }
+.agent-guide code, .agent-files code { font: 12px ui-monospace, SFMono-Regular, Consolas, monospace; color: var(--text); background: var(--panel2); border-radius: 4px; padding: 1px 5px }
+
+.agent-files-scroll { overflow-x: auto }
+.agent-files { border-collapse: collapse; width: 100%; min-width: 520px; font-size: 13px }
+.agent-files th { text-align: left; font: 600 10px var(--font); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); padding: 0 16px 10px 0 }
+.agent-files td { vertical-align: top; padding: 10px 16px 10px 0; border-top: 1px solid var(--line); color: var(--muted); line-height: 1.6 }
+.agent-files td:first-child { white-space: nowrap }
+.agent-files a { color: var(--accent) }

@@ -89,7 +89,8 @@ def _dist_path_for_url(href: str) -> Path | None:
     if not path.startswith("/"):
         return None
     path = path.split("#")[0].split("?")[0]
-    if path.endswith(".md") or path.endswith(".txt"):
+    # Files served as themselves: Markdown twins, llms.txt, and the published data under /data/.
+    if path.endswith((".md", ".txt", ".json")):
         return DIST / path.lstrip("/")
     if path == "/":
         return DIST / "index.html"

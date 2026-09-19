@@ -58,7 +58,7 @@ test('practice and reference pages resolve, including their children', () => {
   for (const p of ['/worksheet/', '/recipes/', '/recipes/support-desk/', '/teardowns/coding-agent/', '/failures/']) {
     assert.equal(navContext(p, levels, tracks).group, 'practice', p);
   }
-  for (const p of ['/timeline/', '/names/', '/glossary/', '/method/']) {
+  for (const p of ['/timeline/', '/names/', '/glossary/', '/method/', '/agents/']) {
     assert.equal(navContext(p, levels, tracks).group, 'reference', p);
   }
 });

@@ -1,0 +1,151 @@
+---
+// /agents/: for a person who wants their own AI agent to use this site. Three prompts to copy,
+// then the guide the agent will read, shown word for word. Showing it is the point: a page that
+// gives instructions to somebody's agent owes that somebody the text.
+import Base from '../layouts/Base.astro';
+import SectionTop from '../components/SectionTop.astro';
+import { url } from '../lib/url';
+import { agentGuide, agentFiles, inlineHtml, type Block } from '../lib/agents';
+import { guideInput, absFor, useCases } from '../lib/agents-data';
+import '../styles/agents.css';
+
+const abs = absFor(Astro.site);
+const guide: Block[] = agentGuide(guideInput(Astro.site));
+const files = agentFiles(abs);
+const cases = useCases(Astro.site);
+const engineering = cases.filter((c) => c.domain === 'engineering').length;
+const guideUrl = abs('/agents.md');
+
+const PROMPTS = [
+  {
+    id: 'choose',
+    label: 'Choosing an approach',
+    text: `Read ${guideUrl} and follow it. I want to know the simplest way to do this job with AI, and why not something simpler or more capable:\n\n[describe the job: what comes in, what has to come out, how often, who checks it, what a wrong answer costs]\n\nAsk me whatever you need to know before you recommend anything.`,
+  },
+  {
+    id: 'engineer',
+    label: 'For engineering work',
+    text: `Read ${guideUrl} and follow it. I write software for electronics test, measurement, design or analysis. Prefer the recipes whose domain is "engineering", and tell me plainly which parts of this job need no model at all.\n\nThe job: [describe it: the instruments or data involved, what is automated today, what is still done by hand, what a wrong result would cost]\n\nAsk me whatever you need to know first.`,
+  },
+  {
+    id: 'review',
+    label: 'Reviewing a proposal',
+    text: `Read ${guideUrl} and follow it. My team proposes the following AI system. Use the site to tell me whether it is at the right level for the job, what a lower level would lose, how it is likely to fail, and what I should ask them before approving it:\n\n[paste or describe the proposal]`,
+  },
+];
+---
+<Base
+  title="For your agent · Gradient Ascent"
+  description="Point your own AI agent at this site: describe a job, and it can use the worksheet, the recipes and the technique pages to recommend the simplest approach and say why."
+>
+  <div class="page-hero">
+    <div class="eyebrow muted"><span class="dot"></span>For your agent</div>
+    <h1>Describe the job. Let your agent read the manual.</h1>
+    <p>
+      This site is written for people, and it is also laid out for the AI agent a person already
+      uses. Tell your agent what you are trying to get done, point it here, and it can walk the
+      same decision the <a href={url('/worksheet/')} style="color:var(--accent)">worksheet</a> walks,
+      find the closest of {cases.length} worked use cases{engineering > 0 && <>, {engineering} of them for engineers</>}, read the
+      pages behind its answer, and tell you the simplest approach that does the job and why not
+      the one above it.
+    </p>
+  </div>
+
+  <section class="section">
+    <SectionTop
+      eyebrow="Start here"
+      title="Copy a prompt, fill in the brackets"
+      aside="Any agent that can open a web address will do. The prompt gives it one address; that page tells it where everything else is."
+    />
+    <div class="agent-prompts">
+      {PROMPTS.map((p) => (
+        <div class="panel agent-prompt">
+          <div class="agent-prompt-top">
+            <h3>{p.label}</h3>
+            <button type="button" class="agent-copy" data-copy={p.id} aria-label={`Copy the prompt: ${p.label}`}>Copy</button>
+          </div>
+          <pre id={`prompt-${p.id}`} tabindex="0">{p.text}</pre>
+        </div>
+      ))}
+    </div>
+    <p class="footnote reading">
+      A good agent will ask you questions before it answers. If yours recommends something without
+      asking what a wrong result would cost you, ask it to start again from the worksheet.
+    </p>
+  </section>
+
+  <section class="section" id="guide">
+    <SectionTop
+      eyebrow="Nothing hidden"
+      title="Exactly what your agent will read"
+      aside="A page that gives instructions to somebody's agent owes that somebody the text. This is the whole of it, generated from the same data as the rest of the site."
+    />
+    <div class="panel agent-guide">
+      <p class="agent-guide-src">
+        Served as Markdown at <a href={url('/agents.md')}>{guideUrl}</a>
+      </p>
+      {guide.map((b) => {
+        if (b.kind === 'h2') return <h3 class="agent-h2">{b.text}</h3>;
+        if (b.kind === 'h3') return <h4>{b.text}</h4>;
+        if (b.kind === 'p') return <p set:html={inlineHtml(b.text)} />;
+        if (b.kind === 'ol') return <ol>{b.items.map((it) => <li set:html={inlineHtml(it)} />)}</ol>;
+        if (b.kind === 'ul') return <ul>{b.items.map((it) => <li set:html={inlineHtml(it)} />)}</ul>;
+        return <pre>{b.text}</pre>;
+      })}
+    </div>
+  </section>
+
+  <section class="section">
+    <SectionTop
+      eyebrow="The files"
+      title="What is published for a program to read"
+      aside="The human pages are built from these, so an agent reading them sees what the site knows and nothing it does not."
+    />
+    <div class="panel">
+      <div class="agent-files-scroll">
+        <table class="agent-files">
+          <thead><tr><th>Address</th><th>What it is</th></tr></thead>
+          <tbody>
+            {files.map((f) => (
+              <tr>
+                <td><a href={f.url}>{f.path}</a></td>
+                <td>{f.what}</td>
+              </tr>
+            ))}
+            <tr>
+              <td><code>any page + .md</code></td>
+              <td>Every technique, recipe, teardown, level and thread page has a clean Markdown twin, for example <a href={url('/techniques/rag.md')}>/techniques/rag.md</a>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="footnote reading">
+      Every page on this site is still marked Draft: written, sourced and reviewed, with no
+      recorded run behind it. The guide tells your agent so, and tells it not to quote any number
+      here as a measurement.
+    </p>
+  </section>
+</Base>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
+    button.addEventListener('click', async () => {
+      const pre = document.getElementById(`prompt-${button.dataset.copy}`);
+      if (!pre) return;
+      try {
+        await navigator.clipboard.writeText(pre.textContent ?? '');
+        button.textContent = 'Copied';
+      } catch {
+        // No clipboard permission: select the text so the reader can copy it by hand.
+        const range = document.createRange();
+        range.selectNodeContents(pre);
+        const sel = window.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+        button.textContent = 'Selected';
+      }
+      window.setTimeout(() => (button.textContent = 'Copy'), 1800);
+    });
+  }
+</script>
