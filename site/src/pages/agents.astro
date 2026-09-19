@@ -25,7 +25,7 @@ const PROMPTS = [
   {
     id: 'engineer',
     label: 'For engineering work',
-    text: `Read ${guideUrl} and follow it. I write software for electronics test, measurement, design or analysis. Prefer the recipes whose domain is "engineering", and tell me plainly which parts of this job need no model at all.\n\nThe job: [describe it: the instruments or data involved, what is automated today, what is still done by hand, what a wrong result would cost]\n\nAsk me whatever you need to know first.`,
+    text: `Read ${guideUrl} and follow it. I write software for electronics test, measurement, design or analysis.${engineering > 0 ? ' Prefer the recipes whose domain is "engineering".' : ''} Tell me plainly which parts of this job need no model at all, and treat anything that could command real equipment as needing a person's approval.\n\nThe job: [describe it: the instruments or data involved, what is automated today, what is still done by hand, what a wrong result would cost]\n\nAsk me whatever you need to know first.`,
   },
   {
     id: 'review',

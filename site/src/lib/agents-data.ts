@@ -50,6 +50,10 @@ export function guideInput(site: URL | undefined): GuideInput {
     },
     namesAsOf: asOf,
     allDraft: allPages().every((p) => p.status !== 'published'),
+    domainCounts: useCases(site).reduce<Record<string, number>>((acc, c) => {
+      acc[c.domain] = (acc[c.domain] ?? 0) + 1;
+      return acc;
+    }, {}),
   };
 }
 

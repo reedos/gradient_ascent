@@ -33,6 +33,7 @@ const input = (over: Partial<GuideInput> = {}): GuideInput => ({
   counts: { techniques: 49, recipes: 20, teardowns: 3, names: 216, milestones: 96, terms: 103 },
   namesAsOf: '2026-09-18',
   allDraft: true,
+  domainCounts: { general: 15 },
   ...over,
 });
 const sheet: AgentWorksheet = {
@@ -112,6 +113,18 @@ test('while every page is a draft, the guide forbids quoting a number as a measu
   const later = toMarkdown('T', agentGuide(input({ allDraft: false })));
   assert.ok(!later.includes('Nothing on this site is measured yet'));
   assert.match(later, /only a page marked Published carries measured numbers/);
+});
+
+test('the guide points at engineering recipes only when the data has some', () => {
+  // A cold sitting caught the first version promising a domain that was still empty.
+  assert.ok(!guideText().includes('engineering'), 'no engineering use cases, so no mention of them');
+  const withSome = toMarkdown('T', agentGuide(input({ domainCounts: { general: 15, engineering: 8 } })));
+  assert.match(withSome, /8 of them have the domain `engineering`/);
+  assert.match(withSome, /prefer those/);
+});
+
+test('an answer built by analogy has to say so', () => {
+  assert.match(guideText(), /an answer built by analogy from general pages should not read as though the site had covered their case/);
 });
 
 test('the guide carries live counts and the registry date, not typed ones', () => {

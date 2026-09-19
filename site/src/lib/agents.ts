@@ -88,6 +88,10 @@ export interface GuideInput {
   counts: { techniques: number; recipes: number; teardowns: number; names: number; milestones: number; terms: number };
   namesAsOf: string;
   allDraft: boolean;
+  /** How many use cases carry each domain, from the data. The guide may only point an agent at a
+   *  domain that has something in it: a cold sitting on 09/19/2026 caught the first version
+   *  telling agents to prefer `engineering` recipes before a single one existed. */
+  domainCounts: Record<string, number>;
 }
 
 /** The files an agent can fetch, in the order it should want them. One list, used by the guide,
@@ -111,6 +115,11 @@ export function agentFiles(abs: (p: string) => string): { path: string; url: str
 /** The guide, as blocks. Rendered to Markdown for the agent and to HTML for the person. */
 export function agentGuide(input: GuideInput): Block[] {
   const { abs, levels, counts } = input;
+  const engineering = input.domainCounts.engineering ?? 0;
+  const engineeringAdvice =
+    engineering > 0
+      ? ` ${engineering} of them have the domain \`engineering\`: whole jobs from electronics test, measurement, design and analysis, worked on a shared simulated test bench. If the person writes software for that kind of work, prefer those.`
+      : '';
   const ladder = [...levels].sort((a, b) => a.order - b.order).map((l) => `**Level ${l.order}, ${l.title}.** ${l.who}`);
   return [
     {
@@ -139,9 +148,9 @@ export function agentGuide(input: GuideInput): Block[] {
       kind: 'ol',
       items: [
         '**Get the job straight before recommending anything.** You need: what comes in (and how messy it is), what has to come out, how often it runs and how fast it must answer, who or what checks the result, what a wrong answer costs, what data it touches and where that data is allowed to go, and what they have already tried. Ask for whatever is missing. If they cannot say what a correct result looks like, tell them that is the first thing to settle, because nothing at any level can be evaluated without it.',
-        `**Walk the seven questions in order** (${abs('/worksheet.md')}). Each question tests one level, lowest first. Stop at the first level whose test passes. Do not skip ahead because a higher level sounds more capable, and do not let the word the person used ("agent", "RAG", "fine-tune") choose the level for you.`,
+        `**Walk the seven questions in order** (${abs('/worksheet.md')}). Each question tests one level, lowest first. Stop at the first level whose test passes. Do not skip ahead because a higher level sounds more capable, and do not let the word the person used ("agent", "RAG", "fine-tune") choose the level for you. Some questions will not fit the shape of the job: the question about searching documents means little for a job that sorts incoming messages and acts on them. When a question does not apply, the answer is no, and you go on to the next one. Say that you did.`,
         '**Then ask the four cross-cutting questions.** They never change the level. They change the advice: what to check, what to log, what needs a person’s approval, what must stay on the person’s own hardware.',
-        `**Look for the closest recipe** in ${abs('/data/use-cases.json')}. A recipe is a whole job already worked through: which techniques, at which level, and the reasoning. If one fits, recommend it and adapt it. If the person writes software for electronics test, measurement, design or analysis, prefer the recipes whose domain is \`engineering\`. If none fits, compose the answer from technique pages at the level you settled on.`,
+        `**Look for the closest recipe** in ${abs('/data/use-cases.json')}. A recipe is a whole job already worked through: which techniques, at which level, and the reasoning.${engineeringAdvice} If one fits, recommend it and adapt it. If none fits, compose the answer from technique pages at the level you settled on, and say that you did: an answer built by analogy from general pages should not read as though the site had covered their case.`,
         `**Read the pages you are about to recommend**, in their \`.md\` form, before you recommend them. Every technique page says when you do not need it, how it fails, what it costs and how to evaluate it. Use the relations in ${abs('/data/taxonomy.json')}: \`requires\` is what to read or build first, \`upgrades_to\` carries the condition under which moving up is justified, \`alternative_to\` carries the question that decides between two techniques.`,
         '**Answer in the shape below.**',
       ],
@@ -156,7 +165,8 @@ export function agentGuide(input: GuideInput): Block[] {
         '**Why not one level lower**, if that is a fair question for their job.',
         '**What to build first.** The smallest version that would tell them whether the approach works.',
         '**How they will know it works.** Point them at the evals pages: a small set of real examples with known right answers comes before any prompt tuning.',
-        '**How it fails.** The two or three failure modes from the technique pages that apply to their case, and what to watch for.',
+        '**How it fails.** The two or three failure modes from the technique pages that apply to their case, and what to watch for. If one kind of mistake costs them far more than the other (a missed emergency against a false alarm), say which way every threshold and every approval gate should lean, and that the examples on this site assume the two cost about the same.',
+        '**Roughly what it costs to run.** This site has no measured costs, so work it out for them and label it an estimate: their volume, times the model calls per item at the level you recommend, times a plausible token count per call, at the price on the model maker’s own current pricing page. An order of magnitude is what they need: whether this is five dollars a month or five hundred.',
         '**If they would rather buy than build**, the named products from the registry that do this, with the date the registry was checked.',
         '**Links** to the pages you used, so they can read the reasoning for themselves.',
       ],
@@ -208,7 +218,7 @@ export function worksheetBlocks(sheet: AgentWorksheet, levels: AgentLevel[], abs
       kind: 'p',
       text:
         `The worksheet at ${abs('/worksheet/')}, as text. Seven questions, asked in order, each testing one level from the lowest up. Stop at the first answer that says "settle": that is the lowest level that does the job. ` +
-        'Then ask all four cross-cutting questions. They do not change the level, they add cautions.',
+        'Then ask all four cross-cutting questions. They do not change the level, they add cautions. A question that does not fit the shape of the job (the documents question, for a job that sorts messages and acts on them) is answered no.',
     },
     { kind: 'h2', text: 'The seven questions that settle the level' },
   ];

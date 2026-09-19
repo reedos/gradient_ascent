@@ -142,7 +142,13 @@ and a single end-to-end accuracy number cannot tell those apart.
 Try a plain rule (a keyword, a regular expression, a dropdown the user picks from) first if the
 categories are few and easy to tell apart from the surface form of the input: a rule is free to
 run, free to test, and never drifts between two similar inputs the way a classifier can. That is
-<Link href="/techniques/order-zero/">level 0, no model at all</Link>: no model at all.
+<Link href="/techniques/order-zero/">level 0, no model at all</Link>.
+
+A rule and a classifier are not a choice of one. Where one category is dangerous to miss, run
+both and escalate if either one fires. The rule catches the plain cases for nothing ("gas",
+"smoke", "flooding") and keeps catching them on the day the classifier gets one wrong. The
+classifier catches the tenant who writes "something smells odd by the stove". Each covers the
+other's blind spot, and the cost is a few lines of code.
 
 Move up to routing once the categories are real but the wording that signals each one is too
 varied to write as a rule, and a wrong route is cheap enough to tolerate at the rate a classifier
