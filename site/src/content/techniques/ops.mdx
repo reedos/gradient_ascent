@@ -55,36 +55,35 @@ what one already has.
 <Lanes>
 <Lane name="use" title="Use it">
 
-If you pay for an AI product by usage, three questions tell you more than the sticker price.
-Does it cache anything that repeats? Anthropic's own documentation says prompt caching "optimizes
-your API usage by allowing resuming from specific prefixes in your prompts," and states its
-pricing as multipliers on the base input token price: cache writes at "1.25 times" for a
-five-minute cache and "2 times" for a one-hour one, and cache reads at "0.1 times the base input
-tokens price," with a footnote naming two current models whose reads are cheaper still<Cite
-n={2}/>: a product built on a repeated system prompt or a shared document set that isn't using
-this is leaving a documented discount on the table.
-Does it batch anything that doesn't need an instant answer? OpenAI's Batch API documents "50%
-cost discount compared to synchronous APIs" in exchange for results that complete "within 24
-hours (and often more quickly)" instead of immediately<Cite n={3}/>, the same trade any product
-can make on its own non-urgent work. And does it route easy requests to a cheaper model and
-escalate only the hard ones? A product that sends everything to its most capable model pays top
-price for questions a smaller one would have answered.
+When a product you pay for by usage is slow, expensive, or flaky, three questions to the vendor
+find out why faster than guessing at settings on your own side. Send them together, in writing,
+rather than asking one at a time over a call.
 
-A product hitting its own rate limit looks, from the outside, like it's just slow or briefly
-broken. Anthropic's own API documentation describes its limits as requests, input tokens and
-output tokens per minute, enforced with a "token bucket algorithm" so that "your capacity is
-continuously replenished up to your maximum limit, rather than being reset at fixed intervals",
-with a 429 error naming which limit was hit<Cite n={1}/>. A product that retries a failed request
-quietly is doing you a favor; one that just errors during a spike is passing its own capacity
-problem on to you.
+Does it cache anything that repeats? Anthropic's own documentation describes prompt caching as
+reusing "specific prefixes in your prompts" at a fraction of the price: a cache write costs "1.25
+times" the ordinary rate for a five-minute cache, "2 times" for a one-hour one, and a cache read
+costs "0.1 times the base input tokens price," with a footnote naming two current models whose
+reads are cheaper still<Cite n={2}/>. A product built around a repeated system prompt or a shared
+document set that is not doing this is paying, and probably charging you, full price on every
+call.
 
-Running a model on your own hardware instead of an API is its own trade-off, not a strictly
-better choice. Ollama, one tool built for this, labels one card on its own front page "Local" and
-states under it, "Nothing you run locally ever leaves your machine."<Cite n={5}/> That is a
-property of where the computation happens, not a policy that can be revised. What it costs
-instead is hardware you buy and keep running, and a choice limited to models small enough to fit
-on it; what that limit costs you is a question for an
-<Link href="/techniques/evals/">eval</Link> on your own task, not a general answer.
+Does it batch anything that does not need an instant answer? OpenAI's Batch API documents "50%
+cost discount compared to synchronous APIs" for results that complete "within 24 hours (and often
+more quickly)" instead of immediately<Cite n={3}/>. Ask whether any of what you pay for is
+eligible for that and simply is not using it.
+
+When it slows down or goes quiet, ask what specifically was hit: "Which limit did we hit, requests,
+input tokens, or output tokens, and when does it clear?" Anthropic's own API is rate-limited on
+requests, input tokens and output tokens per minute, with a "token bucket algorithm" so capacity
+"is continuously replenished up to your maximum limit, rather than being reset at fixed
+intervals", and a 429 error naming which limit was exceeded<Cite n={1}/>. A well-built product can
+answer that question specifically; one that just says the system is having issues has not looked,
+or is not telling you.
+
+If the honest answer is that the product runs on hardware someone owns instead of paying per call,
+that is its own trade, not a strict upgrade: Ollama, one tool built for this, states "Nothing you
+run locally ever leaves your machine"<Cite n={5}/>, in exchange for buying and maintaining the
+machine it runs on, and a ceiling on how large a model that machine can actually hold.
 
 </Lane>
 <Lane name="build" title="Build it">

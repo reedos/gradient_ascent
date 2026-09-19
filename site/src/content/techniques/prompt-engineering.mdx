@@ -57,41 +57,34 @@ so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Most people already do some of this; it is usually one clause added on the fly ("be concise",
-"answer as a table") rather than a deliberate practice. The makers' own guides describe it as a
-handful of moves that hold up across their different models.
+This works in the same chat box you already use, no different interface required. Three moves
+carry most of the weight, and you can stack them in a single message.
 
-**Instructions.** Say exactly what you want, not what you do not want. "Answer in two sentences"
-gets followed more reliably than "don't be too long."
+State the role, then the exact instruction, then the format, in that order. Try: "You are a
+parts-desk assistant. List every part number mentioned below, one per line, with its price if the
+text states one. If a price isn't given, write 'not stated.'" That's a role, an instruction and a
+format in three sentences, and each one narrows what the model can plausibly answer with.
 
-**Examples.** Show, not just tell, especially for a format that is hard to describe in words.
-OpenAI's guide calls one well-chosen example few-shot learning<Cite n={1}/>, and Google's
-guide goes further, recommending that few-shot examples always be included rather than left
-out<Cite n={3}/>.
+For anything where the shape of the answer matters as much as its content, show one example
+instead of only describing it: OpenAI's guide calls one well-chosen example few-shot
+learning<Cite n={1}/>, and Google's guide goes further, recommending that few-shot examples always
+be included rather than left out<Cite n={3}/>. If you want the reply as a table, a bulleted list,
+or a single sentence, say so directly; Google's own guide gives that example verbatim: ask for a
+response "as a table, bulleted list, elevator pitch, keywords, sentence, or paragraph"<Cite n={3}/>,
+and that is what comes back.
 
-**A role.** Telling the model who it is for this conversation ("you are a parts-desk assistant")
-narrows what a plausible answer looks like, the way a job title narrows what a person would say
-next.
+You'll know it worked when the reply is something you, or a script, can check without rereading a
+paragraph: a table with the right number of rows, a list that starts where you asked it to. You'll
+know it failed when the model answers the right question in the wrong shape, which usually means
+the instruction and the format got buried in the same sentence; put the format on its own line and
+ask again.
 
-**A format.** Asking for the answer as a specific shape makes the reply something code can check
-automatically instead of something a person has to read and judge. Google's own guide gives this
-example directly: ask for a response "as a table, bulleted list, elevator pitch, keywords,
-sentence, or paragraph"<Cite n={3}/> and that is what comes back.
-
-**Asking for reasoning.** For a question with more than one step, asking the model to work
-through it before giving a final answer tends to help, at the cost of more tokens and more time;
-OpenAI's guide notes this matters less for a model built to reason on its own by default, which
-tends to do better on high-level guidance than on very precise, spelled-out steps<Cite n={1}/>.
-
-**Iterating against test cases.** Anthropic's guide frames this as the starting point, not an
-afterthought: it assumes you arrive with a clear definition of success and a way to test against
-it, and says to establish both first if you do not have them<Cite n={2}/>. Then check a new
-version against the same cases the old one had to pass. A prompt that "feels" better after one
-try is a different claim from a prompt that scores better across cases it was not tuned on.
-
-In a chat app, all of this still applies with no API in sight: a saved custom instruction, a
-pinned example message, or just typing "answer in a table" each session are the same moves,
-done by hand instead of programmed once.
+None of this is worth doing for a question you'll ask once. It earns its keep once you're asking a
+close variant of the same thing repeatedly, and there Anthropic's guide has the right frame:
+arrive with a clear definition of what a correct answer looks like and a few cases to check a new
+version against, and set both up before touching the prompt itself<Cite n={2}/>. A prompt that
+"reads better" once, on one try, is a different claim from one that holds up on cases you didn't
+tune it on.
 
 </Lane>
 <Lane name="build" title="Build it">

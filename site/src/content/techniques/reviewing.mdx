@@ -50,40 +50,40 @@ here reports a measured number.
 <Lanes>
 <Lane name="use" title="Use it">
 
-**Reviewing one answer.** Three passes, in this order, because the first two need no expertise
-and the third needs all of yours:
+Reviewing one answer starts with a request you can type back to whatever produced it: "List
+every number, date, name and citation you used, and tell me exactly where each one came from."
+That turns a paragraph you'd judge by feel into a list you can check line by line: for each item,
+either the source it points to says it or it doesn't. When it can't produce one, or the source
+named doesn't actually contain the figure, that's the failure, and the usual cause is that it
+summarized or estimated instead of quoting.
 
-1. Pull out every specific claim (a figure, a date, a name, a citation, a quoted line) and
-   check each one against the thing it came from. Open the source; do not accept a summary of it.
-2. Check what is missing against what you asked for. If the brief asked for five clauses and
-   four came back, nothing in the answer will say so.
-3. Then read for judgment: is this the right answer to the right question, and would you have
-   made the same calls? This is the part only you can do, so spend the time there.
+Then three passes, in order: the first two need no expertise, the third needs all of yours.
 
-For a code change, pass 3 means reading the diff, not a summary of it written by the same system
-that made the change: see <Link href="/techniques/coding-agents/">coding agents</Link>.
+1. Open the source for each item and confirm it says what the answer says. Do not accept a
+   summary of the source; open the document, email or page itself.
+2. Check what's missing against what you asked for. If you asked for five points and got four,
+   nothing in the answer will flag the gap.
+3. Read for judgment: is this the right answer to the right question? This is the part only you
+   can do.
 
-**Reviewing a day of unattended work** is a different job: nothing can be stopped mid-run, so
-there is only a record. Read the list of actions taken before any summary of them, irreversible
-ones first: sent, deleted, paid, published, filed. Open two or three at random and confirm the
-work matches what the record claims. Then look at the shape of the day: how many items were
-handled, skipped, flagged. A run that flagged nothing and skipped nothing is a run to look at
-harder, not a clean one. Set the sample rate in advance (one item in ten) so it does not drift
-with how busy the week is.
+**Reviewing a day of unattended work** is different: nothing can be stopped mid-run, so there is
+only a record. Read the actions taken before any summary, irreversible ones first (sent, deleted,
+paid, published), and open two or three at random to confirm the record matches what was done.
 
 Fluency is not evidence. A fabricated answer reads exactly as well as a correct one, and a 2025
-paper by researchers at OpenAI and Georgia Tech argues this is structural rather than deceptive:
-models "hallucinate because the training and evaluation procedures reward guessing over
-acknowledging uncertainty," because "language models are optimized to be good test-takers, and
-guessing when uncertain improves test performance."<Cite n={2}/> That is an argument about
-training and grading, not a measurement of any product. The tone of an answer tells you nothing
-about the claims inside it.
+paper by researchers at OpenAI and Georgia Tech argues this is structural: models "hallucinate
+because the training and evaluation procedures reward guessing over acknowledging uncertainty,"
+because "language models are optimized to be good test-takers, and guessing when uncertain
+improves test performance."<Cite n={2}/>
 
-What erodes first is attention, not trust. In a 2019 survey of 475 online-panel participants
-whose automation experience was mostly low-stakes, the authors of a complacency scale put the core of
-it at "the degree of attention devoted to monitoring automated tasks (specifically, the lack
-thereof)"<Cite n={3}/>. See <Link href="/techniques/human-in-the-loop/">human approval</Link>
-for what a checkpoint is worth once nobody is reading it.
+What erodes first is attention, not trust. A 2019 survey puts the core of automation complacency
+at "the degree of attention devoted to monitoring automated tasks (specifically, the lack
+thereof)"<Cite n={3}/>. A string of clean checks is exactly when your attention is most likely to
+slip, which argues for a fixed sample rate over trusting that today's batch looks fine.
+
+Skip the three passes on something low-stakes you'll reread yourself anyway. And when there's
+nothing to check against, no source, no record, no number you can recompute, that isn't a review
+you can do; ask for the source before you sign off, not after.
 
 </Lane>
 <Lane name="build" title="Build it">

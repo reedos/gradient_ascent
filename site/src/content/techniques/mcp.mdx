@@ -90,29 +90,36 @@ yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-If a chat app or an editor lets you add a "connector" or "MCP server" from a directory, then ask
-the model to use it, you have used MCP. Claude connectors work this way, and workflow builders
-such as Langflow and Gumloop let a flow call tools from a connected MCP server the same way a
-function-calling flow calls one defined inline. The point of the protocol is that the same server
-works with any of these hosts, because they all speak the same requests underneath: list what a
-server offers, read from it, or call one of its tools.
+Look for "Connectors," "MCP servers" or "Integrations" in your chat app's or editor's settings,
+usually with a directory to browse and add from. Claude connectors work this way, and workflow
+builders such as Langflow and Gumloop let a flow call tools from a connected server the same way a
+function-calling flow calls one defined inline: the point of the protocol is that the same server
+works with any of these hosts.
 
-The protocol's documentation describes three things a server can offer, and is specific about who
-is meant to decide each one: "Tools" are "functions that your LLM can actively call," and the
-model decides when to use them; "Resources" are "passive data sources that provide read-only
-access to information for context," and the application decides what to fetch; "Prompts" are
-"pre-built instruction templates," and the user decides when to invoke one<Cite n={2}/>. A server that only
-exposes resources cannot act on its own; one that exposes tools can, which is exactly the
-distinction worth checking before connecting one.
+Before adding one, read what it offers: the protocol treats three kinds of thing differently, and
+only one of them can act on its own. "Tools" are "functions that your LLM can actively call," and
+the model decides when to use them; "Resources" are "passive data sources that provide read-only
+access to information for context," fetched by the application rather than requested by the model;
+"Prompts" are "pre-built instruction templates," invoked by you<Cite n={2}/>. A server offering
+only resources is read-only and safe to add freely; one offering tools can take actions on your
+behalf, described by whoever built the server, not by the app you are using, and the specification
+itself says "clients MUST consider tool annotations to be untrusted unless they come from trusted
+servers"<Cite n={3}/>.
 
-Because a tool's description is what steers the model toward using it, and that description comes
-from whoever wrote the server, the specification is direct about the risk: "clients MUST consider
-tool annotations to be untrusted unless they come from trusted servers"<Cite n={3}/>. It also asks
-for a person in the loop: "there SHOULD always be a human in the loop with the ability to deny
-tool invocations"<Cite n={3}/>. One of the client behaviors it lists for that: "Show tool inputs
-to the user before calling the server, to avoid malicious or accidental data
-exfiltration"<Cite n={3}/>. A product that lets an MCP tool run with no visible confirmation for
-anything beyond a lookup is not following that guidance.
+A safe tool next to a dangerous one on the same server can look identical on the surface: both are
+just a name and a sentence. Read the sentence for what the tool actually does, not how it is
+phrased.
+
+To test whether a connected tool is actually being called rather than answered from memory, ask
+for something only that tool could know: look up one specific record through the connector and
+name the exact field the answer came from. A real call shows you the tool name and its arguments
+before or alongside the answer; the specification lists, among the behaviors it wants from a
+client, "Show tool inputs to the user before calling the server, to avoid malicious or accidental
+data exfiltration"<Cite n={3}/>, so a product that goes straight to a final answer with nothing
+shown in between is skipping a step it is supposed to offer you.
+
+If nothing you use regularly calls out to another system, you have no reason to add a connector at
+all: a plain chat answers as well and reads nothing else.
 
 </Lane>
 <Lane name="build" title="Build it">

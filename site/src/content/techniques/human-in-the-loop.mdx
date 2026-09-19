@@ -65,26 +65,31 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Approval steps in ordinary automation tools are the plainest version of this. Power Automate
-sells the feature directly, under the heading "Streamlined approval processes": "Create, manage,
-and share approval processes across your organization"<Cite n={2}/>. A flow runs up to a point, a
-person is asked to approve or reject, and only an approval lets it continue. Coding agents put
-the pause at a different kind of irreversible step: Jules works from a plan you confirm ("That
-looks good. Continue!"), and when the work is done, "Jules creates a PR of the changes. Approve
-the PR, merge it to your branch, and publish it on GitHub"<Cite n={3}/>: two gates, both of them
-yours, sitting either side of the part that is hard to undo rather than in front of every step.
+Put the approval gate right before the step that is expensive or hard to undo, not in front of
+every step. Power Automate sells the feature directly, under the heading "Streamlined approval
+processes": "Create, manage, and share approval processes across your organization"<Cite n={2}/>,
+pausing a flow until a person approves or rejects and letting only an approval continue it. Jules
+puts two gates around the part that is genuinely hard to undo instead of one in front of
+everything: you confirm a plan first, "That looks good. Continue!", and once the work is done,
+"Jules creates a PR of the changes. Approve the PR, merge it to your branch, and publish it on
+GitHub"<Cite n={3}/>.
 
-Tools at this level usually offer a second mode that skips the asking. Cline's own description of
-the choice: "Approve every step, or flip auto-approve for autopilot"<Cite n={4}/>. Which of those
-you want is a real decision, and it is worth making deliberately rather than by drift: a gate is
-only a control while somebody is reading what it shows them, and an approval that has become
-automatic (by the flip of a setting, or by habit) is a step in the run, not a check on it.
+An approval screen is only worth having if it shows enough to actually judge, not just a yes or
+no button. It needs to show the thing being approved in full, the draft text or the change
+itself, and what it was based on, its sources or citations, so you can check a specific claim
+against a specific source rather than approving on how confident it sounds. A screen that only
+asks whether to approve, with nothing to check it against, is asking you to rubber-stamp, not
+review. Where missing a bad case costs far more than a false alarm, set the gate to catch more
+than strictly necessary on purpose: reviewing a few extra items that turn out fine is the price
+of not missing the one that does not.
 
-So if a tool asks you to approve something, two questions are worth answering honestly: what
-would actually happen if you clicked through without reading, and how much of it are you
-reading. The answer to the second tends to fall over time. <Link
-href="/techniques/evaluator-optimizer/">Write and check</Link> is the move when the thing you
-were reading for turns out to be something a second prompt can test every time.
+Watch for the point an approval turns into a reflex. Cline's own description of the alternative
+is a single setting: "Approve every step, or flip auto-approve for autopilot"<Cite n={4}/>, and
+which of those you actually want is worth deciding on purpose rather than by habit. Time yourself
+once: how long do you actually spend reading before you click approve, and is that long enough to
+have caught a real mistake? If the honest answer is no, move the gate to the one step that truly
+matters and read that one closely, or stop approving and turn on whatever the tool calls
+automatic mode. A gate nobody is really reading is not a control. It is just a delay.
 
 </Lane>
 <Lane name="build" title="Build it">

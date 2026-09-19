@@ -51,39 +51,36 @@ site's own small version of it.
 <Lanes>
 <Lane name="use" title="Use it">
 
-If a product you use shows "thinking" steps, tool calls, or a "sources" panel while it works,
-that is observability surfaced to you directly: a trace the product recorded for its own
-debugging, with a reader-facing view built on top. When an answer looks wrong, that panel is
-where to look first (which step, if any, went off track) rather than only rereading the final
-text.
+If a product you use shows a "thinking" panel, a tool-call log, or a "sources" panel while it
+works, open that when an answer looks wrong, before rereading the final text again. That panel is
+a trace the product recorded for its own debugging, with a reader-facing view built on top.
 
-The same question a builder asks of a system applies to a product you did not build: can you
-tell, after the fact, which step produced a wrong answer? A chat app that shows only a final
-message gives you nothing to check but plausibility. One that shows retrieved sources, the tool
-calls it made, or a citation trail gives you something to check against, the same distinction
-<Link href="/techniques/reviewing/">reviewing</Link> makes about a result in general.
+What each panel tells you differs. A "thinking" panel is the model's own account of its
+reasoning, in its own words: a report, not a guarantee that it's what actually produced the
+answer. A "sources" panel is more checkable: it names what was retrieved, so you can open the
+source and confirm the sentence attributed to it is really there, the same first pass
+<Link href="/techniques/reviewing/">reviewing</Link> describes for any claim. A tool-call log
+tells you what the system did, not why; a wrong tool called is a fact you can act on without
+reading any of the model's stated reasoning.
 
-Cost and time are also worth watching, not just correctness. If a product's answers are slow or
-it hits a usage limit, that is very often one expensive or malfunctioning step, not the whole
-system being slow. Without a per-step view there is no way to tell "one bad step" apart from
-"everything is slow" from the outside, and per-step numbers are also what
-<Link href="/techniques/cost-optimization/">cost optimization</Link> needs before it can say
-which lever would help.
+The check: take the part of the answer that looks wrong and try to find it in the panel. If a
+sources panel names a passage that genuinely doesn't say what the answer claims, the failure is
+retrieval or reading, and asking it to answer using only that passage usually fixes it. If
+nothing in the panel accounts for the wrong part, the panel isn't covering the step that actually
+failed, and rereading it harder won't help; rephrase the question instead of trusting this one.
+And if a product is slow or hits a usage limit, a per-step panel usually shows one stuck step
+rather than the whole system being slow.
 
-Sampling is what makes this affordable at any real volume: OpenTelemetry describes sampling as
-"one of the most effective ways to reduce the costs of observability without losing visibility,"
-and distinguishes a decision made "as early as possible" (head sampling) from one made only
-after "considering all or most of the spans within the trace" (tail sampling)<Cite n={2}/>. A
-product that traces everything, forever, at full detail either has very little traffic or is
-about to have a very large bill.
+Not everything gets recorded, and that's deliberate: OpenTelemetry describes sampling as "one of
+the most effective ways to reduce the costs of observability without losing visibility"<Cite
+n={2}/>, which is why a rare, one-off bad answer can have no panel behind it at all in an
+otherwise well-built product.
 
-A hosted tracing backend is the same question from another angle. Once a span leaves the process
-that recorded it, whatever it carries (a prompt fragment, a tool call's arguments, an answer)
-travels to a company whose own retention and access terms apply, not the model maker's. Check
-what a tracing product itself documents about what it stores, for how long, and whether capturing
-message content can be turned off, the same question this page asks about the trace format
-itself. See <Link href="/techniques/safety/">safety, privacy and governance</Link> for what an
-intermediary between a person and a model means for data more generally.
+Before your team sends real conversations to a hosted tracing product, ask what its own
+documentation says it stores, for how long, and whether capturing the actual message content can
+be turned off. A hosted backend is a second company now holding that text under its own terms,
+not the model maker's, which is <Link href="/techniques/safety/">safety, privacy and
+governance</Link>'s point about every intermediary on the route.
 
 </Lane>
 <Lane name="build" title="Build it">

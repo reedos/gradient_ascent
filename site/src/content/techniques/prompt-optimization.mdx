@@ -51,37 +51,33 @@ nothing below is measured.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Most prompt-improvement tools a person meets directly are not the search DSPy runs. Anthropic's
-Prompt Improver rewrites a prompt in one pass using five named techniques (a chain-of-thought
-section, example standardization into XML, example enrichment, rewriting for clarity, and a
-prefilled assistant message), after which "you can provide feedback for Claude about what is and
-isn't working to further improve the prompt"<Cite n={3}/>. The rewrite itself compares no
-candidates and consults no score. Scoring is a separate step in the same product: Anthropic
-describes its prompt evaluator as letting you "test your prompts under various
-scenarios"<Cite n={3}/>.
-It adds an "ideal output" column so users can "grade model outputs on a 5-point
-scale"<Cite n={3}/>: a person grading, one prompt at a time, not a search choosing between prompts
-by number.
+Chat apps increasingly ship an "improve this prompt" button. Anthropic's own version rewrites a
+prompt in one pass using fixed techniques, then lets you keep adjusting it: "you can provide
+feedback for Claude about what is and isn't working to further improve the prompt"<Cite n={3}/>.
+That button compares no candidates and consults no score. It hands you a better first draft, not a
+measurement of whether the new prompt actually works better than the old one.
 
-The tools this page is about do the choosing. They run many candidate instructions, or many
-candidate few-shot examples, and keep whichever scores highest on a set of examples. That makes the
-question about any number one of them reports the same question
-<Link href="/techniques/evals/">evals</Link> asks about every score: was it measured on data the
-search never touched while it was choosing? A search allowed to see its own scoring set will always
-find something that scores well on it, which is a different claim from finding something that works
-elsewhere.
+To find that out, run the by-hand version yourself. Collect ten real questions you already know
+the right answer to. Run all ten through your current prompt and mark which came back right. Run
+the same ten through the rewritten prompt, unchanged otherwise, and mark which came back right.
+Count both. A rewrite that gets seven right against the old prompt's eight is not an improvement,
+however much better it reads on the page.
 
-None of this replaces writing a prompt by hand for a one-off task, and an optimized prompt is not
-a permanent asset: it is fitted to one development set, on one model. Change the model (a new
-version from the same maker counts) and the search has to be re-run, or at minimum the winner
-re-scored, because nothing about the old score carries over to a model that answers differently.
+Some tools go a step further and let a person grade the outputs: Anthropic's own prompt evaluator
+lets you "test your prompts under various scenarios"<Cite n={3}/> and adds an "ideal output" column
+so you can "grade model outputs on a 5-point scale"<Cite n={3}/>. That is still a person grading
+one prompt at a time, not a search comparing prompts by number; read that grade the same way you'd
+read your own ten-question count, as one data point, not a verdict.
 
-An engineer who wants a better prompt is often not asking a model to decide anything. The job is
-turning numbers code already computed into report prose: a production summary, an engineering-test
-lab note, or a precise-measurement writeup all still need a sentence written around a margin or a
-Cpk. A search here is a search over phrasing, scored on whether the drafted sentence states every
-number correctly, not on whether a verdict is right; the verdict came from code before the prompt
-ever ran, and stays there no matter which candidate wins.
+An optimized or "tuned" prompt someone hands you is also not permanent: it was fitted to one set of
+test questions on one model, and switching models, including a new version from the same maker,
+can make an old winner perform worse than the plain prompt it beat. If a prompt you rely on was
+last checked against a model that has since changed, re-run your own ten questions before trusting
+it again.
+
+None of this is worth doing for a question you will ask once. Write it, read the answer, move on.
+Set up the ten-question comparison only once you are about to keep a rewritten prompt running for a
+while, since that is the point where "seems better" starts costing something if it turns out wrong.
 
 </Lane>
 <Lane name="build" title="Build it">

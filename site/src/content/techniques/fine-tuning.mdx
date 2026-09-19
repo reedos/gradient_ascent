@@ -68,38 +68,35 @@ below is measured.
 <Lanes>
 <Lane name="use" title="Use it">
 
-You are unlikely to run a training job yourself. You may well be the one deciding whether your team
-should, and on whose platform, and two things are worth checking first: how much data a job really
-needs, and whether the service will still be taking new jobs a year from now.
+Someone offering to fine-tune a model for your team is asking you to pay for a training run now in
+exchange for shorter, cheaper, more consistent answers later. Two questions, put to the vendor in
+writing, decide whether that is worth it, and one platform's own numbers give you a floor to hold
+their answers against.
 
-On data, OpenAI's current guide states, "The minimum number of examples you can provide for
-fine-tuning is 10." It adds, "We see improvements from fine-tuning on 50–100 examples, but the
-right number for you varies greatly and depends on the use case," and recommends "starting with 50
-well-crafted demonstrations and evaluating the results." Its advice when that changes nothing is
-not more data: "If 50 examples have no impact, rethink your task or prompt before adding training
-data"<Cite n={5}/>. Those are OpenAI's numbers for OpenAI's platform rather than a fact about
-fine-tuning anywhere else, and still a useful check against a pitch that starts at thousands of
-examples.
+How much of your own data does the job actually need? OpenAI's current guide states, "The minimum
+number of examples you can provide for fine-tuning is 10." It adds, "We see improvements from
+fine-tuning on 50–100 examples, but the right number for you varies greatly and depends on the use
+case," and recommends "starting with 50 well-crafted demonstrations and evaluating the results."
+Past that point its own advice is not more data: "If 50 examples have no impact, rethink your task
+or prompt before adding training data"<Cite n={5}/>. Those are OpenAI's numbers for OpenAI's
+platform, not a law of fine-tuning anywhere else, but a vendor asking for thousands of examples
+before they will even start owes you a reason theirs needs so many more.
 
-For an engineer, the same right-number question often arrives with a number attached: 200 labeled
-failure notes from bring-up, each with a confirmed root cause. OpenAI's numbers above are the
-nearest anchor, not a verdict for a different task. The test is the same whether the notes came
-from production test, engineering test, or a precise-measurement log: hold a slice back, fine-tune
-on the rest, score against the slice, then add more.
+Will the training service still be open when you need to retrain? The same documentation states,
+"OpenAI is winding down the fine-tuning platform. The platform is no longer accessible to new
+users, but existing users of the fine-tuning platform will be able to create training jobs for the
+coming months."<Cite n={4}/> It adds, "All fine-tuned models will remain available for inference
+until their base models are deprecated." So a model already trained keeps answering after that.
+Together AI's fine-tuning overview carries no such notice today<Cite n={2}/>. Ask any vendor
+selling training directly whether the service is still taking new jobs, and for how long.
 
-On durability, the same maker's documentation states, "OpenAI is winding down the fine-tuning
-platform. The platform is no longer accessible to new users, but existing users of the fine-tuning
-platform will be able to create training jobs for the coming months."<Cite n={4}/> It adds, "All
-fine-tuned models will remain available for inference until their base models are deprecated." The
-page puts no end date on "the coming months," so neither does this one. Together AI's fine-tuning
-overview carries no such notice<Cite n={2}/>. One maker's notice and another's silence is not a
-rule about hosted fine-tuning generally; the platform you are actually considering has its own
-current page.
+The check that actually tells you whether it worked: collect real questions you already know the
+right answer to, run them through the fine-tuned model and the one it replaces, and read both sets
+of answers side by side rather than trusting either party's summary number.
 
-A product described as "fine-tuned on our data" changed its weights once, in advance, a different
-claim from one that reads your documents at answer time. Fine-tuning does not teach a model
-today's facts: a question about something newer than the dataset gets whatever the model does
-when it does not know, not a lookup. That is <Link href="/techniques/rag/">retrieval</Link>'s job.
+And it will not teach the model something that happened last week. Fine-tuning changes weights
+once, in advance; it does not give the model a live lookup of a document, so a question about
+something newer than the training data gets a guess, not a fact.
 
 </Lane>
 <Lane name="build" title="Build it">

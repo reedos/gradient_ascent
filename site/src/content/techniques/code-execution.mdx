@@ -57,29 +57,34 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-If a chat app has ever run Python for you (plotted a chart from data you pasted in, summed a
-column, found where two lines cross) you have used code execution. ChatGPT's data analysis
-feature and Gemini Notebook both work this way, writing and running code behind the scenes rather
-than computing a number from the model's own token predictions; Mistral Vibe does the same for
-its own chat product.
+This is the feature in ChatGPT's data analysis, Gemini Notebook and Mistral Vibe that runs actual
+Python on data you give it, instead of guessing a number from the words in your message. Paste a
+table or upload a spreadsheet, then ask something concrete: "Add up the total in the amount
+column, and show me a bar chart of totals by month." A model asked to just compute that from the
+text of your message can get arithmetic wrong; a model that writes and runs code cannot, because
+the number comes from the code executing, not from a token prediction.
 
-What makes this safe to offer at all is what the sandbox refuses to do, not what it lets the
-model write. Anthropic's own container: "Internet access: Completely disabled for security" and
-"External connections: No outbound network requests permitted"<Cite n={1}/>, alongside fixed
-resource limits ("Memory: 5 GiB RAM," "CPU: 1 CPU"<Cite n={1}/>) and a maximum execution time,
-past which Anthropic documents the call returning an error rather than running on<Cite n={1}/>.
-OpenAI's code interpreter is built the same way: "A container is a fully sandboxed virtual
-machine that the model can run Python code in"<Cite n={2}/>, sized in fixed memory tiers and set
-to expire "if it is not used for 20 minutes"<Cite n={2}/>. Those limits are the sandbox. What the
-model writes runs inside them, whatever it turns out to be.
+What makes this safe to try at all is what the sandbox refuses to do, not what it lets the model
+write. Anthropic's own container has "Internet access: Completely disabled for security"<Cite
+n={1}/>; OpenAI's runs the same way, inside "a fully sandboxed virtual machine that the model can
+run Python code in"<Cite n={2}/>, with a fixed memory limit and a session that expires "if it is
+not used for 20 minutes"<Cite n={2}/>. Neither can reach your email, your bank, or anything else on
+the internet, whatever the code says.
 
-The same question about permission applies here as with any tool: if the sandbox can reach a
-service that needs a password or a key, where does that credential live? E2B, a sandbox product
-outside the chat apps, lists a "Secrets vault" whose description is "Keys your agent can use but
-never read", and says of the boundary around it that "the sandbox reaches out under your egress
-policy, never around it"<Cite n={3}/>: available to the network call the code makes, never to the
-code itself. If a product shows you the code it ran, read it before
-trusting the number or chart sitting next to it.
+Get in the habit of asking to see the code, not just the number or the chart: most of these
+products have a button or an expandable section for it. You do not need to read Python fluently to
+check the shape of it: does it use the column you actually asked about, and does the final number
+come from a calculation in the code rather than a sentence typed after it? A total that changes
+when you ask the same question twice, or a chart with no code shown next to it, is a sign the
+answer was written rather than computed.
+
+The same habit answers the question of trust for a credential, too: if a connected tool can reach
+a service that needs a password, that key has to live somewhere the code cannot read and only the
+network call can use, the way a sandbox product outside the chat apps, E2B, describes its own
+"Secrets vault" as "Keys your agent can use but never read"<Cite n={3}/>.
+
+If the file is small enough to eyeball, or the calculation is one you would trust a spreadsheet
+formula to do, that is faster than typing a prompt for it: open the spreadsheet.
 
 </Lane>
 <Lane name="build" title="Build it">

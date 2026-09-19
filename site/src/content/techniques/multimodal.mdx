@@ -65,36 +65,34 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-You have used multimodal chat any time you uploaded a photo, a screenshot or a PDF into a chat
-app and asked about it, or spoke instead of typing and got a transcribed, answered reply back.
-Claude, ChatGPT and Gemini all take images and documents directly in the same conversation as
-text, and most also offer voice input that gets turned into text before the model ever sees it.
+Look for the paperclip, camera or microphone icon next to where you type in any chat app: that's
+where you attach a photo, a screenshot, a PDF, or record your voice instead of typing. Use it for
+anything where the picture says more than you'd want to type out: a label, a receipt, a whiteboard
+photo, a page of a document. If typing the fact yourself is just as fast as photographing it, type
+it; a plain sentence has no cost surprise waiting in it.
 
-What is worth noticing, compared to a plain text question, is cost and how much you can actually
-check. An image or a long audio clip is not free the way typing a sentence is: Claude turns each
-image into visual tokens by dividing it into small patches, so one large photo can cost as many
-tokens as several paragraphs of text before the model has said anything back<Cite n={1}/>; Gemini
-bills audio by the second<Cite n={2}/>. Attaching ten photos to one question is a real cost
-difference from attaching one, in a way that is easy to forget, since nothing in most chat
-interfaces shows a running token count.
+For anything you need read back exactly, don't just ask "what does this say"; ask it to transcribe
+the specific part you care about, then check that part against the original yourself, character by
+character if it matters: an account number, a date, a dollar figure. A model can describe an image
+with full confidence about a detail that is not actually in it, and nothing in the reply marks
+which parts it read and which it filled in, so treat a first read as a draft to verify rather than
+a finished answer.
 
-Checking the reply is also different by direction. Text answered from an uploaded document can
-still be checked against that document, the same way a citation in RAG can be checked against a
-source passage. A generated image or video has no source passage to check it against: the whole
-point was to make something that did not exist before. Google DeepMind's answer is the SynthID
-mark on Veo's videos<Cite n={4}/>, and a mark is not a check a reader can perform: you cannot
-tell a generated video from a real one by looking, so you trust the mark, or the product. Content
-credentials is the industry name for that record, specified by C2PA rather than one maker: signed
-assertions about where a file came from, bound to the file. The specification passes no judgment
-on whether that history is good or bad, only on whether it validates<Cite n={5}/>.
+Cost is worth a glance before you attach ten photos instead of one. An image is not free the way a
+typed sentence is: Claude turns each one into visual tokens by dividing it into small patches, so
+a single large photo can cost as many tokens as several paragraphs of text before the model has
+said anything back<Cite n={1}/>; Gemini bills a voice recording by the second, not by the
+word<Cite n={2}/>. Attaching everything "just in case" costs real money at any real volume, even
+when every attachment answers the same short question.
 
-For anything generated and then used somewhere that matters (a document, a report, a decision)
-treat it the way you would treat a first draft from someone whose work you have not checked
-before: useful, but not yet verified.
-
-Multimodal is one of the techniques behind the
-<Link href="/shapes/#extract-structure">pull structured data out of something unstructured</Link>
-job shape, when what goes in is a photo or a recording rather than typed text.
+If you ask a chat app to generate an image or a video rather than read one, there is nothing to
+check it against: the whole point was to make something that didn't exist before. Google
+DeepMind marks its Veo videos with SynthID so the origin can be checked later<Cite n={4}/>, and the
+wider industry name for that kind of record is content credentials: signed assertions about where
+a file came from that anyone can validate, though the standard itself says nothing about whether
+that origin is trustworthy<Cite n={5}/>. Treat anything generated the way you'd treat a first draft
+from someone whose work you haven't checked before, especially before it goes anywhere that
+matters.
 
 </Lane>
 <Lane name="build" title="Build it">

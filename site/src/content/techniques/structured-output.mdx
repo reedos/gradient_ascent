@@ -70,35 +70,31 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-You have used structured output any time a product turned something you typed or said into a
-form, a calendar event, or a spreadsheet row, rather than just a reply in a chat window. "Add
-lunch with Sam Thursday at noon" becoming an actual calendar entry with a title, a date and a
-time is a model extracting three fields into a schema, not free text. These features feel
-different from chat for exactly this reason: the product asked for a fixed shape, not a sentence.
+You've used this any time an app turned something you typed or said into a form, a calendar entry,
+or a spreadsheet row instead of a paragraph of text. Look for the moment right after that: does
+the app show you the extracted fields on a draft or review screen before it commits to anything,
+or does it just go and do it? "Add lunch with Sam Thursday at noon" becoming a calendar entry is a
+model filling in a title, a date and a time; the software worth trusting is the one that shows you
+those three fields and lets you fix any of them before saving.
 
-What separates a good version of this from a bad one is what happens when the extraction is
-wrong, not whether it usually works. A well-built feature validates the result before doing
-anything with it: a date has to actually be a valid date, a required field has to actually be
-present, and either retries automatically or hands the draft back for you to confirm, the way a
-calendar app shows a proposed event before saving it. A poorly built one accepts whatever
-JSON-shaped thing came back and acts on it immediately, which is how a voice assistant ends up
-creating an event on the wrong date with no chance to catch it.
+If a tool skips that step, or you can't find a confirmation screen anywhere in it, give it a
+genuinely ambiguous instruction on purpose: "Set up a payment for the amount in this email," with
+no amount stated anywhere, or a date that could mean two different things. Watch what it does with
+the gap. A well-built feature asks you to confirm the field or fill in the blank yourself; a
+poorly built one invents something plausible and acts on it, which is how a wrong date or a wrong
+amount gets through with nobody noticing until later.
 
-The distinction between "the API guarantees this is valid JSON" and "the values are actually
-correct" matters here. A schema-constrained reply is guaranteed to be well-formed: every required
-field present, every type right. Nothing about that guarantee checks that the date it extracted is
-the date you meant, or that a warranty length pulled from a document matches what the document
-actually says. Those checks are still yours, or a person's, to make; the schema guarantee is about
-shape, not truth.
+Two things are worth checking apart from each other, not as one pass. Did the extraction fill
+every field it needed, in the right shape, a real date rather than a scrap of text that only looks
+like one? And separately: is the value actually correct, the date you meant, the amount the
+document actually states? A tool can pass the first check and fail the second, and a shape that
+looks valid is not the same claim as a fact that's true.
 
-When a product fills a form or a record for you, look for a review step before it commits to
-anything, especially anything costly to get wrong: a payment amount, a shipping address, a date
-on a legal document. Its absence is invisible in a demo; it only shows up the first time the
+None of this needs a second look for something low-stakes you'd catch and fix in five seconds
+anyway, a draft you were going to reread regardless. It matters for anything costly to get wrong: a
+payment amount, a shipping address, a date on something legal. That's where a review step before
+saving earns its place, and its absence is invisible in a demo, right up until the first time the
 extraction is wrong.
-
-Structured output is one of the techniques behind the
-<Link href="/shapes/#extract-structure">pull structured data out of something unstructured</Link>
-job shape.
 
 </Lane>
 <Lane name="build" title="Build it">

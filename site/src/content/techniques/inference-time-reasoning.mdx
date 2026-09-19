@@ -63,35 +63,36 @@ so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Most chat apps that offer a reasoning model give you a toggle or a slider for this, often called
-"thinking," "extended reasoning," or an effort level from low to high. Turning it up gets a model
-that visibly works through a problem (restating what is being asked, trying an approach, checking
-it, backtracking if it does not hold up) before giving a final answer<Cite n={1}/>. That is worth
-it for a hard multi-step problem: real math, a subtle bug, a plan with several dependent steps. It
-is usually not worth it for a fact you could look up, a short classification, or anything where
-the first plausible answer is also the right one: the makers' own guidance says as much directly:
-use minimal effort for fact retrieval and classification, and save the higher settings for coding,
-math, and multi-step planning<Cite n={2}/><Cite n={3}/>.
+Look for a toggle, a slider, or a menu item labeled "thinking," "extended reasoning," or an effort
+level from low to high, usually near where you type or in settings. Turn it on, or push it higher,
+only for a question with real multiple steps: a word problem with several dependent parts, a plan
+that has to account for constraints, a bug you can't spot at a glance. Anthropic's own guidance
+describes what that setting buys: a model that visibly works through a problem, restating what's
+being asked, trying an approach, checking it, backtracking if it doesn't hold up, before giving a
+final answer<Cite n={1}/>.
 
-The other shape (running the same question several times and combining the answers) is mostly
-invisible to a reader, since it happens inside a product rather than as a setting you control. A
-coding tool that generates several candidate fixes and keeps the one that actually passes the
-tests is doing a version of this: best-of-N with a checker, where the checker is something
-concrete (does the code run, does the test pass) rather than a vote. A product that shows a
-confidence figure next to an answer, or that quietly retries a step that looked shaky, is often
-running more than one attempt behind the scenes and combining them, even when the interface never
-uses the phrase "self-consistency."
+For anything else, leave it off or set it low. Ask a plain factual question, such as what year a
+law was passed, with the setting on, then again with it off, and time both. If the answer, not
+just the wait, comes back identical either way, you've found a question this setting was never
+going to help with: the makers' own guidance says to use minimal effort for fact retrieval and
+classification, and save the higher settings for coding, math and multi-step
+planning<Cite n={2}/><Cite n={3}/>.
 
-Both shapes trade money and time for a better chance at a right answer, and neither fixes a model
-that is confidently wrong the same way every time. More thinking applied to a bad approach still
-produces a bad answer, just a longer and more convincing-looking one; running the same flawed
-reasoning several times and voting only helps when the mistakes differ from run to run, not when
-they are systematic. If a product's answer is wrong, more reasoning effort is not automatically
-the fix to reach for first: whether the model had the information it needed in the first place is
-worth checking before spending more on reasoning about the wrong facts.
+Some products never show a toggle at all and instead run several attempts behind the scenes,
+showing you only the one they kept. You can't switch that off, but you can still check it: ask the
+same real question again in a brand new conversation, worded slightly differently, and see whether
+the two answers actually agree. Two confident, different answers to the same question is a sign to
+verify the fact independently, not to trust whichever one you saw first.
 
-Inference-time reasoning is one of the techniques behind the
-<Link href="/shapes/#transform-text">turn one piece of text into another</Link> job shape.
+You'll know the setting earned its cost when turning it on changes the answer on a question you
+already know the right answer to, not just when it makes the reply read more thorough. A longer,
+more confident-sounding wrong answer is not a win; check it against something you can verify
+before trusting the extra length it took to get there.
+
+If an answer is wrong because the model never had a fact it needed, more thinking time will not
+fix that, no matter how high the setting goes. That's a missing-information problem, not a
+reasoning one, and the fix is giving it the fact directly, not asking it to think harder about the
+same gap.
 
 </Lane>
 <Lane name="build" title="Build it">

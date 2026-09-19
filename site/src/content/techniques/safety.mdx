@@ -77,29 +77,32 @@ here reports a measured number. It describes the mechanisms and the checks.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Before pasting anything sensitive into a chat app, check what that product's own page says about
-retention and training, and check that the page covers the plan you are actually on. Anthropic's
-Privacy Center article of July 1, 2026 says that if you allow your chats to improve Claude, "we
-may retain your data in a de-identified format for up to 5 years in our model training
-pipelines", and that a conversation you delete is "Removed from your chat history immediately"
-and "Deleted from our back-end storage systems within 30 days". That article covers consumer
-products, and says that for "commercial products such as Claude for Work and the Anthropic API"
-there is a different page<Cite n={4}/>. OpenAI documents a different default for its API, in a
-page that covers the API and not its consumer product: "data sent to the OpenAI API is not used
-to train or improve OpenAI models" unless you explicitly opt in, with abuse-monitoring logs
-"retained for up to 30 days"<Cite n={5}/>. Neither statement transfers to the other company, to
-the other product, or to a plan its own page does not name.
+Before pasting anything sensitive into a chat app, find that product's own page on retention and
+training, and check that it covers the plan you are actually on: a company's consumer product and
+its business or API plan often say opposite things. Anthropic's Privacy Center article of
+July 1, 2026 says that if you allow your chats to improve Claude, "we may retain your data in a
+de-identified format for
+up to 5 years in our model training pipelines", and that a conversation you delete is "Removed from
+your chat history immediately" and "Deleted from our back-end storage systems within 30 days". That
+article covers consumer products, and says that for "commercial products such as Claude for Work
+and the Anthropic API" there is a different page<Cite n={4}/>. OpenAI documents a different default
+for its API, in a page that covers the API and not its consumer product: "data sent to the OpenAI
+API is not used to train or improve OpenAI models" unless you explicitly opt in, with
+abuse-monitoring logs "retained for up to 30 days"<Cite n={5}/>. Neither statement transfers to the
+other company, to the other product, or to a plan its own page does not name. If you cannot find
+the page for your actual plan, do not assume the friendlier answer applies: ask whoever manages the
+account, or treat the text as kept and used until someone can show you otherwise.
 
-Prompt injection is worth understanding even if you never write code. If you use a tool that
-reads a web page, a file, or an email on your behalf and then acts on it (books something,
-sends something, changes something), ask what stops it from following an instruction hidden in
-that content instead of yours. A page designed to be read by an assistant, not a person, can say
-anything; nothing about being "just a web page" stops it from containing a line that looks like a
-command. The honest answer from a well-built tool is that a person approves anything irreversible
-before it happens: OWASP's own mitigation list, under the heading "Require human approval for
-high-risk actions", is to "Implement human-in-the-loop controls for privileged operations to
-prevent unauthorized actions"<Cite n={1}/>, and if a tool can't tell you what its approval step
-actually checks, that is worth treating as a real gap, not a detail.
+The second check is for any tool that reads a web page, a file, or an email on your behalf and then
+acts: books something, sends something, changes something. Ask what stops it from following an
+instruction hidden in that content instead of yours. A page written to be read by an assistant, not
+a person, can say anything; nothing about being "just a web page" stops it from containing a line
+that looks like a command. The honest answer from a well-built tool is that a person approves
+anything irreversible before it happens, the control OWASP's own guidance calls for under "Require
+human approval for high-risk actions": "Implement human-in-the-loop controls for privileged
+operations to prevent unauthorized actions"<Cite n={1}/>. If a tool cannot say what its approval
+step actually checks, treat that as a real gap, not a detail, and watch the first several things it
+does before trusting it to act unsupervised.
 
 </Lane>
 <Lane name="build" title="Build it">

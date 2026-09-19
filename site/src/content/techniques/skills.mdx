@@ -61,28 +61,35 @@ yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Claude Code is where a reader is most likely to meet a skill directory, and AGENTS.md is the
-closest thing to an open convention across coding agents for standing instructions: the file holds
-"the extra, sometimes detailed context coding agents need: build steps, tests, and
-conventions"<Cite n={3}/>. Anthropic's documentation puts token costs on each stage: about 100
-tokens per skill for the always-on name and description, under 5,000 for a body that loads only
-once a skill is triggered, and nothing at all for bundled files until they are read<Cite n={1}/>:
-the published figures, not a measurement this site has made.
+Skills mostly live in coding agents today: Claude Code's own skills directory, or a similar folder
+any agent that reads an AGENTS.md-style file will pick up. Look for a skills folder in a project,
+each entry a short file describing what it does and a longer body of instructions underneath.
 
-The security point is not incidental. A skill is instructions written by someone else, and
-Anthropic's own warning is direct: "a malicious Skill can direct Claude to invoke tools or execute
-code in ways that don't match the Skill's stated purpose," with risks the documentation names as
-"data exfiltration" and "unauthorized system access"<Cite n={1}/>. Its guidance is to use skills
-only from sources you trust, and to audit one thoroughly (every bundled file, not just the
-description) before running it against anything that matters.
+Before you add or run one from outside your own team, read the whole body, not just its one-line
+description: Anthropic's own warning is direct, "a malicious Skill can direct Claude to invoke
+tools or execute code in ways that don't match the Skill's stated purpose," naming "data
+exfiltration" and "unauthorized system access" among the risks<Cite n={1}/>. A safe skill next to a
+dangerous one can carry an equally short, equally reasonable-sounding description; the difference
+only shows up in the body, and in what it asks to be allowed to do.
 
-Treat a skill like code you didn't write, because in every way that matters it is one. Claude
-Code's own documentation makes this concrete for one specific risk: `allowed-tools` in a skill's
-frontmatter pre-approves the tools it lists for the turn that invokes the skill, and Anthropic
-notes that workspace trust does not gate that field: "A skill can grant itself broad tool access,
-so review the `allowed-tools` of skills checked into a repository before you run Claude Code
-there"<Cite n={2}/>. That is the same review you would give any other change before it merges, not
-a one-time check when a skill is first added.
+That last part is a specific field worth reading on its own. Claude Code's own documentation:
+"A skill can grant itself broad tool access, so review the `allowed-tools` of skills checked into
+a repository before you run Claude Code there"<Cite n={2}/>. A skill that only reads and
+summarizes needs little; one that lists broad file or network access needs the same scrutiny you
+would give a code change from someone you don't know, every time it changes, not just when you
+first add it.
+
+To test whether a skill actually loaded rather than the agent answering from general knowledge,
+ask it to do the specific task the skill's description promises, then ask it to name which skill it
+used and quote a line straight from that skill's own instructions, not a summary in its own words.
+An answer that cannot quote anything from the file it claims to have read probably never loaded it
+at all, and answered from general training instead.
+
+AGENTS.md is the closest thing to a shared convention for the plainer version of this, a project's
+own standing instructions rather than a library of separate skills: "the extra, sometimes detailed
+context coding agents need: build steps, tests, and conventions"<Cite n={3}/>. If there is only one
+procedure you ever need, that file, or a fixed instruction in your prompt, does the job without a
+skill library at all.
 
 </Lane>
 <Lane name="build" title="Build it">

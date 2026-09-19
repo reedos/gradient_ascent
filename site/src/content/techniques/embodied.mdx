@@ -72,38 +72,36 @@ yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Robotics models moved fast in 2026. Google DeepMind's current robotics model is Gemini Robotics
-2<Cite n={1}/>. Physical Intelligence's π0.7 "can follow new language commands and perform tasks
-that were never seen in its training data" and "can compose and recombine the skills it learned
-to solve new tasks", per its own post. This post compares it against that maker's earlier specialist
-models, not against π0<Cite n={4}/>.
+Ask a maker to show it doing your specific task, not a generalization demo.
+Google DeepMind's current robotics model is Gemini Robotics 2<Cite n={1}/>; Physical Intelligence
+says its π0.7 "can follow new language commands and perform tasks that were never seen in its
+training data" and "can compose and recombine the skills it learned to solve new tasks", comparing
+it only against that maker's own earlier models, not every competitor<Cite n={4}/>. A claim about
+generalizing is not a demonstration of the one task you need done; ask for the second.
 
-Latency is not an abstraction here the way it is for a chat reply. Physical Intelligence's post
-about π0 says "Dexterous robot manipulation requires π0 to output motor commands at a high
-frequency, up to 50 times per second"<Cite n={3}/>. A model too slow for that rate is not a worse
-robot; it is a robot that cannot do the task at all, however correct each single decision is.
+Ask whether it is fast enough for the job, not just accurate at it. Physical Intelligence says
+"Dexterous robot manipulation requires π0 to output motor commands at a high frequency, up to 50
+times per second"<Cite n={3}/>. A model too slow for a task is not a worse machine; it cannot do
+the task at all, however correct each single decision is. If the job needs that kind of speed, ask
+for the number, not a demo video that hides the pace.
 
-Safety, on machines that ship today, mostly lives in hardware, not the model. Figure AI's 2025
-announcement for its Figure 03 robot describes "strategically placed multi-density foam to
-protect against pinch points" and "safeguards at the Battery Management System (BMS), cell,
-interconnect, and pack levels"<Cite n={5}/>. 1X's page for NEO says "Tendon-driven actuators
-create safe movements," that "NEO's joints are covered from outside access, making the surface
-entirely pinch proof," and lists figures for head-injury criterion and audible noise<Cite n={6}/>.
-None of that is the model checking itself; it is a physical limit that holds whatever the model
-decides. Each is its maker's claim about its own machine, dated to the page it appears on.
+Ask what protects a person or the room if the model errs, and expect the honest answer to be
+hardware, not the model. Figure AI describes "strategically placed multi-density foam
+to protect against pinch points" and "safeguards at the Battery Management System (BMS), cell,
+interconnect, and pack levels" on its Figure 03<Cite n={5}/>. 1X says NEO's "Tendon-driven
+actuators create safe movements" and that "NEO's joints are covered from outside access, making
+the surface entirely pinch proof"<Cite n={6}/>. Neither is the model checking itself; each is a
+physical limit that holds regardless, and each is its maker's own claim about its own machine.
 
-1X's page also describes a person in the loop: "For complex tasks NEO doesn't know, an Expert
+Ask those three (the task, the speed, the hardware limit) before it comes in the door. One more
+matters once it has: what it keeps between visits, a learned routine, a map of your rooms,
+recorded video, and where that is stored. 1X says "For complex tasks NEO doesn't know, an Expert
 from 1X can remotely supervise its actions at scheduled times to help it learn new abilities and
-get the job done"<Cite n={6}/>. Read the whole sentence: the remote person finishes the job as
-well as teaching it, so "the robot did this" and "a person drove it" are not always
-distinguishable from outside.
+get the job done"<Cite n={6}/>: read that as the remote person finishing the job as well as
+teaching it, so "the robot did this" is not always what happened.
 
-Three questions to ask of any machine like this, because the answer is rarely on the marketing
-page. What persists between runs (a learned routine, a map of your rooms, recorded video) and
-where it is kept. What it may do unattended, and what waits for a person, is the same split
-<Link href="/techniques/agent-teammates/">always-on assistants</Link> make in software, with a
-worse failure if it is wrong. And how you stop it: a physical button within reach that cuts
-power, because stopping must not depend on the thing you are stopping.
+Find the physical stop switch before the first run: a button within reach that cuts power, because
+stopping it must not depend on the thing you are stopping.
 
 </Lane>
 <Lane name="build" title="Build it">

@@ -64,29 +64,31 @@ with a bag-of-words stub rather than a trained model.
 <Lanes>
 <Lane name="use" title="Use it">
 
-You rarely meet this labeled "embeddings" or "vector search." It shows up inside other products
-as "search your files," "related items," or a chat app answering a question about a document you
-uploaded. Sometimes a maker documents it plainly: Microsoft says Microsoft 365 Copilot builds a
-vectorized semantic index of an organization's files, in which material with similar meaning
-sits close together, so a search can return more than exact matches, and that it runs alongside
-the ordinary keyword index rather than replacing it<Cite n={4}/>. More often nothing says so; the
-rest of the named examples are on the <Link href="/techniques/rag/">RAG page</Link>, since
-embeddings and search is usually the mechanism under a product rather than the product.
+Test whether a search box you use is running on keywords alone or also on meaning. Search using
+a word that is not literally in the document you expect to find, a synonym, a description, or a
+rephrasing rather than the document's own term. Typing "quieter" when the document only states a
+decibel rating is the shape of the test. A pure keyword search comes back empty or wrong when the
+words do not match. A search backed by embeddings, or a hybrid of the two, has a chance of
+finding the right result anyway, because it is comparing meaning, not spelling.
 
-There is a simple test for whether a search box is running on keywords alone or also on meaning:
-search for something using a word that is not literally in the document you are looking for (a
-synonym, a description, a rephrasing) and see whether it still finds it. A pure keyword search
-comes back empty or wrong when the words do not match. A search backed by embeddings, or a hybrid
-of the two, has a chance of finding the right result anyway, because it is comparing meaning, not
-spelling.
+Act on what the test shows. Some search tools expose the choice directly, as a toggle between
+"keyword" and "smart" or "semantic" search: when one mode gives you a wrong or missing result,
+try the other before concluding the tool cannot find the answer at all. Try it in both
+directions, since matching on meaning is what finds a passage worded differently than your
+question, and matching on literal words is what reliably finds an exact string, a part number, an
+order id, a serial number, that a vector comparison has no special reason to rank first. Running
+both and merging them is the hybrid arrangement pgvector documents doing with Postgres full-text
+search<Cite n={3}/>.
 
-Some search tools expose the choice directly, as a toggle between "keyword" and "smart" or
-"semantic" search. When one of them gives you a wrong or missing result, try the other mode
-before concluding the tool cannot find the answer, and try it in both directions: matching on
-meaning is what finds a passage worded differently than your question, and matching on literal
-words is what reliably finds an exact string (a part number, an order id, a serial number) that
-a vector comparison has no special reason to rank first. Running both and merging them is the
-hybrid arrangement pgvector documents<Cite n={3}/>.
+If a tool has no such toggle and keeps missing rephrased questions, that is not something the
+search box lets you fix: the problem is in how the tool was built, and naming that is more useful
+than assuming you typed it wrong. Sometimes a maker documents the mechanism plainly: Microsoft
+says Microsoft 365 Copilot builds a vectorized semantic index of an organization's files, in
+which material with similar meaning sits close together, and that it runs alongside the ordinary
+keyword index rather than replacing it<Cite n={4}/>. More often nothing says so. You rarely meet
+this labeled "embeddings" or "vector search" at all, since it is usually the mechanism under a
+product, such as a chat app answering a question about a document you uploaded, rather than the
+product itself; the named examples of that are on the <Link href="/techniques/rag/">RAG page</Link>.
 
 </Lane>
 <Lane name="build" title="Build it">

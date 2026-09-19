@@ -49,43 +49,40 @@ here reports a measured number.
 <Lanes>
 <Lane name="use" title="Use it">
 
-A record for one person is five columns and takes about twenty seconds a row. Keep it wherever
+A record for one person is five columns, takes about twenty seconds a row, and lives wherever
 you already keep notes:
 
 | Date | Task type | What you checked | Right? | What you changed |
 |---|---|---|---|---|
-| 12 Mar | renewal dates from a contract | all 4 dates against the clauses | yes | nothing |
-| 12 Mar | plain-language summary of a policy | the 2 exclusions it listed | no | added the third exclusion |
+| 3/12/2027 | renewal dates from a contract | all 4 dates against the clauses | yes | nothing |
+| 3/12/2027 | plain-language summary of a policy | the 2 exclusions it listed | no | added the third exclusion |
 
-The columns that do the work are the second and the fifth. **Task type** is what makes the record
-usable later: "renewal dates from a contract" and "tone of a client reply" are separate lines
-even if the same product did both. **What you changed** is the only column that says how wrong it
-was: nothing, a word, or the whole answer. A month of that tells you, per task type, how often
-you are actually editing rather than accepting, and that number is your sampling rate for the
-next month.
+**Task type** keeps the record usable later: separate lines even when the same product did both.
+**What you changed** is the check itself: nothing, a word, or the whole thing. After a month,
+read down that column for one task type. Mostly "nothing" means you can safely sample instead of
+reading every one; anything else means you aren't ready to stop checking, whatever the product's
+reputation is. Write the number down; it's next month's sampling rate, not a feeling you'll
+remember correctly later.
 
-Two rules keep the record honest. Log the checks you *did*, including the ones that came back
-fine; a record of corrections alone reads as a catastrophe. And re-check the record whenever what
-you are trusting changes: a new model version, an edited prompt, a new tool. Anthropic states
-this for its own published techniques: where one names a specific model, "treat it as measured on
+Two rules keep it honest. Log the checks that came back fine, not only the corrections, or the
+record reads like a catalog of disasters. And start a fresh page whenever what you're trusting
+changes: a new model version, an edited prompt, a different tool. Anthropic says exactly this
+about its own published techniques: where one names a specific model, "treat it as measured on
 that model and re-check it against your own evals before applying it to another."<Cite n={1}/> A
-record built on last quarter's version does not transfer just because the product name did.
+record built on last quarter's version doesn't transfer just because the product name did.
 
-Be careful about what the research here establishes. A 2019 scale for automation complacency was
-developed on "a sample of 475 online respondents" from Amazon Mechanical Turk,
-whose "experience with automation was predominantly with relatively low-stakes and common forms
-of automation, such as in-car navigation systems", which its authors name as a limitation. Both
-of its new subscales "showed discriminant validity from the previous complacency potential scale
-and from similar constructs, such as propensity to trust", and "only the monitoring-focused scale
-had a significant relationship with hypothetical complacency"<Cite n={2}/>. A general disposition
-to trust is measuring something else. Those participants were not supervising models, so this is
-not a finding about your work. It is a reason to keep a count per task rather than trust a
-disposition you think you have.
+Skip it for a one-off task you'll never ask again, or something so low-stakes a wrong answer
+costs nothing to fix. Keep it for whatever you catch yourself about to trust from memory instead
+of a count.
 
-A 2025 position paper surveying over-reliance research defines the risk as "relying on LLMs
-beyond their capabilities" and locates it across "diverse domains from healthcare to personal
-advice"<Cite n={3}/>. It argues for measurement rather than reporting one, which is where the
-table above starts.
+Be wary of research that sounds like it settles this. A 2019 complacency scale was built on
+Mechanical Turk respondents whose "experience with automation was predominantly with relatively
+low-stakes and common forms of automation, such as in-car navigation systems," which its own
+authors name as a limitation<Cite n={2}/>; those participants weren't supervising a model at
+work, so treat the finding as a reason to keep your own count, not a number about your job. A
+2025 survey defines over-reliance as "relying on LLMs beyond their capabilities"<Cite n={3}/> and
+argues for measurement over impression, which is exactly what the
+table above is.
 
 </Lane>
 <Lane name="build" title="Build it">

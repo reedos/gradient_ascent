@@ -58,40 +58,36 @@ yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-If you have uploaded files to a chat app and asked a question about them, you have used RAG.
-The product searched your files for the passages closest to your question, put those passages
-in front of the model, and asked once.
+Upload files to a chat app's project or file feature and ask about them: that is RAG. The
+product searches your files for the passages closest to your question, puts those in front of
+the model, and asks once.
+
+Ask questions a handful of passages can answer on their own. "What does the warranty cover"
+works well. "Summarize every change across all our contracts this year" does not, because no
+single search finds every relevant passage and the tool only searches once. If an answer comes
+back thin, vague, or off-topic, do not push it for more. Split the question into the several
+narrower ones a single search could actually catch, one document or one topic at a time, and ask
+them separately.
 
 Anthropic's own documentation describes this directly: once a project's uploaded files approach
 what the context window can hold, Claude switches into what Anthropic calls RAG mode. Anthropic
 says that expands how much a project can hold by up to ten times while maintaining response
 quality<Cite n={2}/>; that is the maker's claim, not a number this site has measured. OpenAI
-documents the same pattern for its own file search feature, which products built on its API can
-call: it retrieves passages from uploaded files by keyword and meaning together, and returns an
-answer with citations to the files it used<Cite n={3}/>. Gemini Notebook, Perplexity and
-workplace search tools such as Glean and Microsoft 365 Copilot work the same way: search first,
-then answer.
+documents the same pattern for its own file search feature: it retrieves passages from uploaded
+files by keyword and meaning together, and returns an answer with citations to the files it
+used<Cite n={3}/>.
 
-To get better results from a tool like this, ask questions a handful of passages can answer on
-their own. "What does the warranty cover" works well. "Summarize every change across all our
-contracts this year" does not, because no single search finds every relevant passage, and the
-tool only searches once.
+Check the citations every time the product shows them. Open the source it names and confirm the
+sentence it cites is actually there. A citation that does not obviously support the sentence
+beside it, or an answer with none at all, means the search missed something and the model filled
+the gap on its own; treat that answer as unconfirmed rather than final.
 
-Check the citations when the product shows them. A citation that does not obviously support the
-sentence next to it is a sign the search missed something and the model filled the gap on its
-own.
-
-RAG cannot join facts that live in different documents into one answer (a table in one file
-and a rule in another) because it only ever searches once. It cannot run a second,
-better-targeted search after seeing what the first one turned up; that is what
-<Link href="/techniques/agentic-rag/">agentic RAG</Link> and the deep research modes built on it
-do instead. And it will not reliably tell you when it found nothing useful. A search that comes
-back thin can still produce a confident-sounding answer built from whatever passages were
-closest, even if none of them actually address the question.
-
-RAG is one of the techniques behind the
-<Link href="/shapes/#answer-from-documents">answer questions from a body of documents</Link> job
-shape.
+RAG cannot join facts that live in different documents, a table in one file and a rule in
+another, because it only ever searches once, and it will not reliably tell you when it found
+nothing useful. When a question genuinely needs two documents joined, or a full sweep across
+many files, that is not this tool's job: ask it as separate, narrower questions and join the
+answers yourself, or use a tool built to search repeatedly, listed under Out there at the foot of
+this page.
 
 </Lane>
 <Lane name="build" title="Build it">

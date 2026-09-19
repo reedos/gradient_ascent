@@ -61,30 +61,33 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Be honest about what a "reviewing" or "checking" step in a product actually verifies before
-trusting it. Zheng et al. studied using one model to judge another's output. Their paper is
-mostly a case *for* the practice: it reports that "strong LLM judges like GPT-4 can match both
-controlled and crowdsourced human preferences well, achieving over 80% agreement, the same level
-of agreement between humans"<Cite n={2}/>,
-but it examines the limitations too, "including position, verbosity, and self-enhancement biases,
-as well as limited reasoning ability", and proposes "solutions to mitigate some of them"<Cite
-n={2}/>. Self-enhancement bias (a judge favoring output that resembles its own) is the sharpest
-of those for this page: a reviewer built from the same kind of model as the author is not a fresh
-pair of eyes by default. A reviewer is only worth trusting more than the author when it has
-criteria and access the author's own pass did not: its own retrieval, a rule written down in
-advance, or a different model family entirely.
+Before trusting a "reviewing" or "checking" step in a product, find out what the checker has that
+the drafter did not. Zheng et al. studied using one model to judge another's output and found it
+works better than you might expect: "strong LLM judges like GPT-4 can match both controlled and
+crowdsourced human preferences well, achieving over 80% agreement, the same level of agreement
+between humans"<Cite n={2}/>. But they also name the failure worth knowing by its actual name,
+not a vague caution: "position, verbosity, and self-enhancement biases, as well as limited
+reasoning ability"<Cite n={2}/>. Self-enhancement bias, a judge favoring output that resembles its
+own, is the one that matters here: a reviewer built from the same kind of model as the author is
+not a fresh pair of eyes by default.
 
-Meta documents one real product built around a stronger version of this idea: a second agent that
-does not just review after the fact but gates every action before it happens. Its own announcement
-states, "A separate Sentinel agent runs on that same machine, kept apart from Muse at the system
-level. Nothing Muse does reaches the internet unless the Sentinel approves it, and it asks the
-person for permission when needed."<Cite n={3}/> Sentinel is a supervisor with its own process
-boundary, not a shared prompt: the separation this page's reviewer also depends on.
+Meta's Muse shows what a genuinely separate check looks like. Its own announcement states, "A
+separate Sentinel agent runs on that same machine, kept apart from Muse at the system level.
+Nothing Muse does reaches the internet unless the Sentinel approves it, and it asks the person for
+permission when needed."<Cite n={3}/> That is a supervisor with its own process boundary, not the
+same model reading its own draft twice.
 
-What to watch for in anything that claims to check its own work: whether the checker has something
-the drafter did not (its own sources, a written rule, a different model) or whether "checking"
-is really the same model reading its own draft again, which Zheng et al.'s biases apply to exactly
-as much as the first pass.
+Ask any product that claims to check its own work one direct question: "Does the checker use its
+own sources or rules, or is it reading the same draft again?" An answer naming its own retrieval,
+a written rule, or a different model is the kind of check worth trusting more than the author's
+own pass. An answer that amounts to the same model looking it over again is not a fresh pair of
+eyes; treat the label as decoration, not verification. If the product will not say, look at what
+it shows you instead: a citation in the "checked" version that was not in the draft is evidence of
+real work; a verdict with no new source behind it is not.
+
+None of this is worth setting up yourself. If a person is already going to read the output before
+it matters, a second model's opinion does not change what happens next: skip both the check and
+the question.
 
 </Lane>
 <Lane name="build" title="Build it">

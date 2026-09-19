@@ -62,28 +62,33 @@ below is measured. It describes the choice and shows how the data for it gets pr
 <Lanes>
 <Lane name="use" title="Use it">
 
-You are unlikely to fine-tune a model yourself, but you already use products built on adapted
-ones: a smaller model priced and marketed for one narrow job (fast customer-support replies, code
-completion) is often a distilled or fine-tuned version of a larger one, trained the way OpenAI's
-own distillation guide documents: capture a larger model's outputs that meet your bar, then use
-that captured set to train a smaller model on the same task<Cite n={3}/>. The question worth
-asking about a claim like "our small model matches the big one on this task" is: matches it on
-what, exactly? The same narrow task it was trained for, or everything the big model could do?
-Training on one task's examples optimizes for that task; nothing about it preserves the rest of
-what the larger model could do, so the scope of the comparison is the part to check.
+The pitch to test is "smaller, cheaper, or trained on our own material, and it matches the one you
+use today." Build a switching test before you believe it. Pull twenty real tasks from your own
+recent work (questions you actually got asked, drafts you actually wrote) and write down, for
+each, the answer you already know is right. Send all twenty to the tool you use now and to the one
+being pitched, then read the two sets of answers side by side, task by task, not score by score.
 
-The practical choice most people actually face is not whether to fine-tune but whether a product
-should be trusted to have done it well. A support bot that always answers in the same rigid
-format, or a coding assistant that is unusually fast but only within one language, is showing the
-signature of adaptation: narrow and consistent instead of broad and instructable. Neither trait
-is a defect by itself; the question is whether it fits what you need done.
+Two disagreements out of twenty is worth a closer look before you switch; five or more means the
+new tool is not ready to replace the old one on your actual work, whatever the pitch says. Read
+every disagreement rather than just counting them: a wrong answer on something you handle every
+week matters more than one on something you rarely hit.
 
-Fine-tuning does not fix a model that does not know your facts. Training a model further makes
-its behavior more consistent on the kind of input it was trained on; it does not reliably store
-new facts the way handing it a document does, and a model asked to recall a specific number it
-saw a few times during training is not the same as a model reading that number off the page in
-front of it right now. A vendor's page that blurs "we trained it on our docs" into "it knows our
-docs" is worth reading twice.
+Ask what the "trained on our docs" or "trained on our data" claim actually covers, the same
+capture-then-filter step behind most distilled or fine-tuned products: a maker runs a larger model
+over examples of one task, keeps what meets its bar, and trains a smaller model on
+that<Cite n={3}/>. A model narrowed to one job that way can be excellent at that job and
+confidently wrong the moment you ask it something else. Your twenty-task file only catches that
+if a few of the twenty sit outside the narrow job the vendor is actually selling.
+
+"Trained on our docs" is also not "reads our docs." A model trained further on your material got
+more consistent at the kind of thing it saw during training; it did not gain a live lookup of that
+material. A fact from last week is not something training put there, so a question about something
+recent tests memory the tool does not have. If the product will not also let you attach the
+current document and answer from that, treat "it knows our docs" as a guess dressed as a fact.
+
+Switching to something with no vendor at all, such as writing a longer, more specific prompt for
+the tool you already use, needs the same twenty-task comparison before you call it better, not
+just cheaper.
 
 </Lane>
 <Lane name="build" title="Build it">

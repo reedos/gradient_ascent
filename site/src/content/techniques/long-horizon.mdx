@@ -72,35 +72,35 @@ yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-You have probably used a product built this way if you have ever handed a coding agent a ticket
-and closed the tab. Cognition's documentation for Devin gives a size for what fits one session:
-"As a rule of thumb: if a task would take you three hours or less, Devin can most likely do it.
-For larger projects, break them into focused sessions and run them in parallel with managed
-Devins"<Cite n={2}/>. The second sentence is this level's problem in miniature: past a certain
-size the work stops being one run and becomes several, and something has to carry what each one
-learned to the next. That page does not say the work runs unattended, so this one does not say
-Cognition claims it does.
+Before you hand over a job that will run for hours, get a sense of whether it fits one session or
+needs several. Cognition's documentation for Devin gives a size: "As a rule of thumb: if a task
+would take you three hours or less, Devin can most likely do it. For larger projects, break them
+into focused sessions and run them in parallel with managed Devins"<Cite n={2}/>. Past that size,
+the work stops being one run and becomes several, and something has to carry what one session
+learned into the next: that handoff, not the work itself, is what you are trusting the product to
+do well. That page does not say the work runs unattended, so this one does not say Cognition
+claims it does.
 
-What is worth checking, in any product like this, is how you find out what happened while you
-were away. Devin's own documentation describes a timeline view in its session insights that
-"provides a chronological, color-coded view of key events during the session"<Cite n={3}/>: a
-record built for someone catching up after the fact, not for someone watching live. That is the
-audit trail this whole level depends on: if a long-running agent cannot show what it did and
-when, in a form meant for someone who was not there, there is no way to check it did the right
-thing.
+When you come back, look for a record built for someone who was not there, not a live view.
+Devin's own documentation describes a timeline in its session insights that "provides a
+chronological, color-coded view of key events during the session"<Cite n={3}/>. Read it for three
+things: the last timestamp (recent means it is still moving, stale means it may not be), what
+changed since the entry before it, and whether the same step appears more than once in a row. A
+step repeating with no new timestamp after it is the concrete difference between "still working"
+and "stuck," not a feeling you get from watching a spinner. For a coding agent specifically, the
+same signal shows up as commits or file changes with their own timestamps: one an hour old with
+nothing newer after it is a session that has stopped making progress, whatever its status still
+says.
 
-The other habit worth building is telling apart "still working" from "stuck." A coding agent that
-quietly reruns the same failing check for an hour looks, from the outside, exactly like one
-making steady progress, unless the product actually distinguishes the two. Look for a status that
-says which is happening, not just a spinner, and for a way to stop the run yourself, since
-something started without you should also be something you can end without waiting for it to
-decide it is done.
+Find the stop control before you need it, not while you are looking for it. Something that started
+without you should be something you can end without it: a button or command that halts the
+session, not closing the tab and hoping. A session you cannot stop is not actually attended,
+whatever the product's status page says.
 
-Products in this category differ in what they actually persist and for how long, and a maker's
-page is the only way to know which: some keep a session alive for one ticket and discard its
-state once a pull request lands, others are built to run indefinitely against a standing queue.
-Nothing about "it ran for three hours last time" tells you which one you are using; the product's
-own documentation on sessions, history and limits does.
+What a session actually keeps between runs varies by product: some discard everything once a
+ticket closes, others run indefinitely against a standing queue. "It ran for three hours last
+time" does not tell you which; the product's own documentation on sessions, history and limits
+does, and it is worth reading before the first run that matters.
 
 </Lane>
 <Lane name="build" title="Build it">

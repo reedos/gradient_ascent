@@ -58,36 +58,36 @@ question through both RAG and this technique side by side.
 <Lanes>
 <Lane name="use" title="Use it">
 
-This is what a deep-research mode in a chat app is doing. ChatGPT, Claude, Gemini and Perplexity
-each ship one; SpaceXAI's Grok has DeepSearch. Ask a question, and instead of one search the
-product runs several, reads what each one turns up, and decides for itself whether it has enough
-or needs to look further before writing a report.
+This is what "Deep Research" or "DeepSearch" does in a chat app: ChatGPT, Claude, Gemini,
+Perplexity and Grok DeepSearch all ship a mode like it, usually a toggle or a separate button next
+to the ordinary send button. Reach for it when a question has more than one part living in
+different places, or when two sources might disagree and you want that checked rather than guessed
+past: "Compare what our returns policy says about damaged items against what the shipping
+carrier's own terms say, and tell me where they conflict." A question one search can already answer
+does not need it, and costs more here for nothing extra.
 
-Google's description of its own Deep Research is specific about the mechanism: the model
-"oversees the execution of" a research plan, and at each step "the model reasons over information
-available to decide its next move", browsing "the web and your Gmail, Drive, and Chat if you
-choose so"<Cite n={1}/>. This is the same search-then-read-then-decide loop the run above steps through,
-aimed at a much larger set of sources. OpenAI's documentation for its deep research models
-describes the output the same way: it "will contain a listing of web search calls, code
-interpreter calls, and remote MCP calls made to get to the answer," so the searches themselves are
-visible, not just the final report<Cite n={3}/>.
+Once it is running, Google's own description of the mechanism is specific: the model "oversees the
+execution of" a research plan, and at each step "the model reasons over information available to
+decide its next move"<Cite n={1}/>. That means the searches it runs are worth reading, not just the
+report at the end. Open the sources or search-steps panel most of these products show: OpenAI's
+deep research output "will contain a listing of web search calls, code interpreter calls, and
+remote MCP calls made to get to the answer,"<Cite n={3}/> so the individual searches are visible,
+not hidden inside the final prose.
 
-That visibility is worth using. A deep-research report that shows its sources or its search steps
-is showing you the trace this page's run diagram illustrates in miniature: check whether a claim
-in the report actually traces back to one of the searches shown, the same way you would check
-RAG's citations, and watch for a report that cites a source it never appears to have opened.
+Check a claim in the report against a source it actually shows, the way you would check a citation
+in plain RAG search: does the linked source really say what the report claims, and does the report
+ever cite a source it does not appear to have opened at all.
 
-The loop also has a cap you do not see. OpenAI documents a `max_tool_calls` parameter a developer
-can set when creating a deep research request, "to control the total number of tool calls (like to
-web search or an MCP server) that the model will make before returning a result"<Cite n={3}/>; the
-products built on this pattern have some version of the same limit. A
-report that reads as thinner than the question deserved, especially on something with several
-parts to it, may be a run that hit its cap rather than one that ran out of things to find.
+There is a cap you do not see. OpenAI documents a setting a developer can turn to control the total
+number of tool calls a deep-research run may make before returning a result<Cite n={3}/>, and every
+product like it has some version of the same limit. A report that reads thinner than the question
+deserved, especially one with several parts, may be a run that hit its cap rather than one that ran
+out of things to find; asking it to keep going, or narrowing the question, is worth trying before
+trusting a thin answer.
 
-Ask questions this is actually for: ones where the right next search depends on what the last one
-found, or where the answer draws on several documents that disagree. A question one search can
-already answer does not need this, and costs more here for no benefit. See when RAG alone is
-enough, below.
+If a single document already has the answer, upload it and ask directly: deep research is for
+questions that need several sources found and weighed against each other, not for reading a file
+you already have.
 
 </Lane>
 <Lane name="build" title="Build it">

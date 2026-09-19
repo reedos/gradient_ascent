@@ -66,36 +66,38 @@ scored result file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Claude Code's subagents are the clearest version of this a reader outside a research lab has
-likely used. Each one runs "in its own context window with a custom system prompt, specific tool
-access, and independent permissions", and the handoff is described this way: "When Claude
-encounters a task that matches a subagent's description, it delegates to that subagent, which
-works independently and returns results"<Cite n={3}/>. The isolation is the point, not a side
-effect. Anthropic's own Research feature is built the same way: its engineering post says that
-when a user submits a query, "the lead agent analyzes it, develops a strategy, and spawns
-subagents to explore different aspects simultaneously"<Cite n={2}/>. Grok Build and Devin Desktop
-are registered against this shape too, under their own names.
+You will meet this shape inside a product rather than switch it on yourself. Claude Code's
+subagents are the clearest version a reader outside a research lab has likely used. Each one runs
+"in its own context window with a custom system prompt, specific tool access, and independent
+permissions", and the handoff is described this way: "When Claude encounters a task that matches
+a subagent's description, it delegates to that subagent, which works independently and returns
+results"<Cite n={3}/>. Anthropic's own Research feature works the same way: "the lead agent
+analyzes it, develops a strategy, and spawns subagents to explore different aspects
+simultaneously"<Cite n={2}/>. Grok Build and Devin Desktop do the same under their own names: the
+shape is worth recognizing even though none of it is yours to configure.
 
-The separate context window is the actual benefit, not a detail: each worker reads only its own
-slice of the problem, so a task too large for one window still fits, and a worker's dead ends
-never crowd the lead's own reasoning. Anthropic puts it this way: "Subagents facilitate
-compression by operating in parallel with their own context windows, exploring different aspects
-of the question simultaneously before condensing the most important tokens for the lead research
-agent"<Cite n={2}/>.
+The reason a product delegates like this instead of answering directly is capacity, not
+showmanship. Anthropic puts it this way: "Subagents facilitate compression by operating in
+parallel with their own context windows, exploring different aspects of the question
+simultaneously before condensing the most important tokens for the lead research agent"<Cite
+n={2}/>. That is the job a team buys: a question too broad for one pass, split into pieces small
+enough to finish.
 
-That isolation is also what the failures above look like. Without a specific brief, Anthropic's
-own team found "agents duplicate work, leave gaps, or fail to find necessary information"<Cite
-n={2}/>, and in an early version "agents made errors like spawning 50 subagents for simple
-queries"<Cite n={2}/>: a runaway team costs like a runaway single agent, multiplied by however
-many workers spawned. What to watch for in a product built this way: whether it names a cap on
-workers at all, and whether a stalled or duplicated-looking run tells you so or just returns an
-answer that quietly skipped something.
+Two things are worth asking rather than assuming. Whether the product caps how many workers it
+spawns: Anthropic's own team found that without a specific brief, "agents duplicate work, leave
+gaps, or fail to find necessary information"<Cite n={2}/>, and in an early version, "agents made
+errors like spawning 50 subagents for simple queries"<Cite n={2}/>. Ask directly: "How many
+workers did you use for this, and did any of them cover the same ground?" If a multi-part answer
+looks thinner than the question deserved, an uncapped or duplicated team is the likely reason, not
+a missing answer.
 
-Anthropic's own engineering team states the price of the shape plainly: "In our data, agents
+Then expect the bill. Anthropic states its own system's price plainly: "In our data, agents
 typically use about 4× more tokens than chat interactions, and multi-agent systems use about 15×
-more tokens than chats"<Cite n={2}/>. The 15× is the figure for this page's shape, and it is
-Anthropic's own measurement of its own system, not a rate to expect from yours: it says "in our
-data" and this site has measured nothing.
+more tokens than chats"<Cite n={2}/>. That 15× is Anthropic's own measurement of its own system,
+not a rate to expect elsewhere, but it sets the trade correctly: a team costs more per answer than
+one pass, in exchange for covering more ground than one pass could. If your question is narrow
+enough for a single assistant to answer directly, try that first: cheaper, and nothing here to set
+up.
 
 </Lane>
 <Lane name="build" title="Build it">

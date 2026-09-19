@@ -51,34 +51,40 @@ here reports a measured number.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Briefing is the skill everything else rests on, and it is mostly the discipline of not assuming
-the model already knows what you mean. Anthropic's own prompting guidance states the underlying
-point plainly: "Claude responds well to clear, explicit instructions"<Cite n={1}/>, and the <Link
-href="/techniques/briefing/">briefing</Link> page quotes the fuller version of that guidance and
-takes it apart into six parts. What you want, the constraints it has to respect, and what "done"
-looks like are three separate things. Writing them on three lines, not in one paragraph, is the
-whole discipline: a missing constraint is invisible in prose and obvious in a list.
+Four things to do this week, one per skill, each handed to its own page for the full depth.
 
-How much to spell out depends on which model you are briefing, and OpenAI's own guidance sorts
-its models into two kinds for exactly that reason<Cite n={2}/>. The <Link
-href="/techniques/briefing/">briefing</Link> page quotes that passage and works an example
-through it; the overview's job is only to say that the newcomer's mistake runs in both
-directions: over-specifying a model that could have worked out the details, or under-specifying
-one that needed them spelled out.
+Briefing: before your next real request, write the goal, the constraint and what "done" looks
+like on three separate lines instead of folding them into one paragraph. Anthropic's own guidance
+states the underlying point plainly: "Claude responds well to clear, explicit
+instructions"<Cite n={1}/>. How much detail a model needs also depends on which one you're
+briefing: OpenAI's own guidance sorts its models into two kinds for exactly that reason, one that
+works out the details from a goal on its own and one that needs them spelled out<Cite n={2}/>.
+Read a result that missed the mark against those three lines before rewriting it louder; the
+<Link href="/techniques/briefing/">briefing</Link> page has the full six-part version and a worked
+example.
 
-Reviewing work you did not do is a different skill from doing the work yourself, and it gets
-harder, not easier, as a system does more without you. Anthropic's own guidance for agent
-builders describes agents pausing "for human feedback at checkpoints or when encountering
-blockers" as a normal part of the design, not a fallback, and lists coding as a case where "Code
-solutions are verifiable through automated tests"<Cite n={3}/>. Even there it says human review
-remains crucial, the sentence <Link href="/techniques/reviewing/">reviewing</Link> quotes in full.
-The practical version: check what you can verify independently (a citation that resolves, a number
-you can recompute) before trusting the parts you cannot. The failure mode that follows has a
-name and a literature: a scale-development paper in Frontiers in
-Psychology summarizes the agreed definition of complacency as a human operator monitoring an
-automated system, at a frequency that is "suboptimal or below a normative rate," where that
-suboptimal monitoring "leads to performance failures"<Cite n={4}/>. The trust was real; it just
-stopped being checked against evidence.
+Reviewing: pick one thing you routinely accept from a model without checking, and check it once
+this week against something independent, a citation that resolves, a number you can recompute.
+You'll know it worked when you can point to what you verified, not just say the answer "seemed
+right"; if you can't find anything in the output to check it against at all, that's the failure,
+not your diligence. Anthropic's own guidance for agent builders treats human checkpoints as a
+normal part of design, not a fallback, and even for coding, where "Code solutions are verifiable
+through automated tests," says human review remains crucial<Cite n={3}/>; the <Link
+href="/techniques/reviewing/">reviewing</Link> page has the rest.
+
+Delegating: before handing something over, ask what a wrong answer would cost and how you'd
+notice, then hand over only the part that scores well on both; the <Link
+href="/techniques/delegating/">delegating</Link> page turns those two questions, plus two more,
+into a short table you can score any task against.
+
+Trust: a string of correct answers is exactly when to keep checking, not stop. A
+scale-development paper on automation complacency found that monitoring a system "at a frequency
+that is suboptimal or below a normative rate" leads to performance failures<Cite n={4}/>; <Link
+href="/techniques/trust/">calibrating trust</Link> covers what a record of your own corrections
+over time should look like, and how to read it.
+
+None of this is worth doing for a single, low-stakes request you wouldn't mind redoing by hand
+yourself.
 
 </Lane>
 <Lane name="build" title="Build it">

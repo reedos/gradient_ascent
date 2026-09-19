@@ -57,19 +57,31 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-If you have built an automation with an if/else branch on a visual canvas (send it here if the
-amount is over some threshold, otherwise send it there), you have built a small workflow graph,
-whether or not the tool calls it that. Dify describes the appeal as a visible plan rather than a
-hidden prompt: "visual building blocks and AI prompts to define how an app thinks, retrieves
-data, makes decisions, uses tools, asks for human input, and completes tasks," turning "Prompt
-Logic Into a Visible Execution Path"<Cite n={2}/>.
+Build a small workflow graph in a visual automation canvas: a trigger, a sequence of steps, and
+at least one branch node that sends the run one way or another depending on something in the
+data so far, such as sending it one place if an amount is over a threshold and somewhere else if
+it is not. Dify describes the appeal as a visible plan rather than a hidden prompt: "visual
+building blocks and AI prompts to define how an app thinks, retrieves data, makes decisions, uses
+tools, asks for human input, and completes tasks," turning "Prompt Logic Into a Visible Execution
+Path"<Cite n={2}/>.
 
-The thing to check in a tool like this is exactly what decides each branch. A branch driven by a
-fixed rule ("if the category field equals X") is this level: fully predictable, fully testable
-in isolation, and it never surprises you by taking a path you didn't design for. A branch driven
-by asking a model which way to go, inside the same node, is a different thing wearing the same
-visual shape: the diagram looks identical, but the behavior underneath has moved up a level,
-and testing "every possible path" stops being something you can enumerate in advance.
+A branch is worth trusting only once you know what actually decides it. A rule, such as one that
+checks whether a category field equals a fixed value, is fully predictable: build one input for
+each path on purpose and confirm each one lands where you expect. A branch that asks a model
+which way to go, inside that same node, wears the identical visual shape but behaves differently:
+you cannot enumerate every path in advance the way you can with a rule, so test it with several
+inputs worded differently but aimed at the same branch, not just one.
+
+After a run finishes, open its history if the tool keeps one and read what each node received and
+returned, in order, not only the final output. If a run failed or took the wrong branch, that
+per-node history is where the wrong turn actually shows up. And if a run fails partway through,
+check whether the tool can resume from where it stopped instead of starting the whole thing over;
+that depends on whether it actually saved the state at each step along the way, which is usually
+a setting worth turning on rather than something you get for free.
+
+A graph is more machinery than a task needs when nothing in it ever branches. A plain ordered
+list of steps does that job with one less thing to build, test and reread later, and is worth
+reaching for first.
 
 </Lane>
 <Lane name="build" title="Build it">

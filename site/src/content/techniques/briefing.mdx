@@ -44,38 +44,37 @@ here reports a measured number.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Here is the same job briefed three ways. A contracts manager wants renewal dates out of supplier
-agreements.
+Here is the same job briefed three ways, from lightest to heaviest. A contracts manager wants
+renewal dates pulled from supplier agreements.
 
-**One chat message.** Before: "Summarize this contract." After: "List every renewal and
-termination date in this agreement, one line each, as `date / clause number / what happens on
-that date`. Quote the clause. If a date depends on a condition, say so instead of picking one.
-If the agreement does not state a date, write 'not stated' rather than inferring it."
+One chat message. Before: "Summarize this contract." After: "List every renewal and termination
+date in this agreement, one line each, as `date / clause number / what happens on that date`.
+Quote the clause. If a date depends on a condition, say so instead of picking one. If the
+agreement does not state a date, write 'not stated' rather than inferring it." That's the whole
+brief in four sentences: goal, format, constraint, and what to do when unsure. Anthropic's own
+guidance backs two of these as plain instructions: "Be specific about the desired output format
+and constraints" and, for research work, "Define what constitutes a successful answer to your
+research question"<Cite n={1}/>.
 
-That is all six parts in four sentences: goal, format, constraint, and what to do when unsure.
-Anthropic's guidance backs two of them as plain instructions: "Be specific about the desired
-output format and constraints" and, for research work, "Define what constitutes a successful
-answer to your research question."<Cite n={1}/>
+You'll know the brief worked when the reply follows the format on the first try and writes "not
+stated" instead of guessing at a missing date. If it invents a date instead, the constraint didn't
+land; fix it by putting that line on its own, not by repeating the same paragraph louder.
 
-**An agent working for an hour** over a folder of forty agreements. Everything above, plus the
-things a single message never needed: which folder and which file types, that it must not modify
-the source files, that a document it cannot read goes on a list rather than being skipped
-silently, and what "done" means for the run: a table with one row per agreement, including the
-ones it failed on. Without that last part, an agent told to "extract the renewal dates" will
-finish, and you will not know which forty it means.
+An agent working for an hour over forty agreements needs everything above, plus what a single
+message never had to say: which folder, which file types, that it must not modify the source
+files, and what "done" means, a table with one row per agreement, including the ones it failed on.
+Skip writing any of this down for a question you're asking once, with nothing to reuse and no one
+else who has to follow it; that's not what a brief is for.
 
-**A standing policy** for an assistant that runs every week without being asked. Now the brief
-is a policy: which categories it may act on alone (add a reminder), which always wait for a
-person (write to the supplier), and what it does with a new case fitting neither. There is no
-next message from you to catch a wrong guess before it acts, which is why
-<Link href="/techniques/human-in-the-loop/">human approval</Link> stops being optional here and
-<Link href="/techniques/delegating/">delegating</Link> becomes the prior question.
+A standing policy, for an assistant that runs every week unasked, has no next message from you to
+catch a wrong guess, which is exactly why it needs a stated rule for what waits for a person and
+what doesn't, before the first run rather than after.
 
-How much detail suits the model matters too. OpenAI's guidance draws the line by model type: "A
-reasoning model is like a senior co-worker. You can give them a goal to achieve and trust them
-to work out the details. A GPT model is like a junior coworker. They'll perform best with
-explicit instructions to create a specific output."<Cite n={2}/> Newcomers miss in both
-directions.
+How much detail suits the model also matters. OpenAI's guidance draws the line by model type: "A
+reasoning model is like a senior co-worker. You can give them a goal to achieve and trust them to
+work out the details. A GPT model is like a junior coworker. They'll perform best with explicit
+instructions to create a specific output."<Cite n={2}/> Test which kind you're briefing before
+assuming more detail always helps, or that it never does.
 
 </Lane>
 <Lane name="build" title="Build it">

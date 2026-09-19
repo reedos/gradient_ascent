@@ -60,26 +60,33 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-If you have built a multi-step automation where one step's result becomes the input to the next
-(summarize a document, then draft a reply from the summary; extract a list, then look each item
-up), you have built a prompt chain, whether or not a model sits inside every step. Automation
-services such as Zapier, Make, n8n and Power Automate are built around exactly this idea: a
-trigger, then an ordered list of steps, each one able to use what came before it. Whether such a
-tool is any good to work in comes down to what it will show you: n8n advertises "Every step of
-your agents' reasoning, traceable on the canvas"<Cite n={2}/>, and that is the thing to check for
-in any of them: can you open one step and see what it was given and what it returned, or only
-ever the final answer?
+Build a chain in an automation tool with a visual canvas: a trigger, then an ordered list of
+steps, each one able to use what came before it. Start with the trigger, such as when a form is
+submitted or when an email arrives, add one step that does one clear job (summarize the message,
+draft a reply from the summary), and connect them in order. Automation services such as Zapier,
+Make, n8n and Power Automate are all built around this shape.
 
-The reason to chain steps instead of asking for everything in one prompt is that each step gets
-a simpler, more specific job, which a model does more reliably than one large, mixed instruction.
-The cost is that a chain runs every step every time, even on questions a single call could have
-answered, and a wrong turn early in the chain has nowhere to be caught unless a later step, or a
-person, is checking for it.
+Add a gate between two steps rather than trusting the chain straight through: an ordinary
+condition, checked in the tool itself, before the next step is allowed to run. "Only continue if
+the drafted reply names a dollar figure" is a gate; it does not ask a model whether the draft
+looks fine, it tests something specific in the output and stops the chain when that is missing.
 
-Watch the middle of the chain, not just the ends. A translated document that reads fluently can
-still be a fluent translation of a document the first step got wrong; the failure is invisible
-at the final step because nothing there is checking against the original request, only against
-the previous step's output.
+Before you trust a chain, open each step on the canvas and check what it was actually given and
+what it actually returned, not just the final result at the end. n8n advertises this directly:
+"Every step of your agents' reasoning, traceable on the canvas"<Cite n={2}/>, and that is the
+thing to check for in any of them, whatever the tool. If a step's input does not include
+something you assumed it would, the original request, an earlier step's full output, that is
+usually where a chain silently goes wrong: a translated document can read fluently while being a
+fluent translation of a document an earlier step got wrong, and nothing at the end is checking it
+against the original request, only against the step before it.
+
+Build only as many steps as the task needs. A chain that always runs four fixed steps costs more
+than one that runs one, on a question a single step could already answer. If nothing between the
+first step and the last is worth checking on its own, that is a sign the chain is more machinery
+than the job needs, and a single step will do. When a step fails outright rather than just
+answering badly, check whether the tool retries that one step alone or reruns the whole chain
+from the trigger; the second is a slower, more expensive habit worth knowing about before it
+happens on something time-sensitive.
 
 </Lane>
 <Lane name="build" title="Build it">

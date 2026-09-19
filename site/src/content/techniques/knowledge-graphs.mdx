@@ -68,32 +68,29 @@ recorded trace, no scored result file, nothing below measured.
 <Lane name="use" title="Use it">
 
 Knowledge graphs are usually invisible plumbing, the same way
-<Link href="/techniques/embeddings-search/">embeddings and search</Link> are. Occasionally one is
-named: Glean, an enterprise AI platform, calls the layer under its answers the Enterprise Graph
-and describes it as a knowledge graph of the entities a company works around: projects, people,
-customers and products<Cite n={4}/>. More often nothing says so, and what you can notice instead
-is the shape of an answer. A tool built on retrieval alone tends to answer from one strong match. A tool that can
-join facts across documents (a part's compatible model and that model's coverage, in one answer,
-rather than only half of it) is doing something closer to what a graph gives you, whether or not
-it uses one internally. <Link href="/techniques/agentic-rag/">Deep-research modes</Link>, which
-run several searches and combine what they find, get some of the same multi-document reach
-without necessarily building a graph at all.
+<Link href="/techniques/embeddings-search/">embeddings and search</Link> are: nothing in a chat
+app's interface tells you whether a graph sits under an answer. The one thing a non-technical
+reader can act on directly is provenance. A graph-backed answer can show its work as a chain,
+this fact from this source, connected to that fact from that source, instead of one citation
+covering the whole answer; each link in a chain like that is a separate, checkable claim, which
+is a stronger guarantee than a citation that only says an answer is based on some set of sources
+somewhere in it.
 
-The other place this shows up for a reader, not a builder, is provenance. A graph-backed answer
-can show its work as a chain (this fact, from this source, connected to that fact, from that
-source) rather than one citation at the end covering the whole answer. When a tool gives you a
-chain like that, each link is a specific, separately checkable claim, which is a stronger
-guarantee than a citation that only says an answer is "based on" some set of sources somewhere in
-it.
+Occasionally a maker names the layer directly: Glean, an enterprise AI platform, calls it the
+Enterprise Graph and describes it as a knowledge graph of the entities a company works around,
+projects, people, customers and products<Cite n={4}/>. Most of the time nothing says so, and
+there is nothing in the interface for a non-technical reader to inspect or configure.
 
-Ask before trusting one: how was the graph built, and how often is it rebuilt? A graph extracted
-once from a document set that keeps changing goes stale the same way a search index does, except
-a stale edge can join two facts that used to be true together and no longer are: a subtler
-failure than a stale passage, because neither fact on its own looks wrong.
-
-Knowledge graphs are one of the techniques behind the
-<Link href="/shapes/#answer-from-documents">answer questions from a body of documents</Link> job
-shape.
+Before trusting or buying a tool that claims this, ask the vendor two questions. How is the graph
+built, and how often is it rebuilt from the current documents? A graph extracted once from a
+document set that keeps changing goes stale the way a search index does, except a stale edge can
+join two facts that used to be true together and no longer are, which is harder to spot than a
+stale passage because neither fact alone looks wrong. When the tool shows a chain of connected
+facts behind an answer, is each link checkable against a specific source, or is the chain just
+for show? If neither answer is satisfying, this technique is not doing anything for you yet,
+whatever the product literature claims. For the question this site is actually built to help
+with, using AI over your own documents, the page that is yours is
+<Link href="/techniques/rag/">RAG</Link>.
 
 </Lane>
 <Lane name="build" title="Build it">

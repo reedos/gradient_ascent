@@ -71,36 +71,34 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Coding agents that split a task and work on the pieces at once are a visible product example of
-sectioning. Replit, announcing the fourth version of Replit Agent: "Independent tasks can run in
-parallel, with progress visible and coordinated," and for larger jobs it "can split a single task
-into smaller pieces, work on them simultaneously with sub-agents, and recombine the
-results"<Cite n={2}/>.
-Claude Code's subagents feature documents the same pattern for research rather than code: "For
-independent investigations, spawn multiple subagents to work simultaneously". The documentation
-then says that "Each subagent explores its area independently, then Claude synthesizes the
-findings", and adds that "This works best when the research paths don't depend on each
-other"<Cite n={3}/>. That is sectioning with a model doing the combining, which is the part that
-sits above this level.
+Run several steps of a chain at once instead of one after another, in a tool whose canvas lets
+you branch into parallel paths and merge them back. Split a task into independent branches only
+when each branch's step genuinely does not need another branch's answer to run: screening a
+request for policy problems while a separate step drafts a reply to it is independent work;
+drafting a reply and then checking that same reply is not, because the check needs the draft
+first. The benefit you are paying for is speed, not a better answer: running three calls at once
+finishes in about the time of the slowest one instead of the sum of all three, which is worth
+confirming actually happened before you trust the setup.
 
-Voting is harder to spot from the outside: several runs of the same question, combined into one
-answer. It costs several times what asking once costs, so it earns its place only where a wrong
-answer costs more than the extra calls: a security review, a policy judgment, a number somebody
-is about to act on.
+Coding agents show this on the canvas directly. Replit, announcing the fourth version of Replit
+Agent, says "Independent tasks can run in parallel, with progress visible and coordinated," and
+for larger jobs it "can split a single task into smaller pieces, work on them simultaneously with
+sub-agents, and recombine the results"<Cite n={2}/>. Claude Code's subagents feature documents
+the same pattern for research: "For independent investigations, spawn multiple subagents to work
+simultaneously". It says "Each subagent explores its area independently, then Claude synthesizes
+the findings", adding that "This works best when the research paths don't depend on each
+other"<Cite n={3}/>.
 
-The habit worth building either way: before firing several calls at once, check whether the task
-actually splits into genuinely independent parts. If two of the "sections" you're about to run in
-parallel actually depend on each other's answer, that is a sequence, and running it in parallel
-does not fix that; it just makes the dependency invisible until the combine step falls apart.
+Open each branch after a parallel run finishes and read what it actually saw and returned, the
+same way you would check one step of a plain chain: a tool that only shows the merged final
+answer is hiding exactly the place two branches disagreed or repeated each other. Watch for
+repetition specifically. Two branches that never saw each other's work can both answer the same
+sub-question, so the combined result states one fact twice with nothing that noticed the overlap.
 
-Sectioning has a plain engineering version, and it is the <Link
-href="/shapes/#review-against-criteria">check a piece of work against written rules</Link> job
-shape: take one board's bill of materials and netlist summary, check it against the written
-design review rules one call per rule, and combine the findings in code. The rule list is known
-before any call runs, which is what keeps this at level 3. It reads the same on a production
-revision as on one of five prototypes being characterized. What it does not do is decide
-anything: a margin and a verdict stay arithmetic, and a finding that cites no rule text is
-dropped by code rather than argued with.
+Reach for several independent opinions on the same question, rather than several different
+sub-tasks, only where a wrong answer costs more than the extra run: a security review, a policy
+call, a number somebody is about to act on. For anything routine, one pass is enough, and running
+several is just several times the cost for no benefit anyone will notice.
 
 </Lane>
 <Lane name="build" title="Build it">

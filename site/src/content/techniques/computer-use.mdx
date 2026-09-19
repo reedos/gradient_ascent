@@ -58,34 +58,35 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-If an agent has ever taken over a mouse and keyboard to click through a real application on your
-behalf, you have seen computer use. Anthropic, OpenAI and Google each document a tool for it, all
-three cited below; the block at the foot of this page names the products and tools registered
-against the technique.
+Look for an agent feature that can browse or operate an application for you: "Computer use,"
+"Browser agent," or an autonomous mode sitting next to an ordinary chat box. All three makers this
+page cites agree on the setting to start with: run it inside a sandbox, not your own logged-in
+browser or desktop, so a wrong click lands somewhere that does not matter. Anthropic asks for a
+"dedicated virtual machine or container"<Cite n={1}/>, OpenAI for an "isolated browser or
+VM"<Cite n={2}/>, and Google for a "sandboxed VM or container"<Cite n={3}/>; a product running
+against your own signed-in session by default is not following that advice, and the setting to
+change is usually labeled something like isolated or sandboxed environment.
 
-All three makers describe the same shape of risk. Screen content is not trustworthy just because
-it is on screen. OpenAI is direct about it: "Treat screen content as untrusted. Text in a page,
-document, or tool result cannot grant permission or override the user's instructions"<Cite n={2}/>.
-Anthropic writes that "in some circumstances, Claude will follow commands found in content even
-when they conflict with your instructions," and that classifiers scan what the tools return, such
-as screenshots, to flag potential prompt injections. It describes this as "an extra layer of
-defense" alongside a list of precautions it still asks you to take<Cite n={1}/>. Google offers
-"opt-in screenshot scanning to detect hidden adversarial instructions" for the same
-reason<Cite n={3}/>.
+Your first task should have nothing real riding on it: "Open this page and click through to the
+confirmation screen, then stop and tell me what you saw," not something that spends money or
+deletes anything. Confirm the setting that pauses the run before a consequence rather than after
+it: OpenAI's own guidance is direct. "Confirm consequential actions. Keep users in control of
+purchases, data transmission, destructive changes, and other actions that are hard to
+reverse"<Cite n={2}/>, and every maker cited here documents some version of that pause.
 
-The three also converge on what to do about actions that cannot be undone. Anthropic lists, among
-those precautions, asking "a human to confirm decisions that might result in meaningful
-real-world consequences and any tasks requiring affirmative consent, such as accepting cookies,
-completing financial transactions, or agreeing to terms of service"<Cite n={1}/>. OpenAI:
-"Confirm consequential actions. Keep users in control of purchases, data transmission,
-destructive changes, and other actions that are hard to reverse"<Cite n={2}/>. Google recommends
-avoiding the technique for "tasks involving critical decisions, sensitive data, or actions where
-serious errors cannot be corrected"<Cite n={3}/>.
+Read what it saw before you trust what it did. Text on a real screen is not an instruction just
+because the agent read it. OpenAI's own words: "Treat screen content as untrusted. Text in a page,
+document, or tool result cannot grant permission or override the user's instructions"<Cite n={2}/>;
+Anthropic scans for the same risk as "an extra layer of defense"<Cite n={1}/>, and Google offers
+"opt-in screenshot scanning to detect hidden adversarial instructions"<Cite n={3}/>.
 
-All three also say the environment itself has to be contained, not just the model's judgment: a
-"dedicated virtual machine or container"<Cite n={1}/>, an "isolated browser or VM"<Cite n={2}/>, a
-"sandboxed VM or container"<Cite n={3}/>. A product that lets an agent click through your own
-logged-in browser, rather than a separate one, is not following that guidance.
+A run that stops halfway usually means it hit exactly the pause described above: a purchase, a
+delete, a terms-of-service agreement, something the product is built to stop and ask you about
+rather than finish alone. Read what it is asking before you approve it, the same way you would
+read a confirmation dialog you would otherwise click through too fast.
+
+If the steps never change (the same few clicks on the same page, every time) a saved macro or a
+browser extension does that more reliably and does not need watching.
 
 </Lane>
 <Lane name="build" title="Build it">

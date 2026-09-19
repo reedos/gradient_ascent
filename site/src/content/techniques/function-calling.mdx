@@ -69,32 +69,36 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-If a chat app's plugin, connector or "action" feature has ever done something beyond answering
-from its own knowledge (checked a calendar, looked something up in a connected tool, filed a
-ticket) you have used function calling. Custom GPTs with actions, Claude connectors and Gemini
-connected apps are the same mechanism wearing a product name: the app offers the model a list of
-actions, the model picks one when the request calls for it, and the product runs it for you.
-OpenAI has announced that custom GPTs are being retired. Its own FAQ lists December 11, 2026 as
-the "Scheduled retirement" on which "Custom GPTs stop running" for affected Enterprise
-workspaces, adds that "the dates are subject to change", and says other plans may follow the same
-timeline<Cite n={6}/>.
+Look in your chat app's settings, or an icon near the message box, for connectors, plugins,
+actions or tools: the feature that lets the model do something beyond answering from what it
+already knows. Custom GPTs with actions, Claude connectors and Gemini connected apps are the same
+mechanism wearing a product name: the app offers the model a list of actions, the model picks one
+when the request calls for it, and the product carries it out. OpenAI is retiring one of those:
+its own FAQ names a "Scheduled retirement" on which "Custom GPTs stop running" for affected
+workspaces, though "the dates are subject to change"<Cite n={6}/>, so check what a connector
+migrates to before building a habit around it.
 
-Whether anything gets called at all is a judgment call the model makes on its own, not a fixed
-switch. Anthropic documents the default this way: "It calls a tool when the request maps to that
-tool's described capability and the answer isn't already in context"<Cite n={1}/>. That cuts both
-ways. A question the model can already answer skips the tool entirely, which is usually what you
-want; a question that sounds like it needs a lookup but does not quite match any tool's
-description can also get answered from memory instead, with nothing in the chat bubble to tell
-you which one happened.
+Before turning one on, read what it can actually do, not just its name. A tool that only looks
+something up (today's weather, an account balance) fails safely if the model reaches for it by
+mistake. A tool with a real consequence sits right next to it on the same permission screen and
+looks just as ordinary: OpenAI's own examples range from "Get today's weather for a location" to
+"Issue refunds for a lost order"<Cite n={4}/>. Read every tool in the list this way, not only the
+one you meant to add.
 
-That is the real question to ask about a product doing this on your behalf: not only whether it
-picked the right action, but what that action was allowed to do in the first place. OpenAI's own
-guide lists example tools ranging from a lookup to something with a real consequence: "Get
-today's weather for a location," "Access account details for a given user ID," and "Issue refunds
-for a lost order"<Cite n={4}/>. A tool that can only look something up fails safely if the model
-reaches for it by mistake; a tool that can issue a refund does not. If a product shows you the
-action and its arguments before it runs (not just the final answer) that is worth reading,
-especially for anything with a side effect.
+To check whether a connector actually ran rather than the model answering from memory, ask
+something it could only get right by checking: what is actually on your calendar on a specific
+day, not what a typical day would look like. Whether anything gets called at all is a judgment
+call the app makes on its own: it "calls a tool when the request maps to that tool's described
+capability and the answer isn't already in context"<Cite n={1}/>. A fact that could only have come
+from your real data means it worked; a generic-sounding answer with no sign anything ran means it
+guessed instead, and the fix is usually to ask more specifically, naming the exact thing to check.
+
+For anything with a side effect, look for a screen that shows the action and its arguments before
+it runs, not just the final answer; skipping that is skipping the one point where you could still
+say no.
+
+If the single thing you need is already a button in the app itself, skip the connector and use
+the button.
 
 </Lane>
 <Lane name="build" title="Build it">

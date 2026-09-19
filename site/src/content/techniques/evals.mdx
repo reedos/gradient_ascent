@@ -50,36 +50,38 @@ measuring works.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Most people meet an eval as someone else's number: a vendor's benchmark score, a coworker's "the
-new prompt tested better." Two questions turn that number from a claim into something you can
-check. First, how was it graded: did the answer have to match exactly, or did another model
-read it and decide? A rubric grader is a judgment call made by software. Anthropic's own guidance
-on building evaluations calls exact-match grading "perfect for tasks with clear-cut, categorical
-answers like sentiment analysis (positive, negative, neutral)", and points to model-based grading
-on a rating scale for qualities like tone and coherence instead<Cite n={1}/>; a page that reports
-one number with no mention of which kind was used has left out something that changes how much to
-trust it. Second, was any of the grading checked by a person? OpenAI's own documentation on
-graders says "Writing grader prompts is an iterative process", and under a heading it calls
-Grader hacking says that "Models being trained sometimes learn to exploit weaknesses in model
-graders", naming the behavior both "grader hacking" and "reward hacking".
-The detection it describes is to run both kinds and compare: a model that has hacked the grader
-"will score highly on model grader evals but score poorly on expert human evaluations"<Cite
-n={2}/>. A number nobody has checked by hand carries that risk with no way to tell from the
-outside.
+When a coworker tells you a new prompt "tested better," reply with two sentences: "How was it
+graded, exact match or a model reading it?" and "Did you run the old version on the identical
+question set, or a different one?" Those two questions catch most of what makes a "tested
+better" claim unreliable, and they cost you nothing to ask.
 
-A before/after claim needs both runs on the same questions. If a team says a new prompt "tested
-better," ask what it was tested against and whether the old prompt was run on the identical
-question set: LangSmith's own documentation lists regression tests among the things comparing
-evaluation runs is for, and describes running evaluations as the way to "catch regressions, and
-track quality over time"<Cite n={3}/>, which only works if nothing about the test itself moved
-between the two runs.
+If the answer to the second is "a different set" or "I don't remember," there is no comparison
+yet, whatever the number says. LangSmith's own documentation describes running evaluations as the
+way to "catch regressions, and track quality over time"<Cite n={3}/>, which only works if
+nothing about the test itself moved between the two runs. On the first question, either grading
+method is fine: Anthropic's own guidance calls exact-match grading "perfect for tasks with
+clear-cut, categorical answers like sentiment analysis (positive, negative, neutral)"<Cite n={1}/>,
+and points to model-based grading on a rating scale for qualities like tone and coherence instead.
+What matters is that the method was the same both times.
 
-A number that only reports accuracy is half the story. Braintrust's documentation distinguishes
-evaluation that runs before a change ships, against a fixed set of examples, from evaluation that
-runs continuously on production traffic once the ground truth is not known in advance<Cite
-n={4}/>. A one-time score from before launch says nothing about how the same system is doing
-against real questions six months later; a page or a dashboard that only ever shows the launch
-number is answering a question nobody is currently asking.
+The one thing worth building yourself: twenty real questions from your own work, with the answer
+you'd expect written next to each, kept in a document. When the tool changes (a new model, an
+edited prompt, a new version) run the same twenty through it and read the answers against what
+you wrote down. That catches most of what a coworker's "seems better" would miss, and it takes
+one afternoon to build, once.
+
+If a rubric grader, a second model judging the answer, is involved, OpenAI's own documentation on
+graders warns that "Models being trained sometimes learn to exploit weaknesses in model
+graders," and that the tell is a model that "will score highly on model grader evals but score
+poorly on expert human evaluations"<Cite n={2}/>. You don't need to build that detection
+yourself; ask whether anyone has checked a handful of the automated grades by hand, and if the
+answer is no, treat the score as unverified.
+
+A one-time launch score is also not the whole story: Braintrust's documentation distinguishes
+evaluation before a change ships from evaluation that keeps running on production traffic once
+the right answer isn't known in advance<Cite n={4}/>. Building the harness that does either is
+not your job; that belongs to whoever owns the system, covered in Build it below. Yours is the
+two sentences and your own twenty questions.
 
 </Lane>
 <Lane name="build" title="Build it">

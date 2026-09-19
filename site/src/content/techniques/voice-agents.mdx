@@ -69,34 +69,35 @@ file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-ChatGPT voice and Gemini Live are both built this way, and the frameworks behind others (LiveKit
-Agents, Pipecat, Vapi) all handle the same three problems: deciding when a turn
-ends, handling an interruption, and keeping the whole round trip fast enough to feel like a
-conversation.
+If you are setting one up for your business rather than just talking to one, two things have to be
+in place before it takes a single real call: the disclosure, and the way out to a person.
 
-Turn detection is more than silence-counting in the systems that document it well. LiveKit ships a
-turn-detector model that "Predicts end of turn from both the meaning of speech and its acoustic
-properties, on top of VAD", and an endpointing delay that controls "how long the agent waits after
-speech (or after an STT end-of-utterance signal) before treating the turn as
-complete"<Cite n={3}/>. Interruption handling has a similar subtlety: LiveKit says its framework
-"pauses the agent's speech whenever it detects user speech in the input audio", and offers an
-adaptive mode meant to tell "true interruptions from conversational backchanneling" apart (a
-caller saying "mm-hmm" should not cut the agent off), after which, it says, "By default, the agent
-resumes speaking from where it left off after a false interruption"<Cite n={3}/>.
+Say plainly, before the caller can say anything else, that they are talking to an AI. ElevenLabs
+requires exactly this of businesses using its agents: telling callers "They are interacting with AI
+rather than a human" and that "Their conversations are being recorded and may be shared with
+ElevenLabs and its third-party large language model providers,"<Cite n={4}/> with that notice
+"presented immediately prior to any interaction"<Cite n={4}/>, not after the first exchange.
+ElevenLabs is explicit that meeting this is the organization's own responsibility, not legal
+advice<Cite n={4}/>, and what the law actually requires varies by place; check it for where you
+operate rather than assuming a platform's minimum covers you.
 
-Disclosure is a rule some platforms impose on their own customers. ElevenLabs requires the
-organizations using its agents to tell callers "They are interacting with AI rather than a human"
-and that "Their conversations are being recorded and may be shared with ElevenLabs and its
-third-party large language model providers," and requires that notice be "presented immediately
-prior to any interaction": before the conversation begins, not buried afterward<Cite n={4}/>.
-ElevenLabs is explicit that this is its platform's requirement and not legal advice, and that
-compliance with whatever laws apply is the organization's own responsibility<Cite n={4}/>; what
-the law requires varies by place and by use, and this page does not say. Whatever the rule where
-you are, a product that makes the disclosure hard to find is telling you something.
+Build the way out next: a phrase that reliably hands the call to a person ("talk to someone," "I
+need a human") and a real person or queue on the other end of it, not a dead end. Write the script
+for that handoff the same way you would write the disclosure: plainly, and tested before it goes
+live.
 
-Watch, when you use one: does it actually stop the instant you start talking, or does it finish its
-sentence first? Does a stray "okay" from you derail it? Both are the turn-taking decisions above,
-visible from the outside.
+Then call it yourself, on your own phone, before a customer does. Interrupt it mid-sentence on
+purpose and check it actually stops: LiveKit's own documentation describes a framework that "pauses
+the agent's speech whenever it detects user speech in the input audio"<Cite n={3}/>, and a real
+deployment should behave the same way, not talk over you. Say a stray "mm-hmm" while it is
+mid-answer and check it keeps going rather than restarting, since a good one tells "true
+interruptions from conversational backchanneling" apart<Cite n={3}/>. Ask for the handoff phrase
+and confirm it actually reaches your fallback, not a dropped call. Time the pause between finishing
+a sentence and its reply: a long silence with nothing said to fill it reads as broken, not
+thoughtful.
+
+If what callers ask is small and known in advance (hours, an address, a balance) a script or a menu
+answers it without needing a conversation to manage at all.
 
 </Lane>
 <Lane name="build" title="Build it">

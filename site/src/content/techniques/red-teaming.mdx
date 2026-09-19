@@ -56,38 +56,36 @@ site, so nothing below reports a measured number.
 <Lanes>
 <Lane name="use" title="Use it">
 
-A vendor's claim to have red-teamed a product is worth checking against its own published
-method, not taken as a fixed guarantee. Anthropic, one maker that publishes its own approach,
-describes several distinct methods rather than one. Its "domain-specific expert teaming"
-"involves collaborating with subject matter experts to identify and assess potential
-vulnerabilities or risks in AI systems within their area of expertise"; separate sections of the
-same post cover automated red teaming and multilingual and multicultural red
-teaming<Cite n={1}/>. "We red-team our models" can mean any of several different things, and the
-specifics (who did it, what they were looking for, how recently) are what actually tells you
-anything.
+Before your team adopts an automated checker, a spam or fraud filter, a classifier that flags
+policy violations, anything that decides pass or fail on its own, spend half an hour trying to
+break it using your own real examples, not made-up ones.
 
-A finding does not have to mean "broken." What matters more is what happened next: was the gap
-fixed, is it a known, documented limitation, or does using the product a certain way avoid it?
-NIST's AI Risk Management Framework, published as NIST AI 100-1, is, in NIST's own words,
-"intended for voluntary use"<Cite n={3}/>. NIST's own excerpt of the framework says its Core "is
-composed of four functions: govern, map, measure, and manage"<Cite n={5}/>. A finding that cannot
-be fixed outright still has to land in one of those, scoped and owned, rather than being known
-about and forgotten.
+Two exercises, about ten minutes each. First, take a real example the checker is supposed to
+catch and reword it just enough to see if it still does: misspell the flagged word, add a
+plausible-sounding preamble, split it across two messages instead of one. Second, take a real
+example that should pass and see how easily you can make it get flagged by accident. If either
+takes you less than ten minutes, write down exactly what you did, in order, and send that to
+whoever administers the tool. A vague "it seems easy to fool" gets filed and forgotten; the
+specific input that fooled it gets fixed.
 
-If you operate a system rather than build one, the same instinct applies at smaller scale: before
-trusting a check that is supposed to catch bad output, try to make it fail on purpose. A check
-nobody has tried to break is a check nobody knows the limits of, which is the other half of what
-<Link href="/techniques/guardrails/">guardrails</Link> says about a filter's real precision.
+A vendor's claim to have red-teamed a product is worth checking against its actual method, not
+taken as a fixed guarantee. Anthropic, one maker that publishes its own approach, describes
+several distinct methods rather than one: its "domain-specific expert teaming" "involves
+collaborating with subject matter experts to identify and assess potential vulnerabilities or
+risks in AI systems within their area of expertise"<Cite n={1}/>, which is different work from an
+automated scan. Ask which method a vendor claims, who did it, and how recently, rather than
+accepting "we red-team our models" as one fixed thing.
 
-An engineer already does a version of this, under other names, and it splits three ways. In
-production test, the sequence runs the same units the same way every shift, so the case nobody
-wrote is the case nobody sees: the equivalent of red teaming is the deliberate bad unit, the
-swapped fixture, the operator note typed on the wrong row. In design verification, five
-prototypes leave room for one adversarial case per corner, which is the shape of this page's own
-coding-agent example below: the corner nobody swept, ordinary attribute access rather than a
-blocked name, was the one that mattered. In precise measurement nothing attacks the number, and
-the gap is somewhere else entirely, in an unchecked coverage factor or an accuracy row read from
-the wrong calibration interval.
+A finding you hand over doesn't have to mean the tool is broken. What matters is what happens to
+it next. NIST's own AI Risk Management Framework, which it says is "intended for voluntary
+use"<Cite n={3}/>, organizes exactly this: its Core "is composed of four functions: govern, map,
+measure, and manage"<Cite n={5}/>, meaning a finding that can't be fixed today still needs an
+owner and a decision, not silence. If it's raised twice with nothing changing, that's the actual
+finding, and it belongs to whoever owns the budget, not to you to keep retesting alone.
+
+This is the other half of what <Link href="/techniques/guardrails/">guardrails</Link> says about
+a filter's real precision: a check nobody has tried to break is a check nobody actually knows the
+limits of.
 
 </Lane>
 <Lane name="build" title="Build it">

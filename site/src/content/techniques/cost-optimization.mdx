@@ -45,33 +45,35 @@ published rate, not something this site has measured.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Before optimizing anything, check whether the level being used is justified at all: a smaller,
-cheaper level that still passes is a bigger saving than any lever inside a level that shouldn't
-have been reached in the first place. The <Link href="/worksheet/">worksheet</Link> is built for
-exactly that question.
+Before questioning any line on an AI bill, check whether you are even paying for the right amount
+of tool for the job: the <Link href="/worksheet/">worksheet</Link> walks through exactly that
+question, and a smaller, cheaper setup that still gets the work done beats optimizing anything
+built on top of the wrong one. Answer it first.
 
-Once the level is settled, the levers below it trade differently. A smaller model for easy
-questions saves the most, but only if the easy/hard split is judged correctly: a router that
-misjudges a hard question as easy answers it badly with no separate signal that routing, not the
-model, made the mistake, the same failure <Link href="/techniques/ops/">ops</Link> names. Shorter
-context saves on every call it touches, but only if what got cut was truly unneeded: a document
-trimmed to fit a smaller window can quietly drop the passage a later question needed.
+Once that is settled, two more levers show up as discounts on a vendor's own pricing page, and
+both are worth understanding before a bill surprises you. Caching charges more to store something
+reusable, then charges less every time it gets reused: on the Claude API as its prompt-caching
+page reads on September 19, 2026, a cache write costs "1.25 times the base input tokens price"
+for a five-minute cache and "2 times" for a one-hour one, while a cache read costs "0.1 times the
+base input tokens price"<Cite n={1}/>. Those are Anthropic's figures for Anthropic's models on
+that date and say nothing about any other provider, but the shape holds generally: a tool that
+resends the same instructions or documents in full on every call, instead of reusing them, is
+paying (and likely charging you) full price for material that has not changed since the last
+call.
 
-Caching a repeated prefix only pays for itself if it is genuinely read again inside its window,
-and the break-even is arithmetic you can do from the maker's own published multipliers. On the
-Claude API as its prompt-caching page reads on September 19, 2026, a cache write is charged above
-the ordinary input rate ("1.25 times the base input tokens price" for a five-minute cache, "2
-times" for a one-hour one) and a read at "0.1 times the base input tokens price." A footnote names
-two of its current models whose cache hits and refreshes are "priced at 0.025x the base input
-price," and says that "All other models use the standard 0.1x multiplier."<Cite n={1}/> Those are
-Anthropic's figures for Anthropic's models on that date, and they say nothing about any other
-provider. The shape they imply is general, though: one write and no read loses money against not
-caching at all.
+Batching trades a wait for a discount. OpenAI's Batch API offers a "50% cost discount compared to
+synchronous APIs" for work that "completes within 24 hours (and often more quickly)" instead of
+right away<Cite n={2}/>. That is a good trade for a nightly report nobody is watching load, and the
+wrong one for anything a person is waiting on right now.
 
-Batching trades a wait for a discount. OpenAI's Batch API page, read the same day, offers a "50%
-cost discount compared to synchronous APIs" where "Each batch completes within 24 hours (and
-often more quickly)"<Cite n={2}/>. Half price for work nobody is sitting in front of is a good
-trade; the thing to check is that nobody is actually sitting in front of it.
+The check that tells you whether either lever is actually saving anything: ask for the bill's own
+breakdown, not just the total. Put it to the vendor in writing: "Show me, per call, which requests
+hit a cache and which were batched, against which were charged the full rate." If they cannot
+produce that split, the discount may not be reaching you even if the feature exists on paper. And
+if your own
+usage is occasional rather than steady, the honest answer is that neither lever is worth chasing:
+caching and batching both pay off on volume, and a handful of questions a week will not reach the
+point where either matters.
 
 </Lane>
 <Lane name="build" title="Build it">

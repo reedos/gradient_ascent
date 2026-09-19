@@ -65,36 +65,38 @@ file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Claude Code, Codex, Cursor, GitHub Copilot, Jules, Antigravity CLI, Grok Build, Devin, Devin
-Desktop, Replit Agent, Cline, Aider and Zed are all coding agents in this sense, each with its own
-take on permissions and sandboxing.
+Claude Code, Codex, Cursor, GitHub Copilot and the other coding agents this page names all put a
+permission setting in their settings menu, often called something like Auto, Plan, or Approval
+mode. Start on the most cautious one: Anthropic's own plan mode is a state where "Claude explores
+and plans without editing your source files; file edits are never auto-approved,"<Cite n={2}/> so
+you see the whole plan before anything on disk changes. Loosen it one step at a time as you learn
+what a task actually needs to touch.
 
-Briefing one well means writing down, once, what a person would otherwise repeat every session:
-build commands, test commands, and conventions. AGENTS.md exists for exactly this: "a README for
-agents": a place for "the extra, sometimes detailed context coding agents need: build steps,
-tests, and conventions that might clutter a README or aren't relevant to human
-contributors"<Cite n={1}/>. A vague brief gets a vague plan; a brief that names the test command
-gets an agent that can tell for itself whether it succeeded.
+Before real work, write down, once, what you would otherwise repeat every session: the build
+command, the test command, and anything it should never touch. AGENTS.md is the open convention
+for this file, "a README for agents", holding "the extra, sometimes detailed context coding agents
+need: build steps, tests, and conventions"<Cite n={1}/>. A brief that names the test command gets
+an agent that can tell for itself whether it succeeded; a vague one gets a vague result.
 
-Keeping one from doing damage is mostly a matter of permissions. Anthropic's Agent SDK documents a
-`"plan"` mode where "Claude explores and plans without editing your source files; file edits are
-never auto-approved," useful for proposing a change before anything actually runs<Cite n={2}/>.
-OpenAI documents the same boundary for Codex from the other direction: under its Auto preset Codex
-"can read files, make edits, and run commands in the working directory automatically" and "asks
-for approval to edit files outside the workspace or to run commands that require network access",
-and by default "the agent runs with network access turned off"<Cite n={4}/>. Cross that boundary
-and, in OpenAI's words, "the approval flow takes over"<Cite n={3}/>. Neither maker leaves the
-boundary implicit; both make it a setting you pick.
+A first task with nothing at stake: point it at a small, already-broken piece of your own project
+and ask it to fix that one thing and run the tests, nothing else. OpenAI documents its own default:
+under Codex's Auto preset the agent "can read files, make edits, and run commands in the working
+directory automatically", asking approval only to "edit files outside the workspace or to run
+commands that require network access"<Cite n={4}/>. Cross that boundary and, in OpenAI's words,
+"the approval flow takes over"<Cite n={3}/>: a request you answer, not something that happens
+quietly.
 
-Reviewing a diff is still your job. Read it the way you would a colleague's: does it change only
-what the brief asked for, and did the tests referenced in the trace actually run, or does the
-agent's own account just say they should pass? Claude Code's checkpointing captures the state of
-your code "before each prompt you send that starts a turn," so a change that turns out wrong can
-be reverted with `/rewind` rather than untangled by hand. Read the limitation printed beside it
-before relying on it: checkpointing "does not track files modified by Bash commands", only edits
-made through Claude's own file editing tools, and Anthropic says plainly that it is not a
-replacement for version control<Cite n={5}/>. See
-<Link href="/techniques/operator-craft/">operator craft</Link> for the review habit itself.
+Read what it changed the way you would read a colleague's work: does the diff touch only what you
+asked for, and did the tests actually run, or does the agent's summary just say they should?
+Claude Code keeps a checkpoint "before each prompt you send that starts a turn,"<Cite n={5}/> so a
+bad change can be undone, but the net has a hole: it "does not track files modified by Bash
+commands"<Cite n={5}/>, only its own edits, and it is not a substitute for real version control.
+
+A run that stops partway through is usually the approval boundary working: it reached something
+outside the workspace, or the network, and is waiting on you rather than guessing.
+
+If the fix is one obvious line, just make it: briefing an agent for that costs more than typing
+the line.
 
 </Lane>
 <Lane name="build" title="Build it">

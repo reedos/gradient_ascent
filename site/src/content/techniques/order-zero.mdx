@@ -62,34 +62,39 @@ file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-You already use level zero constantly without thinking of it that way. The search box on many
-documentation sites and helpdesks is keyword search, not a model reading every page for you:
-Elastic markets Elasticsearch for customer support search<Cite n={1}/>, and OpenSearch lists
-document search among its own capabilities<Cite n={2}/>. A form that asks "which appliance do you
-own" from a dropdown is a rule, not an AI feature, even on a site that also has a chatbot
-elsewhere. A spam filter is the textbook case of the third kind: one label predicted from past
-examples, no language model involved: scikit-learn names spam detection as a classification job
-on its own front page<Cite n={3}/>.
+Before opening a chat app, run three checks on the actual question in front of you, in order.
 
-The question that matters is not whether a model could do this; it is whether ordinary code
-already does it as well, for a fraction of the cost, which is worth measuring on your own data
-rather than assuming. Two checks settle most cases. First: can the input be described as a
-fixed set of shapes (a part number, a five-option dropdown) or a small, known vocabulary? If so, a
-rule or a search is often enough. Second: what does a wrong answer cost, and how would you notice
-it? A keyword search that misses is visible, the passage is right there to check. A language
-model that confidently answers from the wrong section can look identical to a correct answer
-until someone checks it by hand. When a wrong answer is cheap to catch, level 0's obviously
-irrelevant failure mode is the safer one to ship, even if a model would get more questions right
-overall. When getting it wrong is expensive (money moves, a part gets ordered, a warranty claim is
-approved), an explicit check earns its cost, whichever level does the work.
+First, is there already a search box built into whatever you're using: a help center, a document
+library, your own file system? Try the question there, in your own words, before anything else.
+Elastic markets Elasticsearch for exactly this kind of support search<Cite n={1}/>, and OpenSearch
+lists document search among its own capabilities<Cite n={2}/>, so a plain "find this" question is
+very often already answered, for free, before a model gets involved.
 
-The same argument holds on a bench, across production test, engineering test at low volume, and
-precise measurement. A limit check is a comparison. A yield is a count. A Cpk is a mean, a
-standard deviation and a subtraction. A margin to a specification is a subtraction; an
-uncertainty budget is a root sum of squares. None of that needs a model, and a model never
-produces the reported measurement, the uncertainty, the margin or the verdict. This is the
-<Link href="/shapes/#look-up-or-calculate">look something up, or work it out from numbers you
-already have</Link> job shape, and level 0 is the whole of it.
+Second, if the search comes back empty or buried, run it again with a different word for the same
+thing: "lint trap" instead of "lint filter," "cancel" instead of "terminate." A miss caused by
+vocabulary, not by the fact being absent, is the single most common way level zero looks broken
+when it isn't; try two or three synonyms before deciding the answer just isn't written down
+anywhere.
+
+Third, if the job is sorting something into a fixed set of buckets from examples you already have
+(spam or not spam, urgent or not, which department a request belongs to), that's a classifier's
+job, not a model's: scikit-learn names spam detection as a classification job on its own front
+page<Cite n={3}/>, and a tool built for exactly that needs no language model behind it, and no
+per-question cost either.
+
+You'll know a check worked when the result actually answers the question, in the document's own
+words, and you can point at the passage that answers it. You'll know it failed when nothing
+relevant comes back at all, not when a fluent-sounding paragraph comes back that you have no way
+to check against anything.
+
+Weigh what a wrong answer would cost before adding a model on top of any of this. A missed search
+is visible: nothing came back, so you know to keep looking. A model's confident wrong guess
+usually isn't visible at all, until someone checks it by hand.
+
+None of these three checks apply once the input is real free text, worded a hundred different
+ways, that no rule or keyword list can reasonably anticipate. That's
+<Link href="/techniques/chat/">chat</Link>, the next page, and the one place on this site where a
+model actually earns its keep on a plain question.
 
 </Lane>
 <Lane name="build" title="Build it">

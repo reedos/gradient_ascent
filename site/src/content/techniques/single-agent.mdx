@@ -70,36 +70,35 @@ file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-"Single agent" is rarely a label a product shows you; it is the loop running underneath a more
-specific feature. A coding agent deciding which file to open next, a deep-research mode deciding
-whether to search again, and a computer-use agent deciding where to click are all this same
-loop wearing a different set of tools: see <Link href="/techniques/coding-agents/">coding
-agents</Link>, <Link href="/techniques/agentic-rag/">agentic RAG</Link> and
-<Link href="/techniques/voice-agents/">voice agents</Link> for the named products in each case.
-<Link href="/techniques/skills/">Skills</Link> are the same loop choosing which instructions to
-load rather than which tool to call.
+"Single agent" is not a feature you turn on: it is the loop running underneath a coding agent
+deciding which file to open next, a deep-research mode deciding whether to search again, a voice
+agent deciding whether to keep talking, or a skill-picking agent deciding which instructions to
+load. See <Link href="/techniques/coding-agents/">coding agents</Link>, <Link
+href="/techniques/agentic-rag/">agentic RAG</Link>, <Link href="/techniques/voice-agents/">voice
+agents</Link> and <Link href="/techniques/skills/">skills</Link> for what to actually do with each
+of those. This page is about the one thing they share: what it means when one of them just stops.
 
-What is worth watching for, in any product built this way, is the caps you cannot see. Anthropic's
-Agent SDK documents a `max_turns` limit on tool-use round trips and a separate `max_budget_usd`
-spend limit, and the run ends with a specific reason attached, `error_max_turns` or
-`error_max_budget_usd`, when either is hit rather than continuing indefinitely<Cite n={4}/>.
-OpenAI's Agents SDK works the same way: pass a `max_turns` argument, and the run raises a
-`MaxTurnsExceeded` exception once the loop's turn count passes it, unless you explicitly set
-`max_turns=None` to remove the limit<Cite n={5}/>. A tool the product runs on your behalf can also
-be capped on its own: the Agent SDK documents `allowed_tools` and `disallowed_tools` lists and a
-`permission_mode` that controls whether a tool call needs your approval before it runs at
-all<Cite n={4}/>. A session that stops partway through a long task, with no obvious error, is very
-likely hitting one of these caps, not failing silently.
+Every product built this way has a limit on it you will never see a setting for, only its effect.
+Anthropic's Agent SDK caps the number of tool-use round trips and how much a session may spend, and
+ends the run with a specific reason attached rather than continuing forever<Cite n={4}/>. OpenAI's
+Agents SDK does the same by default, raising a distinct error once a run's turn count passes its
+limit<Cite n={5}/>. When a coding agent, a research assistant or any other tool built this way stops
+partway through a long task with no obvious error, that is very likely what happened: it hit a cap
+built into the product, not a crash. Asking it to continue, or splitting the task into a smaller
+piece and starting fresh, is the right response, not repeating the same request and expecting a
+different stopping point.
 
-Recovery is also worth watching. Anthropic's documentation says that when a tool call is denied,
-"Claude receives a rejection message as the tool result and typically attempts a different
-approach or reports that it couldn't proceed"<Cite n={4}/>: the loop is built to keep going on a
-setback, which is usually good, but it means a wrong turn does not necessarily stop the run on its
-own. Anthropic separately writes that agents' autonomy brings "higher costs, and the potential for
-compounding errors," and recommends testing them in a sandbox with guardrails around what they can
-actually affect<Cite n={3}/>. Expect a single agent to cost more and behave less predictably than a
-fixed sequence of steps, and expect that unpredictability to show up as variable cost per question,
-not just as an occasional wrong answer.
+Setbacks along the way do not usually end a run on their own. Anthropic's documentation says that
+when a step does not go as planned, the agent "typically attempts a different approach or reports
+that it couldn't proceed"<Cite n={4}/>, which is usually good, but it also means a wrong turn early
+on can carry through several more steps before anything looks visibly wrong. Anthropic's broader
+advice on this is worth taking at face value: autonomy brings "higher costs, and the potential for
+compounding errors,"<Cite n={3}/> so read the final answer against what you actually asked for, not
+just against whether it sounds finished.
+
+None of the settings themselves (how many turns, how much it may spend, which tools it may use) are
+something you set: whoever built the product you are using chose those. Your job is reading the
+result and knowing that a run stopping short is usually a limit, not a failure.
 
 </Lane>
 <Lane name="build" title="Build it">

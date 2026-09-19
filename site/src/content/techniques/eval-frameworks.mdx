@@ -79,30 +79,37 @@ so nothing below reports a measured number.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Most people meet these tools as someone else's dashboard: "our evals run in Braintrust," "CI runs
-promptfoo," "check the LangSmith experiment." Before trusting a number one of them reports, four
-checks apply, each a version of a question <Link href="/techniques/evals/">the evals page</Link>
-already raises about any score, now aimed at a tool a team adopted rather than built.
+You'll meet these tools as someone else's number, not something you set up yourself: "our evals
+run in Braintrust," "CI runs promptfoo," "check the LangSmith experiment." Before repeating that
+number in a meeting, ask whoever set it up four questions, in these words.
 
-First, what graded it (a pattern match, or a model reading a rubric) and if a model graded it,
-has anyone checked a sample of its verdicts against a person's own judgment? A dashboard that shows
-one aggregate number rarely shows this by default; it is usually a setting or a second report
-someone has to go looking for. Second, is the number comparable to the last one: same dataset, same
-grading configuration, or did either one quietly change between runs? A framework that versions
-datasets and grading configs separately makes this easy to check; one that does not makes it easy to
-compare two different things without noticing. Third, were any items ungraded (a malformed grader
-reply, a run that errored out) and were they excluded from the score or folded into it as a
-failure? And fourth, if the tool is a hosted service, where does the data being graded actually go.
-A locally run, open-source tool and a cloud dashboard answer that question very differently. A
-golden set and the answers it grades are the same text the system under test sent and received,
-so grading them in a hosted dashboard hands that text to a second company under that company's
-terms, whatever the model maker's page says. Read the dashboard company's own retention and
-access terms for the plan in use before a set or its graded outputs leaves the machine that ran
-them, which is <Link href="/techniques/safety/">safety, privacy and governance</Link>'s point
-about every intermediary on the route.
+"Was this graded by an exact match, or by a model reading a rubric?" If a model graded it, ask a
+second question right after: "Has anyone checked a sample of its verdicts against a person's own
+read?" A dashboard's one aggregate number rarely says which on its own; it's usually a setting or
+a second report someone has to go find, and "I don't know" is itself worth having as an answer.
 
-None of these four checks require reading a line of the tool's code. They are questions to ask
-whoever set the dashboard up, or checks to run once against a report before trusting the next ten.
+"Is this the same dataset and grading setup as the last number you showed me, or did either
+change?" A framework that versions both separately makes this easy to answer; one that doesn't
+makes it easy to compare two different things without anyone noticing.
+
+"How many items came back ungraded, and were they left out of the score or counted as
+failures?" A malformed grader reply or a run that errored out shouldn't silently become a wrong
+answer, and a well-built dashboard can tell you which happened.
+
+"Where does the data being graded actually go?" If the tool is hosted, your prompts and answers
+are now sitting with a second company under that company's own terms, whatever your model
+maker's page promises. A locally run tool and a cloud dashboard answer this very differently,
+which is <Link href="/techniques/safety/">safety, privacy and governance</Link>'s point about
+every intermediary on the route, applied here to a dashboard rather than the model itself.
+
+If two or more of these come back as "I'm not sure" or "I'd have to check," treat the number as
+a rumor rather than a result until someone actually answers them; a good dashboard makes all four
+easy to answer on the spot, and a bad one makes even the person who built it stop and go looking.
+
+None of this requires reading a line of the tool's code, and building the harness that produces
+the number isn't yours to do either: that decision belongs to whoever owns the system, weighed
+against everything Build it below lays out. Yours is asking these four questions before you
+trust what the dashboard tells you.
 
 </Lane>
 <Lane name="build" title="Build it">

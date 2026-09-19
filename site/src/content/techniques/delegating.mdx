@@ -47,7 +47,8 @@ here reports a measured number.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Score the task, not the model. Each row is a question about the work in front of you.
+Score the task, not the model. Each row is a question about the work in front of you, answered
+before you hand anything over.
 
 | Question | Hand it over | Keep it, or check before it acts |
 |---|---|---|
@@ -57,26 +58,23 @@ Score the task, not the model. Each row is a question about the work in front of
 | Whose context does it need? | Everything relevant is in the material you can give it | It turns on a relationship, an unwritten exception, or something said in a room |
 
 Read the row that scores worst, not the average. A task on the right of even one row wants a
-person between the model and the action, not more trust, but a checkpoint. A task on the left of all
-four is a reasonable thing to hand over unattended.
+person between the model and the action, not more trust but a checkpoint; a task on the left of
+all four is reasonable to hand over unattended.
 
-Three things this site recommends never running unattended, each because it fails the same two
-rows (irreversible and unverifiable after the fact):
+You'll know the score was right when a handed-over task keeps coming back cheap to check and
+cheap to redo. If one starts costing more to verify than it saved, that's not the model getting
+worse; it's the row you scored wrong, and the fix is re-scoring, not adding a step to catch the
+surprise afterward.
 
-1. Anything that moves money or creates a legal obligation on your behalf.
-2. Anything that communicates in your name to someone outside your own team.
-3. Anything that deletes or overwrites the only copy of something.
+Three things this site recommends never running unattended, regardless of score: anything that
+moves money or creates a legal obligation on your behalf, anything that communicates in your name
+outside your own team, and anything that deletes or overwrites the only copy of something. Each
+fails the same two rows: irreversible, and unverifiable after the fact.
 
-These are not warnings about what a model is likely to do. They are consequences of the table:
-you cannot check the result after the fact, because after the fact is too late. Everything else
-is a judgment for you to make, and most work is everything else.
-
-Then widen deliberately. Hand over the cheapest, most reversible slice first, watch what actually
-goes wrong for a few weeks, and widen only past what held up, which takes a record, so
-<Link href="/techniques/reviewing/">reviewing</Link> and <Link href="/techniques/trust/">calibrating
-trust</Link> are the next two pages, and <Link href="/techniques/human-in-the-loop/">human
-approval</Link> is the checkpoint the middle rows ask for. All four sit on the <Link
-href="/techniques/operator-craft/">operator craft</Link> topic.
+For everything else, widen deliberately: hand over the cheapest, most reversible slice first,
+watch what actually goes wrong for a few weeks, and widen only past what held up. Skip the
+framework for a single request you'd happily redo yourself; it earns its cost once a kind of task
+is going to repeat.
 
 </Lane>
 <Lane name="build" title="Build it">

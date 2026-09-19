@@ -62,38 +62,36 @@ example below stops exactly where a real project would start paying for one.
 <Lanes>
 <Lane name="use" title="Use it">
 
-A small, fast model marketed as unusually good at one narrow job may well be distilled: a maker ran
-a larger model over many examples of that job and trained a smaller model on the results. Two
-questions are worth asking about one. The first is about the dataset: what task were the captured
-answers filtered for, and does your use fall inside that task or outside it?
+A small, fast model marketed as unusually good at one narrow job may be distilled: a maker ran a
+larger model over many examples of that job and trained a smaller model on the results. Before
+signing anything built that way, send whoever is selling it one procurement question in writing:
+"Was this model trained on outputs captured from another company's model, and does that company's
+terms allow training a model you resell to us on those outputs?" This site gives no legal advice
+and cannot tell you how a clause applies to your plan; it can quote three documents as they read
+today, so you know what to ask a vendor to explain.
 
-The second question is not technical: whether a maker's terms let you train on its model's outputs
-at all. This site gives no legal advice and cannot tell you how a clause applies to your plan; it
-can quote three documents as they read today.
+Anthropic's Commercial Terms of Service state under Use Restrictions that "Customer may not and
+must not attempt to (a) access the Services to build a competing product or service, including to
+train competing AI models or resell the Services except as expressly approved by
+Anthropic"<Cite n={2}/>. Google's Gemini API Additional Terms of Service state, "You may not use
+the Services to develop models that compete with the Services (e.g., Gemini API or Google AI
+Studio)"<Cite n={3}/>, while separately saying "Google only uses content that you import or upload
+to our model tuning feature for that express purpose"<Cite n={3}/>, a statement about data use, not
+an exception to the restriction above.
 
-Anthropic's Commercial Terms of Service, effective June 17, 2025 and read September 19, 2026,
-state under Use Restrictions that "Customer may not and must not attempt to (a) access the
-Services to build a competing product or service, including to train competing AI models or
-resell the Services except as expressly approved by Anthropic"<Cite n={2}/>. Those are the
-commercial terms; Anthropic
-publishes separate consumer terms this page has not read. Google's Gemini API Additional Terms of
-Service, dated March 23, 2026, state that "You may not use the Services to develop models that
-compete with the Services (e.g., Gemini API or Google AI Studio)"<Cite n={3}/>. The same document
-separately says "Google only uses content that you import or upload to our model tuning feature
-for that express purpose"<Cite n={3}/>, a statement about data use, not an exception to the
-restriction above.
+OpenAI's Services Agreement restricts a customer, "except for a Permitted Exception," from using
+"Output to develop artificial intelligence models that compete with OpenAI's products and
+services"<Cite n={5}/>. That exception covers Output used to "develop artificial intelligence
+models primarily intended to categorize, classify, or organize data (e.g., embeddings or
+classifiers), if these models are not distributed or made commercially available to third
+parties," and to fine tune or customize "models provided as part of OpenAI's fine-tuning or other
+Services"<Cite n={5}/>: an in-house classifier fits; a model sold to a third party does not.
 
-OpenAI's own Services Agreement, effective January 1, 2026, restricts a customer, "except for a
-Permitted Exception," from using "Output to develop artificial intelligence models that compete
-with OpenAI's products and services"<Cite n={5}/>. That exception covers Output used to "develop
-artificial intelligence models primarily intended to categorize, classify, or organize data (e.g.,
-embeddings or classifiers), if these models are not distributed or made commercially available to
-third parties," and to fine tune or customize "models provided as part of OpenAI's fine-tuning or
-other Services"<Cite n={5}/>: an in-house classifier fits; a model sold to a third party does not.
-
-Distillation inherits whatever the teacher got wrong. A captured answer that reads fluently and
-would pass a casual glance is not the same as a correct one, and a student trained on enough
-confidently wrong examples learns to be confidently wrong the same way, just faster and cheaper.
+Whether any of that covers your actual plan is a question for whoever can read your contract, not
+this page. Ask a second, technical question alongside the legal one: what task were the captured
+answers filtered for, and does your use fall inside it or outside it? A model distilled on support
+replies for one product answers a question about a different one fluently and wrong, with nothing
+in the reply flagging that it has left the task it was trained for.
 
 </Lane>
 <Lane name="build" title="Build it">

@@ -58,35 +58,34 @@ site, so nothing below reports a measured number.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Ollama, llama.cpp and LM Studio all let a person run an open-weight model on their own computer
-with no account and no per-call bill; Ollama's own pricing section states that "Local models are
-always free"<Cite n={1}/>. What you give up against a hosted frontier model is quality at the top
-end: the largest, most capable models usually do not run on an ordinary computer at all, so a
-local setup means picking a model that actually fits and checking on your own task whether it is
-good enough, the same question an <Link href="/techniques/evals/">eval</Link> exists to answer.
+If privacy, not price, is why you want this: a desktop app that runs a model on your own computer
+needs no account and sends nothing anywhere else. Look for a downloadable application rather than
+a website. Ollama, one such tool, states plainly that "Local models are
+always free"<Cite n={1}/>; llama.cpp and LM Studio are two more. Install one, let it suggest a
+model sized for your computer, and run the actual questions you would otherwise send to a chat
+app before trusting it with anything real.
 
-Quantization is the lever that makes a large model fit smaller hardware: it reduces the precision
-each weight is stored at. llama.cpp's own documentation puts it plainly: quantization "reduces
-the precision of model weights (e.g., from 32-bit floats to 4-bit integers), which shrinks the
-model's size and can speed up inference," at a cost the same page is careful about: it "may
-introduce some accuracy loss which is usually measured in Perplexity (ppl) and/or Kullback–Leibler
-Divergence (kld)," minimized "by using a suitable imatrix file"<Cite n={3}/>. So: a smaller
-quantization fits smaller hardware and may run faster, at a quality cost specific to the model,
-method and setting, measured rather than assumed. Name the exact quantization you ran (Q4_K_M is
-not "4-bit" in general) whenever you report what it cost you.
+What to expect first: most models you can run locally are compressed to fit consumer hardware, a
+step called quantization. llama.cpp's own documentation puts it plainly: quantization "reduces the
+precision of model weights (e.g., from 32-bit floats to 4-bit integers), which shrinks the model's
+size and can speed up inference," at a cost the same page is careful about: it "may introduce some
+accuracy loss which is usually measured in Perplexity (ppl) and/or Kullback–Leibler Divergence
+(kld)," minimized "by using a suitable imatrix file"<Cite n={3}/>. What that means for you: the
+model you install is smaller and less capable than the full-size version you may have read about,
+and how much was cut varies by download. Run the same handful of questions you already know good
+answers to through it and through a hosted chat app, side by side; if the local one is noticeably
+worse, that is the real trade for keeping the data on your machine, not a setup mistake.
 
-Context length is the other lever, and the less obvious one: a longer context window costs
-memory before a single token of it is used, which is what this page's own example measures. A
-chat app that lets you pick a smaller "context size" or "memory" setting locally is trading
-exactly this (how much the model can see at once) for how much hardware it needs.
+The setting most worth checking is whatever the app calls "context size" or "memory": a smaller
+number there means the model forgets more of what you told it earlier in the conversation, in
+exchange for needing less of your computer's memory to run at all. If it keeps losing track of
+something you said two messages back, that setting is usually why, and raising it is the fix if
+your machine has room.
 
-The privacy reason lands differently by setting. A production test station triaging today's
-retest log cannot send serial numbers and yield data off the floor network, so the model runs
-there regardless of a hosted API's price. An engineer characterizing five prototype boards before
-a design review is not weighing a per-call bill at all: five runs in an afternoon barely register
-either way, and the real reason to stay local is that the schematics are not public yet. A person
-writing one measurement's uncertainty budget has the smallest stake: a model's contribution
-there, if any, costs rounding error against the instrument's own calibration.
+A hosted model is the honest answer once none of this is actually about privacy: a per-message
+price you likely will not notice, nothing to install or keep updated, and no ceiling set by what
+your own machine can run. Local inference earns its place when something specific truly cannot
+leave the machine, not as a default upgrade from a chat app that already works fine.
 
 </Lane>
 <Lane name="build" title="Build it">

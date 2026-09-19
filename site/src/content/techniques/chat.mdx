@@ -72,37 +72,36 @@ yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Four kinds of name get used almost interchangeably in conversation, and keeping them apart is the
-fastest way to make sense of anything on this site, or in the news about AI.
+The name that actually matters is not "Claude" or "ChatGPT," it's the specific model your product
+used to answer you. Most chat apps show this in a menu near the message box, a dropdown at the top
+of the conversation, or a settings panel; look there before anywhere else. Anthropic's own
+documentation names Claude Sonnet 5 as a specific, versioned model, released June 30, 2026 with the
+model id `claude-sonnet-5`<Cite n={1}/>: that is the kind of name the menu is naming, not the
+product's own name.
 
-A **developer** trains models. Anthropic and OpenAI are developers. A developer's name rarely
-appears on your screen by itself; it appears on everything else.
+When a colleague's advice about "Claude" doesn't reproduce, the product name isn't enough
+information to debug from. Ask which model their menu showed, not which app they opened: Claude,
+Anthropic's own product, is described as "a helpful, intuitive, and powerful collaborator you can
+put to work on real tasks"<Cite n={2}/>, and that description covers more than one model
+underneath it. ChatGPT is the same shape: one product name over several possible models. If
+neither of you checked the menu, you were never comparing the same thing in the first place.
 
-A **model** is a trained system with a specific, versioned name. Claude Sonnet 5 is a model
-Anthropic trains; Anthropic's own documentation states it as released June 30, 2026, with the
-model id `claude-sonnet-5`<Cite n={1}/>. The version matters because a model is frozen once
-trained: Claude Sonnet 5 does not quietly get smarter next month; a new model with a new name
-replaces it instead.
+Two things to check directly in the product itself, not by asking a model about itself from
+memory. Type "What model are you, and what is your knowledge cutoff?" and compare the answer
+against the menu's own label and the product's own documentation; a model can be wrong about its
+own name and date, and the menu is the source that actually decides. And before comparing "Claude"
+against another product's newest model by name, check that you are comparing two models rather
+than a product against a model, since a product can run more than one and the menu decides which.
 
-A **product** is something a person uses: a chat app, here. Claude, Anthropic's own product, is
-described as "a helpful, intuitive, and powerful collaborator you can put to work on real
-tasks"<Cite n={2}/>; behind that description, it calls one of Anthropic's models to generate each
-reply. ChatGPT is OpenAI's equivalent product. A product's name and a model's name are not
-interchangeable: "Claude" is not itself a model, and asking "which Claude" is really asking which
-model answered you, which the product usually shows in a menu.
+The developer and the tool matter mainly when you're building something, not chatting. OpenAI's
+own documentation describes its API as what lets a developer "prompt a model and generate text" or
+"build agents that use tools and computers"<Cite n={3}/>: if a feature was clearly built by
+someone else's code calling a model, that's the tool layer, and not something you troubleshoot
+from inside a chat window. Ollama states plainly that "Nothing you run locally ever leaves your
+machine"<Cite n={4}/>, which matters only if privacy is the actual question you came with.
 
-A **tool** is something a developer builds with, not something a person chats in directly.
-OpenAI's API documentation points a developer at the API to "prompt a model and generate text" or
-to "build agents that use tools and computers"<Cite n={3}/>: code calls it; a person does not type
-into it directly. Ollama is a different kind of tool: it can run a model on your own machine, and
-states plainly, "Nothing you run locally ever leaves your machine"<Cite n={4}/>. Neither is a
-product on its own; each is what someone else's product, or your own code, gets built on top of.
-
-Once these four are apart, a lot of confusion resolves itself. "Is Claude as good as GPT-6 Astra"
-compares a product to a model, which is not quite the right question, since a product can run
-more than one model and a menu decides which. "I built this with the OpenAI API" is a tool
-credit, not a product endorsement. Reading a name anywhere on this site, ask which of the four it
-is; the "Out there" list at the bottom of every page groups its names the same way.
+None of this matters for a one-off question you can check yourself. It matters when a result
+doesn't match what you expected, or what someone else got.
 
 </Lane>
 <Lane name="build" title="Build it">

@@ -53,32 +53,33 @@ site, so nothing below is measured.
 <Lanes>
 <Lane name="use" title="Use it">
 
-You are unlikely to generate a training set yourself, but synthetic data shows up wherever a
-product claims a dataset that would have been too expensive to collect by hand: more languages, more
-edge cases, more examples of a rare situation than any team could write in a reasonable time. The
-question worth asking is the one Self-Instruct's own framing answers implicitly by including a
-filtering step at all<Cite n={1}/>: was the generated data checked before it was trained on, or was
-it trained on because it was cheap to produce. A number stated as "N synthetic examples used for
-training" says nothing on its own about whether any of them were verified.
+Ask one question of any product or paper that reports a dataset built partly or fully by a model,
+and put it exactly this way: "What checked each example before it was used, and what share did
+that check reject?" A number stated as "50,000 synthetic examples" says nothing on its own about
+whether a person, or any independent process, verified a single one of them. Generating and
+filtering are two separate steps, the way Self-Instruct's own pipeline builds a filtering step in
+on purpose rather than treating generation as the whole job<Cite n={1}/>; a dataset description
+that only ever mentions the first step, with no rejection rate anywhere, is answering a question
+you did not ask.
 
-Model collapse names a specific pattern, not synthetic data as a category: unchecked model output
-trained on by the next model, round after round. What the 2023 paper says disappears is the tails
-of the distribution<Cite n={2}/>: the rare, unusual, edge-case examples, which are often precisely
-what a synthetic set was generated to add more of. One checked batch used once is a different
-situation from that loop.
+"Model collapse" is not a reason to distrust every generated example. It names one specific
+failure: a model's own unchecked output feeding the next model's training, round after round, so
+that the rare and unusual cases quietly vanish from what later models ever see<Cite n={2}/>. One
+generated batch, checked once against something outside the model that produced it, and used once,
+is not that loop. Ask what the check actually compared the generated data against, not just
+whether the word "filtered" appears on the page.
 
-None of this is unique to text. The same question applies to a generated image set, a generated
-audio set, or a generated set of tool-call examples: was each one checked against something outside
-the model that produced it, or only against how plausible it looks.
+None of this is specific to text. The same question applies to a generated image set, a generated
+audio set, or a set of generated tool-call examples: checked against something outside the model
+that made it, or only against how plausible it looks.
 
-For an engineer, text and measurements fall on opposite sides of that line. Five boards back from
-the board house is not enough characterization data, and generating more operator notes or fault
-descriptions to train or test a classifier is the honest half of this technique: real language,
-checked before use, the way this page's example checks a paraphrase. Generating more measurements
-is not honest in any of the three settings a bench serves: a production log needs a real unit on a
-real fixture, a characterization sweep needs a real reading at a real corner, and a precise
-measurement needs a real instrument on a real range. A model may draft the report around a
-measurement; it may not draft the measurement.
+If the claim in front of you is about a measurement rather than words, the question does not need
+asking: refuse it outright. A model may help draft the report around a reading, a margin, or a
+pass or fail line; it may not produce the reading itself. Five boards back from a supplier is not
+enough characterization data, and no amount of generated language changes that. Generating more
+fault descriptions or operator notes to train or test a classifier is a different, honest use of
+the same idea, so long as the notes are real language checked before use, not a stand-in for the
+readings themselves.
 
 </Lane>
 <Lane name="build" title="Build it">
