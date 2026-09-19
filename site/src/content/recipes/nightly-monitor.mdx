@@ -108,3 +108,8 @@ six months. No result file exists; this is what a run would score.
   producing diffs the model has to judge.
 - Keep a per-run record of cost and latency beside the findings, so a slow night shows up before
   it becomes a bill nobody expected.
+- Swap the mechanism for a source that grows instead of changing: where a query returns a result
+  set, "what is new" is the records dated after the last run rather than a diff against last
+  night's copy, which is the same shape and cheaper arithmetic, and is what <Link
+  href="/recipes/weekly-status-report/">the weekly status report</Link> and <Link
+  href="/recipes/literature-watch/">the literature watch</Link> both do.
