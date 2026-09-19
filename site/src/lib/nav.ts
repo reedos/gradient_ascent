@@ -47,7 +47,21 @@ export interface NavGroup {
   sections: NavSection[];
 }
 
-export function buildNav(levels: NavLevel[], tracks: NavTrack[]): NavGroup[] {
+export interface NavThread {
+  id: string;
+  title: string;
+}
+
+/** What the menu says under a thread's title. A thread with no line here gets the general one,
+ *  so a new thread in content/taxonomy.json appears in the menu with no edit to this file. */
+const THREAD_HINTS: Record<string, string> = {
+  'graph-engineering': 'One idea followed across three levels',
+  'who-approves-what': 'What a person still holds, level by level',
+  'checking-the-work': 'Five ways to tell whether it worked',
+  'what-the-model-sees': 'Context, from a prompt to a note for the next session',
+};
+
+export function buildNav(levels: NavLevel[], tracks: NavTrack[], threads: NavThread[] = []): NavGroup[] {
   const ordered = [...levels].sort((a, b) => a.order - b.order);
   return [
     {
@@ -70,7 +84,7 @@ export function buildNav(levels: NavLevel[], tracks: NavTrack[]): NavGroup[] {
           items: [
             { label: 'All techniques', path: '/techniques/', hint: 'Every page, grouped by level' },
             { label: 'The map', path: '/map/', hint: 'How the techniques connect' },
-            { label: 'Graph engineering', path: '/threads/graph-engineering/', hint: 'One idea followed across three levels' },
+            ...threads.map((t) => ({ label: t.title, path: `/threads/${t.id}/`, hint: THREAD_HINTS[t.id] ?? 'A reading path across levels' })),
           ],
         },
         {

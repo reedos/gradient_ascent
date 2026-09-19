@@ -3,14 +3,14 @@ import { usDate } from '../lib/dates';
 // The footer carries the whole site map, built from the same src/lib/nav.ts the header's menus
 // read. It is also where the phone's Menu link lands when JavaScript is off.
 import Logo from './Logo.astro';
-import { asOf, levels, tracks } from '../lib/content';
+import { asOf, levels, tracks, threads } from '../lib/content';
 import { url } from '../lib/url';
 import { buildNav, type NavLevel, type NavTrack } from '../lib/nav';
 import { REPO_URL } from '../lib/site';
 
 const navLevels: NavLevel[] = levels.map((l) => ({ order: l.order, title: l.title, short: l.short, slugs: l.pages.map((p) => p.slug) }));
 const navTracks: NavTrack[] = tracks.map((t) => ({ id: t.id, title: t.title, slugs: (t.pages ?? []).map((p) => p.slug) }));
-const groups = buildNav(navLevels, navTracks);
+const groups = buildNav(navLevels, navTracks, threads.map((t) => ({ id: t.id, title: t.title })));
 ---
 <footer class="site-footer">
   <div class="footer-top">

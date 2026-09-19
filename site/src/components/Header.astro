@@ -8,7 +8,7 @@
 // click-outside, and the phone sheet.
 import Logo from './Logo.astro';
 import { url } from '../lib/url';
-import { levels, tracks } from '../lib/content';
+import { levels, tracks, threads } from '../lib/content';
 import { buildNav, navContext, railItems, isCurrent, type NavLevel, type NavTrack } from '../lib/nav';
 import { REPO_URL } from '../lib/site';
 import '../styles/header.css';
@@ -20,7 +20,7 @@ if (!path.startsWith('/')) path = `/${path}`;
 
 const navLevels: NavLevel[] = levels.map((l) => ({ order: l.order, title: l.title, short: l.short, slugs: l.pages.map((p) => p.slug) }));
 const navTracks: NavTrack[] = tracks.map((t) => ({ id: t.id, title: t.title, slugs: (t.pages ?? []).map((p) => p.slug) }));
-const groups = buildNav(navLevels, navTracks);
+const groups = buildNav(navLevels, navTracks, threads.map((t) => ({ id: t.id, title: t.title })));
 const ctx = navContext(path, navLevels, navTracks);
 const rail = railItems(groups, ctx);
 const railGroup = groups.find((g) => g.id === ctx.group);

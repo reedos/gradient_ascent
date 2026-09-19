@@ -18,7 +18,11 @@ const tracks: NavTrack[] = [
   { id: 'evals', title: 'Evals', slugs: ['eval-frameworks'] },
   { id: 'safety', title: 'Safety', slugs: ['guardrails'] },
 ];
-const groups = buildNav(levels, tracks);
+const threads = [
+  { id: 'graph-engineering', title: 'Graph engineering' },
+  { id: 'a-new-thread', title: 'A new thread' },
+];
+const groups = buildNav(levels, tracks, threads);
 
 test('four groups, in the order the site reads', () => {
   assert.deepEqual(groups.map((g) => g.id), ['levels', 'techniques', 'practice', 'reference']);
@@ -84,7 +88,7 @@ test('the rail shows the ladder on a level page and the group\'s own pages elsew
   assert.deepEqual(railItems(groups, { group: 'levels', level: 5 }).map((i) => i.level), [0, 1, 5]);
   assert.deepEqual(railItems(groups, { group: 'practice' }).map((i) => i.path), ['/worksheet/', '/shapes/', '/recipes/', '/teardowns/', '/failures/']);
   // Techniques: the browse links only; five topics would not fit a rail and live in the menu.
-  assert.deepEqual(railItems(groups, { group: 'techniques' }).map((i) => i.path), ['/techniques/', '/map/', '/threads/graph-engineering/']);
+  assert.deepEqual(railItems(groups, { group: 'techniques' }).map((i) => i.path), ['/techniques/', '/map/', '/threads/graph-engineering/', '/threads/a-new-thread/']);
 });
 
 test('isCurrent: a level item follows the context, an index stays current on its children', () => {
@@ -122,4 +126,13 @@ test('every fixed menu path is a real route in src/pages', () => {
     const file = join(pages, ...parts);
     assert.ok(existsSync(`${file}.astro`) || existsSync(join(file, 'index.astro')), `no page for ${item.path}`);
   }
+});
+
+test('every thread handed in gets a menu entry, and one with no written hint still gets a line', () => {
+  const browse = groups.find((g) => g.id === 'techniques')!.sections[0].items;
+  const added = browse.find((i) => i.path === '/threads/a-new-thread/');
+  assert.equal(added?.label, 'A new thread');
+  assert.ok(added?.hint && added.hint.length > 10);
+  assert.equal(browse.find((i) => i.path === '/threads/graph-engineering/')?.hint, 'One idea followed across three levels');
+  assert.deepEqual(buildNav(levels, tracks).find((g) => g.id === 'techniques')!.sections[0].items.map((i) => i.path), ['/techniques/', '/map/']);
 });

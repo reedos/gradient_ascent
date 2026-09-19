@@ -116,6 +116,12 @@ export const GET: APIRoute = async ({ site }) => {
   lines.push(`- [Method](${abs('/method/')}): How a level is defined, how a page is written, how results are measured.`);
   lines.push('');
 
+  lines.push('## What changed');
+  lines.push(
+    `- [What changed](${abs('/changes/')}): Dated record of what changed on this site and why it ` +
+      `matters to a reader, newest first. Atom feed at ${abs('/changes.xml')}.`,
+  );
+  lines.push('');
   lines.push('## Glossary');
   lines.push(
     `- [Glossary](${abs('/glossary/')}): ${glossaryTerms.length} terms a newcomer meets on this site, each defined from the page that explains it.`,

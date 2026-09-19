@@ -8,9 +8,11 @@ import landscape from '../../../../content/landscape.json';
 import glossary from '../../../../content/glossary.json';
 import timeline from '../../../../content/timeline.json';
 import capability from '../../../../content/capability.json';
+import frontier from '../../../../content/frontier.json';
+import changes from '../../../../content/changes.json';
 import { agentWorksheet, agentLevels, useCases, agentShapes } from '../../lib/agents-data';
 
-const NAMES = ['taxonomy', 'landscape', 'glossary', 'timeline', 'capability', 'worksheet', 'use-cases', 'shapes'] as const;
+const NAMES = ['taxonomy', 'landscape', 'glossary', 'timeline', 'capability', 'worksheet', 'use-cases', 'shapes', 'frontier', 'changes'] as const;
 
 export const getStaticPaths: GetStaticPaths = () => NAMES.map((name) => ({ params: { name } }));
 
@@ -22,6 +24,8 @@ export const GET: APIRoute = ({ params, site }) => {
   else if (name === 'glossary') body = glossary;
   else if (name === 'timeline') body = timeline;
   else if (name === 'capability') body = capability;
+  else if (name === 'frontier') body = frontier;
+  else if (name === 'changes') body = changes;
   else if (name === 'shapes') {
     body = {
       note: 'The kinds of job, by the shape of the work and not its subject. Match a job on what the work is; split a request that joins several shapes. usual_level is an expectation the worksheet tests, never a verdict. A recipe is one worked instance of a shape: take its reasoning and leave its subject.',

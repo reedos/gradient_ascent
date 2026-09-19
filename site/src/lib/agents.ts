@@ -130,6 +130,8 @@ export function agentFiles(abs: (p: string) => string): { path: string; url: str
     f('/data/landscape.json', 'The registry of named models, products and tools, each with its maker, what it demonstrates, a source and the date it was checked. Names change: read retired and superseded_by.'),
     f('/data/glossary.json', 'The terms the site uses, each defined from the page that explains it.'),
     f('/data/timeline.json', 'Dated milestones per level, with sources.'),
+    f('/data/frontier.json', 'What is still unsolved at each level and what is being tried, with sources and the date checked.'),
+    f('/data/changes.json', 'What changed on this site and when. Check it if you cited a page before.'),
   ];
 }
 
