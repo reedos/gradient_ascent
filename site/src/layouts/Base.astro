@@ -4,7 +4,7 @@ import Footer from '../components/Footer.astro';
 import '../styles/global.css';
 import '../styles/print.css'; // finish-indexes: the print handout stylesheet, see its own file comment
 import { url } from '../lib/url';
-import { feedbackUrl } from '../lib/site';
+import { feedbackUrl, INDEXABLE } from '../lib/site';
 
 interface Props {
   title: string;
@@ -23,6 +23,7 @@ const feedback = feedbackUrl(canonical, title);
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {!INDEXABLE && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href={url('/favicon.svg')} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
