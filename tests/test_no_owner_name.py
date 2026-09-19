@@ -37,7 +37,10 @@ BINARY_EXTENSIONS = {
 
 EMAIL_SHAPE = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+")
 WINDOWS_USER_PATH = re.compile(r"C:\\Users\\[^\\/:*?\"<>|\r\n]+", re.IGNORECASE)
-UNIX_HOME_PATH = re.compile(r"(?:/home/|/Users/)[^/\s\"'<>]+")
+# The slash after the alternation, rather than inside it, so this line does not spell the very
+# thing it searches for: the scan reads every tracked file including this one, and the earlier
+# spelling matched its own source and failed the suite on itself.
+UNIX_HOME_PATH = re.compile(r"(?:/home|/Users)/[^/\s\"'<>]+")
 
 # (path relative to ROOT, posix separators, exact matched text) pairs a reviewer has looked at and
 # ruled not a personal identifier. Each one is commented with why. Nothing is allowlisted by
@@ -195,6 +198,24 @@ class NoOwnerNameTest(unittest.TestCase):
             any(needle.search(planted) for needle in needles.values()),
             "the derived needles no longer match the owner's own name; the scan is a no-op",
         )
+
+    def test_a_planted_identifier_shape_is_actually_caught(self) -> None:
+        # Same reasoning as the planted name above, for the three shape patterns. The home-path
+        # regex in particular is spelled carefully so it does not match its own source, and a
+        # careless respelling could easily stop it matching anything at all.
+        # Each sample is assembled from pieces rather than written out, for the same reason the
+        # home-path regex above is: a literal sample here would be a real hit in a tracked file
+        # and this file would fail its own scan.
+        who = "someone"
+        back = "\\"
+        for line, pattern in (
+            (f"contact = {who}" + "@" + "example.com", EMAIL_SHAPE),
+            (f"path = C:{back}Users{back}{who}{back}notes.txt", WINDOWS_USER_PATH),
+            ("path = " + "/home" + "/" + who + "/notes.txt", UNIX_HOME_PATH),
+            ("path = " + "/Users" + "/" + who + "/notes.txt", UNIX_HOME_PATH),
+        ):
+            with self.subTest(line=line):
+                self.assertTrue(pattern.search(line))
 
     def test_license_itself_is_exempt_and_not_silently_skipped_for_the_wrong_reason(self) -> None:
         # LICENSE is skipped by an exact relative-path match ("LICENSE"), not because it happens
