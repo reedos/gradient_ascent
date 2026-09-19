@@ -160,7 +160,7 @@ class StoryOneWorstCornerTests(unittest.TestCase):
     def test_the_margin_is_a_finding_and_not_a_measurement_artifact(self) -> None:
         """20.4 mV against an expanded uncertainty of about 0.35 mV: the measurement decides this."""
         thin = next(c for c in self.corners if c.serial == THIN_MARGIN_SERIAL)
-        budget = budget_for_point(self.points[(thin.serial, thin.tamb_c, thin.vin_v, thin.iout_a)], range_v=NOMINAL_RANGE_V)
+        budget = budget_for_point(self.points[(thin.serial, thin.tamb_c, thin.vin_v, thin.iout_a)])
         self.assertGreater(thin.margin_v / budget.expanded_v, 50.0)
 
 
@@ -190,11 +190,22 @@ class UncertaintyBudgetTests(unittest.TestCase):
         self.assertAlmostEqual(budget.expanded_v, 2.0 * budget.combined_v, places=12)
 
     def test_matches_the_value_this_page_reports(self) -> None:
-        """docs/THE-BENCH.md: 351.6 uV expanded, for a generic reading in this session's shape.
-        This specific corner's own five readings come out close but not identical, because its
-        repeatability line is this block's own spread and not the notebook's generic ~60 uV."""
-        budget = budget_for_point(self.readings, range_v=NOMINAL_RANGE_V)
-        self.assertAlmostEqual(1e6 * budget.expanded_v, 352.7, delta=5.0)
+        """352.7 uV expanded, for this corner's own five readings. Two nearby figures belong to
+        other readings and neither is this one: characterization-notebook.md section 6 gets
+        351.6 uV for a generic reading of this session, and mdn6100-programming-manual.md section
+        8 gets 349.5 uV for ten readings of a different rail. The differences are the
+        repeatability line, which is this block's own spread rather than a looked-up one."""
+        budget = budget_for_point(self.readings)
+        self.assertAlmostEqual(1e6 * budget.expanded_v, 352.7, delta=0.1)
+
+    def test_the_range_defaults_to_the_one_the_readings_were_actually_taken_on(self) -> None:
+        """A budget that has to be told the range can be told the wrong one. The file carries it
+        per reading, so the default reads it there, and every reading of this corner is on the
+        10 V range the sweep script selected."""
+        self.assertEqual({r.meter_range_v for r in self.readings}, {NOMINAL_RANGE_V})
+        by_default = budget_for_point(self.readings)
+        told = budget_for_point(self.readings, range_v=NOMINAL_RANGE_V)
+        self.assertAlmostEqual(by_default.expanded_v, told.expanded_v, places=12)
 
     def test_meter_accuracy_is_named_and_priced_at_the_range_it_was_read_on(self) -> None:
         wrong_range = budget_for_point(self.readings, range_v=100.0)
@@ -249,21 +260,42 @@ class StoryTwoGuardbandedVerdictTests(unittest.TestCase):
         self.assertEqual(guarded_verdict(value, 0.0, upper=LINE_REG_MAX_PCT), VERDICT_PASS)
 
     def test_the_regulation_uncertainty_is_about_the_notebook_s_own_figure(self) -> None:
-        readings = self.points[(MARGINAL_LINE_SERIAL, 25.0, 32.0, 1.000)]
-        u = regulation_uncertainty_pct(readings, range_v=NOMINAL_RANGE_V)
+        u = regulation_uncertainty_pct(
+            self.points[(MARGINAL_LINE_SERIAL, 25.0, 32.0, 1.000)],
+            self.points[(MARGINAL_LINE_SERIAL, 25.0, 9.0, 1.000)],
+        )
         # characterization-notebook.md section 6: 0.0075 percentage points.
         self.assertAlmostEqual(u, 0.0075, delta=0.0015)
 
+    def test_a_regulation_figure_whose_two_ends_used_different_ranges_is_priced_on_the_worse(self) -> None:
+        """Board 3's 32 V block at 25 degC was read on the 100 V range and its 9 V block on the
+        10 V range, because the slipped-range window crosses one end of that sweep. A difference
+        is no better than the weaker half of it, so the pair is priced on the 100 V row: about
+        four times the uncertainty of an ordinary regulation figure on this bench. It is still a
+        pass, and pricing it on the 10 V range it was half taken on would have understated it."""
+        by_key = {(c.serial, c.tamb_c): c for c in self.checks}
+        crossed = by_key[(THIN_MARGIN_SERIAL, 25.0)]
+        ordinary = by_key[(THIN_MARGIN_SERIAL, 70.0)]
+        self.assertGreater(crossed.uncertainty_pct, 3.0 * ordinary.uncertainty_pct)
+        self.assertEqual(crossed.verdict, VERDICT_PASS)
+
     def test_regulation_uncertainty_recomputed_independently_from_the_raw_csv_agrees(self) -> None:
         rows = _rows()
-        values = [
-            float(r["vout_v"]) for r in rows
-            if r["serial"] == MARGINAL_LINE_SERIAL and r["tamb_c"] == "25.0"
-            and r["vin_v"] == "32.0" and r["iout_a"] == "1.000"
-        ]
-        per_reading = combined_uncertainty(
-            dc_voltage_budget(values, range_v=NOMINAL_RANGE_V, lead_half_width_v=None)
-        )
+
+        def per_reading_at(vin: str) -> float:
+            block = [
+                r for r in rows
+                if r["serial"] == MARGINAL_LINE_SERIAL and r["tamb_c"] == "25.0"
+                and r["vin_v"] == vin and r["iout_a"] == "1.000"
+            ]
+            range_v = max(float(r["meter_range_v"]) for r in block)
+            return combined_uncertainty(
+                dc_voltage_budget(
+                    [float(r["vout_v"]) for r in block], range_v=range_v, lead_half_width_v=None
+                )
+            )
+
+        per_reading = max(per_reading_at("32.0"), per_reading_at("9.0"))
         expected = 100.0 * expanded_uncertainty(per_reading * math.sqrt(2.0)) / 5.000
         by_key = {(c.serial, c.tamb_c): c for c in self.checks}
         self.assertAlmostEqual(by_key[(MARGINAL_LINE_SERIAL, 25.0)].uncertainty_pct, expected, places=6)
@@ -333,7 +365,7 @@ class StoryThreeMeterRangeTests(unittest.TestCase):
         ratio = range_cost(self.points, minority_range_v=100.0, majority_range_v=NOMINAL_RANGE_V)
         # Both computations pick "a" slipped point (dict ordering is not the same as CSV row
         # order), so this checks the two independent methods land in the same narrow band rather
-        # than pinning them to one one specific point's exact ratio.
+        # than pinning them to one specific point's exact ratio.
         self.assertAlmostEqual(wrong / right, ratio, delta=0.05)
 
 

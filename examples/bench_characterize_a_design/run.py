@@ -68,12 +68,13 @@ VOUT_MAX_V = 5.100
 #: srb5030-test-spec.md step 4: line regulation, 9.0 V to 32.0 V at 1.000 A, reported as a
 #: percentage of the 5.000 V nominal output. 32.0 V and not the datasheet's 36.0 V, because
 #: ECN-2608-04 caps the boards this sweep's own revision C prototypes are being compared against;
-#: characterization-notebook.md section 1 records swimming the same 32.0 V ceiling on purpose.
+#: characterization-notebook.md section 1 records sweeping to the same 32.0 V ceiling on purpose.
 LINE_REG_MAX_PCT = 0.300
 
 #: characterization-notebook.md section 2: "Meter: DC volts, 10 V range, selected once per board
 #: rather than per reading." The range the sweep script chose, and the range every point in this
-#: file should have been read on.
+#: file should have been read on. Nothing below prices a reading against it: every budget reads
+#: the range off the readings themselves, because sixty of them were not taken on it.
 NOMINAL_RANGE_V = 10.0
 
 
@@ -205,14 +206,27 @@ def worst_corner_per_board(points: Points) -> list[CornerMargin]:
     return sorted(best.values(), key=lambda c: c.margin_v)
 
 
-def budget_for_point(readings: list[Reading], *, range_v: float) -> UncertaintyBudget:
+def point_range_v(readings: list[Reading]) -> float:
+    """The meter range a point was read on, which is the coarser one if a point ever straddled
+    two. The sweep script selects a range once per board, so in this file every point is read
+    entirely on one range; this is where that assumption is checked rather than assumed."""
+    return max(r.meter_range_v for r in readings)
+
+
+def budget_for_point(readings: list[Reading], *, range_v: float | None = None) -> UncertaintyBudget:
     """The uncertainty budget behind one output-voltage reading, at the range it was actually
     read on: meter accuracy, the display's resolution, the repeatability of these five readings,
     and the lead and connection contribution `characterization-notebook.md` section 6 carries over
     from `calibration-procedure.md`. `dc_voltage_budget` is the one function every engineering page
-    on this bench imports for this; nothing here writes a second root sum of squares."""
+    on this bench imports for this; nothing here writes a second root sum of squares.
+
+    `range_v` defaults to the range these readings carry in the file rather than to the range the
+    sweep script meant to use. Pass it only to price the same readings on a range they were not
+    taken on, which is what `range_cost` does deliberately."""
     values = [r.vout_v for r in readings]
-    contributions = dc_voltage_budget(values, range_v=range_v)
+    contributions = dc_voltage_budget(
+        values, range_v=point_range_v(readings) if range_v is None else range_v
+    )
     combined_v = combined_uncertainty(contributions)
     return UncertaintyBudget(
         contributions=contributions, combined_v=combined_v, expanded_v=expanded_uncertainty(combined_v)
@@ -227,15 +241,26 @@ def line_regulation_pct(points: Points, serial: str, tamb_c: float) -> float:
     return 100.0 * (high - low) / VOUT_NOM_V
 
 
-def regulation_uncertainty_pct(readings: list[Reading], *, range_v: float) -> float:
+def regulation_uncertainty_pct(high: list[Reading], low: list[Reading]) -> float:
     """The uncertainty on a regulation figure, not on one reading. Line regulation is a difference
     of two readings taken through the same leads, so the lead-and-connection line cancels
     (`lead_half_width_v=None`), and what is left of each reading combines in quadrature: `sqrt(2)`
     times one reading's own meter-and-resolution-and-repeatability uncertainty, expanded at k=2,
     stated as a percentage of the nominal output. `characterization-notebook.md` section 6 derives
-    this by hand for one board; this is the general function behind that arithmetic."""
-    values = [r.vout_v for r in readings]
-    per_reading = combined_uncertainty(dc_voltage_budget(values, range_v=range_v, lead_half_width_v=None))
+    this by hand for one board; this is the general function behind that arithmetic.
+
+    The two readings are not always on the same meter range: the slipped-range window in this file
+    crosses one end of two boards' 25 degC sweeps, so one of the two ends is priced against a row
+    the other end never used. This takes the worse of the two, which is conservative and is the
+    honest reading of a difference: it is no better than the weaker half of it."""
+    per_reading = max(
+        combined_uncertainty(
+            dc_voltage_budget(
+                [r.vout_v for r in block], range_v=point_range_v(block), lead_half_width_v=None
+            )
+        )
+        for block in (high, low)
+    )
     return 100.0 * expanded_uncertainty(per_reading * math.sqrt(2.0)) / VOUT_NOM_V
 
 
@@ -249,8 +274,9 @@ def scan_line_regulation(points: Points) -> list[RegulationCheck]:
     for serial in serials:
         for tamb_c in ambients:
             value_pct = line_regulation_pct(points, serial, tamb_c)
-            high_readings = points[(serial, tamb_c, 32.0, 1.000)]
-            uncertainty_pct = regulation_uncertainty_pct(high_readings, range_v=NOMINAL_RANGE_V)
+            uncertainty_pct = regulation_uncertainty_pct(
+                points[(serial, tamb_c, 32.0, 1.000)], points[(serial, tamb_c, 9.0, 1.000)]
+            )
             verdict = guarded_verdict(value_pct, uncertainty_pct, upper=LINE_REG_MAX_PCT)
             checks.append(RegulationCheck(serial, tamb_c, value_pct, uncertainty_pct, verdict))
     return checks
@@ -346,7 +372,7 @@ def run(
         normalized = thin.serial
     focus_serial = normalized
 
-    budget = budget_for_point(points[(thin.serial, thin.tamb_c, thin.vin_v, thin.iout_a)], range_v=NOMINAL_RANGE_V)
+    budget = budget_for_point(points[(thin.serial, thin.tamb_c, thin.vin_v, thin.iout_a)])
     tracer.record(
         kind="code", decided_by="code", title="Uncertainty budget for that corner's output voltage",
         detail=(

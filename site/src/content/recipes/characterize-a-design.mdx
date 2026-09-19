@@ -14,12 +14,11 @@ Five hand-built Orbeck SRB-5030 revision C boards came back from the board house
 review is Thursday, and nobody knows yet what the regulator does at 9 V in, 3 A out and 70 degC,
 which is the corner where low line, full load and a hot ambient all push the output the same way.
 This is engineering test, not production: five boards, not two hundred, a script that runs a few
-times over three days, not a fixed sequence run on every unit, and a report at the end rather than
-a per-unit pass or fail. The artifacts on hand are
-`evals/bench/data/characterization-2026-09.csv` (five boards, four input voltages, three load
-currents, three ambients, five readings a point, no verdict column at all) and
-`evals/bench/corpus/characterization-notebook.md`, the engineer's own working notes on what was
-set up, what the sweep was, and what the readings mean.
+times over three days rather than a fixed sequence run on every unit, and a report at the end
+rather than a per-unit pass or fail. The artifacts on hand are
+`evals/bench/data/characterization-2026-09.csv` (four input voltages, three load currents, three
+ambients, five readings a point, no verdict column at all) and
+`evals/bench/corpus/characterization-notebook.md`, the engineer's own working notes.
 
 ## Level 0, and why not higher
 
@@ -27,37 +26,37 @@ A sweep over line, load and temperature is a nested loop. The margin to a datash
 corner is a subtraction. An uncertainty budget for one reading is a root sum of squares over four
 named numbers, and guardbanding a limit by it is another subtraction. Finding the corner where a
 board's margin is thinnest, of the 36 this sweep visits for each of the five boards, is a
-minimum. None of it needs a model, for the same reason `<Link
-href="/recipes/limits-without-a-model/">limits without a model</Link>` needs none on the
+minimum. None of it needs a model, for the same reason
+<Link href="/recipes/limits-without-a-model/">limits without a model</Link> needs none on the
 production log: a margin nobody can reproduce is worse than no margin, and an uncertainty a model
 assembled looks exactly like one a budget produced, so neither may ever come from one.
 
 Low volume changes what the arithmetic is for, not whether it is arithmetic. There is no golden
-run to check five boards against and no population to run statistics over: no Cpk, no control
+run to check five boards against and no population to run statistics over: no Cpk and no control
 chart, because both need more units than a characterization sweep will ever have. A margin and an
-uncertainty budget do the work Cpk and a control chart do in production, on one board at a time
-instead of two hundred, and the honest cannot-say verdict below is what takes the place of a
-capability index this data set is too small to support.
+uncertainty budget do that work here instead, one board at a time.
 
 A model earns a place once the job stops being arithmetic over numbers this sweep already
-produced. Turning the notebook and the computed results into a report a reviewer can read is
-`<Link href="/recipes/measurement-writeup/">measurement writeup</Link>`, one call, with every
-figure in the draft checked against what code computed before anyone reads it. This page has no
+produced. Turning the notebook and these results into a report a reviewer can read is
+<Link href="/recipes/measurement-writeup/">measurement writeup</Link>, one call, with every
+figure in the draft checked against what code computed. Getting the meter's accuracy table out of
+its programming manual in the first place is
+<Link href="/recipes/accuracy-specs-from-the-manual/">accuracy specs from the manual</Link>,
+which is where the rows the budget below prices a reading against come from. This page has no
 model call anywhere in it.
 
 ## The sweep, stepped
 
 Nothing here talks to an instrument. The MDN-6100 already wrote every reading to
-`characterization-2026-09.csv` over the three days `docs/THE-BENCH.md` and the notebook describe;
-this recipe starts after that, reading the file the way `evals.bench.CHARACTERIZATION_CSV` names
-it. A row here is a reading, not a verdict: no `result` column, no `lower_limit`, because a margin
-needs the limit the reader is holding it against, which is the datasheet's, and not a number the
-file would otherwise carry twice.
+`characterization-2026-09.csv`, and this recipe starts after that, reading the file the way
+`evals.bench.CHARACTERIZATION_CSV` names it. A row is a reading and not a verdict: no `result`
+column and no limit column, because the limit a margin is taken against lives in the datasheet.
+That limit is the 4.900 to 5.100 V window `srb5030-datasheet.md` section 4 holds over the full
+line, load and temperature range, not the tighter 4.9500 to 5.0500 V window production checks at
+one fixed condition.
 
-Grouping every corner by board and keeping the smallest margin to the datasheet's 4.900 to 5.100 V
-output window (`srb5030-datasheet.md` section 4, the full line, load and temperature figure, not
-the tighter 4.9500 to 5.0500 V window production checks at one fixed condition) finds the same
-corner for all five boards, without being told where to look:
+Grouping every corner by board and keeping the smallest margin finds the same corner for all five
+boards, without being told where to look:
 
 | Serial | VOUT at 9.0 V, 3.000 A, 70 degC | Margin to 4.900 V |
 | --- | --- | --- |
@@ -67,14 +66,12 @@ corner for all five boards, without being told where to look:
 | SRB5030-2609-0004 | 4.97849 V | 78.5 mV |
 | SRB5030-2609-0005 | 4.96470 V | 64.7 mV |
 
-Board SRB5030-2609-0003 holds a fifth of the margin the other four hold, and it is not a failing
-board. It passes every corner in the file, its output at 24 V in and 1 A is 4.9585 V against the
-4.950 to 5.050 V window that condition is checked against, its load regulation is 0.657 percent
-against an 0.800 percent limit, and its line regulation is 0.236 percent against 0.300. No single
-parameter of it is out of specification. What it does not have, at the one corner where line, load
-and temperature all push the same way, is much left over: 20.4 mV where the other four hold 58 to
-79. That is the finding, and it is one a sample of one typical board at 25 degC would have said
-nothing about, because 25 degC is not the corner and one board is not a population.
+Board SRB5030-2609-0003 is not a failing board. It passes every corner in the file, its output at
+24 V in and 1 A is 4.9585 V against the 4.950 to 5.050 V window that condition is checked against,
+its load regulation is 0.657 percent against an 0.800 percent limit, and its line regulation is
+0.236 percent against 0.300. No single parameter of it is out of specification. What it does not
+have is much left over where all three push the same way. That is the finding, and a sample of one
+typical board at 25 degC would have said nothing about it.
 
 Against the measurement, that margin is not in doubt. An output-voltage reading from this session
 prices out as follows, from the meter's own accuracy specification
@@ -82,29 +79,43 @@ prices out as follows, from the meter's own accuracy specification
 
 <CodeFile file="examples/bench_characterize_a_design/run.py" func="budget_for_point" />
 
-For board 3's five readings at its worst corner, on the 10 V range the sweep script selected:
+For board 3's five readings at its worst corner, 9.0 V in, 3.000 A out, 70 degC ambient, on the
+10 V range the sweep script selected:
 
-| Contribution | Standard uncertainty |
-| --- | --- |
-| Meter accuracy, 1 year, 10 V range, 23 degC | 128.3 uV |
-| Resolution, 10 uV per count | 2.9 uV |
-| Repeatability, 5 readings | 36.1 uV |
-| Leads and connections | 115.5 uV |
-| Combined | 176.4 uV |
-| Expanded, k = 2 | 352.7 uV |
+| Contribution | Half-width or spread | Standard uncertainty |
+| --- | --- | --- |
+| Meter accuracy, 1 year, 10 V range, 23 degC | 222.2 uV | 128.3 uV |
+| Resolution, 10 uV per count | 5.0 uV | 2.9 uV |
+| Repeatability, 5 readings | s = 80.7 uV | 36.1 uV |
+| Leads and connections | 200 uV | 115.5 uV |
+| Combined | | 176.4 uV |
+| Expanded, k = 2 | | 352.7 uV |
 
-The 23 degC in the first line is the meter's own ambient on the bench, not the chamber's: the
-boards sat at 70 degC and the meter sat next to the operator, and the two are different
-temperatures for different reasons (`characterization-notebook.md` section 6 names both). Against
-20.4 mV of margin, 352.7 uV of expanded uncertainty is nothing: the margin is about 58 times the
-measurement, which is what makes this a design finding rather than a coincidence of where the
-meter happened to land that day. `guarded_verdict` still calls it a pass, correctly, and the page
-would be wrong to call it more than that: a thin margin is a design question for Thursday's
-review, not a test failure.
+The first column is what the specification or the record allows; the second is that reduced to a
+standard uncertainty. An accuracy specification is a limit and says nothing about where inside it
+this meter sits, so it is treated as a rectangular distribution and divided by the square root of
+3, and so is the display's own quantization, whose half-width is half a count. Repeatability is
+the one line measured on the day rather than looked up: the sample standard deviation of the five
+readings over the square root of five. The four combine by root sum of squares, and k = 2 covers
+roughly 95 percent of where the true value could be once they are combined, which is a coverage
+statement and not a guarantee that the value is inside.
+
+The 23 degC in the first line is the meter's own ambient, not the chamber's: the boards sat at
+70 degC and the meter sat next to the operator (`characterization-notebook.md` section 6 names
+both). And the 352.7 uV belongs to those five readings and to no others, which is worth saying
+because two nearby figures are quoted elsewhere for other readings: the meter's manual works a
+budget for ten readings of a different rail and gets 349.5 uV, and the notebook works one for a
+generic reading of this session and gets 351.6 uV. All three are honest and none of them is
+interchangeable.
+
+Against 20.4 mV of margin, 352.7 uV is nothing: the margin is about 58 times the measurement,
+which is what makes this a design finding rather than a coincidence of where the meter happened to
+land that day. `guarded_verdict` calls it a pass, correctly, and the page would be wrong to call
+it more than that: a thin margin is a design question for Thursday's review, not a test failure.
 
 Guardbanding is not only for the corner that looks tight. Running the same check over every
-board's line regulation at every ambient this sweep visited, rather than only the one case the
-notebook happens to flag, finds a second board with nothing wrong at its nominal corner:
+board's line regulation at every ambient, rather than only the case the notebook flags, finds a
+second board with nothing wrong at its nominal corner:
 
 | Serial | Ambient | Line regulation | Uncertainty | Verdict |
 | --- | --- | --- | --- | --- |
@@ -116,17 +127,22 @@ The 25 degC row is the one this page exists to teach. A bare comparison against 
 limit says 0.299 is a pass, and that comparison is not wrong about the arithmetic; it is wrong
 about what the measurement can support. Line regulation is a difference of two readings through
 the same leads, so the lead-and-connection line cancels and the uncertainty is smaller than a
-single reading's, about 0.0075 percentage points, expanded at k = 2. The margin at 25 degC is
-0.0006 points, well inside the uncertainty. Guardbanded, the acceptance limit is 0.2925 percent and
-0.299 is over it: the honest statement is that this measurement does not say whether that board
-meets its line regulation limit at 25 degC. It is not a pass and it is not a fail. The 70 degC row
-is not ambiguous at all, 0.334 against 0.300 by far more than the measurement is worth, so the
-design question that board 5 raises is real regardless of what the 25 degC row can or cannot say.
-Every other board, at every ambient, passes by tens of times the uncertainty.
+single reading's: 0.0075 percentage points, expanded at k = 2, against a margin of 0.0006 points.
+Guardbanded, the acceptance limit is 0.2925 percent and 0.299 is over it, so the honest statement
+is that this measurement does not say whether that board meets its line regulation limit at
+25 degC. It is not a pass and it is not a fail. The 70 degC row is not ambiguous at all, 0.334
+against 0.300 by far more than the measurement is worth, so the design question board 5 raises is
+real whatever the 25 degC row can or cannot say.
 
-The last finding in this sweep is not about any board. Grouping the output voltage's point-to-point
-spread by the `meter_range_v` column every row already carries, rather than by board or by corner,
-finds sixty readings that scatter about seven times more than the rest:
+The other twelve checks are passes, and not all the same kind of pass, which is why the scan
+reports the distance rather than only the word. Boards 1, 2 and 4 clear the limit by about 25
+times the uncertainty, board 3 by nine, and board 5's own 0 degC row by four. Two of the twelve,
+both at 25 degC, carry four times the usual uncertainty for a reason that has nothing to do with
+the boards, which is the next finding.
+
+That finding is not about any board. Grouping the output voltage's point-to-point spread by the
+`meter_range_v` column every row already carries, rather than by board or by corner, finds sixty
+readings that scatter about seven times more than the rest:
 
 | Meter range | Points | Mean spread | Boards |
 | --- | --- | --- | --- |
@@ -135,12 +151,17 @@ finds sixty readings that scatter about seven times more than the rest:
 
 Nothing about those sixty readings is an error: the error queue is empty and the numbers are
 right. They are just worth less, because the meter's accuracy specification is per range and the
-100 V range's term does not scale down for a 5 V reading. Pricing the same five readings on the
-range they were actually read on against the range the rest of the sweep used puts a number on
-that: 2.4 times the expanded uncertainty. The window crosses a board boundary, so two boards are
-touched and each only partly, which is what rules the boards themselves out: a board with a
-repeatability problem would be noisy at every corner it was measured at, and these two are noisy
-only in the window where the meter sat on the wrong range.
+100 V range's term does not scale down for a 5 V reading. Pricing the same five readings both
+ways puts a number on that: 2.4 times the expanded uncertainty. The window crosses a board
+boundary, so two boards are touched and each only partly, which is what rules the boards
+themselves out: a board with a repeatability problem would be noisy at every corner, and these two
+are noisy only where the meter sat on the wrong range.
+
+That window is also why two of the regulation checks carry 0.031 points instead of 0.0075. One end
+of each of those figures was read on the 100 V range and the other on the 10 V range, so
+`scan_line_regulation` prices the pair on the coarser of the two: a difference is no better than
+the weaker half of it. Pricing them on the range the sweep script meant to use would have quoted a
+100 V reading against a 10 V row, which is the same mistake one size down.
 
 ## The code
 
@@ -151,10 +172,10 @@ only in the window where the meter sat on the wrong range.
 <CodeFile file="examples/bench_characterize_a_design/run.py" func="spread_by_meter_range" />
 
 Every step this code takes is `decided_by: "code"` (`examples/common/trace.py` is the one
-definition of that field on this site): a sweep is a loop, a margin and a guardband are
-subtractions, and a budget calls `dc_voltage_budget`, `combined_uncertainty` and
-`expanded_uncertainty` from `examples/common/bench.py` rather than assembling one by hand. Run it
-yourself:
+definition of that field on this site), and no budget is assembled by hand anywhere in it:
+`dc_voltage_budget`, `combined_uncertainty` and `expanded_uncertainty` come from
+`examples/common/bench.py`, where `tests/test_bench.py` checks them against the meter's manual.
+Run it yourself:
 
 <CodeFile file="examples/bench_characterize_a_design/README.md" start={13} end={14} lang="text" expect="SRB5030-2609-0003" />
 
@@ -175,37 +196,37 @@ yourself:
 
 This is an engineering-test cost, counted per run and per session rather than per unit: the script
 here runs a handful of times over the three days the sweep took, not once for every board on a
-line. Ten milliseconds and zero model calls are not worth discussing on their own; what is worth
-discussing is that this recipe's cost does not depend on whether five boards came back or fifty,
-because nothing in it is a per-item call.
+line. Ten milliseconds and zero model calls are not worth discussing on their own. What is worth
+discussing is that nothing in this recipe is a per-item call, so the cost is the same whether five
+boards came back or fifty.
 
 ## How it fails on a real bench, specifically
 
 <FailureModes modes={[
   {
     name: "A corner never visited",
-    notice: "This sweep's margin table is only as good as the corners in it. A design review that only asks about 24 V in, 1 A out and 25 degC would never see board 3's 20.4 mV, because that corner is not the one nominal testing visits.",
-    test: "Check that the sweep's own input voltages, load currents and ambients (the sets this page derives from the file itself) include the datasheet's stated minimum and maximum on each axis, not only its typical point. worst_corner_per_board only ever reports the worst of the corners it was actually given.",
+    notice: "This margin table is only as good as the corners in it. A design review that asks only about 24 V in, 1 A out and 25 degC never sees board 3's 20.4 mV, because that corner is not the one nominal testing visits.",
+    test: "Check that the sweep's own input voltages, load currents and ambients, which this page derives from the file itself, include the datasheet's stated minimum and maximum on each axis and not only its typical point. worst_corner_per_board only ever reports the worst of the corners it was given.",
   },
   {
     name: "A condition recorded that was not the condition taken",
-    notice: "One block in this file is labeled 12.0 V and was actually taken at 24.0 V, because the operator stepped away mid-sweep. The output voltage gives nothing away: holding the output steady while the input moves is the entire job of the part. The input current does, because at the labeled voltage the board would be putting out more power than it took in.",
-    test: "tests/test_bench_characterization.py proves this: a power balance (input power below output power at the labeled condition) finds exactly the one point in the file where that is true, and no uncertainty budget would have caught it, because every reading in that block is a good reading of a condition nobody asked for.",
+    notice: "One block in this file is labeled 12.0 V and was taken at 24.0 V, because the operator stepped away mid-sweep. The output voltage gives nothing away, since holding it steady while the input moves is the entire job of the part. The input current does, because at the labeled voltage the board would be putting out more power than it took in.",
+    test: "tests/test_bench_characterization.py proves it: a power balance finds exactly the one point in the file where input power is below output power. No uncertainty budget would have caught it, because every reading in that block is a good reading of a condition nobody asked for.",
   },
   {
     name: "A block that scatters for a reason that is not the board",
-    notice: "Sixty readings in this file are noisier for a reason that has nothing to do with any board: the meter was left on the 100 V range. Blamed on the nearest board instead, it reads as a repeatability problem that is not there.",
-    test: "spread_by_meter_range groups the spread by meter_range_v before it is grouped by anything else, and range_cost prices the same readings both ways. A block noisier than the rest is a range question before it is a board question.",
+    notice: "Sixty readings here are noisier for a reason that has nothing to do with any board: the meter was left on the 100 V range. Blamed on the nearest board instead, it reads as a repeatability problem that is not there.",
+    test: "spread_by_meter_range groups the spread by meter_range_v before anything else, and range_cost prices the same readings both ways. budget_for_point reads the range off the readings for the same reason: a budget that has to be told its range can be told the wrong one.",
   },
   {
     name: "A margin declared a pass when it is smaller than the measurement",
     notice: "0.299 percent against a 0.300 percent limit is a pass by a bare comparison and not one the measurement supports: the expanded uncertainty on that figure is 0.0075 points, twelve times the margin. Calling it a pass ships a design decision the data does not back; calling it a fail is just as wrong.",
-    test: "guarded_verdict, called with the figure's own expanded uncertainty rather than 0.0, returns cannot say for exactly this case; scan_line_regulation runs it for every board at every ambient so a case like this is found rather than assumed away.",
+    test: "guarded_verdict, called with the figure's own expanded uncertainty rather than 0.0, returns cannot say for exactly this case, and scan_line_regulation runs it for every board at every ambient so a case like this is found rather than assumed away.",
   },
   {
     name: "A temperature coefficient applied to the wrong ambient",
-    notice: "The meter's accuracy specification has its own calibration band, centered on where the meter sits, and this bench's meter sits on the bench at about 23 degC while the boards it is measuring sit in a chamber at 0, 25 or 70 degC. Pricing the meter's own uncertainty at the chamber's ambient instead of the meter's overstates or understates the budget for no reason connected to the board.",
-    test: "budget_for_point calls dc_voltage_budget with the meter's own ambient, not the sweep's tamb_c; a budget that moved when tamb_c changed while the bench's own temperature did not would be the bug this guards against.",
+    notice: "The meter's accuracy specification has its own calibration band, centered on where the meter sits. This bench's meter sits at about 23 degC while the boards it measures sit in a chamber at 0, 25 or 70 degC, and pricing the meter at the chamber's ambient moves the budget for no reason connected to the board.",
+    test: "budget_for_point calls dc_voltage_budget with the meter's own ambient and not the sweep's tamb_c. A budget that moved when tamb_c changed while the bench's own temperature did not would be the bug this guards against.",
   },
 ]} />
 
@@ -215,43 +236,40 @@ because nothing in it is a per-item call.
 
 There is no free-text answer here for a person to grade, so there is no confusion matrix: a
 margin, a budget and a guardbanded verdict are closed-form arithmetic, and either they reproduce
-the numbers docs/THE-BENCH.md and the notebook state or there is a bug.
+the numbers `docs/THE-BENCH.md` and the notebook state or there is a bug.
 `tests/test_example_bench_characterize_a_design.py` checks every number this page states two
 ways, once by calling the module and once by recomputing it independently from the raw CSV with
-nothing but `csv`, `statistics` and `math`, the same discipline
-`tests/test_bench_characterization.py` uses to prove the data itself. At five boards there is no
-golden run to score a report against and no population to collect a sample size from; what a
-person checking this by hand should look at first is the same thing the tests check: that every
-corner the page claims is the worst one really is the minimum over every corner in the file, and
-that a verdict marked cannot say is not quietly a pass with a softer name. `scripts/eval_run.py`'s
-60-question set grades a drafted answer against a document set; nothing here drafts an answer, so
-that runner does not apply, and `scripts/eval_run.py bench_characterize_a_design` says so rather
-than pretending to score it.
+nothing but `csv`, `statistics` and `math`. At five boards there is no golden run to score against
+and no population to draw a sample size from, so what a person checks by hand is what those tests
+check: that the corner the page calls the worst one really is the minimum over every corner in
+the file, that a verdict marked cannot say is not a pass with a softer name, and that every budget
+was priced on the range and the calibration interval its readings actually carry.
+`scripts/eval_run.py`'s 60-question set grades a drafted answer against a document set; nothing
+here drafts an answer, so `scripts/eval_run.py bench_characterize_a_design` says that rather than
+pretending to score it.
 
 </HowToEval>
 
 ## How to adapt it
 
 Every number above, the 4.900 to 5.100 V window, the four input voltages and three load currents,
-the five serials, is this bench's own. A real characterization sweep has its own datasheet window
-and its own corners, and the same code reads them from the datasheet and the sweep's own condition
-columns rather than typing them in twice: `window_margin` takes the limits as arguments, and
-`worst_corner_per_board` and `scan_line_regulation` derive which input voltages, load currents and
-ambients to check from the file's own columns, not from a list written into this page.
+the five serials, is this bench's own. A real sweep has its own window and its own corners, and
+the same code takes them from the datasheet and from the file rather than from a list typed into
+a page: `window_margin` takes the limits as arguments, and `worst_corner_per_board` and
+`scan_line_regulation` derive the conditions to check from the file's own columns.
 
-The lead-and-connection contribution in the budget above is a specific number from
-`calibration-procedure.md`, carried over from a fixture path this session's bench harness is not.
+The lead-and-connection contribution is a number from `calibration-procedure.md`, carried over
+from a fixture path this session's bench harness is not.
 `characterization-notebook.md` section 7 says so directly: that line is assumed and not measured,
-and everything downstream of it moves if it is wrong. A real budget states where each of its own
-four lines came from with the same honesty, including the one that is a guess.
+and everything downstream of it moves if it is wrong. A real budget states where each of its four
+lines came from with the same honesty, including the one that is a guess.
 
 This shape is not specific to electronics. Any job with a small number of prototypes swept over
 several conditions, where the answer is a margin and not a verdict and there are too few units for
 a population statistic to mean anything, is the same reasoning: a material's strength across a
 batch of coupons at several temperatures, a chemical process's yield across a handful of pilot
 runs at different feed rates, a mechanical tolerance stack checked across a small first-article
-build. None of those needs a model either, and none of them has enough units for Cpk to say
-anything a margin and an honest uncertainty do not already say better.
+build. None of those needs a model either.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
