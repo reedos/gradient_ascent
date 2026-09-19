@@ -36,7 +36,7 @@ grows more demanding, not less, as a system climbs the ladder. At level 1 it is 
 saying clearly what you want. By level 7 it is several: judging work you did not do yourself,
 deciding what to hand over and what to keep, and knowing, from evidence rather than a good first
 impression, how much to trust a system that acts without asking each time. This page is the
-overview; four pages carry the depth — <Link href="/techniques/briefing/">briefing</Link>,
+overview; four pages carry the depth: <Link href="/techniques/briefing/">briefing</Link>,
 <Link href="/techniques/reviewing/">reviewing</Link>, <Link
 href="/techniques/delegating/">delegating</Link>, and <Link
 href="/techniques/trust/">calibrating trust</Link>.
@@ -64,7 +64,7 @@ How much to spell out depends on which model you are briefing, and OpenAI's own 
 its models into two kinds for exactly that reason<Cite n={2}/>. The <Link
 href="/techniques/briefing/">briefing</Link> page quotes that passage and works an example
 through it; the overview's job is only to say that the newcomer's mistake runs in both
-directions — over-specifying a model that could have worked out the details, or under-specifying
+directions: over-specifying a model that could have worked out the details, or under-specifying
 one that needed them spelled out.
 
 Reviewing work you did not do is a different skill from doing the work yourself, and it gets
@@ -72,8 +72,8 @@ harder, not easier, as a system does more without you. Anthropic's own guidance 
 plainly that "human review remains crucial for ensuring solutions align with broader system
 requirements" even where automated checks already ran, and describes agents pausing "for human
 feedback at checkpoints or when encountering blockers" as a normal part of the design, not a
-fallback<Cite n={3}/>. The practical version: check what you can verify independently — a
-citation that resolves, a number you can recompute — before trusting the parts you cannot. The
+fallback<Cite n={3}/>. The practical version: check what you can verify independently (a
+citation that resolves, a number you can recompute) before trusting the parts you cannot. The
 failure mode that follows has a name and a literature: a scale-development paper in Frontiers in
 Psychology summarizes the agreed definition of complacency as a human operator monitoring an
 automated system, at a frequency that is "suboptimal or below a normative rate," where that
@@ -86,7 +86,7 @@ stopped being checked against evidence.
 A builder shapes operator craft through the interface, whether or not any of this is written
 down as a rule. A free-text chat box makes the brief and the request the same blob of prose, so
 nothing stops the constraint or the definition of done from getting silently dropped on a rewrite.
-A task input with separate fields — what to do, what not to do, what finished looks like — costs
+A task input with separate fields (what to do, what not to do, what finished looks like) costs
 a little more to build and makes the brief a thing the reader can check against later, not just a
 paragraph they typed and moved past.
 
@@ -101,8 +101,8 @@ creating good agent-computer interfaces"<Cite n={3}/>. The surface a reviewer re
 same budget.
 
 Approval points are where operator craft becomes a piece of code, not just a habit. An interface
-that lets a person approve or reject one specific action before it runs — rather than trusting an
-instruction in a system prompt to hold — is the same shape as the permission check on the <Link
+that lets a person approve or reject one specific action before it runs (rather than trusting an
+instruction in a system prompt to hold) is the same shape as the permission check on the <Link
 href="/techniques/safety/">safety, privacy and governance</Link> page: a check outside the model,
 that runs whether or not the model would have gotten it right on its own. A builder designing for
 delegation decides, ahead of time and in code, which actions get that checkpoint and which do
@@ -111,15 +111,15 @@ all once volume goes up.
 
 No runnable example accompanies this page. A task-input form, a review surface, and an approval
 checkpoint are interface and process decisions, not an algorithm with a fixed answer to test
-against — the honest Build it lane here is what to design for, not code to run.
+against: the honest Build it lane here is what to design for, not code to run.
 
 </Lane>
 </Lanes>
 
 <WhenNot>
 
-Skip building any of this out formally — a task-input form with separate fields, a visible review
-surface, a coded approval checkpoint — for a single, low-stakes request you would not mind redoing
+Skip building any of this out formally (a task-input form with separate fields, a visible review
+surface, a coded approval checkpoint) for a single, low-stakes request you would not mind redoing
 by hand. Writing the constraint and the "done" condition on their own line, the way the Practices
 below ask, is already most of the value, and it costs nothing to try before building anything
 around it.
@@ -159,7 +159,7 @@ the person who asked, that "I would have caught it" stops being a good enough pl
   {
     name: 'Nothing in the interface gives a reviewer something to check',
     notice: 'A tool shows only a final answer, so a reviewer can judge no more than whether it sounds plausible, and a wrong answer that reads fluently passes review the same as a right one would.',
-    test: "Try to verify one specific claim in the output independently of the tool itself — a citation, a recomputed number. If the interface gives you nothing to check it against, that is the failure, not the reviewer's diligence.",
+    test: "Try to verify one specific claim in the output independently of the tool itself: a citation, a recomputed number. If the interface gives you nothing to check it against, that is the failure, not the reviewer's diligence.",
   },
 ]} />
 
@@ -172,25 +172,25 @@ the person who asked, that "I would have caught it" stops being a good enough pl
   <Link href="/techniques/prompt-engineering/">prompt</Link> is the entire interface between what
   you want and what you get back.
 - <Link href="/levels/2/">Context</Link>: reviewing has to include what the model was given, not
-  only what it said — <Link href="/techniques/rag/">RAG</Link>'s own failure modes show a wrong
+  only what it said: <Link href="/techniques/rag/">RAG</Link>'s own failure modes show a wrong
   answer built from the right sources is a different problem than one built from missing ones,
   and telling the two apart is its own skill.
 - <Link href="/levels/3/">Workflows</Link>: a fixed pipeline hands you a defined checkpoint, the
   way <Link href="/techniques/human-in-the-loop/">human approval</Link>'s own pause-and-resume
   shape does, so reviewing can happen at a point along the way instead of only at the end.
 - <Link href="/levels/4/">Tools</Link>: delegating a specific action, not just an answer, becomes
-  a real decision — <Link href="/techniques/function-calling/">function calling</Link> is exactly
-  that decision in code — trusting a model to describe what it would do is not the same judgment
+  a real decision (<Link href="/techniques/function-calling/">function calling</Link> is exactly
+  that decision in code), and trusting a model to describe what it would do is not the same judgment
   as trusting it to actually do it.
-- <Link href="/levels/5/">Agents</Link>: the model chooses its own steps, so calibrating trust —
-  how much to check, and how often, instead of checking every single step
-  <Link href="/techniques/single-agent/">a single agent</Link> takes — replaces reviewing each one
+- <Link href="/levels/5/">Agents</Link>: the model chooses its own steps, so calibrating trust
+  (how much to check, and how often, instead of checking every single step
+  <Link href="/techniques/single-agent/">a single agent</Link> takes) replaces reviewing each one
   by hand.
 - <Link href="/levels/6/">Teams of agents</Link>: reviewing shifts toward reviewing a division of
-  labor, not one output — whether <Link href="/techniques/orchestrator-workers/">a lead's
+  labor, not one output: whether <Link href="/techniques/orchestrator-workers/">a lead's
   split</Link> of the task was sensible is a separate question from whether each part came back
   right.
-- <Link href="/levels/7/">Always-on agents</Link>: delegating reaches its hardest form — deciding
+- <Link href="/levels/7/">Always-on agents</Link>: delegating reaches its hardest form: deciding
   in advance what an agent may do without asking and what it must always ask about, the three-way
   policy <Link href="/techniques/agent-teammates/">always-on assistants</Link>' own example
   builds, since there is no longer a moment where a person is watching in real time to decide.
@@ -199,14 +199,14 @@ the person who asked, that "I would have caught it" stops being a good enough pl
 
 - Write the constraint and the "done" condition down separately from the request itself, not
   folded into one paragraph that's easy to reread without noticing a piece went missing.
-- When reviewing work you didn't do, check what you can verify independently first — a citation
-  that resolves, a number that recomputes — before trusting the parts you can't check that way.
+- When reviewing work you didn't do, check what you can verify independently first (a citation
+  that resolves, a number that recomputes) before trusting the parts you can't check that way.
 - Decide what to hand over by what a wrong answer costs and how fast you'd notice it: the same
   question <Link href="/techniques/order-zero/">level 0, no model at all</Link> asks about choosing a level at
   all, applied here to one task instead.
 - Calibrate trust from a running record of corrections over time, not from how confident the most
   recent answer sounded.
-- Treat a string of correct answers as a reason to keep sample-checking, not a reason to stop —
+- Treat a string of correct answers as a reason to keep sample-checking, not a reason to stop:
   that is exactly where the research on automation complacency says monitoring erodes.
 
 ## Run it
@@ -216,8 +216,8 @@ the person who asked, that "I would have caught it" stops being a good enough pl
   supposed to be reviewing as it happened. A rising after-the-fact rate is the signal to review
   more closely, not a sign that less review is now safe."
   costAtVolume="Review time should not fall to zero as trust grows; it should shift from checking
-  everything to checking a sample plus anything that crosses a fixed bar — an irreversible
-  action, a number that gets repeated elsewhere — the same shape a human-in-the-loop checkpoint
+  everything to checking a sample plus anything that crosses a fixed bar (an irreversible
+  action, a number that gets repeated elsewhere), the same shape a human-in-the-loop checkpoint
   uses."
   failsInProduction="Automation complacency: after enough correct answers in a row, checking
   starts to feel like wasted effort, and the one wrong answer that actually mattered goes through

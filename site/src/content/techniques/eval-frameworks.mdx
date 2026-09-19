@@ -66,7 +66,7 @@ trace of what happened inside each run, not only the final answer.
 
 Five of them are set out side by side below, described only in their own documentation's words, read
 September 18, 2026. There is no ranking and no "best for" here: what fits a team depends on things this
-page cannot know — what is already being traced, who has to read a result, and whether the data
+page cannot know: what is already being traced, who has to read a result, and whether the data
 being graded may leave the machine at all. A sixth tool, OpenAI Evals, is mid-shutdown and is
 reported separately rather than compared. <Link href="/techniques/prompt-optimization/">Prompt
 optimization</Link> is the technique that consumes whatever one of these produces.
@@ -82,14 +82,14 @@ promptfoo," "check the LangSmith experiment." Before trusting a number one of th
 checks apply, each a version of a question <Link href="/techniques/evals/">the evals page</Link>
 already raises about any score, now aimed at a tool a team adopted rather than built.
 
-First, what graded it — a pattern match, or a model reading a rubric — and if a model graded it,
+First, what graded it (a pattern match, or a model reading a rubric) and if a model graded it,
 has anyone checked a sample of its verdicts against a person's own judgment? A dashboard that shows
 one aggregate number rarely shows this by default; it is usually a setting or a second report
-someone has to go looking for. Second, is the number comparable to the last one — same dataset, same
+someone has to go looking for. Second, is the number comparable to the last one: same dataset, same
 grading configuration, or did either one quietly change between runs? A framework that versions
 datasets and grading configs separately makes this easy to check; one that does not makes it easy to
-compare two different things without noticing. Third, were any items ungraded — a malformed grader
-reply, a run that errored out — and were they excluded from the score or folded into it as a
+compare two different things without noticing. Third, were any items ungraded (a malformed grader
+reply, a run that errored out) and were they excluded from the score or folded into it as a
 failure? And fourth, if the tool is a hosted service, where does the data being graded actually go:
 a locally run, open-source tool and a cloud dashboard answer that question very differently, which
 matters most for anything that should not leave the machine it runs on.
@@ -114,8 +114,8 @@ customers"<Cite n={10}/>.
 **Braintrust.** Calls itself "the active observability platform for instrumenting, understanding,
 and improving agents," with a workflow it names as instrument, observe, annotate, evaluate, deploy
 and admin<Cite n={2}/>. On where the data goes: hosted, with a self-hosting guide that "offers a
-self-hosted deployment option that separates data storage from platform management" — the customer
-runs the storage, Braintrust runs the managed interface — and marks self-hosting as available only
+self-hosted deployment option that separates data storage from platform management" (the customer
+runs the storage, Braintrust runs the managed interface) and marks self-hosting as available only
 on the Enterprise plan<Cite n={4}/>. No license on the pages read. Grading is its autoevals
 library, which "bundles together a variety of automatic evaluation methods including" LLM-as-a-judge,
 heuristic (it gives Levenshtein distance) and statistical (BLEU)<Cite n={3}/>.
@@ -124,13 +124,13 @@ heuristic (it gives Levenshtein distance) and statistical (BLEU)<Cite n={3}/>.
 engineering and deployment. On where the data goes: "cloud, hybrid, or self-hosted," and its docs
 say all three options include those same four capabilities<Cite n={5}/>. No license on the pages
 read. Grading is "evaluators," which are "workspace-level resources that score application
-performance," run over a dataset — "a collection of examples," where "an example is a test input,
-reference output pair" — and each experiment "captures outputs, evaluator scores, and execution
+performance," run over a dataset ("a collection of examples," where "an example is a test input,
+reference output pair") and each experiment "captures outputs, evaluator scores, and execution
 traces for every example in the dataset"<Cite n={6}/>.
 
 **DeepEval.** Calls itself "a simple-to-use, open-source LLM evaluation framework, for evaluating
 large-language model systems." On where the data goes: its metrics "run locally on your machine,"
-with an opt-in cloud — using the `deepeval` platform "will allow you to generate sharable testing
+with an opt-in cloud: using the `deepeval` platform "will allow you to generate sharable testing
 reports on the cloud." License: "DeepEval is licensed under Apache 2.0." Grading uses
 "LLM-as-a-judge and other NLP models"<Cite n={7}/>.
 
@@ -140,7 +140,7 @@ Apache-2.0 badge on its README. Grading is metrics "both LLM-based and tradition
 quickstart ships one template today, `rag_eval`, "Evaluate RAG systems," with agent, benchmark,
 prompt and workflow templates listed under "Coming Soon"<Cite n={8}/>.
 
-**OpenAI Evals** is the sixth, described apart because it is being withdrawn — and it is the hosted
+**OpenAI Evals** is the sixth, described apart because it is being withdrawn: and it is the hosted
 platform being withdrawn, not the separate open-source repository of that name. OpenAI's
 deprecations page gives the dates: announced June 3, 2026, "Existing evals become read-only" on Oct
 31, 2026, and "The Evals dashboard and API are scheduled to shut down" on Nov 30, 2026, with a
@@ -157,7 +157,7 @@ every rubric grader's verdicts for hand-checking on every run:
 
 <CodeFile file="scripts/eval_run.py" func="sample_for_review" />
 
-And ungraded is a tracked outcome rather than a silent failure — a grader reply that does not parse
+And ungraded is a tracked outcome rather than a silent failure: a grader reply that does not parse
 as PASS or FAIL is `None`, counted and excluded from the score, never scored as wrong:
 
 <CodeFile file="scripts/eval_run.py" func="parse_verdict" />
@@ -170,7 +170,7 @@ as PASS or FAIL is `None`, counted and excluded from the score, never scored as 
 Before adopting any of these, try the version that takes an afternoon: twenty questions in a
 spreadsheet, the answers pasted in beside them, read by a person. Most teams asking which framework
 to pick have not yet written down what a good answer looks like, and a framework will not do that
-for them — it will run whatever they have, faster. A tool is worth installing once the same
+for them: it will run whatever they have, faster. A tool is worth installing once the same
 comparison has to be made repeatedly, or more than one person has to trust the number, which is the
 threshold <Link href="/techniques/evals/">evals</Link> sets for building a golden set at all,
 applied now to buying instead of writing.
@@ -207,7 +207,7 @@ default rather than on request.
   {
     name: 'A shut-down platform leaves old numbers with no way to reproduce them',
     notice: "A score reported months ago came from a platform that has since been withdrawn, and nobody can re-run the same evaluation to check whether it still holds.",
-    test: "Before citing an old score as still meaningful, check the maker's own deprecations page for the tool. OpenAI's gives two dates for Evals — read-only, then shut down — which is the kind of notice worth finding before the second one passes.",
+    test: "Before citing an old score as still meaningful, check the maker's own deprecations page for the tool. OpenAI's gives two dates for Evals (read-only, then shut down) which is the kind of notice worth finding before the second one passes.",
   },
 ]} />
 
@@ -233,7 +233,7 @@ projection is a question for its own documentation.
 
 <RunIt
   monitor="The hand-check agreement rate between a rubric grader and a person, tracked over time
-  in whichever tool is running the evals — not just read once at adoption and never checked again."
+  in whichever tool is running the evals: not just read once at adoption and never checked again."
   costAtVolume="A hosted service comes with a bill; a self-hosted, open-source one comes with an
   operator instead. Neither is the main number: the model calls being graded, and the grader
   model's own calls on top of them, are what scale with the size of the set."
@@ -241,7 +241,7 @@ projection is a question for its own documentation.
   recorded, and a later comparison against an old score is quietly comparing two different tests
   without anyone noticing."
   whatToLog="The dataset version, the grading configuration, and which items were ungraded, for
-  every run — exactly what an experiment or a result file needs to carry so a number can be
+  every run: exactly what an experiment or a result file needs to carry so a number can be
   checked later without re-running anything."
 />
 

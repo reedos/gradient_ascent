@@ -28,7 +28,7 @@ import Link from '../../components/page/Link.astro';
 
 Calibrating trust means keeping how much you rely on a model without checking in line with how
 often it has actually been right on tasks like the one in front of you. It is a record, not an
-impression, and it is built one checked result at a time — which is why
+impression, and it is built one checked result at a time: which is why
 <Link href="/techniques/reviewing/">reviewing</Link> comes first: the reviews are the entries.
 It is the last of the four skills on the <Link href="/techniques/operator-craft/">operator
 craft</Link> topic, and what the record is *for* is the next round of
@@ -58,7 +58,7 @@ you already keep notes:
 | 12 Mar | plain-language summary of a policy | the 2 exclusions it listed | no | added the third exclusion |
 
 The columns that do the work are the second and the fifth. **Task type** is what makes the record
-usable later — "renewal dates from a contract" and "tone of a client reply" are separate lines
+usable later: "renewal dates from a contract" and "tone of a client reply" are separate lines
 even if the same product did both. **What you changed** is the only column that says how wrong it
 was: nothing, a word, or the whole answer. A month of that tells you, per task type, how often
 you are actually editing rather than accepting, and that number is your sampling rate for the
@@ -66,7 +66,7 @@ next month.
 
 Two rules keep the record honest. Log the checks you *did*, including the ones that came back
 fine; a record of corrections alone reads as a catastrophe. And re-check the record whenever what
-you are trusting changes — a new model version, an edited prompt, a new tool. Anthropic states
+you are trusting changes: a new model version, an edited prompt, a new tool. Anthropic states
 this for its own published techniques: where one names a specific model, "treat it as measured on
 that model and re-check it against your own evals before applying it to another."<Cite n={1}/> A
 record built on last quarter's version does not transfer just because the product name did.
@@ -77,19 +77,19 @@ was mostly low-stakes. Its authors summarize prior work as expecting trust and c
 together, then report that their own monitoring subscale overlapped far less with a general
 propensity to trust machines than their other subscale did<Cite n={2}/>. Being a trusting person,
 in that data, did not predict whether you kept watching. Those participants were not supervising
-models, so this is not a finding about your work — but it is a reason to keep a count per task
+models, so this is not a finding about your work, but it is a reason to keep a count per task
 rather than trusting a disposition you think you have.
 
 A 2025 position paper surveying over-reliance research defines the risk as "relying on LLMs
 beyond their capabilities" and locates it across "diverse domains from healthcare to personal
-advice"<Cite n={3}/>. It argues for measurement rather than reporting a measurement — which is
+advice"<Cite n={3}/>. It argues for measurement rather than reporting a measurement: which is
 the same conclusion as the table above, from a much larger literature.
 
 </Lane>
 <Lane name="build" title="Build it">
 
 A team cannot keep one person's notebook. What replaces it is a fixed set of checkable questions,
-scored the same way every time and kept as a file — the <Link href="/techniques/evals/">evals</Link>
+scored the same way every time and kept as a file: the <Link href="/techniques/evals/">evals</Link>
 topic pointed at a running system rather than at a prompt being drafted. "We have been using it a
 while and it seems fine" is the thing the file exists to replace.
 
@@ -97,13 +97,13 @@ Three properties make a team record worth keeping:
 
 - **Broken out by task kind**, the way this site's own eval set splits its questions, so a good
   score on easy lookups cannot stand in for the record on the cases nobody re-checked.
-- **Versioned by what produced it** — model id, prompt version, tool set. A rise or a fall is
+- **Versioned by what produced it**: model id, prompt version, tool set. A rise or a fall is
   only informative if you can name what changed; without that, the record is a mood.
 - **Fed automatically where it can be.** A result that carries a citation, the way
   <Link href="/techniques/rag/">RAG</Link>'s does, can have the mechanical part checked by
   machine: the reviewing page's own checker reports whether a figure the answer states appears in
   the section it cites. That is one row of evidence per answer without a person reading the whole
-  thing — and it is a presence check, so it is a floor under the record, not the record.
+  thing, and it is a presence check, so it is a floor under the record, not the record.
 
 Sample by hand on top of that, at a rate you write down. The machine check and the human sample
 answer different questions, and an automated number rising while nobody has read an output in
@@ -119,7 +119,7 @@ a record over identical-looking results is much more expensive to keep.
 
 ## At each level
 
-- <Link href="/levels/0/">No model</Link>: nothing to calibrate — a rule passes its tests or it
+- <Link href="/levels/0/">No model</Link>: nothing to calibrate: a rule passes its tests or it
   does not, and it behaves the same way tomorrow.
 - <Link href="/levels/1/">One call</Link>: every reply is independent, so the record is simply a
   tally per task type with nothing else to attribute a change to.
@@ -128,7 +128,7 @@ a record over identical-looking results is much more expensive to keep.
 - <Link href="/levels/3/">Workflows</Link>: the steps are fixed, so trust can be tracked per
   step, and one unreliable stage stops dragging down the ones around it.
 - <Link href="/levels/4/">Tools</Link>: the record now needs to cover the action taken, not only
-  the sentence produced — a wrong call can be reported in perfectly correct prose.
+  the sentence produced: a wrong call can be reported in perfectly correct prose.
 - <Link href="/levels/5/">Agents</Link>: the unit becomes a whole run of variable length, so the
   record tracks outcomes and cost per run rather than accuracy per answer.
 - <Link href="/levels/6/">Teams of agents</Link>: agreement between agents is not evidence. The
@@ -152,7 +152,7 @@ a record over identical-looking results is much more expensive to keep.
 ## Run it
 
 <RunIt
-  monitor="Per task type, the edit rate — how often a result is accepted unchanged — next to the
+  monitor="Per task type, the edit rate (how often a result is accepted unchanged) next to the
   sampling rate actually being used. Those two numbers moving apart is the whole subject of this
   page, in either direction."
   costAtVolume="Keeping the record costs roughly the same per checked result at any volume, so
@@ -170,8 +170,8 @@ a record over identical-looking results is much more expensive to keep.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: 'Pick a task you now let a model do without checking. Write down when you last verified one of its answers and what you found. If you cannot remember, that gap is the distance between your trust and your record — and the next five results are the cheapest rows you will ever add.' },
-  { lane: 'build', body: 'Take one output type from a system you use or built. Sketch the automatic check for it — what would a machine compare against what — and say what that check would NOT catch. The second half is what the human sample is for.' },
+  { lane: 'use', body: 'Pick a task you now let a model do without checking. Write down when you last verified one of its answers and what you found. If you cannot remember, that gap is the distance between your trust and your record, and the next five results are the cheapest rows you will ever add.' },
+  { lane: 'build', body: 'Take one output type from a system you use or built. Sketch the automatic check for it (what would a machine compare against what) and say what that check would NOT catch. The second half is what the human sample is for.' },
   { lane: 'either', body: 'Name one task you trust a model on and one you deliberately do not. For each, write the evidence the position rests on. If either answer is a feeling rather than a count, that is the one to start a record for.' },
 ]} />
 

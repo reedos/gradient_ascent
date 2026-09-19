@@ -62,7 +62,7 @@ ask the same question several times and combine the answers, the way self-consis
 several reasoning paths and keeps whichever final answer most of them agree on<Cite n={4}/>.
 
 Every maker that offers the first kind says close to the same thing: more thinking helps on
-problems with real intermediate steps — math, debugging, planning — and mostly wastes tokens on
+problems with real intermediate steps (math, debugging, planning) and mostly wastes tokens on
 ones that do not have any, like a lookup or a classification<Cite n={1}/><Cite n={2}/><Cite n={3}/>.
 This page's example uses the second kind, because it is the one a fixed `StubModel` can
 demonstrate honestly: sample the same question several times and take the answer most samples
@@ -107,15 +107,15 @@ so nothing below is measured. It is illustrated.
 
 Most chat apps that offer a reasoning model give you a toggle or a slider for this, often called
 "thinking," "extended reasoning," or an effort level from low to high. Turning it up gets a model
-that visibly works through a problem — restating what is being asked, trying an approach, checking
-it, backtracking if it does not hold up — before giving a final answer<Cite n={1}/>. That is worth
+that visibly works through a problem (restating what is being asked, trying an approach, checking
+it, backtracking if it does not hold up) before giving a final answer<Cite n={1}/>. That is worth
 it for a hard multi-step problem: real math, a subtle bug, a plan with several dependent steps. It
 is usually not worth it for a fact you could look up, a short classification, or anything where
-the first plausible answer is also the right one — the makers' own guidance says as much directly:
+the first plausible answer is also the right one: the makers' own guidance says as much directly:
 use minimal effort for fact retrieval and classification, and save the higher settings for coding,
 math, and multi-step planning<Cite n={2}/><Cite n={3}/>.
 
-The other shape — running the same question several times and combining the answers — is mostly
+The other shape (running the same question several times and combining the answers) is mostly
 invisible to a reader, since it happens inside a product rather than as a setting you control. A
 coding tool that generates several candidate fixes and keeps the one that actually passes the
 tests is doing a version of this: best-of-N with a checker, where the checker is something
@@ -129,7 +129,7 @@ that is confidently wrong the same way every time. More thinking applied to a ba
 produces a bad answer, just a longer and more convincing-looking one; running the same flawed
 reasoning several times and voting only helps when the mistakes differ from run to run, not when
 they are systematic. If a product's answer is wrong, more reasoning effort is not automatically
-the fix to reach for first — whether the model had the information it needed in the first place is
+the fix to reach for first: whether the model had the information it needed in the first place is
 worth checking before spending more on reasoning about the wrong facts.
 
 </Lane>
@@ -146,7 +146,7 @@ Extracting the final number from free-form reasoning text is its own small, fixe
 (`_extract`): read from the bottom for a line starting `Answer:` and pull the number out of it, so
 a sample that reasons at length still ends in something machine-checkable. Five samples from a
 scripted stub exercise the vote itself, not a claim about how often real models agree with
-themselves on a hard question — that claim (whether five samples on a real model land on the
+themselves on a hard question: that claim (whether five samples on a real model land on the
 right number more often than one sample does) is exactly what this site's eval set is built to
 measure, once a real run exists (see `docs/EVALS.md`).
 
@@ -156,7 +156,7 @@ Run it yourself:
 
 Every step is `decided_by: "code"`: the sample count is fixed, and the code always takes the
 majority regardless of what any individual sample said. A model choosing to think longer inside
-one call — the other shape of this technique — would still be `decided_by: "code"` by this site's
+one call (the other shape of this technique) would still be `decided_by: "code"` by this site's
 definition too: the code decided to turn thinking on or set an effort level, and the model
 deciding what to think about is not the same as the model deciding what the control flow does
 next (see `docs/EVALS.md`).
@@ -166,7 +166,7 @@ next (see `docs/EVALS.md`).
 
 <WhenNot>
 
-Skip the extra tokens if a single plain call already gets the answer right on repeat tries — test
+Skip the extra tokens if a single plain call already gets the answer right on repeat tries: test
 that before assuming more thinking or more samples will help. And if the model is wrong because it
 was never given a fact it needed, not because it reasoned badly, more reasoning effort does not
 fix that; <Link href="/techniques/rag/">RAG</Link> or a better prompt fixes a missing-information
@@ -224,7 +224,7 @@ same 60-question set (`docs/EVALS.md`), with the sample count or the effort leve
 setting on the run rather than a fixed part of the technique. The comparison that actually matters
 is one sample against five, or low effort against high, on the exact same questions, since the
 whole claim is "more inference-time computation raises the score for some class of model, on some
-kinds of question" — and the site's claim rule requires naming which model class and which kinds
+kinds of question": and the site's claim rule requires naming which model class and which kinds
 that holds for once a result file exists.
 
 This example samples one arithmetic question five times and returns the majority answer. It

@@ -34,14 +34,14 @@ import Link from '../../components/page/Link.astro';
 import codeExecutionRun from '../../data/runs/code-execution.json';
 
 Code execution lets the model write a small program instead of choosing among named tools, and a
-sandbox — not the model — runs it. The shape is the same as function calling: the model's output
+sandbox (not the model) runs it. The shape is the same as function calling: the model's output
 picks what happens next, and your code always carries it out. Anthropic describes its own version
 this way: the tool "allows Claude to run Bash commands and manipulate files, including writing
 code, in a secure, sandboxed environment"<Cite n={1}/>. What the model writes is data your code
 hands to an interpreter, never text your code trusts and runs directly.
 
 Code execution sits at level 4, tools. The model's one real choice is what code to write; the
-`decided_by: "model"` step below is picking that content, not deciding whether to run it — your
+`decided_by: "model"` step below is picking that content, not deciding whether to run it: your
 code always runs whatever it wrote, inside a fixed sandbox, and always asks once more for an
 answer once the result is back. That fixed shape, one write-and-run cycle bounded from outside, is
 the line to level 5: a coding agent keeps writing and running code in a loop it exits on its own,
@@ -57,8 +57,8 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-If a chat app has ever run Python for you — plotted a chart from data you pasted in, summed a
-column, found where two lines cross — you have used code execution. ChatGPT's data analysis
+If a chat app has ever run Python for you (plotted a chart from data you pasted in, summed a
+column, found where two lines cross) you have used code execution. ChatGPT's data analysis
 feature and Gemini Notebook both work this way, writing and running code behind the scenes rather
 than computing a number from the model's own token predictions; Mistral Vibe does the same for
 its own chat product.
@@ -66,7 +66,7 @@ its own chat product.
 What makes this safe to offer at all is what the sandbox refuses to do, not what it lets the
 model write. Anthropic's own container: "Internet access: Completely disabled for security" and
 "External connections: No outbound network requests permitted"<Cite n={1}/>, alongside fixed
-resource limits — "Memory: 5 GiB RAM," "CPU: 1 CPU"<Cite n={1}/> — and a maximum execution time,
+resource limits ("Memory: 5 GiB RAM," "CPU: 1 CPU"<Cite n={1}/>) and a maximum execution time,
 past which Anthropic documents the call returning an error rather than running on<Cite n={1}/>.
 OpenAI's code interpreter is built the same way: "A container is a fully sandboxed virtual
 machine that the model can run Python code in"<Cite n={2}/>, sized in fixed memory tiers and set
@@ -76,7 +76,7 @@ model writes runs inside them, whatever it turns out to be.
 The same question about permission applies here as with any tool: if the sandbox can reach a
 service that needs a password or a key, where does that credential live? E2B, a sandbox product
 outside the chat apps, documents keeping "secrets in a vault that injects them at the egress
-proxy, so the value never enters the sandbox"<Cite n={3}/> — available to the network call the
+proxy, so the value never enters the sandbox"<Cite n={3}/>: available to the network call the
 code makes, never to the code itself. If a product shows you the code it ran, read it before
 trusting the number or chart sitting next to it.
 
@@ -84,15 +84,15 @@ trusting the number or chart sitting next to it.
 <Lane name="build" title="Build it">
 
 The example answers a numeric question by writing one arithmetic expression instead of prose. The
-model never gets Python; it gets a system prompt that asks for exactly one line — an expression
+model never gets Python; it gets a system prompt that asks for exactly one line (an expression
 using numbers, `+ - * /` and parentheses, or the word `NONE` if the retrieved passages don't have
-what it needs — and the code is the only thing that ever runs it:
+what it needs) and the code is the only thing that ever runs it:
 
 <CodeFile file="examples/code_execution/run.py" start={25} end={31} expect="SYSTEM_PROMPT = (" />
 
 This is an allow-list, not a blocklist. A blocklist has to name every dangerous spelling in
-advance; `_eval_node` instead names the handful of node types arithmetic actually needs —
-constants, the four operators, unary plus and minus — and falls through to `UnsafeExpression` for
+advance; `_eval_node` instead names the handful of node types arithmetic actually needs
+(constants, the four operators, unary plus and minus) and falls through to `UnsafeExpression` for
 anything else. A function call, a name lookup, an attribute access and an import all fail the
 same way, because none of them is a node type this function ever matches. That is why the
 whitelist is the point: it does not have to recognize an attack to stop it.
@@ -113,8 +113,8 @@ function never promised. And a result that is not a finite number is refused, so
 
 That last bound is on the result, not on the arithmetic, and the difference is worth knowing
 before you copy it: `1/1e400` overflows in the middle and comes back as `0.0`, a finite number,
-so it is returned like any other. Nothing here is wrong with the figure — it is the value Python
-computes — but a reader is not told that an intermediate went to infinity on the way.
+so it is returned like any other. Nothing here is wrong with the figure (it is the value Python
+computes) but a reader is not told that an intermediate went to infinity on the way.
 
 The run itself checks the model's reply, evaluates it if it looks like one, and hands back either
 a computed answer or a plain refusal:
@@ -122,7 +122,7 @@ a computed answer or a plain refusal:
 <CodeFile file="examples/code_execution/run.py" start={112} end={143} expect="first = model.complete(messages, max_tokens=60)" />
 
 Declining (`NONE`) and writing a real expression are both the one `decided_by: "model"` step this
-level records — the same rule as function calling's tool-or-not choice. A refusal from the
+level records: the same rule as function calling's tool-or-not choice. A refusal from the
 sandbox is `decided_by: "code"`, same as running a tool: the model already made its one decision
 by the time the sandbox looks at what it wrote, so rejecting the content is code's call, not a
 second model decision. Run it yourself:
@@ -135,13 +135,13 @@ second model decision. Run it yourself:
 <WhenNot>
 
 Try <Link href="/techniques/function-calling/">function calling</Link> first if the set of things
-you would want the model to do can be named and typed in advance as a short list of tools — most
+you would want the model to do can be named and typed in advance as a short list of tools: most
 of the time it can, and a named tool is easier to log, test and limit than an open-ended
 expression. Try a fixed formula in your own code if the calculation itself never varies with the
 question.
 
 Move up to code execution once the computation depends on numbers or an operation you cannot
-enumerate in advance as a fixed set of named actions — arbitrary arithmetic, reshaping a table, a
+enumerate in advance as a fixed set of named actions: arbitrary arithmetic, reshaping a table, a
 chart built from data given at question time.
 
 </WhenNot>
@@ -151,17 +151,17 @@ chart built from data given at question time.
 <FailureModes modes={[
   {
     name: 'The expression is safe but uses the wrong numbers',
-    notice: 'The sandbox happily evaluates 38.50 + 46.00 -- a real result, cited to a real section -- but the two numbers came from different products than the question asked about, because nothing checks that an expression only uses numbers the retrieved passages actually named for that product.',
+    notice: 'The sandbox happily evaluates 38.50 + 46.00 (a real result, cited to a real section) but the two numbers came from different products than the question asked about, because nothing checks that an expression only uses numbers the retrieved passages actually named for that product.',
     test: 'Ask about two similarly priced parts from different models and check that the cited section actually contains both numbers used, not just numbers that happen to appear somewhere in the retrieved passages.',
   },
   {
     name: 'The needed numbers were never retrieved',
-    notice: 'The model declines, correctly, because the passages it was given do not contain a number it needs -- but a different search would have found it. A safe decline still means a right answer nobody got.',
+    notice: 'The model declines, correctly, because the passages it was given do not contain a number it needs, but a different search would have found it. A safe decline still means a right answer nobody got.',
     test: 'Ask a numeric question whose figures live in a section a keyword search ranks below the cutoff, and check whether the run declines instead of computing a wrong number from partial information.',
   },
   {
     name: 'The whitelist is too strict for a legitimate question',
-    notice: "A question that genuinely needs an operation outside plus, minus, times and divide -- a percentage, a power, a square root -- gets a decline that looks like a security block but is really a missing feature. The length and depth bounds do the same for a legitimate sum with too many terms in it.",
+    notice: "A question that genuinely needs an operation outside plus, minus, times and divide (a percentage, a power, a square root) gets a decline that looks like a security block but is really a missing feature. The length and depth bounds do the same for a legitimate sum with too many terms in it.",
     test: "Ask a question whose arithmetic needs a percentage or an exponent and confirm the run declines cleanly, rather than the model trying to fake the operation with what is allowed. Read the refusal text: it names which bound was hit, so a missing operator and an over-long expression do not look alike in a log.",
   },
   {
@@ -171,7 +171,7 @@ chart built from data given at question time.
   },
   {
     name: 'An expression built to escape the whitelist',
-    notice: "A written expression tries to reach a name, a call or an attribute -- the pattern behind most real sandbox escapes -- and has to be refused the same way a harmless typo is, before anything runs.",
+    notice: "A written expression tries to reach a name, a call or an attribute (the pattern behind most real sandbox escapes) and has to be refused the same way a harmless typo is, before anything runs.",
     test: "Script a model response that writes __import__('os').system(...) and confirm the run refuses it and never calls Python's own eval or exec; see tests/test_example_code_execution.py.",
   },
 ]} />
@@ -201,7 +201,7 @@ set, with the reason (see `docs/EVALS.md`). Asking `scripts/eval_run.py` for it 
 that reason and stops, rather than producing a number about a task the technique was never built
 to do. What it would be scored on instead: correctness on the 12 `numeric` questions in the
 shared set, the only kind this technique answers by design, plus two numbers the shared harness
-does not otherwise track — how often a deliberately malicious or malformed expression is refused
+does not otherwise track: how often a deliberately malicious or malformed expression is refused
 rather than evaluated, and how cleanly the other four question kinds (lookup, multi-hop,
 unanswerable, conflicting sources) are declined instead of forced through an arithmetic answer
 that was never going to fit them.
@@ -221,7 +221,7 @@ that was never going to fit them.
 
 <TryIt items={[
   { lane: 'use', body: "Ask a chat app's data-analysis feature a question that needs a calculation across numbers you give it, then ask it to show you the code it ran. Does the code actually compute what the final answer claims?" },
-  { lane: 'build', body: 'Run python -m examples.code_execution --model stub with a question naming two different appliance models. The stub echoes the question back instead of writing an expression, so the sandbox refuses it -- which is the point: nothing the model returns is trusted to be arithmetic. Then open a Python shell in the repo root and call examples.code_execution.run.safe_eval on a few strings of your own: "38.50 + 41.00", "2 ** 10", "__import__(\'os\').listdir(\'.\')", and "1" plus "+1" forty times. Read which bound each one hits.' },
+  { lane: 'build', body: 'Run python -m examples.code_execution --model stub with a question naming two different appliance models. The stub echoes the question back instead of writing an expression, so the sandbox refuses it. This is the point: nothing the model returns is trusted to be arithmetic. Then open a Python shell in the repo root and call examples.code_execution.run.safe_eval on a few strings of your own: "38.50 + 41.00", "2 ** 10", "__import__(\'os\').listdir(\'.\')", and "1" plus "+1" forty times. Read which bound each one hits.' },
   { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose, using only the synthetic documents in evals/corpus/.' },
 ]} />
 

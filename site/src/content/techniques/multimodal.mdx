@@ -37,14 +37,14 @@ import Cite from '../../components/page/Cite.astro';
 import Link from '../../components/page/Link.astro';
 import multimodalRun from '../../data/runs/multimodal.json';
 
-Multimodal means the model takes more than text — images, audio, video and documents in, and for
+Multimodal means the model takes more than text: images, audio, video and documents in, and for
 some models, images, audio and video out. What changes is not the one-call shape; this is still
 level 1, still one request and one response. What changes is what goes inside the request and the
 reply, and what it costs to check whether the reply is right.
 
 An image is not free the way a sentence is: Claude turns one into visual tokens by dividing it
 into 28×28-pixel patches, so a single 1000×1000 photo costs over a thousand tokens before any
-text is read<Cite n={1}/>. Gemini bills audio by the second — about 1,920 tokens per minute — and
+text is read<Cite n={1}/>. Gemini bills audio by the second (about 1,920 tokens per minute) and
 can describe tone or a sound with no words in it at all<Cite n={2}/>. Generated output changes the
 picture again: there is no source to check it against. What the makers do instead is filter and
 mark it. OpenAI says every prompt and every generated image is filtered against its content
@@ -76,13 +76,13 @@ interfaces shows a running token count.
 
 Checking the reply is also different by direction. Text answered from an uploaded document can
 still be checked against that document, the same way a citation in RAG can be checked against a
-source passage. A generated image or video has no source passage to check it against — the whole
+source passage. A generated image or video has no source passage to check it against: the whole
 point was to make something that did not exist before. That is why Google DeepMind marks every
 video Veo produces with an invisible watermark rather than relying on a person recognizing it by
 eye<Cite n={4}/>; a reader cannot perform that check unassisted and has to trust the mark, or the
 product, instead.
 
-For anything generated and then used somewhere that matters — a document, a report, a decision —
+For anything generated and then used somewhere that matters (a document, a report, a decision)
 treat it the way you would treat a first draft from someone whose work you have not checked
 before: useful, but not yet verified.
 
@@ -97,17 +97,17 @@ a photograph of an appliance's rating plate followed by the question about it:
 
 <CodeFile file="examples/multimodal/run.py" func="build_request" />
 
-The picture is a reference here, not bytes. Both documented backends take an image as base64 —
+The picture is a reference here, not bytes. Both documented backends take an image as base64:
 Anthropic's `image` block accepts a base64 source, a URL or an uploaded `file_id`<Cite n={1}/>,
-Ollama's chat API takes an `images` array of base64 strings — so a real caller reads the file and
+Ollama's chat API takes an `images` array of base64 strings: so a real caller reads the file and
 passes base64. Nothing in this repository ships a photograph, and an example that runs against a
 stub has nothing to look at anyway, so the part carries a label and the trace prints that.
 
 Audio does not go in as audio, on either of those two backends. Neither documents an audio input
 block, so both raise rather than guess a wire format, and the working shape is the one the
 example takes: transcribe first, send the transcript as text beside the picture. Gemini is the
-counter-example — it takes audio directly, and can describe tone or a sound with no words in it
-at all<Cite n={2}/> — which is the thing a transcription step throws away.
+counter-example (it takes audio directly, and can describe tone or a sound with no words in it
+at all<Cite n={2}/>) which is the thing a transcription step throws away.
 
 The rest of the run is an ordinary one call, and the check at the end is the part worth copying:
 
@@ -117,8 +117,8 @@ Ask for a named format, then test the reply against it, and an unreadable plate 
 unreadable instead of as a plausible serial number. Every step is `decided_by: "code"`.
 
 Two things beyond the code shape. **Cost is per input, not per call**: an image's cost follows
-its resolution — Claude divides it into 28×28-pixel patches and counts one visual token per
-patch, downscaling past a limit<Cite n={1}/> — and audio's follows its duration, about 1,920
+its resolution (Claude divides it into 28×28-pixel patches and counts one visual token per
+patch, downscaling past a limit<Cite n={1}/>) and audio's follows its duration, about 1,920
 tokens a minute on Gemini<Cite n={2}/>. The same code path can cost ten times as much depending
 on what was attached to it. And **preprocessing is often cheaper than a bigger model**: downsizing
 an image, trimming an audio clip to the part that matters, or pulling text out of a document with
@@ -140,7 +140,7 @@ Run it yourself:
 <WhenNot>
 
 Skip attaching an image, a document or audio at all if plain text already says everything the
-model needs — a photo of a label is worth sending only when the text you would otherwise type is
+model needs: a photo of a label is worth sending only when the text you would otherwise type is
 longer or less precise than the picture. And if the only reason to attach a document is to search
 it once, typing the relevant passage directly, or using
 <Link href="/techniques/context-engineering/">context engineering</Link>, is cheaper than sending
@@ -193,13 +193,13 @@ the whole file as an attachment.
 <HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
 
 Multimodal does not fit the site's shared 60-question document-qa task, since every document in
-`evals/corpus/` is plain text — there is no image, audio or video in it to test against.
+`evals/corpus/` is plain text: there is no image, audio or video in it to test against.
 `scripts/eval_run.py` will not score this example for that reason, and says so rather than
 returning a number measured on the wrong inputs (`docs/EVALS.md`).
 
 The eval this technique needs is its own set: real photographs and clips with the right answer
 written down beside each one. Two numbers from it. Field accuracy, per field, against those
-labels — a serial number read off a plate is either right or wrong, character for character, so
+labels: a serial number read off a plate is either right or wrong, character for character, so
 this half needs no grader model. And the refusal rate on inputs that genuinely cannot be read: a
 blurred plate should come back unreadable, and an invented serial that happens to look plausible
 is the failure this measurement exists to catch. Report cost beside both, since the token cost

@@ -53,7 +53,7 @@ prompt optimization searches for a better prompt instead of a person hand-editin
 
 Adaptation is orthogonal to the eight levels: an adapted model can sit under a single chat call
 or under one seat in a team of agents. It is the alternative to writing the same instructions
-into every prompt — <Link href="/techniques/prompt-engineering/">prompt engineering</Link>'s
+into every prompt: <Link href="/techniques/prompt-engineering/">prompt engineering</Link>'s
 "say it every time" against adaptation's "train it in once."
 
 This page is marked draft, not published: no training run has happened for this site, so nothing
@@ -65,10 +65,10 @@ below is measured. It describes the choice and shows how the data for it gets pr
 You are unlikely to fine-tune a model yourself, but you already use products built on adapted
 ones: a smaller model priced and marketed for one narrow job (fast customer-support replies, code
 completion) is often a distilled or fine-tuned version of a larger one, trained the way OpenAI's
-own distillation guide documents — capture a larger model's outputs that meet your bar, then use
+own distillation guide documents: capture a larger model's outputs that meet your bar, then use
 that captured set to train a smaller model on the same task<Cite n={3}/>. The question worth
 asking about a claim like "our small model matches the big one on this task" is: matches it on
-what, exactly — the same narrow task it was trained for, or everything the big model could do?
+what, exactly: the same narrow task it was trained for, or everything the big model could do?
 Training on one task's examples optimizes for that task; nothing about it preserves the rest of
 what the larger model could do, so the scope of the comparison is the part to check.
 
@@ -94,7 +94,7 @@ fine-tuning job would actually need, and check that it is not broken before spen
 a training run.
 
 The example turns the site's own 60-question set into a small supervised fine-tuning file. Each
-question becomes one line in chat format — a `system`/`user`/`assistant` message list — the shape
+question becomes one line in chat format (a `system`/`user`/`assistant` message list), the shape
 Together AI's fine-tuning data preparation guide documents: each message has "a role (`system`,
 `user`, or `assistant`) and `content`", and a conversation "must start with `system` or `user`
 and alternate `user` and `assistant` afterwards"<Cite n={2}/>. The same guide recommends holding
@@ -114,10 +114,10 @@ the training file's, and reports any that show up in both:
 `_normalize` lowercases, drops punctuation and collapses whitespace, so two questions that differ
 only in styling count as one. On this set the check comes back empty: all 60 questions normalize
 to distinct strings. The test file proves it catches a leak by putting the same question,
-restyled, on opposite sides of the split — and proves what it misses, by letting a genuine
+restyled, on opposite sides of the split, and proves what it misses, by letting a genuine
 paraphrase through. Equality over normalized text is the floor. Catching paraphrases needs a
 similarity measure instead, usually an embedding of each question, and that is the gap that
-starts to matter on a larger set built partly from generated questions — the job Argilla's
+starts to matter on a larger set built partly from generated questions: the job Argilla's
 distilabel describes itself as built for, "a framework for synthetic data and AI
 feedback"<Cite n={6}/>.
 
@@ -146,8 +146,8 @@ outlast the platforms that sell them.
 <WhenNot>
 
 Try a better prompt, a few-shot example, or <Link href="/techniques/rag/">RAG</Link> first. Most
-of what looks like a reason to fine-tune is actually a prompt problem — the instructions were not
-specific enough — or a retrieval problem — the model was never given the fact it needed — and
+of what looks like a reason to fine-tune is actually a prompt problem (the instructions were not
+specific enough) or a retrieval problem (the model was never given the fact it needed), and
 both are cheaper to fix and faster to test than a training run.
 
 Adaptation earns its cost once the same instructions are sent enough times that training them in
@@ -183,7 +183,7 @@ about the shape and volume of the calls.
   },
   {
     name: 'A reward the grader can game',
-    notice: "A reinforcement-fine-tuned model's score against its own reward model climbs while its answers, read by a person, do not actually improve — the same grader-hacking risk this site's evals topic covers, applied to training instead of testing.",
+    notice: "A reinforcement-fine-tuned model's score against its own reward model climbs while its answers, read by a person, do not actually improve: the same grader-hacking risk this site's evals topic covers, applied to training instead of testing.",
     test: "Hand-check a sample of the reward grader's own verdicts the way this site's eval runner checks a rubric grader's, rather than trusting the trend of the reward curve alone.",
   },
 ]} />
@@ -192,19 +192,19 @@ about the shape and volume of the calls.
 
 - <Link href="/levels/0/">No model</Link>: a classical model such as the ones on the
   <Link href="/techniques/order-zero/">level 0 page</Link> is, by definition, already fit to your
-  data every time it is trained — the questions this page raises about adaptation do not arise
+  data every time it is trained: the questions this page raises about adaptation do not arise
   until there is a language model to adapt.
 - <Link href="/levels/1/">One call</Link>: a fine-tuned model can replace a long, repeated
   <Link href="/techniques/prompt-engineering/">prompt-engineered</Link> system prompt with a
   shorter call that already behaves the trained way, at the cost of retraining whenever the
   instructions change.
 - <Link href="/levels/2/">Context</Link>: adaptation does not substitute for
-  <Link href="/techniques/rag/">retrieval</Link> — training a model further changes how it
+  <Link href="/techniques/rag/">retrieval</Link>: training a model further changes how it
   behaves, not what current facts it can reliably recall, so a fine-tuned model still needs
   documents in front of it for anything that changes after training.
 - <Link href="/levels/3/">Workflows</Link>: a fixed step that is called the same way thousands of
-  times, with the same instructions and shape of input every time — one step of
-  <Link href="/techniques/prompt-chaining/">prompt chaining</Link>, say — is the cheapest place
+  times, with the same instructions and shape of input every time (one step of
+  <Link href="/techniques/prompt-chaining/">prompt chaining</Link>, say) is the cheapest place
   to swap a small adapted model in for a large general one.
 - <Link href="/levels/4/">Tools</Link>: a model fine-tuned on your own tool set can produce fewer
   malformed <Link href="/techniques/function-calling/">function calls</Link> than a general model
@@ -214,14 +214,14 @@ about the shape and volume of the calls.
   <Link href="/techniques/single-agent/">a single agent</Link>'s loop especially well, because it
   trains directly against whether the task got done, the same thing the loop's own stop decision
   is trying to get right, instead of imitating example transcripts.
-- <Link href="/levels/6/">Teams of agents</Link>: a fixed role played by one agent every time — an
-  author, a <Link href="/techniques/debate-review/">reviewer</Link> — is a narrow, repeated task,
+- <Link href="/levels/6/">Teams of agents</Link>: a fixed role played by one agent every time (an
+  author, a <Link href="/techniques/debate-review/">reviewer</Link>) is a narrow, repeated task,
   the case adaptation is built for; each seat could run its own smaller adapted model instead of
   every seat running the same large one.
 - <Link href="/levels/7/">Always-on agents</Link>: an
   <Link href="/techniques/agent-teammates/">always-on assistant</Link> logs every action it
   proposed and what happened to it, which is exactly the raw material a later fine-tuning or
-  distillation pass would use — and exactly the data the
+  distillation pass would use, and exactly the data the
   <Link href="/techniques/safety/">safety, privacy and governance</Link> topic's questions about
   retention and training use apply to.
 
@@ -253,7 +253,7 @@ about the shape and volume of the calls.
   away from the training data's shape, not that the model got worse."
   costAtVolume="A training run is a one-time or periodic cost; a fine-tuned or distilled small
   model can then cost less per call than a large general model prompted the long way, but only on
-  the narrow task it was trained for — traffic outside that task still needs the general model."
+  the narrow task it was trained for: traffic outside that task still needs the general model."
   failsInProduction="The world changes and the training data doesn't: a model fine-tuned on last
   quarter's product line answers confidently and wrong about this quarter's, with nothing in its
   own output flagging that its training predates the change."
@@ -265,7 +265,7 @@ about the shape and volume of the calls.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: 'Find a product that advertises a "custom-trained" or "fine-tuned" small model. Read what task it claims to be good at, and ask whether that claim is about behavior on that one task or about general knowledge — the page usually only supports the first.' },
+  { lane: 'use', body: 'Find a product that advertises a "custom-trained" or "fine-tuned" small model. Read what task it claims to be good at, and ask whether that claim is about behavior on that one task or about general knowledge: the page usually only supports the first.' },
   { lane: 'build', body: 'Run python -m examples.adaptation --out .local/scratch/adaptation from the repo root, open val.jsonl, and check that every line has exactly one system, one user and one assistant message in that order.' },
   { lane: 'either', body: "Pick two questions from evals/questions.json that ask about the same appliance in different words, and decide whether they're similar enough that putting one in training and one in validation would leak. Write down what made the call." },
 ]} />

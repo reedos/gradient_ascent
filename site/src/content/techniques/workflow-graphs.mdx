@@ -56,8 +56,8 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-If you have built an automation with an if/else branch on a visual canvas — send it here if the
-amount is over some threshold, otherwise send it there — you have built a small workflow graph,
+If you have built an automation with an if/else branch on a visual canvas (send it here if the
+amount is over some threshold, otherwise send it there), you have built a small workflow graph,
 whether or not the tool calls it that. Dify describes the appeal as a visible plan rather than a
 hidden prompt: "visual building blocks and AI prompts to define how an app thinks, retrieves
 data, makes decisions, uses tools, asks for human input, and completes tasks," turning "Prompt
@@ -67,7 +67,7 @@ The thing to check in a tool like this is exactly what decides each branch. A br
 fixed rule ("if the category field equals X") is this level: fully predictable, fully testable
 in isolation, and it never surprises you by taking a path you didn't design for. A branch driven
 by asking a model which way to go, inside the same node, is a different thing wearing the same
-visual shape — the diagram looks identical, but the behavior underneath has moved up a level,
+visual shape: the diagram looks identical, but the behavior underneath has moved up a level,
 and testing "every possible path" stops being something you can enumerate in advance.
 
 </Lane>
@@ -94,7 +94,7 @@ left out below; the graph machinery is the part worth reading here.
 <CodeFile file="examples/workflow_graphs/run.py" start={95} end={154} expect="NODES: dict[str, Callable" />
 
 The checkpoint is the concrete payoff graphs are usually sold on. `state`'s durable fields are
-all plain values — strings, an int, a list of citation strings — so recording it after every node
+all plain values (strings, an int, a list of citation strings) so recording it after every node
 is a real `json.dumps`, not an idea that would need a redesign to actually implement. A crashed
 run could resume from the last written checkpoint by loading that same dict and re-entering the
 loop at the node the checkpoint names, with no change to `NODES` or `EDGES` at all.
@@ -106,7 +106,7 @@ function up in a dict instead of calling it directly) that buys nothing when the
 reasonable order to run things in. The place a graph earns that cost back is where this example
 starts to gesture at it but does not fully need it: a genuine branch (`no_match`) that a nested
 `if` inside a longer function would have buried, a state shape simple enough to checkpoint for
-real, and node functions that would still make sense wired into a different graph — none of
+real, and node functions that would still make sense wired into a different graph: none of
 which a straight-line function forbids, but a graph makes structurally obvious rather than
 something a reader has to reconstruct from control flow.
 
@@ -121,7 +121,7 @@ Run it yourself:
 
 Try a plain function with an ordinary `if`/`while`, the way <Link
 href="/techniques/evaluator-optimizer/">write and check</Link>'s example does, first if the
-process has one obvious order and no real branch — a graph's nodes-and-edges indirection is
+process has one obvious order and no real branch: a graph's nodes-and-edges indirection is
 ceremony when there is only one path through the code anyway.
 
 Move up to a workflow graph once the process has a real branch that a nested `if` would bury, a
@@ -136,7 +136,7 @@ than one wiring.
   {
     name: 'An edge function with a bug routes to the wrong node silently',
     notice: 'The run completes and returns an answer, but a later step is missing something an earlier node actually produced, because an edge function read the wrong state field or compared it wrong.',
-    test: "Unit test every edge function directly, with a small hand-built state dict for each branch it can take, the same way you would test any other pure function — no model or graph run required.",
+    test: "Unit test every edge function directly, with a small hand-built state dict for each branch it can take, the same way you would test any other pure function: no model or graph run required.",
   },
   {
     name: 'The graph has an unreachable node',
@@ -178,7 +178,7 @@ than one wiring.
 The same 60 questions as every other technique, with a narrow interest in the result. Because
 the graph runs the same logic as write and check, its score on citation hit rate and revision
 count should match
-that page's result file once one exists — a divergence between the two would point at a bug in
+that page's result file once one exists: a divergence between the two would point at a bug in
 the graph wiring, not a difference in what the technique can do. The `no_match` branch is what
 `unanswerable` questions specifically exercise: whether retrieval finding nothing correctly ends
 the run at a dead end rather than drafting from an empty source list.

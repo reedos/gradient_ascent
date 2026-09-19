@@ -48,10 +48,10 @@ import parallelRun from '../../data/runs/parallelization.json';
 
 Parallel calls run more than one model call at the same time instead of one after another, and
 combine the results in code. Anthropic describes two distinct variations<Cite n={1}/>. **Sectioning**
-breaks one task into independent subtasks that each run in parallel — one call screens a request
+breaks one task into independent subtasks that each run in parallel: one call screens a request
 for policy violations while another handles it, or several calls each evaluate a different
 aspect of the same output. **Voting** runs the *same* task several times and combines the
-outputs — several prompts review the same code for vulnerabilities, or several prompts judge the
+outputs: several prompts review the same code for vulnerabilities, or several prompts judge the
 same content against different thresholds and the results are combined into one verdict.
 
 Both stay at level 3 as long as your code decides how many calls to make, what each one gets,
@@ -83,7 +83,7 @@ sectioning with a model doing the combining, which is the part that sits above t
 
 Voting is harder to spot from the outside: several runs of the same question, combined into one
 answer. It costs several times what asking once costs, so it earns its place only where a wrong
-answer costs more than the extra calls — a security review, a policy judgment, a number somebody
+answer costs more than the extra calls: a security review, a policy judgment, a number somebody
 is about to act on.
 
 The habit worth building either way: before firing several calls at once, check whether the task
@@ -95,7 +95,7 @@ does not fix that; it just makes the dependency invisible until the combine step
 <Lane name="build" title="Build it">
 
 The example is sectioning: it retrieves a fixed set of candidate document sections, asks the
-model to answer from each one *alone* — never seeing the other sections or the other calls — and
+model to answer from each one *alone* (never seeing the other sections or the other calls) and
 combines whichever sections actually answered part of the question. Because each call already
 knows which single section it saw, citations are exact by construction; nothing has to be parsed
 back out of free text the way RAG and prompt chaining do.
@@ -107,7 +107,7 @@ first. That is what keeps the example deterministic without an explicit sort: or
 retrieval, never from a race between threads.
 
 Every `tracer.record` call happens on the main thread, after `list(pool.map(...))` has already
-collected every result — the trace itself is never written to from more than one thread at once.
+collected every result: the trace itself is never written to from more than one thread at once.
 A `StubModel` built from a fixed list of canned responses is not safe to call from several
 threads concurrently, since it advances a shared counter with no lock; the example's tests build
 their stub from a function that reads the prompt instead, which has no shared state to race on.
@@ -123,8 +123,8 @@ Run it yourself:
 
 <CodeFile file="examples/parallelization/README.md" start={16} end={16} lang="text" expect="python -m examples.parallelization" />
 
-Real-time parallel calls like these are for when the answer is needed now. When it is not — a
-nightly re-score of every open ticket, a one-time pass over a large document set — the batch
+Real-time parallel calls like these are for when the answer is needed now. When it is not (a
+nightly re-score of every open ticket, a one-time pass over a large document set), the batch
 APIs three model makers publish do the same "many calls, one submission" idea asynchronously and
 cheaper: Anthropic's Message Batches API "reduc[es] costs by 50%... with most batches finishing
 in less than 1 hour"<Cite n={4}/>; OpenAI's Batch API gives "a 50% cost discount compared to
@@ -141,13 +141,13 @@ price.
 <WhenNot>
 
 Try <Link href="/techniques/prompt-chaining/">prompt chaining</Link> or a single call first if
-the task's parts actually depend on each other — a later part needs an earlier part's answer,
+the task's parts actually depend on each other: a later part needs an earlier part's answer,
 or the sections would overlap and need to be reconciled against each other. Running dependent
 work in parallel does not make it independent; it just hides the dependency until the combine
 step produces a contradiction.
 
 Move up to parallelization once the task genuinely splits into parts that do not need each
-other's answers, and the parts are already known before any call runs — a section list you
+other's answers, and the parts are already known before any call runs: a section list you
 retrieved, a fixed set of checks to run, a fixed number of independent opinions to gather.
 
 </WhenNot>
@@ -162,7 +162,7 @@ retrieved, a fixed set of checks to run, a fixed number of independent opinions 
   },
   {
     name: 'A fixed combine step cannot resolve a disagreement',
-    notice: 'Two sections answer the same question differently — an old figure and a superseding one — and a plain concatenation states both without saying which is current, because nothing in the combine step compares them against each other.',
+    notice: 'Two sections answer the same question differently (an old figure and a superseding one) and a plain concatenation states both without saying which is current, because nothing in the combine step compares them against each other.',
     test: "Run a question over sections you know conflict (an original spec and a later correction) and check whether the combined answer states both values with no indication of which one is authoritative.",
   },
   {
@@ -215,7 +215,7 @@ run first.
 
 <RunIt
   monitor="Per-branch latency and error rate, not just the overall run's. One slow or failing branch in a thread pool can dominate wall time even though the others finished quickly; averaging across branches hides exactly the branch worth investigating."
-  costAtVolume="Cost is the number of parallel calls times the number of questions, same as a sequential chain of the same length — parallelism buys latency, not a lower bill. For volume that does not need an immediate answer, a maker's batch API halves the per-call cost in exchange for asynchronous delivery."
+  costAtVolume="Cost is the number of parallel calls times the number of questions, same as a sequential chain of the same length: parallelism buys latency, not a lower bill. For volume that does not need an immediate answer, a maker's batch API halves the per-call cost in exchange for asynchronous delivery."
   failsInProduction="Concurrency crosses a provider's per-minute rate limit once real question volume arrives, producing errors a low-volume stub or manual test never triggers. Separately, a thread pool sized for a fixed number of sections silently under-uses itself if fewer candidates come back than expected, or queues up if more do."
   whatToLog="Each branch's input, output, token counts and wall time individually, plus which branches were kept versus dropped by the combine step, so a bad or missing final answer traces back to one specific branch rather than to 'the parallel step' as a whole."
 />

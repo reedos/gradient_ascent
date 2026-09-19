@@ -40,7 +40,7 @@ import chatRun from '../../data/runs/chat.json';
 
 Chat is level 1: one request, one response, and nothing in between decides anything. You, or the
 product you are using, send a question in a message, and the model returns an answer once. There
-is no search step, no tool call, and no second look at its own answer — whatever comes back on
+is no search step, no tool call, and no second look at its own answer: whatever comes back on
 the first attempt is what you get. This is also what most people mean by "using AI": typing into
 a chat app and reading back a reply.
 
@@ -69,10 +69,10 @@ appears on your screen by itself; it appears on everything else.
 A **model** is a trained system with a specific, versioned name. Claude Sonnet 5 is a model
 Anthropic trains; Anthropic's own documentation states it as released June 30, 2026, with the
 model id `claude-sonnet-5`<Cite n={1}/>. The version matters because a model is frozen once
-trained — Claude Sonnet 5 does not quietly get smarter next month; a new model with a new name
+trained: Claude Sonnet 5 does not quietly get smarter next month; a new model with a new name
 replaces it instead.
 
-A **product** is something a person uses — a chat app, here. Claude, Anthropic's own product, is
+A **product** is something a person uses: a chat app, here. Claude, Anthropic's own product, is
 described as "a helpful, intuitive, and powerful collaborator you can put to work on real
 tasks"<Cite n={2}/>; behind that description, it calls one of Anthropic's models to generate each
 reply. ChatGPT is OpenAI's equivalent product. A product's name and a model's name are not
@@ -80,8 +80,8 @@ interchangeable: "Claude" is not itself a model, and asking "which Claude" is re
 model answered you, which the product usually shows in a menu.
 
 A **tool** is something a developer builds with, not something a person chats in directly. The
-OpenAI API ships "guides and conceptual documentation for building with the OpenAI API"<Cite n={3}/>
-— code calls it; a person does not type into it directly. Ollama is a different kind of tool: it
+OpenAI API ships "guides and conceptual documentation for building with the OpenAI API"<Cite n={3}/>:
+code calls it; a person does not type into it directly. Ollama is a different kind of tool: it
 runs a model on your own machine instead of over the network, so that "nothing you run locally
 ever leaves your machine"<Cite n={4}/>. Neither is a product on its own; each is what someone
 else's product, or your own code, gets built on top of.
@@ -100,17 +100,17 @@ what the model does with no documents and no tools available to it. `examples/on
 about Halvorsen, a fictional appliance maker invented for this site's synthetic documents,
 specifically so a model has never legitimately seen its manuals. A correct run at this level
 mostly means declining questions it cannot know the answer to, rather than inventing a
-plausible-sounding number — which is exactly the failure this level exists to measure, and
+plausible-sounding number: which is exactly the failure this level exists to measure, and
 exactly what <Link href="/techniques/rag/">RAG</Link> exists to fix.
 
 The system prompt is the only lever available here, and it says so directly: answer plainly, and
 say so plainly when a specific fact is not known instead of guessing at it. There is no chunking,
-no search and no schema — one system message, one user message, one call.
+no search and no schema: one system message, one user message, one call.
 
 <CodeFile file="examples/one_call/run.py" func="run" />
 
 Two things are worth noticing in the trace. First, calling the model is not itself a model
-decision: the code decided to make this call, in this order, before the model said anything — the
+decision: the code decided to make this call, in this order, before the model said anything: the
 `"model"` kind on that step and the `"code"` `decided_by` on the same step answer two different
 questions (see `docs/EVALS.md`). Second, there is nothing left to decide once the call returns;
 the code does not parse the answer, check it against anything, or call the model again. It hands
@@ -119,7 +119,7 @@ back exactly what came back. Run it yourself:
 <CodeFile file="examples/one_call/README.md" start={15} end={15} lang="text" expect="python -m examples.one_call" />
 
 A newcomer building their first real thing on top of a model almost always starts here, whether or
-not they call it "level 1": one prompt, sent through whichever tool wraps the developer's model —
+not they call it "level 1": one prompt, sent through whichever tool wraps the developer's model,
 usually that developer's own API, or a tool like Ollama that can swap which model answers without
 changing the calling code.
 
@@ -130,7 +130,7 @@ changing the calling code.
 
 Try <Link href="/techniques/order-zero/">level 0, no model at all</Link> first if the question has a fixed
 vocabulary and repeats often enough that a keyword search or a rule can answer it with no model at
-all. Level 0 is fast, free and completely predictable — three things a chat reply cannot
+all. Level 0 is fast, free and completely predictable: three things a chat reply cannot
 promise.
 
 </WhenNot>
@@ -185,7 +185,7 @@ documents attached, its lookup and numeric scores should sit close to level 0's 
 it gets right, it gets right from training data alone, which for a fictional appliance maker like
 Halvorsen should be close to nothing. The one place a single call can beat a keyword score is
 unanswerable questions, if the system prompt's instruction to decline rather than guess actually
-holds — it can say "I don't know" in its own words instead of returning an irrelevant passage.
+holds: it can say "I don't know" in its own words instead of returning an irrelevant passage.
 
 No result file exists yet for any level (see `docs/EVALS.md`). Run
 `python scripts/eval_run.py --example one_call --model stub --dry` to project the token cost of a

@@ -42,8 +42,8 @@ import orgSwarmsRun from '../../data/runs/organizations-swarms.json';
 
 An organization of agents is several standing agents with distinct roles and a shared goal, not
 one agent calling another for one task and getting an answer back. This page sits at level 7,
-not level 6, because the roster itself — who exists, what they are working on, when a new round
-of work starts — keeps running and gets decided along the way, rather than being fixed by a
+not level 6, because the roster itself (who exists, what they are working on, when a new round
+of work starts) keeps running and gets decided along the way, rather than being fixed by a
 person for one job and torn down after.
 
 This is mostly frontier. What ships today is closer to <Link
@@ -67,8 +67,8 @@ yet, so nothing below is measured. It is illustrated.
 
 Almost nothing you can subscribe to today is a genuine standing organization of agents; what
 exists and ships is a framework a developer assembles, not a product you turn on. MetaGPT is the
-one this page can name with a source: its own documentation states the idea outright —
-"assign different roles to GPTs to form a collaborative entity for complex tasks" — and lists
+one this page can name with a source: its own documentation states the idea outright:
+"assign different roles to GPTs to form a collaborative entity for complex tasks," and lists
 "product managers / architects / project managers / engineers" as the roles it
 includes<Cite n={3}/>. That is a fixed roster running a fixed procedure on one task, closer to a
 simulated org chart than to agents that keep existing and deciding what to work on next.
@@ -76,7 +76,7 @@ simulated org chart than to agents that keep existing and deciding what to work 
 One thing about output from anything built this way is measured, and worth stating exactly as its
 authors do. A 2026 paper ran 500 cascades across 10 knowledge domains on three models, 1,250
 responses in all, passing each answer along a chain of agents that revise it. In three-agent
-chains the hallucination score fell — from 0.422 at the first agent to 0.272 at the last — and
+chains the hallucination score fell (from 0.422 at the first agent to 0.272 at the last) and
 factual accuracy fell with it, "from 0.789 to 0.769", which the authors call "a trade-off between
 hallucination suppression and factual preservation"<Cite n={4}/>. The chain does suppress
 hallucinations; it also shaves off correct material on the way. Both movements are small, over
@@ -85,12 +85,12 @@ one benchmark, at one chain length, so read it as a direction rather than a rate
 The rest of this section is the site's reasoning, not a finding. Four things have to be written
 down before a roster runs without a person in the room, and none come from the model: what
 persists between rounds (the board, the claims, each role's memory), what a role may do
-unattended, what stops for approval, and how the whole organization is halted at once — one
+unattended, what stops for approval, and how the whole organization is halted at once: one
 switch that drains the board and refuses new claims, not a role-by-role hunt while the rest keep
 working.
 
 Accountability is the fifth and the one this page cannot settle. When a mistake reaches a person
-by way of two or three roles that each added something, who is responsible — the role that made
+by way of two or three roles that each added something, who is responsible: the role that made
 the error, the one that passed it on, or whoever set the roster up? No maker's page or paper this
 site has read answers that. Decide it on purpose, in writing, before relying on a system like
 this for anything that matters.
@@ -98,7 +98,7 @@ this for anything that matters.
 </Lane>
 <Lane name="build" title="Build it">
 
-The example is deliberately small: three roles — researcher, writer, reviewer — share one task
+The example is deliberately small: three roles (researcher, writer, reviewer) share one task
 board, and a coordinator model decides which open task goes to which role. What each role would
 actually do with an assigned task is out of scope; a role agent would use whatever pattern
 elsewhere in this manual fits its own job. What this example isolates is only the part specific
@@ -114,8 +114,8 @@ proposal as its own dashed edge and says so under its tally.
 been assigned two tasks this round gets no more, whatever the coordinator's output requests next.
 Claiming is checked against the board itself, not against what the coordinator believes is true:
 `task.status != "open"` refuses an assignment outright, so if the coordinator's own single call
-proposes the same task to two different roles — which its output can do, since nothing stops a
-model from repeating itself — only the first proposal is ever honored. The second reads the board
+proposes the same task to two different roles (which its output can do, since nothing stops a
+model from repeating itself), only the first proposal is ever honored. The second reads the board
 fresh, sees the task is no longer open, and is refused, not silently overwritten and not queued
 to run later. That check is what the shared board is actually for: a coordinator's plan is a
 proposal against it, not an instruction the board has to accept.
@@ -131,8 +131,8 @@ benchmarks, against the systems they chose to compare with, and not a result thi
 measured.
 
 A different line of research reaches for coordination without any fixed roster at all. Park et
-al.'s Generative Agents paper populated a sandbox environment — twenty-five agents in a small
-town, no shared board and no fixed roles, just memory, planning and reflection — and reports
+al.'s Generative Agents paper populated a sandbox environment (twenty-five agents in a small
+town, no shared board and no fixed roles, just memory, planning and reflection) and reports
 that "starting with only a single user-specified notion that one agent wants to throw a
 Valentine's Day party, the agents autonomously spread invitations to the party over the next two
 days, make new acquaintances, ask each other out on dates to the party, and coordinate to show up
@@ -145,7 +145,7 @@ The two rules look alike and behave differently, which is worth testing separate
 spent per round and refills at the start of the next one, while a claim is permanent until the
 task is done. `tests/test_example_organizations_swarms.py` scripts a coordinator that over-assigns
 one role, one that proposes the same task twice in a single call, and one that tries to re-claim
-a task in a later round — that last test keeps a second task open on purpose, because a round with
+a task in a later round: that last test keeps a second task open on purpose, because a round with
 nothing open returns before the model is ever called and would otherwise pass without checking
 anything. Run it yourself:
 
@@ -163,8 +163,8 @@ afterward is level 6, cheaper to reason about, and is what the one shipping fram
 names actually does.
 
 Move up to a standing organization only once the roster itself needs to persist and change
-between tasks — new roles added, old ones retired, work assigned across many separate requests
-rather than one — and once you have an answer, in writing, for who is accountable when it acts.
+between tasks (new roles added, old ones retired, work assigned across many separate requests
+rather than one) and once you have an answer, in writing, for who is accountable when it acts.
 
 </WhenNot>
 
@@ -174,7 +174,7 @@ rather than one — and once you have an answer, in writing, for who is accounta
   {
     name: 'A task is claimed by two roles at once',
     notice: 'Two roles both believe they own the same task and either duplicate the work or step on each other\'s output.',
-    test: 'Script a coordinator that proposes the same task to two roles in one call (this page\'s own test suite does exactly this) and confirm only the first proposal is honored — not that both fail, not that both succeed.',
+    test: 'Script a coordinator that proposes the same task to two roles in one call (this page\'s own test suite does exactly this) and confirm only the first proposal is honored: not that both fail, not that both succeed.',
   },
   {
     name: 'A role quietly exceeds its budget',
@@ -209,7 +209,7 @@ rather than one — and once you have an answer, in writing, for who is accounta
   ]}
   comparedTo={{
     label: 'a single agent (level 5) doing all three roles’ work itself',
-    note: 'The coordination call itself is cheap: one small model call per round. What this strip does not show, and what a real system pays for, is each role’s own work once assigned — three separate agents’ worth of calls this example does not run, on top of the coordination shown here.',
+    note: 'The coordination call itself is cheap: one small model call per round. What this strip does not show, and what a real system pays for, is each role’s own work once assigned: three separate agents’ worth of calls this example does not run, on top of the coordination shown here.',
   }}
   level={7}
 />
@@ -224,8 +224,8 @@ the site's shared 60-question set does not apply, the same reason it does not ap
 be measured here: the share of coordination rounds that violate the budget or double-claim a task
 under adversarial scripting (this should be exactly zero, and
 `tests/test_example_organizations_swarms.py` checks it on the stub every run), how evenly work
-actually spreads across roles against how evenly the coordinator intended it to, and — the harder
-measurement research has not settled — whether a final output's accuracy degrades as it passes
+actually spreads across roles against how evenly the coordinator intended it to, and (the harder
+measurement research has not settled) whether a final output's accuracy degrades as it passes
 through more roles, the way the hallucination-cascade paper measures for its own three-agent
 chain<Cite n={4}/>.
 
@@ -234,7 +234,7 @@ chain<Cite n={4}/>.
 ## Run it
 
 <RunIt
-  monitor="Assignments refused for budget or for a task no longer being open — both should be rare relative to the volume of tasks, and a rising rate of either is worth reading as a sign the roster or the budgets no longer match the workload, not just logging and moving on."
+  monitor="Assignments refused for budget or for a task no longer being open: both should be rare relative to the volume of tasks, and a rising rate of either is worth reading as a sign the roster or the budgets no longer match the workload, not just logging and moving on."
   costAtVolume="One coordination call per round regardless of roster size, plus each role's own work once assigned; coordination cost itself stays close to flat as the roster grows, but the total system cost does not, since every added role is added work somewhere downstream of this example."
   failsInProduction="A role silently falls behind its budget every round because the coordinator keeps proposing more than it can take, and nobody notices until a backlog of unclaimed tasks is large enough to see on a dashboard nobody was watching."
   whatToLog="Every proposed assignment, whether the board accepted or refused it and why, which role actually touched a task before it was marked done, and the full chain of roles a given output passed through, so an accountability question has an answer that does not require asking any of the agents."

@@ -35,7 +35,7 @@ Gateway (Proxy) with virtual keys, cost tracking, and an admin UI," offering "Vi
 per-key/team/user budgets" and "Centralized logging, guardrails, and caching"<Cite n={2}/>.
 
 A gateway is not an agent framework: it decides nothing about what a model should do next, and
-holds no task state. It overlaps with an API aggregator without being the same thing — LiteLLM's
+holds no task state. It overlaps with an API aggregator without being the same thing: LiteLLM's
 own docs describe a library that "gives you a single, unified interface to call 100+ LLMs" and a
 separately named "Gateway (Proxy)" run on top of it, adding keys, budgets and policy<Cite n={2}/>.
 
@@ -61,9 +61,9 @@ outages and rate limits with automatic fallbacks"<Cite n={1}/>. Those are the ma
 what its product is for, not a result this site has checked.
 
 What a gateway costs is a new component between you and the model, and a new question about who
-sees your traffic. A hosted gateway — OpenRouter is one, and Cloudflare AI Gateway another, whose
+sees your traffic. A hosted gateway (OpenRouter is one, and Cloudflare AI Gateway another, whose
 documented features include caching, rate limiting, logging and "model fallbacks in case of
-an error"<Cite n={3}/> — is a third party that a request passes through before
+an error"<Cite n={3}/>) is a third party that a request passes through before
 it reaches the model provider at all, on top of whatever the model provider itself sees. That is
 a question to answer, not a warning: what does this company say it retains, for how long, and is
 that acceptable for the traffic you are about to send through it. A self-hosted gateway, the mode
@@ -82,7 +82,7 @@ integrations, and it also becomes the one thing whose going down takes all five 
 
 The example is a small in-process gateway: one call per key routes to that key's primary
 provider, falls back to its secondary on any error, and is refused outright once the key's token
-budget is spent. Both "providers" are `Model`s from `examples.common.model` — here two
+budget is spent. Both "providers" are `Model`s from `examples.common.model`: here two
 `StubModel`s standing in for what would really be an Ollama tag and a Claude model id behind the
 same interface, so the gateway's own code never has to know which one actually answered:
 
@@ -94,13 +94,13 @@ provider ever being contacted. Be precise about what that buys, though, because 
 oversell. The check asks whether anything is left, not whether enough is left, so one call of any
 size may still start and finish below zero; the overshoot is bounded by one call, and the tests
 pin it. And check, call, subtract is three steps, so two calls racing each other can both read
-the same remaining budget and both go through — a real gateway reserves against the budget under
+the same remaining budget and both go through: a real gateway reserves against the budget under
 a lock or in a shared store, and this one runs in a single thread and says so.
 
 Fallback is the mechanism that needs a warning rather than a caveat. `complete` falls back on any
 exception from the primary, and an exception does not tell you whether the provider did the work
-before it failed. For a plain completion that is harmless. For anything with a side effect — a
-call that charges something, files something, or sends something — retrying on a different
+before it failed. For a plain completion that is harmless. For anything with a side effect (a
+call that charges something, files something, or sends something), retrying on a different
 provider can do it twice, so falling back on everything that raises is a choice to make per
 route, not a default to leave on.
 
@@ -109,7 +109,7 @@ call's prompt text never reaches `LogEntry.prompt`; a caller has to turn it off 
 see it, the same shape of default OpenTelemetry uses for anything that might carry
 <Link href="/techniques/observability/">sensitive content</Link>. The flag covers the gateway's
 own log and nothing else. If both providers fail, the second one's exception propagates
-unchanged, and a real provider client often quotes part of the request in that string — a second
+unchanged, and a real provider client often quotes part of the request in that string: a second
 way prompt text leaves a system whose logs are careful.
 
 <CodeFile file="examples/ai_gateways/README.md" start={12} end={12} lang="text" expect="python -m examples.ai_gateways" />
@@ -118,10 +118,10 @@ way prompt text leaves a system whose logs are careful.
 primary falls back and the log records `fell_back=True`; a key with an exhausted budget raises on
 its next call while a different key's budget is untouched; a planted secret never appears in the
 log's `repr` with redaction on, only when it is explicitly turned off; and three more tests pin
-the limits above — the single-call overshoot, the two calls that both read the budget before
+the limits above: the single-call overshoot, the two calls that both read the budget before
 either subtracts, and the refused call that reaches no provider and names no prompt in its error.
 
-What the example leaves out matters as much as what it includes. It has no policy check — a real
+What the example leaves out matters as much as what it includes. It has no policy check: a real
 gateway's "guardrails" step, the same idea <Link href="/techniques/guardrails/">guardrails</Link>
 covers, would run here, on the request before it is sent or the answer before it is returned. It
 also has no cache: a real gateway's cache is keyed on more than the prompt text alone, because
@@ -135,7 +135,7 @@ response.
 <WhenNot>
 
 Skip a gateway while a project calls one provider directly with one key and has no budget,
-routing or fallback need of its own — a gateway adds a component that itself has to stay running,
+routing or fallback need of its own: a gateway adds a component that itself has to stay running,
 and a single call to a single provider has nothing for a gateway to route between.
 
 Move up once more than one provider is in play, once separate callers need separate budgets or
@@ -167,11 +167,11 @@ everything rather than reimplemented in each application that calls a model.
   {
     name: 'A budget check runs after the call instead of before it',
     notice: 'A key goes over budget because the check that should have refused the call ran only after the provider had already answered and been billed.',
-    test: 'Confirm a key with zero budget remaining is refused before any provider is called, the way this example\'s Gateway.complete checks first — not billed once more and then flagged.',
+    test: 'Confirm a key with zero budget remaining is refused before any provider is called, the way this example\'s Gateway.complete checks first, not billed once more and then flagged.',
   },
   {
     name: 'Fallback retries a request that should not run twice',
-    notice: "A primary provider fails after doing the work rather than before, the gateway cannot tell the two apart, and the retry on the secondary repeats a side effect — something charged, filed or sent twice for one request.",
+    notice: "A primary provider fails after doing the work rather than before, the gateway cannot tell the two apart, and the retry on the secondary repeats a side effect: something charged, filed or sent twice for one request.",
     test: 'List what each route can actually cause to happen, and confirm fallback is enabled only on the routes where repeating the request is harmless; for the rest, the gateway should surface the error rather than retry it somewhere else.',
   },
   {
@@ -181,7 +181,7 @@ everything rather than reimplemented in each application that calls a model.
   },
   {
     name: "The log redacts nothing, or redacts what a reader actually needed",
-    notice: "A log built for debugging keeps full prompt and answer text by default, which is useful right up until the log itself becomes the thing someone has to secure and explain in an audit — or the opposite: redaction is on for everything, including the one field a real incident needed to see.",
+    notice: "A log built for debugging keeps full prompt and answer text by default, which is useful right up until the log itself becomes the thing someone has to secure and explain in an audit, or the opposite: redaction is on for everything, including the one field a real incident needed to see.",
     test: "Check what a log actually contains after a real request, not what a redaction flag is named; this example's own tests assert the secret string is absent with redact=True and present with it off, which is the same check to run against a real deployment.",
   },
 ]} />
@@ -192,13 +192,13 @@ everything rather than reimplemented in each application that calls a model.
   call <Link href="/techniques/chat/">chat</Link> makes; whether it earns its place here depends
   entirely on whether more than one provider or key is already in the picture.
 - <Link href="/levels/3/">Workflows</Link>: your own code already decided which step calls which
-  model, so the gateway's routing is redundant with that decision — what it adds here is one
+  model, so the gateway's routing is redundant with that decision: what it adds here is one
   budget and one log across every step, not new fallback logic your code didn't already have.
 - <Link href="/levels/4/">Tools</Link>: a tool definition passes through the gateway unchanged
   in either direction, so nothing about <Link href="/techniques/function-calling/">function
-  calling</Link> is this layer's concern — only the token accounting around the call is.
+  calling</Link> is this layer's concern: only the token accounting around the call is.
 - <Link href="/levels/5/">Agents</Link>: the number of calls a run makes is not fixed in advance,
-  so a gateway's per-key budget is a real backstop here, not just bookkeeping — the same ceiling
+  so a gateway's per-key budget is a real backstop here, not just bookkeeping: the same ceiling
   <Link href="/techniques/single-agent/">a single agent</Link>'s own `max_tokens` cap is meant to
   provide, enforced one layer further out in case the cap inside the loop fails to hold.
 - <Link href="/levels/6/">Teams of agents</Link>: several agents can share one gateway key or
@@ -215,7 +215,7 @@ everything rather than reimplemented in each application that calls a model.
   subtracting afterwards, so two simultaneous calls cannot both spend the last of it.
 - Turn fallback on per route, not globally. A request that can be repeated safely is a different
   thing from one that charges, files or sends, and only the first is a fallback candidate.
-- Key a cache on more than the prompt text — who asked matters as much as what was asked, or one
+- Key a cache on more than the prompt text: who asked matters as much as what was asked, or one
   caller's cached answer can reach another's request.
 - Log every fallback as its own event, not folded into a plain success count, so a primary
   provider quietly failing every request is visible before someone asks why costs changed.
@@ -239,7 +239,7 @@ everything rather than reimplemented in each application that calls a model.
   changed, or a cache keyed only on the prompt text returns one caller's answer to a different
   caller."
   whatToLog="Which key called, which provider actually answered, whether it fell back, tokens in
-  and out, and whether a policy check ran and what it decided — with prompt and answer content
+  and out, and whether a policy check ran and what it decided, with prompt and answer content
   redacted unless explicitly captured."
 />
 
@@ -247,8 +247,8 @@ everything rather than reimplemented in each application that calls a model.
 
 <TryIt items={[
   { lane: 'use', body: "Find a product you use that calls more than one AI provider (check its status page or documentation for the providers it names). Look for signs of a gateway in front of them: one combined status indicator, or a single outage that took down access to every provider at once." },
-  { lane: 'build', body: "Run python -m examples.ai_gateways --demo from the repo root and read the printed log. Then change team-a's budget in _demo_gateway (examples/ai_gateways/__main__.py) from 10 to 10000 and run it again -- does the second call for team-a still get refused?" },
-  { lane: 'either', body: "Pick one of the failure modes above and write down, for a real system you use or built, which of its two mitigations -- the check itself, or the log that would reveal the check failed -- you actually have today." },
+  { lane: 'build', body: "Run python -m examples.ai_gateways --demo from the repo root and read the printed log. Then change team-a's budget in _demo_gateway (examples/ai_gateways/__main__.py) from 10 to 10000 and run it again: does the second call for team-a still get refused?" },
+  { lane: 'either', body: "Pick one of the failure modes above and write down, for a real system you use or built, which of its two mitigations (the check itself, or the log that would reveal the check failed) you actually have today." },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

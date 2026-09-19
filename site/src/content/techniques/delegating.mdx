@@ -35,7 +35,7 @@ the result? How reversible is the action once taken? Does the task need context 
 None of the four asks how good the model is.
 
 Anthropic's prompting guide draws the same line. For teams who want a model to confirm before
-risky actions it publishes a sample prompt — text you add to your own, not a description of
+risky actions it publishes a sample prompt: text you add to your own, not a description of
 default behavior: "Consider the reversibility and potential impact of your actions. You are
 encouraged to take local, reversible actions like editing files or running tests, but for actions
 that are hard to reverse, affect shared systems, or could be destructive, ask the user before
@@ -57,11 +57,11 @@ Score the task, not the model. Each row is a question about the work in front of
 | Whose context does it need? | Everything relevant is in the material you can give it | It turns on a relationship, an unwritten exception, or something said in a room |
 
 Read the row that scores worst, not the average. A task on the right of even one row wants a
-person between the model and the action — not more trust, a checkpoint. A task on the left of all
+person between the model and the action: not more trust, a checkpoint. A task on the left of all
 four is a reasonable thing to hand over unattended.
 
 Three things this site recommends never running unattended, each because it fails the same two
-rows — irreversible and unverifiable after the fact:
+rows (irreversible and unverifiable after the fact):
 
 1. Anything that moves money or creates a legal obligation on your behalf.
 2. Anything that communicates in your name to someone outside your own team.
@@ -72,7 +72,7 @@ you cannot check the result after the fact, because after the fact is too late. 
 is a judgment for you to make, and most work is everything else.
 
 Then widen deliberately. Hand over the cheapest, most reversible slice first, watch what actually
-goes wrong for a few weeks, and widen only past what held up — which takes a record, so
+goes wrong for a few weeks, and widen only past what held up, which takes a record, so
 <Link href="/techniques/reviewing/">reviewing</Link> and <Link href="/techniques/trust/">calibrating
 trust</Link> are the next two pages, and <Link href="/techniques/human-in-the-loop/">human
 approval</Link> is the checkpoint the middle rows ask for. All four sit on the <Link
@@ -97,7 +97,7 @@ independently names the same amount, no matter what a retrieved note tried to ta
 into. The model may propose; only a call the person's own words support runs.
 
 Start narrow by default. Anthropic's own advice to agent builders is "finding the simplest
-solution possible, and only increasing complexity when needed"<Cite n={3}/> — the Use it lane's
+solution possible, and only increasing complexity when needed"<Cite n={3}/>: the Use it lane's
 "widen deliberately," stated as a design default rather than a habit somebody has to remember.
 
 Delegating to another agent is still delegating, and the four questions apply to the split as
@@ -126,8 +126,8 @@ is where it gets designed on purpose.
   now something outside the conversation actually changes.
 - <Link href="/levels/5/">Agents</Link>: you delegate a sequence you will not see, so score the
   table against everything the loop *might* do, not against the task you had in mind.
-- <Link href="/levels/6/">Teams of agents</Link>: the split itself is delegated — a lead agent
-  decides who does what, and that decision is now also made without you.
+- <Link href="/levels/6/">Teams of agents</Link>: the split itself is delegated (a lead agent
+  decides who does what), and that decision is now also made without you.
 - <Link href="/levels/7/">Always-on agents</Link>: the decision moves entirely into advance, as a
   standing policy, because there is no moment of handover left to think at. See <Link
   href="/techniques/agent-teammates/">always-on assistants</Link>.

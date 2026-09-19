@@ -51,7 +51,7 @@ Be precise about what that is and is not. A guardrail is a probabilistic check: 
 something *looks* disallowed, usually with a model of its own, and it can be wrong in both
 directions. It is not the control that holds. The control that holds is a check in code that
 tests a specific fact and refuses the action when the fact is false, whatever anything upstream
-concluded — <Link href="/techniques/safety/">safety</Link>'s own example is exactly that check. A
+concluded: <Link href="/techniques/safety/">safety</Link>'s own example is exactly that check. A
 guardrail lowers how often that check gets tested. It never stands in for it.
 
 This topic is not a level on the ladder; it applies at every level, the way
@@ -72,7 +72,7 @@ site, so nothing below reports a measured number.
 A guardrail is usually invisible until it fires: a product that refuses to answer a question, or
 that returns a generic "I can't help with that" instead of the thing you asked for, has very
 likely run an input or output check that decided the request or the answer matched something it
-was built to catch. That refusal is a guess, not a certainty — the check is probabilistic, so it
+was built to catch. That refusal is a guess, not a certainty: the check is probabilistic, so it
 can be wrong in either direction: a legitimate request that happens to resemble a disallowed
 pattern gets refused (a false positive), or a disallowed one worded just differently enough gets
 through.
@@ -99,17 +99,17 @@ them is a substitute for another.
 
 The control that actually holds is not a guardrail model at all: it is a permission check written
 in code, run no matter what anything upstream decided.
-<Link href="/techniques/safety/">Safety</Link>'s own example is that check — `_permitted`,
-walked through on that page — refusing a refund unless the customer's own message names the same
+<Link href="/techniques/safety/">Safety</Link>'s own example is that check (`_permitted`,
+walked through on that page), refusing a refund unless the customer's own message names the same
 amount the tool call asks for, at the order this conversation is already about. Nothing here
 repeats that walkthrough; read it there.
 
-What this page shows instead is the piece that runs before the model ever sees untrusted content
-— delimiting it, so a retrieved note cannot pass as the system's own instructions:
+What this page shows instead is the piece that runs before the model ever sees untrusted content:
+delimiting it, so a retrieved note cannot pass as the system's own instructions:
 
 <CodeFile file="examples/safety/run.py" func="_delimited" />
 
-This is an input-side guardrail in the plainest sense, and it is a hint, not a guarantee — a
+This is an input-side guardrail in the plainest sense, and it is a hint, not a guarantee: a
 model can still be talked into following text it was told is data. That is exactly why the code
 check after it exists at all: a guardrail lowers the odds an attack works; it does not remove the
 need for a control that holds even when the guardrail does not.
@@ -118,14 +118,14 @@ Classifier-model guardrails are a different mechanism from a code-side permissio
 different one from delimiting: a separate model, trained specifically to say whether content is
 safe. Meta documents Llama Guard 4 as a distinct safeguard model, not the one it is checking,
 whose guardrails apply "on the input and output of the model" it is placed in front of<Cite
-n={5}/> — a second opinion from a second model, which can itself be wrong, rather than a
+n={5}/>: a second opinion from a second model, which can itself be wrong, rather than a
 deterministic check on a specific fact the way `_permitted` is.
 
 Schema and structured-output checks are the guardrail form aimed at a different failure: not
 "is this unsafe" but "is this well-formed." Guardrails AI's own README describes its two
 functions as running "Input/Output Guards" that "detect, quantify and mitigate the presence of
 specific types of risks," and separately helping "generate structured data from LLMs"<Cite
-n={3}/> — a schema check catches a malformed answer a safety classifier would never flag, because
+n={3}/>: a schema check catches a malformed answer a safety classifier would never flag, because
 nothing about a badly-shaped JSON object is unsafe, only wrong.
 
 A product aimed at the whole request and response pair, rather than one side of it, is AI
@@ -142,11 +142,11 @@ in your own code and runbooks, where a former name outlives an acquisition for y
 <WhenNot>
 
 Skip a separate guardrail layer for a single-user tool with no retrieved content and nothing it
-can act on — <Link href="/techniques/safety/">safety</Link>'s own guidance is the same here:
+can act on: <Link href="/techniques/safety/">safety</Link>'s own guidance is the same here:
 direct prompt injection is the whole risk, and the worst it can do is a bad answer to your own
 question.
 
-Never treat a guardrail — classifier, filter, or schema check — as the control that makes an
+Never treat a guardrail (classifier, filter, or schema check) as the control that makes an
 action safe to run unattended. Add a code-side permission check, the way
 <Link href="/techniques/safety/">safety</Link>'s own example does, as soon as a model can call a
 tool that does something; a guardrail can lower how often that check gets tested, but it cannot
@@ -165,17 +165,17 @@ replace it.
   {
     name: 'A guardrail model is trusted the same as the check it backstops',
     notice: "An input or output classifier returns a wrong verdict and nothing else catches it, because the code-level check was skipped on the assumption the classifier would cover it.",
-    test: "Turn the classifier off for one test run and confirm a code-level permission check, where one exists, still refuses the same attack on its own -- a system where only the classifier catches it has one layer, not two.",
+    test: "Turn the classifier off for one test run and confirm a code-level permission check, where one exists, still refuses the same attack on its own: a system where only the classifier catches it has one layer, not two.",
   },
   {
     name: 'A check runs at the wrong point in the flow',
     notice: "An output check catches a bad answer after the model already read and was influenced by untrusted input earlier in the same turn, when an input-side check placed before the model would have stopped the same problem earlier and cheaper.",
-    test: "For a given failure, trace which of the five points a rail can run at (input, dialog, retrieval, execution, output) would have caught it, and confirm a check actually exists there -- not just somewhere in the pipeline.",
+    test: "For a given failure, trace which of the five points a rail can run at (input, dialog, retrieval, execution, output) would have caught it, and confirm a check actually exists there, not just somewhere in the pipeline.",
   },
   {
     name: 'Structured-output validity is mistaken for safety',
     notice: 'A schema check confirms an answer is well-formed JSON and that passes as "the guardrails ran," even though nothing about schema validity says the content inside the fields is safe, accurate, or authorized.',
-    test: "Feed the schema check a well-formed answer that is nonetheless unsafe or wrong, and confirm something else -- not the schema check -- is what catches it.",
+    test: "Feed the schema check a well-formed answer that is nonetheless unsafe or wrong, and confirm something else (not the schema check) is what catches it.",
   },
   {
     name: 'A renamed or re-owned tool is referenced by its old name',
@@ -187,27 +187,27 @@ replace it.
 ## At each level
 
 - <Link href="/levels/1/">One call</Link>: an input filter on the user's message and an output
-  check on the answer are the only two points that exist yet — the same two halves
+  check on the answer are the only two points that exist yet: the same two halves
   <Link href="/techniques/chat/">chat</Link>'s single call has.
 - <Link href="/levels/2/">Context</Link>: a retrieval rail becomes relevant for the first time,
   since retrieved content is now something a check can inspect before it reaches the model —
   exactly the failure mode <Link href="/techniques/rag/">RAG</Link> names for prompt injection
   through retrieved text.
-- <Link href="/levels/4/">Tools</Link>: an execution rail — a check on what a tool call is about
-  to do, before it runs — is where the code-side permission check
+- <Link href="/levels/4/">Tools</Link>: an execution rail (a check on what a tool call is about
+  to do, before it runs) is where the code-side permission check
   <Link href="/techniques/safety/">safety</Link>'s own example builds actually lives; this is the
   level where a guardrail stops being advisory and starts standing in front of a real action.
 - <Link href="/levels/5/">Agents</Link>: checks that ran once per exchange at lower levels now
   need to run on every step of a loop with no fixed length, the same shift
   <Link href="/techniques/single-agent/">a single agent</Link>'s own step cap responds to for
-  cost — a guardrail evaluated only at the start of a run cannot catch what the run drifts into
+  cost: a guardrail evaluated only at the start of a run cannot catch what the run drifts into
   by its twentieth step.
 - <Link href="/levels/6/">Teams of agents</Link>: one agent's output becomes another agent's
   input, so a check placed only at the system's outer boundary misses content moving between
-  agents entirely — the reason <Link href="/techniques/agent-graphs/">agent graphs</Link> checks
+  agents entirely: the reason <Link href="/techniques/agent-graphs/">agent graphs</Link> checks
   a handoff against an allowlist before acting on it.
 - <Link href="/levels/7/">Always-on agents</Link>: nobody is reading each decision as it happens,
-  so the signal is the refusal rate over time rather than any single refusal — a rate that moves
+  so the signal is the refusal rate over time rather than any single refusal: a rate that moves
   means either the traffic changed or the check did, and both are worth knowing about.
 
 ## Practices
@@ -228,7 +228,7 @@ replace it.
 
 <RunIt
   monitor="Refusal rate on a labeled set of legitimate requests, separately from catch rate on a
-  labeled set of attacks -- a guardrail tuned to look good on one number alone is untuned on the
+  labeled set of attacks: a guardrail tuned to look good on one number alone is untuned on the
   other."
   costAtVolume="A code-side check like safety's own permission check is a few lines run on every
   call, negligible next to the model call it guards. A classifier-model guardrail such as Llama
@@ -237,7 +237,7 @@ replace it.
   failsInProduction="A false positive rate nobody measured turns out to be high enough that
   people route around the product entirely, or a guardrail model's own wrong verdict goes
   uncaught because nothing else was checking the same thing."
-  whatToLog="Which check ran, what it decided, and why -- refused, altered, or passed -- on both
+  whatToLog="Which check ran, what it decided, and why (refused, altered, or passed) on both
   legitimate and disallowed content, so a refusal rate can be broken out by whether it was
   correct, not just counted."
 />
@@ -245,7 +245,7 @@ replace it.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: "Think of a legitimate request a product has refused you. Write down which of the five points a check could have run at -- input, dialog, retrieval, execution, output -- the refusal most likely came from, and what the refusal message did and did not tell you about why. A refusal that explains nothing costs the same as a wrong one." },
+  { lane: 'use', body: "Think of a legitimate request a product has refused you. Write down which of the five points a check could have run at (input, dialog, retrieval, execution, output) the refusal most likely came from, and what the refusal message did and did not tell you about why. A refusal that explains nothing costs the same as a wrong one." },
   { lane: 'build', body: "Open examples/safety/run.py and read _delimited alongside _permitted. Write down, for each, which of the five rail types NeMo Guardrails names (input, dialog, retrieval, execution, output) it corresponds to, and which of the two still holds if the model ignores everything it was told." },
   { lane: 'either', body: "Pick one guardrail tool named on this page. Read its own documentation for one thing it explicitly says it does NOT do or does not guarantee, and write down what would have to catch that gap instead." },
 ]} />

@@ -50,7 +50,7 @@ tools)"<Cite n={1}/>. The model produces a call, not an effect; this page is abo
 those two cases, where your own code runs it.
 
 Function calling sits at level 4, tools. The one real choice in a run is the model's: which
-action, if any, and with what arguments — the `decided_by: "model"` step in the run below. Your
+action, if any, and with what arguments: the `decided_by: "model"` step in the run below. Your
 code decides which actions to offer, runs whichever one gets chosen, and asks for the final
 answer. That is the line to level 5: here the model chooses once, inside a run your code bounds;
 a single agent chooses again after every result, and leaves the loop only when it decides to.
@@ -66,8 +66,8 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lane name="use" title="Use it">
 
 If a chat app's plugin, connector or "action" feature has ever done something beyond answering
-from its own knowledge — checked a calendar, looked something up in a connected tool, filed a
-ticket — you have used function calling. Custom GPTs with actions, Claude connectors and Gemini
+from its own knowledge (checked a calendar, looked something up in a connected tool, filed a
+ticket) you have used function calling. Custom GPTs with actions, Claude connectors and Gemini
 connected apps are the same mechanism wearing a product name: the app offers the model a list of
 actions, the model picks one when the request calls for it, and the product runs it for you.
 
@@ -85,7 +85,7 @@ guide lists example tools ranging from a lookup to something with a real consequ
 today's weather for a location," "Access account details for a given user ID," and "Issue refunds
 for a lost order"<Cite n={4}/>. A tool that can only look something up fails safely if the model
 reaches for it by mistake; a tool that can issue a refund does not. If a product shows you the
-action and its arguments before it runs — not just the final answer — that is worth reading,
+action and its arguments before it runs (not just the final answer) that is worth reading,
 especially for anything with a side effect.
 
 </Lane>
@@ -100,22 +100,22 @@ call at most one of them. The system prompt says so directly, and the code enfor
 way that does not depend on the model following instructions: only `first.tool_calls[0]` is ever
 run, and the follow-up call that asks for a final answer is not given the `tools` list at all, so
 there is nothing left for the model to call even if it wanted to. That second fact is where level
-4 stops and level 5 starts — capping the run at one action is a decision your code made in
+4 stops and level 5 starts: capping the run at one action is a decision your code made in
 advance, not one the model makes about when to stop.
 
 <CodeFile file="examples/function_calling/run.py" func="run" />
 
 If the model's first response carries no tool call, that is still the one model decision this
 level records: it chose to answer directly rather than to act, the same kind of choice as the
-stop at level 5. If it asks for more than one tool at once — Anthropic notes that "by default,
-Claude may call multiple tools in a single response"<Cite n={3}/> — the code drops every call
+stop at level 5. If it asks for more than one tool at once (Anthropic notes that "by default,
+Claude may call multiple tools in a single response"<Cite n={3}/>) the code drops every call
 after the first and says so in the trace, rather than silently running one and hiding that a
 second was requested.
 
 `_run_tool` is the closest thing here to validating a call before acting on it: it checks the
 tool's name against the two it knows and falls through to `unknown_tool` for anything else,
 which reports the mismatch as text instead of raising. It does not check the *shape* of the
-arguments — `part_number` is read with a plain default, not checked against the schema — which
+arguments (`part_number` is read with a plain default, not checked against the schema) which
 is what a maker's own schema-conformance feature is for. Anthropic's tip on the same page as the
 quote above: "Add `strict: true` to your custom tool definitions to ensure Claude's tool calls
 always match your schema exactly"<Cite n={1}/>. OpenAI documents the same idea for its own
@@ -130,13 +130,13 @@ schema, instead of being best effort"<Cite n={4}/>. Run it yourself:
 <WhenNot>
 
 Try <Link href="/techniques/routing/">routing</Link> first if you already know, from the
-question's surface form, which single action applies — the model does not need to choose an
+question's surface form, which single action applies: the model does not need to choose an
 action your code can already tell apart. Try <Link href="/techniques/prompt-chaining/">prompt
 chaining</Link>, or a plain conditional, if the set of actions is small and always runs in the
 same order regardless of what the model says.
 
 Move up to function calling once the right action depends on something only the model can judge
-from open-ended input — which of several tools applies, or whether none does — and getting that
+from open-ended input (which of several tools applies, or whether none does) and getting that
 judgment wrong sometimes is cheap enough to tolerate.
 
 Two siblings at this level change where the action comes from rather than who chooses it. Reach
@@ -153,7 +153,7 @@ enumerated in advance as a list of named actions at all.
 <FailureModes modes={[
   {
     name: 'Confident call, wrong or missing argument',
-    notice: "The model calls the right tool but the argument does not match anything real — a part number that was never in the parts list, a query that does not resemble the question — and the tool answers with whatever it was actually handed rather than what the reader meant.",
+    notice: "The model calls the right tool but the argument does not match anything real (a part number that was never in the parts list, a query that does not resemble the question) and the tool answers with whatever it was actually handed rather than what the reader meant.",
     test: "Ask about a part number that does not exist and confirm the tool reports it as not found, rather than the model inventing a price to go with a citation that never backed one.",
   },
   {
@@ -201,13 +201,13 @@ enumerated in advance as a list of named actions at all.
 Function calling is one of the examples the site's own 60-question set scores directly (see
 `docs/EVALS.md`), the same way RAG and routing are: it answers a question about the documents and
 cites what it used. Level 4 adds one more thing worth checking beyond the answer itself: a result
-file's `model_decided_steps` should equal the number of questions run, exactly — one model
+file's `model_decided_steps` should equal the number of questions run, exactly: one model
 decision per question, never zero and never more than one. A number outside that range means the
 trace is wrong before the answer is even graded.
 
 Unlike routing, whose `--dry` projection follows the cheapest branch because the token-counting
 stand-in cannot produce a label the code recognizes, this example's branch depends on whether
-`tools` were offered, not on parsed text — and the stand-in calls the first tool every time tools
+`tools` were offered, not on parsed text: and the stand-in calls the first tool every time tools
 are offered, so `--dry` already projects the tool-calling branch, the more expensive one.
 
 No result file exists for function calling yet. Run `python scripts/eval_run.py --example

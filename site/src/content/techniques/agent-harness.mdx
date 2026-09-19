@@ -53,9 +53,9 @@ import agentHarnessRun from '../../data/runs/agent-harness.json';
 An agent harness is everything around the model in an agent: the loop that calls it, the tool
 definitions it is shown and the code that runs them, what goes into its next request, whether an
 action needs approval, the caps on steps and tokens, the sandbox, and what gets logged. None of that
-is the model. Anthropic's own account of what makes something an agent is one sentence — systems
+is the model. Anthropic's own account of what makes something an agent is one sentence: systems
 "where LLMs dynamically direct their own processes and tool usage, maintaining control over how they
-accomplish tasks"<Cite n={1}/> — and almost everything a builder builds sits outside it.
+accomplish tasks"<Cite n={1}/>, and almost everything a builder builds sits outside it.
 
 That is why the same model behaves very differently in a different harness: change the step cap, the
 allowlist or the context policy and a run finishes, fails, or runs up a bill doing neither, with
@@ -65,7 +65,7 @@ calling loop engineering; Anthropic's Claude Code team, writing under that headi
 agents repeating cycles of work until a stop condition is met"<Cite n={4}/>.
 
 Level 5 is where the harness first has real decisions to bound: the model decides both the action
-and when to stop — see <Link href="/techniques/single-agent/">single agent</Link> for the loop
+and when to stop: see <Link href="/techniques/single-agent/">single agent</Link> for the loop
 itself.
 
 This page is marked draft, not published: the agent harness has no recorded trace and no scored
@@ -94,20 +94,20 @@ not necessarily running a bigger model; it may just be compacting well.
 
 **What it will let run.** Anthropic's SDK lets a hook "short-circuit the loop: a PreToolUse hook
 that rejects a tool call prevents it from executing, and Claude receives the rejection message
-instead"<Cite n={2}/> — the same veto shape this page's own example builds. OpenAI's Codex
+instead"<Cite n={2}/>: the same veto shape this page's own example builds. OpenAI's Codex
 documents the same split from the sandbox side: "Sandboxing and approvals are different controls
 that work together. The sandbox defines technical boundaries. The approval policy decides when the
-agent must stop and ask before crossing them"<Cite n={6}/> — enforced on macOS "using the built-in Seatbelt
+agent must stop and ask before crossing them"<Cite n={6}/>: enforced on macOS "using the built-in Seatbelt
 framework"<Cite n={6}/>, and, between asking every time and never asking, a policy that can "keep
 specific approval prompt categories interactive while automatically rejecting others"<Cite n={7}/>.
 
 **What it costs to run past a demo.** A hard cap on steps or spend is a harness decision, not a
-model one — see <Link href="/techniques/single-agent/">single agent</Link> for what happens when
+model one: see <Link href="/techniques/single-agent/">single agent</Link> for what happens when
 one is hit.
 
 **What a session hands off.** Anthropic's engineering blog describes a subagent that may explore
 at length and return "only a condensed, distilled summary of its work"<Cite n={3}/> to the harness
-that spawned it — see <Link href="/techniques/long-horizon/">long-running tasks</Link> for the
+that spawned it: see <Link href="/techniques/long-horizon/">long-running tasks</Link> for the
 version that spans separate processes, and <Link href="/techniques/memory/">memory</Link> for what
 a harness keeps on purpose rather than by summary.
 
@@ -118,20 +118,20 @@ documentation says about these four things before assuming a rough session was t
 <Lane name="build" title="Build it">
 
 The example is the same loop <Link href="/techniques/single-agent/">single agent</Link> runs —
-act, check a cap, repeat — rebuilt so four moving parts are arguments to `run` instead of fixed in
+act, check a cap, repeat: rebuilt so four moving parts are arguments to `run` instead of fixed in
 the function body: a `ToolRegistry` (the definitions the model is shown, and the `allowed` set
-checked before any of them runs — the split
+checked before any of them runs: the split
 <Link href="/techniques/function-calling/">function calling</Link> makes for one call, made
 reusable), a `ContextPolicy` (a function from the growing message history to whatever the next
-request sends — <Link href="/techniques/context-engineering/">context engineering</Link> applied
+request sends: <Link href="/techniques/context-engineering/">context engineering</Link> applied
 inside the loop rather than once before it), a `Hook` (a chance to veto a call the model already
-chose, before the registry runs it — a silent version of what
+chose, before the registry runs it: a silent version of what
 <Link href="/techniques/human-in-the-loop/">human approval</Link> does out loud), and the step and
 token caps.
 
 `trim_to_budget` is the context policy worth reading closely. It keeps every message except tool
 results, and keeps only as many of the most recent tool results as fit under a token budget,
-replacing older ones with a short placeholder rather than deleting them silently — a small version
+replacing older ones with a short placeholder rather than deleting them silently: a small version
 of what Anthropic calls tool result clearing<Cite n={3}/>:
 
 <CodeFile file="examples/agent_harness/run.py" func="trim_to_budget" />
@@ -148,7 +148,7 @@ model has already decided:
 A real hook would look at the call's own name and arguments instead of just counting; running one
 inside a sandbox that actually isolates what a tool may touch, rather than a check like this one,
 is <Link href="/techniques/code-execution/">code execution</Link>'s territory, and what gets loaded
-into the model's instructions in the first place — which skill, not just which tool — is
+into the model's instructions in the first place (which skill, not just which tool) is
 <Link href="/techniques/skills/">skills</Link>'.
 
 `run` is the loop these parts plug into: ask the model through whatever the context policy
@@ -159,12 +159,12 @@ stops or a cap does.
 <CodeFile file="examples/agent_harness/run.py" func="run" />
 
 Every tool call, its arguments, and the decision to stop are `decided_by: "model"`; running a tool,
-a hook's veto, and forcing a final answer when a cap is reached are always `decided_by: "code"` —
+a hook's veto, and forcing a final answer when a cap is reached are always `decided_by: "code"`:
 the same split `single_agent`'s example makes, with two more kinds of code-decided step than that
 one has.
 
 `tests/test_example_agent_harness.py` runs the same scripted model twice with only the context
-policy changed, and the two runs answer differently — confidently citing the warranty term under a
+policy changed, and the two runs answer differently: confidently citing the warranty term under a
 generous policy, saying it could not confirm the term under a tight one. Nothing about the model's
 own logic changed between the two runs; only what the harness let it see did. Read that for what it
 is: a scripted stand-in, written to answer from whatever the harness left in front of it, so what
@@ -184,11 +184,11 @@ Run it yourself:
 <WhenNot>
 
 Try <Link href="/techniques/single-agent/">single agent</Link> first if you have not seen the basic
-loop yet — this page assumes you have, and is about what surrounds it, not the loop itself.
+loop yet: this page assumes you have, and is about what surrounds it, not the loop itself.
 
 Move to thinking about the harness deliberately once an agent runs past a one-off demo: choosing
 the caps, the allowlist, the context policy and the approval settings on purpose is what turns a
-loop that happens to work into a system somebody can operate and debug — see
+loop that happens to work into a system somebody can operate and debug: see
 <Link href="/techniques/safety/">safety, privacy and governance</Link> for testing one before
 trusting it with anything real, and <Link href="/techniques/ops/">operations</Link> for running one
 after that.
@@ -200,27 +200,27 @@ after that.
 <FailureModes modes={[
   {
     name: 'A trimmed tool result leaves a silent gap',
-    notice: "The final answer is missing a fact an earlier tool call actually returned, with no error and no retry -- the context policy dropped it before a later call, and nothing downstream says so.",
+    notice: "The final answer is missing a fact an earlier tool call actually returned, with no error and no retry: the context policy dropped it before a later call, and nothing downstream says so.",
     test: "Run the same scripted model through a generous context policy and a tight one on the same question and compare the final text word for word; this page's own tests do exactly this.",
   },
   {
     name: 'A hook veto reads as the model refusing',
-    notice: "A run stops short of an action, and it reads, from the transcript alone, like the model chose caution -- when a hook actually blocked a call the model had already decided to make.",
+    notice: "A run stops short of an action, and it reads, from the transcript alone, like the model chose caution: when a hook actually blocked a call the model had already decided to make.",
     test: 'Read the trace, not the transcript. A veto is its own decided_by: "code" step; a model declining on its own is decided_by: "model". Confusing the two hides who is actually setting the policy.',
   },
   {
     name: 'A tool the model can see is one the registry will not run',
     notice: 'The model calls a tool whose definition it was shown, and the call fails the way an unregistered name would, because the tool was advertised but never added to the allowlist that actually runs it.',
-    test: "Give the model a tool definition with no matching entry in the registry's allowlist and confirm the failure looks exactly like an unknown tool, not a special error -- a mismatched allowlist should never be distinguishable from a typo.",
+    test: "Give the model a tool definition with no matching entry in the registry's allowlist and confirm the failure looks exactly like an unknown tool, not a special error: a mismatched allowlist should never be distinguishable from a typo.",
   },
   {
     name: 'Caps tuned for a different task cut every run short',
-    notice: 'Every run in a batch hits the step or token cap and returns a forced, partial answer, and the task looks fine in isolation -- the caps were copied from a shorter task and never re-tuned.',
-    test: "Force a low cap on a task that genuinely needs more steps and confirm the forced answer is visibly marked, not indistinguishable from a real stop -- this page's own tests do exactly this.",
+    notice: 'Every run in a batch hits the step or token cap and returns a forced, partial answer, and the task looks fine in isolation: the caps were copied from a shorter task and never re-tuned.',
+    test: "Force a low cap on a task that genuinely needs more steps and confirm the forced answer is visibly marked, not indistinguishable from a real stop: this page's own tests do exactly this.",
   },
   {
     name: "Logging the model's output is not logging the harness's decisions",
-    notice: "A run goes wrong and the only record is what the model said -- not which cap fired, what a policy trimmed, or which hook denied a call -- so nobody can tell whether the model or the harness caused it.",
+    notice: "A run goes wrong and the only record is what the model said (not which cap fired, what a policy trimmed, or which hook denied a call) so nobody can tell whether the model or the harness caused it.",
     test: 'Read what actually gets logged for one run end to end and check whether a cap, a trim, or a veto shows up in it at all, or only the text the model produced.',
   },
 ]} />
@@ -258,10 +258,10 @@ one is not model variance, it is what the harness cost the run.
 ## Run it
 
 <RunIt
-  monitor="Which cap ends a run (step, token, or a real stop), how often a hook vetoes a call the model chose, and how much of the growing context a policy actually keeps versus trims on a typical run -- numbers a dashboard showing only the final answer will never surface."
-  costAtVolume="Tracks the same thing single agent's does -- how many actions a question actually needs -- plus one more: a tighter context policy costs fewer tokens per call at any given step count, so two harnesses running the identical loop can differ in spend without differing in step count at all."
+  monitor="Which cap ends a run (step, token, or a real stop), how often a hook vetoes a call the model chose, and how much of the growing context a policy actually keeps versus trims on a typical run: numbers a dashboard showing only the final answer will never surface."
+  costAtVolume="Tracks the same thing single agent's does (how many actions a question actually needs) plus one more: a tighter context policy costs fewer tokens per call at any given step count, so two harnesses running the identical loop can differ in spend without differing in step count at all."
   failsInProduction="A context policy trims a fact a later step still needed, and the run finishes anyway with a plausible but wrong answer; or a hook denies a call quietly enough that a person reading only the final text never learns anything was blocked."
-  whatToLog="Which cap fired if any, every hook decision and its reason, what a context policy actually dropped on each call, and the tool registry's allowlist at the time of the run -- a harness that only logs the model's own output cannot be debugged when the harness itself is what went wrong."
+  whatToLog="Which cap fired if any, every hook decision and its reason, what a context policy actually dropped on each call, and the tool registry's allowlist at the time of the run: a harness that only logs the model's own output cannot be debugged when the harness itself is what went wrong."
 />
 
 ## Try it

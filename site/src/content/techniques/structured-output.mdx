@@ -42,7 +42,7 @@ import Cite from '../../components/page/Cite.astro';
 import Link from '../../components/page/Link.astro';
 import structuredOutputRun from '../../data/runs/structured-output.json';
 
-Structured output means the reply comes back in a fixed shape — a JSON object with named fields —
+Structured output means the reply comes back in a fixed shape (a JSON object with named fields)
 instead of a paragraph your code has to parse by guessing. Makers reach it two ways. A
 JSON-Schema response format constrains which tokens the model may produce next, so
 the output matches the schema: OpenAI says a model given one "will always generate responses that
@@ -52,7 +52,7 @@ responses"<Cite n={1}/>; Gemini takes the same approach through a schema in
 schema and have the model call it, adding `strict: true` to make the call match
 exactly<Cite n={3}/>.
 
-Read the rest of that page, though: OpenAI lists cases where a reply still may not match — a
+Read the rest of that page, though: OpenAI lists cases where a reply still may not match: a
 refusal, or a response cut short by the token limit<Cite n={1}/>. And no schema check speaks to
 whether the values are right; a validly typed number can still be the wrong one. Validating your
 own side and retrying once, the way Pydantic raises "an error with a breakdown of what was
@@ -94,8 +94,8 @@ different from chat for exactly this reason: the product asked for a fixed shape
 
 What separates a good version of this from a bad one is what happens when the extraction is
 wrong, not whether it usually works. A well-built feature validates the result before doing
-anything with it — a date has to actually be a valid date, a required field has to actually be
-present — and either retries automatically or hands the draft back for you to confirm, the way a
+anything with it: a date has to actually be a valid date, a required field has to actually be
+present, and either retries automatically or hands the draft back for you to confirm, the way a
 calendar app shows a proposed event before saving it. A poorly built one accepts whatever
 JSON-shaped thing came back and acts on it immediately, which is how a voice assistant ends up
 creating an event on the wrong date with no chance to catch it.
@@ -108,7 +108,7 @@ actually says. Those checks are still yours, or a person's, to make; the schema 
 shape, not truth.
 
 When a product fills a form or a record for you, look for a review step before it commits to
-anything, especially anything costly to get wrong — a payment amount, a shipping address, a date
+anything, especially anything costly to get wrong: a payment amount, a shipping address, a date
 on a legal document. Its absence is invisible in a demo; it only shows up the first time the
 extraction is wrong.
 
@@ -125,7 +125,7 @@ schema is five fields, all required.
 The retry is deliberately capped at one. `_validate` checks the reply for every required field,
 checks that the appliance named in the reply matches the one that was actually asked about (a
 model can return well-typed JSON about the wrong appliance), and checks that the numeric fields
-are really integers rather than, say, the string `"90 days"` — a mistake a schema does not always
+are really integers rather than, say, the string `"90 days"`: a mistake a schema does not always
 catch, depending on how strictly the backend enforces it. If the first reply fails validation, the
 code appends the specific problem to the conversation and asks once more; a schema-constrained
 backend makes the second reply far more likely to be correctly typed, but this example's own
@@ -139,7 +139,7 @@ Run it yourself:
 Every step is `decided_by: "code"`: the schema is fixed, the retry count is fixed, and the model
 only ever chooses the field values inside whatever shape it was given. Compare this with
 <Link href="/techniques/function-calling/">function calling</Link> at level 4, where the model
-additionally decides whether to use a schema-shaped tool at all — the schema there is the same
+additionally decides whether to use a schema-shaped tool at all: the schema there is the same
 idea, but the decision of when to reach for it moves from your code to the model.
 
 </Lane>
@@ -147,7 +147,7 @@ idea, but the decision of when to reach for it moves from your code to the model
 
 <WhenNot>
 
-Skip the schema, and just read the reply as text, if nothing downstream actually parses it — a
+Skip the schema, and just read the reply as text, if nothing downstream actually parses it: a
 chat app showing an answer to a person does not need JSON. And if the field you need is already
 typed in a fixed, unambiguous format (a form field a person filled in directly, a part number a
 barcode scanner read), <Link href="/techniques/order-zero/">level 0, no model at all</Link> reads it directly,

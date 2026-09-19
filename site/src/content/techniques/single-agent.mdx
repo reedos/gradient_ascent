@@ -56,7 +56,7 @@ missing-step errors<Cite n={2}/>.
 
 Level 5 is the first level where two things are both the model's decision: which action to take,
 and when to stop. Your code still runs every tool and returns every result, and enforces caps the
-model cannot override — on steps, on tokens, and on which tools it may attempt at all. Hit a cap
+model cannot override: on steps, on tokens, and on which tools it may attempt at all. Hit a cap
 first and your code forces the final answer; that stop is the program's decision, not the
 model's.
 
@@ -73,7 +73,7 @@ file yet, so nothing below is measured. It is illustrated.
 "Single agent" is rarely a label a product shows you; it is the loop running underneath a more
 specific feature. A coding agent deciding which file to open next, a deep-research mode deciding
 whether to search again, and a computer-use agent deciding where to click are all this same
-loop wearing a different set of tools — see <Link href="/techniques/coding-agents/">coding
+loop wearing a different set of tools: see <Link href="/techniques/coding-agents/">coding
 agents</Link>, <Link href="/techniques/agentic-rag/">agentic RAG</Link> and
 <Link href="/techniques/voice-agents/">voice agents</Link> for the named products in each case.
 <Link href="/techniques/skills/">Skills</Link> are the same loop choosing which instructions to
@@ -93,7 +93,7 @@ likely hitting one of these caps, not failing silently.
 
 Recovery is also worth watching. Anthropic's documentation says that when a tool call is denied,
 "Claude receives a rejection message as the tool result and typically attempts a different
-approach or reports that it couldn't proceed"<Cite n={4}/> — the loop is built to keep going on a
+approach or reports that it couldn't proceed"<Cite n={4}/>: the loop is built to keep going on a
 setback, which is usually good, but it means a wrong turn does not necessarily stop the run on its
 own. Anthropic separately writes that agents' autonomy brings "higher costs, and the potential for
 compounding errors," and recommends testing them in a sandbox with guardrails around what they can
@@ -108,24 +108,24 @@ The example is plan-and-execute: one call with no tools asks the model to write 
 a loop offers two tools, `search` and `lookup_part`, and lets the model act on the plan, revise it,
 and decide when to stop. This is deliberately not the same shape as
 <Link href="/techniques/agentic-rag/">agentic RAG</Link>'s example, which is a single continuous
-loop with no separate planning call — compare the two traces and the two papers behind them.
+loop with no separate planning call: compare the two traces and the two papers behind them.
 ReAct interleaves reasoning traces with task-specific actions<Cite n={1}/>. Plan-and-Solve draws
-its plan up before any action: Wang et al. list three pitfalls in zero-shot chain-of-thought —
-calculation errors, missing-step errors and semantic misunderstanding errors — propose
+its plan up before any action: Wang et al. list three pitfalls in zero-shot chain-of-thought
+(calculation errors, missing-step errors and semantic misunderstanding errors), propose
 Plan-and-Solve against the missing steps, and extend it to PS+ for the calculation
 errors<Cite n={2}/>.
 
 The planning call is the one line in this example that looks like a model decision but is not
 one. It is `kind: "model"` because a model ran, but `decided_by: "code"`: your code always makes
-this call, and always moves on to the execution loop next, whatever the plan actually says — the
+this call, and always moves on to the execution loop next, whatever the plan actually says: the
 same rule the single call in <Link href="/techniques/rag/">RAG</Link>'s example follows. Only once
 the loop starts offering tools does the model's own output pick what happens next: which tool,
 with what arguments, or to stop. Every one of those steps is `decided_by: "model"`, matching
 `examples/agentic_rag/`.
 
 `max_steps` (default 5) and `max_tokens` (default 3000) are the hard caps, checked after every
-tool result. Hitting either forces one last no-tools call for a final answer — `decided_by:
-"code"`, since the model never chose to stop — and the trace records which cap did it, so a
+tool result. Hitting either forces one last no-tools call for a final answer (`decided_by:
+"code"`, since the model never chose to stop), and the trace records which cap did it, so a
 partial answer never looks like a normal one. `tests/test_example_single_agent.py` scripts a model
 that never stops calling tools on its own and checks both caps actually cut the run short.
 
@@ -141,15 +141,15 @@ Run it yourself:
 <WhenNot>
 
 Try <Link href="/techniques/function-calling/">function calling</Link> first if one tool call,
-chosen once, is enough for the task — most single lookups are.
+chosen once, is enough for the task: most single lookups are.
 
-Try a fixed sequence of steps instead — <Link href="/techniques/workflow-graphs/">workflow
-graphs</Link> or a simpler chain — if you can write down in advance which actions the task needs
+Try a fixed sequence of steps instead (<Link href="/techniques/workflow-graphs/">workflow
+graphs</Link> or a simpler chain) if you can write down in advance which actions the task needs
 and in what order. A workflow like that is wrong the same way every time it is wrong, and it costs
 the same every time it runs, which a single agent does not.
 
 Move up to a single agent once the number and order of actions cannot be known before the model
-sees the question — a search that might take one lookup or five, depending on what the first one
+sees the question: a search that might take one lookup or five, depending on what the first one
 turns up.
 
 </WhenNot>
@@ -169,7 +169,7 @@ turns up.
   },
   {
     name: 'Tool misuse',
-    notice: 'The model calls a tool with an argument it invented rather than one it actually retrieved earlier in the trace — a part number it guessed, not one a search or a prior lookup returned.',
+    notice: 'The model calls a tool with an argument it invented rather than one it actually retrieved earlier in the trace: a part number it guessed, not one a search or a prior lookup returned.',
     test: "Trace every tool argument back to where it came from: a prior tool result, or nowhere. An argument that traces to nowhere is a guess, whether or not the tool call itself succeeds.",
   },
   {

@@ -51,7 +51,7 @@ An adapter leaves the original weights alone and trains a small add-on instead: 
 describes freezing the pretrained weights and injecting trainable "rank decomposition matrices"
 into each layer of the Transformer architecture, and reports that "compared to GPT-3 175B
 fine-tuned with Adam, LoRA can reduce the number of trainable parameters by 10,000 times and the
-GPU memory requirement by 3 times"<Cite n={1}/> — two figures measured against that one model
+GPU memory requirement by 3 times"<Cite n={1}/>: two figures measured against that one model
 trained with that one optimizer, not a multiplier to expect from any job. Together AI calls LoRA
 "the default training mode" on its own hosted service<Cite n={2}/>.
 
@@ -91,7 +91,7 @@ endpoint"<Cite n={2}/>. One maker's notice and another's silence on one date is 
 hosted fine-tuning; a service can stop taking new jobs while the models it already trained keep
 answering, and the platform you are actually considering has its own current page.
 
-A product described as "fine-tuned on our data" changed its weights once, in advance — a different
+A product described as "fine-tuned on our data" changed its weights once, in advance: a different
 claim from a product that reads your documents at answer time. Fine-tuning does not teach a model
 today's facts, so a question about something newer than the dataset gets whatever the model does
 when it does not know, not a lookup. That is <Link href="/techniques/rag/">retrieval</Link>'s job.
@@ -99,7 +99,7 @@ when it does not know, not a lookup. That is <Link href="/techniques/rag/">retri
 </Lane>
 <Lane name="build" title="Build it">
 
-Nothing on this site trains a model — no example here calls a fine-tuning API, on this page or on
+Nothing on this site trains a model: no example here calls a fine-tuning API, on this page or on
 <Link href="/techniques/adaptation/">the adaptation page</Link> it hangs from. What
 `examples/adaptation` builds instead is the file a supervised fine-tuning job would actually need:
 a chat-format JSONL split into training and validation questions from the site's own 60-question
@@ -115,7 +115,7 @@ always produces the same partition:
 The default, 20%, exists for the same reason Together AI's own fine-tuning data preparation guide
 gives: its instructions for carving "a validation set out of a single JSONL file" end with "then
 pass both files to the job and set `n_evals` above 0," so that "the model evaluates against the
-validation set at the specified intervals" during training<Cite n={3}/> — a held-out set is only
+validation set at the specified intervals" during training<Cite n={3}/>: a held-out set is only
 useful if something is scored against it while the job runs, not just kept aside.
 
 `run` is the whole pipeline in order: load the questions, split them, write both files, then check
@@ -192,7 +192,7 @@ neither is a failure that happened twice.
   },
   {
     name: 'A reward the grader can game',
-    notice: "A reinforcement-fine-tuned model's score against its own grader climbs while answers read by a person do not improve — the training-time version of the grader-hacking risk the site's evals topic covers for testing.",
+    notice: "A reinforcement-fine-tuned model's score against its own grader climbs while answers read by a person do not improve: the training-time version of the grader-hacking risk the site's evals topic covers for testing.",
     test: "Hand-check a sample of the grader's own verdicts on the training data, the way a rubric grader's verdicts are hand-checked at eval time, rather than trusting the reward curve alone.",
   },
 ]} />
@@ -204,8 +204,8 @@ neither is a failure that happened twice.
 This site's own 60-question set does not score fine-tuning: the example on this page builds and
 checks a training file, and answers no question about the corpus, so the grading contract in
 `evals/questions.json` has nothing to check it against (see `docs/EVALS.md`). What a real
-fine-tuning job would still want measured is the same question set run twice — once on the base
-model, once on the fine-tuned one — so a claim of improvement is a before/after score on the same
+fine-tuning job would still want measured is the same question set run twice (once on the base
+model, once on the fine-tuned one) so a claim of improvement is a before/after score on the same
 60 questions rather than a training-time number alone, the way the <Link
 href="/techniques/evals/">evals</Link> page's own rule requires. Alongside that: the leak check
 this page shows, run against the real split before spending anything on a job, and a handful of
@@ -233,7 +233,7 @@ off-task prompts checked before and after, to catch the forgetting failure mode 
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: "Find a product that advertises a small, fast, task-specific model. Look for whether its own page says LoRA/adapter, full fine-tuning, or doesn't say — and whether that silence changes how much you'd trust a claim that it 'matches' a bigger model." },
+  { lane: 'use', body: "Find a product that advertises a small, fast, task-specific model. Look for whether its own page says LoRA/adapter, full fine-tuning, or doesn't say: and whether that silence changes how much you'd trust a claim that it 'matches' a bigger model." },
   { lane: 'build', body: 'Run python -m examples.adaptation --out .local/scratch/fine-tuning from the repo root, then open val.jsonl and count the lines. Change --val-fraction to 0.1 and run it again; does the count change the way split\'s docstring says it should?' },
   { lane: 'either', body: "Pick two questions from evals/questions.json about the same appliance and decide whether they're close enough that training on one and validating on the other would leak. Run the leak check and see whether your judgment matches leaked_questions's." },
 ]} />

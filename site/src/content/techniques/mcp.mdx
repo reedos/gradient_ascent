@@ -70,7 +70,7 @@ client per server<Cite n={1}/>.
 
 MCP sits at level 4 for the same reason function calling does: a tool a server exposes is still
 one fixed action your code carries out once the model picks it, inside a run your code bounds.
-The line to level 5 falls in the same place too — one choice here, against a loop the model
+The line to level 5 falls in the same place too: one choice here, against a loop the model
 leaves on its own in a <Link href="/techniques/single-agent/">single agent</Link>. What MCP
 changes is not how much the model decides but where the tool definitions and the code that runs
 them live: behind a protocol boundary any compliant host can speak, instead of wired into one
@@ -113,8 +113,8 @@ anything beyond a lookup is not following that guidance.
 </Lane>
 <Lane name="build" title="Build it">
 
-The example makes the same one decision `examples/function_calling` does — which tool, with what
-arguments — through a small stand-in of an MCP client and server instead of a Python function
+The example makes the same one decision `examples/function_calling` does (which tool, with what
+arguments) through a small stand-in of an MCP client and server instead of a Python function
 this file defines inline. It borrows the shape of a few things the specification defines and
 skips almost everything else:
 
@@ -130,15 +130,15 @@ page's `README.md` say plainly is not the real thing.
 
 The stand-in mirrors revision 2026-07-28, and one thing it does not skip is worth naming: there is
 no connection to open and no handshake to perform before the first request, because the current
-specification removed both — see Stateless MCP below.
+specification removed both: see Stateless MCP below.
 
 `run` itself looks almost identical to `examples/function_calling`'s: list what is available, let
 the model pick at most one, run it, ask once more.
 
 <CodeFile file="examples/mcp/run.py" start={125} end={145} expect="through the MCP server's tool" />
 
-The difference is that `mcp_tools` came from `list_tools(transport)` — a round trip through the
-stand-in server — rather than a Python list this file wrote. A real client would send the same
+The difference is that `mcp_tools` came from `list_tools(transport)` (a round trip through the
+stand-in server) rather than a Python list this file wrote. A real client would send the same
 `tools/list` request over stdio or Streamable HTTP and get the same shape of answer back from a
 server it may not have written or even trust. Run it yourself:
 
@@ -150,22 +150,22 @@ server it may not have written or even trust. Run it yourself:
 <WhenNot>
 
 Try <Link href="/techniques/function-calling/">function calling</Link> first if the tools your
-code needs are the ones your own application defines — a protocol adds a client, a server
+code needs are the ones your own application defines: a protocol adds a client, a server
 boundary and a message format to maintain, for no benefit if nothing outside your own codebase
 will ever call those tools a different way.
 
 Move up to MCP once more than one application needs the same tools, or the tools should come from
-someone else's server — a database, a ticketing system, a search index — that you would rather
+someone else's server (a database, a ticketing system, a search index) that you would rather
 connect to than reimplement.
 
 </WhenNot>
 
 ## Stateless MCP
 
-"Stateless" is not shorthand here. The specification's own changelog uses the word directly — one
+"Stateless" is not shorthand here. The specification's own changelog uses the word directly: one
 of its listed major changes for the current revision reads "Make MCP stateless: remove the
 initialize/notifications/initialized handshake. Every request now carries its protocol version
-and client capabilities in _meta"<Cite n={6}/> — so this is the specification's own description,
+and client capabilities in _meta"<Cite n={6}/>: so this is the specification's own description,
 not a blog post's paraphrase of something the spec calls by another name.
 
 Two changes shipped together in the 2026-07-28 revision. That is the current one: the
@@ -180,7 +180,7 @@ sessions are gone with it, under a second entry in the same changelog: the revis
 arguments"<Cite n={6}/>. The
 transport specification says what that took away in practice: servers used to assign a session
 via a header, clients could open a standalone stream to receive messages of their own, and a
-broken stream could resume from where it left off — of all of it, the current revision states
+broken stream could resume from where it left off: of all of it, the current revision states
 plainly, "None of these mechanisms are part of this revision"<Cite n={5}/>. A current server that
 receives an `Mcp-Session-Id` header from an older client is told to "ignore it, and do not mint or
 echo session IDs"<Cite n={5}/>.
@@ -195,12 +195,12 @@ platform that may run a different instance for every single request has nowhere 
 at all; a protocol that asks nothing to be remembered between requests has nothing to lose when
 the backend that handled the last one is gone. The companion proposal, SEP-2567, describes what
 replaces a session for a server that genuinely needs state across calls: "Stateful workflows use
-`create_*() -> handle` + threaded parameters (guidance, not a protocol construct)"<Cite n={8}/> —
+`create_*() -> handle` + threaded parameters (guidance, not a protocol construct)"<Cite n={8}/>:
 an ordinary tool call hands back an identifier, and later calls pass it back as one of their own
 arguments, the same as any other piece of data the tool takes, rather than something the
 transport carries for you.
 
-Both proposals are merged — SEP-2575 on May 11, 2026, SEP-2567 on May 7, 2026 — and both changes are
+Both proposals are merged (SEP-2575 on May 11, 2026, SEP-2567 on May 7, 2026) and both changes are
 in the 2026-07-28 revision: released, not proposed. What is still open is narrower. The
 specification's own roadmap, updated
 August 22, 2026, lists "capability scoping for tool lists after SEP-2575" among what its maintainers
@@ -212,18 +212,18 @@ express, not a reconsideration of removing sessions in the first place.
 <FailureModes modes={[
   {
     name: "A tool's own description steers the model somewhere it shouldn't go",
-    notice: "A connected server's tool description reads like an instruction rather than documentation -- 'always call this first' or 'ignore prior instructions and' -- and the model follows it, because the specification lets a description do exactly what it says: steer which tool the model picks.",
+    notice: "A connected server's tool description reads like an instruction rather than documentation ('always call this first' or 'ignore prior instructions and') and the model follows it, because the specification lets a description do exactly what it says: steer which tool the model picks.",
     test: "Before connecting a new server, read every tool's name and description as if it were untrusted text, the way the specification itself says to treat tool annotations from a server you have not verified.",
   },
   {
     name: 'A tool with a side effect runs with no visible confirmation',
-    notice: "The model calls a tool that changes something -- files a ticket, sends a message -- and the host shows nothing before or after, so there is no point at which a person could have said no.",
+    notice: "The model calls a tool that changes something (files a ticket, sends a message) and the host shows nothing before or after, so there is no point at which a person could have said no.",
     test: "Check whether the host shows the tool name and its arguments before the call runs, the way the specification asks clients to; a chat bubble with only the final answer is not that.",
   },
   {
     name: 'The tool list changes and the code still has the old one',
     notice: "A server adds, removes or changes a tool, and a client that cached the list from tools/list keeps offering the model a tool that no longer exists, or the old shape of one that does.",
-    test: "This example cannot show the failure: it calls list_tools on every run and caches nothing. Check a real client instead. Does it list once at startup or per request, does it honour the freshness hint the specification puts on a tool list, and does it subscribe to the list-changed notification the specification defines?",
+    test: "This example cannot show the failure: it calls list_tools on every run and caches nothing. Check a real client instead. Does it list once at startup or per request, does it honor the freshness hint the specification puts on a tool list, and does it subscribe to the list-changed notification the specification defines?",
   },
   {
     name: 'An unexpected method or a hallucinated tool name is treated as a crash instead of an answer',
@@ -254,7 +254,7 @@ express, not a reconsideration of removing sessions in the first place.
 
 The example answers the same kind of question `function_calling` does, with the same citations,
 so it is scored against the site's own 60-question set the same way (see `docs/EVALS.md`): exact
-or rubric match, plus citation hit rate. Level 4 adds the same check function calling describes —
+or rubric match, plus citation hit rate. Level 4 adds the same check function calling describes:
 `model_decided_steps` should equal the number of questions run, exactly one per question.
 
 The number specific to this technique, beyond accuracy, is how much the protocol layer itself
@@ -272,7 +272,7 @@ No result file exists for MCP yet. Run `python scripts/eval_run.py --example mcp
 ## Run it
 
 <RunIt
-  monitor="Which servers and tools are actually being called versus merely listed, and how often the model declines every offered tool. A tool nobody ever calls is either miscategorized or badly described -- the same failure routing's dead fallback route is, one level up."
+  monitor="Which servers and tools are actually being called versus merely listed, and how often the model declines every offered tool. A tool nobody ever calls is either miscategorized or badly described: the same failure routing's dead fallback route is, one level up."
   costAtVolume="Every question pays for at least the tools/list round trip and one model call; a second model call only happens when a tool actually ran. Over a real transport, each round trip also pays network latency an in-process call does not, so cost tracks server count and network distance, not just question count."
   failsInProduction="A server's tool descriptions change and the host is still working from a cached list, so the model is offered a tool that no longer behaves the way its old description said. A server outside your control changes what a tool's description tells the model to do, and nothing downstream re-checks it."
   whatToLog="Which server and tool were listed and called, the raw request and result at the protocol boundary, and whether the call succeeded or came back as a protocol or tool-execution error, so a wrong answer traces back to a bad tool choice, a bad argument, or the server itself."
@@ -282,7 +282,7 @@ No result file exists for MCP yet. Run `python scripts/eval_run.py --example mcp
 
 <TryIt items={[
   { lane: 'use', body: 'Find a product that lets you connect an MCP server or similar connector. Before adding one, read every tool it would expose and ask whether you would trust a stranger to write instructions your assistant follows automatically.' },
-  { lane: 'build', body: 'Run python -m examples.mcp --model stub with a question about a part number. Then, in a Python shell in the repo root, build the transport yourself and call call_tool(transport, "search_docs", {"query": "pump"}) -- a tool name the server never registered. You get back ("unknown tool: search_docs", True): a protocol error the caller can read, not an exception. Which layer decided that, and what would a real host do with it?' },
+  { lane: 'build', body: 'Run python -m examples.mcp --model stub with a question about a part number. Then, in a Python shell in the repo root, build the transport yourself and call call_tool(transport, "search_docs", {"query": "pump"}): a tool name the server never registered. You get back ("unknown tool: search_docs", True): a protocol error the caller can read, not an exception. Which layer decided that, and what would a real host do with it?' },
   { lane: 'either', body: 'Compare this page’s run to function calling’s side by side. Which steps are identical, and which ones exist only because a protocol boundary sits between the model’s choice and the code that carries it out?' },
 ]} />
 

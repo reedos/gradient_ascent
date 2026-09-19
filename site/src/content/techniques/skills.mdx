@@ -39,11 +39,11 @@ every turn. Anthropic's own documentation draws that line directly against a sys
 don't have to repeat the same guidance across conversations"<Cite n={1}/>. The mechanism is
 progressive disclosure, which Anthropic documents in three stages: a skill's name and description
 load at startup and stay in context; the body of its `SKILL.md`, the actual instructions, loads
-only when the skill is triggered; anything else it bundles — further reference files, scripts —
+only when the skill is triggered; anything else it bundles (further reference files, scripts)
 costs nothing until it is read or run<Cite n={1}/>.
 
-A skill differs from <Link href="/techniques/rag/">RAG</Link> in what gets fetched — RAG retrieves
-facts, a skill supplies a procedure — and from <Link href="/techniques/adaptation/">fine-tuning</Link>
+A skill differs from <Link href="/techniques/rag/">RAG</Link> in what gets fetched (RAG retrieves
+facts, a skill supplies a procedure) and from <Link href="/techniques/adaptation/">fine-tuning</Link>
 in where the knowledge lives: fine-tuning bakes a behavior into the weights, while a skill loads
 per request and can be edited or removed in seconds.
 
@@ -66,20 +66,20 @@ closest thing to an open convention across coding agents for standing instructio
 "the extra, sometimes detailed context coding agents need: build steps, tests, and
 conventions"<Cite n={3}/>. Anthropic's documentation puts token costs on each stage: about 100
 tokens per skill for the always-on name and description, under 5,000 for a body that loads only
-once a skill is triggered, and nothing at all for bundled files until they are read<Cite n={1}/> —
+once a skill is triggered, and nothing at all for bundled files until they are read<Cite n={1}/>:
 the published figures, not a measurement this site has made.
 
 The security point is not incidental. A skill is instructions written by someone else, and
 Anthropic's own warning is direct: "a malicious Skill can direct Claude to invoke tools or execute
 code in ways that don't match the Skill's stated purpose," with risks the documentation names as
 "data exfiltration" and "unauthorized system access"<Cite n={1}/>. Its guidance is to use skills
-only from sources you trust, and to audit one thoroughly — every bundled file, not just the
-description — before running it against anything that matters.
+only from sources you trust, and to audit one thoroughly (every bundled file, not just the
+description) before running it against anything that matters.
 
 Treat a skill like code you didn't write, because in every way that matters it is one. Claude
 Code's own documentation makes this concrete for one specific risk: `allowed-tools` in a skill's
 frontmatter pre-approves the tools it lists for the turn that invokes the skill, and Anthropic
-notes that workspace trust does not gate that field — "A skill can grant itself broad tool access,
+notes that workspace trust does not gate that field: "A skill can grant itself broad tool access,
 so review the `allowed-tools` of skills checked into a repository before you run Claude Code
 there"<Cite n={2}/>. That is the same review you would give any other change before it merges, not
 a one-time check when a skill is first added.
@@ -88,7 +88,7 @@ a one-time check when a skill is first added.
 <Lane name="build" title="Build it">
 
 The example holds three skills in a small registry, each a `Skill(name, description, body)`. Every
-description is folded into the system prompt up front — cheap, and always available for the model
+description is folded into the system prompt up front: cheap, and always available for the model
 to match against. No body is. The model reads the question, decides whether one of the three
 descriptions actually fits, and if so calls `load_skill` with its name; your code looks it up and
 appends the body as a new message, and only then has the model actually seen the instructions it
@@ -113,12 +113,12 @@ Run it yourself:
 
 <WhenNot>
 
-Try a plain system prompt — <Link href="/techniques/prompt-engineering/">prompt engineering</Link>
-— first if there is only one procedure the agent ever needs; paying to keep even a short
+Try a plain system prompt (<Link href="/techniques/prompt-engineering/">prompt engineering</Link>)
+first if there is only one procedure the agent ever needs; paying to keep even a short
 description of it in context buys nothing a fixed instruction does not already give you for free.
 
 Try <Link href="/techniques/routing/">routing</Link> instead if you can tell, from the question
-alone and in code, which instructions apply — a classifier that always attaches the same fixed
+alone and in code, which instructions apply: a classifier that always attaches the same fixed
 text for the same category is cheaper and more predictable than asking the model to choose.
 
 Move up to skills once there are several distinct procedures, the right one depends on judgment a
@@ -177,8 +177,8 @@ more context than it is worth.
 
 <HowToEval>
 
-`skills` does not do the site's own question-answering task — there is no document, no question
-about it, and no citation to grade — so it is not part of the shared 60-question set, the same way
+`skills` does not do the site's own question-answering task (there is no document, no question
+about it, and no citation to grade), so it is not part of the shared 60-question set, the same way
 `embeddings_search` and `memory` are not (see `docs/EVALS.md`). What would actually be measured is
 specific to this task: given a labeled set of questions and the skill each one should trigger,
 selection accuracy (did it load the right one, none when none applies, and not an extra one it
@@ -192,7 +192,7 @@ runner for the measures above exists yet.
 
 <RunIt
   monitor="Skill selection accuracy against a labeled set of tasks, how often a loaded skill's instructions show up in the final answer, and how often the model loads a skill and then ignores it."
-  costAtVolume="Cost scales with how many requests actually trigger a skill load, not with how many skills exist in the registry — a large registry with rare triggers costs close to nothing per request until one is chosen."
+  costAtVolume="Cost scales with how many requests actually trigger a skill load, not with how many skills exist in the registry: a large registry with rare triggers costs close to nothing per request until one is chosen."
   failsInProduction="A skill checked into the project changes without review, and the next session that triggers it inherits whatever it now says or whatever tool access it now grants, with no signal that anything changed."
   whatToLog="The full list of descriptions offered, which skill (if any) was chosen, its complete body at the time it was loaded, and which cap (if any) forced the final answer."
 />

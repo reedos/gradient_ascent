@@ -34,20 +34,20 @@ Write and check runs two prompts against each other: one writes, a separate one 
 against explicit criteria, and if it fails, the first revises and the check runs again. Anthropic
 describes it as "one LLM call generates a response while another provides evaluation and feedback
 in a loop," worth its cost "when we have clear evaluation criteria, and... iterative refinement
-provides measurable value" — its examples are literary translation and a search task that takes
+provides measurable value": its examples are literary translation and a search task that takes
 several rounds to get right<Cite n={1}/>.
 
 "Clear evaluation criteria" is the load-bearing phrase. A checker asked whether an answer is
 "good" is a second draft with extra steps: with no fixed thing to test for, its verdict drifts
-between calls the way the first draft's wording would. A checker asked one checkable question —
-does every citation the draft makes appear in the sources it was given — answers the same way on
+between calls the way the first draft's wording would. A checker asked one checkable question
+(does every citation the draft makes appear in the sources it was given) answers the same way on
 the same input every time, which is what makes looping on it worth doing.
 
 A model's output does change what happens next here: the checker says pass or fail and the code
 branches on it. It is still level 3 because the code owns the loop. The `while` condition and the
 cap are written before either prompt runs, so the verdict is data the code reads, the same as a
-classifier's label one page earlier. Hand the model the loop — let it judge whether another
-revision is worth the cost — and the stop becomes a model decision, which is level 5.
+classifier's label one page earlier. Hand the model the loop (let it judge whether another
+revision is worth the cost) and the stop becomes a model decision, which is level 5.
 
 This page is marked draft, not published: this technique has no recorded trace and no scored
 result file yet, so nothing below is measured. It is illustrated.
@@ -60,7 +60,7 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lane name="use" title="Use it">
 
 No product in this site's registry is documented well enough yet to name here as a plain example
-of a person using this pattern from the outside — most of what looks like "the model checked its
+of a person using this pattern from the outside: most of what looks like "the model checked its
 own work" in a chat app is either a single model reasoning at length before answering (a level-1
 technique) or an agent that runs a real test and decides what to do about a failure itself (level
 4 or 5), not a fixed, code-owned draft-check-revise loop with an outside cap. If you have used a
@@ -70,7 +70,7 @@ product's own documentation describes it, not assumed to be this pattern.
 
 What is worth watching for, in any product that claims to check its own output: whether the
 checking step is told a specific, testable thing to look for, or just asked whether the draft is
-good. The second version is common and mostly cosmetic — it adds a pause and a second cost, not a
+good. The second version is common and mostly cosmetic: it adds a pause and a second cost, not a
 real check, because "is this good" is not something a second pass of the same kind of model can
 answer any more reliably than the first pass could.
 
@@ -86,13 +86,13 @@ anything softer than a string match to know which case it got.
 The loop's shape is a `while` with two conditions the code owns completely: keep going while the
 last check failed *and* the cap has not been reached. `max_revisions` (default 2) is a plain
 function argument, not something the model can see or influence. When the cap is hit before a
-pass, the code records that explicitly and still returns the last draft — shipping an answer that
+pass, the code records that explicitly and still returns the last draft: shipping an answer that
 is known to still fail its own check is a real, visible outcome here, not a bug hidden by the
 loop quietly running forever.
 
 The trace above shows why the checker needs a *narrow* criterion. It catches the draft citing
 `dw300-manual#6`, a real section of the real corpus, that simply was not one of the four sources
-this particular retrieval handed to the draft step — a citation the checker can verify
+this particular retrieval handed to the draft step: a citation the checker can verify
 mechanically, with no judgment call. What it would not catch: every one of those four retrieved
 sources being wrong for the question, or the drafter and the checker sharing a blind spot,
 because they are typically driven by the same kind of model and can fail on the same kind of
@@ -105,7 +105,7 @@ Run it yourself:
 
 <CodeFile file="examples/evaluator_optimizer/README.md" start={16} end={16} lang="text" expect="python -m examples.evaluator_optimizer" />
 
-The same shape — a metric-driven loop instead of a vibe-driven one — is what DSPy's optimizers do
+The same shape (a metric-driven loop instead of a vibe-driven one) is what DSPy's optimizers do
 to a prompt itself, at build time rather than at answer time: "all optimizers read a numeric
 score per example," and each one "tunes one or more of: instructions, demos, or weights"<Cite
 n={2}/> to raise that score. DSPy loops over many training examples to improve the *prompt*
@@ -121,7 +121,7 @@ of the check agree.
 Try a single call, or a fixed, code-only check like the one <Link
 href="/techniques/prompt-chaining/">prompt chaining</Link>'s example uses (comparing citations by
 set intersection, no second model call), first if the thing you would check for is something
-plain code can already test — that is cheaper, always consistent, and does not need a second
+plain code can already test: that is cheaper, always consistent, and does not need a second
 prompt at all.
 
 Move up to write and check once the failure you are trying to catch needs judgment against a
@@ -184,7 +184,7 @@ alone.
 
 No result file exists yet (see `docs/EVALS.md`), so this page cannot say what that rate actually
 is here. Run `python scripts/eval_run.py --example evaluator_optimizer --model <spec> --dry` to
-project the cost of a real run first — the projection matters more for this technique than most,
+project the cost of a real run first: the projection matters more for this technique than most,
 since its real cost depends on how often questions need a revision, not just how many questions
 there are.
 
@@ -196,7 +196,7 @@ there are.
   monitor="The cap-hit rate over time (the share of runs that exhaust max_revisions still failing) and the average revisions per run. A cap-hit rate that rises with no change to the checker's prompt is a sign the questions arriving have shifted, not that the checker got stricter."
   costAtVolume="Cost per question is variable here, unlike a fixed-step workflow: it depends on how often the checker fails the first draft. Budget for the worst case (every question uses the full cap), not the average, or a bad week of drafts becomes a bad week of the bill too."
   failsInProduction="The writer and the checker share a blind spot neither prompt was built to catch, so confidently wrong answers pass their own check at the normal rate, with no signal in the trace that anything is different from a correctly-checked answer."
-  whatToLog="Every draft, every check verdict verbatim, and every revision, in order, for each question — not just the final answer. A checker that starts passing bad drafts is invisible in aggregate metrics until you can see its actual verdicts change."
+  whatToLog="Every draft, every check verdict verbatim, and every revision, in order, for each question: not just the final answer. A checker that starts passing bad drafts is invisible in aggregate metrics until you can see its actual verdicts change."
 />
 
 ## Try it

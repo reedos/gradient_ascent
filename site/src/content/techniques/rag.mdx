@@ -35,7 +35,7 @@ import Link from '../../components/page/Link.astro';
 import ragRun from '../../data/runs/rag.json';
 
 Retrieval-augmented generation, or RAG, answers a question by searching your own documents
-first. The documents are cut up in advance into chunks — passages of a few hundred words each —
+first. The documents are cut up in advance into chunks (passages of a few hundred words each)
 and every chunk is turned into an embedding, a list of numbers standing in for its meaning. That
 set of embeddings is the index. Your code embeds the question the same way, compares it against
 the index, keeps the closest few chunks, puts them in the prompt, and the model answers once,
@@ -81,8 +81,8 @@ Check the citations when the product shows them. A citation that does not obviou
 sentence next to it is a sign the search missed something and the model filled the gap on its
 own.
 
-RAG cannot join facts that live in different documents into one answer — a table in one file
-and a rule in another — because it only ever searches once. It cannot run a second,
+RAG cannot join facts that live in different documents into one answer (a table in one file
+and a rule in another) because it only ever searches once. It cannot run a second,
 better-targeted search after seeing what the first one turned up; that is what
 <Link href="/techniques/agentic-rag/">agentic RAG</Link> and the deep research modes built on it
 do instead. And it will not reliably tell you when it found nothing useful. A search that comes
@@ -110,7 +110,7 @@ tests, and a real embedding model behind the same interface, so the retrieval lo
 know which one is running.
 
 Retrieval scores every chunk's embedding against the question's embedding by cosine similarity
-— how closely the two vectors point in the same direction — and keeps the top `k`, four by
+(how closely the two vectors point in the same direction) and keeps the top `k`, four by
 default. `_cosine` below returns a plain dot product rather than a full cosine, because both
 embedders return unit vectors, for which the two are the same number. This is the one place a
 real system usually adds more: a second, more expensive reranking pass over a larger first cut
@@ -171,12 +171,12 @@ those to still make sense.
   },
   {
     name: 'Stale index',
-    notice: 'The answer is correct for an old version of a document but wrong for the current one — a warranty length that changed, a part number that was superseded.',
+    notice: 'The answer is correct for an old version of a document but wrong for the current one: a warranty length that changed, a part number that was superseded.',
     test: 'Change a fact in the corpus without re-embedding. The retriever keeps returning the old text, because it was indexed at embed time, not at read time.',
   },
   {
     name: 'Conflicting sources',
-    notice: "Two documents disagree — an installation guide states one clearance, a later service bulletin corrects it — and the answer picks one without saying there's a conflict.",
+    notice: "Two documents disagree (an installation guide states one clearance, a later service bulletin corrects it) and the answer picks one without saying there's a conflict.",
     test: "Ask a question the corpus answers two different ways on purpose, and check whether the answer names both values and says which one is authoritative.",
   },
   {

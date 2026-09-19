@@ -40,7 +40,7 @@ import embeddingsSearchRun from '../../data/runs/embeddings-search.json';
 An embedding is a list of floating-point numbers standing in for a piece of text. OpenAI's
 documentation states what makes that useful: the distance between two embeddings measures how
 related the texts are, small distances meaning high relatedness, and it recommends cosine
-similarity — how closely two vectors point the same way — for the comparison<Cite n={1}/>.
+similarity (how closely two vectors point the same way) for the comparison<Cite n={1}/>.
 
 Search built on this has three fixed parts: documents are cut into chunks small enough to
 retrieve on their own; every chunk is embedded once into a vector index, a database such as
@@ -68,14 +68,14 @@ You rarely meet this labeled "embeddings" or "vector search." It shows up inside
 as "search your files," "related items," or a chat app answering a question about a document you
 uploaded. Sometimes a maker documents it plainly: Microsoft says Microsoft 365 Copilot builds a
 vectorized semantic index of an organization's files, in which material with similar meaning
-sits close together, so a search can return more than exact matches — and that it runs alongside
+sits close together, so a search can return more than exact matches, and that it runs alongside
 the ordinary keyword index rather than replacing it<Cite n={4}/>. More often nothing says so; the
 rest of the named examples are on the <Link href="/techniques/rag/">RAG page</Link>, since
 embeddings and search is usually the mechanism under a product rather than the product.
 
 There is a simple test for whether a search box is running on keywords alone or also on meaning:
-search for something using a word that is not literally in the document you are looking for — a
-synonym, a description, a rephrasing — and see whether it still finds it. A pure keyword search
+search for something using a word that is not literally in the document you are looking for (a
+synonym, a description, a rephrasing) and see whether it still finds it. A pure keyword search
 comes back empty or wrong when the words do not match. A search backed by embeddings, or a hybrid
 of the two, has a chance of finding the right result anyway, because it is comparing meaning, not
 spelling.
@@ -84,7 +84,7 @@ Some search tools expose the choice directly, as a toggle between "keyword" and 
 "semantic" search. When one of them gives you a wrong or missing result, try the other mode
 before concluding the tool cannot find the answer, and try it in both directions: matching on
 meaning is what finds a passage worded differently than your question, and matching on literal
-words is what reliably finds an exact string — a part number, an order id, a serial number — that
+words is what reliably finds an exact string (a part number, an order id, a serial number) that
 a vector comparison has no special reason to rank first. Running both and merging them is the
 hybrid arrangement pgvector documents<Cite n={3}/>.
 
@@ -94,14 +94,14 @@ hybrid arrangement pgvector documents<Cite n={3}/>.
 The example below indexes the same synthetic corpus RAG uses, then answers one query two ways
 instead of one: by embedding every chunk and ranking them by cosine similarity to the query, and
 separately by BM25 keyword score over the same chunks. It reports where the two result sets agree
-and where they diverge, instead of answering the question — this level searches, it does not
+and where they diverge, instead of answering the question: this level searches, it does not
 answer.
 
 What the example embeds with is not an embedding model, and nothing it returns is evidence about
 one. `StubEmbedder` (`examples/common/model.py`) hashes words into 64 buckets and counts them: a
 bag of words with no notion that "quiet" and "dBA" are related unless the words themselves
-overlap. Run it on a query that shares real words with the corpus — "DW-300 Normal cycle water
-use" — and its top hit matches keyword search's top hit exactly, which tells you the pipeline
+overlap. Run it on a query that shares real words with the corpus ("DW-300 Normal cycle water
+use") and its top hit matches keyword search's top hit exactly, which tells you the pipeline
 works and nothing about semantics. Run it on "Which dishwasher is quieter, the DW-300 or the
 DW-480?" and neither method finds `specs-comparison#2`, the section that actually gives both
 decibel ratings, because the word "quieter" never appears in the corpus at all. A trained model is
@@ -115,7 +115,7 @@ vectors' lengths instead of taking a bare dot product, so the ranking is a true 
 `Embedder` is plugged in and not only for one that happens to return unit vectors. Every step is
 `decided_by: "code"`: what gets embedded, how many results come back, and how the two result sets
 get compared are fixed before anything runs. The example implements neither of the two optional
-parts above — no hybrid fusion of the two lists it prints, and no reranking.
+parts above: no hybrid fusion of the two lists it prints, and no reranking.
 
 Run it yourself:
 
@@ -127,12 +127,12 @@ Run it yourself:
 <WhenNot>
 
 Try <Link href="/techniques/order-zero/">level 0, no model at all</Link>, plain keyword search, first if your
-questions reliably use the same words as the documents — a part number, an exact phrase, a
+questions reliably use the same words as the documents: a part number, an exact phrase, a
 serial number. It is simpler, needs no index to keep in sync, and often wins outright on exact
 identifiers.
 
-Move to embeddings and search once questions are worded differently than the source text — a
-synonym, a paraphrase, a description instead of the term the document uses — which is exactly
+Move to embeddings and search once questions are worded differently than the source text (a
+synonym, a paraphrase, a description instead of the term the document uses) which is exactly
 where keyword matching stops working.
 
 </WhenNot>

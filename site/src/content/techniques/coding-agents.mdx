@@ -70,7 +70,7 @@ Desktop, Replit Agent, Cline, Aider and Zed are all coding agents in this sense,
 take on permissions and sandboxing.
 
 Briefing one well means writing down, once, what a person would otherwise repeat every session:
-build commands, test commands, and conventions. AGENTS.md exists for exactly this — "a README for
+build commands, test commands, and conventions. AGENTS.md exists for exactly this: "a README for
 agents": a place for "the extra, sometimes detailed context coding agents need: build steps,
 tests, and conventions that might clutter a README or aren't relevant to human
 contributors"<Cite n={1}/>. A vague brief gets a vague plan; a brief that names the test command
@@ -110,14 +110,14 @@ The deciding is `check_source`, and it is the part worth copying. An earlier ver
 example ran the proposed source through `exec` with an empty `__builtins__` and called that a
 sandbox. It is not one: an empty builtins dict does nothing about attribute access, and attribute
 access alone reaches every loaded class and, through any of their `__globals__`, a real
-`__builtins__` — an escape that uses no builtin name, so no list of forbidden names would catch
+`__builtins__`: an escape that uses no builtin name, so no list of forbidden names would catch
 it. A review of this repository wrote that escape and it worked. What replaced it is a whitelist
 of the AST node types the task actually needs, the same discipline
 <Link href="/techniques/code-execution/">code execution</Link>'s arithmetic evaluator uses:
 anything outside the list is refused by construction rather than by spelling.
 
 Even that is a check inside the same interpreter, which is not what a real coding agent needs. A
-real one restricts a whole filesystem and process — OpenAI documents Codex using "an OS-enforced
+real one restricts a whole filesystem and process: OpenAI documents Codex using "an OS-enforced
 sandbox that limits what it can touch (typically to the current workspace), plus an approval
 policy that controls when it must stop and ask you before acting"<Cite n={4}/>. What carries over
 from this example is the shape, not the boundary: the model never runs its own code directly,
@@ -147,8 +147,8 @@ Run it yourself:
 
 <WhenNot>
 
-Try a fixed <Link href="/techniques/workflow-graphs/">workflow</Link> — lint, autoformat, or a
-single scripted patch — first if the fix is already known and the same every time; a workflow like
+Try a fixed <Link href="/techniques/workflow-graphs/">workflow</Link> (lint, autoformat, or a
+single scripted patch) first if the fix is already known and the same every time; a workflow like
 that is cheaper and never proposes something unexpected.
 
 Try <Link href="/techniques/function-calling/">function calling</Link> instead if one tool call
@@ -156,7 +156,7 @@ settles it, such as running a single existing test suite once and reporting the 
 editing involved.
 
 Move up to a coding agent once the number and shape of edits needed cannot be known before the
-model reads the failing test — when fixing it might take one change or several, depending on what
+model reads the failing test: when fixing it might take one change or several, depending on what
 the first attempt reveals.
 
 </WhenNot>
@@ -211,8 +211,8 @@ the first attempt reveals.
 
 <HowToEval>
 
-`coding_agents` does not do the site's own question-answering task — there is no document, no
-question and no citation to grade — so it is not part of the shared 60-question set, the same way
+`coding_agents` does not do the site's own question-answering task (there is no document, no
+question and no citation to grade), so it is not part of the shared 60-question set, the same way
 `embeddings_search` and `memory` are not (see `docs/EVALS.md`). What would actually be measured is
 specific to this task: the share of attempts that reach a passing state at all, the number of
 attempts it takes, whether a fix that passes its own test also passes every other test in the

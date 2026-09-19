@@ -62,7 +62,7 @@ here reports a measured number. It describes the mechanisms and the checks.
 <Lane name="use" title="Use it">
 
 Before pasting anything sensitive into a chat app, check what that product's own page says about
-retention and training — and check that the page covers the plan you are actually on. Anthropic's
+retention and training, and check that the page covers the plan you are actually on. Anthropic's
 Privacy Center article for Claude Free, Pro and Max says that if you allow your chats to improve
 Claude, "we may retain your data in a de-identified format for up to 5 years in our model
 training pipelines," and that a conversation you delete is "deleted from our back-end storage
@@ -74,13 +74,13 @@ train or improve OpenAI models" unless you explicitly opt in, with abuse-monitor
 the other product, or to a plan its own page does not name.
 
 Prompt injection is worth understanding even if you never write code. If you use a tool that
-reads a web page, a file, or an email on your behalf and then acts on it — books something,
-sends something, changes something — ask what stops it from following an instruction hidden in
+reads a web page, a file, or an email on your behalf and then acts on it (books something,
+sends something, changes something), ask what stops it from following an instruction hidden in
 that content instead of yours. A page designed to be read by an assistant, not a person, can say
 anything; nothing about being "just a web page" stops it from containing a line that looks like a
 command. The honest answer from a well-built tool is that a person approves anything irreversible
-before it happens — OWASP's own guidance for builders is to "implement human-in-the-loop controls
-for privileged operations to prevent unauthorized actions"<Cite n={1}/> — and if a tool can't tell
+before it happens: OWASP's own guidance for builders is to "implement human-in-the-loop controls
+for privileged operations to prevent unauthorized actions"<Cite n={1}/>, and if a tool can't tell
 you what its approval step actually checks, that is worth treating as a real gap, not a detail.
 
 </Lane>
@@ -105,14 +105,14 @@ extensible functionality, and handle these functions in code rather than providi
 model"<Cite n={1}/>. Here that check permits a refund only when three things hold, none of them
 decided by the model: the customer's own message asks for a refund, that message names the same
 amount of money the call asks for, and the destination is the order this conversation was already
-about — an id the calling code passes in.
+about: an id the calling code passes in.
 
 Each of the three is doing separate work. `_MONEY` matches a figure written as money (`$40`,
 `40 dollars`), so amounts are compared as numbers rather than as substrings: a bare number the
 customer never wrote as a price, such as the order number in "order 4821," authorizes nothing,
 and a customer who writes "$40" still gets the refund when the model asks for `40.0`. The refund
-words stop a figure the customer merely mentioned — "I was charged $80.00 twice, can you explain
-why?" — from being turned into an authorization by a note asking for exactly that amount. The
+words stop a figure the customer merely mentioned ("I was charged $80.00 twice, can you explain
+why?") from being turned into an authorization by a note asking for exactly that amount. The
 order id is the strongest of the three, because it is the only one that is not a reading of
 English: `order_id` arrives as a tool argument the model wrote, and a call naming any other order
 is refused and logged rather than quietly redirected.
@@ -137,12 +137,12 @@ What the check does not do is worth as much as what it does, and the same test f
 attacks still work, both written down there rather than left for someone who copies this to find
 later. Matching refund words is a test of wording, not of meaning: "I do not want a refund of
 $40" reads to it exactly like a request for one. And an amount the customer authorized for one
-reason authorizes it for any reason — the check knows how much and where, never what for. Both
+reason authorizes it for any reason: the check knows how much and where, never what for. Both
 are bounded by the third condition: the money can only reach this customer's own order, so the
 worst either can produce is a wrong refund to the right person. A system where that is already
 too expensive wants <Link href="/techniques/human-in-the-loop/">human approval</Link> in front of
 the action, not a longer regular expression. The 60-question set does not score this example —
-it refuses rather than answers — so `docs/EVALS.md` names what to measure instead: the share of
+it refuses rather than answers, so `docs/EVALS.md` names what to measure instead: the share of
 injected requests refused against the share of legitimate ones permitted.
 
 Keeping the check outside the model is what the guardrail frameworks in this page's sources do
@@ -164,7 +164,7 @@ can be misdirected by what it was shown, at every level. What changes with the s
 control is worth building today, not whether to think about this at all.
 
 Skip a permission check, a delimiter and an audit log for a single-user tool that only reads and
-only answers you, with no retrieved content, no tool calls and nothing it can act on — direct
+only answers you, with no retrieved content, no tool calls and nothing it can act on: direct
 prompt injection is the whole risk there, and the worst it can do is give you a bad answer to
 your own question. Build them in as soon as any one of those stops being true: another person's
 content reaches the model, or the model can call a tool that does something.
@@ -182,7 +182,7 @@ not a reason to leave them out.
 <FailureModes modes={[
   {
     name: 'A wording match approves the wrong thing',
-    notice: "A check that matches refund words or amounts as text passes an attack phrased to avoid the exact words it looks for — a sentence that mentions a figure while declining it reads to a substring check exactly like a request for one.",
+    notice: "A check that matches refund words or amounts as text passes an attack phrased to avoid the exact words it looks for: a sentence that mentions a figure while declining it reads to a substring check exactly like a request for one.",
     test: "Feed the check a sentence that contains the trigger words but means the opposite, the way this page's own example's test file does, and confirm it is not treated as authorization.",
   },
   {
@@ -202,7 +202,7 @@ not a reason to leave them out.
   },
   {
     name: 'The refusal is not logged',
-    notice: "A permission check quietly refuses a call and nothing records that it happened, so a rising rate of blocked attempts — the actual signal of an attack — is invisible until someone thinks to ask.",
+    notice: "A permission check quietly refuses a call and nothing records that it happened, so a rising rate of blocked attempts (the actual signal of an attack) is invisible until someone thinks to ask.",
     test: "Trigger a refusal on purpose and check whether it produced a log entry with enough detail to reconstruct what was attempted, not just that something failed.",
   },
 ]} />
@@ -210,7 +210,7 @@ not a reason to leave them out.
 ## At each level
 
 - <Link href="/levels/0/">No model</Link>: there is no model to redirect, so the risks here are
-  ordinary software security — input validation, access control — the same ground
+  ordinary software security (input validation, access control), the same ground
   <Link href="/techniques/order-zero/">level 0</Link>'s own page already covers, not this topic's
   own concerns.
 - <Link href="/levels/1/">One call</Link>: the user's own message is the only input in play, the
@@ -223,13 +223,13 @@ not a reason to leave them out.
   way it reads the user's message, with nothing marking one as more trustworthy than the other
   unless the code does.
 - <Link href="/levels/3/">Workflows</Link>: a fixed pipeline gives a defender fixed places to put
-  a check between steps — the gate in <Link href="/techniques/prompt-chaining/">prompt
-  chaining</Link>'s own example is exactly that — but a compromised step's output still moves on
+  a check between steps (the gate in <Link href="/techniques/prompt-chaining/">prompt
+  chaining</Link>'s own example is exactly that), but a compromised step's output still moves on
   to the next step by default unless something explicitly stops it there.
 - <Link href="/levels/4/">Tools</Link>: a tool call can act on the world, not just produce a
   sentence, so the same injected instruction that used to produce a wrong answer can now attempt
   a real action, the risk <Link href="/techniques/function-calling/">function calling</Link>'s
-  own failure modes name directly — this is where a permission check like this page's example
+  own failure modes name directly: this is where a permission check like this page's example
   earns its place.
 - <Link href="/levels/5/">Agents</Link>: the model chooses its own next step across many turns
   with nobody reading each one, so a single injected instruction early in
@@ -237,12 +237,12 @@ not a reason to leave them out.
   actions before a person sees any of them.
 - <Link href="/levels/6/">Teams of agents</Link>: one agent's output becomes another agent's
   input, so an injected instruction can move from an agent that only reads content to one that
-  holds permissions the first agent never had — the reason
+  holds permissions the first agent never had: the reason
   <Link href="/techniques/agent-graphs/">agent graphs</Link> checks a handoff against an allowlist
   before acting on it.
 - <Link href="/levels/7/">Always-on agents</Link>: an agent acts when nobody is watching in real
-  time, so an audit trail — a record of what it did and why, kept independent of the agent itself
-  — has to stand in for the person who was not there to catch a problem as it happened, the
+  time, so an audit trail (a record of what it did and why, kept independent of the agent itself)
+  has to stand in for the person who was not there to catch a problem as it happened, the
   record <Link href="/techniques/agent-teammates/">always-on assistants</Link>' own policy layer
   is built to leave behind.
 
@@ -258,7 +258,7 @@ not a reason to leave them out.
 - Check the specific product's own data-handling page before sending it anything sensitive; a
   company's consumer product and its API can default to opposite retention and training rules.
 - Log what an action-taking system did and why, especially anything that ran with no person
-  watching at the time — the record is how a level 6 or 7 system gets checked after the fact.
+  watching at the time: the record is how a level 6 or 7 system gets checked after the fact.
 - Two pages under this one go further: <Link href="/techniques/guardrails/">guardrails</Link> on
   what a check on the way in and out can and cannot promise, and
   <Link href="/techniques/red-teaming/">red teaming</Link> on attacking your own system before
@@ -267,7 +267,7 @@ not a reason to leave them out.
 ## Run it
 
 <RunIt
-  monitor="How often the permission check refuses a call, and what triggered each refusal —
+  monitor="How often the permission check refuses a call, and what triggered each refusal:
   a rising refusal rate on ordinary traffic can mean a prompt regressed as easily as it can mean
   an actual attack."
   costAtVolume="A permission check like the example's is a few lines of code run on every tool
@@ -280,15 +280,15 @@ not a reason to leave them out.
   hold."
   whatToLog="The untrusted content that reached the model, the model's tool call in full, whether
   the permission check passed or refused and why, and who or what approved anything that needed
-  approval — enough to reconstruct the decision without asking the model again."
+  approval: enough to reconstruct the decision without asking the model again."
 />
 
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: "Open a chat app or assistant you use and find its privacy or data-usage settings. Does it say whether your conversations train future models, and for how long they're kept? Compare it with a different product from the same company if it has one (a chat app versus that company's API) — the two are often not the same." },
+  { lane: 'use', body: "Open a chat app or assistant you use and find its privacy or data-usage settings. Does it say whether your conversations train future models, and for how long they're kept? Compare it with a different product from the same company if it has one (a chat app versus that company's API): the two are often not the same." },
   { lane: 'build', body: 'Run python -m examples.safety --model stub --scenario injected and --scenario legitimate from the repo root. Neither calls a tool against the interactive stub; open tests/test_example_safety.py and read the two tests that script a model into calling issue_refund, to see the refusal and the permitted call actually happen.' },
-  { lane: 'either', body: "Pick a tool or assistant you use that reads something you did not write — a web page, an email, a shared document — and then acts. Write down where the untrusted text enters, which actions it could reach, and the one check, outside the model, that would have to hold if the model followed an instruction in that text." },
+  { lane: 'either', body: "Pick a tool or assistant you use that reads something you did not write (a web page, an email, a shared document) and then acts. Write down where the untrusted text enters, which actions it could reach, and the one check, outside the model, that would have to hold if the model followed an instruction in that text." },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

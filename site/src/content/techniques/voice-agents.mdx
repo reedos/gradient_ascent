@@ -51,12 +51,12 @@ interruption"<Cite n={1}/>. Google calls the same behavior "barge-in": "Users ca
 model at any time"<Cite n={2}/>.
 
 The example below is a text simulation, not a voice pipeline: nothing here records, streams,
-transcribes or synthesizes sound. What it can honestly show is the control flow — which choices
-are the model's and which belong to the system around it — using `Message` content parts to
+transcribes or synthesizes sound. What it can honestly show is the control flow (which choices
+are the model's and which belong to the system around it) using `Message` content parts to
 reference audio without pretending to process it.
 
 Level 5 still means the model decides the action and the stop: here, whether to keep talking or
-yield the floor. Your code enforces the caps — a latency budget on a turn, and an interruption
+yield the floor. Your code enforces the caps: a latency budget on a turn, and an interruption
 that is never the model's own choice to make.
 
 This page is marked draft, not published: voice agents has no recorded trace and no scored result
@@ -69,8 +69,8 @@ file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-ChatGPT voice and Gemini Live are both built this way, and the frameworks behind others — LiveKit
-Agents, Pipecat, Vapi — all handle the same three problems: deciding when a turn
+ChatGPT voice and Gemini Live are both built this way, and the frameworks behind others (LiveKit
+Agents, Pipecat, Vapi) all handle the same three problems: deciding when a turn
 ends, handling an interruption, and keeping the whole round trip fast enough to feel like a
 conversation.
 
@@ -80,14 +80,14 @@ properties, on top of VAD," and an endpointing delay that sets "how long the age
 speech... before treating the turn as complete"<Cite n={3}/>. Interruption handling has a similar
 subtlety: LiveKit says its framework "pauses the agent's speech whenever it detects user speech in
 the input audio," and offers an adaptive mode meant to tell "true interruptions from conversational
-backchanneling" apart — a caller saying "mm-hmm" should not cut the agent off — with the agent
+backchanneling" apart (a caller saying "mm-hmm" should not cut the agent off) with the agent
 resuming "from where it left off" once a false interruption is detected<Cite n={3}/>.
 
 Disclosure is a rule some platforms impose on their own customers. ElevenLabs requires the
 organizations using its agents to tell callers "They are interacting with AI rather than a human"
 and that "Their conversations are being recorded and may be shared with ElevenLabs and its
 third-party large language model providers," and requires that notice be "presented immediately
-prior to any interaction" — before the conversation begins, not buried afterward<Cite n={4}/>.
+prior to any interaction": before the conversation begins, not buried afterward<Cite n={4}/>.
 ElevenLabs is explicit that this is its platform's requirement and not legal advice, and that
 compliance with whatever laws apply is the organization's own responsibility<Cite n={4}/>; what
 the law requires varies by place and by use, and this page does not say. Whatever the rule where
@@ -101,18 +101,18 @@ visible from the outside.
 <Lane name="build" title="Build it">
 
 The example simulates one turn's control flow with a text model and no audio anywhere. The caller's
-utterance is carried as an `AudioPart` label next to a `TextPart` transcript — the transcript is
+utterance is carried as an `AudioPart` label next to a `TextPart` transcript: the transcript is
 what the model actually reads, and the label is what a trace shows in place of sound it never
 processed, exactly the pattern `examples/common/model.py` documents for a run that never reaches a
 real speech model.
 
 The model generates its answer in chunks. After each one it either calls `continue_speaking`,
 meaning it has more to say, or calls nothing, meaning it is done and the floor returns to the
-caller — `decided_by: "model"` either way, the same shape every level-5 example on this site uses
+caller: `decided_by: "model"` either way, the same shape every level-5 example on this site uses
 for its stop. `MAX_CHUNKS_PER_TURN` (3) stands in for a latency budget: past a certain number of
 chunks a real system has to cut the agent off to stay responsive, whatever the model would have
 said next. `interrupt_after_chunk` simulates a caller starting to talk mid-turn; when it fires, the
-code cuts the agent off immediately, without asking the model anything — `decided_by: "code"`,
+code cuts the agent off immediately, without asking the model anything: `decided_by: "code"`,
 because a real interruption is a signal the system acts on the instant it arrives, not a choice the
 model gets to weigh in on. OpenAI's own guidance for evaluating a voice agent puts this on the
 list of things to measure: "audible response timing, unwanted silence, overlap, and yielding to
@@ -130,12 +130,12 @@ Run it yourself:
 <WhenNot>
 
 Try plain <Link href="/techniques/chat/">chat</Link> first if the interaction does not actually
-need to happen in real time — turn-taking, interruption and latency budgets are all cost you pay
+need to happen in real time: turn-taking, interruption and latency budgets are all cost you pay
 for synchrony you may not need.
 
-Try a fixed workflow instead — transcribe the utterance, then
+Try a fixed workflow instead (transcribe the utterance, then
 <Link href="/techniques/routing/">route</Link> it to one of a few known intents, then answer with a
-scripted response — if the things a caller might ask are small and known in advance; that is
+scripted response) if the things a caller might ask are small and known in advance; that is
 cheaper and does not need the model to manage the turn itself.
 
 Move up to a voice agent once the range of things a caller might say is too open for a fixed set of
@@ -194,7 +194,7 @@ intents, and the conversation genuinely needs to flow rather than follow a menu.
 <HowToEval>
 
 `voice_agents` does not do the site's own question-answering task and is not part of the shared
-60-question set — a text-simulated turn loop has no document to cite. What changes for evaluation
+60-question set: a text-simulated turn loop has no document to cite. What changes for evaluation
 here is the task itself: voice needs its own small eval, on its own page, the way this site treats
 every technique whose running task is not a fair test of it. What that eval would measure is
 specific to a spoken conversation: yielding to interruptions (does the agent actually stop when
@@ -219,7 +219,7 @@ exists yet.
 <TryIt items={[
   { lane: 'use', body: 'Start a conversation with a voice assistant you have access to and interrupt it mid-sentence on purpose. Does it stop immediately? Does anything at the start of the call tell you that you are talking to an AI?' },
   { lane: 'build', body: 'Run python -m examples.voice_agents --model stub with a question of your own from the repo root, then read tests/test_example_voice_agents.py to see a scripted model that keeps talking across several chunks, one that gets interrupted mid-turn, and one that never yields.' },
-  { lane: 'either', body: 'Write the disclosure sentence you would want to hear at the start of a call with an AI agent. Then check whether the SYSTEM_PROMPT in examples/voice_agents/run.py does anything like it — it does not, on purpose, since this example is about turn control, not disclosure. Where would you actually add it?' },
+  { lane: 'either', body: 'Write the disclosure sentence you would want to hear at the start of a call with an AI agent. Then check whether the SYSTEM_PROMPT in examples/voice_agents/run.py does anything like it: it does not, on purpose, since this example is about turn control, not disclosure. Where would you actually add it?' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

@@ -26,14 +26,14 @@ result looks like, what to do when something is unclear, and the format to answe
 out and the model supplies it itself, usually with something plausible rather than a question
 back to you.
 
-Anthropic's own prompting guidance makes the point directly — "Think of Claude as a brilliant but
-new employee who lacks context on your norms and workflows" — and offers a test it calls the
+Anthropic's own prompting guidance makes the point directly: "Think of Claude as a brilliant but
+new employee who lacks context on your norms and workflows," and offers a test it calls the
 golden rule: "Show your prompt to a colleague with minimal context on the task and ask them to
 follow it. If they'd be confused, Claude will be too."<Cite n={1}/> The six parts are that rule
 taken apart.
 
-This page is about what a request must contain. The moves *inside* a request — worked examples,
-an assigned role, asking for reasoning first — are
+This page is about what a request must contain. The moves *inside* a request (worked examples,
+an assigned role, asking for reasoning first) are
 <Link href="/techniques/prompt-engineering/">prompt engineering</Link>; how much of the six parts
 you have to spell out grows with how much the model is left to decide, which is
 <Link href="/techniques/operator-craft/">operator craft</Link>'s thesis applied to one skill.
@@ -48,19 +48,19 @@ Here is the same job briefed three ways. A contracts manager wants renewal dates
 agreements.
 
 **One chat message.** Before: "Summarize this contract." After: "List every renewal and
-termination date in this agreement, one line each, as `date — clause number — what happens on
+termination date in this agreement, one line each, as `date / clause number / what happens on
 that date`. Quote the clause. If a date depends on a condition, say so instead of picking one.
 If the agreement does not state a date, write 'not stated' rather than inferring it."
 
 That is all six parts in four sentences: goal, format, constraint, and what to do when unsure.
-Anthropic's guidance backs two of them as plain instructions — "Be specific about the desired
+Anthropic's guidance backs two of them as plain instructions: "Be specific about the desired
 output format and constraints" and, for research work, "Define what constitutes a successful
 answer to your research question."<Cite n={1}/>
 
 **An agent working for an hour** over a folder of forty agreements. Everything above, plus the
 things a single message never needed: which folder and which file types, that it must not modify
 the source files, that a document it cannot read goes on a list rather than being skipped
-silently, and what "done" means for the run — a table with one row per agreement, including the
+silently, and what "done" means for the run: a table with one row per agreement, including the
 ones it failed on. Without that last part, an agent told to "extract the renewal dates" will
 finish, and you will not know which forty it means.
 
@@ -86,7 +86,7 @@ at all.
 
 A free-text box makes the brief and the request the same blob of prose, so a constraint typed in
 sentence four is one rewrite away from vanishing without trace. A task input with separate fields
-— goal, context, constraints, done looks like, what to do when unsure, output format — costs more
+(goal, context, constraints, done looks like, what to do when unsure, output format) costs more
 to build and pays for itself the first time someone can point at the field that was left blank
 instead of re-reading a paragraph to guess what went missing. Two of those fields deserve default
 values rather than a blank box: "stop and ask" for uncertainty, and a house format for the output.
@@ -97,8 +97,8 @@ response. An agent that is not told what to do when the brief runs out will pick
 because silence reads as permission rather than as an open question; the checkpoint that catches
 that is on the <Link href="/techniques/human-in-the-loop/">human approval</Link> page.
 
-For a standing brief — a system prompt, a project's instructions file, a document an agent loads
-before a task — the same six parts apply, written once and reused. Two things change at that
+For a standing brief (a system prompt, a project's instructions file, a document an agent loads
+before a task) the same six parts apply, written once and reused. Two things change at that
 scale. The brief now has versions, so it needs to be stored and diffed like code rather than
 edited in a settings box nobody can audit; and it can be tested, which is the
 <Link href="/techniques/evals/">evals</Link> topic applied to a document instead of a model. The
@@ -117,20 +117,20 @@ brief rather than in the one message.
 - <Link href="/levels/0/">No model</Link>: nothing to brief; a rule takes an input and produces
   an output with no instructions to interpret.
 - <Link href="/levels/1/">One call</Link>: the brief is the whole interface, and it is cheap to
-  fix — a bad result costs one retry.
+  fix: a bad result costs one retry.
 - <Link href="/levels/2/">Context</Link>: the brief has to say which material counts, because
   the retrieval step will otherwise choose for you and the answer will not say it did.
 - <Link href="/levels/3/">Workflows</Link>: each step carries its own brief, so a vague one in
   the middle of a chain shows up as a bad result several steps later.
 - <Link href="/levels/4/">Tools</Link>: the brief has to name which actions are allowed, not only
-  what answer is wanted — the model is choosing what to do, not only what to say.
+  what answer is wanted: the model is choosing what to do, not only what to say.
 - <Link href="/levels/5/">Agents</Link>: the brief has to define "done" for a loop that decides
   for itself when to stop, and say what to do when it is unsure, since there is no next message
   from you mid-run.
 - <Link href="/levels/6/">Teams of agents</Link>: a lead agent writes the briefs for the others,
   so yours now has to say how the work should be split, not only what should come back.
-- <Link href="/levels/7/">Always-on agents</Link>: the brief becomes a standing policy — what it
-  may decide alone, what always waits — and it is read at moments you are not present for. See
+- <Link href="/levels/7/">Always-on agents</Link>: the brief becomes a standing policy (what it
+  may decide alone, what always waits) and it is read at moments you are not present for. See
   <Link href="/techniques/agent-teammates/">always-on assistants</Link>.
 
 ## Practices
@@ -138,7 +138,7 @@ brief rather than in the one message.
 - Write the six parts as separate lines. A missing constraint is invisible inside a paragraph and
   obvious in a list.
 - State the output format every time. A model guesses a shape as readily as it guesses a fact.
-- Say what to do when the brief runs out — stop and ask, or make a stated assumption and flag it.
+- Say what to do when the brief runs out: stop and ask, or make a stated assumption and flag it.
   Silence is read as permission to guess.
 - Include the failures in the definition of done: the list it could not process is part of the
   result, not an exception to it.

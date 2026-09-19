@@ -10,7 +10,7 @@ sources:
     accessed: "2026-09-18"
   - title: "DSPy Optimizers (formerly Teleprompters)"
     url: "https://github.com/stanfordnlp/dspy/blob/main/docs/docs/learn/optimization/optimizers.md"
-    publisher: "DSPy (Stanford NLP) — documentation source"
+    publisher: "DSPy (Stanford NLP), documentation source"
     accessed: "2026-09-18"
   - title: "Prompt improver"
     url: "https://claude.com/blog/prompt-improver"
@@ -51,13 +51,13 @@ nothing below is measured.
 <Lane name="use" title="Use it">
 
 Most prompt-improvement tools a person meets directly are not the search DSPy runs. Anthropic's
-Prompt Improver rewrites a prompt in one pass using five named techniques — a chain-of-thought
+Prompt Improver rewrites a prompt in one pass using five named techniques (a chain-of-thought
 section, example standardization into XML, example enrichment, rewriting for clarity, and a
-prefilled assistant message — after which "you can provide feedback for Claude about what is and
+prefilled assistant message), after which "you can provide feedback for Claude about what is and
 isn't working to further improve the prompt"<Cite n={3}/>. The rewrite itself compares no
 candidates and consults no score. Scoring is a separate step in the same product: Anthropic
 describes its prompt evaluator as letting you "test your prompts under various scenarios," with an
-"ideal output" column added so users can "grade model outputs on a 5-point scale"<Cite n={3}/> — a
+"ideal output" column added so users can "grade model outputs on a 5-point scale"<Cite n={3}/>: a
 person grading, one prompt at a time, not a search choosing between prompts by number.
 
 The tools this page is about do the choosing. They run many candidate instructions, or many
@@ -69,8 +69,8 @@ find something that scores well on it, which is a different claim from finding s
 elsewhere.
 
 None of this replaces writing a prompt by hand for a one-off task, and an optimized prompt is not
-a permanent asset: it is fitted to one development set, on one model. Change the model — a new
-version from the same maker counts — and the search has to be re-run, or at minimum the winner
+a permanent asset: it is fitted to one development set, on one model. Change the model (a new
+version from the same maker counts) and the search has to be re-run, or at minimum the winner
 re-scored, because nothing about the old score carries over to a model that answers differently.
 
 </Lane>
@@ -80,10 +80,10 @@ re-scored, because nothing about the old score carries over to a model that answ
 one thing: search over a fixed list of whole system prompts, using
 <Link href="/techniques/distillation/">distillation's own</Link> `grade_exact` as the metric,
 against the site's 32 exact-graded questions. What DSPy's own optimizers actually search over is
-usually finer-grained — its documentation lists "synthesizing good few-shot examples for every
+usually finer-grained: its documentation lists "synthesizing good few-shot examples for every
 module," "proposing and intelligently exploring better natural-language instructions for every
 prompt," and "building datasets for your modules and using them to finetune the LM weights" as
-three different things an optimizer can tune<Cite n={2}/> — this example only ever swaps the whole
+three different things an optimizer can tune<Cite n={2}/>. This example only ever swaps the whole
 instruction, never touches an example or a weight.
 
 The split is the part worth reading closely:
@@ -100,7 +100,7 @@ reader could see. Four properties hold it up, and each is a test. The split is a
 partition for a given seed: the same seed gives the same two lists, every question lands in exactly
 one of them, and the held-out side is never empty even at a fraction that rounds to zero. Every
 held-out question is asked exactly once, after selection has finished and only under the winning
-instruction — the test asserts the ordering, not just the instruction, since a held-out question
+instruction: the test asserts the ordering, not just the instruction, since a held-out question
 scored early and re-scored later would still have leaked. Every candidate is scored on the same
 development questions. And ties resolve to the first candidate in list order, which means a run
 where everything ties has selected nothing: `python -m examples.prompt_optimization --model stub`
@@ -111,7 +111,7 @@ search that worked.
 
 Size is the honest limitation. DSPy's own guidance for a longer optimization run with its
 `MIPROv2` optimizer is to use it when you "have enough data (e.g. 200 examples or more to prevent
-overfitting)"<Cite n={2}/> — scoped to that one optimizer's longer search mode, not a rule for
+overfitting)"<Cite n={2}/>: scoped to that one optimizer's longer search mode, not a rule for
 every method. This example splits 32 questions 24/8, enough to demonstrate the discipline and far
 short of enough to trust a winner.
 
@@ -124,7 +124,7 @@ There is a prerequisite here that rules most cases out on its own: no eval set, 
 program that picks a prompt by score cannot run without a metric and examples to run it against,
 so if you do not already have an eval set you trust, the work in front of you is
 <Link href="/techniques/evals/">building one</Link>, and that work usually improves the prompt by
-itself — writing down what a good answer looks like is most of saying what you want. Start where
+itself: writing down what a good answer looks like is most of saying what you want. Start where
 <Link href="/techniques/prompt-engineering/">prompt engineering</Link> starts: one prompt written
 by hand, checked against a handful of real cases.
 
@@ -177,7 +177,7 @@ against a set nobody has checked will confidently hand you the one that best fit
 Running the site's eval runner over this example would be circular: the example already uses 32 of
 those 60 questions as the thing it searches and reports against (see `docs/EVALS.md`). Its own
 held-out score is the measurement, and it means something only because of where the number came
-from — data the choice never touched, which is the rule <Link href="/techniques/evals/">evals</Link>
+from: data the choice never touched, which is the rule <Link href="/techniques/evals/">evals</Link>
 sets for every before/after on this site.
 
 Optimizing a real prompt against the full 60 works the same way: cut a slice off first, search on

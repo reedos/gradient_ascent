@@ -47,7 +47,7 @@ that outline<Cite n={1}/>.
 
 Prompt chaining sits at level 3, workflows. The model fills in the content of each step; your
 code decides how many steps there are, what order they run in, and what gate sits between them.
-The line to level 4 falls where the model's output starts selecting what runs next — where it
+The line to level 4 falls where the model's output starts selecting what runs next: where it
 is offered a tool and can choose to call it.
 
 This page is marked draft, not published: prompt chaining has no recorded trace and no scored
@@ -61,13 +61,13 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lane name="use" title="Use it">
 
 If you have built a multi-step automation where one step's result becomes the input to the next
-— summarize a document, then draft a reply from the summary; extract a list, then look each item
-up — you have built a prompt chain, whether or not a model sits inside every step. Automation
+(summarize a document, then draft a reply from the summary; extract a list, then look each item
+up), you have built a prompt chain, whether or not a model sits inside every step. Automation
 services such as Zapier, Make, n8n and Power Automate are built around exactly this idea: a
 trigger, then an ordered list of steps, each one able to use what came before it. Whether such a
 tool is any good to work in comes down to what it will show you: n8n advertises "Every step of
 your agents' reasoning, traceable on the canvas"<Cite n={2}/>, and that is the thing to check for
-in any of them — can you open one step and see what it was given and what it returned, or only
+in any of them: can you open one step and see what it was given and what it returned, or only
 ever the final answer?
 
 The reason to chain steps instead of asking for everything in one prompt is that each step gets
@@ -87,13 +87,13 @@ the previous step's output.
 The example runs the same four steps on every question, around a keyword search: rewrite the
 question into up to three short search queries, retrieve for each query separately, draft an
 answer from everything retrieved, then check the draft's citations against what retrieval
-actually found. Two of the four steps call the model — the rewrite and the draft — but the code
+actually found. Two of the four steps call the model (the rewrite and the draft), but the code
 decides that sequence before either call happens, and always runs all four steps regardless of
 what either call returns. That is the whole difference from level 4: here the model fills in
 step *content*; it never picks the next step.
 
 The fourth step is the gate. `_check_citations` takes the set of citations the draft actually
-claims and the set of sections retrieval actually found, and keeps only the intersection — a
+claims and the set of sections retrieval actually found, and keeps only the intersection: a
 citation the model invented, to a section nothing ever retrieved, is silently dropped rather
 than trusted. This is what Anthropic means by adding "programmatic checks... on any intermediate
 steps to ensure that the process is still on track"<Cite n={1}/>: the check does not ask the
@@ -101,16 +101,16 @@ model whether it did well, it tests the output against a fact the code can verif
 
 Because each step is an ordinary function that takes plain values and returns plain values, each
 one is testable without the others and without a real model. `_check_citations` takes a draft
-string and a list of sections and returns the grounded set — a test can hand it a draft that
+string and a list of sections and returns the grounded set: a test can hand it a draft that
 invents a citation and assert it gets dropped, with no model call anywhere in the test. The
 site's own test suite does exactly this for the chain as a whole, against a scripted stub model.
 
 A chain fails most often at its weakest single step, and the failure travels forward invisibly.
 If the rewrite step turns "is the vent length still 35 feet" into a query that only matches the
 original manual, retrieval never sees the correcting service bulletin, and the draft answers
-confidently from stale text — nothing downstream can tell that the search itself was incomplete.
-Frameworks built to run fixed multi-step processes at production scale — Temporal, Prefect,
-Apache Airflow, Inngest — exist mainly to make that first kind of failure recoverable rather than
+confidently from stale text: nothing downstream can tell that the search itself was incomplete.
+Frameworks built to run fixed multi-step processes at production scale (Temporal, Prefect,
+Apache Airflow, Inngest) exist mainly to make that first kind of failure recoverable rather than
 silent: Temporal's own description is that its workflows "automatically capture state at every
 step, and in the event of failure, can pick up exactly where they left off"<Cite n={3}/>, which
 is a durability guarantee this example's plain function calls do not have.
@@ -127,11 +127,11 @@ Run it yourself:
 <WhenNot>
 
 Try <Link href="/techniques/rag/">RAG</Link> or a single call first if one retrieval pass and one
-answer already handles the question — a chain that always runs four fixed steps costs more than
+answer already handles the question: a chain that always runs four fixed steps costs more than
 one that runs one, for no benefit on a question a single pass could already answer.
 
 Move up to prompt chaining once a task genuinely needs more than one model-filled step in a
-known order, with something worth checking in between — rewriting a query before searching,
+known order, with something worth checking in between: rewriting a query before searching,
 outlining before writing, drafting before verifying.
 
 </WhenNot>
@@ -146,7 +146,7 @@ outlining before writing, drafting before verifying.
   },
   {
     name: 'A gate that never fails',
-    notice: "The programmatic check between two steps always passes, on every input, including ones it should catch — usually because the check tests something the step can never actually get wrong, rather than the thing that matters.",
+    notice: "The programmatic check between two steps always passes, on every input, including ones it should catch: usually because the check tests something the step can never actually get wrong, rather than the thing that matters.",
     test: "Deliberately produce the exact failure the gate exists to catch (an invented citation, an outline missing a required section) and confirm the gate rejects it, not just that it accepts good input.",
   },
   {

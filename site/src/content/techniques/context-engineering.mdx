@@ -68,16 +68,16 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-If you have used a chat app's "project" or "custom instructions" feature — pinning files and
+If you have used a chat app's "project" or "custom instructions" feature (pinning files and
 instructions that apply to every conversation in that project, instead of retyping them each
-time — you have done context engineering by hand. Anthropic's Claude Projects keeps a project's
+time) you have done context engineering by hand. Anthropic's Claude Projects keeps a project's
 files and instructions available to every conversation inside it: that pinned material is the
 stable part of the request, and what you type each turn is the part that changes<Cite n={5}/>.
 Other makers' chat apps have the same feature; the ones this site has checked are listed under
 Out there at the foot of this page.
 
-Two habits follow. First, put material worth reusing — a style guide, a product's specs, a
-policy document — into the part of the tool that stays fixed across the conversation, rather than
+Two habits follow. First, put material worth reusing (a style guide, a product's specs, a
+policy document) into the part of the tool that stays fixed across the conversation, rather than
 pasting it into every message; that is both cheaper, if the product passes the saving on, and
 keeps your typed message focused on what actually changed. Second, do not assume a very long
 project or a chat you have been running for hours is still as reliable per turn as a short one,
@@ -96,8 +96,8 @@ The example below builds one request from parts that change at different rates: 
 instructions and the reference documents never change between calls; conversation history and the
 question change every call. It puts the parts that never change first and the parts that change
 last, which is the ordering a caching backend needs to reuse the front of the request<Cite n={1}/>
-<Cite n={2}/>. Nothing here searches for anything — the whole synthetic document set goes in, the
-same way regardless of the question — so this is what <Link href="/techniques/rag/">RAG</Link>'s
+<Cite n={2}/>. Nothing here searches for anything (the whole synthetic document set goes in, the
+same way regardless of the question) so this is what <Link href="/techniques/rag/">RAG</Link>'s
 "put it all in the window" alternative actually looks like in code.
 
 The static block is built once per call from every document in `evals/corpus/`, concatenated in a
@@ -106,7 +106,7 @@ fixed, alphabetical order so its bytes are identical from one question to the ne
 conversation history gets to use. When history does not fit, the code drops the oldest turns
 first and never touches the documents, since the documents are the part later calls can still
 reuse from cache. This is the one place the code makes a real decision, and it is a fixed rule,
-not a judgment call — nothing here is decided by the model.
+not a judgment call: nothing here is decided by the model.
 
 Ordering the request is necessary for caching but not sufficient, and the two makers cited above
 differ in a way worth reading before you count on a discount. OpenAI documents caching as on by
@@ -132,7 +132,7 @@ not fit are all fixed before the model ever sees the request. Run it yourself:
 <WhenNot>
 
 Skip this and write a single prompt directly if there is nothing beyond the question itself to
-include — no documents, no reusable instructions, no history worth keeping. That is plain
+include: no documents, no reusable instructions, no history worth keeping. That is plain
 <Link href="/techniques/chat/">chat</Link> or <Link href="/techniques/prompt-engineering/">prompt
 engineering</Link>.
 
@@ -155,7 +155,7 @@ request at all: a search can miss the passage, and sending everything cannot.
   {
     name: 'A cache that never hits',
     notice: 'Every call costs and takes as much as the first one, even though most of the request is the same material as last time.',
-    test: 'Look at what sits before the first part that changes between calls: a timestamp, a random id, or a reordered document list at or near the front invalidates the cached prefix every call. Then check the two things ordering cannot fix — whether the provider needs caching switched on explicitly for this request, and whether the prefix clears the provider\'s minimum cacheable length, below which nothing is cached and no error is returned.',
+    test: 'Look at what sits before the first part that changes between calls: a timestamp, a random id, or a reordered document list at or near the front invalidates the cached prefix every call. Then check the two things ordering cannot fix: whether the provider needs caching switched on explicitly for this request, and whether the prefix clears the provider\'s minimum cacheable length, below which nothing is cached and no error is returned.',
   },
   {
     name: 'Context rot: worse answers from a request that still fits',

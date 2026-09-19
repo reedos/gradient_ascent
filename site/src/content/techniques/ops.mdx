@@ -61,11 +61,11 @@ your API usage by allowing resuming from specific prefixes in your prompts," and
 pricing as multipliers on the base input token price: cache writes at "1.25 times" for a
 five-minute cache and "2 times" for a one-hour one, and cache reads at "0.1 times the base input
 tokens price," with a footnote naming two current models whose reads are cheaper still<Cite
-n={2}/> — a product built on a repeated system prompt or a shared document set that isn't using
+n={2}/>: a product built on a repeated system prompt or a shared document set that isn't using
 this is leaving a documented discount on the table.
 Does it batch anything that doesn't need an instant answer? OpenAI's Batch API documents "50%
 cost discount compared to synchronous APIs" in exchange for results that complete "within 24
-hours (and often more quickly)" instead of immediately<Cite n={3}/> — the same idea any product
+hours (and often more quickly)" instead of immediately<Cite n={3}/>: the same idea any product
 can apply to its own non-urgent work. And does it route easy requests to a cheaper model and
 escalate only the hard ones? A product that sends everything to its most capable model pays top
 price for questions a smaller one would have answered.
@@ -80,7 +80,7 @@ that just errors during a spike is passing its own capacity problem on to you.
 Running a model on your own hardware instead of an API is its own trade-off, not a strictly
 better choice. Ollama, one tool built for this, says of running locally that "nothing you run
 locally ever leaves your machine" and "your prompts are never tracked or trained on"<Cite
-n={5}/> — a property of where the computation happens, not a policy that can be revised. What it
+n={5}/>: a property of where the computation happens, not a policy that can be revised. What it
 costs instead is hardware you buy and keep running, and a choice limited to models small enough
 to fit on it; what that limit costs you is a question for an
 <Link href="/techniques/evals/">eval</Link> on your own task, not a general answer.
@@ -90,13 +90,13 @@ to fit on it; what that limit costs you is a question for an
 
 The example is a small reporting tool: it reads trace files in the exact shape
 `examples/common/trace.py` writes, and a price table the caller supplies, and reports cost and
-latency per question and per level. No price is written into the code — a maker's per-token price
+latency per question and per level. No price is written into the code: a maker's per-token price
 is specific to one model and changes without notice, so hard-coding one here would eventually be
 wrong and would read as this site's own claim about a real price rather than the caller's.
 
 <CodeFile file="examples/ops/run.py" func="cost_for_trace" />
 
-A trace's model id might not be in the price table at all — a model retired since the table was
+A trace's model id might not be in the price table at all: a model retired since the table was
 built, a typo, a local model with no per-token price because nothing is billed for it. The
 estimator reports that as `usd: None`, not as free, and names every unpriced model id it found so
 the gap is visible instead of silently zeroed out:
@@ -104,8 +104,8 @@ the gap is visible instead of silently zeroed out:
 <CodeFile file="examples/ops/run.py" func="summarize_by_level" />
 
 `python -m examples.ops --demo` needs no files: it writes two synthetic trace files with a real
-`Tracer` — one shaped like a level 1 chat call, one like the level 2 RAG run this site's own `rag`
-page illustrates — and prices them against a small table that is explicitly made up for the demo,
+`Tracer` (one shaped like a level 1 chat call, one like the level 2 RAG run this site's own `rag`
+page illustrates) and prices them against a small table that is explicitly made up for the demo,
 kept apart from `examples.ops.run` itself so nothing about the reusable code depends on it. A real
 report would point `--traces` at recorded `trace.json` files and `--prices` at a table built from
 a maker's current, dated price page instead.
@@ -122,7 +122,7 @@ a page, not for production monitoring across every call a system makes. A real d
 generally reaches for a shared standard instead: OpenTelemetry describes itself as "vendor- and
 tool-agnostic," an "observability framework and toolkit" for producing traces, metrics and logs
 that many different backends can read, explicitly leaving "the backend (storage) and the frontend
-(visualization)... to other tools"<Cite n={4}/> — the same tokens-in, tokens-out and wall-time
+(visualization)... to other tools"<Cite n={4}/>: the same tokens-in, tokens-out and wall-time
 fields this example reads out of a trace file, but emitted in a shape a tracing backend already
 knows how to store, query and alert on.
 
@@ -134,8 +134,8 @@ knows how to store, query and alert on.
 Skip caching, batching and a routing layer before there is enough traffic for any of them to pay
 for themselves. A cache write costs more than a plain call and only earns that back once the same
 content is read again inside its window; a routing layer is a second system to build, test and
-keep in sync with whatever it is choosing between. Below some real volume, the simplest version —
-one model, called directly, priced as is — costs less in engineering time than any of these
+keep in sync with whatever it is choosing between. Below some real volume, the simplest version
+(one model, called directly, priced as is) costs less in engineering time than any of these
 levers saves in tokens.
 
 Skip building a tracing format of your own, too. This site's own `trace.json` exists to step
@@ -159,7 +159,7 @@ just as well as the expensive one.
   },
   {
     name: 'An unpriced model id goes unnoticed',
-    notice: 'A cost report understates the real bill because a model id — retired, mistyped, or newly added — has no entry in the price table and gets silently treated as free instead of flagged.',
+    notice: 'A cost report understates the real bill because a model id (retired, mistyped, or newly added) has no entry in the price table and gets silently treated as free instead of flagged.',
     test: "Check a report for a named list of unpriced model ids, the way this page's own example's summarize_by_level does, rather than trusting a total that a missing price can quietly shrink.",
   },
   {
@@ -192,13 +192,13 @@ just as well as the expensive one.
   savings show up, which is the whole subject of
   <Link href="/techniques/context-engineering/">context engineering</Link>.
 - <Link href="/levels/3/">Workflows</Link>: the same fixed step run thousands of times a day,
-  with no need for an answer inside the next minute — one step of
+  with no need for an answer inside the next minute (one step of
   <Link href="/techniques/prompt-chaining/">prompt chaining</Link>, run unconditionally on every
-  question — is exactly the case batching was built for.
+  question) is exactly the case batching was built for.
 - <Link href="/levels/4/">Tools</Link>: whether a question needs a tool at all is the model's own
-  call, so cost swings between one call and two for the same kind of question —
-  <Link href="/techniques/function-calling/">function calling</Link>'s own cost strip shows that
-  split directly — and a cost estimate here has to budget for both, not just the typical case.
+  call, so cost swings between one call and two for the same kind of question
+  (<Link href="/techniques/function-calling/">function calling</Link>'s own cost strip shows that
+  split directly) and a cost estimate here has to budget for both, not just the typical case.
 - <Link href="/levels/5/">Agents</Link>: a loop with no fixed number of steps is the hardest
   thing on the ladder to put a ceiling on; a hard cap on steps or tokens matters here the way it
   matters to <Link href="/techniques/single-agent/">a single agent</Link>'s own `max_steps` and
@@ -206,17 +206,17 @@ just as well as the expensive one.
 - <Link href="/levels/6/">Teams of agents</Link>: several models working one task multiplies
   every per-call number by however many agents are in the team, the way
   <Link href="/techniques/orchestrator-workers/">a lead and its workers</Link> cost several times
-  a single call for the same question — which is exactly where routing a smaller model to the
+  a single call for the same question: which is exactly where routing a smaller model to the
   easy seats and a stronger one to the hard seat earns its keep.
 - <Link href="/levels/7/">Always-on agents</Link>: a system that runs continuously has a cost
-  that is a rate, not a number per question — <Link href="/techniques/agent-teammates/">an
-  always-on assistant</Link> spends one call every tick whether or not anything gets proposed —
+  that is a rate, not a number per question (<Link href="/techniques/agent-teammates/">an
+  always-on assistant</Link> spends one call every tick whether or not anything gets proposed)
   so what's worth alerting on shifts from "did this one thing cost too much" to "is this hour
   costing more than a normal hour does."
 
 ## Practices
 
-- Cache what repeats, batch what can wait, and route by difficulty — the three levers that move a
+- Cache what repeats, batch what can wait, and route by difficulty: the three levers that move a
   bill, each with its own break-even.
   <Link href="/techniques/cost-optimization/">Cost optimization</Link> works through all three.
 - Measure cost and latency broken out by level or technique, not only as one aggregate number, so
@@ -240,11 +240,11 @@ just as well as the expensive one.
   which model's price applies to how much of your traffic, which usually matters more than either
   discount."
   failsInProduction="A cache's TTL expires between requests that used to land inside it, and the
-  discount silently disappears with nothing failing outright — the bill goes up while every
+  discount silently disappears with nothing failing outright: the bill goes up while every
   individual request still succeeds, which is why it needs its own metric, not just an error
   count."
   whatToLog="Tokens in and out, wall time, model id, cache hit or miss, and which level or
-  technique a call belongs to, on every call — the same fields the example's estimator reads back
+  technique a call belongs to, on every call: the same fields the example's estimator reads back
   out of a trace file."
 />
 
@@ -252,8 +252,8 @@ just as well as the expensive one.
 
 <TryIt items={[
   { lane: 'use', body: "Find an AI product you pay for by usage and check its documentation for whether it caches repeated content or batches non-urgent work. If it doesn't say, that silence is itself an answer worth noting." },
-  { lane: 'build', body: 'Run python -m examples.ops --demo from the repo root and read the per-level report it prints. Then edit DEMO_PRICES in examples/ops/__main__.py to double the RAG model\'s output price and run it again — which level\'s mean cost changes, and by how much?' },
-  { lane: 'either', body: "Pick one technique's Cost and latency strip elsewhere on this site and estimate what running it 10,000 times a day would cost, using the illustrative numbers on that page. Then note which lever here — caching, batching, routing — would cut that number the most." },
+  { lane: 'build', body: 'Run python -m examples.ops --demo from the repo root and read the per-level report it prints. Then edit DEMO_PRICES in examples/ops/__main__.py to double the RAG model\'s output price and run it again: which level\'s mean cost changes, and by how much?' },
+  { lane: 'either', body: "Pick one technique's Cost and latency strip elsewhere on this site and estimate what running it 10,000 times a day would cost, using the illustrative numbers on that page. Then note which lever here (caching, batching, routing) would cut that number the most." },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

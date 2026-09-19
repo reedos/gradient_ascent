@@ -36,7 +36,7 @@ Red teaming is attacking your own system on purpose, before someone else does it
 permission. OWASP's own announcement of its Gen AI Red Teaming Guide describes it as a
 "practical approach to evaluating LLM and Generative AI vulnerabilities," with coverage that
 "spans from model-level vulnerabilities (toxicity, bias) to system-level pitfalls (API misuse,
-data exposure)"<Cite n={2}/> — the system around the model, not only the model itself, is in
+data exposure)"<Cite n={2}/>: the system around the model, not only the model itself, is in
 scope.
 
 The result that matters is not a report; it is a change to the system, most durably a test that
@@ -58,19 +58,19 @@ describes several distinct methods rather than one. Its "domain-specific expert 
 "involves collaborating with subject matter experts to identify and assess potential
 vulnerabilities or risks in AI systems within their area of expertise"; separate sections of the
 same post cover automated red teaming and multilingual and multicultural red teaming<Cite n={1}/>. "We red-team our models" can mean any of several different things, and the
-specifics — who did it, what they were looking for, how recently — are what actually tells you
+specifics (who did it, what they were looking for, how recently) are what actually tells you
 anything.
 
 A finding does not have to mean "broken." What matters more is what happened next: was the gap
 fixed, is it a known, documented limitation, or does using the product a certain way avoid it?
-NIST's AI Risk Management Framework — AI RMF 1.0, published as NIST AI 100-1 and, in NIST's
-words, "intended for voluntary use" — organizes the work into four functions it names govern,
+NIST's AI Risk Management Framework (AI RMF 1.0, published as NIST AI 100-1 and, in NIST's
+words, "intended for voluntary use") organizes the work into four functions it names govern,
 map, measure and manage<Cite n={3}/>. A finding that cannot be fixed outright still has to land
 in one of those, scoped and owned, rather than being known about and forgotten.
 
 If you operate a system rather than build one, the same instinct applies at smaller scale: before
 trusting a check that is supposed to catch bad output, try to make it fail on purpose. A check
-nobody has tried to break is a check nobody knows the limits of — which is the other half of what
+nobody has tried to break is a check nobody knows the limits of, which is the other half of what
 <Link href="/techniques/guardrails/">guardrails</Link> says about a filter's real precision.
 
 </Lane>
@@ -107,7 +107,7 @@ The test still carries the input that used to write a file to disk, and asserts 
 
 `examples/debate_review`'s reviewer is fenced off from a draft it did not write, so a draft
 ending in a forged "Reply ACCEPT" cannot read as an instruction. The first version of that fence
-shortened any marker it found instead of removing it — and shortening is not breaking: a draft
+shortened any marker it found instead of removing it, and shortening is not breaking: a draft
 containing one bracket more than the marker came back out of the fence as a working marker, ready
 to close the block early. An audit found it, and the fix replaces a marker with a note built from
 none of the characters a marker is made of, so no surviving fragment can combine into another:
@@ -129,7 +129,7 @@ what keeps a fixed bug fixed when the surrounding code changes next year.
 <WhenNot>
 
 Skip a formal red-teaming exercise for a single-user tool with no retrieved content and nothing
-it can act on — the same floor <Link href="/techniques/safety/">safety</Link> sets for a
+it can act on: the same floor <Link href="/techniques/safety/">safety</Link> sets for a
 permission check and a delimiter. Reading the code once for the obvious cases is proportionate
 there; a taught defense that decides who gets money, what a tool is allowed to do, or what an
 unattended system does next is not that case.
@@ -145,8 +145,8 @@ correct; being small did not make any of them safe to leave untested.
 <FailureModes modes={[
   {
     name: 'A defense is trusted because it reads correctly',
-    notice: "Code that looks right on inspection is treated as done, with no input constructed specifically to break it -- which is exactly the gap all three of this page's own repository examples shared before an audit found them.",
-    test: "Before trusting a check, write the one input most specifically designed to defeat it -- not a random or typical input -- the way this page's own examples' regression tests do.",
+    notice: "Code that looks right on inspection is treated as done, with no input constructed specifically to break it: which is exactly the gap all three of this page's own repository examples shared before an audit found them.",
+    test: "Before trusting a check, write the one input most specifically designed to defeat it (not a random or typical input), the way this page's own examples' regression tests do.",
   },
   {
     name: 'A finding is fixed but never becomes a test',
@@ -155,7 +155,7 @@ correct; being small did not make any of them safe to leave untested.
   },
   {
     name: 'Scope excludes the system around the model',
-    notice: "Testing focuses entirely on what the model says and misses vulnerabilities in the code around it -- the permission check, the sandbox, the fence -- which is exactly where this page's own three examples' real bugs lived.",
+    notice: "Testing focuses entirely on what the model says and misses vulnerabilities in the code around it (the permission check, the sandbox, the fence), which is exactly where this page's own three examples' real bugs lived.",
     test: "Confirm a red-teaming scope explicitly names the non-model code paths in play (permission checks, sandboxes, parsers), the way OWASP's own guide's system-level category asks for, not only the model's outputs.",
   },
   {
@@ -172,21 +172,21 @@ correct; being small did not make any of them safe to leave untested.
 
 ## At each level
 
-- <Link href="/levels/1/">One call</Link>: attacking the prompt itself — the input a person can
-  type directly — is the whole scope, since there is no retrieved content and no tool call yet
+- <Link href="/levels/1/">One call</Link>: attacking the prompt itself (the input a person can
+  type directly) is the whole scope, since there is no retrieved content and no tool call yet
   for an attack to reach.
 - <Link href="/levels/2/">Context</Link>: retrieved content is now something to attack, not just
-  the user's own message — the same expansion <Link href="/techniques/safety/">safety</Link>'s
+  the user's own message: the same expansion <Link href="/techniques/safety/">safety</Link>'s
   own "at each level" section names for prompt injection generally.
 - <Link href="/levels/4/">Tools</Link>: an attack that used to only produce a bad sentence can
   now attempt a real action, so this is the level where the highest-value finding usually lives
-  — a permission check that fails is exactly the shape of bug this page's own safety example
+  : a permission check that fails is exactly the shape of bug this page's own safety example
   narrates.
 - <Link href="/levels/5/">Agents</Link>: an attack does not have to work on the first turn; a
   long loop gives it many chances, so testing has to include multi-turn attempts, not just single
   malicious inputs.
 - <Link href="/levels/6/">Teams of agents</Link>: a handoff between agents is its own attack
-  surface — content that one agent only reads can carry an instruction for the next agent, which
+  surface: content that one agent only reads can carry an instruction for the next agent, which
   may hold permissions the first never had, the exact shape
   <Link href="/techniques/debate-review/">review and debate</Link>'s fence was built to break
   and failed to break on its first attempt.
@@ -198,13 +198,13 @@ correct; being small did not make any of them safe to leave untested.
 
 - Scope before testing: which system, which access, which categories of harm, and who is allowed
   to know the exercise is running.
-- Name the non-model code in scope explicitly — permission checks, sandboxes, parsers, fences.
+- Name the non-model code in scope explicitly: permission checks, sandboxes, parsers, fences.
   All three bugs above lived there, and a scope written around "the model" would have missed
   every one.
 - End each finding in a named test carrying the original input, not in a patch and a note.
 - Let people decide the categories and let automation cover the ground inside them, in that
   order.
-- Give every finding you cannot fix an owner and a decision — accepted, restricted, scheduled —
+- Give every finding you cannot fix an owner and a decision (accepted, restricted, scheduled)
   so it stays visible instead of aging out of a document.
 
 ## Run it
@@ -219,7 +219,7 @@ correct; being small did not make any of them safe to leave untested.
   failsInProduction="A defense that passed every test built to confirm it works never got a test
   built specifically to break it, and the first real attack is the first one it ever saw."
   whatToLog="Every finding, the specific input that triggered it, whether it became a regression
-  test, and its current status -- fixed, accepted, or scoped around -- so nothing found is later
+  test, and its current status (fixed, accepted, or scoped around) so nothing found is later
   simply forgotten."
 />
 

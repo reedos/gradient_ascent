@@ -39,7 +39,7 @@ import orderZeroRun from '../../data/runs/order-zero.json';
 
 Level 0 is not using a model at all. Before reaching for a language model, ask whether a rule, a
 keyword search, a form, or a classical statistics model already answers the question. If the
-input is structured — a part number, a choice from five options — plain code reads it and cannot
+input is structured (a part number, a choice from five options) plain code reads it and cannot
 guess wrong. If the input is free text with a fixed vocabulary, a keyword search finds the
 passage whose words best match the question's, which is what search engines like Elasticsearch
 and OpenSearch do<Cite n={1}/><Cite n={2}/>. If the task is to predict a label or a number from
@@ -63,27 +63,27 @@ file yet, so nothing below is measured. It is illustrated.
 <Lane name="use" title="Use it">
 
 You already use level zero constantly without thinking of it that way. The search box on most
-documentation sites and helpdesks is keyword search — often Elasticsearch or OpenSearch running
-behind the scenes<Cite n={1}/><Cite n={2}/> — not a model reading every page for you. A form that
+documentation sites and helpdesks is keyword search (often Elasticsearch or OpenSearch running
+behind the scenes<Cite n={1}/><Cite n={2}/>) not a model reading every page for you. A form that
 asks "which appliance do you own" from a dropdown is a rule, not an AI feature, even on a site
 that also has a chatbot elsewhere. A spam filter is the textbook case of the third kind: one
 label predicted from past examples, millions of times a day, with no language model reading your
-mail — scikit-learn names spam detection as a classification job on its own front page<Cite n={3}/>.
+mail: scikit-learn names spam detection as a classification job on its own front page<Cite n={3}/>.
 
-The question that matters here is not "could a model do this" — a model can usually attempt
-almost anything — it is whether ordinary code already does it as well, for a fraction of the
+The question that matters here is not "could a model do this" (a model can usually attempt
+almost anything). It is whether ordinary code already does it as well, for a fraction of the
 cost. Whether it does, on your own data, is something to measure rather than assume in either
 direction. Two checks settle most cases. First: can the input be described as a fixed set of shapes (a
 part number, a five-option dropdown, an email address) or a small, known vocabulary? If so, a
 rule or a form is often enough, and it can be tested exhaustively rather than sampled. Second, and
 the one people skip: what does a wrong answer cost, and how would you notice it? A keyword search
-that returns the wrong manual section is annoying but visible — the passage is right there, and a
+that returns the wrong manual section is annoying but visible: the passage is right there, and a
 reader can see it doesn't answer the question. A language model that confidently answers from the
 wrong section, or states a plausible number that is not the right one, can look identical to a
 correct answer until someone checks it by hand. If a wrong answer is cheap to catch and cheap to
-be wrong about, level 0's failure mode — an obviously irrelevant result — is the safer one to
-ship, even if a model would get more questions right overall. If getting it wrong is expensive —
-money moves, a part gets ordered, a warranty claim is approved — that argues for a level with an
+be wrong about, level 0's failure mode (an obviously irrelevant result) is the safer one to
+ship, even if a model would get more questions right overall. If getting it wrong is expensive
+(money moves, a part gets ordered, a warranty claim is approved) that argues for a level with an
 explicit check built in, whichever level ends up doing the work.
 
 </Lane>

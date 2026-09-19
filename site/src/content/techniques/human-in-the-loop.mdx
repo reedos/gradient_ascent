@@ -44,10 +44,10 @@ import hitlRun from '../../data/runs/human-in-the-loop.json';
 
 Human approval pauses a run before something costly, irreversible, or too uncertain to ship, and
 hands that decision to a person. Anthropic frames the pause as a checkpoint inside an agent's own
-loop — "agents can then pause for human feedback at checkpoints or when encountering
-blockers"<Cite n={1}/> — but the version on this page stays at level 3: *your code* decides when
+loop ("agents can then pause for human feedback at checkpoints or when encountering
+blockers"<Cite n={1}/>) but the version on this page stays at level 3: *your code* decides when
 to pause, against a fixed rule. The model is never asked whether a person should look, and the
-line to level 4 is exactly that — a design where the model can call for review itself.
+line to level 4 is exactly that: a design where the model can call for review itself.
 
 The rule that decides *when* to pause does the real work. Two common ones: confidence (the draft
 has nothing to point to, so it may be a guess) and cost (the draft names a price, or an action
@@ -67,18 +67,18 @@ result file yet, so nothing below is measured. It is illustrated.
 
 Approval steps in ordinary automation tools are the plainest version of this. Power Automate
 sells the feature directly: "Streamlined approval processes" that let you "create, manage, and
-share approval processes across your organization"<Cite n={2}/> — a flow runs up to a point, a
+share approval processes across your organization"<Cite n={2}/>: a flow runs up to a point, a
 person is asked to approve or reject, and only an approval lets it continue. Coding agents put
 the pause at a different kind of irreversible step: Jules works from a plan you confirm ("That
 looks good. Continue!"), and when the work is done, "Jules creates a PR of the changes. Approve
-the PR, merge it to your branch, and publish it on GitHub"<Cite n={3}/> — two gates, both of them
+the PR, merge it to your branch, and publish it on GitHub"<Cite n={3}/>: two gates, both of them
 yours, sitting either side of the part that is hard to undo rather than in front of every step.
 
 Tools at this level usually offer a second mode that skips the asking. Cline's own description of
 the choice: "Approve every step, or flip auto-approve for autopilot"<Cite n={4}/>. Which of those
 you want is a real decision, and it is worth making deliberately rather than by drift: a gate is
 only a control while somebody is reading what it shows them, and an approval that has become
-automatic — by the flip of a setting, or by habit — is a step in the run, not a check on it.
+automatic (by the flip of a setting, or by habit) is a step in the run, not a check on it.
 
 So if a tool asks you to approve something, two questions are worth answering honestly: what
 would actually happen if you clicked through without reading, and how much of it are you
@@ -89,19 +89,19 @@ were reading for turns out to be something a second prompt can test every time.
 </Lane>
 <Lane name="build" title="Build it">
 
-The example checks a drafted answer against two fixed rules — no citation at all (`low_confidence`)
-or a dollar figure in the text (`high_cost`) — and if either trips, `run` returns a `PendingReview`
+The example checks a drafted answer against two fixed rules: no citation at all (`low_confidence`)
+or a dollar figure in the text (`high_cost`), and if either trips, `run` returns a `PendingReview`
 instead of a final `Answer`. `PendingReview` is a plain dataclass: the question, the full draft
 text, its citations, and the reason. That is deliberately everything a reviewer needs to judge
-the answer on its own merits, not just a bare yes/no — a reviewer shown only "approve this
+the answer on its own merits, not just a bare yes/no: a reviewer shown only "approve this
 answer?" with no sources to check it against is being asked to rubber-stamp, not review.
 
 `resume` is a second, separate function. It takes the checkpoint, a person's decision
-(`approve`, `edit` or `reject`), and — for an edit — their corrected text, and produces the final
+(`approve`, `edit` or `reject`), and, for an edit, their corrected text, and produces the final
 answer. Nothing about the pause or the resume is a model decision: `_needs_review` is a plain
 function of the draft's text and citations, and `resume` just branches on a string a person
 supplied. A real system would serialize `PendingReview` the same way, hand it to a queue or a
-ticket, and call `resume` whenever the decision comes back — hours or days later, in a different
+ticket, and call `resume` whenever the decision comes back: hours or days later, in a different
 process entirely, with nothing about the code above needing to change.
 
 <CodeFile file="examples/human_in_the_loop/run.py" start={26} end={101} expect="LEVEL = 3" />
@@ -117,7 +117,7 @@ and the resume can both be exercised on `StubModel` with no actual person or liv
 If you would rather not write the checkpoint yourself, LangGraph has this built in. Its
 documentation describes middleware that pauses when a model proposes an action that might need
 review, waits for a decision, and saves the graph's state so the run can resume
-later<Cite n={5}/> — the same two halves as `run` and `resume` above, with the persistence
+later<Cite n={5}/>: the same two halves as `run` and `resume` above, with the persistence
 supplied. The decisions it names are the three this example takes plus one more: approve, edit,
 reject, and answer the model directly.
 
@@ -127,11 +127,11 @@ reject, and answer the model directly.
 <WhenNot>
 
 Try shipping without a gate first if a wrong answer costs little and is easy to notice and fix
-after the fact — a gate adds latency and a person's attention, and both are wasted on an answer
+after the fact: a gate adds latency and a person's attention, and both are wasted on an answer
 nobody needed to check.
 
 Move up to a real approval gate once being wrong is expensive, hard to undo, or the kind of
-mistake nobody would notice until it was too late to matter — and pick the threshold from what
+mistake nobody would notice until it was too late to matter: and pick the threshold from what
 actually made past answers wrong, not a guess.
 
 </WhenNot>
@@ -188,7 +188,7 @@ says so rather than scoring the questions that happen not to pause and calling t
 this technique (see `docs/EVALS.md`).
 
 What would be measured here is the gate, in three parts. The pause rate: what share of questions
-trip each threshold. Whether the right ones pause — `unanswerable` questions should pause at a
+trip each threshold. Whether the right ones pause: `unanswerable` questions should pause at a
 high rate, having no citation to point to, and a low pause rate on that kind means the threshold
 is missing exactly the case it exists to catch. And accuracy after `resume`, scored separately
 for approved and for edited answers, which is the only measurement that says whether the person
@@ -203,7 +203,7 @@ long a real queue of paused checkpoints takes a person to clear.
   monitor="The pause rate over time, and separately, the approve/edit/reject split among decisions actually made. A pause rate that drifts with no change to the threshold code is a sign the traffic mix changed, not the rule."
   costAtVolume="Model cost tracks question count the same as a single-call technique. The real cost that grows with volume is reviewer time: a fixed pause rate against rising traffic means a rising number of checkpoints waiting on the same number of people."
   failsInProduction="The pause rate creeps up until approving becomes reflexive, or a queue of paused checkpoints backs up faster than anyone is clearing it, and answers that were correctly flagged for review sit unresolved rather than being wrong out loud."
-  whatToLog="Every pause with its reason, the full checkpoint shown to the reviewer, the decision made, who made it, and the time between the pause and the resume — an approval with no record of what was actually shown is not auditable after the fact."
+  whatToLog="Every pause with its reason, the full checkpoint shown to the reviewer, the decision made, who made it, and the time between the pause and the resume: an approval with no record of what was actually shown is not auditable after the fact."
 />
 
 ## Try it

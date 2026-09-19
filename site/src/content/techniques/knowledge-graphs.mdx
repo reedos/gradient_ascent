@@ -69,32 +69,32 @@ recorded trace, no scored result file, nothing below measured.
 Knowledge graphs are usually invisible plumbing, the same way
 <Link href="/techniques/embeddings-search/">embeddings and search</Link> are. Occasionally one is
 named: Glean, a workplace search product, calls the layer under its answers the Enterprise Graph
-and describes it as a knowledge graph of the entities a company works around — projects, people,
+and describes it as a knowledge graph of the entities a company works around: projects, people,
 customers and products<Cite n={4}/>. More often nothing says so, and what you can notice instead
 is the shape of an answer. A tool built on retrieval alone tends to answer from one strong match. A tool that can
-join facts across documents — a part's compatible model and that model's coverage, in one answer,
-rather than only half of it — is doing something closer to what a graph gives you, whether or not
+join facts across documents (a part's compatible model and that model's coverage, in one answer,
+rather than only half of it) is doing something closer to what a graph gives you, whether or not
 it uses one internally. <Link href="/techniques/agentic-rag/">Deep-research modes</Link>, which
 run several searches and combine what they find, get some of the same multi-document reach
 without necessarily building a graph at all.
 
 The other place this shows up for a reader, not a builder, is provenance. A graph-backed answer
-can show its work as a chain — this fact, from this source, connected to that fact, from that
-source — rather than one citation at the end covering the whole answer. When a tool gives you a
+can show its work as a chain (this fact, from this source, connected to that fact, from that
+source) rather than one citation at the end covering the whole answer. When a tool gives you a
 chain like that, each link is a specific, separately checkable claim, which is a stronger
 guarantee than a citation that only says an answer is "based on" some set of sources somewhere in
 it.
 
 Ask before trusting one: how was the graph built, and how often is it rebuilt? A graph extracted
 once from a document set that keeps changing goes stale the same way a search index does, except
-a stale edge can join two facts that used to be true together and no longer are — a subtler
+a stale edge can join two facts that used to be true together and no longer are: a subtler
 failure than a stale passage, because neither fact on its own looks wrong.
 
 </Lane>
 <Lane name="build" title="Build it">
 
-The example below extracts triples from two of the synthetic corpus's documents — which part fits
-which model, and which model carries which warranty class — with one model call per document, the
+The example below extracts triples from two of the synthetic corpus's documents: which part fits
+which model, and which model carries which warranty class: with one model call per document, the
 same shape as GraphRAG's own indexing step<Cite n={1}/>. It stores them in a plain dict keyed by
 subject, then answers a two-hop question by walking exactly two edges: a part number to the model
 it fits, then that model to its warranty class. Both edges' citations travel with the answer, so
@@ -105,8 +105,8 @@ itself is a plain Python dict rather than a graph database such as Neo4j, which 
 built to be queried and to scale past a handful of documents would actually use. It also skips
 the clustering and community summarization Microsoft's system does over a large graph, and it
 looks up a fixed two-hop pattern rather than searching the graph for whatever path answers an
-arbitrary question. If a hop is missing — no edge extracted for a part that was never given a fitment, for
-example — the code reports no path found rather than guessing, and if a part fits more than one
+arbitrary question. If a hop is missing (no edge extracted for a part that was never given a fitment, for
+example) the code reports no path found rather than guessing, and if a part fits more than one
 model, the walk follows whichever edge was extracted first, which is a real limitation worth
 noticing rather than a subtle bug this page pretends does not exist.
 
@@ -114,7 +114,7 @@ noticing rather than a subtle bug this page pretends does not exist.
 
 Every step is `decided_by: "code"`: the code always makes both extraction calls, in this order,
 and always walks the graph the same way afterward. The model fills in what a step says, not which
-step runs next. Run it yourself — `--model stub` replays a transcribed extraction rather than
+step runs next. Run it yourself: `--model stub` replays a transcribed extraction rather than
 calling anything, so the walk runs offline; what you see is what the code does with triples, not
 what a model's reading of those documents looks like:
 

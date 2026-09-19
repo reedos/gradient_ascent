@@ -35,7 +35,7 @@ import promptEngineeringRun from '../../data/runs/prompt-engineering.json';
 
 Prompt engineering is writing the request itself well: instructions, examples, an assigned role, a
 required format, and sometimes an explicit ask to reason before answering. It does not change what
-level a technique sits at — this is still level 1, one call, decided entirely by code — it changes
+level a technique sits at (this is still level 1, one call, decided entirely by code). It changes
 what happens inside that one call, by giving the model more to work with than the bare question
 alone.
 
@@ -44,7 +44,7 @@ Every maker that publishes a model also publishes its own guidance for this, bec
 each one helps do not<Cite n={1}/><Cite n={2}/><Cite n={3}/>. None of it is worth doing once and
 trusting forever: write down what a correct answer looks like before changing a prompt, then check
 the new version against the same cases the old one had to pass. This page's example makes that
-concrete — the same question and the same source text, asked two ways, checked by a regular
+concrete: the same question and the same source text, asked two ways, checked by a regular
 expression rather than by reading the reply and deciding it looks better.
 
 This page is marked draft, not published: it has no recorded trace and no scored result file yet,
@@ -98,7 +98,7 @@ done by hand instead of programmed once.
 
 The example runs the exact contrast above: the same question, against the same source passage,
 sent to the model two ways. The structured prompt adds a role, an explicit two-field output
-format, and one worked example — the moves OpenAI's and Anthropic's guides both
+format, and one worked example: the moves OpenAI's and Anthropic's guides both
 describe<Cite n={1}/><Cite n={2}/>. The bare prompt is the question and the passage with nothing
 else added.
 
@@ -107,7 +107,7 @@ else added.
 The check at the end is what turns "did structure help" into something answerable rather than a
 matter of taste: `FIELD_RE` looks for exactly `PART: <something> PRICE: <something>` in the reply.
 Against this site's `StubModel`, the two replies are scripted by hand for the test that exercises
-this example — a well-formatted two-line answer for the structured run, and a hedging sentence
+this example: a well-formatted two-line answer for the structured run, and a hedging sentence
 that never states a part number in that shape for the bare one. That is an honest limit on what a
 stub run can show: it demonstrates the check a real prompt-tuning loop is built from, not a
 finding about how any real model responds to more or less structure. The citations above are the
@@ -119,7 +119,7 @@ Run it yourself:
 
 Every step is `decided_by: "code"`, the same as chat: the code always builds whichever prompt
 style it was asked for and asks the model exactly once. What changes between the two runs is
-entirely inside the prompt, not in the control flow around it — which is the technique in one
+entirely inside the prompt, not in the control flow around it, which is the technique in one
 sentence: something you do to the request, not a different level.
 
 </Lane>
@@ -127,8 +127,8 @@ sentence: something you do to the request, not a different level.
 
 <WhenNot>
 
-Skip adding structure if the bare question already gets the right answer every time you try it —
-structure has its own cost: more tokens on every call, and a format instruction that itself needs
+Skip adding structure if the bare question already gets the right answer every time you try it.
+Structure has its own cost: more tokens on every call, and a format instruction that itself needs
 testing. And if the format absolutely must be valid on every single call rather than usually
 valid, use <Link href="/techniques/structured-output/">structured output</Link> instead of an
 instruction alone: a schema is enforced by the API, a format instruction is only a strong
@@ -172,7 +172,7 @@ suggestion the model can still miss.
   ]}
   comparedTo={{
     label: 'structured output (level 1)',
-    note: 'Structured output enforces a schema at the API level instead of asking for a format in words, for a similar token cost — the difference is whether an invalid reply is even possible, not how much it costs to ask.',
+    note: 'Structured output enforces a schema at the API level instead of asking for a format in words, for a similar token cost: the difference is whether an invalid reply is even possible, not how much it costs to ask.',
   }}
   level={1}
 />

@@ -24,7 +24,7 @@ import Cite from '../../components/page/Cite.astro';
 import Link from '../../components/page/Link.astro';
 
 Cost optimization is choosing, deliberately, which of several ways to spend fewer tokens and less
-time fits a system — not applying all of them by default. The site's own thesis is the first
+time fits a system: not applying all of them by default. The site's own thesis is the first
 lever: use the lowest level that does the job, checked with the <Link href="/worksheet/">decision
 worksheet</Link>, before reaching for any of the levers below it. After that: a smaller model for
 questions that don't need a large one (<Link href="/techniques/routing/">routing</Link>), less
@@ -45,23 +45,23 @@ published rate, not something this site has measured.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Before optimizing anything, check whether the level being used is justified at all — a smaller,
+Before optimizing anything, check whether the level being used is justified at all: a smaller,
 cheaper level that still passes is a bigger saving than any lever inside a level that shouldn't
 have been reached in the first place. The <Link href="/worksheet/">worksheet</Link> is built for
 exactly that question.
 
 Once the level is settled, the levers below it trade differently. A smaller model for easy
-questions saves the most, but only if the easy/hard split is judged correctly — a router that
+questions saves the most, but only if the easy/hard split is judged correctly: a router that
 misjudges a hard question as easy answers it badly with no separate signal that routing, not the
 model, made the mistake, the same failure <Link href="/techniques/ops/">ops</Link> names. Shorter
-context saves on every call it touches, but only if what got cut was truly unneeded — a document
+context saves on every call it touches, but only if what got cut was truly unneeded: a document
 trimmed to fit a smaller window can quietly drop the passage a later question needed.
 
 Caching a repeated prefix only pays for itself if it is genuinely read again inside its window,
 and the break-even is arithmetic you can do from the maker's own published multipliers. On the
 Claude API as its prompt-caching page reads on September 18, 2026, a cache write is charged above the
-ordinary input rate — "1.25 times the base input tokens price" for a five-minute cache, "2 times"
-for a one-hour one — and a read at "0.1 times the base input tokens price." A footnote names two of its current models
+ordinary input rate ("1.25 times the base input tokens price" for a five-minute cache, "2 times"
+for a one-hour one) and a read at "0.1 times the base input tokens price." A footnote names two of its current models
 whose cache hits and refreshes are "priced at 0.025x the base input price," and says that "All
 other models use the standard 0.1x multiplier."<Cite n={1}/> Those are Anthropic's figures for
 Anthropic's models on that date, and they say nothing about any other provider. The shape they
@@ -85,7 +85,7 @@ looks like going in.
 
 The arithmetic is one multiply-and-add per model id: tokens in against the input price, tokens
 out against the output price, both per 1,000 tokens. Every lever above changes one of those four
-numbers rather than the formula — caching changes which price a call's input tokens are billed
+numbers rather than the formula: caching changes which price a call's input tokens are billed
 at, routing changes which row of the price table applies at all, and shorter context changes
 `tokens_in` directly.
 
@@ -100,13 +100,13 @@ Measuring cost per successful task, not per call, is what keeps a cheaper-lookin
 smaller model that answers three times before getting a question right costs more than a larger
 one that answers once, even though every individual call was cheaper. That is exactly what an
 <Link href="/techniques/evals/">eval</Link> scored on outcomes, not on call count, is built to
-catch — the site's own `citation_hit_rate` and `score_overall` fields, read alongside `tokens_in`
+catch: the site's own `citation_hit_rate` and `score_overall` fields, read alongside `tokens_in`
 and `tokens_out` from the same result file, are what a real version of this comparison would use.
 
 `tests/test_example_ops.py` checks this arithmetic directly and is not mine to extend, but it is
 worth reading here: 1,000 input and 1,000 output tokens against a $1/$2-per-1,000-token made-up
 table comes to exactly $3.00, and a model id missing from the table reports `usd: None`, never
-$0.00 — an unpriced call costs something; the estimator just cannot say how much, which is the
+$0.00: an unpriced call costs something; the estimator just cannot say how much, which is the
 same distinction that matters when a lever changes which model answered and the price table
 hasn't caught up yet.
 
@@ -116,7 +116,7 @@ hasn't caught up yet.
 <WhenNot>
 
 Skip every lever below "use the lowest level that does the job" until there is enough real,
-sustained traffic for the engineering cost of adding one to be smaller than what it saves — a
+sustained traffic for the engineering cost of adding one to be smaller than what it saves: a
 cache write costs more than a plain call and only earns that back on a second read; a router is a
 second system to build and keep in sync with whatever it is choosing between.
 
@@ -146,7 +146,7 @@ for hardware and the upkeep of a service you now operate.
   {
     name: 'A cheaper model answers wrong and nobody notices the extra cost of getting it right',
     notice: 'Routing to a smaller model looks like a savings in the per-call numbers, but the smaller model needs a retry or a correction more often, so the true cost per successful task is higher than the per-call price suggested.',
-    test: 'Score cost per successful task, not per call, the way this page\'s "measure by outcome, not by call count" point argues — a lever that wins on the wrong denominator is not actually a saving.',
+    test: 'Score cost per successful task, not per call, the way this page\'s "measure by outcome, not by call count" point argues: a lever that wins on the wrong denominator is not actually a saving.',
   },
   {
     name: 'Batching a request that actually needed an instant answer',
@@ -171,7 +171,7 @@ catalog; <Link href="/techniques/ops/">ops</Link> covers what each level costs t
   so there is nothing to cache; nothing is deferred, so there is nothing to batch.
 - <Link href="/levels/2/">Context</Link>: what you put in the window, because you pay for it on
   every single call. Cutting it and caching the part that cannot be cut are the same lever seen
-  from two sides — see <Link href="/techniques/context-engineering/">context engineering</Link>.
+  from two sides: see <Link href="/techniques/context-engineering/">context engineering</Link>.
 - <Link href="/levels/3/">Workflows</Link>: the step that runs on every question whether it
   needs to or not. Find it first, and only then ask whether it could be batched or skipped.
 - <Link href="/levels/4/">Tools</Link>: not a lever but a budgeting rule. The model decides
@@ -209,8 +209,8 @@ catalog; <Link href="/techniques/ops/">ops</Link> covers what each level costs t
   costAtVolume="Every lever here trades a bit of engineering complexity for a real discount, per
   the maker figures quoted above; the crossover point where that trade is worth making is a
   function of real, sustained volume, not of how the levers look on paper."
-  failsInProduction="A lever's condition stops being true without anyone noticing — a cache's
-  content stops repeating, a batch queue starts holding requests someone is actually waiting on —
+  failsInProduction="A lever's condition stops being true without anyone noticing (a cache's
+  content stops repeating, a batch queue starts holding requests someone is actually waiting on)
   and the saving silently becomes a cost or a complaint instead."
   whatToLog="Which lever, if any, touched each call; tokens in and out; cache hit or miss; whether
   a call was batched or synchronous; and which model actually answered, so cost per successful
@@ -220,9 +220,9 @@ catalog; <Link href="/techniques/ops/">ops</Link> covers what each level costs t
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: "Pick a task you currently do with a single, most-capable chat model. Using the worksheet's own questions, decide whether a cheaper level or a smaller model would still pass -- then actually try it once and compare." },
+  { lane: 'use', body: "Pick a task you currently do with a single, most-capable chat model. Using the worksheet's own questions, decide whether a cheaper level or a smaller model would still pass: then actually try it once and compare." },
   { lane: 'build', body: "Run python -m examples.ops --demo from the repo root and read the RAG row's tokens_in (1,850). Using the cache-write and cache-read multipliers quoted above, work out by hand how many reads inside a five-minute window it takes before caching that prefix has paid for its own write." },
-  { lane: 'either', body: "Pick one technique's Cost and latency strip elsewhere on this site. Name the one lever from this page that would cut its cost the most, and the one condition -- named in this page's own failure modes -- that would have to hold for that lever to actually pay off." },
+  { lane: 'either', body: "Pick one technique's Cost and latency strip elsewhere on this site. Name the one lever from this page that would cut its cost the most, and the one condition (named in this page's own failure modes) that would have to hold for that lever to actually pay off." },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

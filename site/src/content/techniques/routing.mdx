@@ -73,8 +73,8 @@ file yet, so nothing below is measured. It is illustrated.
 <Lane name="use" title="Use it">
 
 If you have built an automation that sends different kinds of incoming items down different
-branches — a support inbox split into billing, technical and general queues, a form that files
-into different systems depending on what it asked for — you have built a router. Zapier's Paths
+branches (a support inbox split into billing, technical and general queues, a form that files
+into different systems depending on what it asked for), you have built a router. Zapier's Paths
 feature is a direct product version of this: "if 'A' happens in your first app, then do this, but
 if 'B' happens, do something else"<Cite n={2}/>, with a rule for each path controlling what is
 allowed to reach it.
@@ -86,7 +86,7 @@ writer did not anticipate, and more expensive and less predictable than a rule, 
 similar messages can occasionally get different labels.
 
 A router is only as good as its smallest category. If "unclear" or "other" quietly becomes the
-largest bucket, the router is not routing — it is mostly declining, and whatever handles that
+largest bucket, the router is not routing: it is mostly declining, and whatever handles that
 bucket needs to be a real path rather than a quiet drop, because "unclear" is usually where the
 questions that need a person's judgment end up. Sending that bucket to someone is <Link
 href="/techniques/human-in-the-loop/">human approval</Link>, the last technique at this level.
@@ -99,19 +99,19 @@ then dispatches to one of three fixed handlers. Only the lookup handler calls th
 the numeric handler answers from an exact part-number match in the parts list with no model call
 at all, and the fallback answers nothing on purpose rather than guess. A question that reaches
 the cheapest handler that can actually answer it costs less than one that reaches the most
-capable one by default — the point Anthropic makes about routing to a smaller model for easy
+capable one by default: the point Anthropic makes about routing to a smaller model for easy
 questions<Cite n={1}/> generalizes to routing to no model at all when a plain lookup will do.
 
 `_parse_label` is the whole boundary between what the model decided and what the code decided:
 it takes the model's raw text, keeps only the first word, and returns it if and only if it is one
-of the three known labels — anything else, including a hedge like "probably lookup," becomes
+of the three known labels: anything else, including a hedge like "probably lookup," becomes
 `unclear`. The routing table itself, `ROUTES = {"lookup": ..., "numeric": ..., "unclear": ...}`,
 is a plain dict the code wrote before the first question ever arrived. The model can steer which
 value comes out of `_parse_label`; it cannot add a fourth key to `ROUTES`.
 
 The fallback route matters as much as the working ones. `_numeric_route` calls the fallback
 itself when the label says "numeric" but no part number pattern actually appears in the question
-— the classifier can be confident about the wrong thing, and the honest response is to defer
+: the classifier can be confident about the wrong thing, and the honest response is to defer
 rather than to force an answer out of a handler that has nothing to work with.
 
 <CodeFile file="examples/routing/run.py" start={24} end={97} expect="LEVEL = 3" />
@@ -140,7 +140,7 @@ and a single end-to-end accuracy number cannot tell those apart.
 <WhenNot>
 
 Try a plain rule (a keyword, a regular expression, a dropdown the user picks from) first if the
-categories are few and easy to tell apart from the surface form of the input — a rule is free to
+categories are few and easy to tell apart from the surface form of the input: a rule is free to
 run, free to test, and never drifts between two similar inputs the way a classifier can. That is
 <Link href="/techniques/order-zero/">level 0, no model at all</Link>: no model at all.
 
@@ -196,8 +196,8 @@ gets it wrong.
 <HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
 
 Two numbers matter here, not one. End-to-end accuracy on the same 60-question set as every other
-technique is the first; routing accuracy — whether the classify step's label matches the kind a
-person would assign the question — is the second, and the site scores them separately so a wrong
+technique is the first; routing accuracy (whether the classify step's label matches the kind a
+person would assign the question) is the second, and the site scores them separately so a wrong
 route and a right route with a wrong answer are not confused with each other.
 
 The `numeric` kind maps directly onto the example's part-number handler; `unanswerable`

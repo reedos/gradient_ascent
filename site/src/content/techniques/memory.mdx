@@ -38,8 +38,8 @@ own beyond the messages inside it, so a product that seems to remember you is wr
 somewhere and reading them back into a later, otherwise unrelated conversation.
 
 Two different things get called memory. A summary is a compressed account of what happened, cheap
-to reread, but whatever it leaves out is gone. A record is closer to the raw fact — a purchase on
-a date, a preference stated once — kept on its own and searched later. Letta draws that line in
+to reread, but whatever it leaves out is gone. A record is closer to the raw fact (a purchase on
+a date, a preference stated once) kept on its own and searched later. Letta draws that line in
 its own product: a small "core" memory that stays in the context window, and a larger "archival"
 memory that cannot be pinned there and has to be queried on demand with a search
 tool<Cite n={3}/>. Mem0, which sells memory infrastructure for other people's products rather than
@@ -58,7 +58,7 @@ recorded trace and no scored result file, so nothing below is measured.
 <Lane name="use" title="Use it">
 
 If a chat app has ever surprised you by remembering something from an earlier, separate
-conversation — a preference, a project, a person you mentioned — you have used this. Several
+conversation (a preference, a project, a person you mentioned) you have used this. Several
 chat apps have the feature now; the ones this site has checked are listed under Out there at the
 foot of this page. They do not all behave the same way, so the three questions below are worth
 asking of whichever one you use, rather than assuming what you learned from another.
@@ -66,7 +66,7 @@ asking of whichever one you use, rather than assuming what you learned from anot
 **What is stored, and can you see it?** Anthropic documents Claude's answer: everything Claude
 memory holds is listed by topic in the settings, and you can open any topic to read it, edit it,
 or delete that one on its own. By default it does not store personal or sensitive subject matter
-— health, race, ethnicity, religious beliefs, politics, gender identity and similar areas — unless
+(health, race, ethnicity, religious beliefs, politics, gender identity and similar areas) unless
 you turn that on<Cite n={1}/>.
 
 **Who can see it?** In Claude, memory is per person: Anthropic says an account's owners
@@ -89,14 +89,14 @@ something wrong a year ago and nobody has read since.
 <Lane name="build" title="Build it">
 
 The example below is a small store with the three operations that matter: `write`, `recall`, and
-`forget`. It is handed a list of facts already stated — the extraction step a real product runs
+`forget`. It is handed a list of facts already stated: the extraction step a real product runs
 to decide what is worth keeping is its own model call this example does not duplicate, since
 <Link href="/techniques/knowledge-graphs/">the knowledge graphs example</Link> already shows that
 shape (one model call, always made, that fills in content rather than choosing what happens
 next). What this example shows instead is what happens after writing: `recall` ranks stored facts
 by cosine similarity to a new question, the same mechanism as
 <Link href="/techniques/embeddings-search/">embeddings and search</Link> and the same bag-of-words
-stub embedder, just over a handful of personal facts instead of a document corpus — so the scores
+stub embedder, just over a handful of personal facts instead of a document corpus: so the scores
 it prints show the mechanism and say nothing about how a real embedding model would rank them.
 `forget` removes an entry outright; nothing recalled afterward can include it again, which is the
 whole reason the operation exists rather than being another kind of write.
@@ -104,7 +104,7 @@ whole reason the operation exists rather than being another kind of write.
 <CodeFile file="examples/memory/run.py" func="run" />
 
 Ask about a dishwasher's warranty with all four sample facts in memory, and recall surfaces the
-purchase date and the fact that the unit is in a rental property — both relevant, since rental
+purchase date and the fact that the unit is in a rental property: both relevant, since rental
 use caps the warranty at 90 days regardless of the standard term. Forget the rental-property fact
 first and ask again: the recalled set and the citations both change, and the model is answering a
 different question, because that fact no longer exists anywhere the code can reach. Run it
@@ -123,7 +123,7 @@ turned up.
 
 Try <Link href="/techniques/context-engineering/">context engineering</Link> first if everything
 relevant is already in the current conversation. Memory only matters for information that has to
-survive after a conversation ends — a single session never needs it.
+survive after a conversation ends: a single session never needs it.
 
 Move to memory once a product needs to answer questions using something a user said in a
 different, earlier conversation, not just the one open right now.
@@ -183,7 +183,7 @@ different, earlier conversation, not just the one open right now.
 The site's shared 60-question set is asked within a single sitting over one document set, so it
 does not test what memory is actually for: a fact stated in one session and needed again in a
 separate, later one. A fair eval for this technique would need its own question set, written as
-pairs across sessions — a fact stated in session one, a question in session two that depends on
+pairs across sessions: a fact stated in session one, a question in session two that depends on
 recalling it, and a check that a fact explicitly forgotten between sessions no longer affects the
 answer.
 

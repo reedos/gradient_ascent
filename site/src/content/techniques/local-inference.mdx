@@ -33,7 +33,7 @@ import Link from '../../components/page/Link.astro';
 
 Running a model locally means downloading an open-weight model's parameters and running them on
 your own hardware instead of calling a hosted API. llama.cpp, one runtime built for this,
-describes itself in four words — "LLM inference in C/C++" — and states its goal as inference
+describes itself in four words ("LLM inference in C/C++") and states its goal as inference
 "with minimal setup and state-of-the-art performance on a wide range of hardware - locally and in
 the cloud"<Cite n={2}/>. Why: privacy (nothing leaves the machine), cost at real volume (no
 per-token bill), working offline, and control over exactly which model version runs. What it
@@ -55,24 +55,24 @@ with no account and no per-call bill; the pricing section of Ollama's own home p
 "Local models are always free"<Cite n={1}/>. What you give up against a hosted frontier model is quality at the
 top end: the largest, most capable models are usually not ones an ordinary computer can run at
 all, so a local setup means picking a model that actually fits, and checking on your own task
-whether it is good enough — the same question an <Link href="/techniques/evals/">eval</Link>
+whether it is good enough: the same question an <Link href="/techniques/evals/">eval</Link>
 exists to answer, not a general claim this page can make for you.
 
 Quantization is the lever that makes a large model fit smaller hardware. It reduces the
-precision each weight is stored at — llama.cpp's own documentation puts it plainly: quantization
+precision each weight is stored at, llama.cpp's own documentation puts it plainly: quantization
 "reduces the precision of model weights (e.g., from 32-bit floats to 4-bit integers), which
 shrinks the model's size and can speed up inference." The same page is careful about the cost:
 the process "may introduce some accuracy loss which is usually measured in Perplexity (ppl)
 and/or Kullback–Leibler Divergence (kld)," and that it "can be minimized by using a suitable
 imatrix file"<Cite n={3}/>. So: a smaller quantization fits smaller hardware and may run
 faster, at a quality cost that is specific to the model, the method and the setting, and is
-measured rather than assumed. Name the exact quantization you ran — Q4_K_M is not "4-bit" in
-general — whenever you report what it cost you.
+measured rather than assumed. Name the exact quantization you ran (Q4_K_M is not "4-bit" in
+general) whenever you report what it cost you.
 
 Context length is the other lever, and the less obvious one: a longer context window costs
 memory even before a single token of it is used, which is what this page's own example measures.
 A chat app or assistant that lets you pick a smaller "context size" or "memory" setting locally
-is trading exactly this — how much the model can see at once — for how much hardware it needs.
+is trading exactly this (how much the model can see at once) for how much hardware it needs.
 
 </Lane>
 <Lane name="build" title="Build it">
@@ -109,7 +109,7 @@ several attention heads share one key/value head, so a model's key/value head co
 fraction of its attention head count, and passing the larger number quietly inflates the whole
 estimate. It comes from the model's own config, not from this function.
 
-The cache then multiplies by how many sequences — concurrent requests — are held at once, which
+The cache then multiplies by how many sequences (concurrent requests) are held at once, which
 is the cost of serving several users from one running model rather than one at a time. That
 multiplication is the naive ceiling, and servers are built to avoid paying it in full: vLLM
 documents "Efficient management of attention key and value memory with PagedAttention" and
@@ -118,16 +118,16 @@ models neither, so a real server with either should need less than the number pr
 the same concurrency, while still needing more than it for everything else.
 
 `python -m examples.local_inference --demo` prints the same illustrative 8B-parameter shape four
-ways — full precision against roughly 4-bit, a short context against a long one, one user against
-eight — so each variable's effect is visible on its own:
+ways (full precision against roughly 4-bit, a short context against a long one, one user against
+eight) so each variable's effect is visible on its own:
 
 <CodeFile file="examples/local_inference/README.md" start={11} end={11} lang="text" expect="python -m examples.local_inference --demo" />
 
 `tests/test_example_local_inference.py` checks the arithmetic against numbers computed by hand,
 never against a real model: 1,000,000 parameters at 16 bits is exactly 2,000,000 bytes, and a
 small cache shape works out to exactly 640 bytes. It also pins the two proportionalities the
-sizing questions on this page turn on — doubling the context doubles the cache, eight sequences
-cost eight times one — and that a smaller `bits_per_weight` only ever shrinks the weights term,
+sizing questions on this page turn on (doubling the context doubles the cache, eight sequences
+cost eight times one) and that a smaller `bits_per_weight` only ever shrinks the weights term,
 leaving the cache alone, because quantizing weights does nothing about what a conversation is.
 
 </Lane>
@@ -178,13 +178,13 @@ once a model small enough to run locally already passes the eval that matters fo
 
 ## At each level
 
-- <Link href="/levels/0/">No model</Link>: nothing to run locally — this topic's own concerns
+- <Link href="/levels/0/">No model</Link>: nothing to run locally: this topic's own concerns
   start at level 1.
-- <Link href="/levels/1/">One call</Link>: the smallest case — one short prompt, one short
-  answer, the least memory this page's own estimator will ever report for a given model.
+- <Link href="/levels/1/">One call</Link>: the smallest case (one short prompt, one short
+  answer), the least memory this page's own estimator will ever report for a given model.
 - <Link href="/levels/2/">Context</Link>: a retrieved passage set or a large pasted document
   fills the context window before the model answers at all, so context length, not just model
-  size, starts to drive the memory number — the same window
+  size, starts to drive the memory number: the same window
   <Link href="/techniques/rag/">RAG</Link>'s own prompt assembly fills.
 - <Link href="/levels/4/">Tools</Link>: tool definitions and their results are extra tokens in
   the same context window, so a tool-heavy <Link href="/techniques/function-calling/">function
@@ -192,9 +192,9 @@ once a model small enough to run locally already passes the eval that matters fo
   with no tools at all.
 - <Link href="/levels/5/">Agents</Link>: a long-running loop's transcript keeps growing across
   turns, so the KV cache a <Link href="/techniques/single-agent/">single agent</Link> run needs
-  grows with it — a context budget sized for one exchange is not sized for a whole run.
+  grows with it: a context budget sized for one exchange is not sized for a whole run.
 - <Link href="/levels/6/">Teams of agents</Link>: several agents worked at once on one machine
-  are exactly the "several sequences" case this page's own `num_sequences` parameter counts —
+  are exactly the "several sequences" case this page's own `num_sequences` parameter counts:
   <Link href="/techniques/orchestrator-workers/">a lead and its workers</Link> running locally
   multiplies the KV cache cost by however many are active together, not just by one.
 - <Link href="/levels/7/">Always-on agents</Link>: load is sustained rather than one burst per
@@ -212,7 +212,7 @@ once a model small enough to run locally already passes the eval that matters fo
   and keep the gap; that gap is the activation memory and overhead nobody's formula counts.
 - Decide quantization with an <Link href="/techniques/evals/">eval</Link> on your own task, and
   record the exact quantization you ran, not "4-bit".
-- Compare against what the hosted alternative costs over the same period before buying anything —
+- Compare against what the hosted alternative costs over the same period before buying anything:
   that arithmetic belongs to <Link href="/techniques/cost-optimization/">cost optimization</Link>,
   and hardware is a fixed cost that does not care whether you use it.
 
@@ -220,7 +220,7 @@ once a model small enough to run locally already passes the eval that matters fo
 
 <RunIt
   monitor="Memory actually in use against what was sized for, and how many concurrent requests
-  are being served against how many the hardware was budgeted for -- both from this page's own
+  are being served against how many the hardware was budgeted for: both from this page's own
   estimator, checked against the real runtime's own reported usage."
   costAtVolume="Local inference trades a per-call bill for hardware you buy and keep running;
   whether that trade pays depends on real, sustained volume, not on how the hardware looks on
@@ -229,8 +229,8 @@ once a model small enough to run locally already passes the eval that matters fo
   request arrives than the hardware was budgeted to hold, and the failure looks like the model
   being slow or crashing rather than a sizing problem."
   whatToLog="Context length actually used per request, concurrent request count over time, and
-  memory actually consumed, so a sizing failure traces back to which of the two terms -- weights
-  or KV cache -- was undersized, rather than reading as a generic slowdown."
+  memory actually consumed, so a sizing failure traces back to which of the two terms (weights
+  or KV cache) was undersized, rather than reading as a generic slowdown."
 />
 
 ## Try it

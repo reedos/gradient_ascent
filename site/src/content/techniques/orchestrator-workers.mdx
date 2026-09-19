@@ -44,8 +44,8 @@ import Link from '../../components/page/Link.astro';
 import orchestratorRun from '../../data/runs/orchestrator-workers.json';
 
 Level 6 starts where a single model stops being the whole team. A lead model reads the task,
-decides how to split it, and hands each piece to a worker — itself either one call or a
-<Link href="/techniques/single-agent/">single agent</Link> loop — and a lead call combines what
+decides how to split it, and hands each piece to a worker (itself either one call or a
+<Link href="/techniques/single-agent/">single agent</Link> loop) and a lead call combines what
 comes back. Anthropic names this shape orchestrator-workers: "a central LLM dynamically breaks
 down tasks, delegates them to worker LLMs, and synthesizes their results"<Cite n={1}/>, well
 suited, it says, to work "where you can't predict the subtasks needed"<Cite n={1}/>.
@@ -53,7 +53,7 @@ suited, it says, to work "where you can't predict the subtasks needed"<Cite n={1
 What makes this level 6 and not level 5 is not that several models run a loop; a single agent
 already does that. It is that one model's own output now decides what *other* models are asked to
 do. Your code still runs every worker, moves every message and result between lead and worker,
-and enforces a cap on how many workers may spawn and how many tokens the whole team may spend —
+and enforces a cap on how many workers may spawn and how many tokens the whole team may spend:
 caps the lead cannot see or override, the same way a single agent's step cap works.
 
 This page is marked draft, not published: lead agent and workers has no recorded trace and no
@@ -70,7 +70,7 @@ Claude Code's subagents are the clearest version of this a reader outside a rese
 likely used: "when Claude encounters a task that matches a subagent's description, it delegates to
 that subagent, which works independently and returns results"<Cite n={3}/>, each one running "in
 its own context window with a custom system prompt, specific tool access, and independent
-permissions"<Cite n={3}/> — the isolation is the point, not a side effect. Anthropic's own Claude
+permissions"<Cite n={3}/>: the isolation is the point, not a side effect. Anthropic's own Claude
 Research feature works the same way at the product level: "the lead agent analyzes [a query],
 develops a strategy, and spawns subagents to explore different aspects simultaneously"<Cite
 n={2}/>. Grok Build and Devin Desktop are both registered as demonstrating this shape too, under
@@ -85,7 +85,7 @@ simultaneously"<Cite n={2}/>.
 That isolation is also what the failures above look like. Without a specific brief, Anthropic's
 own team found "agents duplicate work, leave gaps, or fail to find necessary information"<Cite
 n={2}/>, and in an early version "agents made errors like spawning 50 subagents for simple
-queries"<Cite n={2}/> — a runaway team costs like a runaway single agent, multiplied by however
+queries"<Cite n={2}/>: a runaway team costs like a runaway single agent, multiplied by however
 many workers spawned. What to watch for in a product built this way: whether it names a cap on
 workers at all, and whether a stalled or duplicated-looking run tells you so or just returns an
 answer that quietly skipped something.
@@ -101,14 +101,14 @@ data" and this site has measured nothing.
 
 One call asks the lead to split the question into independent sub-questions, one per line, at
 most `MAX_WORKERS` (3 by default). Code parses that text into a list, drops exact duplicates, and
-caps it at `MAX_WORKERS` if the lead asked for more — the lead's split is a proposal the code is
+caps it at `MAX_WORKERS` if the lead asked for more: the lead's split is a proposal the code is
 free to cut down, never a command code obeys blindly. Anthropic's own research system names what a
 good brief needs: "each subagent needs an objective, an output format, guidance on the tools and
 sources to use, and clear task boundaries"<Cite n={2}/>; this example's brief is just the
 sub-question text, the simplest version of that, since every worker already shares one tool (the
 corpus) and one output shape (a cited answer).
 
-Each worker is `examples.rag.run.run`, imported and called unmodified — a level-2 single call, not
+Each worker is `examples.rag.run.run`, imported and called unmodified: a level-2 single call, not
 a loop, which satisfies "a level 5 loop or a single call" at the cheap end. A team that needed a
 worker to search iteratively would hand it `examples.agentic_rag.run.run` instead; nothing else in
 this file would change, since both share the same `(question, model, embedder, tracer) -> Answer`
@@ -119,7 +119,7 @@ signature.
 `tracer.tokens_in_total() + tracer.tokens_out_total()` is the whole team's running spend, checked
 before every worker spawns; once it passes `MAX_TEAM_TOKENS` (6,000 by default) the remaining
 sub-questions are dropped and the run ends with whatever workers already answered, rather than
-spawning one more. The split call is the only step in this file with `decided_by: "model"` — the
+spawning one more. The split call is the only step in this file with `decided_by: "model"`: the
 lead's output is what picks which sub-questions exist and how many workers run. Every worker's own
 steps stay `decided_by: "code"`, the same as <Link href="/techniques/rag/">RAG</Link>'s page,
 because retrieval inside a worker is still fixed. The diagram above draws that one call as two
@@ -133,7 +133,7 @@ Run it yourself:
 CrewAI's own README describes a similar split: a "Crew" is built for "dynamic task delegation and
 collaboration"<Cite n={4}/>, and its optional hierarchical process "automatically assigns a manager
 to the defined crew to properly coordinate the planning and execution of tasks through delegation
-and validation of results"<Cite n={4}/> — the manager checks the work as well as parcelling it out,
+and validation of results"<Cite n={4}/>: the manager checks the work as well as parcelling it out,
 which this example's combine step does not. Microsoft's AutoGen, also registered against this
 technique, now carries a maintenance notice: "AutoGen is now in maintenance mode. It will not
 receive new features or enhancements and is community managed going forward." and "New users
@@ -146,11 +146,11 @@ may not be the one to build on by the time you read this.
 <WhenNot>
 
 Try a <Link href="/techniques/single-agent/">single agent</Link> first if one model, in one loop,
-can hold the whole task in its own context window — most tasks can. A team only pays for itself
+can hold the whole task in its own context window: most tasks can. A team only pays for itself
 once the work genuinely does not fit one window or one line of reasoning.
 
 Try <Link href="/techniques/parallelization/">parallel calls</Link> instead if you already know,
-before the question arrives, what the fixed set of subtasks is — sectioning a document into three
+before the question arrives, what the fixed set of subtasks is: sectioning a document into three
 known parts, for instance. That costs the same every run and needs no lead call to decide anything.
 
 Move up to a lead and workers once the split itself cannot be written down in advance: the number
@@ -173,7 +173,7 @@ and shape of the subtasks depend on what the specific question turns out to need
   },
   {
     name: 'The lead drops a worker at combine time',
-    notice: "A worker returned a real, cited answer, but the combined final answer never uses it — the same failure RAG has when a retrieved passage goes unused, one level up.",
+    notice: "A worker returned a real, cited answer, but the combined final answer never uses it: the same failure RAG has when a retrieved passage goes unused, one level up.",
     test: "Compare every worker's citations against the final answer's citations. A worker's citation that never appears in the combined answer was dropped, not wrong.",
   },
   {
@@ -194,7 +194,7 @@ and shape of the subtasks depend on what the specific question turns out to need
   ]}
   comparedTo={{
     label: 'a single agent answering the same question (level 5)',
-    note: 'Every worker pays roughly what a RAG call alone costs, on top of the split and combine calls, so a two-worker run costs on the order of three single calls, not one — before counting a bigger team or a worker that is itself a loop.',
+    note: 'Every worker pays roughly what a RAG call alone costs, on top of the split and combine calls, so a two-worker run costs on the order of three single calls, not one: before counting a bigger team or a worker that is itself a loop.',
   }}
   level={6}
 />
@@ -205,8 +205,8 @@ and shape of the subtasks depend on what the specific question turns out to need
 
 `orchestrator_workers` answers the same question-about-the-documents task `rag` and
 `single_agent` are scored on: every worker cites what it retrieved, and the lead's combined
-answer keeps those citations, so it fits the site's 60-question set the same way — exact or
-rubric match, citation hit rate — plus the split-specific numbers a team adds: workers spawned per
+answer keeps those citations, so it fits the site's 60-question set the same way (exact or
+rubric match, citation hit rate) plus the split-specific numbers a team adds: workers spawned per
 question, and the share of questions where the team token budget cut a worker off before it ran.
 
 `scripts/eval_run.py` counts `orchestrator_workers` among the examples the question set can

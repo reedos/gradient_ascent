@@ -54,7 +54,7 @@ site's own small version of it.
 If a product you use shows "thinking" steps, tool calls, or a "sources" panel while it works,
 that is observability surfaced to you directly: a trace the product recorded for its own
 debugging, with a reader-facing view built on top. When an answer looks wrong, that panel is
-where to look first — which step, if any, went off track — rather than only rereading the final
+where to look first (which step, if any, went off track) rather than only rereading the final
 text.
 
 The same question a builder asks of a system applies to a product you did not build: can you
@@ -66,7 +66,7 @@ calls it made, or a citation trail gives you something to check against, the sam
 Cost and time are also worth watching, not just correctness. If a product's answers are slow or
 it hits a usage limit, that is very often one expensive or malfunctioning step, not the whole
 system being slow. Without a per-step view there is no way to tell "one bad step" apart from
-"everything is slow" from the outside — and per-step numbers are also what
+"everything is slow" from the outside, and per-step numbers are also what
 <Link href="/techniques/cost-optimization/">cost optimization</Link> needs before it can say
 which lever would help.
 
@@ -82,7 +82,7 @@ about to have a very large bill.
 
 This site's own `trace.json`, written by `examples/common/trace.py`, is a small version of the
 same idea: an ordered list of steps, each with a `kind`, a `decided_by`, a title, a detail
-string, token counts, a duration in milliseconds, and which edge style it draws — solid for
+string, token counts, a duration in milliseconds, and which edge style it draws: solid for
 code, dashed for model:
 
 <CodeFile file="examples/common/trace.py" cls="Step" />
@@ -103,8 +103,8 @@ instrumentation to do so. Instrumentation that doesn't support configuration MUS
 
 `examples/observability/run.py` shows the same shape working on a real trace: `to_otel_spans`
 turns this site's own step list into span-shaped dictionaries named the way OpenTelemetry's own
-generative AI conventions name them — `gen_ai.operation.name`, `gen_ai.usage.input_tokens`,
-`gen_ai.usage.output_tokens` — so a trace this site already records could be handed to any
+generative AI conventions name them (`gen_ai.operation.name`, `gen_ai.usage.input_tokens`,
+`gen_ai.usage.output_tokens`), so a trace this site already records could be handed to any
 OpenTelemetry-reading backend instead of only this site's own player. Those three names are
 copied from a specification whose own status line reads Development as of the date above; nothing
 here claims to implement a finished standard, only to borrow its attribute names<Cite n={3}/>.
@@ -115,8 +115,8 @@ The content question is a parameter, not an afterthought: `capture_content` defa
 so a step's `detail` never reaches the returned spans unless a caller turns it on deliberately.
 `tests/test_example_observability.py` pins that a secret planted in a `detail` is absent from the
 default output and present only when `capture_content=True`. Three attacks on that redaction are
-worth knowing about, and the same test file pins all three. A `detail` is free text — it can hold
-a retrieved passage, a tool call's arguments, or an error message that quotes the prompt back —
+worth knowing about, and the same test file pins all three. A `detail` is free text (it can hold
+a retrieved passage, a tool call's arguments, or an error message that quotes the prompt back),
 so redaction has to cover the field, not a list of the things people expect to find in it. A
 captured `detail` goes to this site's own `gradient_ascent.detail`, never to
 `gen_ai.input.messages`, which the specification defines as a structured list of messages: the
@@ -131,8 +131,8 @@ much easier to fill than to clean.
 Linking a trace to a scored result is a join on fields both already carry: this site's
 `trace.json` records a `commit`, and a result file under `evals/results/` (see
 `docs/EVALS.md`) records its own `commit` and `run_date` alongside `citation_hit_rate` and
-`tokens_in`/`tokens_out`. No such pair exists yet — no example has a recorded trace or a
-non-stub result file — but the fields to join them on are already there on both sides. Run it
+`tokens_in`/`tokens_out`. No such pair exists yet (no example has a recorded trace or a
+non-stub result file), but the fields to join them on are already there on both sides. Run it
 yourself:
 
 <CodeFile file="examples/observability/README.md" start={22} end={22} lang="text" expect="python -m examples.observability --demo" />
@@ -143,7 +143,7 @@ yourself:
 <WhenNot>
 
 Skip a tracing format, sampling policy and content-redaction rule for a single script you run
-yourself and read the output of directly — the terminal you are looking at already is the trace.
+yourself and read the output of directly: the terminal you are looking at already is the trace.
 Add structured tracing once a system runs unattended, has more than one or two steps that could
 each go wrong differently, or is used by someone other than the person who can read its logs.
 
@@ -154,8 +154,8 @@ and migrating off it later.
 
 If every call already goes through <Link href="/techniques/ai-gateways/">an AI gateway</Link>,
 some of this is being recorded for you at that hop: one log line per call, with the token counts
-and which provider answered. What a gateway cannot see is what happened between calls — the
-retrieval, the tool result, the branch your own code took — which is the part a trace is for.
+and which provider answered. What a gateway cannot see is what happened between calls (the
+retrieval, the tool result, the branch your own code took), which is the part a trace is for.
 
 </WhenNot>
 
@@ -175,7 +175,7 @@ retrieval, the tool result, the branch your own code took — which is the part 
   {
     name: 'Sampling drops exactly the traces worth reading',
     notice: 'A fixed sampling rate keeps a representative slice of ordinary traffic, but the rare, expensive, failing run is exactly as likely to be dropped as any other, so the traces that would explain an incident are gone by the time anyone looks.',
-    test: "Check whether the sampling policy ever keeps a trace because it was slow, expensive, or errored, not only because a random draw kept it — OpenTelemetry's own distinction between a decision made early and one made after seeing the whole trace is what this test is asking about.",
+    test: "Check whether the sampling policy ever keeps a trace because it was slow, expensive, or errored, not only because a random draw kept it: OpenTelemetry's own distinction between a decision made early and one made after seeing the whole trace is what this test is asking about.",
   },
   {
     name: 'Cost and latency are only known in aggregate',
@@ -184,7 +184,7 @@ retrieval, the tool result, the branch your own code took — which is the part 
   },
   {
     name: 'Redaction is switched on after the content is already stored',
-    notice: "A redaction rule is added once someone notices prompts in the trace store, and the traces recorded before it still hold everything they held that morning — the new rule only governs what gets written from now on.",
+    notice: "A redaction rule is added once someone notices prompts in the trace store, and the traces recorded before it still hold everything they held that morning: the new rule only governs what gets written from now on.",
     test: "Search the existing store, not the code path, for the pattern you just started redacting; if it is still there, the work left is a deletion and a retention policy, not a code change.",
   },
   {
@@ -197,15 +197,15 @@ retrieval, the tool result, the branch your own code took — which is the part 
 ## At each level
 
 - <Link href="/levels/0/">No model</Link>: there is nothing to trace that a normal application
-  log does not already cover — this topic's own concerns start at level 1.
+  log does not already cover: this topic's own concerns start at level 1.
 - <Link href="/levels/1/">One call</Link>: one span, the way
   <Link href="/techniques/chat/">chat</Link>'s own trace is a single model step; the whole
   question is whether that one call's tokens, time and outcome are recorded at all.
 - <Link href="/levels/2/">Context</Link>: what got retrieved is now part of the trace, not just
-  the model call — <Link href="/techniques/rag/">RAG</Link>'s own citations are exactly the
+  the model call: <Link href="/techniques/rag/">RAG</Link>'s own citations are exactly the
   record a reviewer needs to check an answer against its sources.
 - <Link href="/levels/3/">Workflows</Link>: a fixed number of steps means a trace can be
-  compared against the pipeline's own diagram directly — a step that is missing or repeated is
+  compared against the pipeline's own diagram directly: a step that is missing or repeated is
   visible without reading a single token of content.
 - <Link href="/levels/4/">Tools</Link>: a tool call's arguments and result belong in the trace
   as their own step, not folded into the model step around them, since a wrong argument and a
@@ -219,7 +219,7 @@ retrieval, the tool result, the branch your own code took — which is the part 
   <Link href="/techniques/agent-graphs/">agent graphs</Link>' own handoffs need to be
   attributable to a specific agent after the fact.
 - <Link href="/levels/7/">Always-on agents</Link>: nobody is watching a run as it happens, so
-  the trace is the entire record a person has after the fact — sampling policy matters most
+  the trace is the entire record a person has after the fact: sampling policy matters most
   here, since a dropped trace from a system like
   <Link href="/techniques/agent-teammates/">an always-on assistant</Link> cannot be reconstructed
   by asking the model again.
@@ -229,13 +229,13 @@ retrieval, the tool result, the branch your own code took — which is the part 
 - Record tokens in, tokens out and wall time per step, not only per request, so an average
   latency number cannot hide one consistently slow step.
 - Default to not capturing prompt or answer content, and make capturing it an explicit, separate
-  choice — the requirement level OpenTelemetry marks its own message-content attributes with.
+  choice: the requirement level OpenTelemetry marks its own message-content attributes with.
 - Keep content out of the fields nobody thinks of as content: a span's name, a step's title, an
   error string that echoes what was sent. Redaction that covers one field and not those is a
   policy with a hole in it.
 - Give every trace and every scored result a shared id to join on (this site uses the commit
   the code was at), so a bad result can be traced back to a run without guessing which one it was.
-- Bias sampling toward keeping the traces most worth reading — slow, expensive or failed runs —
+- Bias sampling toward keeping the traces most worth reading (slow, expensive or failed runs)
   rather than a uniform random sample that treats an incident the same as an ordinary request.
 - Read the built trace against the pipeline's own diagram after any change to the code that
   produces it, the way this site's own tests check a trace's `decided_by` pattern against the
@@ -252,7 +252,7 @@ retrieval, the tool result, the branch your own code took — which is the part 
   failsInProduction="A trace exists but nothing links it to the bad result someone is asking
   about, or the one trace that would explain an incident was the one sampling dropped."
   whatToLog="Per-step kind, decided_by, tokens in and out, wall time, and a shared id linking the
-  trace to any scored result — content only when explicitly opted in, never by default."
+  trace to any scored result: content only when explicitly opted in, never by default."
 />
 
 ## Try it

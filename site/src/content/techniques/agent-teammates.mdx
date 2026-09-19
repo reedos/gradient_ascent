@@ -55,7 +55,7 @@ says the same thing about Muse: it "runs on its own dedicated computer in the cl
 no one else's agent can reach it"<Cite n={2}/>.
 
 Two decisions move off the person at this level. A scheduler or an event decides *when* a session
-starts — a tick, a new message, a calendar reminder — and that part is ordinary code, no
+starts (a tick, a new message, a calendar reminder) and that part is ordinary code, no
 different from a cron job. What is new is that the *model* decides what happens once it is
 running: whether anything needs attention at all, and if so, what to do about it.
 
@@ -89,7 +89,7 @@ A roster is the more advanced version. Grok Bot's own page: "People inside Space
 multiple Bots in parallel, with one to manage the others. A chief of staff sits on top, with a
 specialist for each lane"<Cite n={1}/>. The same page describes how a bot learns a routine: "The
 best way for a Bot to learn your workflow is to ask it to follow along the next time you do a
-job. It watches the steps and remembers how you like the work done"<Cite n={1}/> — demonstration,
+job. It watches the steps and remembers how you like the work done"<Cite n={1}/>: demonstration,
 not a written spec.
 
 Three mechanisms matter though you rarely see them. A credential vault: "Muse has no visibility
@@ -104,7 +104,7 @@ when needed"<Cite n={2}/>.
 
 Find three things before relying on any of them: what it keeps between sessions, what it may do
 while you are asleep, and how to stop it without the assistant's cooperation. Then read the
-approval queue and the overnight activity log each morning — the only account you get of what
+approval queue and the overnight activity log each morning: the only account you get of what
 happened while you were away.
 
 </Lane>
@@ -113,14 +113,14 @@ happened while you were away.
 The example is the piece behind all of the approval behavior above: one scheduled tick, a model
 that proposes actions, and a fixed, code-side policy that sorts each one into exactly three
 classes regardless of what the model asked for. `run_tick` takes a digest of what changed,
-offers the model one tool per action type, and records whatever it calls — zero calls is a valid
+offers the model one tool per action type, and records whatever it calls: zero calls is a valid
 answer, meaning the model decided nothing needed doing.
 
 <CodeFile file="examples/agent_teammates/run.py" func="run_tick" />
 
 `POLICY` is the whole security model: a plain dict from an action name to `"auto"`, `"approval"`,
 or `"forbidden"`. An action type the table does not mention falls back to `DEFAULT_POLICY`, which
-is `"forbidden"` — the same least-privilege default
+is `"forbidden"`: the same least-privilege default
 <Link href="/techniques/safety/">the safety topic</Link> argues for at every level, applied here
 to actions instead of tool calls. `make_payment` and `share_credential` are pinned to `forbidden`
 outright: no digest, no phrasing, no scripted plan gets either of them run, because the code never
@@ -149,8 +149,8 @@ said what it wants to do. For the scheduler and the state that survives between 
 <Link href="/techniques/long-horizon/">long-running tasks</Link>.
 
 `tests/test_example_agent_teammates.py` scripts a model that proposes one action from each of the
-three classes in a single tick and checks all three outcomes at once — the `auto` one ran, the
-`approval` one sits queued and unrun, and the `forbidden` one never touches `Mailbox` — plus
+three classes in a single tick and checks all three outcomes at once (the `auto` one ran, the
+`approval` one sits queued and unrun, and the `forbidden` one never touches `Mailbox`) plus
 separate tests that an action type nobody classified defaults to forbidden rather than auto, that
 a forbidden item planted directly in the queue is still refused at approval time, and that an
 approval with nobody's name on it runs nothing. Run it yourself:
@@ -163,7 +163,7 @@ approval with nobody's name on it runs nothing. Run it yourself:
 <WhenNot>
 
 Try <Link href="/techniques/single-agent/">a single agent</Link> first if a person is the one
-starting each run. What makes this level different is the trigger, not the loop — if nothing
+starting each run. What makes this level different is the trigger, not the loop: if nothing
 needs to happen unless someone asks, you do not need a scheduler deciding when to wake the model
 up.
 
@@ -173,7 +173,7 @@ unattended between one request and the next.
 
 Move up to an always-on assistant once the work genuinely needs to happen without anyone asking
 for it that day, and once you are ready to build or configure the three-way policy this page's
-example shows — because without one, "the model decides" and "runs unattended" is the same
+example shows: because without one, "the model decides" and "runs unattended" is the same
 sentence as "nothing stops it."
 
 </WhenNot>
@@ -183,8 +183,8 @@ sentence as "nothing stops it."
 <FailureModes modes={[
   {
     name: 'An action type is missing from the policy table',
-    notice: "A new tool or action ships, nobody adds it to the policy, and it runs unattended by accident — the opposite of what a missing entry should mean.",
-    test: 'Check the default. A policy whose unclassified default is "auto" fails open; this example\'s default is "forbidden", so a missing entry fails closed instead — confirm that is still true after any change to the policy table.',
+    notice: "A new tool or action ships, nobody adds it to the policy, and it runs unattended by accident: the opposite of what a missing entry should mean.",
+    test: 'Check the default. A policy whose unclassified default is "auto" fails open; this example\'s default is "forbidden", so a missing entry fails closed instead: confirm that is still true after any change to the policy table.',
   },
   {
     name: 'The approval queue grows and nobody looks at it',
@@ -233,7 +233,7 @@ does not apply, the same reason it does not apply to
 <Link href="/techniques/computer-use/">computer use</Link>. What would be measured here is the
 policy, not an answer: the share of proposed actions correctly sorted into each of the three
 classes against a labeled set of action types, the share of `forbidden` actions that reach
-`_EXECUTORS` under any input (this should be exactly zero, always — `tests/test_example_agent_teammates.py`
+`_EXECUTORS` under any input (this should be exactly zero, always; `tests/test_example_agent_teammates.py`
 checks it on the stub every time the suite runs), and the average age of a queued approval before
 a person resolves it.
 
@@ -244,8 +244,8 @@ a person resolves it.
 <RunIt
   monitor="Approval queue depth and the age of its oldest item, the count of forbidden actions the policy refused this period (a sudden rise is worth reading, not just alerting on), and the ratio of ticks that proposed nothing to ticks that proposed something, which says whether the schedule is well matched to how often anything actually changes."
   costAtVolume="One model call per tick regardless of whether anything gets proposed, so cost tracks the schedule's frequency, not the workload. A tick interval shorter than how often anything meaningful actually changes spends money finding nothing to do."
-  failsInProduction="An action type ships without a policy entry and the default silently governs it — safe if the default is forbidden, dangerous if it is auto. Or a queue fills with approvals nobody is checking, and the assistant's practical unattended scope quietly shrinks to just the auto class, without anyone deciding that on purpose."
-  whatToLog="Every proposed action and which class the policy put it in, who approved or rejected each queued item and when, and every refusal of a forbidden action — refusals are not errors here, and hiding them from the log is how a policy gap goes unnoticed."
+  failsInProduction="An action type ships without a policy entry and the default silently governs it: safe if the default is forbidden, dangerous if it is auto. Or a queue fills with approvals nobody is checking, and the assistant's practical unattended scope quietly shrinks to just the auto class, without anyone deciding that on purpose."
+  whatToLog="Every proposed action and which class the policy put it in, who approved or rejected each queued item and when, and every refusal of a forbidden action: refusals are not errors here, and hiding them from the log is how a policy gap goes unnoticed."
 />
 
 ## Try it
