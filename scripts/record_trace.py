@@ -180,6 +180,19 @@ def list_status() -> list[dict]:
     return rows
 
 
+def sample_input(example: str) -> str | None:
+    """The input an example says it should be tried with, when it says so.
+
+    Most examples answer a question, and any question will do. A few take something narrower as
+    their first argument: a serial number that has to be in the production log, say. Refusing a
+    serial it has never seen is the right behavior there, so such an example names one that
+    exists as `SAMPLE_INPUT` in its `run.py`, and `--question` may then be left out.
+    """
+    module = importlib.import_module(f"examples.{example}.run")
+    value = getattr(module, "SAMPLE_INPUT", None)
+    return value if isinstance(value, str) and value else None
+
+
 def load_run_fn(example: str):
     module = importlib.import_module(f"examples.{example}.run")
     return module.run, module.LEVEL
@@ -344,6 +357,8 @@ def main(argv: list[str]) -> int:
         )
         return 2
 
+    if not args.question:
+        args.question = sample_input(args.example)
     if not args.question:
         print("Missing --question.")
         return 2

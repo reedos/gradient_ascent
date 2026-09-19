@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import dataclasses
 import json
+import re
 from dataclasses import dataclass, field
 from typing import Literal
 
@@ -336,7 +337,25 @@ class PendingApproval:
     coverage: CoverageResult
 
 
+_REVISION_IN_TEXT = re.compile(r"\brev(?:ision)?\.?\s+([A-Za-z])\b", re.IGNORECASE)
+
+
+def _revision_from(text: str) -> str:
+    """The board revision a request names. `run` takes free text because every example here does
+    (`scripts/record_trace.py` fills the first parameter from `--question`), so "A", "rev B" and
+    "a test plan for revision C boards" all work. A request that names a revision this board does
+    not have is refused further down, never guessed at. A request that names none gets revision
+    A: the ECN's 32.0 V ceiling is the stricter limit, so that is the safe way to be wrong, and
+    the trace says which revision was used."""
+    stripped = text.strip()
+    if len(stripped) <= 1:
+        return stripped
+    named = _REVISION_IN_TEXT.search(stripped)
+    return named.group(1) if named else "A"
+
+
 def run(revision: str, model: Model, tracer: Tracer) -> Blocked | PendingApproval:
+    revision = _revision_from(revision)
     requirements = _requirements_for_revision(revision)
     tracer.record(
         kind="code",

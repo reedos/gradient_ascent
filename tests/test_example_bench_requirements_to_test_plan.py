@@ -237,6 +237,17 @@ class RequirementsToTestPlanTests(unittest.TestCase):
         tracer = Tracer(example="bench_requirements_to_test_plan", level=3, model_id="stub-1")
         with self.assertRaises(ValueError):
             run("D", model, tracer)
+        with self.assertRaises(ValueError):
+            run("a test plan for revision D boards", model, tracer)
+
+    def test_the_revision_is_read_out_of_a_sentence_and_defaults_to_the_stricter_limit(self) -> None:
+        from examples.bench_requirements_to_test_plan.run import _revision_from
+
+        self.assertEqual(_revision_from("C"), "C")
+        self.assertEqual(_revision_from("rev b"), "b")
+        self.assertEqual(_revision_from("Write the test plan for Revision C boards"), "C")
+        # names no revision: revision A, whose 32.0 V ceiling is the stricter of the two
+        self.assertEqual(_revision_from("What is the maximum vent run for a DR-520?"), "A")
 
     def test_stale_limit_helper_is_none_when_the_proposal_already_uses_the_current_limit(self) -> None:
         requirement = REQUIREMENTS[0]  # REQ-VIN

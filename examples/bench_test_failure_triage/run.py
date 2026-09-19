@@ -39,6 +39,10 @@ LEVEL = 3
 MAX_RETRIES = 1
 DEFAULT_MEASUREMENT = "VOUT"
 
+#: A serial that did fail VOUT in the production log, for `scripts/record_trace.py`. `run` refuses
+#: a serial it cannot find, which is right, so a recorder needs to be told one that exists.
+SAMPLE_INPUT = "SRB5030-2608-0063"
+
 #: The four causes this recipe sorts a VOUT failure's note into. Each is a cause
 #: `evals/bench/corpus/failure-analysis-guide.md` already names: `dead_board` is section 2,
 #: `fixture_signature` is section 7 (and section 3's "check the fixture before the board"),

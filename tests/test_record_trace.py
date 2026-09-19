@@ -90,9 +90,11 @@ class RecordTraceTests(unittest.TestCase):
         self.assertGreaterEqual(len(examples), 35, "expected most discovered examples to be recordable")
         for example in examples:
             out_path = self._tmp / f"{example}.json"
+            # an example whose first argument is narrower than a question names one that works
+            question = record_trace.sample_input(example) or "What is the maximum vent run for a DR-520?"
             code = record_trace.main(
                 [
-                    "--example", example, "--question", "What is the maximum vent run for a DR-520?",
+                    "--example", example, "--question", question,
                     "--model", "stub", "--allow-stub", "--out", str(out_path),
                 ]
             )
