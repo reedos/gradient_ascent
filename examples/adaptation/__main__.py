@@ -24,6 +24,23 @@ DEFAULT_OUT = Path(".local/scratch/adaptation")
 DEMO_ARGV = ["--out", "{tmpdir}/adaptation"]
 
 
+def _is_placeholder(out: Path) -> bool:
+    """True if --out still carries the {tmpdir} placeholder DEMO_ARGV holds.
+
+    Only tests/test_scripted_stub.py substitutes it. Copied into a shell by hand it is an
+    ordinary path, and writing to it creates a directory literally named `{tmpdir}`, so main
+    refuses it instead and says what to pass.
+    """
+    if "{" not in str(out):
+        return False
+    print(
+        f"--out is still the {{tmpdir}} placeholder from DEMO_ARGV, which only "
+        f"tests/test_scripted_stub.py substitutes. Pass a real path: --out {DEFAULT_OUT}",
+        file=sys.stderr,
+    )
+    return True
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Build and validate a small supervised fine-tuning file.")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT, help=f"directory to write train.jsonl and val.jsonl into (defaults to {DEFAULT_OUT})")
@@ -31,6 +48,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--model", default="stub", help=f"accepted but unused (this example calls no model); {MODEL_HELP}")
     args = parser.parse_args(sys.argv[1:] if argv is None else argv)
+    if _is_placeholder(args.out):
+        return 2
 
     tracer = Tracer(example="adaptation", level=1, model_id="none")
     result = run(tracer, out_dir=args.out, val_fraction=args.val_fraction, seed=args.seed)

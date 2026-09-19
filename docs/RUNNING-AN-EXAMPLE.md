@@ -138,6 +138,29 @@ answering machine.
 thing (`--structured`, `--decision reject`, `--scenario injected`). It is what the tests run, so
 the command that is tested is the command the page prints.
 
+### An example that writes a file
+
+Its `DEMO_ARGV` writes `{tmpdir}` where the path goes (`["--out", "{tmpdir}/student.jsonl"]`), and
+`tests/test_scripted_stub.py` substitutes a real temporary directory, so running the suite leaves
+nothing behind. The command the page prints names a real path instead, under `.local/scratch/`.
+
+That placeholder is only a placeholder to the test harness. Copied into a shell by hand it is an
+ordinary relative path, and it once left a directory literally named `{tmpdir}` in the repository
+root. So `main` refuses a path that still holds it, naming the real path to pass, and exits 2
+before anything is written:
+
+```python
+if _is_placeholder(args.out):
+    return 2
+```
+
+`adaptation`, `distillation` and `synthetic_data` each carry that guard, and
+`DemoArgvPlaceholderTests` in `tests/test_scripted_stub.py` runs every `DEMO_ARGV` holding a
+placeholder exactly as a person would, asserts the run refuses it, and asserts no `{tmpdir}`
+directory appears in the repository root. Any new example that writes a file needs the same four
+lines. `demo_argv`'s `tmpdir` argument is required for the same reason: a default would let a
+caller that forgot it write to `/adaptation` instead of failing.
+
 ## The guard that keeps the sequence honest
 
 `tests/test_scripted_stub.py` runs every example's own demo command against its own `SCRIPTED` and

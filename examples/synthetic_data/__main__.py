@@ -28,6 +28,23 @@ from examples.synthetic_data.run import run
 DEFAULT_OUT = Path(".local/scratch/synthetic-data/questions.jsonl")
 DEMO_ARGV = ["--out", "{tmpdir}/questions.jsonl"]
 
+
+def _is_placeholder(out: Path) -> bool:
+    """True if --out still carries the {tmpdir} placeholder DEMO_ARGV holds.
+
+    Only tests/test_scripted_stub.py substitutes it. Copied into a shell by hand it is an
+    ordinary path, and writing to it creates a directory literally named `{tmpdir}`, so main
+    refuses it instead and says what to pass.
+    """
+    if "{" not in str(out):
+        return False
+    print(
+        f"--out is still the {{tmpdir}} placeholder from DEMO_ARGV, which only "
+        f"tests/test_scripted_stub.py substitutes. Pass a real path: --out {DEFAULT_OUT}",
+        file=sys.stderr,
+    )
+    return True
+
 # Up to two model calls per seed (paraphrase, then a blind answer to whatever the paraphrase
 # came back as), for the 32 exact-graded seeds in evals/questions.json, in order: L01-L12, M01,
 # M02, M08, M09, N01-N12, C01, C02, C09, C12.
@@ -119,6 +136,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--model", default="stub", help=MODEL_HELP)
     parser.add_argument("--out", default=DEFAULT_OUT, type=Path, help="path to write the verified JSONL to")
     args = parser.parse_args(sys.argv[1:] if argv is None else argv)
+    if _is_placeholder(args.out):
+        return 2
 
     model = build_cli_model(args.model, example="synthetic_data", script=SCRIPTED)
     tracer = Tracer(example="synthetic_data", level=1, model_id=model.model_id)

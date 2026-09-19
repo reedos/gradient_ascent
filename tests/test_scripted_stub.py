@@ -71,7 +71,7 @@ def load_main(example: str):
     return importlib.import_module(f"examples.{example}.__main__")
 
 
-def demo_argv(module, tmpdir: str = "") -> list[str]:
+def demo_argv(module, tmpdir: str) -> list[str]:
     """The arguments the example's documented demo command passes besides `--model`. Most
     examples need none, because their `__main__` defaults `--question` to the input the sequence
     was written for.
@@ -79,6 +79,10 @@ def demo_argv(module, tmpdir: str = "") -> list[str]:
     An example that writes a file writes `{tmpdir}` into its `DEMO_ARGV` where the path goes, so
     running the suite leaves nothing behind in the repository. The command a page prints names a
     real path instead; the arguments are otherwise the same.
+
+    `tmpdir` is required on purpose: a default would let a caller that forgot it build the path
+    `/adaptation` and write there, which is the same class of mistake as running the placeholder
+    by hand.
     """
     return [arg.replace("{tmpdir}", tmpdir) for arg in getattr(module, "DEMO_ARGV", [])]
 
@@ -195,6 +199,50 @@ class DemoCommandTests(unittest.TestCase):
                     echo.getvalue().strip(),
                     f"{name}: the scripted replies never reach what the command prints",
                 )
+
+
+class DemoArgvPlaceholderTests(unittest.TestCase):
+    """A `{tmpdir}` entry in `DEMO_ARGV` is a placeholder this file substitutes. Run by hand it
+    is an ordinary path, and it once left a directory literally named `{tmpdir}` in the
+    repository root. An example that carries the placeholder has to refuse it."""
+
+    def _placeholder_examples(self) -> list[str]:
+        return [
+            name
+            for name in example_names()
+            if any("{" in arg for arg in getattr(load_main(name), "DEMO_ARGV", []))
+        ]
+
+    def test_running_an_unsubstituted_demo_argv_by_hand_writes_nothing(self) -> None:
+        for name in self._placeholder_examples():
+            with self.subTest(example=name):
+                module = load_main(name)
+                out, err = io.StringIO(), io.StringIO()
+                with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                    code = module.main(["--model", SCRIPTED_SPEC, *module.DEMO_ARGV])
+                self.assertNotEqual(code, 0, f"{name} ran the placeholder path instead of refusing it")
+                self.assertIn(
+                    "{tmpdir}",
+                    err.getvalue() + out.getvalue(),
+                    f"{name} refused without naming the placeholder that caused it",
+                )
+                self.assertFalse(
+                    (ROOT / "{tmpdir}").exists(),
+                    "a hand-run created a directory named {tmpdir} in the repository root",
+                )
+
+    def test_the_substituted_form_of_the_same_arguments_still_runs(self) -> None:
+        # The refusal has to fire on the placeholder alone, not on every path with a brace in it
+        # and not on the real path a page prints.
+        for name in self._placeholder_examples():
+            with self.subTest(example=name):
+                module = load_main(name)
+                out = io.StringIO()
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    with contextlib.redirect_stdout(out):
+                        code = module.main(["--model", SCRIPTED_SPEC, *demo_argv(module, tmpdir)])
+                self.assertEqual(code, 0)
+                self.assertTrue(out.getvalue().strip())
 
 
 if __name__ == "__main__":
