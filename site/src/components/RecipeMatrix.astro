@@ -1,11 +1,11 @@
 ---
 // The use-case x pattern matrix from the project plan's Content model: recipes down the side, techniques
-// across, grouped and coloured by level, a filled cell where the recipe uses the technique. The
+// across, grouped and colored by level, a filled cell where the recipe uses the technique. The
 // shaping is in lib/matrix.ts (unit-tested in site/tests/matrix.test.ts); this file only draws it.
 //
 // Two renderings, swapped by the media query in styles/matrix.css: the grid, inside its own
 // horizontally scrolling box with a sticky first column, and below 700px a list of recipes with
-// their techniques as level-coloured pills. Both are plain HTML built at compile time -- no client
+// their techniques as level-colored pills. Both are plain HTML built at compile time -- no client
 // JavaScript, and the page itself never scrolls sideways.
 import { url } from '../lib/url';
 import '../styles/matrix.css';

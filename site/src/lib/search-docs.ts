@@ -2,6 +2,7 @@
 // fetchable index) and pages/search.astro (the no-JavaScript fallback listing) render from --
 // one function, so the two can never list a different set of things. Heavy imports live here,
 // not in search.ts: this module runs at build time only and is never bundled to the client.
+import { usDate } from './dates';
 import { getEntry } from 'astro:content';
 import {
   levels,
@@ -116,7 +117,7 @@ export async function buildSearchDocs(): Promise<SearchDoc[]> {
       id: `teardown:${t.slug}`,
       kind: 'teardown',
       title: t.title,
-      meta: reviewed ? `Teardown · expires ${teardownExpiry(reviewed)}` : 'Teardown',
+      meta: reviewed ? `Teardown · expires ${usDate(teardownExpiry(reviewed))}` : 'Teardown',
       summary: `Decoded into ${techniques.map((x) => x.title).join(', ')}.`,
       body,
       level: lv.length ? Math.max(...lv) : undefined,

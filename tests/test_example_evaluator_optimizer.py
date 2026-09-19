@@ -1,7 +1,7 @@
 """Tests for examples/evaluator_optimizer: the write-and-check example for the
 evaluator-optimizer technique page. Mirrors the shape of tests/test_examples.py's
 ExampleTraceTests: run end to end on a scripted StubModel and check the trace's decided_by
-pattern, plus the loop's own behaviour (early exit on a pass, and the hard cap when it never
+pattern, plus the loop's own behavior (early exit on a pass, and the hard cap when it never
 passes).
 """
 from __future__ import annotations

@@ -97,9 +97,9 @@ anything else. A function call, a name lookup, an attribute access and an import
 same way, because none of them is a node type this function ever matches. That is why the
 whitelist is the point: it does not have to recognize an attack to stop it.
 
-The whitelist itself is one function, and it is the whole defence, so here it is rather than a
+The whitelist itself is one function, and it is the whole defense, so here it is rather than a
 description of it. Every node type the task needs is named; anything else raises before it can
-run, which is why the check does not have to recognise an attack in order to stop one:
+run, which is why the check does not have to recognize an attack in order to stop one:
 
 <CodeFile file="examples/code_execution/run.py" func="_eval_node" />
 

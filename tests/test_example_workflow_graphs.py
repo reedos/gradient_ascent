@@ -1,7 +1,7 @@
 """Tests for examples/workflow_graphs: the dict-based graph runner for the workflow-graphs
 technique page. Mirrors the shape of tests/test_examples.py's ExampleTraceTests: run end to end
 on a scripted StubModel and check the trace's decided_by pattern, the branch to a dead end when
-retrieval finds nothing, and the same revision-cap behaviour as write-and-check, now reached
+retrieval finds nothing, and the same revision-cap behavior as write-and-check, now reached
 through the graph's edge functions instead of a hand-written loop.
 """
 from __future__ import annotations

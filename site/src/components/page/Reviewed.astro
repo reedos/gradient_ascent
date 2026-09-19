@@ -1,4 +1,5 @@
 ---
+import { usDate } from '../../lib/dates';
 // Last reviewed date, the 90-day freshness rule (Method: "Stay current and say how current"),
 // and the link to this page's clean Markdown twin. Staleness is computed at build time against
 // the date the site is built, so a page that goes stale shows it on the next build without
@@ -32,12 +33,12 @@ const lead = scope === 'level' ? 'Pages at this level last reviewed' : 'Last rev
 ---
 
 <p class="reviewed-note">
-  {lead} {date}.
+  {lead} {usDate(date)}.
   {
     expires
       ? expired
-        ? ` This teardown expired on ${expires} and is waiting for a re-review; what a product does may have changed since it was written.`
-        : ` Products change faster than techniques do, so this teardown expires on ${expires} and is re-reviewed or retired then.`
+        ? ` This teardown expired on ${usDate(expires)} and is waiting for a re-review; what a product does may have changed since it was written.`
+        : ` Products change faster than techniques do, so this teardown expires on ${usDate(expires)} and is re-reviewed or retired then.`
       : stale
         ? ' This page has not been reviewed in over 90 days and is flagged for a pass.'
         : ' Pages unreviewed for 90 days are flagged for another pass.'

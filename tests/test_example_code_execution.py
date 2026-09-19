@@ -56,7 +56,7 @@ class SafeEvalTests(unittest.TestCase):
 class WhitelistBypassTests(unittest.TestCase):
     """Attempts to get something past the whitelist. Every one must come back as
     `UnsafeExpression` -- not a value, and not some other exception the caller never agreed to
-    handle. The whitelist's claim is that it does not need to recognise an attack to stop one,
+    handle. The whitelist's claim is that it does not need to recognize an attack to stop one,
     so these are written as a list of spellings rather than as a list of threats."""
 
     REFUSED = {

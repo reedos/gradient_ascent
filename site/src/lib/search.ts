@@ -40,7 +40,7 @@ export interface SearchDoc {
    *  not rendered in the result row. */
   body?: string;
   url: string;
-  /** For the level colour dot; 'tracks' renders the neutral topics colour. */
+  /** For the level color dot; 'tracks' renders the neutral topics color. */
   level?: number | 'tracks';
   /** A name's registry page, shown as a second, smaller link beside the primary one. */
   secondaryUrl?: string;

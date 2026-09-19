@@ -74,7 +74,7 @@ interface LanePoint {
   labeled: boolean;
   /** Which side of the lane a visible label prints on -- alternated over the LABELED points only,
    *  in x order, so two adjacent visible labels never land on the same side just because an
-   *  unlabelled dot happened to fall between them in the milestone list (a plain CSS
+   *  unlabeled dot happened to fall between them in the milestone list (a plain CSS
    *  nth-child(odd) over every dot does not track this: most dots on a lane carry no label at
    *  all, so its odd/even parity has nothing to do with which ones are actually visible). */
   labelSide?: 'above' | 'below';

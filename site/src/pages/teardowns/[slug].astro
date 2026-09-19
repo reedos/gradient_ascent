@@ -1,4 +1,5 @@
 ---
+import { usDate } from '../../lib/dates';
 // One teardown: a kind of product the reader has used, decoded into the techniques underneath it.
 // Built the same way a recipe page is -- the taxonomy owns the list and the technique links, the
 // MDX file owns the writing -- with two additions the recipe page does not need: the registry
@@ -83,7 +84,7 @@ const stale = reviewedISO ? teardownIsStale(reviewedISO) : false;
     products.length > 0 && (
       <p class="footnote reading">
         Decoded from {products.map((p) => `${p.name} (${p.maker})`).join(', ')}. Names and makers as
-        registered on {asOf}; the <a href={url('/names/')} style="color:var(--accent)">names index</a>{' '}
+        registered on {usDate(asOf)}; the <a href={url('/names/')} style="color:var(--accent)">names index</a>{' '}
         carries each entry's own source.
       </p>
     )

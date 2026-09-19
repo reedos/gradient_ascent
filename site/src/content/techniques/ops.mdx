@@ -164,7 +164,7 @@ just as well as the expensive one.
   },
   {
     name: 'A retry storm looks like the product being slow',
-    notice: 'Requests queue up and time out during a traffic spike, and from the outside it reads as the product being generally unreliable rather than a specific rate limit being hit.',
+    notice: 'Requests line up and time out during a traffic spike, and from the outside it reads as the product being generally unreliable rather than a specific rate limit being hit.',
     test: 'Check whether a rate-limit error is logged with which limit it hit, separately from an ordinary timeout; if the two look the same in the logs, a slow period cannot be told apart from an unrelated one.',
   },
   {

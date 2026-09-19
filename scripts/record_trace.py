@@ -17,7 +17,7 @@ embedder (`takes_embedder` below) needs one built from a spec `build_embedder` a
 `examples/common/model.py` has no `claude:` branch there, since Anthropic does not publish an
 embeddings endpoint, so recording such an example against a metered `claude:<id>` chat model
 needs `--embedder stub` or `--embedder ollama:<tag>` passed explicitly; leaving `--embedder`
-unset keeps today's behaviour of building the embedder from the same spec as `--model`.
+unset keeps today's behavior of building the embedder from the same spec as `--model`.
 
 Which examples this can record
 -------------------------------
@@ -304,7 +304,7 @@ def build_args(argv: list[str]) -> argparse.Namespace:
         default=None,
         help=(
             "stub | ollama:<tag>, for an example whose run() takes an embedder. Defaults to "
-            "--model (today's behaviour), so pass this separately when --model is claude:<id>: "
+            "--model (today's behavior), so pass this separately when --model is claude:<id>: "
             "build_embedder has no claude: branch (see examples/common/model.py), so pairing a "
             "metered chat model with the local embedder needs the two specs to differ."
         ),

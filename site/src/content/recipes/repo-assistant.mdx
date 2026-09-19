@@ -81,7 +81,7 @@ Coding agents don't answer the site's own document-QA questions, so this recipe 
 small test set: synthetic issues against a synthetic library, each with a known-good fix and its
 test file, written to look like the issues this repository gets. Measure the share that reach a
 passing suite and the attempts each took. Then run the finished fix against the *rest* of the
-suite, not just the file the agent touched, to see whether an accepted change broke behaviour the
+suite, not just the file the agent touched, to see whether an accepted change broke behavior the
 shown tests never exercised. Measure the scope check the way any permission check should be: try
 to get the agent to request something out of scope on purpose, in ways its author did not think
 of, and confirm every attempt is refused. None of this has been run here.

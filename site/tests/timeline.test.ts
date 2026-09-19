@@ -464,7 +464,7 @@ test('buildRecentAxis year ticks cover every whole year in range', () => {
 
 // -- selectLabeledMilestones: always-label marked, de-collide the rest ----------------------------
 
-test('every marked id is always labelled, regardless of spacing', () => {
+test('every marked id is always labeled, regardless of spacing', () => {
   const points = [
     { id: 'a', fraction: 0.1 },
     { id: 'b', fraction: 0.11 },
@@ -498,12 +498,12 @@ test('at most maxExtra unmarked points are added even if several qualify', () =>
   assert.equal(labeled.size, 2);
 });
 
-// -- assignLabelSides: alternates over the LABELLED subset, not every point -----------------------
+// -- assignLabelSides: alternates over the LABELED subset, not every point -----------------------
 
-test('assignLabelSides alternates adjacent labelled points, ignoring unlabelled ones between them', () => {
-  // b and d are the only labelled points; a and c (unlabelled) sit between/around them in x order.
+test('assignLabelSides alternates adjacent labeled points, ignoring unlabeled ones between them', () => {
+  // b and d are the only labeled points; a and c (unlabeled) sit between/around them in x order.
   // A plain nth-child(odd)-over-every-point scheme would not track this -- it counts a, b, c and d
-  // all -- so this specifically checks the labelled subset is what alternates.
+  // all -- so this specifically checks the labeled subset is what alternates.
   const points = [
     { id: 'a', fraction: 0.05 },
     { id: 'b', fraction: 0.1 },

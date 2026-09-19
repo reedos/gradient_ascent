@@ -7,7 +7,7 @@ interface Props {
   dot?: boolean;
 }
 const { label, color, muted = false, dot = true } = Astro.props;
-// A level colour tints the whole eyebrow, the way the level panel does on the home page.
+// A level color tints the whole eyebrow, the way the level panel does on the home page.
 const style = color ? `--c:${color};color:${color}` : undefined;
 ---
 <div class:list={['eyebrow', { muted }]} style={style}>

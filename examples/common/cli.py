@@ -1,7 +1,7 @@
 """Shared `__main__` plumbing for the examples: argument parsing and a default stub model for
 interactive use (`python -m examples.<name> --model stub --question "..."`).
 
-No example's *behaviour* is tested through this module. Each example's tests build their own
+No example's *behavior* is tested through this module. Each example's tests build their own
 `StubModel` responses and call `run` directly, so a trace's shape is asserted against a scripted
 answer rather than against the generic one below. `tests/test_common.py` tests this module
 itself, which is a different thing: that the interactive stub never calls a tool, and that it

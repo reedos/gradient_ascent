@@ -1,4 +1,5 @@
 ---
+import { usDate } from '../../lib/dates';
 import Base from '../../layouts/Base.astro';
 import { url } from '../../lib/url';
 import { named, asOf, counts, namesChecked, techniqueBySlug, type Kind } from '../../lib/content';
@@ -34,13 +35,13 @@ const sections = KIND_ORDER.map((kind) => {
     <h1>Named things</h1>
     <p>
       A developer trains models; a product runs on one or more models; a tool is what a builder
-      assembles products from. {counts.named} entries are listed as of {asOf}, each with the
+      assembles products from. {counts.named} entries are listed as of {usDate(asOf)}, each with the
       techniques it uses.
     </p>
   </div>
 
   <p class="footnote reading">
-    Names listed {asOf}. {namesChecked.verified} of {namesChecked.total} registry entries have
+    Names listed {usDate(asOf)}. {namesChecked.verified} of {namesChecked.total} registry entries have
     been checked against the maker's own page; the registry marks the rest as unchecked. An
     unchecked entry cannot be cited on a published page until it has a primary source, a checked
     date, and is marked verified, and any entry unchecked for 90 days is flagged when the site is

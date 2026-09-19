@@ -96,7 +96,7 @@ test('no recipes means no columns and no rows', () => {
   assert.equal(m.unusedCount, techniques.length);
 });
 
-test('a level number keeps its own colour token and topics keep the neutral one', () => {
+test('a level number keeps its own color token and topics keep the neutral one', () => {
   assert.equal(levelColor(3), 'var(--o3)');
   assert.equal(levelColor('tracks'), 'var(--ot)');
   assert.equal(levelLabel(0), 'Level 0');

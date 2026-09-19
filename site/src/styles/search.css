@@ -1,6 +1,6 @@
 /* /search/ (site/src/pages/search.astro, components/islands/Search.tsx, finish-search). Built
    from the same tokens, hairlines and .subhead/.row-dot shapes as everything in global.css --
-   no new colour, font, radius or shadow. Imported once, from the page, so it never touches a
+   no new color, font, radius or shadow. Imported once, from the page, so it never touches a
    page outside this territory. */
 
 /* Progressive-enhancement toggle, same pattern as worksheet.css: a tiny inline script on the

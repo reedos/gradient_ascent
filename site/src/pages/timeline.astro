@@ -1,4 +1,5 @@
 ---
+import { usDate } from '../lib/dates';
 // /timeline/: a general framework for how the site's eight levels arrived and how quickly
 // capability is changing, built entirely from content/timeline.json (through site/src/lib/
 // timeline.ts) -- no date, id or count on this page is typed in by hand.
@@ -255,7 +256,7 @@ const pageDescription =
             <blockquote>&ldquo;{m.quote}&rdquo;</blockquote>
             <p class="tl-measure-meta">
               <a href={m.source.url} target="_blank" rel="noopener noreferrer">{m.source.title}</a>
-              {' · '}{m.source.publisher}{' · '}{m.date}
+              {' · '}{m.source.publisher}{' · '}{usDate(m.date)}
             </p>
             <p class="tl-measure-scope"><strong>What it measures:</strong> {m.what_it_measures}</p>
             <p class="tl-measure-scope"><strong>Scope:</strong> {m.scope}</p>
@@ -322,7 +323,7 @@ const pageDescription =
       <div class="panel">
         <h3>Correcting a date</h3>
         <p>
-          Nothing on this page is final: it is what this site could verify as of {asOf}. A reader
+          Nothing on this page is final: it is what this site could verify as of {usDate(asOf)}. A reader
           who finds an earlier verifiable source, or a wrong date, corrects it the way any page
           here is corrected — see <a href={url('/method/')}>the method page</a> for how a level is
           defined and how the site changes. The full method behind this specific page's dates is

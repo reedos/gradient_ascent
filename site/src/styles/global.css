@@ -1,5 +1,5 @@
 /* finish-weight: `@import "tailwindcss"` (theme + preflight + utilities) pulled in Tailwind's
-   whole default theme -- about 150 unused colour/shadow/radius/spacing custom properties nothing
+   whole default theme -- about 150 unused color/shadow/radius/spacing custom properties nothing
    on this site references -- and a utility-class scan that matches nothing: a grep across every
    .astro/.tsx/.mdx file for Tailwind utility classes (flex, grid, p-*, text-*, bg-*, rounded, …)
    turns up none; the site is built entirely from the hand-written components below. The one real
@@ -293,7 +293,7 @@ main { max-width: 1392px; margin: auto; padding: 0 48px; min-height: 60vh }
 .prose > table td, .lane-body > table td { color: var(--muted) }
 
 /* Technique and recipe page anatomy (site/src/components/page/*.astro). Built from the same
-   tokens, hairlines and panel/pill/connection shapes as everything above; no new colour, font,
+   tokens, hairlines and panel/pill/connection shapes as everything above; no new color, font,
    radius or shadow is introduced here. */
 /* The lane switch is the page's main control, so it reads at the weight of a section heading
    rather than as a row of small filter pills tucked under the diagram. */
@@ -350,9 +350,9 @@ main { max-width: 1392px; margin: auto; padding: 0 48px; min-height: 60vh }
 .reviewed-note .md-link:hover { text-decoration: underline }
 .when-not-list { margin: 8px 0 0; padding-left: 18px }
 
-/* Task 4.1: carry the level colour onto inner pages beyond the eyebrow -- a thin top rule on
+/* Task 4.1: carry the level color onto inner pages beyond the eyebrow -- a thin top rule on
    the hero, a level chip by the title, and a small dot wherever a technique is listed in a row
-   alongside others. All three read var(--c), set inline per page/row; no new colour token. */
+   alongside others. All three read var(--c), set inline per page/row; no new color token. */
 .page-hero.leveled { border-top: 2px solid var(--c, var(--accent)); padding-top: 22px }
 .pill.level { color: var(--c, var(--accent)); border-color: color-mix(in srgb, var(--c, var(--accent)) 45%, var(--line)) }
 .row-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--c); margin-right: 8px; vertical-align: middle }

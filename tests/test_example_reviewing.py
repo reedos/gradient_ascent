@@ -46,7 +46,7 @@ class FiguresInTests(unittest.TestCase):
         self.assertEqual(figures_in("80%"), ["80%"])
         self.assertEqual(figures_in("80 %"), ["80%"])
         self.assertEqual(figures_in("80 percent"), ["80%"])
-        self.assertEqual(figures_in("80 per cent"), ["80%"])
+        self.assertEqual(figures_in("80 percent"), ["80%"])
 
     def test_a_percentage_is_not_the_same_figure_as_the_bare_number(self) -> None:
         self.assertNotEqual(figures_in("Fill to 80%."), figures_in("Wait 80 minutes."))

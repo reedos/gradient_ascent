@@ -1,4 +1,5 @@
 ---
+import { usDate } from '../../lib/dates';
 import { getEntry, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Eyebrow from '../../components/Eyebrow.astro';
@@ -195,7 +196,7 @@ const nameGroups = [
       )}
     </div>
     <p class="footnote">
-      Names listed {asOf}. {namesChecked.verified} of {namesChecked.total} registry entries have
+      Names listed {usDate(asOf)}. {namesChecked.verified} of {namesChecked.total} registry entries have
       been checked against the maker's own page; the registry marks the rest as unchecked.
     </p>
   </section>

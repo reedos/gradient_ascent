@@ -2,7 +2,7 @@
 // The "Use it / Build it" switch. Both <Lane> children are always in the HTML; a small script
 // hides whichever one is not selected and remembers the choice in localStorage (wrapped in
 // try/catch, since a private window can throw). With JavaScript off, no `hidden` attribute is
-// ever applied, so both lanes render in full: the no-JS behaviour is "show both", not "show
+// ever applied, so both lanes render in full: the no-JS behavior is "show both", not "show
 // neither". The choice is global (one key, `ga:lane`), so it persists from page to page.
 interface Props {
   /** Defaults match the site's lane labels in content/taxonomy.json's `lanes` block. */

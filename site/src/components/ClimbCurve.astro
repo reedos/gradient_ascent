@@ -17,7 +17,7 @@ type Seg = [Pt, Pt, Pt, Pt];
 
 // Logo.astro: `M5 33.5C17.2 32.7 27.6 25.1 34 7.2` in a 40x40 box: one convex cubic that starts
 // flat and keeps steepening to the top, the shape of an exponential. (An earlier S-curve eased
-// off at the top and read as levelling out, which is the opposite of what the chart says.) The
+// off at the top and read as leveling out, which is the opposite of what the chart says.) The
 // cubic is split at t = 0.5 by de Casteljau into two segments so the sampling code below can
 // treat the path as two pieces; together they are exactly the logo's single curve.
 const SEG1: Seg = [
@@ -146,7 +146,7 @@ function anchorXPct(geom: CurveGeometry, canvas: Canvas, stageLevels: number[]):
 }
 
 const anchors = stages.map((s) => anchorXPct(wide, WIDE, s.levels));
-// Partition the width at the midpoints between neighbouring stages' anchors, so every stage owns
+// Partition the width at the midpoints between neighboring stages' anchors, so every stage owns
 // a column proportional to where its levels actually sit on the curve, and the columns tile the
 // full width with no gap.
 const bounds = [0, ...anchors.slice(0, -1).map((a, i) => (a + anchors[i + 1]) / 2), 100];

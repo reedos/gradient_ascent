@@ -8,7 +8,7 @@ Three groups:
     every `unanswerable` question's `absent_terms` really do not appear anywhere in the corpus.
   - `ExampleTraceTests` runs each of the six examples end to end on a scripted `StubModel` and
     checks the trace's `decided_by` pattern matches what that level is supposed to record.
-  - `AgenticCapTests` checks the level-5 loop honours its step cap and its token budget.
+  - `AgenticCapTests` checks the level-5 loop honors its step cap and its token budget.
 """
 from __future__ import annotations
 
@@ -55,7 +55,7 @@ SHARED_FACTS = {
     "part prices": (r"\$(\d+\.\d\d), fits", {"38.50", "41.00", "46.00", "14.25", "15.75", "57.00", "61.50", "9.75", "13.25", "6.50", "19.99"}),
 }
 
-# Names that must never appear: real trademarks and real programme names have no place in a
+# Names that must never appear: real trademarks and real program names have no place in a
 # synthetic corpus that ships under MIT.
 FORBIDDEN_NAMES = [
     "aqua-stop", "aquastop", "energyguide", "energy guide", "bosch", "whirlpool", "maytag",
@@ -162,7 +162,7 @@ class CorpusConsistencyTests(unittest.TestCase):
                 result, q["expected"], places=6, msg=f"{q['id']}: compute() gave {result}, expected {q['expected']}"
             )
             # the expected number must be what the reference answer actually says, in a form the
-            # accept pattern recognises: number, units and all
+            # accept pattern recognizes: number, units and all
             rendered = f"{q['expected']:g}"
             self.assertRegex(
                 q["answer"].replace(",", ""),

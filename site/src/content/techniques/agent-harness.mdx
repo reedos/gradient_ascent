@@ -138,7 +138,7 @@ of what Anthropic calls tool result clearing<Cite n={3}/>:
 
 It runs fresh on every model call, not once at the start, which is what lets the two runs below
 diverge partway through instead of only at the first prompt. It also leaves the opening request
-alone: it recognises a tool result by how the text opens, so without that guard a question starting
+alone: it recognizes a tool result by how the text opens, so without that guard a question starting
 the same way would be trimmed and the model would be answering something it could no longer see.
 `deny_after` is the hook worth reading next, three lines, and the point is that it runs after the
 model has already decided:

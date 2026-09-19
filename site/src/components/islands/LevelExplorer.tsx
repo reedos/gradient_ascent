@@ -24,7 +24,7 @@ export interface LevelDetail {
   who: string;
   description: string;
   pages: LevelPage[];
-  /** Already grouped and labelled on the server, so the island ships only rendered strings. */
+  /** Already grouped and labeled on the server, so the island ships only rendered strings. */
   names: NameGroup[];
 }
 

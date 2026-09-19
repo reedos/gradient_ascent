@@ -200,7 +200,7 @@ test('same-band nodes never overlap even when adjacent titles are long', () => {
   const a = layout.nodes.find((n) => n.slug === 'a')!;
   const b = layout.nodes.find((n) => n.slug === 'b')!;
   assert.ok(!rectsOverlap(a, b));
-  assert.ok(a.x + a.w <= b.x || b.x + b.w <= a.x, 'wide neighbours must not be pushed into each other');
+  assert.ok(a.x + a.w <= b.x || b.x + b.w <= a.x, 'wide neighbors must not be pushed into each other');
 });
 
 // -- Every edge endpoint resolves -----------------------------------------------------------------
@@ -314,9 +314,9 @@ test('no inter-node gap within a level band ever exceeds MAX_GAP', () => {
   }
 });
 
-// -- Bottom-up reordering: a level band's nodes are ordered by their neighbours below --------------
+// -- Bottom-up reordering: a level band's nodes are ordered by their neighbors below --------------
 
-test('orderByBelow (via computeMapLayout) swaps two nodes to match their neighbours below', () => {
+test('orderByBelow (via computeMapLayout) swaps two nodes to match their neighbors below', () => {
   const tax = fixture();
   // Level 0 gets three nodes, left to right: a-first, m-mid, z-last. Level 1 starts as
   // [chat, prompt-engineering] in that order; give BOTH a requires-relation below, pointing the
@@ -406,7 +406,7 @@ test('an edge between two different rows keeps the midpoint-control-point curve 
   assert.equal(g.c2y, my);
 });
 
-test('a same-row edge between neighbours, with nothing between them, does not arc', () => {
+test('a same-row edge between neighbors, with nothing between them, does not arc', () => {
   const layout = computeMapLayout(fixture());
   const level1 = layout.nodes.filter((n) => n.level === 1).sort((a, b) => a.col - b.col);
   const rowNodes = layout.nodes.filter((n) => n.y === level1[0].y);

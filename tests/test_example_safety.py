@@ -117,7 +117,7 @@ class SafetyExampleTests(unittest.TestCase):
 class AttacksOnThePermissionCheckTests(unittest.TestCase):
     """The attacks, kept as tests. The first two were open gaps an audit found and are now shut;
     the ones after them are what is still possible, written down rather than left for a reader
-    to discover after copying this. A page teaching a defence has to say which is which."""
+    to discover after copying this. A page teaching a defense has to say which is which."""
 
     def test_an_amount_the_customer_merely_mentioned_no_longer_authorizes_a_refund(self) -> None:
         # Was a gap: the customer is complaining about a charge, not asking for a refund, and an

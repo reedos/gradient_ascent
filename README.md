@@ -92,7 +92,7 @@ A page becomes `published` when it has a recorded non-stub trace and a non-stub 
 
 ## Contributing
 
-Corrections are welcome: the licence is MIT and the taxonomy, registry and result files are
+Corrections are welcome: the license is MIT and the taxonomy, registry and result files are
 published as data. Every page has a feedback link, and [CONTRIBUTING.md](CONTRIBUTING.md) says
 what makes a correction quick to accept.
 

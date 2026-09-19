@@ -1,5 +1,5 @@
 /* /timeline/ (Timeline.astro, the page itself) and the home page's compact strip
-   (TimelineStrip.astro). Built entirely from the site's existing tokens -- no new colour, font,
+   (TimelineStrip.astro). Built entirely from the site's existing tokens -- no new color, font,
    radius or shadow. `.tl-*` is the wide interactive chart and the page's own sections (how fast,
    measures, list, closing); `.tls-*` is the compact per-level strip shared by the home page and
    /timeline/'s own narrow view. Both stay inside a `.panel`-style frame so they read as siblings
@@ -109,7 +109,7 @@
   position: relative;
   /* Tall enough that an "above" or "below" label (one line of text, plus its margin from the dot)
      never reaches into the NEXT lane's own territory: a label needing about 18px of clearance
-     from the lane's own centre must still fit inside half of this height. 46px (half = 23px) was
+     from the lane's own center must still fit inside half of this height. 46px (half = 23px) was
      not quite enough -- two adjacent lanes' labels could meet exactly at the shared boundary. */
   height: 60px;
   border-bottom: 1px dashed color-mix(in srgb, var(--line) 70%, transparent);

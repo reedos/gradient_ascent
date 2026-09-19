@@ -229,12 +229,12 @@ function layoutPackedRow(items: PendingNode[]): PlacedNode[] {
 
 /**
  * Reorders one level band's items by the average CENTER x of their `requires`/`upgrades_to`
- * neighbours in the band directly below (already placed, since bands are laid out bottom-up --
- * see computeMapLayout). An item with no such neighbour keeps roughly its original position
+ * neighbors in the band directly below (already placed, since bands are laid out bottom-up --
+ * see computeMapLayout). An item with no such neighbor keeps roughly its original position
  * instead of collapsing to one end, by using its own original left-to-right SLOT center (the
  * middle of the `available`-width span its original index would occupy among `count` equally
  * sized slots) as a same-scale stand-in score, so it neither out-ranks nor gets out-ranked by a
- * real neighbour-based score merely because a naive placeholder sat at one extreme. One
+ * real neighbor-based score merely because a naive placeholder sat at one extreme. One
  * deterministic pass (no iteration to a fixed point): it only ever looks at the band immediately
  * below, which is what turns a `requires` or `upgrades_to` edge between adjacent bands into a
  * short, near-vertical curve instead of a long diagonal -- it does not attempt to also straighten
@@ -424,7 +424,7 @@ export interface EdgeGeometry {
   /** True when `from` and `to` sit in the same row (the same level band, or the same topics-band
    *  track row) AND at least one other node in that row sits horizontally between them -- the
    *  case a straight (or midpoint-only) line would run straight through. False for every edge
-   *  between different rows, and for a same-row edge between neighbours with nothing between them
+   *  between different rows, and for a same-row edge between neighbors with nothing between them
    *  to avoid. Keyed on the row (its y), not the band: two topics-band nodes can share a `band`
    *  index while sitting in different track rows, which is not the same-row case this handles. */
   arcsOverIntervening: boolean;

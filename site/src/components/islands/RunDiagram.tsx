@@ -14,7 +14,7 @@ import { useEffect, useRef, useState } from 'react';
  * The fixed shapes of the project plan's visual system. `human` is a person in the flow — an approver, a
  * reviewer — and is drawn as a rounded solid node with a PERSON kicker and a small figure, so it
  * reads apart from `io` (rounded, dashed: where the run starts and ends) at a glance and at
- * 390 px. Same stroke weight and same colours as every other node: nothing here is new ink.
+ * 390 px. Same stroke weight and same colors as every other node: nothing here is new ink.
  */
 export type NodeKind = 'io' | 'code' | 'model' | 'tool' | 'store' | 'human';
 export interface RunNode {
@@ -161,7 +161,7 @@ function NodeShape({ n }: { n: RunNode }) {
   const kick = n.k === 'model' ? 'MODEL' : n.k === 'tool' ? 'TOOL' : n.k === 'human' ? 'PERSON' : '';
   const lines = wrapLabel(n.l);
   const font = labelFontSize(lines);
-  // Two lines straddle the single-line baseline so the block stays vertically centred in the box.
+  // Two lines straddle the single-line baseline so the block stays vertically centered in the box.
   const lead = font * 0.96;
   return (
     <g className={`nd ${n.k}`} data-id={n.id}>
@@ -171,7 +171,7 @@ function NodeShape({ n }: { n: RunNode }) {
         <rect x={x} y={y} width={132} height={38} rx={n.k === 'io' || n.k === 'human' ? 19 : 6} />
       )}
       {n.k === 'human' && (
-        // head and shoulders, inside the node's left edge, clear of the centred label
+        // head and shoulders, inside the node's left edge, clear of the centered label
         <g className="fig">
           <circle cx={x + 12} cy={n.y - 3} r={3} />
           <path d={`M${x + 6},${n.y + 8} a6,6 0 0 1 12,0`} />

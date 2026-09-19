@@ -1,4 +1,5 @@
 ---
+import { usDate } from '../../lib/dates';
 // The teardowns index. Teardowns are the one page kind with a shelf life: the project plan caps how many
 // may be live and expires each one after `expires_days`, so this page prints both numbers and
 // separates the live ones from any that have passed their date, rather than quietly listing a
@@ -77,8 +78,8 @@ const expired = rows.filter((r) => r.stale);
               <p>{r.techniques.map((t) => t.title).join(' · ')}</p>
             </div>
             <div class="signal-meta">
-              {r.reviewed ? `Reviewed ${r.reviewed}` : 'Not written yet'}
-              {r.expires && <><br />Expires {r.expires}</>}
+              {r.reviewed ? `Reviewed ${usDate(r.reviewed)}` : 'Not written yet'}
+              {r.expires && <><br />Expires {usDate(r.expires)}</>}
             </div>
             <a href={url(`/teardowns/${r.slug}/`)} aria-label={`Open ${r.title}`}>
               &#8599;
@@ -109,7 +110,7 @@ const expired = rows.filter((r) => r.stale);
                 </h3>
                 <p>{r.techniques.map((t) => t.title).join(' · ')}</p>
               </div>
-              <div class="signal-meta">Expired {r.expires}</div>
+              <div class="signal-meta">Expired {usDate(r.expires)}</div>
               <a href={url(`/teardowns/${r.slug}/`)} aria-label={`Open ${r.title}`}>
                 &#8599;
               </a>

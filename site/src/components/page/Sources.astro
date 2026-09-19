@@ -1,4 +1,5 @@
 ---
+import { usDate } from '../../lib/dates';
 // Numbered source list, rendered from frontmatter (content.config.ts's `sources` field). Inline
 // <Cite n={1}/> markers in the prose point back to these by id.
 interface Source {
@@ -22,8 +23,8 @@ const { sources } = Astro.props;
           {s.title}
         </a>
         {s.publisher && <span> &middot; {s.publisher}</span>}
-        {s.date && <span>, {s.date}</span>}
-        {s.accessed && <span class="sources-accessed"> (accessed {s.accessed})</span>}
+        {s.date && <span>, {usDate(s.date)}</span>}
+        {s.accessed && <span class="sources-accessed"> (accessed {usDate(s.accessed)})</span>}
       </li>
     ))
   }

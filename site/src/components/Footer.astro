@@ -1,4 +1,5 @@
 ---
+import { usDate } from '../lib/dates';
 // The footer carries the whole site map, built from the same src/lib/nav.ts the header's menus
 // read. It is also where the phone's Menu link lands when JavaScript is off.
 import Logo from './Logo.astro';
@@ -52,7 +53,7 @@ const groups = buildNav(navLevels, navTracks);
     </p>
     MIT licensed. Levels, topics, recipes and the links between pages come from{' '}
     <code>content/taxonomy.json</code>; named models, products and tools come from{' '}
-    <code>content/landscape.json</code>, listed as of {asOf}. Every page is a draft until a recorded run and a scored result stand behind it.
+    <code>content/landscape.json</code>, listed as of {usDate(asOf)}. Every page is a draft until a recorded run and a scored result stand behind it.
   </div>
 </footer>
 

@@ -32,8 +32,8 @@ import {
 import glossaryData from '../../../content/glossary.json';
 
 // ---------------------------------------------------------------------------------------------
-// Glossary: content/glossary.json, typed and colour-linked the same way content.ts links a
-// technique to its level colour. scripts/validate.py's validate_glossary enforces the shape
+// Glossary: content/glossary.json, typed and color-linked the same way content.ts links a
+// technique to its level color. scripts/validate.py's validate_glossary enforces the shape
 // (unique names, resolvable pages, resolvable `see`, 8-60 word definitions) at commit time; this
 // module trusts that and only adds the render-time helpers.
 // ---------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ export interface GlossaryEntry {
 
 export const glossaryTerms: GlossaryEntry[] = (glossaryData as { terms: GlossaryEntry[] }).terms;
 
-/** The level colour a glossary term's page renders in, e.g. "var(--o2)" or "var(--ot)". */
+/** The level color a glossary term's page renders in, e.g. "var(--o2)" or "var(--ot)". */
 export function glossaryColor(entry: GlossaryEntry): string {
   const technique = techniqueBySlug(entry.page);
   if (!technique) return 'var(--ot)';
@@ -56,7 +56,7 @@ export function glossaryColor(entry: GlossaryEntry): string {
 }
 
 /**
- * Where a glossary term's name links, and how that page is labelled beside it. `page` is a
+ * Where a glossary term's name links, and how that page is labeled beside it. `page` is a
  * technique or topic slug for almost every term, and a thread id for the few whose whole point
  * is that one word names two techniques at once (see scripts/validate.py's validate_glossary).
  * One place decides this, so the glossary page, the Markdown endpoints and the search index

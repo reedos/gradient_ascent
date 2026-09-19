@@ -133,7 +133,7 @@ def run(
         )
 
     # `max` keeps the first of equal scores, so a tie resolves to the earliest candidate in the
-    # list. That is a deterministic rule rather than a judgement: a run whose candidates all tie
+    # list. That is a deterministic rule rather than a judgment: a run whose candidates all tie
     # has selected nothing, and its "winner" is list order.
     best = max(candidates, key=lambda c: c.dev_score)
     tied = [c.instruction for c in candidates if c.dev_correct == best.dev_correct]

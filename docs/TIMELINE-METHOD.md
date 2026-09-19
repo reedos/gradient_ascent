@@ -6,7 +6,7 @@ published measures of pace.
 ## Three dates per level
 
 - **described** — the earliest publication this site could verify describing the level's defining
-  idea in a form recognisable today: a paper, or a maker's own technical post. A paper's date is
+  idea in a form recognizable today: a paper, or a maker's own technical post. A paper's date is
   its arXiv v1 submission, not a later revision or the conference publication.
 - **buildable** — the earliest release this site could verify of an open framework, library or
   API a developer could build the level with rather than from scratch. Someone still builds it.
@@ -30,8 +30,8 @@ first (AI Dungeon 2 in 2019, NeevaAI in January 2023, Zapier's OpenAI step in De
 AgentGPT in April 2023, Genspark in June 2024). They are ordinary milestones on the timeline and
 sit in each level's `candidates` with the reason the mark went elsewhere. The marked date is the
 launch. Where the launch was a waitlist or an unveiling, `availability` says so and `opened`
-records the day an ordinary customer could get in: Microsoft 365 Copilot was unveiled on 16 March
-2023 and went on sale on 1 November 2023. With launch dates the seven marks run in level order,
+records the day an ordinary customer could get in: Microsoft 365 Copilot was unveiled on March 16
+2023 and went on sale on November 1, 2023. With launch dates the seven marks run in level order,
 and so do the seven papers. Levels 2, 3 and 4 launched within seven weeks of each other: the
 ideas depend on one another, but the papers were all written by 2022 and ChatGPT's launch let
 them out together.
@@ -44,7 +44,7 @@ behind the MRKL paper. CAMEL is eight weeks ahead of the debate paper.
 Cowork is the worked case. Its January 2026 release ran on the person's own computer and the
 person started every task, so that milestone is at level 5, for the same reason ChatGPT agent is.
 Scheduled tasks (February 2026) do not change that: the person sets the time. The release note of
-7 July 2026, where sessions run remotely and "scheduled tasks run with no device online", is its
+July 7, 2026, where sessions run remotely and "scheduled tasks run with no device online", is its
 level 7 date, and it is a separate milestone. Level 7's test is the taxonomy's own: the models
 decide, "including when to start work".
 
@@ -67,8 +67,8 @@ product but no date — ChatGPT Work, Manus — the milestone stays unverified. 
 A first announcement is often not the day anyone could use the thing. Product milestones carry an
 optional `availability` — `general`, `preview`, `waitlist` or `paid plans`. `available` marks the
 earliest date a customer could get in **without an invitation**: a subscription counts, a
-waitlist does not. ChatGPT plugins were alpha access from a waitlist on 23 March 2023, so level 4
-marks 12 May 2023, when every Plus subscriber got them. Where no invitation-free date verifies,
+waitlist does not. ChatGPT plugins were alpha access from a waitlist on March 23, 2023, so level 4
+marks May 12, 2023, when every Plus subscriber got them. Where no invitation-free date verifies,
 the preview date is marked and called one.
 
 ## What "first" means, and does not

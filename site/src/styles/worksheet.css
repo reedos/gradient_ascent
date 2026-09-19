@@ -1,6 +1,6 @@
 /* The worksheet page and island (site/src/pages/worksheet.astro, site/src/components/islands/
    Worksheet.tsx). Built from the same tokens, hairlines, panel/pill/filter shapes as everything
-   in global.css -- no new colour, font, radius or shadow. Imported once, from the page, so the
+   in global.css -- no new color, font, radius or shadow. Imported once, from the page, so the
    same class names style both the server-rendered no-JS fallback and the client island. */
 
 /* Progressive-enhancement toggle: a tiny inline script on the page (not the island bundle) adds

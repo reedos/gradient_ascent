@@ -4,7 +4,7 @@ technique page (level 4).
 Mirrors the shape of tests/test_example_routing.py: run the example end to end on a scripted
 StubModel and check the trace's decided_by pattern (docs/EVALS.md: level 4 records exactly one
 model-decided step per run, the tool call or the decision to answer without one) alongside the
-function-calling-specific behaviour -- which tool ran, that a second requested call is dropped
+function-calling-specific behavior -- which tool ran, that a second requested call is dropped
 rather than run, and that an unrecognized tool name does not raise.
 """
 from __future__ import annotations

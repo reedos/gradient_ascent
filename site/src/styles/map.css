@@ -209,8 +209,8 @@
   stroke-width: 1;
 }
 /* The level-hue bar along each node's top edge -- see the comment beside it in
-   TechniqueMap.astro. Solid, not mixed with --line, so the colour reads clearly even for the
-   grey --ot topics hue, which is close in value to --line and would nearly vanish if mixed. */
+   TechniqueMap.astro. Solid, not mixed with --line, so the color reads clearly even for the
+   gray --ot topics hue, which is close in value to --line and would nearly vanish if mixed. */
 .map-node-accent {
   fill: var(--c);
   pointer-events: none;

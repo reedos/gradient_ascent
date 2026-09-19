@@ -57,11 +57,11 @@ const rows = series.map((s) => {
   // from "earliest marked date to latest", and called the dates odd; the dates were odd. That rule let
   // a 2017 vector-search library start the Context bar three years before the paper, and let a
   // 2024 open standard, not a product, end the Tools bar. The `buildable` dates stay on the full
-  // timeline, where each is labelled; they do not belong in a bar that claims a single meaning.
+  // timeline, where each is labeled; they do not belong in a bar that claims a single meaning.
   // A level with only one of the two dates gets no bar.
   //
   // A second call (2026-09-18): the date that says a level "arrived" is the product, not the
-  // paper. So the product end is the big labelled dot, the paper end is the small hollow one, and
+  // paper. So the product end is the big labeled dot, the paper end is the small hollow one, and
   // the line between them is faint. The key underneath leads with the product too.
   const pair = s.marks.filter((mk) => mk.key === 'described' || mk.key === 'available');
   const extent = pair.length === 2 ? markExtent(pair) : undefined;

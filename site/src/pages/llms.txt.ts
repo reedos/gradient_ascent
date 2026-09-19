@@ -33,7 +33,7 @@ export const GET: APIRoute = async ({ site }) => {
     '> Status: every technique, topic and recipe page is a DRAFT — written, sourced and reviewed, ' +
       'but with no recorded run and no scored result file behind it. No page on this site reports ' +
       'a measured number. Every cost strip and every stepped trace is an illustration and is ' +
-      'labelled as one.',
+      'labeled as one.',
   );
   lines.push('');
 

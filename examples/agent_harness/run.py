@@ -79,7 +79,7 @@ def trim_to_budget(budget_tokens: int) -> ContextPolicy:
     clearing and compaction -- this one trims by a plain token count to keep the point readable
     in a few lines.
 
-    The question is a user message too, and a tool result is recognised here by how its text
+    The question is a user message too, and a tool result is recognized here by how its text
     opens. So the search starts after the first assistant turn: a question that happens to begin
     "Result of ..." is never trimmed, because a policy that drops the question leaves the model
     answering something it can no longer see."""

@@ -47,11 +47,11 @@ const columnCount = matrixTechniques.filter((t) => usedSlugs.has(t.slug)).length
     <SectionTop
       eyebrow="Use case × pattern"
       title={`${recipes.length} recipes across ${columnCount} techniques`}
-      aside={`Every technique some recipe uses gets a column, grouped and coloured by level; the ${matrixTechniques.length - columnCount} pages no recipe uses are left out. A filled cell means that recipe uses that technique. The grid scrolls sideways inside its own box; on a narrow screen it is a list instead.`}
+      aside={`Every technique some recipe uses gets a column, grouped and colored by level; the ${matrixTechniques.length - columnCount} pages no recipe uses are left out. A filled cell means that recipe uses that technique. The grid scrolls sideways inside its own box; on a narrow screen it is a list instead.`}
     />
     <RecipeMatrix recipes={matrixRecipes} techniques={matrixTechniques} />
     <p class="footnote reading">
-      The columns say which techniques earn their place across many jobs and which are specialised.
+      The columns say which techniques earn their place across many jobs and which are specialized.
       A recipe's own page gives the reasoning for each choice, and says why it does not need a
       higher level.
     </p>

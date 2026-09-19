@@ -4,7 +4,7 @@
 // site/tests/matrix.test.ts can run it under plain `node --test` with no bundler, the same
 // arrangement lib/timeline.ts and lib/search.ts use.
 //
-// One judgement is baked in: a technique NO recipe uses gets no column. The site has 49 technique
+// One judgment is baked in: a technique NO recipe uses gets no column. The site has 49 technique
 // and topic pages and twelve recipes; a full 49-column grid would be mostly empty, would not fit
 // any screen, and would say less than the columns that earn their place. The count of dropped
 // columns is returned so the page can say so out loud rather than quietly showing a subset.
@@ -26,7 +26,7 @@ export interface MatrixRecipe {
 export interface MatrixGroup {
   level: MatrixLevel;
   label: string;
-  /** Column colour token, e.g. "var(--o3)" or "var(--ot)". */
+  /** Column color token, e.g. "var(--o3)" or "var(--ot)". */
   color: string;
   techniques: MatrixTechnique[];
 }

@@ -1,4 +1,5 @@
 ---
+import { usDate } from '../lib/dates';
 import Base from '../layouts/Base.astro';
 import SectionTop from '../components/SectionTop.astro';
 import ClimbCurve from '../components/ClimbCurve.astro';
@@ -73,7 +74,7 @@ const homeRecipes = HOME_RECIPES.map((slug) => {
         <span>{counts.techniques} techniques</span>
         <span>{counts.recipes} recipes</span>
         <span>{counts.named} named models, products and tools</span>
-        <span>Names listed {asOf}</span>
+        <span>Names listed {usDate(asOf)}</span>
       </div>
     </div>
     <div class="hero-art">
@@ -113,7 +114,7 @@ const homeRecipes = HOME_RECIPES.map((slug) => {
     />
     <LevelExplorer levels={levelDetails} tracksDetail={tracksDetail} initialLevel={1} client:load />
     <p class="footnote">
-      Names listed {asOf}. {namesChecked.verified} of {namesChecked.total} registry entries have
+      Names listed {usDate(asOf)}. {namesChecked.verified} of {namesChecked.total} registry entries have
       been checked against the maker's own page; the registry marks the rest as unchecked.
     </p>
   </section>

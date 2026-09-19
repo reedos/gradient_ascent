@@ -1,5 +1,5 @@
 /* Styles for the two generated index pages, /glossary/ and /failures/ (finish-indexes). Built
-   from the same tokens, hairlines and panel/pill shapes as global.css -- no new colour, font,
+   from the same tokens, hairlines and panel/pill shapes as global.css -- no new color, font,
    radius or shadow. Imported directly by glossary.astro and failures.astro, not from the layout,
    so it never touches a page outside this territory. */
 

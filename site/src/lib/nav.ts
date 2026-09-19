@@ -119,7 +119,7 @@ export interface NavContext {
   level?: number;
 }
 
-/** Normalises "/x" and "/x/index.html" style paths to "/x/". */
+/** Normalizes "/x" and "/x/index.html" style paths to "/x/". */
 function norm(path: string): string {
   let p = path.split('#')[0].split('?')[0];
   if (!p.startsWith('/')) p = `/${p}`;

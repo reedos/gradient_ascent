@@ -151,7 +151,7 @@ const drawableEdges = layout.edges
             <rect x={node.x} y={node.y} width={node.w} height={node.h} rx="6" class="map-node-body" style={`--c:${node.color}`} />
             {/* The level's hue as a solid 3px bar along the node's top edge, the same idiom
                 ClimbCurve.astro's cards and the leveled page-hero use (a 2px rule in var(--oN)) --
-                the band label alone was not enough for the colour to "carry across the row" the
+                the band label alone was not enough for the color to "carry across the row" the
                 way it does elsewhere on the site. Square corners: at this scale the sliver of
                 overlap past the rect's own 6px-radius corner is under a pixel and invisible. */}
             <rect x={node.x} y={node.y} width={node.w} height="3" class="map-node-accent" style={`--c:${node.color}`} />

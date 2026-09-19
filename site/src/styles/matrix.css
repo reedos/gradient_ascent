@@ -1,6 +1,6 @@
 /* The recipe x technique matrix on /recipes/ (components/RecipeMatrix.astro). Two renderings of
    the same data, swapped by one media query the way ClimbCurve and Timeline do it: a grid above
-   700px, and below that a list of recipes with their techniques as level-coloured pills. The grid
+   700px, and below that a list of recipes with their techniques as level-colored pills. The grid
    is genuinely unpleasant on a phone -- thirty-odd columns, each a rotated label -- so the narrow
    view is a different shape rather than the same table squeezed. No client JavaScript. */
 
@@ -145,7 +145,7 @@
   border: 0;
 }
 
-/* The phone rendering: one row per recipe, its techniques as level-coloured pills. */
+/* The phone rendering: one row per recipe, its techniques as level-colored pills. */
 .mx-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px }
 .mx-list li {
   border: 1px solid var(--line);

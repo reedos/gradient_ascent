@@ -1,4 +1,5 @@
 ---
+import { usDate } from '../../lib/dates';
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Eyebrow from '../../components/Eyebrow.astro';
@@ -165,7 +166,7 @@ const mdHref = url(isTracks ? '/levels/tracks.md' : `/levels/${order}.md`);
         <div class="eyebrow muted">Out there</div>
         <h2>Named products, tools and models</h2>
       </div>
-      <p>Names listed {asOf}. {namesChecked.verified} of {namesChecked.total} registry entries have been checked against the maker's own page; the registry marks the rest as unchecked.</p>
+      <p>Names listed {usDate(asOf)}. {namesChecked.verified} of {namesChecked.total} registry entries have been checked against the maker's own page; the registry marks the rest as unchecked.</p>
     </div>
     <div class="panel">
       <NameList groups={groups} emptyText="No names listed for this level yet." />

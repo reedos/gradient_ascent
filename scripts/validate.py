@@ -607,7 +607,7 @@ def check_teardowns(repo_root: Path, taxonomy: dict, landscape: dict | None = No
     return errors
 
 
-# RunDiagram draws a node box 132 units wide and 38 tall, centred on (x, y), and sizes the SVG
+# RunDiagram draws a node box 132 units wide and 38 tall, centered on (x, y), and sizes the SVG
 # from the run file's own `h`. Neither number is checked anywhere, and three run files shipped in
 # wave 3 with the final node sliced in half because `h` had been set to the last node's `y`. It
 # builds green and shows up only in a screenshot.

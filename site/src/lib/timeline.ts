@@ -338,7 +338,7 @@ export function markExtent(marks: ResolvedMark[]): { earliest: ResolvedMark; lat
   return { earliest, latest };
 }
 
-// -- "How fast": interval arithmetic, always labelled as the site's own -------------------------
+// -- "How fast": interval arithmetic, always labeled as the site's own -------------------------
 
 export interface NamedInterval {
   /** Whole months between the two dates -- always non-negative; see `reversed`. */
@@ -616,12 +616,12 @@ export interface LabelPoint {
 /**
  * Which milestones on one lane get a printed text label on the wide chart, given each one's
  * fractional x position (0..1) on whichever axis is active. Every marked milestone (its id is in
- * `markedIds`) is always labelled -- it carries the site's own interval arithmetic and has to be
+ * `markedIds`) is always labeled -- it carries the site's own interval arithmetic and has to be
  * identifiable without a hover. Beyond that, up to `maxExtra` more are added, in the order given,
  * each only if it sits at least `minGap` away (as a fraction of the axis) from every label chosen
  * so far -- the de-collision the dense 2023-2026 stretch needs. Every point not selected is still
  * a real, focusable dot; it is reachable by keyboard and read out in the full list below the
- * chart, just not labelled inline.
+ * chart, just not labeled inline.
  */
 export function selectLabeledMilestones(
   points: LabelPoint[],
@@ -657,12 +657,12 @@ export function selectLabeledMilestones(
 export type LabelSide = 'above' | 'below';
 
 /**
- * Which side of the lane each LABELLED point's text prints on, alternating in x order over the
- * labelled points ONLY. This matters because most dots on a lane carry no visible label at all
- * (see selectLabeledMilestones): alternating by raw list position (every other dot, labelled or
- * not) would not keep adjacent VISIBLE labels apart, since an unlabelled dot can sit between two
- * labelled ones without affecting which side either prints on. Alternating over the labelled
- * subset specifically guarantees two neighbouring visible labels are never both "below" (or both
+ * Which side of the lane each LABELED point's text prints on, alternating in x order over the
+ * labeled points ONLY. This matters because most dots on a lane carry no visible label at all
+ * (see selectLabeledMilestones): alternating by raw list position (every other dot, labeled or
+ * not) would not keep adjacent VISIBLE labels apart, since an unlabeled dot can sit between two
+ * labeled ones without affecting which side either prints on. Alternating over the labeled
+ * subset specifically guarantees two neighboring visible labels are never both "below" (or both
  * "above") the lane, which is what actually prevents their text overlapping.
  */
 export function assignLabelSides(points: LabelPoint[], labeled: Set<string>): Map<string, LabelSide> {

@@ -65,7 +65,7 @@ against every one of them, grade each result, and let two runs be compared. Some
 trace of what happened inside each run, not only the final answer.
 
 Five of them are set out side by side below, described only in their own documentation's words, read
-2026-09-18. There is no ranking and no "best for" here: what fits a team depends on things this
+September 18, 2026. There is no ranking and no "best for" here: what fits a team depends on things this
 page cannot know — what is already being traced, who has to read a result, and whether the data
 being graded may leave the machine at all. A sixth tool, OpenAI Evals, is mid-shutdown and is
 reported separately rather than compared. <Link href="/techniques/prompt-optimization/">Prompt
@@ -105,9 +105,9 @@ documentation. Nothing below is this site's assessment of any of them.
 
 **promptfoo.** Calls itself "an open-source CLI and library for evaluating and red-teaming LLM
 apps." On where the data goes: "This software runs completely locally. The evals run on your
-machine and talk directly with the LLM." No licence on the page read. Grading is metrics a user
+machine and talk directly with the LLM." No license on the page read. Grading is metrics a user
 defines over prepared test cases, displayed in "matrix views that let you quickly evaluate outputs
-across many prompts"<Cite n={1}/>. Separately, promptfoo announced on 2026-03-09 that it was
+across many prompts"<Cite n={1}/>. Separately, promptfoo announced on March 9, 2026 that it was
 joining OpenAI, saying "Promptfoo will remain open source and we will continue to serve users and
 customers"<Cite n={10}/>.
 
@@ -116,13 +116,13 @@ and improving agents," with a workflow it names as instrument, observe, annotate
 and admin<Cite n={2}/>. On where the data goes: hosted, with a self-hosting guide that "offers a
 self-hosted deployment option that separates data storage from platform management" — the customer
 runs the storage, Braintrust runs the managed interface — and marks self-hosting as available only
-on the Enterprise plan<Cite n={4}/>. No licence on the pages read. Grading is its autoevals
+on the Enterprise plan<Cite n={4}/>. No license on the pages read. Grading is its autoevals
 library, which "bundles together a variety of automatic evaluation methods including" LLM-as-a-judge,
 heuristic (it gives Levenshtein distance) and statistical (BLEU)<Cite n={3}/>.
 
 **LangSmith.** Describes itself through what it covers: observability, evaluation, prompt
 engineering and deployment. On where the data goes: "cloud, hybrid, or self-hosted," and its docs
-say all three options include those same four capabilities<Cite n={5}/>. No licence on the pages
+say all three options include those same four capabilities<Cite n={5}/>. No license on the pages
 read. Grading is "evaluators," which are "workspace-level resources that score application
 performance," run over a dataset — "a collection of examples," where "an example is a test input,
 reference output pair" — and each experiment "captures outputs, evaluator scores, and execution
@@ -131,11 +131,11 @@ traces for every example in the dataset"<Cite n={6}/>.
 **DeepEval.** Calls itself "a simple-to-use, open-source LLM evaluation framework, for evaluating
 large-language model systems." On where the data goes: its metrics "run locally on your machine,"
 with an opt-in cloud — using the `deepeval` platform "will allow you to generate sharable testing
-reports on the cloud." Licence: "DeepEval is licensed under Apache 2.0." Grading uses
+reports on the cloud." License: "DeepEval is licensed under Apache 2.0." Grading uses
 "LLM-as-a-judge and other NLP models"<Cite n={7}/>.
 
 **Ragas.** Describes itself as "Objective metrics, intelligent test generation, and data-driven
-insights for LLM apps." On where the data goes: installed from PyPI and run locally. Licence: an
+insights for LLM apps." On where the data goes: installed from PyPI and run locally. License: an
 Apache-2.0 badge on its README. Grading is metrics "both LLM-based and traditional," and the
 quickstart ships one template today, `rag_eval`, "Evaluate RAG systems," with agent, benchmark,
 prompt and workflow templates listed under "Coming Soon"<Cite n={8}/>.

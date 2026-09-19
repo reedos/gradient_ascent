@@ -1,7 +1,7 @@
 """Tests for examples/routing: the classify-then-dispatch example for the routing technique page.
 
 Mirrors the shape of tests/test_examples.py's ExampleTraceTests: run the example end to end on a
-scripted StubModel and check the trace's decided_by pattern, plus the routing-specific behaviour
+scripted StubModel and check the trace's decided_by pattern, plus the routing-specific behavior
 (which handler a label sends the question to, and the fallback when a route cannot serve it).
 """
 from __future__ import annotations

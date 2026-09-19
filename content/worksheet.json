@@ -23,7 +23,7 @@
         },
         {
           "id": "no",
-          "label": "No. It needs to understand or produce language, or use judgement a rule cannot capture.",
+          "label": "No. It needs to understand or produce language, or use judgment a rule cannot capture.",
           "action": "next",
           "next": "one-call",
           "relation": { "from": "order-zero", "to": "chat" }

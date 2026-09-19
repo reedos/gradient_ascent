@@ -335,7 +335,7 @@ function chip(n: NamedEntry): NameChip {
   };
 }
 
-/** One level's names, already grouped, labelled and slimmed for the client. */
+/** One level's names, already grouped, labeled and slimmed for the client. */
 export interface NameGroup {
   label: string;
   entries: NameChip[];
