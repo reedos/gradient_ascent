@@ -9,10 +9,13 @@ you tell it to.
 ## Which examples the question set scores
 
 The set asks one thing: here is a question about the documents, answer it and cite what you
-used. An example is scored when it does that. Twenty-six of the forty-four examples do something
+used. An example is scored when it does that, and eighteen of them are. The rest do something
 else: they are honest demonstrations of their own technique, but a score against this set would
 be a number about a task they were not written for, which is worse than no number. Asking the
-runner for one prints the reason and exits 2.
+runner for one prints the reason and exits 2. The scored eighteen are `EXAMPLE_NAMES` in
+`scripts/eval_run.py` and the rest are `NOT_SCORED` beside it, each with its reason; the count of
+the rest is not written down here because examples are still being added, and a number in prose
+that nothing recomputes goes stale without anyone noticing.
 
 | Scored (`--example all` runs these) | Level |
 |---|---|
@@ -116,12 +119,15 @@ less than `"questions_total"`. Re-run with a higher budget, or on a `--kind` sub
 the rest; cached responses from the first run are reused (see below), so you only pay for what is
 still missing.
 
-`evals/budget.json` holds the dry-run ceiling per example as of 2026-09-18, a recommended cap for
-each, and a whole-run cap. **Nothing reads it automatically**: it is a record of what the
-projection said and where the projection is not to be trusted, and you pass the number yourself.
-Two entries are not the dry number: `routing`, for the branching reason above, and
-`context_engineering`, which puts the whole document set in every prompt by design and is the one
-example that costs about 14,000 input tokens a question against `rag`'s 508.
+`evals/budget.json` holds the dry-run ceiling per example, a recommended cap for each, and a
+whole-run cap. Its own `as_of` field carries the date the projection was taken, and
+`tests/test_budget_is_current.py` re-runs the projection and fails if any figure in it has
+drifted, so the file cannot go quietly stale the way it did once before. **Nothing reads it
+automatically**: it is a record of what the projection said and where the projection is not to be
+trusted, and you pass the number yourself. Two entries are not the dry number: `routing`, for the
+branching reason above, and `context_engineering`, which puts the whole document set in every
+prompt by design and is the one example that costs about 14,000 input tokens a question against
+`rag`'s 519.
 
 ## A live local run
 

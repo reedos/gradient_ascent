@@ -670,11 +670,22 @@ def run_example(
     review_items: list[dict] = []
     tokens_so_far = 0
     partial = False
+    interrupted = False
 
     for i, question in enumerate(questions):
         tracer = Tracer(example=name, level=level, model_id=model.model_id)
         start = time.perf_counter()
-        answer = run_fn(question["question"], model, embedder, tracer)
+        try:
+            answer = run_fn(question["question"], model, embedder, tracer)
+        except KeyboardInterrupt:
+            # Ctrl+C. Everything answered so far is real work, already paid for, and a person
+            # stopping a long run still wants to read it: keep the questions that finished,
+            # stop here, and let the caller write the file marked interrupted. The question in
+            # flight is dropped rather than half-recorded. Re-raising instead would have thrown
+            # away every answer in memory, which is what used to happen.
+            interrupted = True
+            partial = True  # the question in flight never finished, so the run is incomplete
+            break
         wall_s = time.perf_counter() - start
         correct = None if dry else grade_question(question, answer, grader)
         results.append(
@@ -715,6 +726,7 @@ def run_example(
         partial=partial,
         budget_tokens=budget_tokens,
     )
+    summary["interrupted"] = interrupted
     summary["review"] = sample_for_review(review_items, seed=review_seed)
     return summary
 
@@ -791,6 +803,20 @@ def write_result(summary: dict, out_dir: Path) -> Path:
         )
     summary["review"] = review
     return out_path
+
+
+def stub_refusal(example: str, *, is_stub: bool, allow_stub: bool) -> str | None:
+    """The line to print when a stub run is refused a result file, or None when it may write one.
+
+    A stub answers nothing real, so a result file from one measures nothing. It is refused unless
+    the caller asks for it outright, and even then the summary carries `"stub": true` so the site
+    can refuse to chart it.
+    """
+    # Named, rather than three lines inside `main`, so a page can pin it by name: a pinned line
+    # range over this file has now slid three times, once per wave that grew the runner.
+    if is_stub and not allow_stub:
+        return f"[{example}] stub model: result not written (pass --allow-stub to write one anyway, marked stub=true)."
+    return None
 
 
 def _print_dry_table(summaries: list[dict]) -> None:
@@ -884,10 +910,24 @@ def main(argv: list[str]) -> int:
             budget_tokens=args.budget_tokens,
             review_seed=args.review_seed,
         )
-        if is_stub and not args.allow_stub:
-            print(f"[{name}] stub model: result not written (pass --allow-stub to write one anyway, marked stub=true).")
+        refusal = stub_refusal(name, is_stub=is_stub, allow_stub=args.allow_stub)
+        if refusal is not None:
+            print(refusal)
+            if summary["interrupted"]:
+                return 130
             continue
         out_path = write_result(summary, args.out)
+        if summary["interrupted"]:
+            # Ctrl+C. Write what finished, say so in plain words, and stop: do not roll on to the
+            # next example of an `--example all` run, which is the opposite of what the person
+            # pressing Ctrl+C asked for. 130 is the shell's own code for "killed by SIGINT".
+            print(
+                f"[{name}] interrupted after {summary['questions_run']} of "
+                f"{summary['questions_total']} questions; wrote {out_path} "
+                '("interrupted": true, "partial": true). Re-run the same command to resume: '
+                "every answer already paid for is in the cache."
+            )
+            return 130
         partial_note = " (PARTIAL, budget reached)" if summary["partial"] else ""
         print(f"[{name}] wrote {out_path} score={summary['score_overall']}{partial_note}")
     return exit_code

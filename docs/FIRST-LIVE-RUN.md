@@ -77,14 +77,17 @@ Do not publish anything off this run. One example, one kind, one model is a smok
 
 ## Step 2: add a grader
 
-`multi_hop` questions are `rubric`-graded: a second model reads each answer against a checklist.
+Eight of the twelve `multi_hop` questions are `rubric`-graded: a second model reads each answer
+against a checklist. The other four are `exact`, so this run exercises both paths at once.
 
 ```
 python scripts/eval_run.py --example rag --model ollama:<your-tag> --grader ollama:<your-tag> --kind multi_hop --budget-tokens 60000
 ```
 
 Writes: the result file above, plus `evals/results/rag/ollama_<your-tag>.review.json`, a
-deterministic 10% sample of the grader's verdicts.
+deterministic 10% sample of the grader's verdicts. Ten percent of eight rounds to one, so expect
+a single entry here; `--review-seed` takes a second, different sample without re-running
+anything, and Step 3 samples from all 28 rubric questions rather than these 8.
 
 Read the sample and decide, yourself, whether you agree before you look at `verdict`. One
 disagreement in a small sample is noise; two in a row means the grader is not trustworthy and no
@@ -149,9 +152,11 @@ from the metered API. `--list` and `--dry-run` both tell you which shape an exam
 Work up the levels, reading each result before starting the next: `order_zero` (free, no model),
 `one_call`, `rag`, `knowledge_graphs`, `prompt_chaining`, `routing`, `parallelization`,
 `evaluator_optimizer`, `workflow_graphs`, `function_calling`, `mcp`, `single_agent`,
-`agentic_rag`, `orchestrator_workers`, `agent_graphs`, `debate_review`, and `context_engineering`
-last. Per-example token caps are in `evals/budget.json`; `routing` and `context_engineering` are
-not what the dry run projects, and the file says why.
+`agent_harness`, `agentic_rag`, `orchestrator_workers`, `agent_graphs`, `debate_review`, and
+`context_engineering` last. That is all eighteen scored examples, which is `EXAMPLE_NAMES` in
+`scripts/eval_run.py`; if the two ever disagree, the runner is right. Per-example token caps are
+in `evals/budget.json`; `routing` and `context_engineering` are not what the dry run projects,
+and the file says why.
 
 At level 4 and above, check `model_decided_steps` against what the level allows: exactly one per
 question at level 4, one per tool call plus one for the stop at level 5. A number outside that is
@@ -191,7 +196,16 @@ Only after the local run is clean, and only for the pages you actually intend to
 
 Ctrl+C is safe at any point. `eval_run.py` caches every response by `(model id, prompt hash)`
 under `.local/eval-cache/`, so a stopped run pays again only for the question in flight, not for
-anything already answered. Resume with the same command. `record_trace.py` writes `trace.json`
+anything already answered. Resume with the same command.
+
+It also leaves you something to read. An interrupted run writes the questions that did finish to
+the usual result file, marked `"interrupted": true` and `"partial": true` with `questions_run`
+below `questions_total`, prints where it put them, and exits 130 without starting the next
+example of an `--example all` run. So Ctrl+C at question 55 of 60 costs you the one in flight,
+not the 54 you waited for. Treat that file the way you would any partial: it is a real score over
+a smaller set, and nothing with `"partial": true` may reach a page.
+
+`record_trace.py` writes `trace.json`
 only once a run finishes, so an interrupted recording leaves no partial file and does not disturb
 whatever trace was already there. Nothing else needs shutting down: neither script starts a
 background process.
