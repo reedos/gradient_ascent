@@ -110,7 +110,7 @@ sub-question text, the simplest version of that, since every worker already shar
 corpus) and one output shape (a cited answer).
 
 Each worker is `examples.rag.run.run`, imported and called unmodified: a level-2 single call, not
-a loop, which satisfies "a level 5 loop or a single call" at the cheap end. A team that needed a
+a loop, which is the cheap end of what a worker can be. A team that needed a
 worker to search iteratively would hand it `examples.agentic_rag.run.run` instead; nothing else in
 this file would change, since both share the same `(question, model, embedder, tracer) -> Answer`
 signature.

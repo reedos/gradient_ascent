@@ -3,28 +3,28 @@ slug: voice-agents
 level: 5
 run: voice-agents
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Realtime conversations"
     url: "https://developers.openai.com/api/docs/guides/realtime-conversations"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
-  - title: "Gemini Live API overview"
-    url: "https://ai.google.dev/gemini-api/docs/live-api"
-    publisher: "Google"
-    accessed: "2026-09-18"
-  - title: "Turn detection"
-    url: "https://docs.livekit.io/agents/build/turns/"
+    accessed: "2026-09-19"
+  - title: "Gemini Live API overview (archived copy)"
+    url: "https://web.archive.org/web/20260915171334id_/https://ai.google.dev/gemini-api/docs/live-api"
+    publisher: "Google (Gemini API documentation, via the Internet Archive)"
+    accessed: "2026-09-19"
+  - title: "Turns overview"
+    url: "https://docs.livekit.io/agents/logic/turns/"
     publisher: "LiveKit"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Disclosure requirements"
     url: "https://elevenlabs.io/docs/eleven-agents/legal/disclosure-requirement"
     publisher: "ElevenLabs"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Voice agents"
     url: "https://developers.openai.com/api/docs/guides/voice-agents"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -47,8 +47,8 @@ something has to decide when the caller has stopped talking, and what happens if
 while the agent is still going. OpenAI's Realtime API documents voice activity detection that
 "will determine when the user has started or stopped speaking and respond automatically," and for
 interruption: "The server will automatically truncate unplayed audio when there's a user
-interruption"<Cite n={1}/>. Google calls the same behavior "barge-in": "Users can interrupt the
-model at any time"<Cite n={2}/>.
+interruption"<Cite n={1}/>. Google calls the same behavior "Barge-in": "Users can interrupt the
+model at any time for responsive interactions"<Cite n={2}/>.
 
 The example below is a text simulation, not a voice pipeline: nothing here records, streams,
 transcribes or synthesizes sound. What it can honestly show is the control flow (which choices
@@ -120,6 +120,12 @@ list of things to measure: "audible response timing, unwanted silence, overlap, 
 interruptions"<Cite n={5}/>.
 
 <CodeFile file="examples/voice_agents/run.py" func="run" />
+
+The same control flow answers a hands-busy question at a bench: an engineer with both hands full
+asks for the last reading and expects to hear it back, not a new one. That is honest only if the
+voice layer never produces the number itself. `SYSTEM_PROMPT` here is about turn control, not
+what gets said, so a bench version would have to add one more rule: read back a value the caller
+is given, never estimate, recall or restate one from anywhere else.
 
 Run it yourself:
 

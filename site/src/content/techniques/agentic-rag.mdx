@@ -3,20 +3,20 @@ slug: agentic-rag
 level: 5
 run: agentic-rag
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Deep Research"
     url: "https://gemini.google/overview/deep-research/"
     publisher: "Google"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "How we built our multi-agent research system"
     url: "https://www.anthropic.com/engineering/multi-agent-research-system"
     publisher: "Anthropic"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Deep research"
     url: "https://developers.openai.com/api/docs/guides/deep-research"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -39,9 +39,9 @@ instead offers the model a search tool it can call as many times as it decides i
 read what comes back, and lets it decide whether to search again, read more closely, or stop and
 answer: the <Link href="/techniques/single-agent/">single-agent</Link> loop aimed at retrieval.
 
-Google describes its own version this way: "at each step, the model has to ground itself on all
+Google describes its own version this way: at each step, "the model has to ground itself on all
 information gathered so far, then identify missing information and discrepancies it wants to
-explore," continuing until "the model determines enough information has been gathered"<Cite
+explore", continuing until "the model determines enough information has been gathered"<Cite
 n={1}/>. OpenAI's deep research models work the same way: "agentic" systems that "conduct
 multi-step research" and return a listing of every search made along the way<Cite n={3}/>. In both
 cases the model chooses the next query and when to stop; your code still runs every search and can
@@ -64,8 +64,8 @@ product runs several, reads what each one turns up, and decides for itself wheth
 or needs to look further before writing a report.
 
 Google's description of its own Deep Research is specific about the mechanism: the model
-"oversees the execution of" a research plan and "at each step the model reasons over information
-available to decide its next move," browsing "the web and your Gmail, Drive, and Chat if you
+"oversees the execution of" a research plan, and at each step "the model reasons over information
+available to decide its next move", browsing "the web and your Gmail, Drive, and Chat if you
 choose so"<Cite n={1}/>. This is the same search-then-read-then-decide loop the run above steps through,
 aimed at a much larger set of sources. OpenAI's documentation for its deep research models
 describes the output the same way: it "will contain a listing of web search calls, code
@@ -122,6 +122,11 @@ not this one. Both are Anthropic's numbers, not anything measured here. Anthropi
 went wrong in early versions of that system: agents "continuing when they already had sufficient
 results, using overly verbose search queries, or selecting incorrect tools"<Cite n={2}/>, the same
 failures a step cap and a careful stop condition exist to catch here, at a much smaller scale.
+
+That escalation only pays off once the searches stop depending on each other: when a question
+splits into independent lines of research that together need more context than one agent can
+hold, see <Link href="/techniques/orchestrator-workers/">lead agent and workers</Link> for
+spreading them across several agents instead of running one longer loop.
 
 </Lane>
 </Lanes>
@@ -216,7 +221,7 @@ real run before spending anything on one.
 
 <TryIt items={[
   { lane: 'use', body: 'Give a deep-research mode a question with two parts that live in different sources, and check its shown searches or sources: did it actually run more than one search, and does each part of the answer trace to one it ran?' },
-  { lane: 'build', body: 'Run python -m examples.agentic_rag --model stub with a question of your own from the repo root, then read tests/test_examples.py\'s agentic_rag tests to see a scripted model that actually searches, reads, and stops.' },
+  { lane: 'build', body: 'Run python -m examples.agentic_rag --model stub with a question of your own from the repo root, then read tests/test_example_agentic_rag.py to see a scripted model that actually searches, reads, and stops.' },
   { lane: 'either', body: 'Compare this page\'s run to RAG\'s: RAG\'s five steps are all solid (code-decided); count how many of this run\'s eight are dashed instead. What does the difference buy, and what does it cost?' },
 ]} />
 

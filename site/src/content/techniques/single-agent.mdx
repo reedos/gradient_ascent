@@ -3,29 +3,29 @@ slug: single-agent
 level: 5
 run: single-agent
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "ReAct: Synergizing Reasoning and Acting in Language Models"
     url: "https://arxiv.org/abs/2210.03629"
     publisher: "arXiv (Princeton University, Google Research)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Plan-and-Solve Prompting: Improving Zero-Shot Chain-of-Thought Reasoning by Large Language Models"
     url: "https://arxiv.org/abs/2305.04091"
     publisher: "arXiv"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Building effective agents"
     url: "https://www.anthropic.com/engineering/building-effective-agents"
     publisher: "Anthropic"
     date: "2024-12-19"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "How the agent loop works"
     url: "https://code.claude.com/docs/en/agent-sdk/agent-loop"
     publisher: "Anthropic (Claude Agent SDK documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Running agents"
     url: "https://openai.github.io/openai-agents-python/running_agents/"
     publisher: "OpenAI (Agents SDK documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -127,7 +127,20 @@ with what arguments, or to stop. Every one of those steps is `decided_by: "model
 tool result. Hitting either forces one last no-tools call for a final answer (`decided_by:
 "code"`, since the model never chose to stop), and the trace records which cap did it, so a
 partial answer never looks like a normal one. `tests/test_example_single_agent.py` scripts a model
-that never stops calling tools on its own and checks both caps actually cut the run short.
+that never stops calling tools on its own and checks both caps actually cut the run short. Those
+caps stop one run; they carry no state into a new one. Once the work outlives a single context
+window or a single sitting, see <Link href="/techniques/long-horizon/">long-running tasks</Link>
+for what picks up across that gap.
+
+The same loop, aimed at a bench instead of a document set, is
+<Link href="/recipes/bring-up-debug-assistant/">bringing up a failed board</Link>. That is
+engineering test, not production test, even though the board came off a production line: one
+board, an afternoon, and an answer that is a cause and a next measurement rather than a pass or a
+fail. Three read-only tools query the test log, the bench documents and one instrument, and each
+measurement narrows in on a cause the way each tool call here narrows in on an answer. Nothing in
+that recipe's tools can set a voltage or enable an
+output; the board is already energized under a technician's own approved sequence before the
+agent's loop ever starts.
 
 <CodeFile file="examples/single_agent/run.py" func="run" />
 

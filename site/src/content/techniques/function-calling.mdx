@@ -3,28 +3,32 @@ slug: function-calling
 level: 4
 run: function-calling
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Tool use with Claude"
     url: "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview"
     publisher: "Anthropic"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Handle tool calls"
     url: "https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls"
     publisher: "Anthropic"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Parallel tool use"
     url: "https://platform.claude.com/docs/en/agents-and-tools/tool-use/parallel-tool-use"
     publisher: "Anthropic"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Function calling"
     url: "https://developers.openai.com/api/docs/guides/function-calling"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
-  - title: "Function calling with the Gemini API"
-    url: "https://ai.google.dev/gemini-api/docs/function-calling"
-    publisher: "Google (Gemini API documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
+  - title: "Function calling with the Gemini API (archived copy)"
+    url: "https://web.archive.org/web/20260915180415id_/https://ai.google.dev/gemini-api/docs/function-calling"
+    publisher: "Google (Gemini API documentation, via the Internet Archive)"
+    accessed: "2026-09-19"
+  - title: "Custom GPT retirement and migration FAQ (archived copy)"
+    url: "https://web.archive.org/web/20260918151544id_/https://help.openai.com/en/articles/20001519-custom-gpt-retirement-and-migration-faq"
+    publisher: "OpenAI (help center, via the Internet Archive)"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -70,6 +74,10 @@ from its own knowledge (checked a calendar, looked something up in a connected t
 ticket) you have used function calling. Custom GPTs with actions, Claude connectors and Gemini
 connected apps are the same mechanism wearing a product name: the app offers the model a list of
 actions, the model picks one when the request calls for it, and the product runs it for you.
+OpenAI has announced that custom GPTs are being retired. Its own FAQ lists December 11, 2026 as
+the "Scheduled retirement" on which "Custom GPTs stop running" for affected Enterprise
+workspaces, adds that "the dates are subject to change", and says other plans may follow the same
+timeline<Cite n={6}/>.
 
 Whether anything gets called at all is a judgment call the model makes on its own, not a fixed
 switch. Anthropic documents the default this way: "It calls a tool when the request maps to that
@@ -121,7 +129,17 @@ is what a maker's own schema-conformance feature is for. Anthropic's tip on the 
 quote above: "Add `strict: true` to your custom tool definitions to ensure Claude's tool calls
 always match your schema exactly"<Cite n={1}/>. OpenAI documents the same idea for its own
 schema: "Setting `strict` to `true` will ensure function calls reliably adhere to the function
-schema, instead of being best effort"<Cite n={4}/>. Run it yourself:
+schema, instead of being best effort"<Cite n={4}/>.
+
+This site's electronics-test bench (`docs/THE-BENCH.md`) draws the same line one step further.
+`examples/common/bench.py` sorts every instrument command into three classes, not two:
+`READ_ONLY_HEADERS` and `is_read_only()` let an agent run any query on its own because a query
+changes nothing; a command that sets a value needs code to check it against a safety envelope
+first; and a command that energizes the board needs that check plus a person's `Approval` naming
+the set point, the same across a production test, an engineering sweep or a precise measurement.
+`_run_tool`'s two-tool whitelist is only the first of those three lines, drawn for a lookup and a
+part search; a tool that could turn something on would need the other two as well. Run it
+yourself:
 
 <CodeFile file="examples/function_calling/README.md" start={16} end={16} lang="text" expect="python -m examples.function_calling" />
 

@@ -3,47 +3,47 @@ slug: mcp
 level: 4
 run: mcp
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Architecture overview"
-    url: "https://modelcontextprotocol.io/docs/learn/architecture"
+    url: "https://modelcontextprotocol.io/docs/2026-07-28/learn/architecture"
     publisher: "Model Context Protocol (specification site)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Understanding MCP servers"
-    url: "https://modelcontextprotocol.io/docs/learn/server-concepts"
+    url: "https://modelcontextprotocol.io/docs/2026-07-28/learn/server-concepts"
     publisher: "Model Context Protocol (specification site)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Tools"
     url: "https://modelcontextprotocol.io/specification/2026-07-28/server/tools"
     publisher: "Model Context Protocol (specification)"
-    accessed: "2026-09-18"
-  - title: "Transports"
+    accessed: "2026-09-19"
+  - title: "Transports Overview"
     url: "https://modelcontextprotocol.io/specification/2026-07-28/basic/transports"
     publisher: "Model Context Protocol (specification)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Streamable HTTP"
     url: "https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http"
     publisher: "Model Context Protocol (specification)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Key Changes"
     url: "https://modelcontextprotocol.io/specification/2026-07-28/changelog"
     publisher: "Model Context Protocol (specification changelog)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "SEP-2575: Make MCP Stateless"
     url: "https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2575"
     publisher: "Model Context Protocol (GitHub, merged proposal)"
     date: "2026-05-11"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "SEP-2567: Sessionless MCP via Explicit State Handles"
     url: "https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2567"
     publisher: "Model Context Protocol (GitHub, merged proposal)"
     date: "2026-05-07"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Roadmap"
     url: "https://modelcontextprotocol.io/development/roadmap"
     publisher: "Model Context Protocol (specification site)"
     date: "2026-08-22"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -162,50 +162,40 @@ connect to than reimplement.
 
 ## Stateless MCP
 
-"Stateless" is not shorthand here. The specification's own changelog uses the word directly: one
-of its listed major changes for the current revision reads "Make MCP stateless: remove the
-initialize/notifications/initialized handshake. Every request now carries its protocol version
-and client capabilities in _meta"<Cite n={6}/>. This is the specification's own description,
-not a blog post's paraphrase of something the spec calls by another name.
+"Stateless" is the specification's own word for the current revision, not a paraphrase. Its
+changelog lists "Make MCP stateless: remove the initialize/notifications/initialized handshake.
+Every request now carries its protocol version and client capabilities in _meta"<Cite n={6}/>
+among the major changes since the previous revision, 2025-11-25<Cite n={6}/>. The maintainers'
+roadmap, updated August 22, 2026, refers to the 2026-07-28 revision as a release already made,
+not a proposal<Cite n={9}/>.
 
-Two changes shipped together in the 2026-07-28 revision. That is the current one: the
-specification's changelog describes it as what changed since the previous revision,
-2025-11-25<Cite n={6}/>, and the maintainers' roadmap, updated August 22, 2026, refers to it as a
-release already made rather than a proposal<Cite n={9}/>. The handshake is gone: earlier revisions opened a
-connection with an `initialize` call and kept capabilities for as long as that connection lasted;
-every request now states its own protocol version and capabilities instead. Protocol-level
-sessions are gone with it, under a second entry in the same changelog: the revision removes
-"protocol-level sessions and the Mcp-Session-Id header from the Streamable HTTP transport", and
-"servers that need cross-call state use explicit, server-minted handles passed as ordinary tool
-arguments"<Cite n={6}/>. The
-transport specification says what that took away in practice: servers used to assign a session
-via a header, clients could open a standalone stream to receive messages of their own, and a
-broken stream could resume from where it left off: of all of it, the current revision states
-plainly, "None of these mechanisms are part of this revision"<Cite n={5}/>. A current server that
-receives an `Mcp-Session-Id` header from an older client is told to "ignore it, and do not mint or
-echo session IDs"<Cite n={5}/>.
+Two changes shipped together. The handshake is gone: earlier revisions opened a connection with
+an `initialize` call and kept capabilities for as long as it lasted; every request now states its
+own protocol version and capabilities instead. Protocol-level sessions are gone with it: the same
+changelog entry removes "protocol-level sessions and the Mcp-Session-Id header from the
+Streamable HTTP transport", and says "Servers that need cross-call state use explicit,
+server-minted handles passed as ordinary tool arguments"<Cite n={6}/>. The transport
+specification is direct about what that took away: servers used to assign a session via a
+header, a client could open a standalone stream for server-initiated messages, and a broken
+stream could resume; "None of these mechanisms are part of this revision"<Cite n={5}/>, and a
+server that gets an `Mcp-Session-Id` header from an older client is told to "ignore it, and do
+not mint or echo session IDs"<Cite n={5}/>.
 
-Why this was worth breaking backward compatibility over is stated in the proposal that became it,
-SEP-2575, rather than in the changelog: the old handshake created "significant challenges
-for scalability (load balancing requires sticky sessions), resilience (server failure loses
-session state), and implementation complexity (both client and server must manage session
-lifecycles)"<Cite n={7}/>. A load balancer that has to keep sending one client to the same backend
-for the life of a session cannot freely spread requests across instances, and a serverless
-platform that may run a different instance for every single request has nowhere to keep a session
-at all; a protocol that asks nothing to be remembered between requests has nothing to lose when
-the backend that handled the last one is gone. The companion proposal, SEP-2567, describes what
-replaces a session for a server that genuinely needs state across calls: "Stateful workflows use
-`create_*() -> handle` + threaded parameters (guidance, not a protocol construct)"<Cite n={8}/>:
-an ordinary tool call hands back an identifier, and later calls pass it back as one of their own
-arguments, the same as any other piece of data the tool takes, rather than something the
-transport carries for you.
+The proposal that became this, SEP-2575, gives the reason: the old handshake created "significant
+challenges for scalability (load balancing requires sticky sessions), resilience (server failure
+loses session state), and implementation complexity (both client and server must manage session
+lifecycles)"<Cite n={7}/>. A protocol that asks nothing to be remembered between requests has
+nothing to lose when the backend that handled the last one is gone. The companion proposal,
+SEP-2567, describes what replaces a session for a server that genuinely needs one: "Stateful
+workflows use `create_*() -> handle` + threaded parameters (guidance, not a protocol
+construct)"<Cite n={8}/>: an ordinary tool call hands back an identifier, and later calls pass it
+back as an argument like any other, rather than something the transport carries.
 
-Both proposals are merged (SEP-2575 on May 11, 2026, SEP-2567 on May 7, 2026) and both changes are
-in the 2026-07-28 revision: released, not proposed. What is still open is narrower. The
-specification's own roadmap, updated
-August 22, 2026, lists "capability scoping for tool lists after SEP-2575" among what its maintainers
-want to look at next<Cite n={9}/>: a further refinement of what a stateless request can still
-express, not a reconsideration of removing sessions in the first place.
+Both proposals are merged (SEP-2575 on May 11, 2026, SEP-2567 on May 7, 2026), so both changes
+are in the 2026-07-28 revision: released, not proposed. What is still open is narrower: the
+roadmap lists "capability scoping for tool lists after SEP-2575" among what maintainers want to
+look at next<Cite n={9}/>, a refinement of what a stateless request can express, not a
+reconsideration of removing sessions in the first place.
 
 ## Failure modes
 
@@ -284,6 +274,7 @@ No result file exists for MCP yet. Run `python scripts/eval_run.py --example mcp
   { lane: 'use', body: 'Find a product that lets you connect an MCP server or similar connector. Before adding one, read every tool it would expose and ask whether you would trust a stranger to write instructions your assistant follows automatically.' },
   { lane: 'build', body: 'Run python -m examples.mcp --model stub with a question about a part number. Then, in a Python shell in the repo root, build the transport yourself and call call_tool(transport, "search_docs", {"query": "pump"}): a tool name the server never registered. You get back ("unknown tool: search_docs", True): a protocol error the caller can read, not an exception. Which layer decided that, and what would a real host do with it?' },
   { lane: 'either', body: 'Compare this page’s run to function calling’s side by side. Which steps are identical, and which ones exist only because a protocol boundary sits between the model’s choice and the code that carries it out?' },
+  { lane: 'build', body: 'Read examples/common/bench.py (docs/THE-BENCH.md describes it): READ_ONLY_HEADERS and is_read_only() sort an electronics-test instrument’s commands into a query an agent may run on its own, a command that sets a value, and a command that energizes the board, which needs a person’s Approval naming the set point. If those commands were exposed as MCP tools instead of Python functions, which class could the specification’s own "Tools" primitive leave to the model alone, and which would still need the same human-in-the-loop step this page’s Use it lane describes?' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

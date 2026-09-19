@@ -3,28 +3,28 @@ slug: coding-agents
 level: 5
 run: coding-agents
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "AGENTS.md"
     url: "https://agents.md/"
     publisher: "agents.md (stewarded by the Agentic AI Foundation, Linux Foundation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "How the agent loop works"
     url: "https://code.claude.com/docs/en/agent-sdk/agent-loop"
     publisher: "Anthropic (Claude Agent SDK documentation)"
-    accessed: "2026-09-18"
-  - title: "Sandboxing"
-    url: "https://learn.chatgpt.com/codex/sandboxing"
+    accessed: "2026-09-19"
+  - title: "Sandbox"
+    url: "https://learn.chatgpt.com/docs/sandboxing"
     publisher: "OpenAI (Codex documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Agent approvals & security"
-    url: "https://learn.chatgpt.com/codex/agent-approvals-security"
+    url: "https://learn.chatgpt.com/docs/agent-approvals-security"
     publisher: "OpenAI (Codex documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Checkpointing"
     url: "https://code.claude.com/docs/en/checkpointing"
     publisher: "Anthropic (Claude Code documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -138,6 +138,14 @@ check, run, report, repeat until the model stops or a cap ends it.
 
 <CodeFile file="examples/coding_agents/run.py" func="run" />
 
+The check does not have to be a test suite. `examples/bench_instrument_script_from_the_manual`
+runs the same propose-check-feedback shape against an instrument's own documented command set
+instead of tests: a drafted command that is not in the manual, or spelled the way a different
+vendor's firmware accepts it, comes back as that instrument's own error rather than a passing
+script, which is what actually happens when a script drafted for one vendor's SCPI dialect is
+pointed at another's. Read it for the check, not for a coding agent: it is level 3, because code
+alone decides when a draft is good enough, not the model.
+
 Run it yourself:
 
 <CodeFile file="examples/coding_agents/README.md" start={18} end={18} lang="text" expect="python -m examples.coding_agents" />
@@ -146,6 +154,10 @@ Run it yourself:
 </Lanes>
 
 <WhenNot>
+
+Try <Link href="/techniques/code-execution/">code execution</Link> first if the model only has to
+write the fix once and your code can just run it and report the result; that costs one model call
+instead of a loop, and there is no reason yet to expect a second try.
 
 Try a fixed <Link href="/techniques/workflow-graphs/">workflow</Link> (lint, autoformat, or a
 single scripted patch) first if the fix is already known and the same every time; a workflow like
@@ -156,7 +168,8 @@ settles it, such as running a single existing test suite once and reporting the 
 editing involved.
 
 Move up to a coding agent once the number and shape of edits needed cannot be known before the
-model reads the failing test. Fixing it might take one change or several, depending on what
+model reads the failing test, and the code has to be read, run and rewritten until it works, with
+the model deciding when it is done. Fixing it might take one change or several, depending on what
 the first attempt reveals.
 
 </WhenNot>

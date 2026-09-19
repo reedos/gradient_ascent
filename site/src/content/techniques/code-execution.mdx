@@ -3,20 +3,20 @@ slug: code-execution
 level: 4
 run: code-execution
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Code execution tool"
     url: "https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool"
     publisher: "Anthropic"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Code Interpreter"
     url: "https://developers.openai.com/api/docs/guides/tools-code-interpreter"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "E2B"
     url: "https://e2b.dev"
     publisher: "E2B"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -224,6 +224,7 @@ that was never going to fit them.
   { lane: 'use', body: "Ask a chat app's data-analysis feature a question that needs a calculation across numbers you give it, then ask it to show you the code it ran. Does the code actually compute what the final answer claims?" },
   { lane: 'build', body: 'Run python -m examples.code_execution --model stub with a question naming two different appliance models. The stub echoes the question back instead of writing an expression, so the sandbox refuses it. This is the point: nothing the model returns is trusted to be arithmetic. Then open a Python shell in the repo root and call examples.code_execution.run.safe_eval on a few strings of your own: "38.50 + 41.00", "2 ** 10", "__import__(\'os\').listdir(\'.\')", and "1" plus "+1" forty times. Read which bound each one hits.' },
   { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose, using only the synthetic documents in evals/corpus/.' },
+  { lane: 'build', body: "Read examples/bench_test_data_by_conversation/README.md: on this site's electronics-test bench, a model writes a short snippet against a retest export whose volts column is actually millivolts under a header that says volts, and a sandbox runs it. Before that snippet or the model ever sees the table, code range-checks the column against the widest node the board has anywhere and corrects the mislabeled unit. Why does that check have to happen in code, on every table, whether or not the model's tool gets called at all, rather than being one more thing the written snippet is trusted to do?" },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

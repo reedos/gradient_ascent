@@ -3,37 +3,37 @@ slug: agent-harness
 level: 5
 run: agent-harness
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Building effective agents"
     url: "https://www.anthropic.com/engineering/building-effective-agents"
     publisher: "Anthropic"
     date: "2024-12-19"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "How the agent loop works"
     url: "https://code.claude.com/docs/en/agent-sdk/agent-loop"
     publisher: "Anthropic (Claude Agent SDK documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Effective context engineering for AI agents"
     url: "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
     publisher: "Anthropic (Engineering blog)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Loop engineering: getting started with loops"
     url: "https://claude.com/blog/getting-started-with-loops"
     publisher: "Anthropic (Claude blog)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Running agents"
     url: "https://openai.github.io/openai-agents-python/running_agents/"
     publisher: "OpenAI (Agents SDK documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Sandboxing"
-    url: "https://learn.chatgpt.com/codex/sandboxing"
+    url: "https://learn.chatgpt.com/docs/sandboxing"
     publisher: "OpenAI (Codex documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Agent approvals & security"
-    url: "https://learn.chatgpt.com/codex/agent-approvals-security"
+    url: "https://learn.chatgpt.com/docs/agent-approvals-security"
     publisher: "OpenAI (Codex documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -53,16 +53,14 @@ import agentHarnessRun from '../../data/runs/agent-harness.json';
 An agent harness is everything around the model in an agent: the loop that calls it, the tool
 definitions it is shown and the code that runs them, what goes into its next request, whether an
 action needs approval, the caps on steps and tokens, the sandbox, and what gets logged. None of that
-is the model. Anthropic's own account of what makes something an agent is one sentence: systems
-"where LLMs dynamically direct their own processes and tool usage, maintaining control over how they
-accomplish tasks"<Cite n={1}/>, and almost everything a builder builds sits outside it.
+is the model. Anthropic defines an agent in one sentence: systems "where LLMs dynamically direct
+their own processes and tool usage, maintaining control over how they accomplish tasks"<Cite n={1}/>,
+and almost everything a builder builds sits outside it.
 
 That is why the same model behaves very differently in a different harness: change the step cap, the
 allowlist or the context policy and a run finishes, fails, or runs up a bill doing neither, with
-nothing about the model different. Designing the loop on purpose is what people have taken to
-calling loop engineering; Anthropic's Claude Code team, writing under that heading, reports
-"multiple different answers" going round about what a loop even is, and gives its own: "loops as
-agents repeating cycles of work until a stop condition is met"<Cite n={4}/>.
+nothing about the model different. Anthropic's Claude Code team calls this loop engineering and
+defines a loop as "agents repeating cycles of work until a stop condition is met"<Cite n={4}/>.
 
 Level 5 is where the harness first has real decisions to bound: the model decides both the action
 and when to stop: see <Link href="/techniques/single-agent/">single agent</Link> for the loop
@@ -87,10 +85,10 @@ Four places to look for the harness in any agent product. **What it lets the mod
 Anthropic's Claude Agent SDK documents automatic compaction firing as a long session grows —
 "When the context window approaches its limit, the SDK automatically compacts the conversation: it
 summarizes older history to free space, keeping your most recent exchanges and key decisions
-intact"<Cite n={2}/>. Anthropic's engineering blog calls a lighter version of the same idea, tool
-result clearing, "one of the safest lightest touch forms of compaction"<Cite n={3}/>. A product that
-never seems to forget anything is
-not necessarily running a bigger model; it may just be compacting well.
+intact"<Cite n={2}/>. Anthropic's engineering blog describes tool result clearing, a lighter version
+of the same idea, as one of the "safest lightest touch forms of compaction"<Cite n={3}/>. A product
+that never seems to forget anything is not necessarily running a bigger model; it may just be
+compacting well.
 
 **What it will let run.** Anthropic's SDK lets a hook "short-circuit the loop: a PreToolUse hook
 that rejects a tool call prevents it from executing, and Claude receives the rejection message
@@ -270,6 +268,7 @@ one is not model variance, it is what the harness cost the run.
   { lane: 'use', body: 'Pick two agent products (a coding agent and a research or deep-research tool, say) and try to name, for each, its step or turn cap, whether it asks before an irreversible action, and what it says when it hits a limit. That is the harness, not the model, and most products document at least part of it.' },
   { lane: 'build', body: 'Run python -m examples.agent_harness --model stub with a question of your own, then open tests/test_example_agent_harness.py and change trim_to_budget(15) to a much larger number in the harness-changes-the-outcome test. Does the answer come back the same as the generous policy\'s?' },
   { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose, using the pattern in tests/test_example_agent_harness.py.' },
+  { lane: 'build', body: 'Read READ_ONLY_HEADERS and is_read_only in examples/common/bench.py, then SafetyEnvelope and Approval right after them. That is the same allowlist-plus-hook shape this page\'s own ToolRegistry and Hook build, in a setting where the one class of command that actually energizes a board needs a person\'s approval naming the set point before it runs at all.' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

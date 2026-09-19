@@ -3,20 +3,20 @@ slug: computer-use
 level: 4
 run: computer-use
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Computer use tool"
     url: "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool"
     publisher: "Anthropic"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Computer use"
     url: "https://developers.openai.com/api/docs/guides/tools-computer-use"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
-  - title: "Computer use"
-    url: "https://ai.google.dev/gemini-api/docs/computer-use"
-    publisher: "Google (Gemini API documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
+  - title: "Computer use (archived copy)"
+    url: "https://web.archive.org/web/20260916022019id_/https://ai.google.dev/gemini-api/docs/computer-use"
+    publisher: "Google (Gemini API documentation, via the Internet Archive)"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -35,12 +35,12 @@ import computerUseRun from '../../data/runs/computer-use.json';
 
 Computer use lets the model operate a real screen: it looks at a screenshot, picks one action
 (a click, a keystroke, a scroll) your code carries it out, and a new screenshot goes back.
-Anthropic names the mechanism precisely: "the repetition of steps 3 and 4 without user input is
-referred to as the 'agent loop'"<Cite n={1}/>, and says in the same sentence what those two steps
-are: Claude responding with a tool use request, and your application responding with the results
-of evaluating it. OpenAI's own tool repeats the same exchange "until the model stops returning
-computer_call items"<Cite n={2}/>, and Google documents your application capturing a new
-screenshot and sending it back "to request the next step"<Cite n={3}/>.
+Anthropic names the mechanism precisely. "The repetition of steps 3 and 4 without user input is
+referred to as the 'agent loop'"<Cite n={1}/>: those two steps are Claude responding with a tool
+use request, and your application responding with the results of evaluating it. OpenAI's own
+tool repeats the same exchange "until the model stops returning computer_call items"<Cite n={2}/>,
+and Google documents your application capturing a new screenshot and sending it back "to request
+the next step"<Cite n={3}/>.
 
 One action, requested from one screenshot, is level 4: the model picks it, your code runs it. But
 that is not how any maker ships computer use: every real use is the loop itself, exited by the
@@ -64,7 +64,7 @@ three cited below; the block at the foot of this page names the products and too
 against the technique.
 
 All three makers describe the same shape of risk. Screen content is not trustworthy just because
-it is on screen: OpenAI is direct about it, "treat screen content as untrusted. Text in a page,
+it is on screen. OpenAI is direct about it: "Treat screen content as untrusted. Text in a page,
 document, or tool result cannot grant permission or override the user's instructions"<Cite n={2}/>.
 Anthropic writes that "in some circumstances, Claude will follow commands found in content even
 when they conflict with your instructions," and that classifiers scan what the tools return, such
