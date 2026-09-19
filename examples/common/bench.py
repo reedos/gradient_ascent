@@ -969,6 +969,8 @@ READ_ONLY_HEADERS = frozenset(
     }
 )
 
+_CHANNEL_SELECTORS = frozenset({"CHAN1", "CHAN2"})
+
 
 def is_read_only(command: str) -> bool:
     """True when this message only reads: safe to run without an approval, on any instrument.
@@ -985,9 +987,13 @@ def is_read_only(command: str) -> bool:
     header = _normalize(parts[0])
     if header not in READ_ONLY_HEADERS:
         return False
-    # `MEAS:VPP? CHAN1` takes a parameter and still only reads; a header with an argument that
-    # is not a channel selector is not one of these.
-    return True
+    if len(parts) == 1:
+        return True
+    # A query with an argument is not read-only just because its header is. `MEAS:VOLT:DC? 0.1`
+    # sets the meter's range before it reads, the range stays set for every later query, and the
+    # error queue says nothing about it. The one argument that only selects what to read is the
+    # oscilloscope's channel, so that is the one argument allowed.
+    return header == "MEAS:VPP?" and parts[1].strip().upper() in _CHANNEL_SELECTORS
 
 
 class SafetyRefusal(Exception):

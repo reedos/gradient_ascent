@@ -474,6 +474,20 @@ class TestReadOnlyClassification(unittest.TestCase):
     def test_long_form_queries_are_recognized(self) -> None:
         self.assertTrue(is_read_only("MEASure:VOLTage:DC?"))
 
+    def test_a_query_whose_argument_sets_a_range_is_not_read_only(self) -> None:
+        # Found by the writer of the bring-up recipe: the header only reads, the argument does not.
+        bench = Bench()
+        before = bench.dmm.dc_range_v
+        self.assertFalse(is_read_only("MEAS:VOLT:DC? 0.1"))
+        self.assertFalse(is_read_only("MEAS:VOLT:AC? 0.1"))
+        self.assertFalse(is_read_only("MEAS:RES? 100"))
+        self.assertFalse(is_read_only("MEAS:VPP? 0.1"))
+        self.assertTrue(is_read_only("MEAS:VPP? CHAN1"))
+        self.assertTrue(is_read_only("meas:vpp? chan2"))
+        # and the reason it matters: sent anyway, the argument changes the meter and stays changed
+        bench.dmm.send("MEAS:VOLT:DC? 0.1")
+        self.assertNotEqual(bench.dmm.dc_range_v, before)
+
     def test_every_listed_header_is_a_query(self) -> None:
         for header in READ_ONLY_HEADERS:
             self.assertTrue(header.endswith("?"), header)
