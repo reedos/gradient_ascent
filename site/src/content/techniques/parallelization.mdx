@@ -233,9 +233,9 @@ run first.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: 'Ask a coding agent or research tool that advertises parallel subagents to work on a task with three genuinely independent parts. Watch whether it actually runs them at once, and whether the combined result repeats anything across parts.' },
-  { lane: 'build', body: 'Run python -m examples.parallelization --model stub with the default question from the repo root, then change CANDIDATES_K from 3 to 5 in examples/parallelization/run.py. Does the combined answer change, or just get longer?' },
-  { lane: 'either', body: 'Cause the overlap failure on purpose: find a question the synthetic documents in evals/corpus/ answer in two places, run it, and count how many times the combined answer says the same thing.' },
+  { lane: 'use', body: 'Ask a coding agent that advertises parallel subagents to work on three independent parts. Does it run them at once, and does the result repeat itself?' },
+  { lane: 'build', body: 'Run python -m examples.parallelization --model stub:scripted from the repo root. Three branches answer from one section each, one says NOT IN THIS SECTION, and the combine keeps the two that did. Now change CANDIDATES_K from 3 to 5 in examples/parallelization/run.py: the run stops with ScriptExhausted, naming the passage no reply matches.' },
+  { lane: 'either', body: 'Cause the overlap failure on purpose: find a question evals/corpus/ answers in two places, run it, and count how often the combined answer repeats itself.' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

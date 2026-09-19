@@ -213,9 +213,9 @@ workflow_graphs --model <spec> --dry` to project the cost of a real run first.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: 'Find an automation tool with a visual if/else or branch node. Open one branch condition and read exactly what it checks. Is it a fixed rule, or does a model decide which way to go inside that node?' },
-  { lane: 'build', body: 'Run python -m examples.workflow_graphs --model stub with a question from the repo root, then with a question built from gibberish words so retrieval finds nothing. Which node does the run stop on in each case, and how many checkpoints does the trace record?' },
-  { lane: 'either', body: 'Draw a process you run as nodes and edges on paper, then count the edges whose condition you could not write as a line of code. Those are the places it is not this level.' },
+  { lane: 'use', body: 'Find an automation tool with a visual if/else node. Read one branch condition: a fixed rule, or a model deciding?' },
+  { lane: 'build', body: 'Run python -m examples.workflow_graphs --model stub:scripted from the repo root: retrieve, draft, a check that fails on an unretrieved citation, revise, check, stop, checkpointing after every node. Now ask a question of gibberish words: retrieval returns nothing, the graph goes straight to no_match, and two checkpoints stand in for five.' },
+  { lane: 'either', body: 'Draw a process you run as nodes and edges, then count the edges whose condition you could not write as a line of code. That is where it stops being this level.' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

@@ -210,9 +210,9 @@ and the token cost of each, since five samples cost about five times one.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: 'Find a "thinking" or "reasoning effort" toggle in a chat app you use. Ask it a simple factual question with it on and off and compare the wait and the answer, then do the same with a real multi-step problem.' },
-  { lane: 'build', body: 'Run python -m examples.inference_time_reasoning --model stub --question "..." from the repo root, then edit the scripted samples in tests/test_example_inference_time_reasoning.py so all five disagree. Does the code still return an answer, and how much should you trust it?' },
-  { lane: 'either', body: 'Pick a question a model recently got wrong. Would asking it to think longer have fixed it, or was the problem that it never had the right information in the first place?' },
+  { lane: 'use', body: 'Find a "thinking" or "reasoning effort" toggle in a chat app. Ask a simple factual question with it on and off, compare the wait and the answer, then a multi-step problem.' },
+  { lane: 'build', body: 'Run python -m examples.inference_time_reasoning --model stub:scripted from the repo root: five samples, three agreeing on 79.50, two wrong, and the vote picking the right one. Now edit SCRIPTED (examples/inference_time_reasoning/__main__.py) so all five answers differ: the vote still returns one, reported as 1/5 agreed. The tally, not the answer, says how far to trust it.' },
+  { lane: 'either', body: 'Pick a question a model got wrong. Would thinking longer have fixed it, or did it lack the information?' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

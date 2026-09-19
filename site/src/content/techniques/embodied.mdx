@@ -258,9 +258,9 @@ not just safety), and the wall-clock time from scene to actuated move under load
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: "Read one robotics maker's own safety page (Google DeepMind's for Gemini Robotics, or 1X's specs for NEO) and list which safety claims are about the AI model and which are about the physical machine. Which kind would you trust more, and why?" },
-  { lane: 'build', body: 'Run python -m examples.embodied --model stub --question "..." with a scene of your own, then open tests/test_example_embodied.py and read test_clamping_toward_a_zone_edge_is_still_refused_not_clamped_in to see why the envelope checks zones after clamping, not before.' },
-  { lane: 'either', body: "Pick one of the failure modes above and try to cause it on purpose: for the forbidden-zone failure, change FORBIDDEN_ZONES in examples/embodied/run.py to overlap the whole workspace and rerun the tests to see which ones start failing." },
+  { lane: 'use', body: "Read one robotics maker's safety page, Google DeepMind's for Gemini Robotics or 1X's for NEO, and sort its claims into those about the model and those about the machine. Which would you trust?" },
+  { lane: 'build', body: 'Run python -m examples.embodied --model stub:scripted from the repo root: the model asks for 320 mm at 400 mm/s; the envelope clamps it to 300 mm at 250 mm/s. Now change that move in SCRIPTED (examples/embodied/__main__.py) to x=200, y=-200. The target is inside the workspace, and it is refused anyway: the path crosses the operator station. The actuator log stays empty.' },
+  { lane: 'either', body: "Cause a failure mode above on purpose: change FORBIDDEN_ZONES in examples/embodied/run.py to overlap the whole workspace, and rerun the tests to see which start failing." },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

@@ -242,9 +242,9 @@ that sends the whole document set on every question.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: 'Open a chat app\'s project or custom-instructions feature. Put a document there instead of pasting it into your message, ask a question about it, then ask a second, unrelated question in the same project. Does the second question still see the document?' },
-  { lane: 'build', body: 'Run python -m examples.context_engineering --model stub with a question of your own, then lower TOKEN_BUDGET in examples/context_engineering/run.py until it is smaller than the static block. What happens to the request, and what does the trace say got cut?' },
-  { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose, using the synthetic documents in evals/corpus/.' },
+  { lane: 'use', body: 'Open a chat app\'s project or custom-instructions feature. Put a document there instead of pasting it into a message, ask about it, then ask something unrelated in the same project. Does it still see the document?' },
+  { lane: 'build', body: 'Run python -m examples.context_engineering --model stub:scripted from the repo root, then lower TOKEN_BUDGET in examples/context_engineering/run.py below the static block's 6,934 tokens. The history budget floors at zero, nothing is cut, and the prompt goes out over budget: it governs history, not the block the cache depends on.' },
+  { lane: 'either', body: 'Cause a failure mode above on purpose, with the documents in evals/corpus/.' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

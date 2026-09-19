@@ -243,11 +243,11 @@ cost of a real run before spending anything on one.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: 'Open a chat app\'s file or project feature with a document you know well, and ask a question whose answer needs two different sections. Does it find both, or only one?' },
-  { lane: 'build', body: 'Run python -m examples.rag --model stub with a question of your own from the repo root, then change TOP_K from 4 to 2 in examples/rag/run.py and ask it again. Which passages drop out, and does the answer get worse?' },
-  { lane: 'build', body: 'Change the retriever. _retrieve in examples/rag/run.py is the only function that picks passages: it embeds the question and every section, then keeps the top k by cosine. Replace its body with a plain count of shared words, keep the signature, and run the same question again. Which kinds of question get better, and which get worse?' },
-  { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose, using the synthetic documents in evals/corpus/.' },
-  { lane: 'either', body: 'Pick two documents you have that can disagree over time, such as a manual and a later errata sheet, or a policy and an amendment. Put both into a document search tool that shows citations, such as a chat app\'s file feature, and ask the question the older document alone would answer wrong. Does the answer cite both, or just the one that sounds authoritative?' },
+  { lane: 'use', body: 'Open a chat app\'s file feature with a document you know well, and ask a question whose answer needs two sections. Does it find both, or one?' },
+  { lane: 'build', body: 'Run python -m examples.rag --model stub:scripted from the repo root: one call, a grounded answer, one citation. Now ask something the corpus does not cover: --question "What is the DR-520 vent length?". Neither the answer nor the citation moves: the citations line is parsed out of the reply, never checked against what retrieval returned. The write and check page adds that check.' },
+  { lane: 'build', body: 'Change the retriever. _retrieve in examples/rag/run.py is the only function that picks passages: it embeds the question and every section, then keeps the top k by cosine. Replace its body with a count of shared words, keep the signature, and run again. Which questions get better, and which get worse?' },
+  { lane: 'either', body: 'Cause one of the failure modes above on purpose, using the documents in evals/corpus/.' },
+  { lane: 'either', body: 'Pick two documents of your own that can disagree over time: a manual and a later errata sheet, say. Put both into a search tool that shows citations, and ask the question the older one alone would answer wrong. Does the answer cite both, or only the one that sounds authoritative?' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

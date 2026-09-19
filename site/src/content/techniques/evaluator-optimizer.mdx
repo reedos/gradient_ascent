@@ -228,10 +228,10 @@ there are.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: 'Find a tool that shows a visible checking or verifying step before its final answer. Look at its own documentation: does it say what the check actually tests, or just that a check happens?' },
-  { lane: 'build', body: 'Run python -m examples.evaluator_optimizer --model stub with a question of your own from the repo root. Then edit CHECK_SYSTEM in examples/evaluator_optimizer/run.py to ask a vaguer question ("Is this a good answer?") instead of the specific citation test, and think through why that version would not reliably return the same verdict twice.' },
-  { lane: 'either', body: 'Write the checking criterion you would use for a piece of work you actually review. Then decide honestly whether two people applying it to the same draft would reach the same verdict. If not, it is not a criterion yet.' },
-  { lane: 'build', body: "Read design-review-rules.md's DR-14 in the design-review-checklist recipe next to this page's own checker. Both catch one quotable, mechanical thing. Now find a rule in that same document that needs reading rather than arithmetic, and say why a single checker pass is less trustworthy on it." },
+  { lane: 'use', body: 'Find a tool that shows a checking or verifying step before its final answer. Does its documentation say what the check actually tests, or only that a check happens?' },
+  { lane: 'build', body: 'Run python -m examples.evaluator_optimizer --model stub:scripted from the repo root. The draft cites dw300-manual#6, the checker answers MISSING since retrieval never returned it, the revision cites one it did, and the check passes. Then edit CHECK_SYSTEM in examples/evaluator_optimizer/run.py to ask something vague ("Is this a good answer?") instead of that citation test, and say why it could not give the same verdict twice.' },
+  { lane: 'either', body: 'Write the checking criterion you would use for work you review. Would two people applying it to the same draft reach the same verdict? If not, it is not a criterion yet.' },
+  { lane: 'build', body: "Read DR-14 in the design-review-checklist recipe's design-review-rules.md next to this page's checker. Both catch one quotable, mechanical thing. Now find a rule there that needs reading rather than arithmetic, and say why a single checker pass is less trustworthy on it." },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

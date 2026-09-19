@@ -213,9 +213,9 @@ nothing about either.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: "Find a product or paper that reports a dataset size built partly or fully with a model. Search its page for the word 'filter', 'verify' or 'check'. A count with nothing beside it tells you how much was generated and nothing about how much was any good." },
-  { lane: 'build', body: 'Run python -m examples.synthetic_data --model stub --out .local/scratch/synthetic-data/questions.jsonl from the repo root and read the rejection counts it prints. Then open examples/synthetic_data/run.py and change ANSWER_SYSTEM_PROMPT to ask for a one-word answer; do you expect the failed-verification count to go up or down against a real model, and why?' },
-  { lane: 'either', body: "Take one question from evals/questions.json and write two paraphrases of it by hand: one that keeps the same answer and one that quietly changes what is being asked while still sounding like a paraphrase. Check both against grade_exact with the original question's contract and the answer you'd expect a good model to give. Does the check catch the second one?" },
+  { lane: 'use', body: "Find a product or paper reporting a dataset size built with a model. Search its page for 'filter', 'verify' or 'check'. A count with nothing beside it says how much was generated and nothing about how much was good." },
+  { lane: 'build', body: 'Run python -m examples.synthetic_data --model stub:scripted --out .local/scratch/synthetic-data/questions.jsonl from the repo root and read the two rejection reasons it prints. Then open examples/synthetic_data/run.py and change ANSWER_SYSTEM_PROMPT to ask for a one-word answer; against a real model, would the failed-verification count go up or down, and why?' },
+  { lane: 'either', body: "Take one question from evals/questions.json and write two paraphrases by hand: one that keeps the same answer, one that quietly changes what is asked while still sounding like a paraphrase. Check both against grade_exact with the original's contract. Does it catch the second?" },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

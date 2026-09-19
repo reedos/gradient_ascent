@@ -219,10 +219,10 @@ by field against those records, and how often the retry was needed.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: 'Find a feature in an app you use that turns text into a form or a calendar event, and deliberately give it an ambiguous input. Does it ask you to confirm, or does it commit to a guess?' },
-  { lane: 'build', body: 'Run python -m examples.structured_output --model stub --question "What is the DR-210\'s warranty?" from the repo root, then open run.py and change one field name in SCHEMA to see which test in tests/test_example_structured_output.py catches it.' },
-  { lane: 'either', body: 'Write down the schema you would want for a task in your own life (a recipe, a receipt, a contact) before trying to get a model to fill it. Which fields are actually required, and which would you rather leave blank than have the model guess?' },
-  { lane: 'build', body: 'Open the accuracy specs from the manual recipe in the recipes section and find the schema for one row of the accuracy table. Which fields in that row would a person have to check against the manual before the row could be trusted?' },
+  { lane: 'use', body: 'Find a feature that turns text into a form or a calendar event and give it an ambiguous input. Does it ask you to confirm, or commit to a guess?' },
+  { lane: 'build', body: 'Run python -m examples.structured_output --model stub:scripted from the repo root: the first record is rejected for a warranty term written as a word; the retry validates. Now rename one field in REQUIRED_FIELDS in examples/structured_output/run.py: both passes fail the same way, and the run ends with an error saying it did not validate after retry, capped at one.' },
+  { lane: 'either', body: 'Write the schema you would want for a task in your own life, a recipe or a receipt, before asking a model to fill it. Which fields are truly required, and which would you rather leave blank than guessed?' },
+  { lane: 'build', body: 'Open the accuracy specs from the manual recipe and find the schema for a row of its table. Which fields would a person have to check against the manual before the row could be trusted?' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

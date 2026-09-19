@@ -265,9 +265,9 @@ test suite runs.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: "If you use a coding agent or a research tool that runs for a while unattended, find its progress or timeline view and read it after a run finishes. Can you tell, from that record alone, what it tried before it got to the final result, without asking it again?" },
-  { lane: 'build', body: 'From the repo root, run python -m examples.long_horizon --model stub --state lh-demo.json --question "What does HLV-2205 cost?" twice in a row. What does the second run do differently because the first one already checkpointed, and what is in lh-demo.json that told it so? Delete the file when you are done.' },
-  { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose: for the crash failure, open tests/test_example_long_horizon.py and read the test that makes the model raise mid-session, then change what it asserts about the checkpoint file and watch it fail.' },
+  { lane: 'use', body: "If you use a coding agent that runs for a while unattended, read its progress or timeline view after a run finishes. Can you tell from that record alone what it tried before the final result, without asking it again?" },
+  { lane: 'build', body: 'From the repo root, run python -m examples.long_horizon --model stub:scripted --state .local/scratch/lh-demo.json twice in a row. The first run starts a session nobody asked for, rebuilds from notes rather than a transcript, answers, and compacts a note. The second finds nothing queued and stops at the checkpoint the first one wrote. What in that file told it so?' },
+  { lane: 'either', body: 'Cause the crash failure on purpose: in tests/test_example_long_horizon.py, read the test that makes the model raise mid-session, then change what it asserts about the checkpoint file and watch it fail.' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

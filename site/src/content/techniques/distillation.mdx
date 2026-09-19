@@ -232,9 +232,9 @@ the dataset is not a result about the student.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: "Find a small model or product marketed as distilled from, or trained on the outputs of, a larger one. Check the maker's own page for what task the distillation covered, and try it on something clearly outside that task." },
-  { lane: 'build', body: 'Run python -m examples.distillation --model stub --out .local/scratch/distillation/student.jsonl from the repo root and read the dropped list it prints. Then open examples/distillation/run.py and change TEACHER_SYSTEM_PROMPT to ask for a one-word answer instead of a sentence; do you expect the pass rate against a real teacher to go up or down, and why?' },
-  { lane: 'either', body: "Pick one exact-graded question from evals/questions.json and write two answers to it by hand: one that is factually right and fails grade_exact, and one that is factually wrong and passes it. If you can construct both, that's the filter's blind spot, not a bug." },
+  { lane: 'use', body: "Find a small model marketed as distilled from a larger one. Check the maker's own page for what task the distillation covered, then try it on something outside that task." },
+  { lane: 'build', body: 'Run python -m examples.distillation --model stub:scripted --out .local/scratch/distillation/student.jsonl from the repo root and read the dropped list it prints, L06 and N04, a made-up error code and an arithmetic slip. Then open examples/distillation/run.py and change TEACHER_SYSTEM_PROMPT to ask for a one-word answer instead of a sentence; against a real teacher, would the pass rate go up or down, and why?' },
+  { lane: 'either', body: "Take one exact-graded question from evals/questions.json and write two answers by hand: one factually right that fails grade_exact, one factually wrong that passes. Both being constructible is the filter's blind spot, not a bug." },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

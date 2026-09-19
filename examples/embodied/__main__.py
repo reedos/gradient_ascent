@@ -46,7 +46,9 @@ def main(argv: list[str] | None = None) -> int:
         if step.title.startswith("Model proposes") or step.title.startswith("Safety envelope"):
             print(f"{step.title}: {step.detail}")
     print(f"outcome: {result.outcome}")
-    print(f"move sent toward the actuator: {result.move}")
+    # Not "sent to the actuator": on a refusal this is the move the envelope stopped, and the
+    # actuator log below is what actually ran.
+    print(f"move after the envelope: {result.move}")
     print(f"actuator log: {actuator_log}")
     if result.reason:
         print(f"reason: {result.reason}")
