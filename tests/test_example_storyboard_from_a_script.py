@@ -81,6 +81,10 @@ SCENES_RESPONSE = json.dumps({"scenes": SCENES})
 SHOTS_RESPONSE = json.dumps({"shots": SHOTS})
 
 
+# The same two replies, in call order, as examples/storyboard_from_a_script/__main__.py's SCRIPTED.
+SEQUENCE = [SCENES_RESPONSE, SHOTS_RESPONSE]
+
+
 def tracer(model_id: str = "stub-1") -> Tracer:
     return Tracer(example="storyboard_from_a_script", level=LEVEL, model_id=model_id)
 
@@ -263,6 +267,15 @@ class PageNumbersTests(unittest.TestCase):
         self.assertEqual((len(report.scenes), len(report.shots)), (4, 20))
         self.assertEqual((report.total_seconds, report.estimated_read_seconds), (50.5, 137.6))
         self.assertFalse(report.over_budget)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        from examples.storyboard_from_a_script.__main__ import SCRIPTED
+
+        self.assertEqual(SCRIPTED, SEQUENCE)
 
 
 class ReportTextTests(unittest.TestCase):

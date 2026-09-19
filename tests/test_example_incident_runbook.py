@@ -67,6 +67,10 @@ GOOD_STEP_RESPONSE = json.dumps({
 })
 
 
+# The same two replies, in call order, as examples/incident_runbook/__main__.py's SCRIPTED.
+SEQUENCE = [TIMELINE_RESPONSE, GOOD_STEP_RESPONSE]
+
+
 def tracer() -> Tracer:
     return Tracer(example="incident_runbook", level=LEVEL, model_id="stub-1")
 
@@ -194,6 +198,15 @@ class JsonRetryTests(unittest.TestCase):
         pending = run("one event", model, tracer())
         self.assertEqual(len(pending.timeline), 1)
         self.assertEqual(pending.timeline[0].id, "e1")
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        from examples.incident_runbook.__main__ import SCRIPTED
+
+        self.assertEqual(SCRIPTED, SEQUENCE)
 
 
 class ResumeTests(unittest.TestCase):

@@ -59,6 +59,19 @@ def _tracer() -> Tracer:
     return Tracer(example="invoice_matching", level=LEVEL, model_id="stub-1")
 
 
+# The same one reply, in call order, as examples/invoice_matching/__main__.py's SCRIPTED.
+SEQUENCE = [_invoice()]
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        from examples.invoice_matching.__main__ import SCRIPTED
+
+        self.assertEqual(SCRIPTED, SEQUENCE)
+
+
 class CleanMatchTests(unittest.TestCase):
     def test_a_clean_match_posts_without_a_pause(self) -> None:
         model = StubModel([StubResponse(text=_invoice())])

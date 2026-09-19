@@ -48,6 +48,10 @@ SECOND = {
 }
 
 
+# The same two replies, in call order, as examples/literature_watch/__main__.py's SCRIPTED.
+SEQUENCE = [json.dumps(VALID), json.dumps(SECOND)]
+
+
 def tracer() -> Tracer:
     return Tracer(example="literature_watch", level=LEVEL, model_id="stub-1")
 
@@ -224,6 +228,15 @@ class TheCitationRuleTests(unittest.TestCase):
         self.assertEqual(tuple(SCHEMA["properties"]), SUMMARY_FIELDS)
         for forbidden in ("citation", "url", "link", "authors", "year", "source"):
             self.assertNotIn(forbidden, SCHEMA["properties"])
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        from examples.literature_watch.__main__ import SCRIPTED
+
+        self.assertEqual(SCRIPTED, SEQUENCE)
 
 
 class PageFiguresTests(unittest.TestCase):

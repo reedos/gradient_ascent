@@ -73,6 +73,14 @@ _REPLIES: dict[str, str] = {
 }
 
 
+# The same six replies, in CHECKLIST order, as examples/contract_review/__main__.py's SCRIPTED:
+# the sequence a reader gets from `--model stub:scripted`, positional rather than matched by
+# content, which is safe here only because every reply validates against any clause it might land
+# on if two calls raced (see _RecordingStub below for why the run itself cannot use a positional
+# stub).
+SEQUENCE = [_REPLIES[rule.id] for rule in CHECKLIST]
+
+
 class _RecordingStub:
     """A callable-based stub, not a list-based one: `ThreadPoolExecutor` calls `complete` from
     several threads at once, and a list-based `StubModel` advances a shared counter with no lock
@@ -271,6 +279,15 @@ class DecidedByTests(unittest.TestCase):
     def test_the_source_records_no_model_decision_anywhere(self) -> None:
         # scripts/validate.py reads examples for this string; the example must not carry one.
         self.assertNotIn('decided_by="model"', RUN_PY.read_text(encoding="utf-8"))
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        from examples.contract_review.__main__ import SCRIPTED
+
+        self.assertEqual(SCRIPTED, SEQUENCE)
 
 
 class ClauseParsingTests(unittest.TestCase):

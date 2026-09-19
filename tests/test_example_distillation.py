@@ -25,6 +25,57 @@ from examples.distillation.run import (  # noqa: E402
 
 QUESTIONS_PATH = ROOT / "evals" / "questions.json"
 
+# The same 32 replies, in call order, as examples/distillation/__main__.py's SCRIPTED: one per
+# exact-graded question in evals/questions.json (L01-L12, M01, M02, M08, M09, N01-N12, C01, C02,
+# C09, C12), every one the question's own reference answer except L06 and N04, which are
+# deliberately wrong so the filter has something real to drop.
+SEQUENCE = [
+    "12 place settings.",
+    "44 dBA.",
+    "7.8 cubic feet.",
+    "A dedicated 240V, 30A circuit.",
+    "Every 30 cycles.",
+    "F4.",
+    "30 minutes.",
+    "$19.99.",
+    "2 years from the original date of purchase.",
+    "8 feet.",
+    "It shuts off the water supply and stops the cycle immediately.",
+    "110 lb.",
+    (
+        "The drain pump is part HLV-2205, priced at $52.00 in the parts list; the DW-480 owner's "
+        "manual confirms HLV-2205 is the drain pump used in that model."
+    ),
+    (
+        "Part HLV-7734, priced at $12.50 in the parts list; the DR-210 owner's manual confirms "
+        "HLV-7734 is the door latch switch used on the DR-210."
+    ),
+    (
+        "The Heavy cycle, run empty with a dishwasher-safe cleaner. On the DW-300 the Heavy cycle "
+        "runs 130 minutes."
+    ),
+    "One Air Fluff cycle, which runs 20 minutes on the DR-520.",
+    "32 gallons.",
+    "$33.60 per year (240 kWh x $0.14/kWh).",
+    "20 kWh (260 - 240).",
+    "5 gallons ((3.2 - 3.0) x 20).",
+    "$79.50 ($38.50 + $41.00).",
+    "$66.75 ($57.00 + $9.75).",
+    "10 minutes (140 - 130).",
+    "104 minutes (42 x 2 + 20).",
+    "$0.03 (3.0 gallons x $0.010/gallon).",
+    "6 cycles (180 / 30).",
+    "3 lb (128 - 125).",
+    "$25.75 ($12.50 + $13.25).",
+    (
+        "25 feet, per Service Bulletin SB-2026-07 (2026-06-01), which supersedes the DR-520 "
+        "owner's manual's 35-foot figure (revision 2024-03-01)."
+    ),
+    "3 elbows, per the 2026 service bulletin, which supersedes the manual's original figure of 4.",
+    "10 feet (35 - 25).",
+    "35 feet, with up to 4 elbows.",
+]
+
 
 def _write_questions(tmp_dir: Path, questions: list[dict]) -> Path:
     path = tmp_dir / "questions.json"
@@ -199,6 +250,30 @@ class RunTests(unittest.TestCase):
         rec = record_trace.classify("distillation")
         self.assertFalse(rec.ok)
         self.assertIn("tracer", rec.reason)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    """End-to-end: the exact sequence examples/distillation/__main__.py's SCRIPTED plays against
+    the real 32-question exact-graded set, not the small fixture the tests above use."""
+
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        from examples.distillation.__main__ import SCRIPTED
+
+        self.assertEqual(SCRIPTED, SEQUENCE)
+
+    def test_the_scripted_run_keeps_thirty_and_drops_two(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            teacher = StubModel([StubResponse(text=t) for t in SEQUENCE])
+            tracer = Tracer(example="distillation", level=1, model_id=teacher.model_id)
+            out_path = Path(tmp) / "student.jsonl"
+
+            result = run(tracer, teacher, out_path=out_path)
+
+            self.assertEqual(len(result.kept), 30)
+            self.assertEqual(result.dropped, ["L06", "N04"])
+            self.assertEqual(len(out_path.read_text(encoding="utf-8").splitlines()), 30)
 
 
 if __name__ == "__main__":

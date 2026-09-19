@@ -65,6 +65,10 @@ PAGE_RUN_RECORD = {
 }
 
 
+# The same one reply, in call order, as examples/meeting_notes/__main__.py's SCRIPTED.
+SEQUENCE = [json.dumps(PAGE_RUN_RECORD)]
+
+
 def tracer() -> Tracer:
     return Tracer(example="meeting_notes", level=LEVEL, model_id="stub-1")
 
@@ -206,6 +210,15 @@ class MeetingNotesExampleTests(unittest.TestCase):
     def test_the_source_records_no_model_decision_anywhere(self) -> None:
         # scripts/validate.py reads examples for this string; the example must not carry one.
         self.assertNotIn('decided_by="model"', RUN_PY.read_text(encoding="utf-8"))
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        from examples.meeting_notes.__main__ import SCRIPTED
+
+        self.assertEqual(SCRIPTED, SEQUENCE)
 
 
 if __name__ == "__main__":

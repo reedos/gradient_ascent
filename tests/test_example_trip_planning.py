@@ -31,6 +31,16 @@ def _tracer() -> Tracer:
     return Tracer(example="trip_planning", level=LEVEL, model_id="stub-1")
 
 
+# The same four calls, in order, as examples/trip_planning/__main__.py's SCRIPTED: three read-only
+# lookups the model chooses for itself, then a book call that pauses the run.
+SEQUENCE = [
+    StubResponse(tool_calls=[ToolCall(name="search_routes", arguments={"origin": "Wrenfield", "destination": "Aldercliff"})]),
+    StubResponse(tool_calls=[ToolCall(name="search_stays", arguments={"city": "Aldercliff"})]),
+    StubResponse(tool_calls=[ToolCall(name="opening_hours", arguments={"place": "Aldercliff Museum of Tides"})]),
+    StubResponse(tool_calls=[ToolCall(name="book", arguments={"kind": "route", "ref": "R1"})]),
+]
+
+
 class TripPlanningExampleTests(unittest.TestCase):
     def test_declares_its_level_and_a_run_and_approve_function(self) -> None:
         self.assertEqual(LEVEL, 5)
@@ -176,14 +186,7 @@ class TripPlanningExampleTests(unittest.TestCase):
         """The recipe page's walkthrough and cost strip quote this exact scripted run -- three
         searches, then a book call, then approval -- so pin the totals here rather than letting
         the page restate a number nothing recomputes."""
-        model = StubModel(
-            [
-                StubResponse(tool_calls=[ToolCall(name="search_routes", arguments={"origin": "Wrenfield", "destination": "Aldercliff"})]),
-                StubResponse(tool_calls=[ToolCall(name="search_stays", arguments={"city": "Aldercliff"})]),
-                StubResponse(tool_calls=[ToolCall(name="opening_hours", arguments={"place": "Aldercliff Museum of Tides"})]),
-                StubResponse(tool_calls=[ToolCall(name="book", arguments={"kind": "route", "ref": "R1"})]),
-            ]
-        )
+        model = StubModel(list(SEQUENCE))
         tracer = _tracer()
         pending = run(SAMPLE_INPUT, model, tracer)
         self.assertEqual(tracer.model_decided_count(), 4)
@@ -191,6 +194,13 @@ class TripPlanningExampleTests(unittest.TestCase):
         self.assertEqual(tracer.tokens_out_total(), 37)
         answer = approve(pending, "approve", tracer)
         self.assertIn("89.00", answer.text)
+
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        from examples.trip_planning.__main__ import SCRIPTED
+
+        self.assertEqual(SCRIPTED, SEQUENCE)
 
     def test_the_token_budget_forces_a_stop_before_the_step_cap(self) -> None:
         def always_search(messages, tools):

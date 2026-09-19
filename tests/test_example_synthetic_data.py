@@ -36,6 +36,88 @@ SEEDS = [
      "grading": "rubric", "rubric": ["mentions the cause"]},
 ]
 
+# The same 61 replies, in call order, as examples/synthetic_data/__main__.py's SCRIPTED: up to two
+# per exact-graded seed in evals/questions.json (L01-L12, M01, M02, M08, M09, N01-N12, C01, C02,
+# C09, C12). L06, N07 and C09 paraphrase to their own seed text unchanged (rejected as duplicates,
+# so neither gets a second call); N04 paraphrases to something novel but answers wrong (rejected
+# as a failed verification); every other seed paraphrases to something novel and answers with the
+# seed's own reference answer (kept).
+SEQUENCE = [
+    "What is the DW-300 dishwasher's place setting capacity?",
+    "12 place settings.",
+    "During its Normal cycle, how loud is the DW-480 dishwasher rated?",
+    "44 dBA.",
+    "What is the drum capacity, in cubic feet, of the DR-520 dryer?",
+    "7.8 cubic feet.",
+    "Which electrical circuit is required to install a DR-210 dryer?",
+    "A dedicated 240V, 30A circuit.",
+    "What is the recommended cleaning interval for the DW-300's fine filter?",
+    "Every 30 cycles.",
+    "Which dryer error code indicates the thermal fuse has opened?",
+    "What is the duration of the DW-300's Quick Wash cycle?",
+    "30 minutes.",
+    "How much does part HLV-9002, the universal dryer vent cleaning kit, cost?",
+    "$19.99.",
+    "What is the duration of Halvorsen's full parts-and-labor warranty on its dishwashers and dryers?",
+    "2 years from the original date of purchase.",
+    "For a dishwasher installation, what is the longest a drain hose is allowed to be?",
+    "8 feet.",
+    "When the DW-480's leak cutoff trips, what happens?",
+    "It shuts off the water supply and stops the cycle immediately.",
+    "How much does an empty DR-210 dryer weigh?",
+    "110 lb.",
+    "What is the price of the DW-480's drain pump, and which document verifies that part is used in the DW-480?",
+    (
+        "The drain pump is part HLV-2205, priced at $52.00 in the parts list; the DW-480 owner's "
+        "manual confirms HLV-2205 is the drain pump used in that model."
+    ),
+    "How much is the DR-210's door latch switch, and which manual verifies it fits that model?",
+    (
+        "Part HLV-7734, priced at $12.50 in the parts list; the DR-210 owner's manual confirms "
+        "HLV-7734 is the door latch switch used on the DR-210."
+    ),
+    "Which cycle does the care and cleaning guide prescribe for the monthly dishwasher deep clean, and what is its runtime on a DW-300?",
+    (
+        "The Heavy cycle, run empty with a dishwasher-safe cleaner. On the DW-300 the Heavy cycle "
+        "runs 130 minutes."
+    ),
+    "Before regular use, the installation guide requires running one cycle on a new dryer. Which cycle is it and how long does it take on a DR-520?",
+    "One Air Fluff cycle, which runs 20 minutes on the DR-520.",
+    "Over 10 Normal cycles, how much water, in gallons, does a DW-300 use?",
+    "32 gallons.",
+    "Based on the rate assumption in the specifications comparison, what does the DW-480 cost to run per year in electricity?",
+    "$33.60 per year (240 kWh x $0.14/kWh).",
+    "In kWh, how much more estimated annual energy does the DW-300 use than the DW-480?",
+    "20 kWh (260 - 240).",
+    "Running 20 Normal cycles on each, how many extra gallons does the DW-300 use compared to the DW-480?",
+    "About 5 gallons more, judging from the cycle specifications.",
+    "If you replaced the heating elements on both a DW-300 and a DW-480, what would the combined price be?",
+    "$79.50 ($38.50 + $41.00).",
+    "Combined, what do a DR-210 heating element and a DR-210 drive belt cost?",
+    "$66.75 ($57.00 + $9.75).",
+    "How many minutes longer is the DW-480's Heavy cycle than the DW-300's Heavy cycle?",
+    "If a DR-520 runs its 42-minute Normal cycle twice and its 20-minute Steam Refresh cycle once in a day, what is the total cycle time in minutes?",
+    "104 minutes (42 x 2 + 20).",
+    "Based on the specifications comparison's rate assumption, how much does one DW-480 Normal cycle cost in water?",
+    "$0.03 (3.0 gallons x $0.010/gallon).",
+    "Back-to-back, how many 30-minute DW-300 Quick Wash cycles fit inside a 180-minute window?",
+    "6 cycles (180 / 30).",
+    "How much heavier is the gas version of the DR-520 than the electric version?",
+    "3 lb (128 - 125).",
+    "Combined, what does it cost to replace the door latch switch on a DR-210 and a DR-520?",
+    "$25.75 ($12.50 + $13.25).",
+    "For a DR-520 installation, what is the longest vent run allowed?",
+    (
+        "25 feet, per Service Bulletin SB-2026-07 (2026-06-01), which supersedes the DR-520 "
+        "owner's manual's 35-foot figure (revision 2024-03-01)."
+    ),
+    "At the maximum vent run length, how many elbows does a DR-520 installation currently allow?",
+    "3 elbows, per the 2026 service bulletin, which supersedes the manual's original figure of 4.",
+    "What is the difference, in feet, between the DR-520 manual's original maximum vent run and the figure in Service Bulletin SB-2026-07?",
+    "Before the 2026 revision, what did the DR-520's original owner's manual state as the maximum vent run?",
+    "35 feet, with up to 4 elbows.",
+]
+
 
 class NormalizeTests(unittest.TestCase):
     def test_case_and_punctuation_collapse_to_the_same_string(self) -> None:
@@ -282,6 +364,31 @@ class RunTests(unittest.TestCase):
         rec = record_trace.classify("synthetic_data")
         self.assertFalse(rec.ok)
         self.assertIn("tracer", rec.reason)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    """End-to-end: the exact sequence examples/synthetic_data/__main__.py's SCRIPTED plays
+    against the real 32-seed exact-graded set, not the small fixture the tests above use."""
+
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        from examples.synthetic_data.__main__ import SCRIPTED
+
+        self.assertEqual(SCRIPTED, SEQUENCE)
+
+    def test_the_scripted_run_keeps_most_and_rejects_the_three_duplicates_and_one_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+            tracer = Tracer(example="synthetic_data", level=1, model_id=model.model_id)
+            out_path = Path(tmp) / "questions.jsonl"
+
+            result = run(tracer, model, out_path=out_path)
+
+            self.assertEqual(len(result.kept), 28)
+            reasons = {r.source_id: r.reason for r in result.rejected}
+            self.assertEqual(reasons, {"L06": "duplicate", "N07": "duplicate", "C09": "duplicate", "N04": "failed verification"})
+            self.assertEqual(len(out_path.read_text(encoding="utf-8").splitlines()), 28)
 
 
 if __name__ == "__main__":
