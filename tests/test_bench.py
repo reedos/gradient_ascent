@@ -928,7 +928,7 @@ class TestGuardedSupply(unittest.TestCase):
         self.supply = GuardedSupply(self.bench)
 
     def approval(self, volts: float = 24.0, amps: float = 1.0) -> Approval:
-        return Approval("R. Osaki", volts, amps, reason="production test step 3")
+        return Approval("the test engineer", volts, amps, reason="production test step 3")
 
     def test_the_normal_path(self) -> None:
         self.supply.set_voltage(24.0)
@@ -1015,11 +1015,11 @@ class TestFullSequence(unittest.TestCase):
         load = GuardedLoad(bench)
         supply.set_voltage(24.0)
         supply.set_current_limit(4.0)
-        supply.output_on(Approval("R. Osaki", 24.0, 4.0, reason="TS-5030 step 3"))
+        supply.output_on(Approval("the test engineer", 24.0, 4.0, reason="TS-5030 step 3"))
         load.set_current(1.0)
         # A second approval, for the second command that energizes the board: 1.000 A out of a
         # board that is already at 24.0 V in.
-        load.input_on(Approval("R. Osaki", 24.0, 1.0, reason="TS-5030 step 3"))
+        load.input_on(Approval("the test engineer", 24.0, 1.0, reason="TS-5030 step 3"))
         reading = float(bench.dmm.send("MEAS:VOLT:DC? 10"))
         self.assertGreaterEqual(reading, 4.9500)
         self.assertLessEqual(reading, 5.0500)
@@ -1047,11 +1047,11 @@ class TestGuardedLoadEnable(unittest.TestCase):
         self.load = GuardedLoad(self.bench)
         self.supply.set_voltage(24.0)
         self.supply.set_current_limit(4.0)
-        self.supply.output_on(Approval("R. Osaki", 24.0, 4.0, reason="bring-up"))
+        self.supply.output_on(Approval("the test engineer", 24.0, 4.0, reason="bring-up"))
         self.load.set_current(1.0)
 
     def approval(self, volts: float = 24.0, amps: float = 1.0) -> Approval:
-        return Approval("R. Osaki", volts, amps, reason="production test step 3")
+        return Approval("the test engineer", volts, amps, reason="production test step 3")
 
     def test_the_normal_path(self) -> None:
         self.load.input_on(self.approval())
@@ -1087,7 +1087,7 @@ class TestGuardedLoadEnable(unittest.TestCase):
         """The supply came up at 24.0 V with a 4.0 A limit; the load is set to 1.0 A. An approval
         written for one enable does not fit the other, which is the point of naming the numbers."""
         with self.assertRaises(SafetyRefusal):
-            self.load.input_on(Approval("R. Osaki", 24.0, 4.0, reason="bring-up"))
+            self.load.input_on(Approval("the test engineer", 24.0, 4.0, reason="bring-up"))
 
     def test_a_set_point_over_the_envelope_is_refused_even_with_a_matching_approval(self) -> None:
         """An approval is permission to energize at a set point, not permission to exceed one."""

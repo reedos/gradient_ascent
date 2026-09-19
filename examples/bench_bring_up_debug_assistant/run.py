@@ -103,10 +103,10 @@ def _bring_up(dmm_offset_v: float) -> Bench:
     load = GuardedLoad(bench, envelope)
     supply.set_voltage(BOARD_VIN_V)
     supply.set_current_limit(4.0)
-    supply.output_on(Approval("R. Osaki", BOARD_VIN_V, 4.0, reason="VOUT bring-up confirmation"))
+    supply.output_on(Approval("the test engineer", BOARD_VIN_V, 4.0, reason="VOUT bring-up confirmation"))
     load.set_current(BOARD_IOUT_A)
     load.input_on(
-        Approval("R. Osaki", BOARD_VIN_V, BOARD_IOUT_A, reason="VOUT bring-up confirmation")
+        Approval("the test engineer", BOARD_VIN_V, BOARD_IOUT_A, reason="VOUT bring-up confirmation")
     )
     return bench
 

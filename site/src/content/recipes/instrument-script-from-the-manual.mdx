@@ -91,7 +91,7 @@ script asks `SYST:ERR?`, not as anything that looks like a crash.
     INP 0
 
 Clean. Now, and only now, code runs it for real: the supply brings the board to 24.000 V with a
-4.000 A current limit approved by R. Osaki, `CURR 1.000` is checked against `SafetyEnvelope`
+4.000 A current limit approved by the test engineer, `CURR 1.000` is checked against `SafetyEnvelope`
 before it is sent, `INP 1` needs its own matching approval, and the load reads back `4.9930V` and
 `1.0000A`. Those are not invented numbers: they are what the DUT model in
 `examples/common/bench.py` computes at 24 V in, 1.000 A out, and they match the load manual's own
