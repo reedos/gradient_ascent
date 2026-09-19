@@ -4,5 +4,172 @@ reviewed: 2026-09-19
 sources: []
 ---
 
-This recipe is being written in this wave. The diagram, the walkthrough, what it costs,
-how it fails and what to measure are not here yet.
+import Run from '../../components/page/Run.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import Link from '../../components/page/Link.astro';
+import householdRun from '../../data/runs/recipe-household-paperwork.json';
+
+A household has a folder of documents and a short list of things that cost money every month: an
+insurance policy, a water bill, a power bill, broadband, a gym, a storage unit, a reading
+subscription somebody signed up for and forgot. The questions are always the same four. What
+renews itself in the next few weeks, and at what price. What is owed right now, and what is
+already late. What all of it costs in a year, and which part of it is the expensive part. And
+where the document is, on the morning somebody needs it.
+
+None of that needs a model. What renews soon is a date subtracted from another date. What is owed
+is a filter on a flag. What the year costs is a multiplication and a sum. Where the document is
+is a naming rule and a set difference. A spreadsheet, a calendar and a folder rule answer all four
+questions, every time, for nothing, and they are right in a way nothing that reads text can
+promise to be.
+
+There is one part of household paperwork that does need a model, and this recipe deliberately
+does not do it: turning a photographed or scanned bill into a record with a provider, an amount
+and a date. That job is <Link href="/recipes/document-extraction/">turning photos and PDFs into
+records</Link>, and the business version of the same seam is
+<Link href="/recipes/invoice-matching/">matching invoices to purchase orders</Link>. Everything
+after the record exists is this page.
+
+## The assembled diagram
+
+<Run data={householdRun} label="Level 0 · Household paperwork, no model" runKey="household-paperwork" />
+
+## Why this level, and why not higher
+
+<Link href="/techniques/order-zero/">Order zero</Link> is the whole recipe: the level the site
+tells you to check first, and the one most household admin actually lives at. The example is
+eleven records and eleven file names. Five functions produce the report, and every one of them is
+something a spreadsheet does natively.
+
+The window is one comparison at each end, and both ends are worth getting right: a renewal on the
+last day of the window is exactly the one worth catching, and a renewal that already happened is
+not a warning about the future.
+
+<CodeFile file="examples/household_paperwork/run.py" func="renewals_due" />
+
+The part people get wrong by hand is not the dates, it is the periods. A water bill at $91.20 a
+quarter and a broadband line at $55.00 a month are not comparable until both are a year, and
+ranking bills by the number printed on them puts the wrong one at the top. Normalizing first is
+one multiplication:
+
+<CodeFile file="examples/household_paperwork/run.py" func="yearly_cents" />
+
+Climbing a level buys nothing here. Level 1 would hand the same eleven records to a model and ask
+it for the same four answers in prose. That costs a call per report, takes a second or two, and
+introduces a failure the arithmetic does not have: a total that looks right and is not. A wrong
+total in a household budget is not caught by anyone, because nobody adds it up again by hand,
+which is why they asked in the first place. Level 2 and above answer a question this job does not
+ask: nothing here has to be searched for, because the records are eleven rows and the folder is
+eleven files.
+
+The level below does not exist. This is the floor, and the honest version of this page says so
+before it offers anything else.
+
+## Walkthrough
+
+The report runs for a date, not for "today": `run` reads that date out of the request and refuses
+a request that names no date at all, rather than answering for a day the reader did not mean. The
+five steps are the five questions, in order, and each one records what it found.
+
+<CodeFile file="examples/household_paperwork/run.py" func="run" />
+
+Against the eleven invented records, run for 09/19/2026, that produces: five auto-renewing
+commitments inside the next 30 days, the first on 10/01 and the largest on 10/02 at $1,184.00; one
+overdue bill, Kestrel Power at $147.80, dated 09/12; one more due on 10/14; a yearly total of
+$5,860.28, of which utilities are $3,014.40 and subscriptions $863.88; and three gaps in the
+folder, two files whose names cannot be searched by date or provider and one commitment with no
+document filed against it at all.
+
+That last group is the one people underestimate. A document that exists and cannot be found is,
+on the morning of a claim, the same as a document that does not exist. The rule is a regular
+expression, and the check is a set difference:
+
+<CodeFile file="examples/household_paperwork/run.py" func="misfiled" />
+
+Two details in the code are deliberate. Money is integer cents everywhere, because a budget in
+floating point drifts by a cent or two and produces a total nobody can reconcile against their own
+statements. And a one-off cost, a warranty bought once, counts as zero in the yearly totals rather
+than being folded in as though it recurred: the report says what it left out.
+
+## What it costs
+
+<CostStrip
+  level={0}
+  stats={[
+    { label: 'Model calls per report', value: '0' },
+    { label: 'Tokens, in and out', value: '0' },
+    { label: 'Records the report covers', value: '11' },
+    { label: 'Cost per report, forever', value: 'nothing' },
+  ]}
+  comparedTo={{
+    label: 'asking a model the same four questions',
+    note:
+      'A level-1 version would send the eleven records and the eleven file names in one prompt and read four answers back. At roughly 700 tokens in and 200 out per report that is about 900 tokens a run, or about 47,000 tokens a year if the report is read weekly. The figures are an estimate, not a measurement. The number that matters is not the money: it is that the arithmetic version cannot produce a wrong total, and the level-1 version can, silently.',
+  }}
+/>
+
+The unit here is per report, and a household reads this one weekly at most. That is what makes the
+cost argument for level 0 an argument about correctness rather than about money. A few thousand
+tokens a year is nothing to anybody. A yearly total that is off by one subscription, on the one
+page a household uses to decide what to cancel, is the whole point of the exercise gone.
+
+## How it fails
+
+The failures here are data problems, not model problems. That is the honest shape of a level-0
+recipe: nothing can hallucinate, and everything can be missing.
+
+<FailureModes modes={[
+  {
+    name: 'A commitment nobody entered',
+    notice: 'A charge appears on a statement that the yearly total does not contain. The report is confidently complete about the rows it has and says nothing about the rows it does not.',
+    test: 'Reconcile one month of a real statement against the records, line by line, before trusting any yearly figure. The report counts eleven records because eleven were entered, not because eleven exist.',
+  },
+  {
+    name: 'A period entered wrong',
+    notice: 'A category total jumps or collapses by a factor of three, four or twelve between one month and the next, or a small bill outranks a large one in the list of largest commitments.',
+    test: 'tests/test_example_household_paperwork.py multiplies each period out on its own and recomputes every category total from the records independently of the code. In a spreadsheet the equivalent check is a column holding the yearly figure next to the billed figure, so the two can be read side by side.',
+  },
+  {
+    name: 'A document that cannot be found',
+    notice: 'Nothing goes wrong until the morning of a claim or a dispute, which is the worst moment to discover a file called scan_0043.pdf.',
+    test: 'Run the naming rule over the whole folder and against every record, not just over new files. The example reports two kinds of gap separately, a file whose name breaks the rule and a record with no document at all, because the fixes are different: rename one, go and find the other.',
+  },
+]} />
+
+## What to measure
+
+<HowToEval>
+
+There is no model here, so there is nothing to score and no eval set to build. What there is to
+check is the data, and the check is a reconciliation: take one month of statements, and confirm
+that every charge on them appears in the records and that every record's amount matches. Do it
+once when the records are first entered and once a year after that. Two numbers are worth writing
+down while you do it: how many charges were missing from the records, and how many amounts had
+drifted since they were entered. Both are measures of the folder, not of any technique.
+
+The one test that is worth automating is the arithmetic itself, which is what this example's test
+file does: the window's boundaries, each period's multiplier, and the category totals recomputed
+from the records rather than read back from the report. A total the code and the check both got
+from the same call proves nothing.
+
+</HowToEval>
+
+## Variations
+
+- Do it in a spreadsheet. One row per commitment, a column for the yearly figure, a filter on the
+  date, and a conditional format for anything unpaid. The reasoning on this page carries over
+  exactly; nothing about it needs Python.
+- Add a reminder by making the report run on a schedule and send itself. That is a timer, not a
+  level: see <Link href="/recipes/nightly-monitor/">the nightly source monitor</Link> for the same
+  argument about a schedule being infrastructure rather than agency.
+- Feed the records from <Link href="/recipes/document-extraction/">document extraction</Link> once
+  the folder is large enough that typing each one in is the bottleneck, and keep a person on the
+  confirm step: an amount read wrong flows into every total on this page.
+- Ask questions of it in words, rather than reading the report, once the records outgrow one
+  screen. That is <Link href="/recipes/document-qa/">document Q&A</Link> at level 2, and it is a
+  different job: answering a question, not producing the same page every week.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}

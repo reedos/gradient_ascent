@@ -313,6 +313,13 @@ NOT_SCORED = {
         'This example runs on the electronics test bench in evals/bench/, a second document set and data set with no question file of its own, so the 60-question set has nothing to grade it against. '
         'Measure instead row accuracy against the manual, counting two mistakes separately: a value transcribed wrong, and a right value taken from the wrong row.'
     ),
+    "household_paperwork": (
+        "it calls no model at all. Eleven household records go in and a report of renewals, "
+        "unpaid bills, yearly totals and missing documents comes out, entirely from arithmetic, "
+        "so there is no answer, no citation and nothing for a grader to read. Measure the data "
+        "instead: how many charges on a month of statements are missing from the records, and "
+        "how many recorded amounts have drifted since they were entered."
+    ),
 }
 KINDS = ["lookup", "multi_hop", "numeric", "unanswerable", "conflicting"]
 DEFAULT_QUESTIONS = ROOT / "evals" / "questions.json"

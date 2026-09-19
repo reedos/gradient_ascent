@@ -1,0 +1,54 @@
+{
+  "illustrative": true,
+  "h": 434,
+  "title": "Household paperwork, assembled",
+  "sub": "Sort by date, subtract, sum by category, and check the folder. No model is called at any step.",
+  "pill": "Level 0 · No model",
+  "nodes": [
+    { "id": "records", "x": 170, "y": 34, "l": "Records and folder", "k": "store" },
+    { "id": "window", "x": 170, "y": 110, "l": "Dates against a window", "k": "code" },
+    { "id": "owed", "x": 170, "y": 186, "l": "Unpaid, and overdue", "k": "code" },
+    { "id": "yearly", "x": 170, "y": 262, "l": "Normalize to a year, sum", "k": "code" },
+    { "id": "folder", "x": 170, "y": 338, "l": "Check the naming rule", "k": "code" },
+    { "id": "out", "x": 170, "y": 414, "l": "One page to read", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "records", "t": "window", "by": "code" },
+    { "id": "e2", "f": "window", "t": "owed", "by": "code" },
+    { "id": "e3", "f": "owed", "t": "yearly", "by": "code" },
+    { "id": "e4", "f": "yearly", "t": "folder", "by": "code" },
+    { "id": "e5", "f": "folder", "t": "out", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "Read what is already written down",
+      "d": "11 records (provider, category, amount in cents, period,\ndate, auto-renew, paid) and the 11 files in the folder",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Subtract dates, keep the next 30 days",
+      "d": "5 of the 7 auto-renewing records fall inside the window:\n10/01 Thornfield Mutual, 10/02 Thornfield Mutual,\n10/06 Larkmoor Fiber, 10/09 Sableway Gym,\n10/18 Pellmore Reading Club",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e3",
+      "h": "Filter the unpaid rows and flag the late ones",
+      "d": "09/12 Kestrel Power $147.80 OVERDUE\n10/14 Brackle Water Board $91.20",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e4",
+      "h": "Multiply each period out to a year and sum by category",
+      "d": "utilities $3,014.40 · insurance $1,958.00\nsubscriptions $863.88 · warranty $24.00\ntotal $5,860.28",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e5",
+      "h": "Match every file against the folder's naming rule",
+      "d": "2 files cannot be found by date or provider\n1 record has no document filed at all",
+      "m": "0 tokens · 0 ms"
+    }
+  ]
+}
