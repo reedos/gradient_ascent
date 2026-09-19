@@ -1,20 +1,20 @@
 ---
 slug: delegating
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Prompting best practices"
     url: "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"
     publisher: "Anthropic (Claude Platform Docs)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "LLM01:2025 Prompt Injection"
     url: "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
     publisher: "OWASP Gen AI Security Project"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Building Effective AI Agents"
     url: "https://www.anthropic.com/engineering/building-effective-agents"
     publisher: "Anthropic"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -95,6 +95,13 @@ correctly by itself. The <Link href="/techniques/safety/">safety</Link> page's e
 version: a permission check that refuses a refund call unless the customer's own message
 independently names the same amount, no matter what a retrieved note tried to talk the model
 into. The model may propose; only a call the person's own words support runs.
+
+Deciding what to hand over also decides who else gets to hold it. Anything sitting between you
+and the model (a workflow automation service, a browser extension, an agent framework's hosted
+tracing) receives the same material the model does and holds it under its own terms, not the
+model maker's. So the thing to check before routing a task through one is the whole route the
+material travels, not only the retention page of the company whose model answers. That check is
+on the <Link href="/techniques/safety/">safety, privacy and governance</Link> page.
 
 Start narrow by default. Anthropic's own advice to agent builders is "finding the simplest
 solution possible, and only increasing complexity when needed"<Cite n={3}/>: the Use it lane's

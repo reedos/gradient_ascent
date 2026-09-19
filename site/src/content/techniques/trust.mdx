@@ -1,22 +1,22 @@
 ---
 slug: trust
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Prompting best practices"
     url: "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"
     publisher: "Anthropic (Claude Platform Docs)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Automation-Induced Complacency Potential: Development and Validation of a New Scale"
     url: "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2019.00225/full"
     publisher: "Frontiers in Psychology (Merritt et al.)"
     date: "2019-02-19"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Measuring and mitigating overreliance to build human-compatible AI"
     url: "https://arxiv.org/abs/2509.08010"
     publisher: "arXiv (Ibrahim et al.)"
     date: "2025-09-08"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -72,13 +72,15 @@ that model and re-check it against your own evals before applying it to another.
 record built on last quarter's version does not transfer just because the product name did.
 
 It is worth being careful about what the research here establishes. A 2019 scale for automation
-complacency was built from a survey of 475 online-panel participants whose automation experience
-was mostly low-stakes. Its authors summarize prior work as expecting trust and complacency to go
-together, then report that their own monitoring subscale overlapped far less with a general
-propensity to trust machines than their other subscale did<Cite n={2}/>. Being a trusting person,
-in that data, did not predict whether you kept watching. Those participants were not supervising
-models, so this is not a finding about your work, but it is a reason to keep a count per task
-rather than trusting a disposition you think you have.
+complacency was developed on "a sample of 475 online respondents" from Amazon Mechanical Turk,
+whose "experience with automation was predominantly with relatively low-stakes and common forms
+of automation, such as in-car navigation systems", which its authors name as a limitation. Both
+of its new subscales "showed discriminant validity from the previous complacency potential scale
+and from similar constructs, such as propensity to trust", and "only the monitoring-focused scale
+had a significant relationship with hypothetical complacency"<Cite n={2}/>. A general disposition
+to trust is measuring something else. Those participants were not supervising models, so this is
+not a finding about your work. It is a reason to keep a count per task rather than trust a
+disposition you think you have.
 
 A 2025 position paper surveying over-reliance research defines the risk as "relying on LLMs
 beyond their capabilities" and locates it across "diverse domains from healthcare to personal

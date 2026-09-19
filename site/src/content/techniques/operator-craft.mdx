@@ -1,25 +1,25 @@
 ---
 slug: operator-craft
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Prompting best practices"
     url: "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"
     publisher: "Anthropic (Claude Platform Docs)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Prompt engineering"
     url: "https://developers.openai.com/api/docs/guides/prompt-engineering"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Building Effective AI Agents"
     url: "https://www.anthropic.com/engineering/building-effective-agents"
     publisher: "Anthropic"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Automation-Induced Complacency Potential: Development and Validation of a New Scale"
     url: "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2019.00225/full"
     publisher: "Frontiers in Psychology"
     date: "2019-02-19"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -52,13 +52,12 @@ here reports a measured number.
 <Lane name="use" title="Use it">
 
 Briefing is the skill everything else rests on, and it is mostly the discipline of not assuming
-the model already knows what you mean. Anthropic's own prompting guidance frames this directly:
-think of the model "as a brilliant but new employee who lacks context on your norms and
-workflows," and test a request against what it labels the golden rule: "Show your prompt to a
-colleague with minimal context on the task and ask them to follow it. If they'd be confused,
-Claude will be too."<Cite n={1}/> What you want, the constraints it has to respect, and what
-"done" looks like are three separate things. Writing them on three lines, not in one paragraph,
-is the whole discipline: a missing constraint is invisible in prose and obvious in a list.
+the model already knows what you mean. Anthropic's own prompting guidance states the underlying
+point plainly: "Claude responds well to clear, explicit instructions"<Cite n={1}/>, and the <Link
+href="/techniques/briefing/">briefing</Link> page quotes the fuller version of that guidance and
+takes it apart into six parts. What you want, the constraints it has to respect, and what "done"
+looks like are three separate things. Writing them on three lines, not in one paragraph, is the
+whole discipline: a missing constraint is invisible in prose and obvious in a list.
 
 How much to spell out depends on which model you are briefing, and OpenAI's own guidance sorts
 its models into two kinds for exactly that reason<Cite n={2}/>. The <Link
@@ -68,13 +67,14 @@ directions: over-specifying a model that could have worked out the details, or u
 one that needed them spelled out.
 
 Reviewing work you did not do is a different skill from doing the work yourself, and it gets
-harder, not easier, as a system does more without you. Anthropic's own guidance for agents says
-plainly that "human review remains crucial for ensuring solutions align with broader system
-requirements" even where automated checks already ran, and describes agents pausing "for human
-feedback at checkpoints or when encountering blockers" as a normal part of the design, not a
-fallback<Cite n={3}/>. The practical version: check what you can verify independently (a
-citation that resolves, a number you can recompute) before trusting the parts you cannot. The
-failure mode that follows has a name and a literature: a scale-development paper in Frontiers in
+harder, not easier, as a system does more without you. Anthropic's own guidance for agent
+builders describes agents pausing "for human feedback at checkpoints or when encountering
+blockers" as a normal part of the design, not a fallback, and lists coding as a case where "Code
+solutions are verifiable through automated tests"<Cite n={3}/>. Even there it says human review
+remains crucial, the sentence <Link href="/techniques/reviewing/">reviewing</Link> quotes in full.
+The practical version: check what you can verify independently (a citation that resolves, a number
+you can recompute) before trusting the parts you cannot. The failure mode that follows has a
+name and a literature: a scale-development paper in Frontiers in
 Psychology summarizes the agreed definition of complacency as a human operator monitoring an
 automated system, at a frequency that is "suboptimal or below a normative rate," where that
 suboptimal monitoring "leads to performance failures"<Cite n={4}/>. The trust was real; it just
