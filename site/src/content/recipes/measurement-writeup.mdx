@@ -11,7 +11,7 @@ import CostStrip from '../../components/page/CostStrip.astro';
 import HowToEval from '../../components/page/HowToEval.astro';
 
 This is an engineering-test page. Five revision C prototypes of the Orbeck SRB-5030 spent three
-days in a chamber, swept over line, load and temperature, and the sweep is done: the margins are
+days on the bench, swept over line, load and temperature, and the sweep is done: the margins are
 computed, the uncertainty budget behind them is computed, the guardbanded verdicts are computed.
 What is left is the afternoon's other job, turning a lab notebook
 (`evals/bench/corpus/characterization-notebook.md`) and a table of numbers into a short
@@ -27,51 +27,60 @@ expanded uncertainty behind the thinnest one, and the three-ambient line regulat
 guardbanded verdict for the one board whose margin the measurement cannot quite decide. None of
 that arithmetic is new to this page; it is the same `dc_voltage_budget`, `combined_uncertainty`,
 `expanded_uncertainty`, `guarded_verdict` and `margin_to_limit` functions every other page on this
-bench that touches uncertainty imports rather than reimplements. This recipe's own job starts
-after all of that: turning the figures and the notebook's prose into paragraphs a reviewer reads
-in under a minute.
+bench that touches uncertainty imports rather than reimplements. A model never produces a
+reported measurement, an uncertainty, a margin or a verdict, here any more than on
+<Link href="/recipes/limits-without-a-model/">the production log</Link>, where the same rule
+shows up as a pass or a fail. This recipe's own job starts after all of that: turning the figures
+and the notebook's prose into paragraphs a reviewer reads in under a minute.
 
 That job is one model call, level 1, <Link href="/techniques/order-zero/">order zero</Link>
 composed with <Link href="/techniques/prompt-engineering/">prompt engineering</Link>. A fixed
-template could produce a report too, but a session's actual story does not have a fixed shape:
-which board is thinnest, whether a line regulation reading lands on a pass, a fail or a cannot-say,
-which open items from the notebook still matter, all of it changes sweep to sweep, and a template
-that tries to cover every combination turns into a maze of conditionals that is itself a program
-nobody is checking with the same rigor as the arithmetic underneath it. One call to write connected
-prose around numbers that cannot move is cheaper than that maze and safer than skipping the prose
-and handing a reviewer a bare table.
+template could produce a report too, but a session's story does not have a fixed shape: which
+board is thinnest, whether a line regulation reading lands on a pass, a fail or a cannot-say,
+which open items still matter, all of it changes sweep to sweep, and a template that covers every
+combination is a maze of conditionals nobody checks with the rigor the arithmetic underneath it
+gets.
 
 The reasons to climb are reasons this page deliberately has none of. There is nothing to retrieve
 that is not already in the notebook and the figures, so <Link href="/techniques/rag/">RAG</Link>
 buys nothing. The output is prose a person reads directly, not a payload another program parses,
 so there is no schema for <Link href="/techniques/structured-output/">structured output</Link> to
 hold it to. Nothing here decides what happens next or calls a tool, so there is no case for an
-agent loop. The one thing this level needs that level 0 does not have is a model at all, because
-level 0 is a template and a template is the maze above.
+agent loop.
 
 ## The run, stepped
 
 `compute_results` reads `evals/bench/data/characterization-2026-09.csv` and returns the corner
 margins for all five boards, the uncertainty budget for the thinnest one, and board
-SRB5030-2609-0005's line regulation figures and verdicts at all three ambients. The corner budget,
-for SRB5030-2609-0003 at 9.0 V in, 3.000 A out, 70 degC, is four named lines the same way every
-other budget on this bench is:
+SRB5030-2609-0005's line regulation figures and verdicts at all three ambients. The corner budget
+is <Link href="/recipes/characterize-a-design/">the same one that page computes</Link>, for the
+same five readings: board SRB5030-2609-0003 at 9.0 V in, 3.000 A out, 70 degC ambient, on the
+10 V range, meter at 23 degC, one year calibration row.
 
-| Contribution | Standard uncertainty |
-| --- | --- |
-| Meter accuracy, 1 year, 10 V range | 128.3 uV |
-| Resolution, 10 uV per count | 2.9 uV |
-| Repeatability, 5 readings | 36.1 uV |
-| Leads and connections | 115.5 uV |
-| Combined | 176.4 uV |
-| Expanded, k = 2 | 352.7 uV |
+| Contribution | Half-width or spread | Standard uncertainty |
+| --- | --- | --- |
+| Meter accuracy, 1 year, 10 V range, 23 degC | 222.2 uV | 128.3 uV |
+| Resolution, 10 uV per count | 5.0 uV | 2.9 uV |
+| Repeatability, 5 readings | s = 80.7 uV | 36.1 uV |
+| Leads and connections | 200 uV | 115.5 uV |
+| Combined | | 176.4 uV |
+| Expanded, k = 2 | | 352.7 uV |
 
-Against that, the corner margin is 20.4 mV: over fifty times the expanded uncertainty, so the
-measurement is not in doubt even though the margin is thin. Board SRB5030-2609-0005's line
-regulation at 25 degC is a different case: 0.299 percent against a 0.300 percent limit, with
-0.0075 percentage points of expanded uncertainty on the difference. `guarded_verdict` returns
-`"cannot say"` there, `"pass"` at 0 degC and `"fail"` at 70 degC, and all three verdicts are
-figures the model is handed, not conclusions it draws.
+That number belongs to those five readings and to nothing else, which matters because two nearby
+figures are in the documents this report is written from. The meter's manual works a budget for a
+different reading and gets 349.5 uV, and the notebook works one for a generic reading of this
+session and gets 351.6 uV. A report that quotes either of those for this corner is quoting the
+wrong measurement, and the check below rejects it for that reason and not by accident.
+
+Against that budget the corner margin is 20.4 mV, about fifty-eight times the expanded
+uncertainty, so the measurement is not in doubt even though the margin is thin. Board
+SRB5030-2609-0005's line regulation at 25 degC is a different case: 0.299 percent against a 0.300
+percent limit, with 0.0075 percentage points of expanded uncertainty on the difference.
+`guarded_verdict` returns `"cannot say"` there, `"pass"` at 0 degC and `"fail"` at 70 degC, and
+all three verdicts are figures the model is handed, not conclusions it draws. The k of 2 is
+stated with every one of those numbers because it is part of them: it covers roughly 95 percent
+of where the true value could be, on the usual assumption that the contributions are independent
+and roughly normal once they are combined, and it is not a guarantee that the value is inside.
 
 Every figure is formatted once, as a `Figure(label, text)` pair, and that formatted string is the
 only form the model is allowed to reproduce:
@@ -101,19 +110,34 @@ token that was never one of the figures. The check does not retry and does not r
 rejects; `run` hands the rejected text back with the failing tokens named, so a review starts from
 the specific sentence to look at rather than from "something in here is wrong."
 
-The regular expression behind the check has to tell a quoted number apart from a serial number's
-digits, or every board's ID would have to be pre-approved as a figure. `SRB5030-2609-0003` is
-never read as the numbers 5030, 2609 and 0003, because every digit inside it sits next to a letter,
-another digit, or the hyphen that joins the three groups, and the check only starts a match where
-none of those touch it on either side.
+Most of the work in writing that check is deciding what counts as one token, and the cases that
+decide it are ordinary prose, not adversarial ones. A serial number has to be an identifier and
+not three figures, or every board's ID would need pre-approving; that is what blanking
+identifier-shaped tokens does before the numeric scan, and `SRB5030-2609-0003` never reaches it.
+A date has to be one token too, or `09/14/2026` reads as 09, 14 and 2026 and a report cannot say
+when the session ran, so dates are matched first and checked whole against the sweep's own first
+and last day, which code takes off the CSV's timestamps. Everything left has to be matched to its
+own edges: `352.7uV` with no space is still the figure 352.7 and not the number 352, `350uV` is
+still an unsupported 350 rather than nothing at all, `20.4-99.9 mV` gives up both of its numbers
+and not just the first, and a figure followed by a comma is the figure. Each of those is a test in
+the file, and each of them was a way this check could have been quietly wrong while looking right.
+
+What it still cannot catch is worth stating just as plainly:
+
+- A digit buried inside a word or hyphenated onto one. `FIX99` and `degC-70` are identifier
+  shaped, so they are blanked with the serials. This is the price of not pre-approving every ID.
+- A figure spelled out. "three hundred fifty microvolts" has no digits in it to scan.
+- A right figure sitting next to the wrong claim, and a caveat the notebook states that the draft
+  drops. Neither is a number, so neither is a token. Both are in the failure modes below, and both
+  are why a person still reads the report.
 
 ## What it costs
 
 <CostStrip
   stats={[
     { label: "Model calls per session report", value: "1" },
-    { label: "Tokens in / out", value: "2,706 / 340" },
-    { label: "Figures computed and handed over", value: "23" },
+    { label: "Tokens in / out", value: "2,724 / 340" },
+    { label: "Figures computed and handed over", value: "25" },
     { label: "Cost per run, at typical rates", value: "a fraction of a cent" },
   ]}
   comparedTo={{
@@ -149,8 +173,8 @@ costs that much.
   },
   {
     name: "A model copies a real number from the notebook that code never produced",
-    notice: "The notebook's own uncertainty example (section 6) states 351.6 uV for a representative reading; this recipe's own code recomputes 352.7 uV for the specific corner it reports on, from that corner's own five readings. Both numbers are honestly arrived at, and they disagree by about a microvolt because they are not the same reading. If a draft quotes the notebook's 351.6 instead of code's own 352.7, the check correctly rejects it: this recipe trusts its own recomputation, not the notebook's arithmetic, even when the notebook is right.",
-    test: "When the check rejects a number that also appears in the notebook, do not treat that as the check being wrong. Confirm which of the two the report should be reporting (almost always code's own recomputation, over the notebook's illustrative figure), and redraft from the figures, not from the notebook's own numbers.",
+    notice: "The notebook goes into the prompt whole, and it carries its own uncertainty figure, 351.6 uV for a generic reading of this session rather than for the corner this report is about. It is a right number for the wrong reading, and it is only a microvolt away from the right one, so nothing about it looks wrong on the page.",
+    test: "The check rejects it, because 351.6 is not one of the figures. When that happens, do not treat the check as the thing that is wrong: confirm which reading the report is about, and redraft from the figures rather than from numbers the source document worked out for itself.",
   },
 ]} />
 
@@ -166,14 +190,11 @@ fail rather than a judgment call: run a session's worth of drafts, count how man
 and a number under 100 percent means the prompt is losing the "copy the figure, do not compute
 one" instruction, not that the arithmetic underneath is wrong.
 
-That check is necessary and not sufficient. It cannot catch a right figure attached to the wrong
-board, and it cannot catch a caveat the notebook states plainly that the draft leaves out, because
-neither of those is a number the check can compare against anything. Before trusting this recipe
-on a real session, keep a small set of past reports (five or six is enough at this volume, since
-there is no golden run to score against and no second unit to catch a mistake the way production
-volume would) and read each one against its own notebook and figures the way the failure modes
-above describe, specifically checking the claim a number sits next to and the open items a report
-is supposed to carry forward.
+That check is necessary and not sufficient, for the reasons the list above it gives. Before
+trusting this recipe on a real session, keep a small set of past reports (five or six is enough at
+this volume, since there is no golden run to score against and no second unit to catch a mistake
+the way production volume would) and read each one against its own notebook, checking the claim
+each number sits next to and the open items the report was supposed to carry forward.
 
 </HowToEval>
 
@@ -193,9 +214,10 @@ the facts exist before the model is asked to write anything, so the same rule ap
 writes the sentences, code supplies and checks the facts, and nothing downstream trusts the prose
 for a number it could have gotten from the table instead.
 
-Where this stays level 1 and does not climb to
-<Link href="/recipes/accuracy-specs-from-the-manual/">the kind of write and check that needs two
-model passes</Link>: one draft, read by one person, with nothing else consuming it. It would move
+Where this stays level 1 and does not climb to the kind of pipeline
+<Link href="/recipes/accuracy-specs-from-the-manual/">accuracy-specs-from-the-manual</Link> needs,
+a schema, a bounded retry and a person's recorded sign-off: one draft, read by one person, with
+nothing else consuming it. It would move
 to <Link href="/techniques/evaluator-optimizer/">write and check</Link> the day a report started
 generating unattended on a schedule with nobody reading each one before it went out, or the day
 something downstream, a dashboard, another program, a second model, started parsing this report's

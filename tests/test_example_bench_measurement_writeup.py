@@ -183,6 +183,45 @@ class UnsupportedNumbersTests(unittest.TestCase):
     def test_a_negative_number_is_still_a_number(self) -> None:
         self.assertEqual(unsupported_numbers("The margin came to -0.034 points.", self.figures), ("-0.034",))
 
+    def test_a_fabricated_number_glued_to_its_unit_is_still_caught(self) -> None:
+        # The first way this check was broken: with no space before the unit, an earlier
+        # lookahead refused to match "350uV" at all and a made-up figure went through clean.
+        self.assertEqual(unsupported_numbers("The budget came to 350uV.", self.figures), ("350",))
+
+    def test_a_real_figure_glued_to_its_unit_is_not_truncated(self) -> None:
+        # The same bug the other way round: the token has to be the whole figure, or a correct
+        # draft gets rejected for a number it quoted correctly.
+        self.assertEqual(unsupported_numbers("The budget came to 352.7uV.", self.figures), ())
+
+    def test_the_second_number_of_a_range_is_not_skipped(self) -> None:
+        # A hyphen between two numbers used to stop the scan restarting, so everything after the
+        # dash in "20.4-99.9 mV" was never looked at.
+        self.assertEqual(unsupported_numbers("Margins ran 20.4-99.9 mV.", self.figures), ("99.9",))
+        self.assertEqual(unsupported_numbers("Margins ran 20.4-78.5 mV.", self.figures), ())
+
+    def test_a_figure_followed_by_a_comma_is_not_reported_as_unsupported(self) -> None:
+        # The comma used to be swallowed into the token, so "2," never matched the figure "2".
+        self.assertEqual(unsupported_numbers("The coverage factor is 2, as stated.", self.figures), ())
+
+    def test_a_bare_decimal_is_a_number(self) -> None:
+        self.assertEqual(unsupported_numbers("It read .299 percent.", self.figures), (".299",))
+
+    def test_a_date_is_checked_whole_against_the_sweep_s_own_days(self) -> None:
+        # The sweep's first and last day are figures, read off the CSV's timestamps, so a report
+        # may date itself; a date the sweep does not have is one token, not three digit groups.
+        self.assertEqual(
+            unsupported_numbers("The sweep ran 09/14/2026 to 09/16/2026.", self.figures), ()
+        )
+        self.assertEqual(
+            unsupported_numbers("The sweep ran 09/14/2026 to 09/20/2026.", self.figures),
+            ("09/20/2026",),
+        )
+
+    def test_a_digit_buried_in_a_word_is_the_limit_this_check_accepts(self) -> None:
+        # Identifier-shaped tokens are blanked so serial numbers are not read as measurements,
+        # and the cost of that is stated on the page: a digit inside a word is not scanned.
+        self.assertEqual(unsupported_numbers("Fixture FIX99 was used.", self.figures), ())
+
 
 class RunTests(unittest.TestCase):
     def test_a_clean_draft_passes_the_check(self) -> None:
@@ -215,9 +254,9 @@ class RunTests(unittest.TestCase):
         model = StubModel([StubResponse(text=CLEAN_DRAFT)])
         tracer = _tracer()
         report = run("", model, tracer)
-        self.assertEqual(tracer.tokens_in_total(), 2706)
+        self.assertEqual(tracer.tokens_in_total(), 2724)
         self.assertEqual(tracer.tokens_out_total(), 340)
-        self.assertEqual(len(report.figures), 23)
+        self.assertEqual(len(report.figures), 25)
 
     def test_the_check_step_is_in_the_trace_and_names_the_failure(self) -> None:
         model = StubModel([StubResponse(text=ROUNDED_DRAFT)])

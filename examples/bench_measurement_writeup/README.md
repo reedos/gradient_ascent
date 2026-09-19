@@ -10,8 +10,10 @@ model is handed those figures, formatted exactly as it may quote them, and the s
 and asked to write the prose around them. It is never asked for a number.
 
 `unsupported_numbers` is the check: every numeric token in the draft has to appear, character for
-character, among the figures code computed. Nothing is retried; a draft the check rejects is
-handed back with the exact tokens that failed, not silently patched.
+character, among the figures code computed. Dates are matched first and checked whole against the
+sweep's own days, and identifier-shaped tokens are blanked so a serial number is not read as
+three quoted measurements. Nothing is retried; a draft the check rejects is handed back with the
+exact tokens that failed, not silently patched.
 
 Run it:
 
