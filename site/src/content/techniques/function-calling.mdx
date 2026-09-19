@@ -91,9 +91,10 @@ especially for anything with a side effect.
 </Lane>
 <Lane name="build" title="Build it">
 
-Every maker's API has the same two halves, so the code below is the shape you write against any
-of them. Google states the division plainly: "The model doesn't execute the function itself.
-Extract the name and args and execute in your application"<Cite n={5}/>.
+All three makers' APIs in this page's sources have the same two halves, so the code below is the
+shape you write against any of them. Google states the division plainly: "The model doesn't
+execute the function itself. Extract the name and args and execute in your
+application"<Cite n={5}/>.
 
 The example offers two tools, `search(query)` and `lookup_part(part_number)`, and lets the model
 call at most one of them. The system prompt says so directly, and the code enforces it a second
