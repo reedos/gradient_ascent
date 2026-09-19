@@ -301,6 +301,18 @@ NOT_SCORED = {
         'This example runs on the electronics test bench in evals/bench/, a second document set and data set with no question file of its own, so the 60-question set has nothing to grade it against. '
         'Measure instead the coverage check: every requirement has a test, and every test names a requirement, a bench instrument, a limit and a unit.'
     ),
+    "bench_characterize_a_design": (
+        'This example runs on the electronics test bench in evals/bench/, a second document set and data set with no question file of its own, so the 60-question set has nothing to grade it against. '
+        'It calls no model at all. Measure the arithmetic instead: every margin, uncertainty budget and guardbanded verdict is recomputed by a test from the characterization data.'
+    ),
+    "bench_measurement_writeup": (
+        'This example runs on the electronics test bench in evals/bench/, a second document set and data set with no question file of its own, so the 60-question set has nothing to grade it against. '
+        'Measure instead the share of drafts in which every figure in the prose is one that code produced, which is a pass or a fail and not a judgment.'
+    ),
+    "bench_accuracy_specs_from_the_manual": (
+        'This example runs on the electronics test bench in evals/bench/, a second document set and data set with no question file of its own, so the 60-question set has nothing to grade it against. '
+        'Measure instead row accuracy against the manual, counting two mistakes separately: a value transcribed wrong, and a right value taken from the wrong row.'
+    ),
 }
 KINDS = ["lookup", "multi_hop", "numeric", "unanswerable", "conflicting"]
 DEFAULT_QUESTIONS = ROOT / "evals" / "questions.json"

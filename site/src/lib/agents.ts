@@ -139,7 +139,7 @@ export function agentGuide(input: GuideInput): Block[] {
   const engineering = input.domainCounts.engineering ?? 0;
   const engineeringAdvice =
     engineering > 0
-      ? ` ${engineering} of them have the domain \`engineering\`: whole jobs from electronics test, measurement, design and analysis, worked on a shared simulated test bench. If the person writes software for that kind of work, read those first: they will be the nearest illustrations.`
+      ? ` ${engineering} of them have the domain \`engineering\`: whole jobs from electronics test, measurement, design and analysis, worked on one simulated bench used three ways: production test, engineering test on a handful of prototypes, and a single precise measurement with its uncertainty. Ask which of the three the person is doing, because volume changes what a model is worth: a script that runs five times has no golden run to check it against. If the person writes software for that kind of work, read those first: they will be the nearest illustrations.`
       : '';
   const ladder = [...levels].sort((a, b) => a.order - b.order).map((l) => `**Level ${l.order}, ${l.title}.** ${l.who}`);
   return [
