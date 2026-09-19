@@ -132,10 +132,28 @@ html.nav-sheet-open { overflow: hidden }
 .section-rail { border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 55%, var(--bg)) }
 .section-rail-inner { max-width: 1392px; margin: auto; padding: 0 48px; display: flex; align-items: center; gap: 22px; height: 44px }
 .section-rail-label { flex: 0 0 auto; font: 600 10px/1 var(--font); letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); padding-right: 22px; border-right: 1px solid var(--line); height: 16px; display: flex; align-items: center }
-/* The right-hand fade says "there is more of this" on a phone, where the rail scrolls sideways
-   and has no scrollbar. It covers only the last few pixels, so it fades nothing when the whole
-   rail fits. Header.astro's script parks the rail on an item's left edge, never mid-label. */
-.section-rail-items { display: flex; align-items: stretch; gap: 2px; height: 100%; min-width: 0; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent 100%); mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent 100%) }
+/* The fades say "there is more of this" on a phone, where the rail scrolls sideways and has no
+   scrollbar. Each covers only the last few pixels, so neither fades anything when the whole rail
+   fits. Header.astro's script parks the rail on an item's left edge, but it clamps that position
+   to the end of the scroll range, and on the last page of a section the clamp wins: the rail
+   rests part way through the label before it and a phone reader's first word is "proves what",
+   which reads as a typo rather than as something that scrolls.
+
+   So the fades follow the scroll position. The left one is absent at rest and grows in as soon
+   as the rail moves; the right one shrinks away at the end, where it was dimming the tail of the
+   current page's own label. Both are declared as registered custom properties so a scroll-driven
+   animation can interpolate them, and the base rule is exactly the old behavior, so a browser
+   without scroll timelines renders what it rendered before rather than something broken. */
+@property --rail-fade-l { syntax: "<length>"; inherits: false; initial-value: 0px }
+@property --rail-fade-r { syntax: "<length>"; inherits: false; initial-value: 26px }
+.section-rail-items { display: flex; align-items: stretch; gap: 2px; height: 100%; min-width: 0; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--rail-fade-l), #000 calc(100% - var(--rail-fade-r)), transparent 100%); mask-image: linear-gradient(to right, transparent 0, #000 var(--rail-fade-l), #000 calc(100% - var(--rail-fade-r)), transparent 100%) }
+@supports (animation-timeline: scroll(self inline)) {
+  .section-rail-items { animation: section-rail-fade linear both; animation-timeline: scroll(self inline) }
+  @keyframes section-rail-fade {
+    from { --rail-fade-l: 0px; --rail-fade-r: 26px }
+    to { --rail-fade-l: 26px; --rail-fade-r: 0px }
+  }
+}
 .section-rail-items a { scroll-snap-align: start }
 .section-rail-items::-webkit-scrollbar { display: none }
 .section-rail-items a { position: relative; display: inline-flex; align-items: center; gap: 7px; padding: 0 12px; font-size: 12.5px; color: var(--muted); white-space: nowrap; transition: color .15s }
