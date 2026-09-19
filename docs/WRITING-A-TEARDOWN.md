@@ -1,7 +1,7 @@
 # Writing a teardown
 
-A teardown takes one kind of product the reader has already used — a deep-research mode, a coding
-agent, an always-on teammate — and takes it apart into the techniques this site explains. It is
+A teardown takes one kind of product the reader has already used (a deep-research mode, a coding
+agent, an always-on teammate) and takes it apart into the techniques this site explains. It is
 the concrete end of the content model: the technique pages teach a pattern with a synthetic
 example, and a teardown shows the same patterns running inside something with a logo on it.
 
@@ -9,7 +9,7 @@ Three are listed in `content/taxonomy.json` under `teardowns.first`, each with a
 the technique slugs it decodes (`patterns`). The taxonomy owns that list; your file owns the
 writing. Write `site/src/content/teardowns/<slug>.mdx` and nothing else. If a teardown needs a
 technique that is not in its `patterns`, or a product that is not in `content/landscape.json`, ask
-the integrator in your page-requests file — do not edit either content file yourself.
+the integrator in your page-requests file; do not edit either content file yourself.
 
 ## What a teardown is not
 
@@ -41,7 +41,7 @@ renamed or retired says so without this file being touched. Never type a product
 in the registry.
 
 `title` is not frontmatter: it comes from the taxonomy. Neither is `status`. Do not put
-`<Sources>` or `<Reviewed>` in the body — the page renders both from frontmatter, last.
+`<Sources>` or `<Reviewed>` in the body: the page renders both from frontmatter, last.
 
 ## The expiry
 

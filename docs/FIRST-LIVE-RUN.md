@@ -3,7 +3,7 @@
 Nothing in this repository has ever called a model. Every example, every test and every number
 in `evals/budget.json` was produced against a stub or a token counter. A technique page goes from
 Draft to Published only when it has a recorded trace from a real run and a result file that is
-not marked `stub` — see *Draft to Published* at the end of this file.
+not marked `stub`: see *Draft to Published* at the end of this file.
 
 Read `docs/EVALS.md` first for what `scripts/eval_run.py` does. This file is the sequence to run
 it in, one page at a time, plus `scripts/record_trace.py`, which records the trace a page's
@@ -16,7 +16,7 @@ written as `python` for short.
 
 - **Run when the machine is otherwise idle.** Stop anything scheduled that talks to your local
   model server before you start, and do not start a run and then walk away while something else
-  on the machine wakes up on a timer — it will make this run slower and, because the runner
+  on the machine wakes up on a timer; it will make this run slower and, because the runner
   records wall time into the result file, wrong in a way nothing downstream can detect.
 - **One example at a time.** Do not pass `--example all` to `eval_run.py` against your local
   model on the first day. It runs every example in sequence, but you want to read each result
@@ -24,13 +24,13 @@ written as `python` for short.
 - **Set the context size explicitly.** `OllamaModel` always sends `num_ctx`, defaulting to 8192
   (`DEFAULT_NUM_CTX` in `examples/common/model.py`). Left to your local model's own default, a
   long prompt is silently truncated from the front, the model never sees the sources, and the
-  chart would read that as the technique failing. If you raise it, say so in your run notes — a
+  chart would read that as the technique failing. If you raise it, say so in your run notes: a
   result file records the model id, not the context size.
 - **Nothing here pulls a model for you.** `OllamaModel` never pulls, on purpose. A missing tag is
   an HTTP 404 with your local server's own message; pull it yourself, deliberately, so you know
   which tag you measured.
 - **`context_engineering` is the one to run last on a local model.** It puts the whole document
-  set in every prompt by design — about 14,000 input tokens a question against `rag`'s 519 — which
+  set in every prompt by design (about 14,000 input tokens a question against `rag`'s 519), which
   is the difference between minutes and an hour on a local model.
 
 ## Order
@@ -42,7 +42,7 @@ written as `python` for short.
 5. The rest of the local run, one example at a time.
 6. Only after that: the metered run, only for pages you intend to publish.
 
-## Step 1 — the smallest real thing
+## Step 1: the smallest real thing
 
 `rag` is the right first example: level 2, one model call per question, no branches. `lookup` is
 the right first kind: 12 questions, all `exact`-graded, so no grader model is involved.
@@ -55,21 +55,21 @@ Writes: `evals/results/rag/ollama_<your-tag>.json`.
 
 Check, in this order:
 
-1. `"stub": false` — if true, you ran the stub; nothing about a stub run may reach a page.
-2. `"partial": false` — if true, the token cap cut it short; raise `--budget-tokens` and re-run.
+1. `"stub": false`: if true, you ran the stub; nothing about a stub run may reach a page.
+2. `"partial": false`: if true, the token cap cut it short; raise `--budget-tokens` and re-run.
    The cache means you only pay for what the first run did not reach.
-3. `"ungraded": 0` — every `lookup` question is `exact`-graded, so anything ungraded means a
+3. `"ungraded": 0`: every `lookup` question is `exact`-graded, so anything ungraded means a
    question is mis-tagged in `evals/questions.json`, not that the model did badly.
-4. `"model_decided_steps": 0` — `rag` is level 2. Nonzero means either the example changed or the
+4. `"model_decided_steps": 0`: `rag` is level 2. Nonzero means either the example changed or the
    rule in `examples/common/trace.py` broke; stop and find out which before reading further.
-5. `"citation_coverage"` — the share of `must_cite` sections the answers actually cited. Low here
+5. `"citation_coverage"`: the share of `must_cite` sections the answers actually cited. Low here
    with a decent `score_overall` means the model found the right answer from the wrong passage.
-6. `"score_overall"` — read it last. It is the least informative number until you trust the five
+6. `"score_overall"`: read it last. It is the least informative number until you trust the five
    above it.
 
 Do not publish anything off this run. One example, one kind, one model is a smoke test.
 
-## Step 2 — add a grader
+## Step 2: add a grader
 
 `multi_hop` questions are `rubric`-graded: a second model reads each answer against a checklist.
 
@@ -77,15 +77,15 @@ Do not publish anything off this run. One example, one kind, one model is a smok
 python scripts/eval_run.py --example rag --model ollama:<your-tag> --grader ollama:<your-tag> --kind multi_hop --budget-tokens 60000
 ```
 
-Writes: the result file above, plus `evals/results/rag/ollama_<your-tag>.review.json` — a
+Writes: the result file above, plus `evals/results/rag/ollama_<your-tag>.review.json`, a
 deterministic 10% sample of the grader's verdicts.
 
 Read the sample and decide, yourself, whether you agree before you look at `verdict`. One
 disagreement in a small sample is noise; two in a row means the grader is not trustworthy and no
-rubric score from this run means anything. If it is not trustworthy, stop here — a rubric score
+rubric score from this run means anything. If it is not trustworthy, stop here: a rubric score
 from an unchecked grader is worse than no score, because it looks like a measurement.
 
-## Step 3 — one example, all 60 questions
+## Step 3: one example, all 60 questions
 
 ```
 python scripts/eval_run.py --example rag --model ollama:<your-tag> --grader ollama:<your-tag> --budget-tokens 100000
@@ -94,7 +94,7 @@ python scripts/eval_run.py --example rag --model ollama:<your-tag> --grader olla
 Check the same six things, plus `score_by_kind.unanswerable`: it is gated in code before any
 grader sees it, so a low score there is a hallucination rate, not a grader's opinion.
 
-## Step 4 — record the trace
+## Step 4: record the trace
 
 A score is a number; a trace is what a reader steps through on the page. Record it separately,
 for one question whose answer you have already read.
@@ -105,7 +105,7 @@ for one question whose answer you have already read.
 python scripts/record_trace.py --list
 ```
 
-This prints every example under `examples/` and, for the ones it cannot record, why — an entry
+This prints every example under `examples/` and, for the ones it cannot record, why: an entry
 point that is not named `run`, or a required argument `--question` cannot fill in.
 `.local/page-requests/wave6-traces.md` has the exact change each of those would need; most pages
 do not need it, since 39 of the 44 examples are recordable as they stand.
@@ -117,7 +117,7 @@ python scripts/record_trace.py --example rag --question "How long is the warrant
 ```
 
 This prints the model id, the projected input and output tokens, and where the trace would be
-written — and calls no model. Then record it for real:
+written. It calls no model. Then record it for real:
 
 ```
 python scripts/record_trace.py --example rag --question "How long is the warranty on the DW-480, and what voids it?" --model ollama:<your-tag>
@@ -126,13 +126,13 @@ python scripts/record_trace.py --example rag --question "How long is the warrant
 Writes: `examples/rag/trace.json`.
 
 Open it and check `"stub": false`, that `commit` is the commit you ran at, and that every step's
-`decided_by` matches the rule in `examples/common/trace.py` — for `rag`, every step is `"code"`.
+`decided_by` matches the rule in `examples/common/trace.py`: for `rag`, every step is `"code"`.
 
 Some examples need an `embedder` as well as a model; today's embedder support covers `stub` and
 `ollama:<tag>` only, so record those against your local model even when the chat answers come
 from the metered API. `--list` and `--dry-run` both tell you which shape an example expects.
 
-## Step 5 — the rest of the local run
+## Step 5: the rest of the local run
 
 Work up the levels, reading each result before starting the next: `order_zero` (free, no model),
 `one_call`, `rag`, `knowledge_graphs`, `prompt_chaining`, `routing`, `parallelization`,
@@ -148,7 +148,7 @@ than the score.
 
 Record a trace (Step 4) for each page before it publishes, in whatever order you write pages.
 
-## Step 6 — the metered run
+## Step 6: the metered run
 
 Only after the local run is clean, and only for the pages you actually intend to publish.
 
@@ -160,7 +160,7 @@ Only after the local run is clean, and only for the pages you actually intend to
    python scripts/eval_run.py --example all --model claude:<id> --dry
    ```
 
-   No key is needed for this — `--dry` never builds a real backend. Compare the numbers with
+   No key is needed for this: `--dry` never builds a real backend. Compare the numbers with
    `evals/budget.json`; if they have moved since the file's own date, an example changed and the
    budget is stale.
 3. Multiply the token figures by the maker's published price on the day you run. No price is
@@ -179,7 +179,7 @@ Only after the local run is clean, and only for the pages you actually intend to
 
 Ctrl+C is safe at any point. `eval_run.py` caches every response by `(model id, prompt hash)`
 under `.local/eval-cache/`, so a stopped run pays again only for the question in flight, not for
-anything already answered — resume with the same command. `record_trace.py` writes `trace.json`
+anything already answered. Resume with the same command. `record_trace.py` writes `trace.json`
 only once a run finishes, so an interrupted recording leaves no partial file and does not disturb
 whatever trace was already there. Nothing else needs shutting down: neither script starts a
 background process.
@@ -195,7 +195,7 @@ A page may be published when every one of these is true. There is no partial ver
 3. **The trace's `decided_by` pattern matches the level** the page claims, per
    `examples/common/trace.py`.
 4. **Every number the page states comes from that result file**, and names the model class it
-   holds for — "level N beats level M" with no class attached is not publishable (the project plan,
+   holds for: "level N beats level M" with no class attached is not publishable (the project plan,
    Measurement design, Claim rule).
 5. **The grader sample for that run was hand-checked**, if any of its questions were
    rubric-graded.

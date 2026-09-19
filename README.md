@@ -10,7 +10,7 @@ enough.
 **Read it: https://reedos.github.io/gradient_ascent/**
 
 **Status: live and in development.** Every page is a draft, and nothing in this repository has
-ever called a model — see [What is and is not real yet](#what-is-and-is-not-real-yet). Found
+ever called a model. See [What is and is not real yet](#what-is-and-is-not-real-yet). Found
 something wrong? Every page has a feedback link, or open
 [the feedback form](https://github.com/reedos/gradient_ascent/issues/new?template=feedback.yml);
 see [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -30,7 +30,7 @@ cd site && npm ci && npm run build            # the site, into site/dist/
 npm run dev                                   # or serve it at localhost:4321
 ```
 
-Run an example against the stub model — no network, no API key, no local model:
+Run an example against the stub model (no network, no API key, no local model):
 
 ```
 python -m examples.rag --model stub --question "What is the DW-300's Normal cycle water use?"
@@ -71,7 +71,7 @@ engineering recipes' example packages, which run on the simulated bench in `eval
 The whole site turns on one distinction, defined once in `examples/common/trace.py`:
 
 > A step is `decided_by: "model"` when the model's **output**, not the program, selected which
-> action happens next — choosing to call a tool, choosing which tool, choosing its arguments, or
+> action happens next: choosing to call a tool, choosing which tool, choosing its arguments, or
 > choosing to stop. Everything else is `decided_by: "code"`.
 
 Calling a model is not a model decision. Levels 1, 2 and 3 call a model, sometimes several times,
@@ -90,7 +90,7 @@ Everything here was built without calling a model, local or remote. That means:
   numbers. Every run diagram carries `"illustrative": true`. No example has a recorded
   `trace.json`, and `evals/results/` is empty.
 - **Projected, not measured:** the token figures in `evals/budget.json`, which come from
-  `eval_run.py --dry` — a token counter, not a model.
+  `eval_run.py --dry`, a token counter, not a model.
 
 A page becomes `published` when it has a recorded non-stub trace and a non-stub result file.
 `docs/FIRST-LIVE-RUN.md` has the full gate.

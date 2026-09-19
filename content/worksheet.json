@@ -11,7 +11,7 @@
     {
       "id": "rule",
       "level_tested": 0,
-      "prompt": "Can the job be done by a fixed rule, a search, or a plain form — with no model involved at all?",
+      "prompt": "Can the job be done by a fixed rule, a search, or a plain form, with no model involved at all?",
       "help": "If you could write the logic as an if/then rule, a lookup table, or a form with fixed fields, start there.",
       "answers": [
         {
@@ -45,17 +45,17 @@
         },
         {
           "id": "no",
-          "label": "No. It needs information the model was not given — documents, current data, or something specific to us.",
+          "label": "No. It needs information the model was not given: documents, current data, or something specific to us.",
           "action": "next",
           "next": "context",
-          "reason": "The right document or the right current fact has to be found and handed to the model before it can answer — nobody can write it all into a single request ahead of time."
+          "reason": "The right document or the right current fact has to be found and handed to the model before it can answer. Nobody can write it all into a single request ahead of time."
         }
       ]
     },
     {
       "id": "context",
       "level_tested": 2,
-      "prompt": "Does finding the right information and putting it in front of the model answer this — one search, or one set of documents, is enough?",
+      "prompt": "Does finding the right information and putting it in front of the model answer this, where one search or one set of documents is enough?",
       "help": "This covers answering from a manual, a knowledge base, or a set of notes, where a single lookup finds what is needed.",
       "answers": [
         {
@@ -78,7 +78,7 @@
       "id": "workflow",
       "level_tested": 3,
       "prompt": "Can every step be written down in advance, so your code decides what happens next and only asks the model to fill in each step?",
-      "help": "This covers sorting things into fixed categories, chaining a few prompts, or checking one draft against another — as long as the model never chooses which step comes next.",
+      "help": "This covers sorting things into fixed categories, chaining a few prompts, or checking one draft against another, as long as the model never chooses which step comes next.",
       "answers": [
         {
           "id": "yes",
@@ -89,17 +89,17 @@
         },
         {
           "id": "no",
-          "label": "No. It has to act on the world while it works — look something up live, run code, or operate something.",
+          "label": "No. It has to act on the world while it works: look something up live, run code, or operate something.",
           "action": "next",
           "next": "tools",
-          "reason": "Writing the steps down in advance is not enough once the task has to reach outside itself while it runs — something has to be looked up live, run, or operated, not just described."
+          "reason": "Writing the steps down in advance is not enough once the task has to reach outside itself while it runs: something has to be looked up live, run, or operated, not just described."
         }
       ]
     },
     {
       "id": "tools",
       "level_tested": 4,
-      "prompt": "Can the model do this by picking one bounded action — calling a function, running a lookup, clicking one thing — with your code carrying out that action and stopping there?",
+      "prompt": "Can the model do this by picking one bounded action (calling a function, running a lookup, clicking one thing), with your code carrying out that action and stopping there?",
       "help": "The model chooses which action to take and with what details, but only one action, and your code performs it and hands back the result.",
       "answers": [
         {
@@ -107,7 +107,7 @@
           "label": "Yes. One action; your code runs it and the task is done.",
           "action": "settle",
           "level": 4,
-          "reason": "The model can do this by picking one bounded action — a lookup, a function call, a click. Your code carries out that action and returns the result; the model does not chain actions together on its own."
+          "reason": "The model can do this by picking one bounded action: a lookup, a function call, a click. Your code carries out that action and returns the result; the model does not chain actions together on its own."
         },
         {
           "id": "no",
@@ -136,14 +136,14 @@
           "label": "No. Even one model working alone in a loop is not enough for this.",
           "action": "next",
           "next": "team",
-          "reason": "A single model, even one working alone in a loop, cannot cover this — the work needs a second, independent perspective, more than one agent's worth of room, or longer than one sitting."
+          "reason": "A single model, even one working alone in a loop, cannot cover this. The work needs a second, independent perspective, more than one agent's worth of room, or longer than one sitting."
         }
       ]
     },
     {
       "id": "team",
       "level_tested": 6,
-      "prompt": "Does the work need to be split across more than one agent or checked independently — or does it have to start on its own, or keep running for a long time?",
+      "prompt": "Does the work need to be split across more than one agent or checked independently, or does it have to start on its own or keep running for a long time?",
       "help": "Pick the closest answer. \"Independent\" means an agent with its own access, not a second pass by the same one.",
       "answers": [
         {
@@ -155,7 +155,7 @@
         },
         {
           "id": "review",
-          "label": "It needs a second, independent agent to check the work, with its own access — one agent checking itself shares its own blind spots.",
+          "label": "It needs a second, independent agent to check the work, with its own access: one agent checking itself shares its own blind spots.",
           "action": "settle",
           "level": 6,
           "relation": { "from": "evaluator-optimizer", "to": "debate-review" }
@@ -204,12 +204,12 @@
       "answers": [
         {
           "id": "easy",
-          "label": "Easily and fast — a glance, or a simple test, confirms it.",
+          "label": "Easily and fast: a glance, or a simple test, confirms it.",
           "caution": null
         },
         {
           "id": "effort",
-          "label": "It takes real effort — reading closely, or running it, to know if it is right.",
+          "label": "It takes real effort: reading closely, or running it, to know if it is right.",
           "caution": {
             "text": "Build the check into the process instead of relying on a read-through. A standing eval set catches drift a one-off spot check misses.",
             "relates_to": ["evals"]
@@ -217,7 +217,7 @@
         },
         {
           "id": "hard",
-          "label": "It is hard or impossible to check — there is no ground truth, or checking takes as long as doing the job.",
+          "label": "It is hard or impossible to check: there is no ground truth, or checking takes as long as doing the job.",
           "caution": {
             "text": "When nobody can easily confirm the result, treat it as unverified until proven otherwise, and keep a person responsible for what happens with it.",
             "relates_to": ["reviewing", "human-in-the-loop"]
@@ -231,12 +231,12 @@
       "answers": [
         {
           "id": "yes",
-          "label": "Yes, easily — nothing has shipped, been spent, or changed yet.",
+          "label": "Yes, easily: nothing has shipped, been spent, or changed yet.",
           "caution": null
         },
         {
           "id": "some",
-          "label": "With some effort — it can be corrected, but it takes real work.",
+          "label": "With some effort: it can be corrected, but it takes real work.",
           "caution": {
             "text": "Log every action taken so a wrong one can be traced and reversed without guessing what happened.",
             "relates_to": ["ops"]
@@ -244,7 +244,7 @@
         },
         {
           "id": "no",
-          "label": "No — money moved, a message went out, or something was deleted.",
+          "label": "No: money moved, a message went out, or something was deleted.",
           "caution": {
             "text": "An action that cannot be undone needs approval before it happens, not review after the fact.",
             "relates_to": ["human-in-the-loop", "safety"]
@@ -258,12 +258,12 @@
       "answers": [
         {
           "id": "no",
-          "label": "No — everything runs on infrastructure you control.",
+          "label": "No: everything runs on infrastructure you control.",
           "caution": null
         },
         {
           "id": "yes",
-          "label": "Yes — a cloud model or a third-party service sees it.",
+          "label": "Yes: a cloud model or a third-party service sees it.",
           "caution": {
             "text": "Know what leaves the machine and who can see it. Check the provider's data-handling terms before sending anything sensitive.",
             "relates_to": ["safety"]

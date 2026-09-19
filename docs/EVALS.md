@@ -10,7 +10,7 @@ you tell it to.
 
 The set asks one thing: here is a question about the documents, answer it and cite what you
 used. An example is scored when it does that. Twenty-six of the forty-four examples do something
-else — they are honest demonstrations of their own technique, but a score against this set would
+else: they are honest demonstrations of their own technique, but a score against this set would
 be a number about a task they were not written for, which is worse than no number. Asking the
 runner for one prints the reason and exits 2.
 
@@ -26,8 +26,8 @@ runner for one prints the reason and exits 2.
 
 `agent_harness` is scored for the same reason `single_agent` is: it takes the runner's
 `(question, model, embedder, tracer) -> Answer` signature and returns an answer with citations
-into the corpus. What it varies is everything around the model — the tool allowlist, the context
-policy, the approval hook and the caps — so running it against `single_agent` on the same
+into the corpus. What it varies is everything around the model (the tool allowlist, the context
+policy, the approval hook and the caps), so running it against `single_agent` on the same
 questions is how you see what a harness change costs and buys.
 
 `mcp` and `single_agent` are scored because both do the set's own task: they answer a question
@@ -97,8 +97,8 @@ trip. A real run should come in under the projection; if one does not, the proje
 and is the bug.
 
 One limit, worth knowing before you set a budget from a number. The ceiling holds for an example
-whose control flow does not read the model's text. Where it does — `routing` classifies the
-question and sends it down one of three branches — the stand-in's placeholder text is not a label
+whose control flow does not read the model's text. Where it does (`routing` classifies the
+question and sends it down one of three branches), the stand-in's placeholder text is not a label
 the example recognizes, so the projection follows the fallback branch, which is the cheapest one.
 Project a branching example from the branch you expect to be busiest instead: run `--dry` on a
 `--kind` subset that takes that branch, or read the branch's own token counts off the trace.
@@ -117,7 +117,7 @@ the rest; cached responses from the first run are reused (see below), so you onl
 still missing.
 
 `evals/budget.json` holds the dry-run ceiling per example as of 2026-09-18, a recommended cap for
-each, and a whole-run cap. **Nothing reads it automatically** — it is a record of what the
+each, and a whole-run cap. **Nothing reads it automatically**: it is a record of what the
 projection said and where the projection is not to be trusted, and you pass the number yourself.
 Two entries are not the dry number: `routing`, for the branching reason above, and
 `context_engineering`, which puts the whole document set in every prompt by design and is the one
@@ -143,8 +143,8 @@ Every response is cached by `(model_id, sha256 of the prompt payload)` under `.l
 changed.
 
 **If this is the first live run this repository has ever done, follow `docs/FIRST-LIVE-RUN.md`
-instead of this section.** It gives the order — one example and one question kind first, then a
-grader, then all 60 questions, then a recorded trace — and says what to look at between the
+instead of this section.** It gives the order (one example and one question kind first, then a
+grader, then all 60 questions, then a recorded trace) and says what to look at between the
 steps. This page describes the runner; that one describes the sitting.
 
 ## A metered run

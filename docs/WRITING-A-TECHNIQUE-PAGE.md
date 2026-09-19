@@ -19,7 +19,7 @@ sources:               # each needs title, url, accessed
 ```
 
 `status` is not frontmatter: it comes from `content/taxonomy.json`, so the two cannot disagree.
-Do **not** put `<Sources>` or `<Reviewed>` in the body — the page renders both from frontmatter,
+Do **not** put `<Sources>` or `<Reviewed>` in the body: the page renders both from frontmatter,
 after the generated blocks, so the reviewed date closes the page.
 
 ## Order of the body
@@ -71,7 +71,7 @@ to a field note or is cut.
 
 ## Sourcing
 
-Every factual claim about the world cites a primary source — the maker's own page — with a
+Every factual claim about the world cites a primary source (the maker's own page) with a
 `<Cite>` in the prose. Open the page and check it says the sentence. No measured result may be
 claimed: no result file exists, so the illustrative notice on `<CostStrip>` and `<Run>` stays.
 Where several companies make a thing, name at least two.
@@ -86,13 +86,13 @@ you typed is missing, because pages reference an id rather than typing the name.
 checks (rule 13), because neither fails the build on its own:
 
 - `h` must clear the lowest node. A node is drawn 19 units below its `y`, so `h` short by less
-  than that slices the last box in half — green build, wrong picture.
+  than that slices the last box in half: green build, wrong picture.
 - Keep every `x` inside the 340-unit canvas. A stray one widens the viewBox instead of clipping,
   which shrinks the whole diagram until the labels fall under 9 px on a phone.
 
 Every run file today carries `"illustrative": true`, which is what stops the site presenting a
 hand-drawn diagram as a measurement. **Do not remove that flag from a file you drew.** It comes
-off when a real recorded trace replaces the file — see `docs/FIRST-LIVE-RUN.md`.
+off when a real recorded trace replaces the file: see `docs/FIRST-LIVE-RUN.md`.
 
 An edge's `by` field is the same rule as a trace step's `decided_by`: see
 `examples/common/trace.py`, which is the single definition. If the diagram plays more
@@ -108,7 +108,7 @@ for effect. Explain a term the first time you use it. Three edits made to this p
 |---|---|
 | …expands how much a project can hold by up to ten times without a drop in response quality. | Anthropic says that expands capacity by up to ten times while maintaining response quality; that is the maker's claim, not a number this site has measured. |
 | Cohere Rerank is one product built for exactly this step. | Cohere and Jina AI both sell one. |
-| …compares it against an embedding already computed for every document chunk. | The documents are cut up in advance into chunks — passages of a few hundred words each — and every chunk is turned into an embedding. That set of embeddings is the index. |
+| …compares it against an embedding already computed for every document chunk. | The documents are cut up in advance into chunks (passages of a few hundred words each) and every chunk is turned into an embedding. That set of embeddings is the index. |
 
 ## Draft versus published
 
@@ -125,7 +125,7 @@ page must meet to become `published`, and the order the first live runs happen i
 1. Every `<Cite>` resolves to a source you opened today, and `accessed` says today.
 2. No sentence claims a measured number; the illustrative notices are intact.
 3. Every `<CodeFile>` range is code the prose actually walks through.
-4. No raw `](/…)` link anywhere — use `<Link>`, which applies the Pages base path. The validator
+4. No raw `](/…)` link anywhere: use `<Link>`, which applies the Pages base path. The validator
    catches this one for you, and a raw link is why: it builds green and 404s in production.
 5. Every `<CodeFile>` range carries an `expect=`, and every pin still points at what the prose
    walks through.

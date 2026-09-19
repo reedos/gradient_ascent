@@ -71,7 +71,7 @@ const pageDescription =
   <div class="page-hero">
     <div class="eyebrow muted"><span class="dot"></span>Timeline</div>
     <h1>When each level arrived</h1>
-    <p>{markSentence} "First" means the earliest the site could verify, not necessarily the true first use of an idea — see the method note at the bottom of this page.</p>
+    <p>{markSentence} "First" means the earliest the site could verify, not necessarily the true first use of an idea. See the method note at the bottom of this page.</p>
   </div>
 
   <section class="section" id="chart">
@@ -115,7 +115,7 @@ const pageDescription =
                 <td class="tl-hf-months">
                   {row.describedToAvailable
                     ? row.describedToAvailable.reversed
-                      ? `${row.describedToAvailable.months} mo — the product came first`
+                      ? `${row.describedToAvailable.months} mo (the product came first)`
                       : `${row.describedToAvailable.months} mo`
                     : '—'}
                 </td>
@@ -123,7 +123,7 @@ const pageDescription =
                   <td class="tl-hf-months">
                     {row.buildableToAvailable
                       ? row.buildableToAvailable.reversed
-                        ? `${row.buildableToAvailable.months} mo — the product came first`
+                        ? `${row.buildableToAvailable.months} mo (the product came first)`
                         : `${row.buildableToAvailable.months} mo`
                       : '—'}
                   </td>
@@ -135,10 +135,10 @@ const pageDescription =
       </table>
       </div>
       <p class="tl-howfast-note">
-        Every interval on this page is this site's own arithmetic over the dates above — calendar
+        Every interval on this page is this site's own arithmetic over the dates above: calendar
         months between two marked milestones, nothing more. "The product came first" marks a level
         where the earliest open framework or API for it (buildable) was not published until after a
-        finished product (available) already existed — the interval is real, just run the other way.
+        finished product (available) already existed; the interval is real, just run the other way.
         "First" means the earliest this site could verify, not asserted as the true first use of an
         idea; see the <a href={url('/method/')}>method page</a> for how a level is defined and how a
         date can be corrected.
@@ -158,7 +158,7 @@ const pageDescription =
         <p class="tl-howfast-note">
           Every date above is a choice between dated candidates. Each level lists what it
           considered and the one-line reason each was or was not marked, so the choice can be
-          argued with rather than taken on trust. A candidate can sit at another level — that is
+          argued with rather than taken on trust. A candidate can sit at another level; that is
           often why it lost.
         </p>
         {levelCandidates.map((lc) => (
@@ -179,7 +179,7 @@ const pageDescription =
                   ) : (
                     c.id
                   )}
-                  {' — '}{c.why}
+                  {'. '}{c.why}
                 </li>
               ))}
             </ul>
@@ -192,8 +192,8 @@ const pageDescription =
       {gaps.map((g) => (
         <div class="tl-gap-row">
           <span>
-            Level {g.fromLevel} ({levelTitle(g.fromLevel)}) to level {g.toLevel} ({levelTitle(g.toLevel)}) — available to available
-            {g.interval?.reversed && <> — level {g.toLevel} arrived first</>}
+            Level {g.fromLevel} ({levelTitle(g.fromLevel)}) to level {g.toLevel} ({levelTitle(g.toLevel)}), available to available
+            {g.interval?.reversed && <>; level {g.toLevel} arrived first</>}
           </span>
           <b>{g.interval ? `${g.interval.months} mo` : 'no single available date for one of these levels'}</b>
         </div>
@@ -282,7 +282,7 @@ const pageDescription =
       title="Grouped by year, newest first"
     />
     <p class="footnote reading" id="timeline-list-heading">
-      Newest year first, newest date first within a year — the direction a reader checking "what's
+      Newest year first, newest date first within a year: the direction a reader checking "what's
       new" would scan. This list is the chart's full text alternative: every milestone above
       appears here once, with its date, maker, one-sentence description, source and links.
     </p>
@@ -335,7 +335,7 @@ const pageDescription =
         <p>
           Nothing on this page is final: it is what this site could verify as of {usDate(asOf)}. A reader
           who finds an earlier verifiable source, or a wrong date, corrects it the way any page
-          here is corrected — see <a href={url('/method/')}>the method page</a> for how a level is
+          here is corrected. See <a href={url('/method/')}>the method page</a> for how a level is
           defined and how the site changes. The full method behind this specific page's dates is
           in <code>docs/TIMELINE-METHOD.md</code> in the site's repository.
         </p>

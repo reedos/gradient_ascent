@@ -12,7 +12,7 @@
       "described": "eliza-1966",
       "buildable": "scikit-learn-first-release",
       "available": null,
-      "note": "Level 0 has no model, so it has no maker announcing general availability the way the other levels do. Products built from rules, search and forms — spreadsheets, form validators, search boxes, spam filters — have been sold to ordinary customers for decades, by many makers, none of whom announced “level 0”, so there is no single date to mark and the site does not invent one. 'buildable' is the earliest general-purpose library the site could verify that let a developer use a level-0 technique (classical machine learning) without writing the algorithm themselves. Rule-based keyword matching (ELIZA, 1966) is decades older than any such packaged library; that gap is real, not a gap in sourcing.",
+      "note": "Level 0 has no model, so it has no maker announcing general availability the way the other levels do. Products built from rules, search and forms (spreadsheets, form validators, search boxes, spam filters) have been sold to ordinary customers for decades, by many makers, none of whom announced “level 0”, so there is no single date to mark and the site does not invent one. 'buildable' is the earliest general-purpose library the site could verify that let a developer use a level-0 technique (classical machine learning) without writing the algorithm themselves. Rule-based keyword matching (ELIZA, 1966) is decades older than any such packaged library; that gap is real, not a gap in sourcing.",
       "candidates": [
         {
           "mark": "described",
@@ -45,7 +45,7 @@
       "described": "gpt-2-post-2019",
       "buildable": "transformers-library-2018",
       "available": "chatgpt-launch",
-      "note": "ChatGPT's launch page will not open from here — openai.com returns 403 — so the date is verified against the Internet Archive's capture of that same page, taken six days later. OpenAI called it a research preview and it was free, but nobody needed an invitation, which is why the site marks it rather than a later date.",
+      "note": "ChatGPT's launch page will not open from here (openai.com returns 403), so the date is verified against the Internet Archive's capture of that same page, taken six days later. OpenAI called it a research preview and it was free, but nobody needed an invitation, which is why the site marks it rather than a later date.",
       "candidates": [
         {
           "mark": "described",
@@ -120,7 +120,7 @@
           "mark": "buildable",
           "id": "openai-embeddings-2022",
           "chosen": false,
-          "why": "January 25, 2022, and it produces vectors only — the developer still writes the retrieval and the prompt."
+          "why": "January 25, 2022, and it produces vectors only: the developer still writes the retrieval and the prompt."
         },
         {
           "mark": "available",
@@ -165,7 +165,7 @@
           "mark": "buildable",
           "id": "langchain-release-2022",
           "chosen": true,
-          "why": "0.0.1 on PyPI, October 25, 2022 — the chaining plumbing a developer stopped writing."
+          "why": "0.0.1 on PyPI, October 25, 2022: the chaining plumbing a developer stopped writing."
         },
         {
           "mark": "buildable",
@@ -291,7 +291,7 @@
           "mark": "available",
           "id": "devin-2024",
           "chosen": false,
-          "why": "March 12, 2024 but “in early access as we ramp up capacity” — an invitation."
+          "why": "March 12, 2024 but “in early access as we ramp up capacity”: an invitation."
         },
         {
           "mark": "available",
@@ -548,7 +548,7 @@
       "kind": "research",
       "title": "XGBoost: A Scalable Tree Boosting System",
       "maker": "Tianqi Chen and Carlos Guestrin",
-      "what": "The paper describes a scalable tree boosting system \"used widely by data scientists to achieve state-of-the-art results\" — classical machine learning, no language model anywhere in it, still advancing in the middle of the deep-learning decade.",
+      "what": "The paper describes a scalable tree boosting system \"used widely by data scientists to achieve state-of-the-art results\". Classical machine learning, no language model anywhere in it, still advancing in the middle of the deep-learning decade.",
       "technique": "order-zero",
       "registry_id": "xgboost",
       "source": {
@@ -644,7 +644,7 @@
       "kind": "research",
       "title": "GPT-3: Language Models are Few-Shot Learners",
       "maker": "OpenAI",
-      "what": "OpenAI's paper describes \"an autoregressive language model with 175 billion parameters\" applied \"without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction\" — the one-call pattern that prompt engineering works within.",
+      "what": "OpenAI's paper describes \"an autoregressive language model with 175 billion parameters\" applied \"without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction\". That is the one-call pattern that prompt engineering works within.",
       "technique": "prompt-engineering",
       "source": {
         "title": "Language Models are Few-Shot Learners",
@@ -743,7 +743,7 @@
       "kind": "research",
       "title": "GPT-4 Technical Report",
       "maker": "OpenAI",
-      "what": "OpenAI's technical report describes \"a large-scale, multimodal model which can accept image and text inputs and produce text outputs\", and reports that it \"exhibits human-level performance on various professional and academic benchmarks\" — OpenAI's own evaluation of its own model.",
+      "what": "OpenAI's technical report describes \"a large-scale, multimodal model which can accept image and text inputs and produce text outputs\", and reports that it \"exhibits human-level performance on various professional and academic benchmarks\". That is OpenAI's own evaluation of its own model.",
       "technique": "multimodal",
       "source": {
         "title": "GPT-4 Technical Report",
@@ -876,7 +876,7 @@
       "kind": "model",
       "title": "DeepSeek-V4.1-Flash",
       "maker": "DeepSeek",
-      "what": "DeepSeek's release note of September 10, 2026 says \"V4.1-Flash is now live on the DeepSeek API with native multimodal support\", describing a mixture-of-experts model with 552B parameters and 8B active for input, 16B for output — a frontier-class open-weight release, one call at a time.",
+      "what": "DeepSeek's release note of September 10, 2026 says \"V4.1-Flash is now live on the DeepSeek API with native multimodal support\", describing a mixture-of-experts model with 552B parameters and 8B active for input, 16B for output: a frontier-class open-weight release, one call at a time.",
       "technique": "chat",
       "registry_id": "deepseek-v4.1-flash",
       "source": {
@@ -916,7 +916,7 @@
       "kind": "tool",
       "title": "FAISS",
       "maker": "Facebook AI Research",
-      "what": "GitHub's record of facebookresearch/faiss gives a creation date of February 7, 2017 and describes it as \"A library for efficient similarity search and clustering of dense vectors\" — the open library a developer could build vector search over their own documents with, and still the substrate under most retrieval code.",
+      "what": "GitHub's record of facebookresearch/faiss gives a creation date of February 7, 2017 and describes it as \"A library for efficient similarity search and clustering of dense vectors\". That is the open library a developer could build vector search over their own documents with, and it is still the substrate under most retrieval code.",
       "technique": "embeddings-search",
       "registry_id": "faiss",
       "source": {
@@ -1233,7 +1233,7 @@
       "kind": "product",
       "title": "OpenAI steps in Zapier",
       "maker": "Zapier",
-      "what": "Zapier's own OpenAI integration page offers an action that “Sends a prompt to OpenAI and generate a response” inside a multi-step Zap, and says “Zapier lets you connect OpenAI with thousands of the most popular apps, so you can automate your work and have more time for what matters most—no code required.” The flow decides what runs next; one of its steps calls a model. The page carries no launch date, so the date marked here is the earliest capture of it this site could read — the feature was live by then, and may well have shipped earlier.",
+      "what": "Zapier's own OpenAI integration page offers an action that “Sends a prompt to OpenAI and generate a response” inside a multi-step Zap, and says “Zapier lets you connect OpenAI with thousands of the most popular apps, so you can automate your work and have more time for what matters most—no code required.” The flow decides what runs next; one of its steps calls a model. The page carries no launch date, so the date marked here is the earliest capture of it this site could read: the feature was live by then, and may well have shipped earlier.",
       "technique": "prompt-chaining",
       "registry_id": "zapier",
       "source": {
@@ -1401,7 +1401,7 @@
       "kind": "research",
       "title": "Building Effective Agents",
       "maker": "Anthropic",
-      "what": "Anthropic's engineering post names and diagrams five workflow patterns — prompt chaining, routing, parallelization, orchestrator-workers and evaluator-optimizer — and advises: \"Start with simple prompts, optimize them with comprehensive evaluation, and add multi-step agentic systems only when simpler solutions fall short.\"",
+      "what": "Anthropic's engineering post names and diagrams five workflow patterns (prompt chaining, routing, parallelization, orchestrator-workers and evaluator-optimizer) and advises: \"Start with simple prompts, optimize them with comprehensive evaluation, and add multi-step agentic systems only when simpler solutions fall short.\"",
       "technique": "evaluator-optimizer",
       "source": {
         "title": "Building Effective AI Agents",
@@ -1457,7 +1457,7 @@
       "kind": "research",
       "title": "Toolformer",
       "maker": "Schick et al., Meta AI",
-      "what": "The paper describes a model trained in a self-supervised way, from a handful of examples per API, to \"decide which APIs to call, when to call them, what arguments to pass, and how to best incorporate the results into future token prediction\" — the model choosing the action, not code choosing it for the model.",
+      "what": "The paper describes a model trained in a self-supervised way, from a handful of examples per API, to \"decide which APIs to call, when to call them, what arguments to pass, and how to best incorporate the results into future token prediction\": the model choosing the action, not code choosing it for the model.",
       "technique": "function-calling",
       "source": {
         "title": "Toolformer: Language Models Can Teach Themselves to Use Tools",
@@ -1585,7 +1585,7 @@
       "kind": "product",
       "title": "Claude analysis tool",
       "maker": "Anthropic",
-      "what": "Anthropic's announcement describes a tool that lets Claude \"write and run JavaScript code directly in Claude.ai\" to \"process data, conduct analysis, and produce real-time insights\", available to \"all Claude.ai users in feature preview\" — code execution reaching people who write none.",
+      "what": "Anthropic's announcement describes a tool that lets Claude \"write and run JavaScript code directly in Claude.ai\" to \"process data, conduct analysis, and produce real-time insights\", available to \"all Claude.ai users in feature preview\": code execution reaching people who write none.",
       "technique": "code-execution",
       "registry_id": "claude-app",
       "source": {
@@ -1720,7 +1720,7 @@
       "kind": "product",
       "title": "Replit Agent",
       "maker": "Replit",
-      "what": "Replit's post says “Last week, we launched Replit Agent, our AI system that can create and deploy applications”, and that “It configures your development environment, installs dependencies, and executes code” — the model choosing each next step and stopping when the app runs. Replit adds: “The agent is available today in early access to all Replit Core subscribers” and “it should be treated as ‘alpha’ software.” A subscription, not an invitation.",
+      "what": "Replit's post says “Last week, we launched Replit Agent, our AI system that can create and deploy applications”, and that “It configures your development environment, installs dependencies, and executes code”: the model choosing each next step and stopping when the app runs. Replit adds: “The agent is available today in early access to all Replit Core subscribers” and “it should be treated as ‘alpha’ software.” A subscription, not an invitation.",
       "technique": "coding-agents",
       "registry_id": "replit-agent",
       "source": {
@@ -1908,7 +1908,7 @@
       "kind": "standard",
       "title": "Agent Skills",
       "maker": "Anthropic",
-      "what": "Anthropic's announcement says \"Skills are folders that include instructions, scripts, and resources that Claude can load when needed\", and that \"Claude will only access a skill when it's relevant to the task at hand\" — the agent deciding which of its own instructions to read.",
+      "what": "Anthropic's announcement says \"Skills are folders that include instructions, scripts, and resources that Claude can load when needed\", and that \"Claude will only access a skill when it's relevant to the task at hand\": the agent deciding which of its own instructions to read.",
       "technique": "skills",
       "registry_id": "agent-skills",
       "source": {
@@ -2103,7 +2103,7 @@
       "kind": "research",
       "title": "Generative Agents",
       "maker": "Park et al., Stanford University and Google Research",
-      "what": "The paper puts \"a small town of twenty five agents\" in a sandbox. Its architecture, in the paper's words, is one that agents use to \"store a complete record of the agent's experiences using natural language, synthesize those memories over time into higher-level reflections, and retrieve them dynamically to plan behavior\" — agents that decide when to act, not only what to answer.",
+      "what": "The paper puts \"a small town of twenty five agents\" in a sandbox. Its architecture, in the paper's words, is one that agents use to \"store a complete record of the agent's experiences using natural language, synthesize those memories over time into higher-level reflections, and retrieve them dynamically to plan behavior\": agents that decide when to act, not only what to answer.",
       "technique": "long-horizon",
       "source": {
         "title": "Generative Agents: Interactive Simulacra of Human Behavior",
@@ -2140,7 +2140,7 @@
       "kind": "product",
       "title": "Manus",
       "maker": "Manus",
-      "what": "Manus describes itself, on its own site, as building \"general AI agents as the Action Engine for life\" and as \"building the hands for AI to do\" rather than the reasoning underneath — an agent a person points at a goal and lets run.",
+      "what": "Manus describes itself, on its own site, as building \"general AI agents as the Action Engine for life\" and as \"building the hands for AI to do\" rather than the reasoning underneath: an agent a person points at a goal and lets run.",
       "technique": "long-horizon",
       "registry_id": "manus",
       "source": {
@@ -2240,7 +2240,7 @@
       "kind": "model",
       "title": "π0.7",
       "maker": "Physical Intelligence",
-      "what": "Physical Intelligence's post calls π0.7 \"a steerable generalist model that can perform dexterous tasks across robots, scenes, and skills\", and reports \"compositional generalization, recombining skills from various tasks to solve new problems\" — including a robot folding laundry with no laundry-folding data in its training.",
+      "what": "Physical Intelligence's post calls π0.7 \"a steerable generalist model that can perform dexterous tasks across robots, scenes, and skills\", and reports \"compositional generalization, recombining skills from various tasks to solve new problems\", including a robot folding laundry with no laundry-folding data in its training.",
       "technique": "embodied",
       "registry_id": "pi0-7",
       "source": {

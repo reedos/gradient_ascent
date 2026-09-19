@@ -269,7 +269,7 @@ function ResultView({
             Why not level {pad(info.next.order)}, {info.next.title}?
           </strong>
           {info.next.description} It would take more to build, more to test and more ways to
-          fail quietly — worth it only once level {pad(info.order)} has actually fallen short,
+          fail quietly: worth it only once level {pad(info.order)} has actually fallen short,
           not because it might. A proposal that skips several levels has to clear that same test
           at every level in between.
         </div>

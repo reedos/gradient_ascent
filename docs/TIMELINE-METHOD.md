@@ -5,12 +5,12 @@ published measures of pace.
 
 ## Three dates per level
 
-- **described** — the earliest publication this site could verify describing the level's defining
+- **described**: the earliest publication this site could verify describing the level's defining
   idea in a form recognizable today: a paper, or a maker's own technical post. A paper's date is
   its arXiv v1 submission, not a later revision or the conference publication.
-- **buildable** — the earliest release this site could verify of an open framework, library or
+- **buildable**: the earliest release this site could verify of an open framework, library or
   API a developer could build the level with rather than from scratch. Someone still builds it.
-- **available** (shown as "Reached the public") — the launch of the widely known product that
+- **available** (shown as "Reached the public"): the launch of the widely known product that
   first put the level in front of ordinary people, dated from its maker's own page. See "The
   mark is the product people know" below.
 
@@ -59,13 +59,13 @@ it was taken, so a milestone verified that way rests on a primary source.
 
 It records the original page in `source.url`, the capture read in `source.archive_url`, and is
 `verified: true` only if that capture shows **both the date and the fact**. Where it shows the
-product but no date — ChatGPT Work, Manus — the milestone stays unverified. A host that does open
+product but no date (ChatGPT Work, Manus), the milestone stays unverified. A host that does open
 (`developers.openai.com`, GitHub, arXiv) is preferred to any capture.
 
 ## Previews, waitlists and paid plans
 
 A first announcement is often not the day anyone could use the thing. Product milestones carry an
-optional `availability` — `general`, `preview`, `waitlist` or `paid plans`. `available` marks the
+optional `availability`: `general`, `preview`, `waitlist` or `paid plans`. `available` marks the
 earliest date a customer could get in **without an invitation**: a subscription counts, a
 waitlist does not. ChatGPT plugins were alpha access from a waitlist on March 23, 2023, so level 4
 marks May 12, 2023, when every Plus subscriber got them. Where no invitation-free date verifies,
@@ -84,7 +84,7 @@ A marked date is a decision between dated candidates. Every level carries a `can
 each milestone considered, whether it was chosen, and a one-line reason. These print on
 `/timeline/` under **What each marked date beat**. Two are openly debatable: level 6's
 `available` reads two Anthropic pages together (sold April 2025, documented as multi-agent June
-2025), and level 3's is the earliest capture of a page that states no launch date — that feature
+2025), and level 3's is the earliest capture of a page that states no launch date; that feature
 was live *by* then rather than *on* then.
 
 ## Measures, and arithmetic
