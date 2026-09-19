@@ -46,9 +46,9 @@ its own command; `examples/rag/README.md` is the one to read first.
 | `examples/<technique>/` | One runnable example per technique: `run.py` (the technique, ~50 readable lines), `__main__.py` (the command line), `README.md` (what it shows and how to run it). |
 | `examples/common/` | The thin model interface (`model.py`), the trace recorder (`trace.py`), the shared tools and agent-loop plumbing. Start here to understand any example. |
 | `evals/` | The synthetic document set (`corpus/`), the 60 questions (`questions.json`), and the projected token budget (`budget.json`). |
-| `scripts/` | `validate.py` (content rules), `eval_run.py` (the eval runner), `record_trace.py` (records one run). |
+| `scripts/` | `validate.py` (content rules), `eval_run.py` (the eval runner), `record_trace.py` (records one run), `import_eci.py` (refreshes the capability snapshot; the only script that uses the network), `preview_server.py` (serves the built site under its base path). |
 | `tests/` | The Python suite. Stdlib `unittest`, no network, no fixtures outside the repository. |
-| `content/` | `taxonomy.json` (the levels, tracks, recipes, teardowns and typed edges between pages), `landscape.json` (the registry of named models, products and tools), `glossary.json`, `timeline.json`, `worksheet.json`. |
+| `content/` | `taxonomy.json` (the levels, tracks, recipes, teardowns and typed edges between pages), `landscape.json` (the registry of named models, products and tools), `glossary.json`, `timeline.json`, `worksheet.json`, and `capability.json` (a dated snapshot of Epoch AI's Epoch Capabilities Index, CC BY 4.0, drawn on the timeline page). |
 | `site/` | The Astro site: MDX pages in `src/content/`, Preact islands in `src/components/islands/`, run diagrams in `src/data/runs/`. |
 
 ## The docs

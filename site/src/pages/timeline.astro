@@ -6,6 +6,7 @@ import { usDate } from '../lib/dates';
 import Base from '../layouts/Base.astro';
 import SectionTop from '../components/SectionTop.astro';
 import Timeline from '../components/Timeline.astro';
+import CapabilityChart from '../components/CapabilityChart.astro';
 import { url } from '../lib/url';
 import { levels as taxonomyLevels } from '../lib/content';
 import {
@@ -242,6 +243,15 @@ const pageDescription =
       </section>
     )
   }
+
+  <section class="section" id="capability">
+    <SectionTop
+      eyebrow="How fast"
+      title="What the models could do over the same years"
+      aside="Every model Epoch AI has scored, by release date, with the best score to date drawn over them and this site's level dates underneath."
+    />
+    <CapabilityChart />
+  </section>
 
   {
     measures.length > 0 && (

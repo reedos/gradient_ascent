@@ -1,0 +1,183 @@
+---
+// Epoch AI's Epoch Capabilities Index by model release date, the frontier over it, and this
+// site's level dates and the reasoning-models shift marked against it. Static SVG built at build
+// time from content/capability.json (scripts/import_eci.py refreshes it). No client JavaScript.
+//
+// The scores are Epoch's, reused under CC BY 4.0 and credited under the chart. This site draws
+// them, draws their running maximum, and does one subtraction for the caption, labeled as its own.
+import snapshotData from '../../../content/capability.json';
+import { usDate } from '../lib/dates';
+import { url } from '../lib/url';
+import { formatDate, levelSeries, shifts, milestone as milestoneById, asOf } from '../lib/timeline';
+import { levels as taxonomyLevels } from '../lib/content';
+import {
+  frontier,
+  frontierAt,
+  frontierChange,
+  frontierPath,
+  labeledFrontier,
+  makeScale,
+  sx,
+  sy,
+  yearOf,
+  type CapabilitySnapshot,
+} from '../lib/capability';
+import '../styles/capability.css';
+
+const snap = snapshotData as unknown as CapabilitySnapshot;
+const W = 1000;
+const H = 496;
+const START = '2022-10-01';
+const scale = makeScale(snap.points, { startISO: START, endISO: asOf, width: W, height: H, pad: { l: 44, r: 18, t: 30, b: 112 } });
+const front = frontier(snap.points);
+const path = frontierPath(scale, front, asOf);
+const named = labeledFrontier(scale, front, 92);
+const r1 = (n: number) => Math.round(n * 10) / 10;
+
+const yTicks: number[] = [];
+for (let v = scale.y0; v <= scale.y1; v += 20) yTicks.push(v);
+const years: number[] = [];
+for (let y = Math.ceil(scale.x0); y <= Math.floor(scale.x1); y++) years.push(y);
+
+// This site's own dates, along the bottom: when each level reached the public.
+const levelMarks = levelSeries()
+  .map((s) => ({ level: s.level, mark: s.marks.find((m) => m.key === 'available') }))
+  .filter((x) => x.mark && x.mark.milestone.date >= START)
+  .map((x) => ({
+    level: x.level,
+    title: taxonomyLevels.find((t) => t.order === x.level)?.title ?? `Level ${x.level}`,
+    product: x.mark!.milestone.short ?? x.mark!.milestone.title,
+    date: x.mark!.milestone.date,
+    x: r1(sx(scale, yearOf(x.mark!.milestone.date))),
+    row: 0,
+  }));
+// Two levels can launch within days of each other (3 and 4 did). A marker that would sit on its
+// neighbor drops to a second row.
+for (let i = 1; i < levelMarks.length; i++) {
+  if (levelMarks[i].x - levelMarks[i - 1].x < 22 && levelMarks[i - 1].row === 0) levelMarks[i].row = 1;
+}
+
+const reasoning = shifts.find((s) => s.id === 'reasoning-models');
+const reasoningM = reasoning ? milestoneById(reasoning.milestone) : undefined;
+const shiftX = reasoningM ? r1(sx(scale, yearOf(reasoningM.date))) : undefined;
+
+// The caption's two figures. Anchored on two named releases, not on a window chosen to flatter:
+// from GPT-4 to the day before the first reasoning model, and from that day to the snapshot.
+const gpt4 = front.find((p) => p.name.startsWith('GPT-4 (Mar 2023)')) ?? front[0];
+const dayBefore = (iso: string) => new Date(Date.parse(`${iso}T00:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
+const before = reasoningM ? frontierChange(front, gpt4.date, dayBefore(reasoningM.date)) : null;
+const after = reasoningM ? frontierChange(front, dayBefore(reasoningM.date), asOf) : null;
+const top = front[front.length - 1];
+const longDate = (iso: string) => formatDate(iso, 'day');
+---
+
+<figure class="cap">
+  <div class="cap-scroll">
+    <svg class="cap-svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby="cap-title cap-desc">
+      <title id="cap-title">Epoch Capabilities Index by model release date, {Math.ceil(scale.x0)} to {usDate(asOf)}</title>
+      <desc id="cap-desc">
+        {snap.points.length} models scored by Epoch AI, plotted by release date. A stepped line follows the best score to date, from {front[0].eci} to {top.eci}. Markers under the axis show when each of this site's levels reached the public, and a vertical line marks the first reasoning model.
+      </desc>
+      <defs>
+        <linearGradient id="cap-grad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="var(--mk1)" />
+          <stop offset=".4" stop-color="var(--mk2)" />
+          <stop offset=".75" stop-color="var(--mk3)" />
+          <stop offset="1" stop-color="var(--mk4)" />
+        </linearGradient>
+      </defs>
+
+      {yTicks.map((v) => (
+        <g>
+          <line class="cap-grid" x1={scale.left} x2={scale.right} y1={r1(sy(scale, v))} y2={r1(sy(scale, v))} />
+          <text class="cap-tick" x={scale.left - 8} y={r1(sy(scale, v)) + 3.5} text-anchor="end">{v}</text>
+        </g>
+      ))}
+      {years.map((y) => (
+        <g>
+          <line class="cap-grid is-v" x1={r1(sx(scale, y))} x2={r1(sx(scale, y))} y1={scale.top} y2={scale.bottom} />
+          <text class="cap-tick" x={r1(sx(scale, y))} y={scale.bottom + 16} text-anchor="middle">{y}</text>
+        </g>
+      ))}
+      <text class="cap-axis" x={scale.left - 34} y={scale.top - 12}>ECI score</text>
+
+      {shiftX !== undefined && reasoningM && (
+        <g>
+          <line class="cap-shift" x1={shiftX} x2={shiftX} y1={scale.top - 6} y2={scale.bottom} />
+          <text class="cap-shift-label" x={shiftX - 7} y={scale.top + 4} text-anchor="end">First reasoning model · {formatDate(reasoningM.date.slice(0, 7), 'month')}</text>
+        </g>
+      )}
+
+      <g class="cap-points">
+        {snap.points.map((p) => (
+          <circle class:list={['cap-dot', p.open && 'is-open']} cx={r1(sx(scale, yearOf(p.date)))} cy={r1(sy(scale, p.eci))} r="2.7">
+            <title>{`${p.name}${p.org ? `, ${p.org}` : ''} · ${p.eci} · ${usDate(p.date)}`}</title>
+          </circle>
+        ))}
+      </g>
+
+      <path class="cap-frontier" d={path} stroke="url(#cap-grad)" fill="none" />
+      {front.map((p) => (
+        <circle class="cap-front-dot" cx={r1(sx(scale, yearOf(p.date)))} cy={r1(sy(scale, p.eci))} r="3.4">
+          <title>{`New high: ${p.name}${p.org ? `, ${p.org}` : ''} · ${p.eci} · ${usDate(p.date)}`}</title>
+        </circle>
+      ))}
+      {named.map((p) => (
+        <text class="cap-name" x={r1(sx(scale, yearOf(p.date))) - 6} y={r1(sy(scale, p.eci)) - 8} text-anchor="end">{p.name.replace(/ \(.*\)$/, '')}</text>
+      ))}
+
+      {levelMarks.map((m) => (
+        <a href={url(`/levels/${m.level}/`)} class="cap-level" style={`--c:var(--o${m.level})`} aria-label={`Level ${m.level}, ${m.title}: ${m.product}, ${longDate(m.date)}`}>
+          <line x1={m.x} x2={m.x} y1={scale.bottom} y2={scale.bottom + 52 + m.row * 24} />
+          <circle cx={m.x} cy={scale.bottom + 62 + m.row * 24} r="9" />
+          <text x={m.x} y={scale.bottom + 66 + m.row * 24} text-anchor="middle">{m.level}</text>
+          <title>{`Level ${m.level}, ${m.title}: ${m.product}, ${longDate(m.date)}`}</title>
+        </a>
+      ))}
+      <text class="cap-axis is-halo" x={scale.right} y={scale.bottom + 38} text-anchor="end">When each level reached the public</text>
+    </svg>
+  </div>
+
+  <ul class="cap-legend">
+    <li><span class="cap-key is-closed" /> A model, closed weights</li>
+    <li><span class="cap-key is-open" /> A model, open weights</li>
+    <li><span class="cap-key is-line" /> Best score to date</li>
+    <li><span class="cap-key is-level" /> A level of this site reaching the public</li>
+  </ul>
+
+  <figcaption>
+    <p>
+      {snap.what_it_is.replace(/^The Epoch Capabilities Index \(ECI\)/, 'Epoch AI’s Capabilities Index')} Epoch adds that
+      “Absolute ECI values are meaningless by themselves, but meaningful comparisons can be made between models.”
+      So read the shape, not the numbers.
+    </p>
+    {before && after && reasoningM && (
+      <p>
+        The shape has a bend in it. From {gpt4.name.replace(/ \(.*\)$/, '')} on {longDate(gpt4.date)} to the day before the first
+        reasoning model, {before.months} months, the best score rose {before.points} points, from {before.from} to {before.to}. In the {after.months} months
+        since, it has risen {after.points}, to {top.eci} ({top.name}, {longDate(top.date)}). Levels 1 to 4 reached the public
+        before the bend; agents, teams of agents and always-on products all arrived after it. Both figures are this
+        site’s subtraction over Epoch’s scores. The index starts in early 2023, so it says nothing about what came before.
+      </p>
+    )}
+    <details class="cap-table">
+      <summary>The {front.length} models that set a new high</summary>
+      <div class="cap-table-scroll">
+        <table>
+          <thead><tr><th>Released</th><th>Model</th><th>Maker</th><th>Score</th></tr></thead>
+          <tbody>
+            {front.map((p) => (
+              <tr><td>{usDate(p.date)}</td><td>{p.name}</td><td>{p.org ?? '—'}</td><td>{p.eci}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </details>
+    <p class="cap-credit">
+      Data: <a href={snap.source.url} rel="noopener">{snap.source.title}</a>, {snap.source.publisher}, reused under{' '}
+      <a href={snap.source.license_url} rel="noopener">{snap.source.license}</a>, retrieved {usDate(snap.retrieved)}; {snap.points.length} models.
+      Scores, release dates and makers are Epoch’s, unchanged apart from rounding. The level markers and the reasoning line are this site’s.
+      Best score on the day of the snapshot: {frontierAt(front, asOf)}.
+    </p>
+  </figcaption>
+</figure>

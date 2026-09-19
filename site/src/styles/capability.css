@@ -1,0 +1,38 @@
+/* The capability chart (components/CapabilityChart.astro): Epoch's index by release date, the
+   frontier, and this site's level dates under the axis. */
+.cap { margin: 0 }
+.cap-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); padding: 14px 10px 6px }
+.cap-svg { display: block; width: 100%; min-width: 760px; height: auto }
+.cap-grid { stroke: var(--line); stroke-width: 1; stroke-dasharray: 2 5 }
+.cap-grid.is-v { stroke-dasharray: none; opacity: .5 }
+.cap-tick { fill: var(--muted); font: 400 11px var(--font); font-variant-numeric: tabular-nums }
+.cap-axis { fill: var(--muted); font: 600 9.5px var(--font); letter-spacing: 1.2px; text-transform: uppercase }
+.cap-axis.is-halo { paint-order: stroke; stroke: var(--panel); stroke-width: 6px; stroke-linejoin: round }
+.cap-dot { fill: var(--muted); opacity: .5 }
+.cap-dot.is-open { fill: var(--panel); stroke: var(--muted); stroke-width: 1.1; opacity: .75 }
+.cap-frontier { stroke-width: 2.2; stroke-linejoin: round }
+.cap-front-dot { fill: var(--text) }
+.cap-name { fill: var(--text); font: 500 10.5px var(--font); paint-order: stroke; stroke: var(--panel); stroke-width: 4px; stroke-linejoin: round }
+.cap-shift { stroke: var(--text); stroke-width: 1; opacity: .35 }
+.cap-shift-label { fill: var(--text); font: 500 10.5px var(--font) }
+.cap-level line { stroke: var(--c); stroke-width: 1; opacity: .55 }
+.cap-level circle { fill: var(--panel); stroke: var(--c); stroke-width: 1.5 }
+.cap-level text { fill: var(--c); font: 600 11px var(--display) }
+.cap-level:hover circle, .cap-level:focus-visible circle { fill: var(--panel2) }
+.cap-legend { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 11.5px; color: var(--muted) }
+.cap-legend li { display: inline-flex; align-items: center; gap: 8px }
+.cap-key { display: inline-block; width: 9px; height: 9px; border-radius: 50% }
+.cap-key.is-closed { background: var(--muted); opacity: .6 }
+.cap-key.is-open { border: 1.2px solid var(--muted) }
+.cap-key.is-line { width: 18px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, var(--mk1), var(--mk2), var(--mk3), var(--mk4)) }
+.cap-key.is-level { border: 1.5px solid var(--o5) }
+.cap figcaption { margin-top: 18px; display: flex; flex-direction: column; gap: 12px }
+.cap figcaption p { font-size: 13.5px; line-height: 1.65; color: var(--muted); max-width: 78ch }
+.cap figcaption p.cap-credit { font-size: 11.5px; line-height: 1.7 }
+.cap figcaption a { color: var(--accent) }
+.cap-table summary { cursor: pointer; font-size: 12.5px; color: var(--text); padding: 6px 0 }
+.cap-table-scroll { overflow-x: auto; margin-top: 8px }
+.cap-table table { border-collapse: collapse; font-size: 12.5px; min-width: 440px }
+.cap-table th, .cap-table td { text-align: left; padding: 6px 18px 6px 0; border-bottom: 1px solid var(--line); color: var(--muted); font-variant-numeric: tabular-nums }
+.cap-table th { font: 600 10px var(--font); letter-spacing: 1.2px; text-transform: uppercase }
+.cap-table td:nth-child(2) { color: var(--text) }
