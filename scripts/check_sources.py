@@ -18,7 +18,10 @@ What it reports per source:
               citation already records an archive_url, which is the copy the page actually
               quotes: handled, not a defect
   moved       it redirects somewhere else (the new address is printed)
-  drifted     it resolves, but the page's own <title> no longer resembles the title we cite
+  drifted     it resolves, but the page's own <title> no longer resembles the title we cite.
+              Where the page's text still names the thing anyway, the line says so: that is
+              usually a maker's page titled after the maker rather than after the product, and
+              not a defect at all
   blocked     the host refuses automated requests, twice; not a defect, read it by hand. Meta
               and ISO answer a script with 400 or 403 however the request is dressed
 
@@ -163,6 +166,40 @@ def _words(text: str) -> set[str]:
     return {w for w in re.findall(r"[a-z0-9]+", text.lower()) if w not in small and len(w) > 2}
 
 
+def _text_of(html: str) -> str:
+    """Tags out, entities left alone. Good enough to ask whether a page still says a word."""
+    html = re.sub(r"(?is)<(script|style|noscript)[^>]*>.*?</\1>", " ", html)
+    return re.sub(r"\s+", " ", re.sub(r"(?s)<[^>]+>", " ", html))
+
+
+def _names_it(cited: str, body: str) -> bool:
+    """Does the page's text still name the thing we cite, even though its <title> does not?
+
+    The registry cites a maker's page by the thing's name, and a maker's page is usually titled
+    after the maker or the section. Black Forest Labs lists FLUX 3 on a page titled "Models";
+    Runway names Gen-4.5 on a home page titled after the company. Comparing those titles reports
+    drift every run, forever, on citations that are perfectly good. This does not change the
+    state, because a page that mentions a name is not proof it is still the page we meant. It
+    puts the finding in the report so whoever triages it can see which lines to look at first."""
+    words = _words(_cited_title(cited))
+    if not words:
+        return False
+    text = _text_of(body).lower()
+    return sum(1 for w in words if w in text) / len(words) >= 0.6
+
+
+def _same_page(url: str, final: str) -> bool:
+    """A redirect that only adds or changes a query string on the same path is not a move: it is
+    a campaign parameter, a language hint or a session marker the server attached to the page we
+    already asked for. Salesforce appends ?bc=OTH; putting that in a citation would be worse than
+    the finding it silences."""
+    def parts(u: str) -> tuple[str, str]:
+        head = u.split("#", 1)[0]
+        path, _, _query = head.partition("?")
+        return path.rstrip("/"), _query
+    return parts(url)[0] == parts(final)[0]
+
+
 def _resembles(cited: str, actual: str) -> bool:
     """Does the page's own title still look like the title we cite? Generous on purpose: a site
     appending its own name, reordering, or adding a subtitle is not drift. Losing the subject is."""
@@ -206,7 +243,7 @@ def _classify(source: Source, final: str, body: str, error: str) -> dict:
         return {**source._asdict(), "state": "blocked", "detail": "refused: a block page, HTTP 200", "final": source.url}
 
     actual = _title_of(body)
-    if final.rstrip("/") != source.url.rstrip("/"):
+    if not _same_page(source.url, final):
         return {**source._asdict(), "state": "moved", "detail": actual, "final": final}
     if not _resembles(source.title, actual):
         # A citation that already records an archived copy quotes that copy, not the live page.
@@ -214,7 +251,10 @@ def _classify(source: Source, final: str, body: str, error: str) -> dict:
         # is handled rather than a defect. Neeva's post is the worked example: neeva.com answers
         # with a redirect stub now, and the capture of the publication day holds the wording.
         state = "archived" if source.archive else "drifted"
-        return {**source._asdict(), "state": state, "detail": actual, "final": final}
+        detail = actual
+        if state == "drifted" and _names_it(source.title, body):
+            detail = f"{actual or '(no title)'} [the page's text still names it]"
+        return {**source._asdict(), "state": state, "detail": detail, "final": final}
     return {**source._asdict(), "state": "ok", "detail": actual, "final": final}
 
 

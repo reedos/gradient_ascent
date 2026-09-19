@@ -15,7 +15,7 @@
           "sources": [
             {
               "title": "Regular expression Denial of Service - ReDoS",
-              "url": "https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS",
+              "url": "https://community.owasp.org/attacks/Regular_expression_Denial_of_Service_-_ReDoS",
               "publisher": "OWASP Foundation",
               "quote": "may reach extreme situations that cause them to work very slowly (exponentially related to input size)",
               "checked": "2026-09-19"
@@ -29,7 +29,7 @@
           "trying": "NIST's combinatorial testing work builds test sets that cover every two-way to six-way combination of parameter values rather than every combination, on the finding that most real failures are triggered by a few interacting factors. Teams pair it with tracking which rules ever fire in production, to find the branches no test reaches.",
           "sources": [
             {
-              "title": "Why do Combinatorial Testing?",
+              "title": "Combinatorial Methods for Trust and Assurance: Why do Combinatorial Testing?",
               "url": "https://csrc.nist.gov/projects/automated-combinatorial-testing-for-software/combinatorial-methods-in-testing/interactions-involved-in-software-failures",
               "publisher": "NIST, Computer Security Resource Center",
               "quote": "it is nearly always impossible to do exhaustive testing, but we don’t have to test all possible combinations of inputs; we only have to test all of the combinations that trigger faults",
@@ -243,7 +243,7 @@
           "trying": "NIST's playbook asks teams to design the human role deliberately, account for the biases that make a reviewer agree too readily, and measure whether oversight is happening at all. Override rates and time spent per review are what tell you, rather than the presence of a checkpoint.",
           "sources": [
             {
-              "title": "Map (AI RMF Playbook)",
+              "title": "Map (AI RMF Playbook, AIRC)",
               "url": "https://airc.nist.gov/airmf-resources/playbook/map/",
               "publisher": "NIST, Trustworthy and Responsible AI Resource Center",
               "quote": "Questions remain about how to configure humans and automation for managing AI risks.",
@@ -265,7 +265,7 @@
           "sources": [
             {
               "title": "MCP Tool Poisoning",
-              "url": "https://owasp.org/www-community/attacks/MCP_Tool_Poisoning",
+              "url": "https://community.owasp.org/attacks/MCP_Tool_Poisoning",
               "publisher": "OWASP Foundation",
               "quote": "Fully detecting injected instructions in free-text responses is an open problem, but schema validation catches the obvious cases.",
               "checked": "2026-09-19"

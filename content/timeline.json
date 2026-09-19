@@ -494,7 +494,7 @@
       "what": "Weizenbaum's paper describes ELIZA, a program that scans input for keywords and applies decomposition and reassembly rules attached to them; the paper says \"Keywords and their associated transformation rules constitute the SCRIPT for a particular class of conversation.\" Code picks the reply, with no model involved.",
       "technique": "order-zero",
       "source": {
-        "title": "ELIZA — a computer program for the study of natural language communication between man and machine",
+        "title": "Joseph Weizenbaum's ELIZA: Communications of the ACM, January 1966",
         "url": "https://courses.cs.umbc.edu/331/papers/eliza.html",
         "publisher": "Communications of the ACM, vol. 9 no. 1, January 1966 (mirror; the ACM Digital Library and cacm.acm.org copies both return 403 to this site's fetcher)"
       },
@@ -609,13 +609,13 @@
       "technique": "prompt-engineering",
       "source": {
         "title": "Better Language Models and Their Implications",
-        "url": "https://openai.com/blog/better-language-models/",
+        "url": "https://openai.com/index/better-language-models/",
         "archive_url": "https://web.archive.org/web/20190311202940id_/https://openai.com/blog/better-language-models/",
         "publisher": "OpenAI"
       },
-      "checked": "2026-09-18",
+      "checked": "2026-09-19",
       "verified": true,
-      "note": "openai.com returns 403 to this site's fetcher; the Internet Archive's capture of March 11, 2019 carries the byline \"February 14, 2019\" and the sentence quoted."
+      "note": "OpenAI moved the post from /blog/ to /index/, and its host no longer refuses this site's fetcher: every sentence quoted here was checked against OpenAI's own live page on September 19, 2026. The Internet Archive capture recorded in source.archive_url carries the same words and is kept as a fallback. The capture, taken March 11, 2019, is also where the byline date comes from."
     },
     {
       "id": "ai-dungeon-2-2019",
@@ -667,14 +667,14 @@
       "registry_id": "openai-api",
       "source": {
         "title": "OpenAI API",
-        "url": "https://openai.com/blog/openai-api",
+        "url": "https://openai.com/index/openai-api/",
         "archive_url": "https://web.archive.org/web/20200615205727id_/https://openai.com/blog/openai-api/",
         "publisher": "OpenAI"
       },
-      "checked": "2026-09-18",
+      "checked": "2026-09-19",
       "verified": true,
       "availability": "waitlist",
-      "note": "openai.com returns 403 here; read through the Internet Archive's capture of June 15, 2020."
+      "note": "OpenAI moved the post from /blog/ to /index/, and its host no longer refuses this site's fetcher: every sentence quoted here was checked against OpenAI's own live page on September 19, 2026. The Internet Archive capture recorded in source.archive_url carries the same words and is kept as a fallback."
     },
     {
       "id": "chain-of-thought-prompting",
@@ -1217,7 +1217,7 @@
       "technique": "prompt-chaining",
       "registry_id": "langchain",
       "source": {
-        "title": "langchain release history",
+        "title": "langchain · PyPI (release history)",
         "url": "https://pypi.org/project/langchain/#history",
         "publisher": "Python Package Index"
       },
@@ -1308,7 +1308,7 @@
       "technique": "routing",
       "registry_id": "semantic-router",
       "source": {
-        "title": "semantic-router release history",
+        "title": "semantic-router · PyPI (release history)",
         "url": "https://pypi.org/project/semantic-router/#history",
         "publisher": "Python Package Index"
       },
@@ -1479,13 +1479,13 @@
       "technique": "code-execution",
       "source": {
         "title": "ChatGPT plugins",
-        "url": "https://openai.com/blog/chatgpt-plugins",
+        "url": "https://openai.com/index/chatgpt-plugins/",
         "publisher": "OpenAI",
         "archive_url": "https://web.archive.org/web/20230401220923id_/https://openai.com/blog/chatgpt-plugins"
       },
-      "checked": "2026-09-18",
+      "checked": "2026-09-19",
       "verified": true,
-      "note": "openai.com returns 403 to this site's fetcher; the Internet Archive's capture of April 1, 2023 shows the date and the wording quoted here. Alpha access from a waitlist, so this is not the level's availability date; the beta that began rolling out to ChatGPT Plus subscribers seven weeks later is.",
+      "note": "OpenAI moved the post from /blog/ to /index/, and its host no longer refuses this site's fetcher: every sentence quoted here was checked against OpenAI's own live page on September 19, 2026. The Internet Archive capture recorded in source.archive_url carries the same words and is kept as a fallback. Alpha access from a waitlist, so this is not the level's availability date; the beta that began rolling out later is the milestone that carries it.",
       "availability": "waitlist",
       "short": "ChatGPT plugins",
       "opened": {
@@ -1530,13 +1530,13 @@
       "registry_id": "openai-api",
       "source": {
         "title": "Function calling and other API updates",
-        "url": "https://openai.com/blog/function-calling-and-other-api-updates",
+        "url": "https://openai.com/index/function-calling-and-other-api-updates/",
         "publisher": "OpenAI",
         "archive_url": "https://web.archive.org/web/20230621010946id_/https://openai.com/blog/function-calling-and-other-api-updates"
       },
-      "checked": "2026-09-18",
+      "checked": "2026-09-19",
       "verified": true,
-      "note": "openai.com returns 403 to this site's fetcher and OpenAI's public API changelog does not go back before 2024; the Internet Archive's capture of June 21, 2023 shows the date and the wording quoted here."
+      "note": "OpenAI moved the post from /blog/ to /index/, and its host no longer refuses this site's fetcher: every sentence quoted here was checked against OpenAI's own live page on September 19, 2026. The Internet Archive capture recorded in source.archive_url carries the same words and is kept as a fallback. OpenAI's public API changelog does not go back before 2024, so the post is the only dated primary source for this."
     },
     {
       "id": "bard-extensions-2023",

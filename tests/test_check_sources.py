@@ -97,6 +97,34 @@ class ClassifyTests(unittest.TestCase):
         with_capture = _source(title="Introducing NeevaAI", archive="https://web.archive.org/web/2023id_/x")
         self.assertEqual(self._state(with_capture, body=body), "archived")
 
+    def test_a_query_string_the_server_added_is_not_a_move(self) -> None:
+        """Salesforce answers a plain request with a redirect to the same page plus ?bc=OTH.
+        Reported as a move, the fix would be to put a campaign parameter in a citation."""
+        source = _source(url="https://example.com/news/report", title="A Page")
+        result = check_sources._classify(source, "https://example.com/news/report?bc=OTH", "<title>A Page</title>", "")
+        self.assertEqual(result["state"], "ok")
+        # A different path is still a move.
+        self.assertEqual(self._state(source, final="https://example.com/news/report-2024"), "moved")
+
+    def test_a_page_titled_after_its_maker_is_flagged_but_marked_as_still_naming_the_thing(self) -> None:
+        """Black Forest Labs lists FLUX 3 on a page titled "Models". The state stays drifted,
+        because a mention is not proof, but the line says the text still names it so whoever
+        triages the report can tell it apart from a page that really has moved on."""
+        body = '<html><title>Models | Black Forest Labs</title><body>FLUX 3 is our latest model.</body></html>'
+        result = check_sources._classify(_source(title="FLUX 3"), "https://example.com/p", body, "")
+        self.assertEqual(result["state"], "drifted")
+        self.assertIn("still names it", result["detail"])
+
+        gone_on = '<html><title>Models | Black Forest Labs</title><body>Nothing to see.</body></html>'
+        result = check_sources._classify(_source(title="FLUX 3"), "https://example.com/p", gone_on, "")
+        self.assertEqual(result["state"], "drifted")
+        self.assertNotIn("still names it", result["detail"])
+
+    def test_the_body_check_ignores_markup_and_script(self) -> None:
+        body = '<html><title>Nope</title><script>var x = "Gen-4.5";</script><body><b>Gen</b>-4.5 ships.</body></html>'
+        self.assertTrue(check_sources._names_it("Gen-4.5", body))
+        self.assertFalse(check_sources._names_it("Gen-4.5", '<html><script>"Gen-4.5"</script><body>hi</body></html>'))
+
     def test_a_refusal_code_is_blocked_and_a_declined_redirect_is_moved(self) -> None:
         self.assertEqual(self._state(_source(), error="refused: HTTP 403"), "blocked")
         self.assertEqual(self._state(_source(), final="https://example.com/q", error="redirect: HTTP 307"), "moved")
