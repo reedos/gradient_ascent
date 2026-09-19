@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import time
 import urllib.error
 import urllib.request
@@ -530,12 +531,44 @@ def _bucket(word: str, dims: int) -> int:
     return int.from_bytes(digest[:4], "big") % dims
 
 
+# Words that appear in nearly every section and in nearly every question. Left in, they are most
+# of the overlap between a question and a chunk, and the ranking becomes a measure of how long a
+# chunk is. This is the stand-in for the inverse-document-frequency weighting a real embedding
+# model gets from its training data, not a claim about how one works.
+_STOPWORDS = frozenset(
+    "a an and are as at be been but by can do does for from has have how i if in into is it its "
+    "not of on or should that the their then there these they this to use used using was what "
+    "when where which who will with would you your".split()
+)
+_WORD_RE = re.compile(r"[a-z0-9][a-z0-9-]*")
+
+
+def _tokens(text: str) -> list[str]:
+    """Words of a text, for the stub embedder: lowercase, punctuation dropped, hyphenated model
+    numbers kept whole (`dw-300` is one word, not two), a possessive `'s` stripped so that
+    "the DW-300's rating" and "the DW-300 rating" share a word, and stopwords dropped."""
+    words: list[str] = []
+    for raw in _WORD_RE.findall(text.lower().replace("\u2019", "'").replace("'s ", " ")):
+        word = raw.removesuffix("-")
+        if word and word not in _STOPWORDS:
+            words.append(word)
+    return words
+
+
 class StubEmbedder:
     """Deterministic hashing bag-of-words embedder. Makes no network call. The same text always
     hashes to the same vector, in this process and every other one, since it uses `sha256`
-    rather than Python's randomized `hash()`."""
+    rather than Python's randomized `hash()`.
 
-    def __init__(self, dims: int = 64, *, model_id: str = "stub-embed-1") -> None:
+    It is a stand-in, not a model: it knows nothing about meaning, so a question and a chunk that
+    share no word share nothing, where a real embedder would still see that "water use" and
+    "consumption" are close. What it does have to be is good enough that retrieval returns the
+    section a reader can see is the right one, because an example whose retrieval misses teaches
+    the opposite of what the page says. That needs enough dimensions to keep two different words
+    apart (64 buckets collide constantly) and a tokenizer that does not let stopwords dominate.
+    """
+
+    def __init__(self, dims: int = 512, *, model_id: str = "stub-embed-1") -> None:
         self._dims = dims
         self.model_id = model_id
 
@@ -544,7 +577,7 @@ class StubEmbedder:
 
     def _embed_one(self, text: str) -> list[float]:
         vector = [0.0] * self._dims
-        for word in text.lower().split():
+        for word in _tokens(text):
             vector[_bucket(word, self._dims)] += 1.0
         return to_unit(vector)
 

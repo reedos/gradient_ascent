@@ -24,7 +24,7 @@ virtual environment, and no `requirements.txt`. Python 3.11 or newer; Node 22.12
 git clone <this repository> && cd gradient_ascent
 
 python scripts/validate.py                    # the content files: 8 levels, 49 techniques, the registry
-python -m unittest discover -s tests          # 770 tests, about 2 seconds
+python -m unittest discover -s tests          # 807 tests, about 3 seconds (41 skip until the site is built)
 
 cd site && npm ci && npm run build            # the site, into site/dist/
 npm run dev                                   # or serve it at localhost:4321
