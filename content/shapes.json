@@ -158,7 +158,9 @@
         "document-qa",
         "ask-the-datasheet"
       ],
-      "teardowns": [],
+      "teardowns": [
+        "workplace-assistant"
+      ],
       "elsewhere": [
         "A policy handbook or a set of standard operating procedures",
         "Datasheets, errata and engineering change notices for the parts on a board",
@@ -386,7 +388,8 @@
         "research-brief"
       ],
       "teardowns": [
-        "deep-research-mode"
+        "deep-research-mode",
+        "answer-engine"
       ],
       "elsewhere": [
         "A literature review",
@@ -423,7 +426,8 @@
         "bring-up-debug-assistant"
       ],
       "teardowns": [
-        "coding-agent"
+        "coding-agent",
+        "browser-agent"
       ],
       "elsewhere": [
         "Fix a bug or add a feature in a repository",

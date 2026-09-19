@@ -1618,6 +1618,35 @@
           "computer-use",
           "human-in-the-loop"
         ]
+      },
+      {
+        "slug": "answer-engine",
+        "title": "A search-grounded answer engine, decoded",
+        "patterns": [
+          "rag",
+          "context-engineering",
+          "routing"
+        ]
+      },
+      {
+        "slug": "workplace-assistant",
+        "title": "A workplace assistant over your own documents, decoded",
+        "patterns": [
+          "rag",
+          "embeddings-search",
+          "knowledge-graphs",
+          "safety"
+        ]
+      },
+      {
+        "slug": "browser-agent",
+        "title": "A browser agent, decoded",
+        "patterns": [
+          "computer-use",
+          "single-agent",
+          "human-in-the-loop",
+          "safety"
+        ]
       }
     ]
   },

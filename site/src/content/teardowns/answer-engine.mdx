@@ -1,0 +1,144 @@
+---
+slug: answer-engine
+products: [perplexity]
+reviewed: 2026-09-19
+sources:
+  - title: "How does Perplexity work?"
+    url: "https://www.perplexity.ai/help-center/en/articles/10352895-how-does-perplexity-work"
+    publisher: "Perplexity"
+    date: "2026-09-03"
+    accessed: "2026-09-19"
+  - title: "What is an answer engine and how does Perplexity work?"
+    url: "https://www.perplexity.ai/help-center/en/articles/10354917-what-is-an-answer-engine-and-how-does-perplexity-work-as-one"
+    publisher: "Perplexity"
+    date: "2026-09-03"
+    accessed: "2026-09-19"
+  - title: "What is Perplexity Pro?"
+    url: "https://www.perplexity.ai/help-center/en/articles/10352901-what-is-perplexity-pro"
+    publisher: "Perplexity"
+    date: "2026-09-03"
+    accessed: "2026-09-19"
+---
+
+import Link from '../../components/page/Link.astro';
+import Cite from '../../components/page/Cite.astro';
+
+## What you see
+
+Ask Perplexity a question and an answer comes back in a few seconds: a short paragraph or two,
+written in plain sentences, with small numbered marks in the text that link out to the pages it
+used. There is no list of ten blue links to read through first. Perplexity's own help center
+describes the mechanism this way: when you ask a question, "it uses advanced AI to search the
+internet in real-time, gathering insights from top-tier sources" and then "distills this
+information into a clear, concise summary, delivering exactly what you need in an
+easy-to-understand, conversational tone."<Cite n={1}/> Every answer carries citations back to
+what it read: "Each answer includes numbered citations linking to the original sources, allowing
+you to easily verify the information or explore further."<Cite n={1}/>
+
+The easy reading is that the model already knew the answer and is just naming its sources out of
+courtesy. What is actually happening is a search that runs first, every time, and an answer that
+is not supposed to say anything the search did not turn up. This page decodes the default,
+one-question-one-answer flow. Perplexity documents a separate Research mode built for the case
+where a single search is not enough<Cite n={3}/>; the site's <Link
+href="/teardowns/deep-research-mode/">deep-research-mode teardown</Link> decodes that agentic,
+many-search version.
+
+## What is happening underneath
+
+Strip away the conversational tone and the steps Perplexity itself lists are the shape of <Link
+href="/techniques/rag/">RAG</Link>, level 2: search first, then answer once from what the search
+returned. Perplexity's help center breaks its own process into three named steps. First,
+"Perplexity leverages sophisticated AI to interpret your question, ensuring it knows exactly
+what you're asking."<Cite n={1}/> Second, the search step: "It searches the internet, gathering
+information from authoritative sources like articles, websites, and journals."<Cite n={1}/>
+Third, it writes the answer from what came back: "Perplexity compiles the most relevant insights
+into a coherent, easy-to-understand answer."<Cite n={1}/> That is RAG's fixed pipeline in full:
+retrieve, then generate once, with the retrieved material as the only thing the model is meant to
+answer from. Nothing in these three steps is described as a choice the model makes about running
+a second, better-targeted search; the searching is code's to trigger, not the model's.
+
+A separate question is what actually gets put in front of the model once the search is back, and
+Perplexity documents at least one thing that goes in beyond that search's own results: what was
+already said. "You can ask follow-up questions, and Perplexity will remember the context of your
+previous queries, ensuring a seamless, flowing conversation."<Cite n={1}/> A follow-up answer is
+not built from the newest search alone; the running conversation goes into the same request
+alongside whatever the latest search returned. Deciding what goes into that request, and what
+gets carried forward from one turn to the next, is <Link
+href="/techniques/context-engineering/">context engineering</Link>, level 2 like RAG itself: no
+searching happens in this step, only assembly, and the assembly is a fixed rule, not a judgment
+call the model makes.
+
+Which of several ways to answer runs at all is a third decision, and Perplexity documents making
+it automatically rather than running every question through one fixed path. Its default is called
+Best mode, and Perplexity states plainly what it does: "this default mode intelligently selects
+the most appropriate model based on your query type."<Cite n={3}/> That is <Link
+href="/techniques/routing/">routing</Link>, level 3: an input is read, sorted into one of a small
+number of kinds, and sent to the handler built for that kind, here a specific underlying model
+rather than a specific tool. Perplexity draws the line to the heavier option in the same
+paragraph: Research mode instead "automatically selects the optimal combination of models for
+in-depth research on complex topics, generating comprehensive reports without manual model
+selection."<Cite n={3}/> One sentence separates a routing decision from a research run: routing
+picks which model answers a question that still gets answered once; Research changes how many
+times the question gets searched at all.
+
+## Which page explains each part
+
+| What you see | What it is | Page |
+|---|---|---|
+| A short answer with numbered citations, seconds after you ask | Search once, then one answer grounded in what was retrieved | <Link href="/techniques/rag/">RAG</Link> |
+| A follow-up question in the same thread still knows what you asked before | The prior conversation and the latest search results assembled into one request | <Link href="/techniques/context-engineering/">Context engineering</Link> |
+| The product quietly picks which underlying model answers a given question | An input sorted into a kind and sent to the handler built for it | <Link href="/techniques/routing/">Routing</Link> |
+
+## What the makers say
+
+Perplexity states plainly what kind of product it considers itself, and draws the contrast with a
+search engine itself: "An answer engine is a tool designed to give you direct, detailed answers to
+your questions. Perplexity serves as an answer engine by searching the web, identifying trusted
+sources, and synthesizing information into clear, up-to-date responses."<Cite n={2}/> "Unlike
+traditional search engines, which make you sift through a list of links, Perplexity delivers the
+insights you're looking for in one place."<Cite n={2}/> On the routing step specifically,
+Perplexity's Best mode is documented as free of the usage caps that apply elsewhere in the
+product: it is "available without quota limits."<Cite n={3}/>
+
+## Where it fails
+
+Perplexity's own accuracy caveat sits right next to its definition of what an answer engine is:
+"While we aim for accuracy, we encourage you to double-check sources for added confidence."<Cite
+n={2}/> That sentence does not say what specifically goes wrong; the two patterns behind the
+product predict their own versions of it.
+
+A citation that is present is not the same as a citation that is correct. Perplexity's numbered
+citations show that a source was retrieved and attached to a sentence, not that the sentence is
+what the source actually says. <Link href="/techniques/rag/">RAG</Link>'s own failure modes name
+the version of this that matters most: a passage can be retrieved and still be ignored, cited more
+because it was nearby than because it was used.
+
+The single-pass ceiling is the other predictable gap. A question whose answer needs two facts from
+two different pages, joined together, is exactly what a single search struggles with: <Link
+href="/techniques/rag/">RAG</Link>'s own page names this directly, that a single search cannot
+join facts living in separate documents into one answer, because it only ever searches once.
+Perplexity documents a separate Research mode that selects a combination of models for in-depth
+research on complex topics<Cite n={3}/>. Why the two modes are split is not something the help
+center says, and this page does not guess at it.
+
+## If you build one
+
+Start at level 2, not higher. <Link href="/techniques/rag/">RAG</Link> is the whole pipeline:
+search once, keep the passages, answer once, and never let the model add a fact the search did not
+return. Perplexity's own account of itself, understand the question, search, then summarize<Cite
+n={1}/>, is that pipeline and nothing more. Add <Link
+href="/techniques/context-engineering/">context engineering</Link> once there is more than one
+question in the thread: deciding what carries forward and what gets cut is a separate job from
+deciding what to retrieve, and it stays a fixed, code-owned rule rather than a model's judgment
+call.
+
+Leave <Link href="/techniques/routing/">routing</Link> for later, and only once there is a real
+second way to answer worth having, such as a cheap path for ordinary questions and a slower one for
+hard ones, the same split Perplexity documents between its default mode and Research<Cite n={3}/>.
+Building that split before there is a second path to route to is complexity with nothing to spend
+it on.
+
+This site's <Link href="/recipes/document-qa/">document Q&A</Link> recipe is the level 2 version
+of the same job: a fixed retrieval step over your own documents, one answer, citations a reader can
+check by hand. A reader building what this teardown decodes would be working at that level, not the
+level a <Link href="/teardowns/deep-research-mode/">deep-research mode</Link> decodes.

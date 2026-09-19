@@ -508,6 +508,10 @@ def mdx_routes(taxonomy: dict, pages_dir: Path) -> set[str]:
     routes |= {f"/levels/{tier['order']}/" for tier in taxonomy["tiers"]}
     routes |= {f"/recipes/{r['slug']}/" for r in taxonomy.get("recipes", [])}
     routes |= {f"/threads/{t['id']}/" for t in taxonomy.get("threads", [])}
+    # `site/src/pages/teardowns/[slug].astro` builds one page per listed teardown, the same way
+    # recipes and threads do. Without this line every internal link to a teardown reports as a
+    # broken route, which is what it did until a teardown first linked to another one.
+    routes |= {f"/teardowns/{t['slug']}/" for t in (taxonomy.get("teardowns") or {}).get("first", [])}
     # The fixed pages, read off the routes Astro generates rather than listed here, so a page
     # added or renamed under site/src/pages/ cannot leave this rule stale.
     for path in sorted(pages_dir.rglob("*.astro")):

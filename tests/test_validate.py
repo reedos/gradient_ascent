@@ -692,6 +692,17 @@ class MdxReferenceTests(unittest.TestCase):
         mdx = '<Link href="/levels/1/">l</Link><Link href="/recipes/r/">r</Link><Link href="/method/">m</Link>'
         self.assertEqual(self.build(mdx), [])
 
+    def test_a_link_to_a_teardown_and_a_thread_passes(self):
+        """Both routes are built from the taxonomy by a dynamic page, so neither appears in the
+        scan of `site/src/pages/*.astro`. Teardowns were missing from the route set until a
+        teardown first linked to another one, and reported as a broken link every time."""
+        mdx = '<Link href="/teardowns/td/">t</Link><Link href="/threads/t/">th</Link>'
+        self.assertEqual(self.build(mdx), [])
+
+    def test_a_link_to_a_teardown_that_is_not_listed_is_still_an_error(self):
+        errors = self.build('<Link href="/teardowns/ghost/">g</Link>')
+        self.assertTrue(any("resolves to no route: '/teardowns/ghost/'" in e for e in errors), errors)
+
     def test_a_link_to_a_track_root_and_a_track_page_passes(self):
         mdx = '<Link href="/techniques/evals/">e</Link><Link href="/techniques/grading/">g</Link>'
         self.assertEqual(self.build(mdx), [])

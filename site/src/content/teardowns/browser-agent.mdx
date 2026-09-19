@@ -1,0 +1,149 @@
+---
+slug: browser-agent
+products: [claude-computer-use, openai-computer-use, gemini-computer-use, browserbase]
+reviewed: 2026-09-19
+sources:
+  - title: "Computer use tool"
+    url: "https://docs.claude.com/en/docs/agents-and-tools/tool-use/computer-use-tool"
+    publisher: "Anthropic"
+    accessed: "2026-09-19"
+  - title: "Computer use"
+    url: "https://developers.openai.com/api/docs/guides/tools-computer-use"
+    publisher: "OpenAI (API documentation)"
+    accessed: "2026-09-19"
+  - title: "Computer use"
+    url: "https://ai.google.dev/gemini-api/docs/computer-use"
+    publisher: "Google (Gemini API documentation)"
+    accessed: "2026-09-19"
+  - title: "What is Browserbase?"
+    url: "https://docs.browserbase.com/introduction/what-is-browserbase"
+    publisher: "Browserbase"
+    accessed: "2026-09-19"
+---
+
+import Link from '../../components/page/Link.astro';
+import Cite from '../../components/page/Cite.astro';
+
+## What you see
+
+Type a sentence, "find a flight from SF to Hawaii and fill in the search form," and instead of a
+list of links, a browser starts moving on its own: a cursor lands on a field, text appears, a page
+loads, a cursor lands on the next field. A few actions later, sometimes a few dozen, it stops and
+reports back something actually done, not just described. Claude computer use, OpenAI computer use
+and Gemini computer use are three makers' versions of the model driving that screen; Browserbase is
+a place the browser it drives can run, off the reader's own machine. Nothing here calls a named
+API for "search flights." The interface is the same interface a person would use, because for most
+of the sites this kind of agent visits, that is the only interface there is: no button has a name
+the model can call directly, only a place on a picture of a screen.
+
+## What is happening underneath
+
+Strip away the browser window and what is left is a small exchange, repeated: one screenshot goes
+to the model, one action comes back, code carries it out, another screenshot goes back. Google is
+direct about what the model actually returns: it "predicts pixel coordinates scaled to the height
+and width of the screen"<Cite n={3}/>, not the name of a button or a line of markup an ordinary web
+page never exposes to whatever is looking at it as a picture. Anthropic names the exchange
+precisely: repeating those two steps without a person in between is what its documentation calls
+the "agent loop"<Cite n={1}/>, and OpenAI describes the same cycle from the other end, continuing "until the
+model stops returning computer_call items"<Cite n={2}/>. That cycle is <Link
+href="/techniques/computer-use/">computer use</Link>, level 4 for one screenshot and one action;
+every real product runs the loop many times over, which is why OpenAI tells builders to "Bound and
+verify the run. Set step, time, or cost limits, support cancellation, and check the actual outcome
+instead of relying only on the model's final answer"<Cite n={2}/>. The step cap is not a nicety; it
+is what stops a model that keeps finding one more thing to click from running forever.
+
+What ends the loop on a good run is the model itself, not a fixed step count. Google describes the
+same repeat-until-done shape: "This process then repeats from step 2, continually soliciting the
+next action from the model until the task is completed or terminated."<Cite n={3}/> That is <Link
+href="/techniques/single-agent/">single agent</Link> behavior, level 5: one model, one tool, looping
+until it says it is done rather than until code tells it to stop. The tool it is driving still has
+to run somewhere, and that is what Browserbase sells instead of a model: "Browserbase is the
+complete platform to build and deploy agents that browse and interact with the web like
+humans"<Cite n={4}/>, "Fleets of headless browsers at scale with isolated sessions and global
+infrastructure"<Cite n={4}/> standing in for the desktop-in-a-box a team would otherwise run itself.
+
+Every maker documents the same shape of guardrail around that loop. A screen is not a trustworthy
+input: OpenAI's own guidance is blunt that "Text in a page, document, or tool result cannot grant
+permission or override the user's instructions"<Cite n={2}/>, and Google ships an opt-in check for
+exactly that, "screenshot scanning to detect hidden adversarial instructions"<Cite n={3}/>. Anthropic
+runs a version of the same check by default: "classifiers will automatically scan what the tools
+return, such as screenshots, to flag potential prompt injections"<Cite n={1}/>. All three also draw
+the same line around where the loop may run at all. Anthropic's security guidance opens with "Using
+a dedicated virtual machine or container with minimal privileges to prevent direct system attacks or
+accidents"<Cite n={1}/>; Google's is to "Run your agent in a sandboxed VM or container to isolate it
+from your host system and limit its potential impact"<Cite n={3}/>; OpenAI's is to "Restrict the
+environment. Use an isolated browser or VM and an allow list of sites and actions"<Cite n={2}/>. This
+is <Link href="/techniques/safety/">safety, privacy and governance</Link>'s territory, and it holds
+regardless of which level the loop above it is running at.
+
+The loop is also not trusted to finish every kind of action by itself. Anthropic's precautions
+include "Asking a human to confirm decisions that might result in meaningful real-world
+consequences and any tasks requiring affirmative consent, such as accepting cookies, completing
+financial transactions, or agreeing to terms of service"<Cite n={1}/>. OpenAI states the same rule
+as a requirement: "Confirm consequential actions. Keep users in control of purchases, data
+transmission, destructive changes, and other actions that are hard to reverse"<Cite n={2}/>. Google
+builds the pause into the response itself: each action carries "a safety_decision from an internal
+safety system that classifies the action as regular/allowed, require_confirmation (requiring user
+approval), or blocked"<Cite n={3}/>. That is <Link href="/techniques/human-in-the-loop/">human
+approval</Link>, level 3: a rule, not a judgment call, decides when the loop has to stop and wait
+for a person, and it sits underneath the level-4 loop and the level-5 agent rather than above them.
+
+## Which page explains each part
+
+| What you see | What it is | Page |
+|---|---|---|
+| A screenshot, then a click or a keystroke, then a new screenshot | The agent loop: one action per turn, requested from a picture of the screen | <Link href="/techniques/computer-use/">Computer use</Link> |
+| The run keeps going until the model itself reports the task done | A single agent looping over one tool until it exits on its own | <Link href="/techniques/single-agent/">Single agent</Link> |
+| A rented, disposable browser instead of the reader's own logged-in one | Isolated sessions run away from the model maker and the reader's machine | <Link href="/techniques/safety/">Safety, privacy and governance</Link> |
+| A step, time or cost limit that ends the run regardless of what the model wants | The cap code enforces underneath the model's own loop | <Link href="/techniques/computer-use/">Computer use</Link> |
+| A pause before a purchase, a form submit, or agreeing to terms | A rule, not the model, deciding when to stop and ask | <Link href="/techniques/human-in-the-loop/">Human approval</Link> |
+
+## What the makers say
+
+Anthropic is direct about how far to trust a session left unattended: "Always carefully review and
+verify Claude's computer use actions and logs. Do not use Claude for tasks requiring perfect
+precision or sensitive user information without human oversight."<Cite n={1}/> OpenAI frames the two
+halves of the job as a split of responsibility rather than something the model handles alone: "You
+provide the environment and execute the model's requests. The model uses screenshots and other tool
+results to decide what to do next."<Cite n={2}/> Google, shipping the capability as a preview,
+states its own limit up front: "We recommend supervising closely for important tasks, and that you
+avoid using the Computer Use capability for tasks involving critical decisions, sensitive data, or
+actions where serious errors cannot be corrected."<Cite n={3}/> Browserbase frames the whole
+category as a gap in what an API can reach: "Agents need the full web. Traditional APIs only cover
+~15% of it. The rest is behind logins, JS rendering, CAPTCHAs, and interactive flows. That requires
+a browser."<Cite n={4}/>
+
+## Where it fails
+
+Clicking is not guaranteed to land on the right thing. Anthropic states plainly that "Claude might
+make mistakes or hallucinate when outputting specific coordinates while generating
+actions"<Cite n={1}/>, the same coordinate step every maker's loop depends on. <Link
+href="/techniques/computer-use/">Computer use</Link>'s own failure modes predict the same gap from
+the other side: an interface changes under an allowlist, and a click that used to be safe lands
+somewhere new.
+
+None of the makers documents identity as something safe to hand over. Anthropic states that
+"Although Claude visits websites, its ability to create accounts, generate and share content, or
+otherwise engage in human impersonation across social media websites and platforms is
+limited"<Cite n={1}/>. Google ships the capability as a preview and says so plainly: "As a Preview
+capability, Computer Use may contain errors and security vulnerabilities."<Cite n={3}/> Neither
+maker publishes a success rate for the loop as a whole, across a real site, over a real task, and
+this page does not invent one.
+
+## If you build one
+
+A reader assembling this is working at level 5, not level 4: <Link
+href="/techniques/computer-use/">computer and browser use</Link> is the tool the single agent calls,
+one screenshot and one action at a time, but the product only exists once something decides for
+itself when to keep calling it and when to stop. Decide the container before the first real run,
+not after one goes wrong; every maker's own guidance above says some version of the same thing, and
+none of them treats it as optional. Write the confirmation rule in code, not in a system prompt: the
+model can be asked to pause before a purchase, but only a step boundary it cannot talk its way past
+can guarantee it does.
+
+This site's <Link href="/recipes/trip-planning/">planning a trip and holding the bookings</Link>
+recipe takes the cheaper route through the same split: checking what is available takes a different
+number of steps every time, which is what the level-5 loop is for, but anything that spends real
+money stops for a person instead of finishing the last click on its own. Reach for a screen-driving
+loop only once the site in front of the reader has no other way in; most of what a trip needs still
+does.

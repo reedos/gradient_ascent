@@ -1,0 +1,140 @@
+---
+slug: workplace-assistant
+products: [glean, glean-enterprise-graph, m365-copilot, m365-semantic-index]
+reviewed: 2026-09-19
+sources:
+  - title: "Microsoft Copilot architecture and how it works"
+    url: "https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-architecture"
+    publisher: "Microsoft (Microsoft Learn)"
+    accessed: "2026-09-19"
+  - title: "Semantic indexing for Microsoft Copilot"
+    url: "https://learn.microsoft.com/en-us/microsoftsearch/semantic-index-for-copilot"
+    publisher: "Microsoft (Microsoft Learn)"
+    accessed: "2026-09-19"
+  - title: "Workplace Search AI – Instantly Find Answers Across All Apps"
+    url: "https://www.glean.com/product/workplace-search"
+    publisher: "Glean"
+    accessed: "2026-09-19"
+  - title: "Enterprise Graph: Powering AI with Deep Organizational Knowledge"
+    url: "https://www.glean.com/product/knowledge-graph"
+    publisher: "Glean"
+    accessed: "2026-09-19"
+---
+
+import Link from '../../components/page/Link.astro';
+import Cite from '../../components/page/Cite.astro';
+
+## What you see
+
+Type a question into the search or chat box built into a company's own tools, something like
+where the signed contract for this account is or what the team decided about pricing, and instead
+of a page of links you get an answer in a sentence or two, with a few citations pointing at the
+document, email, ticket or chat message it came from. Glean and Microsoft 365 Copilot both sell a version of this: a
+box that answers from an organization's own files, mail and chat instead of the open web.
+
+What's easy to miss trying this once is that the box does not answer everyone the same way. Ask it
+the same question from two different desks and the citations that come back can differ, because
+each answer is built only from what that person is already allowed to open. Nobody types a
+permissions request; the scoping happens before the question is answered at all.
+
+## What is happening underneath
+
+The lowest layer turns text into numbers before anything gets compared. Every document, and the
+question itself, becomes a vector, a list of numbers positioned so similar meanings sit near each
+other, so a search can match a question worded one way against a passage using different words.
+Microsoft documents building this at real scale: its semantic index lets an organization "search
+through billions of vectors (mathematical representations of features or attributes) and return
+related results"<Cite n={2}/>. Glean's own workplace-search page names the
+same mechanism more plainly: "Vector search powered by deep learning-based LLMs enables semantic
+understanding for natural language queries."<Cite n={3}/> Neither page describes a model choosing
+anything at this layer; it is <Link href="/techniques/embeddings-search/">embeddings and
+search</Link>, level 2, a fixed comparison the code runs before a model sees the question.
+
+Onto that comparison, Microsoft's documentation adds one more fixed step it calls grounding:
+"Copilot preprocesses the input prompt by using grounding and accesses Microsoft Graph in the
+user's tenant"<Cite n={1}/>, appending whatever the search turned up to the prompt before the
+model answers. Glean's own account of its process names the same two moves in order: "Understand,"
+matching the query by meaning, then "Generate," where "Glean's AI understands your query's context
+and retrieves the most relevant answers, drawing from up-to-date information across your
+tools"<Cite n={3}/>. One search, one answer, cited: this is <Link href="/techniques/rag/">RAG</Link>,
+still level 2. Neither page describes a second search running after the first comes back thin.
+
+Glean documents a separate structure beside the vector index, for questions a single passage
+can't answer alone. Its Enterprise Graph "builds on a rich knowledge graph that identifies high
+value entities — such as projects, people, customers, and products"<Cite n={4}/>, and its own FAQ
+for the product says it "enables multi-hop reasoning across projects, people, documentation,
+support issues, and other connected work"<Cite n={4}/>: a question needing a project and the
+person who owns it joined, rather than one document stating both. This is <Link
+href="/techniques/knowledge-graphs/">knowledge graphs</Link>. Neither Microsoft source here
+describes anything like it for Microsoft 365 Copilot; grounding there is documented as a single
+retrieval step, not a graph walk.
+
+Every layer above runs inside a boundary neither maker describes as the model's to decide.
+Microsoft's architecture documentation states it as a system limit, not a setting: "Copilot only
+accesses data that an individual user is authorized to access, based on, for example, existing
+Microsoft 365 role-based access controls", and "Copilot can't access data that the user doesn't
+have permission to access"<Cite n={1}/>. Its semantic-index documentation repeats the same
+boundary at the retrieval step itself: "the grounding process only accesses content that the
+current user is authorized to access."<Cite n={2}/> Glean states the identical property of its own
+search: "Results are real-time and permissions-aware, so everyone sees only what they should", and
+"Glean enforces the existing permissions of your data sources in results, so users only see what
+they are allowed to access"<Cite n={3}/>. This is <Link href="/techniques/safety/">safety, privacy
+and governance</Link>'s territory, and it is the one part of the system that is not itself a
+retrieval technique: a check against the app's own access-control list, run on every answer
+regardless of what the model would otherwise have shown.
+
+## Which page explains each part
+
+| What you see | What it is | Page |
+|---|---|---|
+| A question is matched to passages that never use its exact words | Text compared as vectors instead of by keyword | <Link href="/techniques/embeddings-search/">Embeddings and search</Link> |
+| One search, then one answer, with citations | Retrieved passages handed to the model once | <Link href="/techniques/rag/">RAG</Link> |
+| An answer joins a fact about a project to a fact about the person who owns it | Entities and relationships walked as a graph | <Link href="/techniques/knowledge-graphs/">Knowledge graphs</Link> |
+| The same question from two desks returns two different sets of citations | Retrieval filtered by the asker's own access, not the model's judgment | <Link href="/techniques/safety/">Safety, privacy and governance</Link> |
+
+## What the makers say
+
+Microsoft is specific about what the tenant boundary does not grant on its own: "Operating inside
+the Microsoft 365 service boundary doesn't grant Copilot tenant-wide visibility."<Cite n={1}/> And
+about what does not leave it: "Prompts, responses, and data accessed through semantic indexing
+aren't used to train foundation LLMs, including those used by Microsoft Copilot."<Cite n={2}/>
+
+Glean describes how its own graph gets built without a person hand-labeling any of it: "Glean
+builds these graphs entirely using machine learning by understanding the data structures of
+enterprise apps and automatically inferring entities. All of this happens in each customer's
+single-tenant environment to ensure data privacy."<Cite n={4}/> And it ties that structure directly
+to what a searcher sees: "Glean builds your company's knowledge graph—understanding people,
+content, and interactions— so every result is personalized to you."<Cite n={3}/>
+
+## Where it fails
+
+Microsoft documents where the grounding step's own coverage stops short. Its supported-content
+table for the semantic index lists delegated mailboxes, shared mailboxes and archived mailbox data
+as not supported at either level, so a question about mail someone else manages for you can come
+back with nothing found<Cite n={2}/>. Freshness has a stated limit too: "New documents that are
+added to SharePoint Online sites that are accessible, via site inheritance, by two or more users
+are indexed daily"<Cite n={2}/>, not the moment they're saved.
+
+Neither maker publishes a number for how often a citation actually supports the sentence next to
+it, and this page does not invent one. Underneath the permission check, both systems are still a
+search, and <Link href="/techniques/rag/">RAG</Link>'s own failure modes predict the rest: a
+chunk boundary splitting a fact in two, a passage cited without being the one the answer actually
+used, two sources disagreeing with no sign either was checked. A permission check that correctly hides a
+document you can't see says nothing about whether the document it did show you was the right one.
+
+## If you build one
+
+The retrieval half of this is the site's own <Link href="/recipes/document-qa/">document
+Q&A</Link> recipe, level 2: chunk, embed, retrieve the top few, answer once. What the recipe does
+not add, because a single-user example has nobody to filter for, is the check both makers describe
+running on every retrieval rather than every model turn. Build that filter into the query that
+fetches candidate passages, against the access-control list the document already lives behind, and
+never phrase it as an instruction the model is asked to follow. <Link
+href="/techniques/safety/">Safety, privacy and governance</Link> is where that instinct comes from:
+a permission the model must remember to respect is one that gets forgotten eventually, under a
+long conversation or an injected instruction. A permission the retrieval step never fetches cannot
+be leaked by anything the model says afterward.
+
+Reach for a <Link href="/techniques/knowledge-graphs/">knowledge graph</Link> only once questions
+need facts joined across documents a single search keeps missing; Glean's own account of building
+one describes real, ongoing extraction work<Cite n={4}/>, not a setting to switch on.
