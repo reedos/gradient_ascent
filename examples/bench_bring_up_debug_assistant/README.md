@@ -10,8 +10,9 @@ scope and returns its response, capped at 8 steps and 5000 tokens (`MAX_STEPS`, 
 before `instrument.send` is ever called, so a command outside the read-only set is refused in
 code and never reaches the instrument, whatever the model asked for. The board is already
 energized when the run starts: `_bring_up` is a technician's own checked sequence through
-`GuardedSupply`, `GuardedLoad`, `SafetyEnvelope`, and `Approval`, the one place in this file that
-sets anything. The agent's loop cannot reach it.
+`GuardedSupply`, `GuardedLoad`, `SafetyEnvelope`, and one `Approval` for each of the two commands
+that energize a board, the one place in this file that sets anything. The agent's loop cannot
+reach it.
 
 Run it:
 

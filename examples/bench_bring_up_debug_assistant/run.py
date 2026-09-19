@@ -10,9 +10,10 @@ read only runs unattended, a command that sets state needs code checking it agai
 point. Only the first class is reachable through this file.
 
 The board is already energized when the agent starts. `_bring_up` is a technician's own checked
-sequence, through `GuardedSupply`, `GuardedLoad`, `SafetyEnvelope` and `Approval`, the same steps
-`tests/test_bench.py`'s `test_step_three` runs. It is the one place in this file where a command
-sets anything, and the agent's own loop never calls it and has no tool that could.
+sequence, through `GuardedSupply`, `GuardedLoad`, `SafetyEnvelope` and two `Approval`s, one for
+each command that energizes the board, the same steps `tests/test_bench.py`'s `test_step_three`
+runs. It is the one place in this file where a command sets anything, and the agent's own loop
+never calls it and has no tool that could.
 
 `decided_by` follows the one rule every level-5 example on this site follows
 (`examples/common/trace.py`): the model's own output chooses which tool to call, with what
@@ -92,7 +93,9 @@ ToolResult = tuple[str, list[str]]
 def _bring_up(dmm_offset_v: float) -> Bench:
     """Everything a technician did before the agent gets the bench, through the checked,
     approved sequence: set the voltage and the current limit, get an `Approval` that names them,
-    enable the supply, set and enable the load. This is the only place in this file that sets
+    enable the supply, set the load, and get a second `Approval` for the enable that actually
+    puts current through the board. Both commands `docs/THE-BENCH.md` classes as energizing a
+    board are here, and each one needed a person. This is the only place in this file that sets
     anything; the agent's own tool cannot reach any of it."""
     bench = Bench(dmm_offset_v=dmm_offset_v)
     envelope = SafetyEnvelope()
@@ -102,7 +105,9 @@ def _bring_up(dmm_offset_v: float) -> Bench:
     supply.set_current_limit(4.0)
     supply.output_on(Approval("R. Osaki", BOARD_VIN_V, 4.0, reason="VOUT bring-up confirmation"))
     load.set_current(BOARD_IOUT_A)
-    load.input_on()
+    load.input_on(
+        Approval("R. Osaki", BOARD_VIN_V, BOARD_IOUT_A, reason="VOUT bring-up confirmation")
+    )
     return bench
 
 
@@ -120,18 +125,18 @@ def _test_log(serial: str, log_path: Path) -> ToolResult:
     return "\n".join(lines), []
 
 
-#: `is_read_only` accepts an argument on every read-only header, because `MEAS:VPP? CHAN1` is
-#: read-only and needs one. But `MEAS:VOLT:DC?`, `MEAS:VOLT:AC?`, `MEAS:RES?` and `READ?` also
-#: take an optional argument, and on the DMM that argument sets the measurement range as a side
-#: effect (`examples/common/bench.py`, `Multimeter._meas_dc`) before the reading is taken: a
-#: query that looks read-only can still leave the instrument in a different state than it found
-#: it. Filed against `examples/common/bench.py` in this recipe's page-request; this tool does not
-#: wait for that fix; it refuses an argument on anything but the one header that legitimately
-#: needs one, closing the gap here instead of trusting `is_read_only` alone.
-_ARGUMENT_ALLOWED_HEADERS = frozenset({"MEAS:VPP?"})
-
-
 def _measure(instrument_name: str, command: str, bench: Bench) -> ToolResult:
+    """Send one command, if and only if `is_read_only` says it only reads.
+
+    `is_read_only` is the whole check, deliberately: the line between a query and a state change
+    is written down once in `examples/common/bench.py` for every example on this site, and a
+    second copy of it here would be a second copy to keep in step. It already covers the case
+    that looks like a query and is not. `MEAS:VOLT:DC? 0.1` has a read-only header, but the
+    multimeter uses that argument to set its DC range before it reads, and the range stays set
+    for every later query with nothing in the error queue to say so, so an argument is read-only
+    on exactly one header: the oscilloscope's `MEAS:VPP? CHAN1`, whose argument only says which
+    channel to report.
+    """
     instruments = {"supply": bench.supply, "dmm": bench.dmm, "load": bench.load, "scope": bench.scope}
     instrument = instruments.get(instrument_name)
     if instrument is None:
@@ -144,12 +149,6 @@ def _measure(instrument_name: str, command: str, bench: Bench) -> ToolResult:
         return (
             f"refused: {command!r} is not a read-only command; this tool can only query "
             f"{instrument_name}, never set it"
-        ), []
-    header, _, argument = command.strip().partition(" ")
-    if argument.strip() and header.upper() not in _ARGUMENT_ALLOWED_HEADERS:
-        return (
-            f"refused: {command!r} carries an argument this tool does not allow; that argument "
-            "can change instrument state even though the header alone is read-only"
         ), []
     return instrument.send(command), []
 

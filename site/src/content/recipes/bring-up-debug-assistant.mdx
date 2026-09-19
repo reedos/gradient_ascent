@@ -25,6 +25,12 @@ analysis guide, plus the bench itself for a confirmation reading. An assistant t
 bench needs the same access and no more: it can look at all of that, and it must never be able to
 change what the bench is doing while somebody is trusting its answer.
 
+Notice where this recipe starts. Knowing that FIX-03 is worth suspecting at all took no model:
+<Link href="/recipes/limits-without-a-model/">grouping the month's VOUT readings by fixture</Link>
+is a `GROUP BY`, and it names the fixture before anyone opens a board. This page picks up one
+board later, where the question stops being which group moved and becomes what to measure next on
+this unit.
+
 ## Level 5, and why not a fixed checklist
 
 This is level 5, an agent in a loop, because which measurement to take next depends on what the
@@ -80,8 +86,11 @@ supposed to draw. An instrument's own ceiling says what it can survive; the enve
 this board can, and those are different numbers for a reason.
 
 The board is already energized when this recipe's agent starts, brought up by a technician
-through that same checked sequence. The agent's own tools never touch `SafetyEnvelope`,
-`GuardedSupply`, `GuardedLoad`, or `Approval` at all, because nothing it can call reaches them:
+through that same checked sequence. Both commands in the third row are in it, and each one takes
+its own `Approval`: one naming the 24.0 V and 4.0 A the supply is set to, and a second naming the
+rail the board is at and the 1.000 A the load is about to pull out of it. The agent's own tools
+never touch `SafetyEnvelope`, `GuardedSupply`, `GuardedLoad`, or `Approval` at all, because
+nothing it can call reaches them:
 
 <CodeFile file="examples/bench_bring_up_debug_assistant/run.py" func="_bring_up" />
 
@@ -89,6 +98,11 @@ through that same checked sequence. The agent's own tools never touch `SafetyEnv
 
 The agent gets three tools, `test_log`, `read_doc`, and `measure`, and a symptom: SRB5030-2608-0011
 failed VOUT on FIX-03. It has no fixed script for what to call next.
+
+No recorded run exists for this page. The walkthrough below is the scripted `StubModel` run in
+`tests/test_example_bench_bring_up_debug_assistant.py`: the tool calls are written down in
+advance and stand in for what a model would decide, while every value coming back is the log's own
+row or the simulated bench's own reading.
 
 **Read the log.** `test_log("SRB5030-2608-0011")` returns all eight logged steps. Step 3 is the
 only failure: `4.9497V (limits 4.9500..5.0500) FAIL`, with the operator's note "low again on
@@ -131,7 +145,9 @@ own decision; running or refusing a tool is always code's.
 `examples/common/bench.py`, is checked before `instrument.send` is ever called, and its result
 decides whether that call happens at all, not whether the model asked politely. Sending a command
 never touched by the check would be the actual bug; this function makes sure that path does not
-exist.
+exist. It is the only check here, deliberately: the line between a query and a state change is
+written down once, in the bench module every example on this site imports, and a second copy of it
+in this file would be a second copy to keep in step with the first.
 
 <CodeFile file="examples/bench_bring_up_debug_assistant/run.py" func="_measure" />
 
@@ -143,7 +159,7 @@ exist.
     { label: 'Model-decided steps (calls plus the stop)', value: '7' },
     { label: 'Refused calls', value: '1' },
     { label: 'Tokens in, cumulative', value: '~4,400' },
-    { label: 'Tokens out, cumulative', value: '~110' },
+    { label: 'Tokens out, cumulative', value: '~160' },
   ]}
   comparedTo={{
     label: 'the board that needed one call',
@@ -163,8 +179,8 @@ failure that already needs a person's attention, not on every unit that passes.
 <FailureModes modes={[
   {
     name: "A query's own argument changes the instrument",
-    notice: "MEAS:VOLT:DC? 0.1 reads as a read-only header, and is_read_only agrees, but the DMM uses that argument to set its DC range before taking the reading. Send it once and every later query on that meter, argument or not, comes back through the same wrong range, which on this board reads as an overload with an empty error queue.",
-    test: "Send a read-only header with an argument it does not need and confirm the range, or any other instrument state, is unchanged afterward. examples/bench_bring_up_debug_assistant/run.py refuses any argument outside the one header (MEAS:VPP? on the scope) that actually needs one, rather than trusting is_read_only alone; see this recipe's page-request against examples/common/bench.py.",
+    notice: "MEAS:VOLT:DC? 0.1 has a read-only header, but the DMM uses that argument to set its DC range before taking the reading. Send it once and every later query on that meter, argument or not, comes back through the same wrong range, which on this board reads as an overload with an empty error queue. A header is not enough to judge a command by.",
+    test: "Send a read-only header with an argument it does not need and confirm the range, or any other instrument state, is unchanged afterward. is_read_only draws the line where the manuals do: a read-only header carrying an argument is read-only on MEAS:VPP? alone, whose argument names a channel and sets nothing, and the tool above refuses everything else before the instrument sees it.",
   },
   {
     name: 'A command drafted for the wrong vendor',

@@ -23,7 +23,7 @@ from examples.bench_bring_up_debug_assistant.run import (  # noqa: E402
     _test_log,
     run,
 )
-from examples.common.bench import NO_ERROR  # noqa: E402
+from examples.common.bench import NO_ERROR, GuardedLoad, SafetyRefusal  # noqa: E402
 from examples.common.model import StubModel, StubResponse, ToolCall  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
 
@@ -192,10 +192,10 @@ class MeasureToolSafetyTests(unittest.TestCase):
         self.assertEqual(step.title, "Refuse a command that sets state")
 
     def test_a_query_argument_that_would_change_the_range_is_refused(self) -> None:
-        # `is_read_only` alone would let this through: the header is read-only, and the argument
-        # only looks like a range selector. examples/common/bench.py's Multimeter actually uses
-        # it to set the DC range as a side effect of the read, which is exactly the kind of state
-        # change this tool exists to refuse. See this recipe's page-request.
+        # The header is read-only and the argument only looks like a range selector, but
+        # examples/common/bench.py's Multimeter uses it to set the DC range as a side effect of
+        # the read, and the range stays set. `is_read_only` is the check that catches it: a
+        # read-only header carrying an argument is read-only on `MEAS:VPP?` alone.
         step, bench = self._run_one_measure("dmm", "MEAS:VOLT:DC? 0.1")
         self.assertEqual(step.title, "Refuse a command that sets state")
         self.assertEqual(bench.dmm.dc_range_v, 10.0, "the refused query must not have changed the DMM's range")
@@ -207,6 +207,18 @@ class MeasureToolSafetyTests(unittest.TestCase):
         bench.scope.send("SING")
         text, _ = _measure("scope", "MEAS:VPP? CHAN1", bench)
         self.assertFalse(text.startswith("refused:"), text)
+
+    def test_the_board_came_up_under_two_approvals_not_one(self) -> None:
+        """Both commands docs/THE-BENCH.md classes as energizing a board are in `_bring_up`, and
+        `GuardedLoad.input_on` refuses the load enable without an `Approval` of its own."""
+        bench = _bring_up(FIXTURE_DMM_OFFSET_V)
+        self.assertTrue(bench.supply.output_on)
+        self.assertEqual(bench.load.send("INP?"), "1")
+        load = GuardedLoad(bench)
+        load.input_off()
+        with self.assertRaises(SafetyRefusal):
+            load.input_on(None)
+        self.assertEqual(bench.load.send("INP?"), "0")
 
     def test_a_refusal_never_touches_the_instruments_error_queue(self) -> None:
         # Refusing a command in code, before `instrument.send` is called, is different from
