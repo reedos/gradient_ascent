@@ -4,8 +4,221 @@ reviewed: 2026-09-19
 sources: []
 ---
 
-Checking a measurement against a limit is a comparison. Yield is a count. Cpk is a mean, a standard deviation and a subtraction. A control chart is those numbers plotted against time. Grouping the same measurements by lot, by fixture, by day and by shift is a `GROUP BY`. None of it needs a model, and the pass or fail decision must never involve one: a wrong pass ships a bad unit.
+import Link from '../../components/page/Link.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
 
-Draft in progress. This page is a slot: the taxonomy entry, the techniques it composes and the
-level it needs are settled, and the writing is not. See `docs/WRITING-AN-ENGINEERING-RECIPE.md`
-for what belongs here, and `docs/THE-BENCH.md` for the bench every engineering recipe runs on.
+A month of Orbeck SRB-5030 regulator boards has gone through final test: 200 units, eight
+measurements each, on four fixtures across two shifts a day. First-pass yield came back at 92.0
+percent. Someone wants to know why the other 8 percent failed, and whether it is one bad batch of
+parts, one fixture that needs recalibrating, or the ordinary spread of a process that is in fact
+fine. The artifacts on hand are `evals/bench/data/production-run-2026-08.csv` (one row per
+measurement: serial, lot, fixture, shift, timestamp, value, unit, its own limits, and the verdict)
+and `evals/bench/corpus/srb5030-test-spec.md`, which says what each of the eight steps measures
+and where its limits came from.
+
+## Level 0, and why not higher
+
+Every question in the paragraph above is a comparison, a mean, a standard deviation or a
+`GROUP BY`. Did this unit pass: two comparisons against its own row's limits. What fraction of
+units passed: a count. Is the ripple step capable of holding its 50 mV limit: a mean, a standard
+deviation and a subtraction, which is the whole of Cpk. Did the process drift at some point: a
+mean and a standard deviation plotted against run order, which is the whole of a control chart.
+Which lot, fixture, day or shift looks different from the rest: `GROUP BY` each of the four in
+turn. None of it needs a model, and the pass or fail decision must never carry one: a wrong pass
+ships a bad unit, and a model that is right 99 times in 100 is a one percent defect rate added to
+a line that measures its own defect rate in parts per million.
+
+A model earns a place once the job stops being arithmetic over numbers that are already there.
+<Link href="/recipes/test-failure-triage/">Sorting failing units and operator notes into known
+causes</Link> reads free text a `GROUP BY` cannot parse. <Link href="/recipes/ask-the-datasheet/">
+Answering a question from a datasheet, a test spec and a change notice</Link> resolves two
+documents that disagree. <Link href="/recipes/test-data-by-conversation/">Asking questions of a
+production log</Link> starts only once the fixed charts below have been built and a question comes
+in that none of them answers. All three cost a model call somewhere this recipe costs nothing.
+This page is the one every other engineering recipe on this site points back to for the half of a
+test engineer's week that a `GROUP BY` already does.
+
+## Reading the log, stepped
+
+Nothing here talks to an instrument. The four instruments that produced this log
+(`docs/THE-BENCH.md` describes them) already wrote their readings to
+`production-run-2026-08.csv`; this recipe starts after that, reading the file the way
+`evals.bench.PRODUCTION_CSV` names it.
+
+Row 8 of the log is unit `SRB5030-2608-0001`'s RIPPLE step: 22.7 mV against an upper limit of
+50.0 mV. `within_limits(22.7, None, 50.0)` compares once and passes. Further down, unit
+`SRB5030-2608-0008`'s RIPPLE row reads 52.2 mV against the same 50.0 mV limit and fails by 2.2 mV,
+with an operator's note that reads "ripple 52mv": the note repeats the number, it does not add
+anything the row didn't already say.
+
+Grouping every RIPPLE reading by lot finds the first story in the data:
+
+| Lot | n | Mean (mV) | SD (mV) | Cpk |
+| --- | --- | --- | --- | --- |
+| L2608A | 52 | 21.21 | 3.40 | 2.82 |
+| L2608B | 51 | 44.41 | 3.76 | 0.50 |
+| L2608C | 47 | 21.50 | 1.36 | 6.97 |
+| L2608D | 48 | 21.67 | 3.54 | 2.67 |
+
+Lot L2608B's ripple mean is more than double the other three lots', and its Cpk of 0.50 says the
+process is not capable of holding the 50 mV limit, against 2.67 or higher everywhere else. Grouped
+by lot, first-pass yield tells almost none of this: 96.2 percent, 90.4 percent, 89.6 percent and
+91.7 percent for the four lots in order, and L2608B is not even the worst of the four. A mean that
+doubles and a Cpk that drops from 2.82 to 0.50 is a different lot of parts; a yield that moves by a
+few points is what an ordinary process already does from lot to lot. This is the argument for
+charting the measurement instead of counting failures: the ripple numbers say plainly what the
+yield numbers all but hide.
+
+A Shewhart individuals chart over the same 198 RIPPLE readings, in the order the log recorded
+them, makes the same point without being told which lot is which. Its center line is the overall
+mean, 27.37 mV; its control limits come from the average difference between one reading and the
+next (the moving range), not from the 50 mV spec limit and not from the sample standard deviation:
+center 27.37 mV, upper control limit 42.11 mV, lower control limit 12.62 mV. Thirty-eight of the
+198 readings fall outside those limits, and thirty-six of the thirty-eight are L2608B units: the
+chart finds the same lot the grouped table did, from run order alone, before anyone thinks to
+group by anything.
+
+Grouping VOUT by fixture (two boards with no output at all set aside first; more on that below)
+finds a second, unrelated story:
+
+| Fixture | n | Mean (V) | Cpk |
+| --- | --- | --- | --- |
+| FIX-01 | 49 | 4.9892 | 1.09 |
+| FIX-02 | 48 | 4.9922 | 1.09 |
+| FIX-03 | 49 | 4.9640 | 0.44 |
+| FIX-04 | 50 | 4.9906 | 1.09 |
+
+FIX-03 reads about 27 mV low and nowhere else does; its LINE_REG, LOAD_REG and EFF_FL means, which
+are differences of two readings rather than one absolute reading, do not move, because a fixed
+offset in the measurement path cancels in a difference. That is a stale calibration constant on
+one fixture, not a board problem, and grouping by fixture is what tells the two apart.
+
+Grouping either measurement by day or by shift finds nothing worth following up. RIPPLE's four
+daily means span 1.55 mV and its two shift means span 2.01 mV, against the 23.2 mV the lot
+grouping moves the mean by; VOUT's daily means span about 5 mV and its shift means about 3 mV,
+against the roughly 27 mV the fixture grouping moves the mean by. Being able to say a grouping
+found nothing is as much the point of this recipe as finding the lot and the fixture were.
+
+## The code
+
+The whole pass or fail decision is two comparisons:
+
+<CodeFile file="examples/bench_limits_without_a_model/run.py" func="within_limits" />
+
+Cpk is a mean, a standard deviation and a subtraction, one-sided against whichever single limit a
+step has and the smaller of both one-sided numbers when a step has two, which is the standard
+two-sided form:
+
+<CodeFile file="examples/bench_limits_without_a_model/run.py" func="cpk" />
+
+`GROUP BY` is one function, called once each for lot, fixture, day and shift:
+
+<CodeFile file="examples/bench_limits_without_a_model/run.py" func="group_stats" />
+
+The control chart estimates its sigma from the average moving range between consecutive readings
+rather than from the sample standard deviation, which is the textbook individuals-chart
+construction and not an arbitrary alternative: a standard deviation taken over a run that already
+contains a shifted lot is inflated by that shift, and the moving range is not.
+
+<CodeFile file="examples/bench_limits_without_a_model/run.py" func="control_chart" />
+
+Every step this code takes is `decided_by: "code"` (`examples/common/trace.py` is the one
+definition of that field on this site), because there is no model anywhere in the call for one to
+decide anything. Run it yourself:
+
+<CodeFile file="examples/bench_limits_without_a_model/README.md" start={11} end={12} lang="text" expect="RIPPLE" />
+
+## What it costs
+
+<CostStrip
+  stats={[
+    { label: "Model calls", value: "0" },
+    { label: "Tokens in / out", value: "0 / 0" },
+    { label: "Compute, whole month's log", value: "~6 ms" },
+    { label: "Cost per unit", value: "$0" },
+  ]}
+  comparedTo={{
+    label: "test-failure-triage",
+    note: "The recipe just above this one on the engineering list classifies a cause from an operator's note once per failing unit. This same run has 16 failing units: 16 calls that this recipe's limit check and grouping never make, because there is nothing here for a model to read.",
+  }}
+/>
+
+The 6 ms above is one machine timing one pass over 198 rows and is not a claim about any other
+hardware; the number worth remembering is the shape of it, not the digits: this recipe's cost does
+not grow with a per-item model call, so it does not matter whether the log holds 200 rows or
+200,000.
+
+## How it fails on a real bench, specifically
+
+<FailureModes modes={[
+  {
+    name: "Trusting the log's own result column",
+    notice: "Every row already carries a PASS or FAIL. It will usually agree with a limit check written against the current test spec; an outdated limit table, a boundary tested strictly instead of inclusively, or one hand-edited row would not, and nothing about reading the column instead of the value tells you which case you're in.",
+    test: "Recompute PASS/FAIL from value, lower_limit and upper_limit for every row and diff against the logged column. within_limits is that recomputation; tests/test_bench_data.py proves the production log itself was written the same way, so a real mismatch means something changed.",
+  },
+  {
+    name: "A control limit read as the spec limit",
+    notice: "RIPPLE's control chart upper limit comes out near 42 mV, well under the 50 mV spec limit. Reported as one unlabeled number, a reading between the two either ships a board that is inside its process's normal spread and gets flagged, or the reverse.",
+    test: "Print the control limits and the spec limits on the same line, from two different sources in the code (control_chart's own arithmetic, and the lower_limit/upper_limit columns), and confirm by construction that they are never the same computation.",
+  },
+  {
+    name: "A dead board folded into a capability number",
+    notice: "A board with no output at all reads near 0 V on a rail with a 5 V nominal. Left in an unfiltered Cpk or a mean, one or two of these can make a genuinely capable process read as barely capable, for a reason that has nothing to do with capability.",
+    test: "Compare a group's Cpk with and without excluding a reading whose magnitude is implausible for the measurement (VOUT near 0 V, not just low). A Cpk that swings by more than the group's own spread when one or two rows move says those rows never belonged in the population being charted.",
+  },
+  {
+    name: "A measurement taken a different way landing in the same column",
+    notice: "The RIPPLE column assumes every reading came from the same scope setup, AC coupled with the 20 MHz bandwidth limit on. If one fixture's setup ever drifts (the bandwidth limit left off), every RIPPLE row from that fixture roughly doubles for a reason that has nothing to do with the board, and grouping by fixture would call it a fixture problem, correctly, for the wrong reason.",
+    test: "When a group's mean moves, check what produced the number before charting it further: same instrument setting, same probe point, same settle delay. A grouped table cannot see the difference between a fixture that measures differently and a fixture that runs different boards.",
+  },
+  {
+    name: "A units mismatch that still parses",
+    notice: "A value column in millivolts under a header that says volts, or the reverse, still parses as a number and still compares as a number. Nothing raises.",
+    test: "Check a measurement's computed mean against its datasheet typical (docs/THE-BENCH.md states one for every step) before trusting a Cpk built from it. A mean off by a factor of 1,000 from the typical is a units bug, not a process finding.",
+  },
+]} />
+
+## How to evaluate it
+
+<HowToEval>
+
+There is no free-text answer here for a person to grade, so there is no confusion matrix and no
+sample of graded examples to collect: `within_limits`, `cpk` and `control_chart` are closed-form
+arithmetic, and either they reproduce the numbers a hand calculation gets or they have a bug.
+`tests/test_example_bench_limits_without_a_model.py` checks every number this page states against
+two independent computations: one call through `run()`, and one written straight from the CSV
+with nothing but `csv` and `statistics`, the same way `tests/test_bench_data.py` checks the bench
+data itself. Before trusting this recipe against a real line's log, keep one hand-checked example
+for each limit shape it will see (upper only, lower only, both) and one for the case that is easy
+to get backwards: a group with too few readings to have a standard deviation at all. `scripts/
+eval_run.py`'s 60-question set grades a drafted answer against a document set; nothing here drafts
+an answer, so that runner does not apply to this recipe, and no page on this site should point a
+reader at it as if it did.
+
+</HowToEval>
+
+## How to adapt it
+
+Every number in the two tables above, the 50 mV ripple limit, the four lots and fixtures, the
+28 mV fixture offset, is this bench's own and specific to `docs/THE-BENCH.md`. A real line has its
+own test specification, its own lots and fixtures (or panels, reels or work orders, whichever your
+line actually calls them), and its own answer for which limits are one-sided and which are two.
+Read the real limits from the real spec the same way `load_readings` reads them from the log's own
+`lower_limit` and `upper_limit` columns, rather than typing them in twice where they can drift out
+of sync with each other.
+
+The individuals chart's constant, 1.128, is specific to a moving range taken between single
+consecutive readings. A line that already groups its own readings into small subgroups (five
+boards from the same reel, say) uses a different, larger subgroup and a different table constant
+for that subgroup size; the shape of the chart does not change, only which number divides the
+moving range.
+
+This shape is not specific to electronics test. Flagging an invoice over an approval threshold,
+finding a scheduling conflict in a calendar, reordering stock once a count falls below a minimum,
+and checking a bill of materials against a supplier's end-of-life list are the same job: the input
+is already structured, the right answer is fixed by a rule or a subtraction, and two people given
+the same numbers get the same answer every time. None of those needs a model either.
+
