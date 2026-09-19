@@ -9,8 +9,8 @@ import HowToEval from '../../components/page/HowToEval.astro';
 import Link from '../../components/page/Link.astro';
 import maintenanceRun from '../../data/runs/recipe-maintenance-log.json';
 
-A small facility's technicians write what they did in plain language — "replaced the belt on pump
-3, it was fraying" — rather than filling out a rigid form. Someone still needs that turned into a
+A small facility's technicians write what they did in plain language: "replaced the belt on pump
+3, it was fraying," rather than filling out a rigid form. Someone still needs that turned into a
 real log entry: which piece of equipment, what was done, when, filed against that equipment's own
 history rather than as a flat note nobody can search. And every so often, a note buried in
 otherwise routine language is actually describing something that needs a person's attention now,
@@ -27,21 +27,21 @@ needs flagging.
 ## Why these techniques, and why not higher
 
 Three techniques compose this recipe. <Link href="/techniques/structured-output/">Structured
-output</Link> turns the note into a fixed record — equipment, action, a condition field, a date —
+output</Link> turns the note into a fixed record (equipment, action, a condition field, a date)
 validated before anything downstream touches it. <Link
 href="/techniques/knowledge-graphs/">Knowledge graphs</Link> is what makes "pump 3" mean something:
 a small graph walk from the named equipment to what line it's on and when it was last serviced, so
 the entry lands linked to a real history rather than as an isolated row. <Link
 href="/techniques/function-calling/">Function calling</Link> is the one place this recipe climbs
-past a fixed pipeline: the model is offered two tools — log it routinely, or flag it for review —
+past a fixed pipeline: the model is offered two tools (log it routinely, or flag it for review)
 and decides which one this note actually calls for.
 
 That decision is why level 4, not level 2, is the honest floor here. Structured output and
 knowledge graphs alone would produce a well-formed, well-linked record every time, but they'd file
-"smelled hot" with the same routine handling as "replaced the belt" — neither technique reads for
+"smelled hot" with the same routine handling as "replaced the belt": neither technique reads for
 risk, only for fields and connections. Function calling's own page draws the boundary this recipe
 needs: the model is offered a schema-shaped action and decides on its own whether to reach for it.
-Structured output's page draws the same contrast from its own side — at level 4 the model
+Structured output's page draws the same contrast from its own side: at level 4 the model
 additionally decides *whether* to use a shape at all, not just what goes in it. A fixed keyword
 list could
 catch a few obvious cases, but "starting to smell hot" is exactly the open-ended phrasing such a
@@ -50,23 +50,23 @@ list can't be written to catch reliably in advance.
 It isn't worth climbing past that single decision. The model acts once, on one note, with
 everything it needs already in the extracted record and the graph walk; nothing here asks it to
 check a result and decide again. A facility that wanted the model to weigh a piece of equipment's
-full service history against similar recent notes elsewhere before deciding — several lookups,
-each depending on the last — is the case a single agent is for, at real added cost for a decision
+full service history against similar recent notes elsewhere before deciding (several lookups,
+each depending on the last) is the case a single agent is for, at real added cost for a decision
 this recipe currently makes in one call.
 
 ## Walkthrough
 
 The three steps compose the runnable code already on the structured output, knowledge graphs and
-function calling pages, unmodified in shape, each written against the site's own shared examples —
-structured output reads a warranty record, knowledge graphs walks from a part to its warranty
-class — rather than a literal maintenance note. Composing them means keeping the same functions
+function calling pages, unmodified in shape, each written against the site's own shared examples
+(structured output reads a warranty record, knowledge graphs walks from a part to its warranty
+class) rather than a literal maintenance note. Composing them means keeping the same functions
 and swapping in this job's own schema and its own two-hop walk (equipment to line, line to
 last-serviced date), and offering `save_log_entry` and `flag_for_review` in place of
 `lookup_part`. Nothing here ships that exact pair of tools yet; what's illustrated above is the
 shape those three pages' code already is, run for this job.
 
 The run above shows a note that reads as routine until its last clause. Extraction pulls a clean
-record — equipment, action, a condition field carrying the technician's own words — and the graph
+record (equipment, action, a condition field carrying the technician's own words) and the graph
 walk finds pump 3's line and that it was serviced two months ago, nothing unusual on its own. The
 model reads the condition field's "starting to smell hot" alongside a worn belt and calls
 `flag_for_review` instead of `save_log_entry`, the one `decided_by: "model"` step in the whole
@@ -95,14 +95,14 @@ task yet, so this recipe cannot claim a score for any of it.
 ## Variations
 
 - Add <Link href="/techniques/human-in-the-loop/">human approval</Link> before saving an entry
-  whose equipment id the graph doesn't recognize — a missing link and a safety concern are
+  whose equipment id the graph doesn't recognize: a missing link and a safety concern are
   different problems and shouldn't share one gate.
 - Move to <Link href="/techniques/single-agent/">a single agent</Link> if escalating ever needs
-  more than one lookup — checking recent notes on similar equipment before judging this one.
+  more than one lookup: checking recent notes on similar equipment before judging this one.
 - Route by facility area first with <Link href="/techniques/routing/">routing</Link> if the same
   pipeline serves more than one site, each with its own equipment graph.
 - Rebuild the graph on a schedule, not on every note; knowledge graphs' own page is direct about
-  the cost — extraction is expensive, and paid once per equipment change, not per entry.
+  the cost: extraction is expensive, and paid once per equipment change, not per entry.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}

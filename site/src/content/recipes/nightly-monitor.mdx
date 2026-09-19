@@ -9,8 +9,8 @@ import HowToEval from '../../components/page/HowToEval.astro';
 import Link from '../../components/page/Link.astro';
 import runData from '../../data/runs/recipe-nightly-monitor.json';
 
-A small trade association tracks a handful of public regulatory pages — filing deadlines, fee
-schedules, published guidance — and wants to know when one changes, without a person opening six
+A small trade association tracks a handful of public regulatory pages (filing deadlines, fee
+schedules, published guidance) and wants to know when one changes, without a person opening six
 tabs every morning to compare them by eye. The job runs unattended, every night, with nobody
 around to notice if it quietly stops working.
 
@@ -21,22 +21,22 @@ around to notice if it quietly stops working.
 ## Why these techniques, and why not higher
 
 Only one part of this job needs a model at all. Fetching each page and diffing it against last
-night's copy is ordinary code — a checksum or a text diff either finds a change or it doesn't, and
+night's copy is ordinary code: a checksum or a text diff either finds a change or it doesn't, and
 no judgment is involved. <Link href="/techniques/structured-output/">Structured output</Link> is
 the model's entire job: given a diff code already found, decide whether it is worth a person's
-attention and write that into a fixed record — source, what changed, why it matters, a confidence
-field — rather than free text someone has to re-read. <Link href="/techniques/evals/">Evals</Link>
+attention and write that into a fixed record (source, what changed, why it matters, a confidence
+field) rather than free text someone has to re-read. <Link href="/techniques/evals/">Evals</Link>
 turns "seems to work" into a number, and the false-positive rate is the one that decides whether
 anybody keeps opening the morning queue.
 
-That call returns one label — substantive, or cosmetic — and code looks it up in a table of two
+That call returns one label (substantive, or cosmetic) and code looks it up in a table of two
 handlers written before the job ever ran. This is <Link href="/techniques/routing/">routing</Link>,
 level 3, and the routing page draws the line to the next level exactly there: a label your code
 branches on is not the model selecting what happens next. There is no loop, no tool the model can
 call, and nothing it decides after the label.
 
 What makes this job feel higher is real, but operational, not agency. It runs on a schedule with
-nobody watching, and it has to remember what it saw last time — one checkpoint per source — or
+nobody watching, and it has to remember what it saw last time (one checkpoint per source) or
 every night reads as a change. <Link href="/techniques/long-horizon/">Long-running tasks</Link>,
 level 7, is where that machinery is written down, and the page to read for a checkpoint that
 survives being interrupted mid-write. But its own advice sends this job back down: a fixed
@@ -44,8 +44,8 @@ workflow on a timer, where what runs and when is known in advance, is a schedule
 long-running task. Borrowing a level's machinery is not the same as needing its level.
 
 Two changes would justify climbing, each with a price. If the monitor had to work out *what* to
-watch — a source with no stable page to diff, where a search has to be re-run and re-judged each
-time — searching becomes a loop and the job is <Link href="/techniques/agentic-rag/">agentic
+watch (a source with no stable page to diff, where a search has to be re-run and re-judged each
+time), searching becomes a loop and the job is <Link href="/techniques/agentic-rag/">agentic
 search</Link>, level 5, costing a varying number of calls per run instead of one per changed page.
 If the association wanted the monitor to *act* on a finding rather than queue it, that is an <Link
 href="/techniques/agent-teammates/">always-on assistant</Link>, where every action type needs a
@@ -55,7 +55,7 @@ policy saying auto, ask or never, and the cost of getting one wrong is no longer
 
 The nightly job wakes, fetches all six tracked pages and diffs each against its stored snapshot.
 Most nights, most pages match; those never reach the model, which keeps a quiet night close to
-free. When a page differs, the diff — not the whole page — goes to the model with one question:
+free. When a page differs, the diff (not the whole page) goes to the model with one question:
 substantive change, or noise (a typo fix, a reformatted date, a re-rendered footer)? Code reads
 the answer. Substantive becomes a finding in the morning queue; cosmetic is logged and dropped,
 the stated reason kept, so anyone auditing the monitor later can see why nothing was raised.
@@ -65,7 +65,7 @@ one run record per source, and no credentials, since the job only reads pages an
 Everything runs without asking, which is defensible only because nothing here acts: the job writes
 to a queue and stops. What leaves the machine is the fetches plus whatever the model call carries;
 against a hosted API the diffs go too, fine for a public page and not for an internal one.
-Stopping it is the schedule — disable the timer and nothing is left running.
+Stopping it is the schedule: disable the timer and nothing is left running.
 
 Seeing what happened while away means the run log, not the queue, which is what the <Link
 href="/techniques/ops/">operations</Link> topic would insist on: every run records which pages
@@ -83,7 +83,7 @@ nothing to report.
 Build a small labeled set from the tracked pages' own published history, or from reconstructed
 before/after pairs: some genuinely substantive changes, some cosmetic, in roughly the mix these
 pages produce. Measure the **false-positive rate** (cosmetic changes wrongly raised) against the
-**false-negative rate** (substantive changes judged cosmetic) separately — they trade against each
+**false-negative rate** (substantive changes judged cosmetic) separately, and they trade against each
 other, and a monitor tuned against one alone looks excellent on paper while failing at the job.
 Re-run the label on an unchanged diff to check the verdict is stable, and track both rates as the
 pages' formatting drifts: a classifier tuned to today's layout is not guaranteed to be right in
@@ -97,7 +97,7 @@ six months. No result file exists; this is what a run would score.
   one on this narrow judgment, usually where a monitor's real savings are.
 - Add <Link href="/techniques/human-in-the-loop/">human approval</Link> before a finding reaches a
   public channel, if "worth a person's attention" grows into "worth posting publicly."
-- Diff structure rather than text — a table cell, a named section — so a re-rendered page stops
+- Diff structure rather than text (a table cell, a named section) so a re-rendered page stops
   producing diffs the model has to judge.
 - Keep a per-run record of cost and latency beside the findings, so a slow night shows up before
   it becomes a bill nobody expected.

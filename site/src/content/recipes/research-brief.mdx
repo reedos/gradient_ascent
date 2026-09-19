@@ -9,7 +9,7 @@ import HowToEval from '../../components/page/HowToEval.astro';
 import Link from '../../components/page/Link.astro';
 import runData from '../../data/runs/recipe-research-brief.json';
 
-An analyst is asked for a short, sourced brief on a public topic — what changed in a rule this
+An analyst is asked for a short, sourced brief on a public topic: what changed in a rule this
 year, what a public filing actually says, how two published accounts of the same event differ.
 Nobody wants prose that sounds right; they want every claim traceable to something they can
 open. That is a research brief: search public sources, draft from them, and check that every
@@ -25,16 +25,16 @@ claim still says what its source says before anyone reads it.
 what to search for, opens a source before relying on it, and decides for itself when it has
 enough to draft from. <Link href="/techniques/evaluator-optimizer/">Write and check</Link> sits
 between the draft and the reader: a second prompt reads one drafted sentence and the section it
-cites, and answers one question — does that section say this?
+cites, and answers one question: does that section say this?
 
 Single-pass <Link href="/techniques/rag/">RAG</Link> (level 2) is not enough on its own because a
-brief's claims rarely come from one search. "What changed" needs at least two queries — the
-current rule, and what it replaced — and the second query depends on what the first one turned
+brief's claims rarely come from one search. "What changed" needs at least two queries (the
+current rule, and what it replaced), and the second query depends on what the first one turned
 up, which is the same reason the RAG page gives for climbing to agentic RAG at all.
 
 Two parts of the checking stay below the model entirely, and should. Plain code confirms that
 every citation resolves to a section this run actually opened, which catches an invented
-identifier outright and costs nothing — the same check write and check's own example runs. Code
+identifier outright and costs nothing: the same check write and check's own example runs. Code
 also owns the loop: how many times a sentence may come back, and what happens when that cap is
 reached with it still unsupported.
 
@@ -57,7 +57,7 @@ down in advance. A short brief's split can be: if the sections are known, runnin
 
 ## Walkthrough
 
-The run above traces one invented topic — a disclosure window, in a made-up advisory — end to
+The run above traces one invented topic (a disclosure window, in a made-up advisory) end to
 end. Nothing in it is a real rule or a real document.
 
 The agent searches, reads a result in full before relying on it, and searches again once it
@@ -86,7 +86,7 @@ This recipe's questions are not the site's own document set, so measuring it mea
 small test set for this job specifically: a handful of synthetic public-style topics with a
 known-correct citation for every claim a good brief would make, plus a few claims deliberately
 paired with the wrong section. Two things matter more than raw fluency. **Citation support
-rate** — for a sample of sentences, does the cited section actually contain the claim, checked by
+rate**: for a sample of sentences, does the cited section actually contain the claim, checked by
 a person against the source. And the checker's own **catch rate** against the deliberately broken
 citations, alongside its **false-flag rate** against citations that were correct all along. A
 checker that flags everything has a perfect catch rate and is useless. Run the check twice on one

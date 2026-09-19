@@ -21,25 +21,25 @@ findings a scheduling system can act on, not a paragraph someone reads later and
 ## Why these techniques, and why not higher
 
 <Link href="/techniques/multimodal/">Multimodal</Link> covers turning the voice note into text:
-one request that carries the audio itself and comes back with a transcript — level 1, the same
+one request that carries the audio itself and comes back with a transcript: level 1, the same
 one-call shape as any other request, with audio where a paragraph would be.
 <Link href="/techniques/prompt-chaining/">Prompt
 chaining</Link> is the technique doing the real work after that: split the transcript into
-individual findings, in the order the technician said them, and fill a fixed record — location,
-component, condition, action needed — for each one. <Link href="/techniques/evals/">Evals</Link>
+individual findings, in the order the technician said them, and fill a fixed record (location,
+component, condition, action needed) for each one. <Link href="/techniques/evals/">Evals</Link>
 is how "did it get this right" is measured for a job with no citation to check against, the way
 document-Q&A has.
 
 Both composed techniques put every decision in code. Transcribing is one fixed call: the code
 always makes it, once, and never asks the model whether to. Splitting the transcript into findings
-and filling each one's record is a fixed sequence too — every step runs in the same order
+and filling each one's record is a fixed sequence too: every step runs in the same order
 regardless of what came back from the last one. Set that against the site's own thesis: this
 recipe reaches level 3 on the ladder, and yet not one step in its run is `decided_by: "model"`.
 The model only fills in what a fixed step already decided to ask it for.
 
 Climbing to <Link href="/techniques/single-agent/">a single agent</Link> would trade that
 predictability for judgment the fixed order can't offer: a note where findings interrupt each
-other ("actually, before the belt — check the filter too"), get corrected mid-sentence, or
+other ("actually, before the belt, check the filter too"), get corrected mid-sentence, or
 describe two sites in one recording. A technician who dictates cleanly, one finding after
 another, the way this recipe's illustrated run does, doesn't need a model deciding how to segment
 the note; a fixed splitter does the same job for less and never disagrees with itself about where
@@ -48,13 +48,13 @@ one finding ends and the next begins.
 ## Walkthrough
 
 The transcript comes back as one block of text. Code splits it on cues a technician's dictation
-already tends to carry — "also," "next," a pause long enough to mark in the transcript — into a
+already tends to carry ("also," "next," a pause long enough to mark in the transcript) into a
 list of candidate findings; this is level 0 work, not a model's judgment call, the same way
 document-Q&A's chunking is just where the source documents already break. Each candidate goes to
 the model once, with a fixed schema: location, component, condition, an action if one was stated,
 and a confidence field the model fills honestly rather than guessing when the note didn't say. A
 last code step checks every required field came back non-empty, and flags a record that is
-missing one rather than filing it — the retry-and-validate shape a structured-output step takes
+missing one rather than filing it: the retry-and-validate shape a structured-output step takes
 anywhere on this site.
 
 Recording is a question to settle before this ships. The technician starts the recording, so
@@ -62,7 +62,7 @@ nobody is taped unawares, but they should still be told where the audio goes, ho
 and who can play it back: a dictated note is a recording of someone's voice, not only a row in a
 table. Retention makes the rest easy. If the structured record is what the scheduling system
 needs, the audio can be deleted once a transcript is accepted, and no archive of voices is left to
-govern. A note that catches a second voice in the background — a customer talking on site — is a
+govern. A note that catches a second voice in the background (a customer talking on site) is a
 different question, answered differently in different places and one for a lawyer rather than this
 page; deleting those is the cheap default.
 
@@ -70,7 +70,7 @@ Transcribe locally and the audio never leaves the device; transcribe against a h
 every note does. Either way the transcript and the records reach whatever stores site records,
 which turns a dictated remark into searchable text. Nothing here pauses for approval before a
 record is filed, so the risk is a misheard word becoming a wrong structured fact nobody checks
-until the next visit — which is what the eval below is for. Cost per note tracks how long the
+until the next visit, which is what the eval below is for. Cost per note tracks how long the
 audio is rather than how many words are in it, since audio is charged by duration on at least one
 maker's API (the multimodal page carries the figure); the structuring calls after it are small by
 comparison.
@@ -79,9 +79,9 @@ comparison.
 
 <HowToEval>
 
-Collect a small set of real-shaped, synthetic dictated notes — a few dozen, covering clean
+Collect a small set of real-shaped, synthetic dictated notes (a few dozen, covering clean
 single-finding notes, multi-finding notes, and a few with a misheard-sounding word or a
-mid-sentence correction — each with a hand-written correct set of records. Measure **finding
+mid-sentence correction) each with a hand-written correct set of records. Measure **finding
 count accuracy** (did the split produce the right number of records, not too many or too few),
 **field accuracy** per required field against the hand-written answer, and the **flag rate**: how
 often a record with a genuinely wrong field also came back with low confidence or a validation
@@ -93,8 +93,8 @@ the system admits it isn't sure of. No run of this has been scored yet.
 
 ## Variations
 
-- Split transcription and structuring across two models — a small, fast speech-to-text one for
-  the transcript, a larger one only for the structuring pass — if a local model can transcribe
+- Split transcription and structuring across two models (a small, fast speech-to-text one for
+  the transcript, a larger one only for the structuring pass) if a local model can transcribe
   well enough to skip sending audio anywhere.
 - Move to <Link href="/techniques/single-agent/">a single agent</Link> once technicians start
   dictating messier notes than a fixed splitter can reliably segment.

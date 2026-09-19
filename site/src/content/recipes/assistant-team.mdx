@@ -11,7 +11,7 @@ import runData from '../../data/runs/recipe-assistant-team.json';
 
 A three-person consultancy runs on always-on assistants instead of one general one: one handles
 scheduling, another chases overdue invoices, a third coordinates. Both working assistants start
-jobs nobody asked for — a weekly pass over unpaid invoices, a morning look at tomorrow's calendar —
+jobs nobody asked for (a weekly pass over unpaid invoices, a morning look at tomorrow's calendar),
 and one incoming request can touch both. None of it should reach a client or an invoicing system
 without a partner's say on anything that isn't routine.
 
@@ -23,25 +23,25 @@ without a partner's say on anything that isn't routine.
 
 <Link href="/techniques/agent-teammates/">Always-on assistants</Link> is the shape each role
 takes: one narrow job, its own routines, and a trigger that is not a person typing. That last part
-is what makes this level 7 rather than level 6 — as that page puts it, what separates the level is
+is what makes this level 7 rather than level 6: as that page puts it, what separates the level is
 the trigger, not the loop. The invoicing assistant's weekly pass starts on a schedule, and what it
 does once running was not written down in advance. <Link href="/techniques/agent-graphs/">Agent
 graphs</Link> describes how a request, or a routine's tick, turns into a handoff to one assistant
 or both: a fixed roster with defined roles, not an open-ended crowd. <Link
-href="/techniques/memory/">Memory</Link> is a shared store both read before acting — a client's
+href="/techniques/memory/">Memory</Link> is a shared store both read before acting: a client's
 standing scheduling preference, a note about a past billing dispute. <Link
 href="/techniques/safety/">Safety</Link> is the scope check between a drafted action and anything
 going out.
 
-Two of those four sit low, deliberately. Memory is level 2 — code writes every entry and code
+Two of those four sit low, deliberately. Memory is level 2: code writes every entry and code
 reads it back, and the model answers only with what it was handed. The scope check is ordinary
 code against a rule table, and has to be: a model asked whether its own draft is risky is not a
-check on that draft. What sits at level 7 is narrow — the standing triggers, and what each
+check on that draft. What sits at level 7 is narrow: the standing triggers, and what each
 assistant decides once one fires.
 
 The composition stops short of <Link href="/techniques/organizations-swarms/">organizations of
 agents</Link> on purpose, and the reason is not size. That page's line is whether the roster
-itself — who exists, what they are working on, when a new round of work starts — gets decided
+itself (who exists, what they are working on, when a new round of work starts) gets decided
 along the way rather than set by a person and left alone. Three roles chosen by three partners are
 set. That page is also candid that the shape is mostly frontier, and that what ships today looks
 more like what this recipe already builds. The climb condition is roles that come and go with the
@@ -51,7 +51,7 @@ enough concurrent independent work for a longer roster to finish anything sooner
 ## Walkthrough
 
 A request such as "reschedule Thursday's 2pm and follow up on the overdue invoice" names two jobs
-at once. The chief-of-staff agent — the supervising node in the agent graph — reads it and hands
+at once. The chief-of-staff agent (the supervising node in the agent graph) reads it and hands
 one part to the scheduling assistant and the other to invoicing; that split is the model's own
 call, since only it can tell the two jobs apart in one sentence. The same graph runs when nobody
 has asked for anything: a routine's tick arrives at the same handoff, and everything after it is
@@ -63,7 +63,7 @@ a charge last quarter. Both drafts go to the scope check before anything happens
 
 The scope check, not either assistant, decides what needs a partner's eyes. A routine reschedule
 with no dispute history clears automatically. A follow-up on an account with a dispute in memory
-is held — not because invoicing work is inherently risky, but because this action touches an
+is held, not because invoicing work is inherently risky, but because this action touches an
 account already in a state that needs a person's judgment, and the check is written to know the
 difference. The partner sees the draft, the reason it was held and the memory entry that triggered
 it, then approves or edits. Nothing either assistant drafts reaches a client or an invoicing
@@ -72,7 +72,7 @@ authorize anything by citing it.
 
 Work that happens while nobody is watching needs three more answers. A partner catching up reads
 one log and one queue: every action that went out automatically, every hold, who cleared it.
-Stopping it is per assistant — pause a routine and typed requests still route — plus one switch
+Stopping it is per assistant (pause a routine and typed requests still route) plus one switch
 that holds everything, for the week nobody is reading the queue. And client names, calendar
 entries and invoice details go to whichever model drafts them, which is a decision to make before
 the first routine fires. Cost is one handoff call plus one drafting call per assistant touched.
@@ -87,7 +87,7 @@ Build a small synthetic set of incoming requests and routine triggers, each labe
 assistant it should reach and whether a memory entry should hold the resulting draft. Measure
 **routing accuracy** (did the handoff reach the right assistant, or both, when a request names two
 jobs), **hold precision and recall** against the scope check's own labels (did it hold what should
-have been held, and only that), and **memory grounding** — for drafts citing a memory entry as
+have been held, and only that), and **memory grounding**: for drafts citing a memory entry as
 their reason, does that entry say what the draft claims. Nothing here carries a score.
 
 </HowToEval>
@@ -96,8 +96,8 @@ their reason, does that entry say what the draft claims. Nothing here carries a 
 
 - Add a research assistant as a fourth role in the same graph, reusing the shared memory and the
   same scope check rather than standing up a separate system.
-- Move a routine class of request — same client, same kind of ask, cleared the same way ten times
-  before — to plain <Link href="/techniques/routing/">routing</Link>, once the pattern is settled
+- Move a routine class of request (same client, same kind of ask, cleared the same way ten times
+  before) to plain <Link href="/techniques/routing/">routing</Link>, once the pattern is settled
   enough to write down as a rule.
 - Give the scope check a stricter threshold for anything touching money than for anything touching
   a calendar, instead of one rule for both.

@@ -12,7 +12,7 @@ import runData from '../../data/runs/recipe-repo-assistant.json';
 A small open-source library has more open issues than its two maintainers have hours. Most are
 small: a failing edge case, a typo in an error message, a function that needs a test it never got.
 The job is an assistant that reads an issue, edits the repository, runs the tests and stops with a
-branch ready for review — not one that decides what to merge.
+branch ready for review, not one that decides what to merge.
 
 ## The assembled diagram
 
@@ -23,8 +23,8 @@ branch ready for review — not one that decides what to merge.
 <Link href="/techniques/coding-agents/">Coding agents</Link> is the core: the model proposes an
 edit, code runs the tests, and the model reads the result and decides whether to try again or
 report what it did. <Link href="/techniques/skills/">Skills</Link> holds the maintainers' own
-conventions — a changelog format, a commit-message style, which test file pattern a given kind of
-fix uses — as short descriptions the agent reads every time and longer bodies it loads only when a
+conventions (a changelog format, a commit-message style, which test file pattern a given kind of
+fix uses) as short descriptions the agent reads every time and longer bodies it loads only when a
 task calls for one, rather than every convention sitting in the system prompt on every run. <Link
 href="/techniques/safety/">Safety</Link> is a code-side check between what the agent proposes and
 what happens to the repository: it reads the diff's paths and the commands the agent asked to run,
@@ -32,7 +32,7 @@ and refuses anything outside what this task was scoped to touch.
 
 Two pieces of this sit below the agent and should stay there. The test suite is not a model at
 all; it is the signal the whole loop turns on, the same suite a maintainer runs by hand. The scope
-check is plain code reading a list, refusing by default anything nobody allowed in advance — a
+check is plain code reading a list, refusing by default anything nobody allowed in advance: a
 check in code, not a line in a prompt asking the model to behave.
 
 Level 5 is enough because one issue is one bounded loop: propose, test, read the result, decide
@@ -41,23 +41,23 @@ agent and workers</Link> is not a longer backlog. That page's condition is that 
 be written down before the work starts, and a queue of separate issues can be: ten known issues at
 once is <Link href="/techniques/parallelization/">parallel calls</Link>, level 3, ten copies of
 this loop with nothing to coordinate. The climb earns its cost when dividing one issue is itself a
-judgment, or when a second agent reviewing the first one's diff catches what the tests cannot —
+judgment, or when a second agent reviewing the first one's diff catches what the tests cannot:
 each costing another agent's worth of calls, spent on a conversation between two models about a
 change a maintainer is about to read anyway.
 
 ## Walkthrough
 
-The agent reads the issue, and for a fix touching this repository's own conventions — adding a
-test, say — calls `load_skill` for the relevant one rather than working from memory of how the
+The agent reads the issue, and for a fix touching this repository's own conventions (adding a
+test, say) calls `load_skill` for the relevant one rather than working from memory of how the
 last repository it saw was organized. It proposes an edit, code applies it and runs the existing
 tests, and the agent reads the result: if a test still fails, it tries again; once everything
 passes, it asks to open a branch.
 
-That request is where the scope check runs. The model is not judging its own change — code
+That request is where the scope check runs. The model is not judging its own change: code
 compares the actual diff, and any commands the agent asked to run, against what this task was
 scoped to touch. A request inside the issue's own files, running only the test suite, becomes a
-branch. One that reaches outside — a workflow file, an unrelated dependency pin, a shell command
-off the allowed list — is refused, with the reason handed back so the agent can try again.
+branch. One that reaches outside (a workflow file, an unrelated dependency pin, a shell command
+off the allowed list) is refused, with the reason handed back so the agent can try again.
 
 Everything past the branch belongs to a person. Nothing merges its own pull request, and nothing
 the agent proposes reaches the default branch or a push credential until a maintainer reads the
@@ -66,7 +66,7 @@ diff. The tests it ran are the ones already in the repository, not new coverage 
 Running this on every incoming issue takes a few more decisions. Nothing persists that the agent
 controls: the maintainers' skills, the branches it opened, a log per issue. Every run starts from
 the repository as committed, so a bad one leaves a branch nobody has to merge. That log is what a
-maintainer reads the next morning — the issue, every edit attempted, every test result, every
+maintainer reads the next morning: the issue, every edit attempted, every test result, every
 refusal the check made, since a refusal is the most interesting line in it and the easiest to
 lose. Stopping it means stopping the trigger: stop handing it issues and nothing new starts. The
 issue text, the files it opens and the test output go to whichever model runs it, unremarkable for

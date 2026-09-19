@@ -11,7 +11,7 @@ import supportRun from '../../data/runs/recipe-support-desk.json';
 
 A hardware shop runs a support desk: customers write in about a part that failed, a warranty
 question, or something that doesn't work the way the manual says. Someone reads each ticket,
-checks the documentation, and — for the tickets that need it — issues a replacement rather than
+checks the documentation and, for the tickets that need it, issues a replacement rather than
 answering in words.
 
 Support desk composes that into one pipeline: sort the ticket, search the documentation, let the
@@ -28,7 +28,7 @@ Four techniques compose this recipe. <Link href="/techniques/routing/">Routing</
 ticket into a fixed queue. <Link href="/techniques/rag/">RAG</Link> searches the shop's
 documentation and drafts an answer from what it finds, cited. <Link
 href="/techniques/function-calling/">Function calling</Link> is the one place this recipe climbs
-past a fixed workflow: the model is offered a tool — issue a replacement part — and decides for
+past a fixed workflow: the model is offered a tool (issue a replacement part) and decides for
 itself whether this ticket needs it, rather than your code deciding in advance from the queue
 label alone. <Link href="/techniques/human-in-the-loop/">Human approval</Link> pauses before a
 reply that used the tool goes out, since a free replacement has a real cost if the model called it
@@ -38,12 +38,12 @@ Level 4 is the right stop, not level 3, because the thing being decided here is 
 calling's own page says the level is for: whether *this* ticket needs a replacement shipped
 rather than an answer written is a judgment about open-ended text that a fixed rule can't make
 reliably. Routing can pick the queue; it can't decide whether to act. That one model decision is
-all this recipe adds over a plain sort-and-answer workflow, and it costs accordingly — function
+all this recipe adds over a plain sort-and-answer workflow, and it costs accordingly: function
 calling's own figures are two model calls on a ticket that gets a tool call, against RAG's one.
 
 It is not worth climbing to <Link href="/techniques/single-agent/">a single agent</Link> unless
-the tool decision itself needs more than one step — the function calling page states that upgrade
-condition directly: move up once the next action depends on what the last one returned, so the
+the tool decision itself needs more than one step (the function calling page states that upgrade
+condition directly): move up once the next action depends on what the last one returned, so the
 model has to choose again and decide when to stop. This desk's tool call is a single bounded
 action with a known result; nothing asks the model to check the outcome and decide again. A
 ticket that needed the model to check an order's shipping status first and act differently on
@@ -62,7 +62,7 @@ the repository yet.
 The run shown is a repeat-failure ticket. It classifies `technical`, and the search step retrieves
 the warranty policy and the part's own listing. The model reads both and decides on its own that a
 repeat failure under warranty calls for a real replacement, and calls the tool with the part
-number and its reasoning. Your code runs the tool and the model drafts the reply from the result —
+number and its reasoning. Your code runs the tool and the model drafts the reply from the result:
 the same `decided_by: "model"` step, and the same "your code always runs whatever it calls"
 boundary, that <Link href="/techniques/function-calling/">function calling</Link>'s own page
 describes. Because
@@ -80,15 +80,15 @@ never have shipped cannot be traced to the ticket, the sources or the argument t
 <HowToEval>
 
 Routing, RAG and function calling are each scored on their own by the site's shared 60-question
-set (see `docs/EVALS.md`); this job's version of each — is the ticket sorted the way a person
+set (see `docs/EVALS.md`); this job's version of each (is the ticket sorted the way a person
 would, does the citation hit rate on retrieved sources hold up, does `model_decided_steps` come
-back as exactly one per ticket, never zero and never more — reuses those numbers, on a labeled set
+back as exactly one per ticket, never zero and never more) reuses those numbers, on a labeled set
 of real or synthetic tickets instead of document questions. Watch one thing routing and RAG alone
 can't tell you:
-whether the tool actually gets called on the tickets that need an action, and only those — a
+whether the tool actually gets called on the tickets that need an action, and only those: a
 model that reaches for it on every ticket, or never, has learned the wrong lesson from its
-description. Human approval isn't scored by the shared runner — a paused ticket has no answer to
-grade — and needs the three numbers its own page describes instead: pause rate, whether the right
+description. Human approval isn't scored by the shared runner (a paused ticket has no answer to
+grade) and needs the three numbers its own page describes instead: pause rate, whether the right
 tickets pause, and accuracy after a person's decision. No result file exists for any of the four,
 so this recipe claims no score.
 
@@ -99,7 +99,7 @@ so this recipe claims no score.
 - Reach for <Link href="/techniques/mcp/">MCP</Link> once more than one application needs these
   same actions, or the tools should come from a server the support team doesn't maintain.
 - Move to <Link href="/techniques/knowledge-graphs/">knowledge graphs</Link> if tickets start
-  needing facts joined across documents — a part's compatible models and each model's own
+  needing facts joined across documents: a part's compatible models and each model's own
   warranty class, answered together rather than by one lucky search.
 - Move to <Link href="/techniques/agentic-rag/">agentic RAG</Link> if a single search often
   misses what a second, better-aimed one would find, before the tool decision happens.
