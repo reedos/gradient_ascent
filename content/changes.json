@@ -4,6 +4,27 @@
   "note": "What changed on this site, and why it matters to somebody reading it. Newest first. Entries are written for a reader, not for whoever made the change: they say what is different and what it is good for, never what a commit did. Every entry links the pages it touched. Several entries can share a date; within a date, file order is the order shown. docs/CHANGES.md says how to add one.",
   "changes": [
     {
+      "id": "a-command-that-shows-the-technique",
+      "date": "2026-09-19",
+      "title": "The command on every page now shows the technique working",
+      "what": "Each page prints one command you can copy and run with no model, no key and no network. Until now that command ran against a stub that echoes your question back, which proved the code ran and little else: a router took its fallback route every time, an agent was never offered a tool to call, a citation check never had a citation to check. Every example that calls a model now also takes --model stub:scripted, and that is the command the pages print. Run one and you see the routing decision, the tool call the code refuses, the draft that fails its own check, and the revision that passes.",
+      "why": "A reader copying a command off a page should see the thing that page is about. Most of them did not, and several pages worked around it by sending people to go read a test file instead. The replies are a written-down fixture, not a run of any model and not a result: what they show is the shape of a run that goes the way the page describes, which is what the command was always meant to demonstrate. The old command still works and is still worth running, because what a model that ignores your format costs you is its own lesson.",
+      "pages": [
+        {
+          "label": "Routing",
+          "path": "/techniques/routing/"
+        },
+        {
+          "label": "Single agent",
+          "path": "/techniques/single-agent/"
+        },
+        {
+          "label": "Write and check",
+          "path": "/techniques/evaluator-optimizer/"
+        }
+      ]
+    },
+    {
       "id": "the-standing-office-jobs",
       "date": "2026-09-19",
       "title": "The two jobs a small office actually runs on",
@@ -255,7 +276,7 @@
       "date": "2026-09-18",
       "title": "Gradient Ascent is public",
       "what": "The first public release: eight levels from no model to always-on agents, a page for every technique in them, the map of how those techniques connect, a worksheet that walks a problem down to the lowest level that does the job, recipes, a glossary built from the pages, a gallery of how each technique fails, a registry of named models, products and tools, and a timeline of when each level reached the public.",
-      "why": "The site's rule is to recommend the lowest level that does the job, and it is hard to follow that rule without seeing the whole ladder. Every page is a draft: written, sourced and reviewed, with no recorded run and no scored result behind it, and each one says so.",
+      "why": "The site's rule is to recommend the lowest level that does the job, and it is hard to follow that rule without seeing the whole ladder. Every page is sourced: written and reviewed, with every factual claim checked against a primary source, and with no recorded run and no scored result behind it, and each one says so.",
       "pages": [
         {
           "label": "Home",

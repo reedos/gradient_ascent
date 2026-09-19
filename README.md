@@ -9,9 +9,10 @@ enough.
 
 **Read it: https://reedos.github.io/gradient_ascent/**
 
-**Status: live and in development.** Every page is a draft, and nothing in this repository has
-ever called a model. See [What is and is not real yet](#what-is-and-is-not-real-yet). Found
-something wrong? Every page has a feedback link, or open
+**Status: live and in development.** Every page is `sourced`: written, with every factual claim
+checked against a primary source, and with no recorded run and no scored result file behind it.
+Nothing in this repository has ever called a model. See
+[What is and is not real yet](#what-is-and-is-not-real-yet). Found something wrong? Every page has a feedback link, or open
 [the feedback form](https://github.com/reedos/gradient_ascent/issues/new?template=feedback.yml);
 see [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -24,27 +25,34 @@ virtual environment, and no `requirements.txt`. Python 3.11 or newer; Node 22.12
 git clone <this repository> && cd gradient_ascent
 
 python scripts/validate.py                    # the content files: 8 levels, 49 techniques, the registry
-python -m unittest discover -s tests          # 1563 tests, about 4 seconds (some skip until the site is built)
+python -m unittest discover -s tests          # the Python suite, seconds (some skip until the site is built)
 
 cd site && npm ci && npm run build            # the site, into site/dist/
 npm run dev                                   # or serve it at localhost:4321
 ```
 
-Run an example against the stub model (no network, no API key, no local model):
+Run an example against a stub model (no network, no API key, no local model):
 
 ```
-python -m examples.rag --model stub --question "What is the DW-300's Normal cycle water use?"
+python -m examples.rag --model stub:scripted
 ```
 
-Every one of the 63 examples takes `--model stub` and prints what it did. Each has a README with
-its own command; `examples/rag/README.md` is the one to read first. Eleven of them are the
-engineering recipes' example packages, which run on the simulated bench in `evals/bench/`.
+All 66 examples run with `--model stub`, which echoes your question back. The 54 that call a
+model also take `--model stub:scripted`, which plays a sequence of replies written down in that
+example's own `__main__.py`. The echo shows that an example runs and what shape its run has; the
+scripted sequence shows the thing the example is about, including every branch the example takes
+on what the model actually said. Neither reaches a network, and neither is a measurement:
+[docs/RUNNING-AN-EXAMPLE.md](docs/RUNNING-AN-EXAMPLE.md) is the contract for both.
+
+Each example has a README with its own command; `examples/rag/README.md` is the one to read
+first. Eleven of them are the engineering recipes' example packages, which run on the simulated
+bench in `evals/bench/`.
 
 ## What is where
 
 | | |
 |---|---|
-| `examples/<technique>/` | One runnable example per technique: `run.py` (the technique, ~50 readable lines), `__main__.py` (the command line), `README.md` (what it shows and how to run it). |
+| `examples/<technique>/` | One runnable example per technique: `run.py` (the technique, ~50 readable lines), `__main__.py` (the command line, and the `SCRIPTED` sequence `--model stub:scripted` plays), `README.md` (what it shows, the command, and what that command prints). |
 | `examples/common/` | The thin model interface (`model.py`), the trace recorder (`trace.py`), the shared tools and agent-loop plumbing, and the simulated electronics bench with its measurement-uncertainty arithmetic (`bench.py`). Start here to understand any example. |
 | `evals/` | The synthetic document set (`corpus/`), the 60 questions (`questions.json`), and the projected token budget (`budget.json`). |
 | `evals/bench/` | The second synthetic world, for the engineering recipes: thirteen documents an engineer works from (`corpus/`), a month of production test data and a characterization sweep of five prototypes (`data/`), and the two seeded scripts that write them (`make_data.py`, `make_characterization.py`). Same loader, same `file#section` citations. |
@@ -57,13 +65,14 @@ engineering recipes' example packages, which run on the simulated bench in `eval
 
 | | |
 |---|---|
-| [docs/WRITING-A-TECHNIQUE-PAGE.md](docs/WRITING-A-TECHNIQUE-PAGE.md) | How to write a page: anatomy, components, word budgets, sourcing, the draft-to-published line. |
+| [docs/WRITING-A-TECHNIQUE-PAGE.md](docs/WRITING-A-TECHNIQUE-PAGE.md) | How to write a page: anatomy, components, word budgets, sourcing, the sourced-to-measured line. |
+| [docs/RUNNING-AN-EXAMPLE.md](docs/RUNNING-AN-EXAMPLE.md) | What the command on a page runs: the example package, the shared arguments, what each of the two stub models can and cannot show, and the convention that keeps a command demonstrating what its page claims. |
 | [docs/WRITING-A-TEARDOWN.md](docs/WRITING-A-TEARDOWN.md) | How to write a teardown: the sections, the frontmatter, the components allowed, the length, and the sourcing rule for a page about somebody else's product. |
 | [docs/CHANGES.md](docs/CHANGES.md) | How to add an entry to the change log behind `/changes/`, and how to work the review queue. |
 | [docs/THE-BENCH.md](docs/THE-BENCH.md) | The invented electronics test bench the engineering recipes run on, used three ways (production test, engineering test, precise measurement): the board, the four instruments, the production test and its limits, the safety envelope, the meter's accuracy specification and the uncertainty budget built from it, and the answer key to the ten defects planted in the two data sets. |
 | [docs/WRITING-AN-ENGINEERING-RECIPE.md](docs/WRITING-AN-ENGINEERING-RECIPE.md) | How to write a recipe for engineers: the three settings a page can be for, what the page contains, how the example package is laid out, and the engineering-correctness bar. |
 | [docs/EVALS.md](docs/EVALS.md) | The eval runner: which examples the question set can score and which it cannot, how a question is graded, how to read a result file. |
-| [docs/FIRST-LIVE-RUN.md](docs/FIRST-LIVE-RUN.md) | The exact sequence for the first run against a real model, and the gate a page passes to become published. |
+| [docs/FIRST-LIVE-RUN.md](docs/FIRST-LIVE-RUN.md) | The exact sequence for the first run against a real model, and the gate a page passes to become measured. |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to send feedback or a correction, and what to run before a pull request. |
 
 ## The one rule worth knowing before you read any code
@@ -85,14 +94,14 @@ exactly one per run, and level 5 records one per tool call plus one for the stop
 Everything here was built without calling a model, local or remote. That means:
 
 - **Real:** the examples, which run end to end against `StubModel`; the tests; the validator; the
-  synthetic corpus and the 60 questions; the site and all 95 written pages.
+  synthetic corpus and the 60 questions; the site and all 98 written pages.
 - **Not real:** every number on the site. The cost strips are illustrative and say so above the
   numbers. Every run diagram carries `"illustrative": true`. No example has a recorded
   `trace.json`, and `evals/results/` is empty.
 - **Projected, not measured:** the token figures in `evals/budget.json`, which come from
   `eval_run.py --dry`, a token counter, not a model.
 
-A page becomes `published` when it has a recorded non-stub trace and a non-stub result file.
+A page becomes `measured` when it has a recorded non-stub trace and a non-stub result file.
 `docs/FIRST-LIVE-RUN.md` has the full gate.
 
 ## Contributing
@@ -106,8 +115,9 @@ If you are changing code here, two things will bite you otherwise:
 1. **Before any commit**, both of these must exit 0: `python scripts/validate.py` and
    `python -m unittest discover -s tests`.
 2. **Pages pin code by line number.** Fifty-six `<CodeFile start={…} end={…}>` pins point into
-   `examples/` and `scripts/`, each guarded by an `expect=` literal. Editing one of those files
-   above a pinned range slides it, and the validator will tell you. See
+   `examples/`, each guarded by an `expect=` literal. Thirty-nine of them pin a single line of an
+   example's `README.md`, which is where a page's Run it command comes from. Editing one of those
+   files above a pinned range slides it, and the validator will tell you. See
    `docs/WRITING-A-TECHNIQUE-PAGE.md` for which files, and prefer `func=` over a range in new
    pages.
 
