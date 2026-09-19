@@ -48,6 +48,7 @@ from examples.common.model import (  # noqa: E402
     StubModel,
     StubResponse,
     TextPart,
+    ToolCall,
     build_embedder,
     build_model,
     content_payload,
@@ -265,6 +266,76 @@ class InteractiveCliTests(unittest.TestCase):
         content = [ImagePart(media_type="image/png", label="plate"), TextPart(text="read this")]
         completion = model.complete([Message(role="user", content=content)])
         self.assertIn("read this", completion.text)
+
+    def test_parse_args_takes_a_default_question_so_a_narrow_input_need_not_be_retyped(self) -> None:
+        # For an example whose first argument is narrower than a question; the value passed in is
+        # `SAMPLE_INPUT` from its run.py, the same constant scripts/record_trace.py falls back to.
+        args = cli.parse_args([], description="d", default_question="S-1042")
+        self.assertEqual(args.question, "S-1042")
+        self.assertEqual(cli.parse_args(["--question", "S-9"], description="d", default_question="S-1042").question, "S-9")
+
+
+class ScriptedStubTests(unittest.TestCase):
+    """`--model stub:scripted`: an ordered sequence of replies, one per model call, so an example
+    whose behavior depends on what the model said can be demonstrated from the command line."""
+
+    def test_replies_come_back_in_order_one_per_call(self) -> None:
+        model = cli.scripted_stub(["first", "second"], example="demo")
+        self.assertEqual(model.complete([Message(role="user", content="a")]).text, "first")
+        self.assertEqual(model.complete([Message(role="user", content="b")]).text, "second")
+
+    def test_a_plain_string_and_a_StubResponse_are_both_accepted(self) -> None:
+        # A call that has to return a tool call needs the StubResponse form; most need a string.
+        call = ToolCall(name="search", arguments={"query": "vent"})
+        model = cli.scripted_stub(["text only", StubResponse(text="", tool_calls=[call])], example="demo")
+        model.complete([Message(role="user", content="a")])
+        self.assertEqual(model.complete([Message(role="user", content="b")]).tool_calls, [call])
+
+    def test_running_past_the_end_names_the_call_number_and_what_was_asked(self) -> None:
+        # Not IndexError, and not an empty string: both read as "the example is broken" when what
+        # happened is that the example now makes one more call than its sequence was written for.
+        model = cli.scripted_stub(["only one"], example="demo")
+        model.complete([Message(role="user", content="a")])
+        with self.assertRaises(cli.ScriptExhausted) as caught:
+            model.complete(
+                [Message(role="system", content="Classify this"), Message(role="user", content="what voltage?")]
+            )
+        message = str(caught.exception)
+        self.assertIn("model call 2", message)
+        self.assertIn("has 1 reply", message)
+        self.assertIn("examples/demo/__main__.py", message)
+        self.assertIn("Classify this", message, "the message must say what that call was doing")
+        self.assertIn("what voltage?", message)
+
+    def test_the_scripted_stub_is_never_asked_to_call_a_tool_by_the_script_itself(self) -> None:
+        # Offering tools must not change which reply comes next: the sequence is the sequence.
+        model = cli.scripted_stub(["one", "two"], example="demo")
+        model.complete([Message(role="user", content="a")], tools=[{"name": "t", "parameters": {"properties": {}}}])
+        self.assertEqual(model.complete([Message(role="user", content="b")]).text, "two")
+
+    def test_build_cli_model_leaves_plain_stub_and_the_live_specs_alone(self) -> None:
+        # Additive: every command a page already prints must behave exactly as it did.
+        plain = cli.build_cli_model("stub", example="demo", script=["unused"])
+        self.assertEqual(plain.model_id, "stub-interactive")
+        self.assertIn("asked:", plain.complete([Message(role="user", content="q")]).text)
+        self.assertEqual(cli.build_cli_model("ollama:some-tag", example="demo").model_id, "ollama:some-tag")
+
+    def test_build_cli_model_plays_the_script_for_the_scripted_spec(self) -> None:
+        model = cli.build_cli_model(cli.SCRIPTED_SPEC, example="demo", script=["scripted reply"])
+        self.assertEqual(model.complete([Message(role="user", content="q")]).text, "scripted reply")
+
+    def test_asking_for_a_script_an_example_does_not_have_is_an_error_not_a_fallback(self) -> None:
+        # Falling back to the echo stub would put us back where we started: a command that prints
+        # something and demonstrates nothing.
+        with self.assertRaises(SystemExit) as caught:
+            cli.build_cli_model(cli.SCRIPTED_SPEC, example="demo", script=None)
+        self.assertIn("SCRIPTED", str(caught.exception))
+
+    def test_the_scripted_stub_makes_no_network_call(self) -> None:
+        # The same rule as every other stub here: constructing and running one is offline.
+        model = cli.scripted_stub(["a"], example="demo")
+        self.assertEqual(model.model_id, "stub-scripted")
+        self.assertEqual(model.complete([Message(role="user", content="q")]).tool_calls, [])
 
 
 class CorpusTests(unittest.TestCase):
