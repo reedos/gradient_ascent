@@ -4,16 +4,192 @@ reviewed: 2026-09-19
 sources: []
 ---
 
-An instrument's accuracy specification is a table in a PDF: one row per range, per calibration
-interval, in parts per million of reading plus parts per million of range, with a temperature band
-and a coefficient for every degree outside it. Nothing downstream can price a measurement until
-that table is data. The model reads the manual and fills the schema, code validates the rows and
-computes the budget from them, and a person checks every row against the manual before a number is
-quoted from it. The failure this recipe exists for is not a garbled row. It is a clean, plausible
-row taken from the wrong calibration interval or the wrong range, which produces an uncertainty
-three times too small and looks exactly like a correct one.
+import CodeFile from '../../components/page/CodeFile.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import Link from '../../components/page/Link.astro';
 
-Draft in progress. This page is a slot: the taxonomy entry, the techniques it composes and the
-level it needs are settled, and the writing is not. See `docs/WRITING-AN-ENGINEERING-RECIPE.md`
-for what belongs here, and `docs/THE-BENCH.md` for the bench every engineering recipe runs on,
-including the accuracy table in `evals/bench/corpus/mdn6100-programming-manual.md`.
+The number going in the report is 0.299 percent against a 0.300 percent limit, and somebody is
+going to ask how good the measurement is. Answering that means turning the MDN-6100's accuracy
+specification, a table in section 2 of its programming manual, into something code can compute
+from: one row per DC volts range per calibration interval, in parts per million of reading plus
+parts per million of range, with a temperature band and a coefficient for every degree outside it.
+This is the precise-measurement setting: one number that has to be right, priced once and reused
+for however many readings that meter takes until it is next calibrated or its manual is next
+revised. `AccuracySpec` in `examples/common/bench.py` is that schema already; this recipe is what
+fills it from the manual instead of from a person typing 15 rows into it by hand.
+
+## Why this level, and why not higher
+
+Level 0 checks the extraction: shape, that all five ranges times three intervals are present
+once each, and that a range's own accuracy only gets looser from the 24 hour row through the 1
+year row, never tighter. <Link href="/techniques/structured-output/">Structured output</Link>
+holds the model to a fixed schema and retries once on a validation error, the same
+schema-then-retry pattern
+<Link href="/recipes/test-failure-triage/">test-failure-triage</Link> uses for a cause label.
+<Link href="/techniques/human-in-the-loop/">Human approval</Link> is what actually earns this
+recipe its level: `run` never returns a table anyone may use, only a proposal, and
+`confirm_table` is where a person's row-by-row read of the manual is recorded. That gate is not
+loosened here the way human approval's own page allows when being wrong is cheap and easy to
+notice after the fact. A wrong row is neither. It is a real number, shaped exactly like the row
+next to it, and it stays wrong until somebody who has read the manual says so.
+
+Nothing here climbs past level 3. There is one document, one schema and one bounded retry; no
+step depends on what an earlier one found, which is the whole case an agent loop would need to
+make for itself. And once the table is confirmed, every budget built from it is arithmetic:
+`price_reading` calls `combined_uncertainty` and `expanded_uncertainty`, the same functions
+<Link href="/recipes/characterize-a-design/">characterize-a-design</Link> runs on the
+characterization data, and no model runs again. A model never produces a reported measurement, an
+uncertainty, a margin or a verdict, on this page or anywhere else on this bench; here it only ever
+proposes what the manual's table says, and code decides whether that proposal is even shaped like
+a table before a person is asked to read it against the real thing.
+
+Whether drafting is worth it at all is a question with an honest smaller answer: for one meter, a
+person reading the manual closely enough to check a drafted table could have typed 15 rows into a
+spreadsheet in about the time it takes to read this section, and typing is not a slower way to
+make the identical mistake a wrong row makes. Where this earns its keep is scale a single meter
+does not have: a lab with instruments from several vendors, each with its own manual and its own
+row shape, a calibration house that reissues a table every time a meter comes back, a manual
+revision that changes a number nobody re-reads. The checking discipline, every row against the
+manual, has to stay exactly as strict per row in that world as it would for one meter; what
+drafting buys is not a lighter check, only fewer hours spent retyping tables that turn over.
+
+## The walkthrough, on the bench
+
+No recorded run exists for this recipe yet (`docs/EVALS.md`), so what follows is worked by hand
+from the same code and the same stub the tests exercise, not a played trace, and it is labeled
+illustrated because it is one.
+
+`run` reads `mdn6100-programming-manual.md` section 2 and asks for all 15 rows as one JSON array.
+A clean reply validates on the first pass: every row is shaped right, all 15 combinations are
+there once each, and every range's ppm numbers increase from the 24 hour row to the 1 year row.
+Two kinds of broken reply are easy for validation to catch and are not this page's argument: a
+missing row, and two intervals of the same range swapped for each other, which breaks the
+increasing sequence the same check already watches for. `tests/test_example_bench_accuracy_specs_from_the_manual.py`
+scripts both with `StubModel` and confirms validation rejects each one.
+
+The reply this page is about validates too. The scripted mistake puts the 100 V range's numbers,
+45 ppm of reading plus 6 ppm of range, under the 10 V range's own 1 year row, which the manual
+prints as 35 plus 5. Nothing about that row is malformed: the range field still correctly says 10
+V, the four numbers are all plausible, non-negative and present once, and the sequence for that
+range still increases, 12, 25, 45, because a range's real accuracy generally gets looser with the
+range too, in the same direction the check is already watching for. `_validate_table` returns no
+problems for it. `run` holds the table anyway, the way it holds a clean one, because it never
+returns anything else: a person still has to read section 2 and check this row before it goes
+anywhere, and in the test that person finds the mismatch and calls `confirm_table` with
+`approved=False`.
+
+Once a table is confirmed, pricing a reading from it is arithmetic that never touches a model
+again, and it is exactly as easy to get wrong a second way. The manual works this out itself in
+section 2: a 4.9930 V reading on the 10 V range, one year specification, is good to 224.8 uV. The
+same reading is good to only 79.9 uV on the 24 hour row, which is the row for a meter calibrated
+in the last day, not eleven months ago, and to 824.7 uV if it were priced against the 100 V range
+instead of the 10 V range it was actually taken on. Both of those are real rows of the identical,
+correctly confirmed table; `price_reading` reaches the wrong one only when it is handed the wrong
+calibration age or the wrong range, which manual section 7 calls out by name as settings, not
+computed values, and squarely in the user's hands.
+
+## The code
+
+<CodeFile file="examples/bench_accuracy_specs_from_the_manual/run.py" func="_validate_table" />
+
+`run` extracts, validates, retries once, and stops there. It returns a proposal, not a table:
+
+<CodeFile file="examples/bench_accuracy_specs_from_the_manual/run.py" func="run" />
+
+`confirm_table` is where a person's decision is actually recorded, the same shape as
+`bench_test_failure_triage`'s `confirm` and the bench's own `GuardedSupply.output_on`:
+
+<CodeFile file="examples/bench_accuracy_specs_from_the_manual/run.py" func="confirm_table" />
+
+Pricing a reading from the confirmed table calls no model. `interval_for_calibration` picks the
+row by three comparisons; `price_reading` is `dc_voltage_budget` read from this extraction's own
+table instead of the one already coded in `examples/common/bench.py`:
+
+<CodeFile file="examples/bench_accuracy_specs_from_the_manual/run.py" func="price_reading" />
+
+## What it costs
+
+<CostStrip
+  level={3}
+  stats={[
+    { label: 'Model calls, one extraction', value: '1 (2 if the reply fails validation)' },
+    { label: 'Rows extracted per call', value: '15' },
+    { label: 'Model calls once confirmed', value: '0, ever, for this meter' },
+  ]}
+  comparedTo={{
+    label: 'typing the table in by hand',
+    note:
+      'For one meter this is not obviously cheaper: reading the manual closely enough to check the draft is most of the work of typing the table directly. The case for drafting is several meters and several manuals, where the checking stays per-row and the retyping does not have to.',
+  }}
+/>
+
+Once confirmed, a table is priced against as many readings as that meter ever takes before its
+next calibration or its manual's next revision, at no further model cost: the setting's own unit,
+per measurement, is what section 8 of the manual already works out by hand for one reading, and
+`price_reading` is that same arithmetic run again for the next one and the one after that.
+
+## How it fails on a real bench, specifically
+
+<FailureModes modes={[
+  {
+    name: 'A row that borrowed the next range up',
+    notice: 'A range’s accuracy row is shaped correctly, is the only row for its slot, and increases across intervals the way every real row does, and it is still the wrong row: its two ppm numbers came from the range above it, which happens to make the same check pass.',
+    test: 'Run _validate_table on the table tests/test_example_bench_accuracy_specs_from_the_manual.py calls BAD_ROWS: it returns no problems. The recipe page exists because that test passes; the row-by-row read against mdn6100-programming-manual.md section 2 is what the confirm step is for, and confirm_table(result, False, tracer, note=...) is how the tests record it being caught.',
+  },
+  {
+    name: 'The calibration row for a meter that was not just calibrated',
+    notice: 'A reading priced against the 24 hour row looks tighter than the same reading priced against the row for how long ago the meter was actually last calibrated, and nothing about the smaller number looks wrong on its own.',
+    test: 'Call price_reading with days_since_cal=0.5 against a meter actually calibrated eleven months ago; it silently returns the 24 hour row’s number instead of the 1 year row’s. test_assuming_a_meter_was_just_calibrated_understates_the_uncertainty checks the expanded uncertainty comes out smaller, never that it raises: price_reading trusts the calibration age it is given.',
+  },
+  {
+    name: 'The range named is not the range the reading was taken on',
+    notice: 'A reading is priced against a bigger range than it was actually measured on, most plausibly because the meter auto-ranged up briefly and nobody logged it, and the result overstates the uncertainty by a real row of the same table rather than understating it.',
+    test: 'Call price_reading with range_v=100.0 for a reading actually taken on the 10 V range; the result is 824.7 uV against a true 224.8 uV, exactly the manual’s own worked comparison in section 2. test_naming_the_wrong_range_overstates_the_uncertainty checks it.',
+  },
+]} />
+
+## What to measure
+
+<HowToEval>
+
+This example runs on `evals/bench/`, a second document set with no question file of its own, so
+`evals/questions.json` has nothing to grade it against (`docs/EVALS.md`). The right measurement is
+row accuracy against the manual, and it counts two mistakes separately, because they are caught
+differently. A value transcribed wrong inside an otherwise well-formed row, a digit or a decimal
+place off, is often visible to validation too, if it breaks the increasing sequence or drifts
+outside a plausible range. A right value taken from the wrong row never is; only a person
+comparing the extracted table against `mdn6100-programming-manual.md` section 2, cell by cell,
+catches it, which is why that comparison is the recipe and not a courtesy tacked onto the end of
+it. Fifteen rows is not enough to trust a rate from for either kind of mistake; collect a table
+per instrument as the lab's own manuals get read this way, and keep every mismatch a person finds,
+not only the ones this bench happened to plant.
+
+</HowToEval>
+
+## How to adapt it
+
+What ports: the schema (one row per range per calibration interval, `AccuracySpec`'s own fields),
+the validation that checks shape, completeness and monotonicity without needing to already know
+the answer, and the rule that nothing downstream may use a table before a person has read it
+against the source. A reader's own instrument states accuracy in its own form, sometimes percent
+of reading plus a fixed offset rather than ppm of reading plus ppm of range; `MDN4010_VOLT_READBACK`
+in `examples/common/bench.py` shows that conversion, since a fixed offset is a ppm-of-range term
+once the range is fixed.
+
+What does not: every number on this page, the specific five ranges and three intervals, and the
+assumption that a manual is Markdown with one table to read rather than a PDF whose table a real
+extraction step would have to parse first. `mdn6100-programming-manual.md` was checked into this
+bench already parsed; a reader's own manual was not.
+
+The same shape, a document with a table in it turned into fixed-field records nothing downstream
+may use unconfirmed, pulls a datasheet's key parameters into a parts database or a calibration
+certificate's as-found and as-left readings into a drift record, the way
+<Link href="/recipes/document-extraction/">document-extraction</Link> pulls a form's fields into a
+patient record. What is specific to this page is the two kinds of wrong row, one code can
+generally catch and one it structurally cannot, and a reader adapting this to a parts database or
+a drift record should ask which of theirs plays the harder part.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}
