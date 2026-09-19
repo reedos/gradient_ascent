@@ -267,6 +267,40 @@ NOT_SCORED = {
         "been clamped or refused ever reaches the actuator log (it must be none), and the rate at "
         "which a legitimate in-bounds move is refused anyway."
     ),
+    # The engineering recipes (docs/WRITING-AN-ENGINEERING-RECIPE.md). One family, one reason,
+    # and each says what its own page measures instead.
+    "bench_limits_without_a_model": (
+        'This example runs on the electronics test bench in evals/bench/, a second document set and data set with no question file of its own, so the 60-question set has nothing to grade it against. '
+        'It calls no model at all. Measure the arithmetic instead: every limit, yield and Cpk figure is recomputed by a test from the production log.'
+    ),
+    "bench_ask_the_datasheet": (
+        'This example runs on the electronics test bench in evals/bench/, a second document set and data set with no question file of its own, so the 60-question set has nothing to grade it against. '
+        'Measure instead whether an answer about a superseded figure cites both the datasheet and the change notice, and names the board revision it applies to.'
+    ),
+    "bench_test_failure_triage": (
+        'This example runs on the electronics test bench in evals/bench/, a second document set and data set with no question file of its own, so the 60-question set has nothing to grade it against. '
+        'Measure instead the confusion matrix of assigned causes against the answer key in docs/THE-BENCH.md, weighting a defect sent back as a fixture fault most heavily.'
+    ),
+    "bench_instrument_script_from_the_manual": (
+        'This example runs on the electronics test bench in evals/bench/, a second document set and data set with no question file of its own, so the 60-question set has nothing to grade it against. '
+        'Measure instead whether the drafted script runs on the simulated instrument with an empty error queue, which is a pass or a fail and not a judgment.'
+    ),
+    "bench_test_data_by_conversation": (
+        'This example runs on the electronics test bench in evals/bench/, a second document set and data set with no question file of its own, so the 60-question set has nothing to grade it against. '
+        'Measure instead whether the figures in the answer equal the figures the executed analysis code printed, and whether the range check stops the mislabeled column.'
+    ),
+    "bench_bring_up_debug_assistant": (
+        'This example runs on the electronics test bench in evals/bench/, a second document set and data set with no question file of its own, so the 60-question set has nothing to grade it against. '
+        'Measure instead whether the agent reaches the documented cause, how many queries it took, and that every state-setting call it attempted was refused.'
+    ),
+    "bench_design_review_checklist": (
+        'This example runs on the electronics test bench in evals/bench/, a second document set and data set with no question file of its own, so the 60-question set has nothing to grade it against. '
+        'Measure instead findings against the known violations in the bill of materials: how many were found, and how many surviving findings cite a rule that says what they claim.'
+    ),
+    "bench_requirements_to_test_plan": (
+        'This example runs on the electronics test bench in evals/bench/, a second document set and data set with no question file of its own, so the 60-question set has nothing to grade it against. '
+        'Measure instead the coverage check: every requirement has a test, and every test names a requirement, a bench instrument, a limit and a unit.'
+    ),
 }
 KINDS = ["lookup", "multi_hop", "numeric", "unanswerable", "conflicting"]
 DEFAULT_QUESTIONS = ROOT / "evals" / "questions.json"
