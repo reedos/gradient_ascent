@@ -3,29 +3,29 @@ slug: context-engineering
 level: 2
 run: context-engineering
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Prompt caching"
     url: "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
     publisher: "Anthropic (Claude Platform documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Prompt caching"
     url: "https://developers.openai.com/api/docs/guides/prompt-caching"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Context Rot: How Increasing Input Tokens Impacts LLM Performance"
     url: "https://www.trychroma.com/research/context-rot"
     publisher: "Chroma Research"
     date: "2025-07-14"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Contextual Retrieval"
     url: "https://www.anthropic.com/engineering/contextual-retrieval"
     publisher: "Anthropic (Engineering blog)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "What are Projects?"
     url: "https://support.claude.com/en/articles/9517075-what-are-projects"
     publisher: "Anthropic (Claude Help Center)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -110,14 +110,15 @@ not a judgment call: nothing here is decided by the model.
 
 Ordering the request is necessary for caching but not sufficient, and the two makers cited above
 differ in a way worth reading before you count on a discount. OpenAI documents caching as on by
-default for supported models, matching a prefix automatically, with a minimum of 1,024 tokens on
-its current models; it says reused tokens are billed at a reduced rate, discounted up to
-90%<Cite n={2}/>. Anthropic requires you to mark the end of the reusable prefix with a
-`cache_control` field, has a per-model minimum below which a marked prompt is silently not cached,
-and prices cache reads at a tenth of its base input rate against a write that costs more than an
-uncached call<Cite n={1}/>. Those are the makers' own published terms, not numbers this site has
-measured, and the write premium is why caching pays off over repeated calls rather than on the
-first one.
+default for supported models, matching a prefix automatically once it clears a minimum cacheable
+length; that minimum is 1,024 tokens on its newest models and different on earlier ones, and
+reused tokens are billed at a reduced rate, discounted up to 90%<Cite n={2}/>. Anthropic requires
+you to mark the end of the reusable prefix with a `cache_control` field, has a per-model minimum
+below which a marked prompt is silently not cached, and prices a cache read as a fraction of its
+base input rate (a tenth for most models, lower still for its newest ones) against a write that
+costs more than an uncached call<Cite n={1}/>. Those are the makers' own published terms, not
+numbers this site has measured, and the write premium is why caching pays off over repeated calls
+rather than on the first one.
 
 <CodeFile file="examples/context_engineering/run.py" func="run" />
 

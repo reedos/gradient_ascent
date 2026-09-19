@@ -14,9 +14,10 @@ be a tool call, and belongs at level 4, not here.
 Run it:
 
 ```
-python -m examples.human_in_the_loop --model stub --question "What does HLV-2205 cost?"
+python -m examples.human_in_the_loop --model stub --question "zzqqx frobnitz wibble"
 ```
 
-Add `--decision approve` (or `edit`/`reject`, with `--note` for an edit's replacement text) to
-resume a paused run immediately instead of just printing the checkpoint. Every step is
-`decided_by: "code"`, including the pause and the resume.
+It matches nothing, so the draft has no citation and pauses for `low_confidence`. Add
+`--decision approve` (or `edit`/`reject`, with `--note` for an edit's replacement text) to resume
+a paused run instead of just printing the checkpoint. Every step is `decided_by: "code"`,
+including the pause and the resume.

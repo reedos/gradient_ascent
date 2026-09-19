@@ -3,29 +3,29 @@ slug: human-in-the-loop
 level: 3
 run: human-in-the-loop
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Building effective agents"
     url: "https://www.anthropic.com/engineering/building-effective-agents"
     publisher: "Anthropic"
     date: "2024-12-19"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Power Automate"
     url: "https://www.microsoft.com/en-us/power-platform/products/power-automate"
     publisher: "Microsoft"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Jules"
     url: "https://jules.google/"
     publisher: "Google"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Cline"
     url: "https://cline.bot/"
     publisher: "Cline"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Human-in-the-loop"
     url: "https://docs.langchain.com/oss/python/langchain/human-in-the-loop"
     publisher: "LangChain (documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -44,26 +44,16 @@ import hitlRun from '../../data/runs/human-in-the-loop.json';
 
 Human approval pauses a run before something costly, irreversible, or too uncertain to ship, and
 hands that decision to a person. Anthropic frames the pause as a checkpoint inside an agent's own
-loop ("agents can then pause for human feedback at checkpoints or when encountering
-blockers"<Cite n={1}/>) but the version on this page stays at level 3: *your code* decides when
-to pause, against a fixed rule. The model is never asked whether a person should look, and the
-line to level 4 is exactly that: a design where the model can call for review itself.
+loop ("Agents can then pause for human feedback at checkpoints or when encountering
+blockers"<Cite n={1}/>), but the version on this page stays at level 3: *your code* decides when
+to pause, against a fixed rule. The model is never asked whether a person should look; the line
+to level 4 is exactly that, a design where the model can call for review itself.
 
-The rule that decides *when* to pause does the real work. Two common ones: confidence (the draft
-has nothing to point to, so it may be a guess) and cost (the draft names a price, or an action
-with a consequence if it is wrong). Get the threshold wrong either way and the gate stops doing
-its job. Too loose, and it waves through the answers that most needed a second look; too strict,
-and approving becomes a reflex rather than a check.
-
-That balance assumes the two kinds of mistake cost about the same, and often they do not. A
-maintenance inbox that pauses on a routine request wastes a minute of someone's time. One that
-lets a gas leak through as routine has done real harm. When a miss costs far more than a false
-alarm, lean the rule on purpose: anything the classifier does not confidently place in a safe
-category pauses, and the default for doubt is the dangerous category, not the common one. You will
-review more than you strictly need to, and that is the price of the asymmetry. The example on this
-page does not lean either way, so this is a change you make yourself, and the number to watch
-afterward is how many of the dangerous cases in your labeled set ever reached a person unpaused.
-It should be none.
+The rule that decides *when* to pause does the real work: confidence (the draft has nothing to
+point to) or cost (it names a price, or an action with a consequence if it is wrong). Get the
+threshold wrong either way and the gate fails at its job: too loose waves through what most
+needed a look; too strict makes approving a reflex. The two kinds of mistake rarely cost the
+same, and getting that threshold right on purpose is the subject of Build it, below.
 
 This page is marked draft, not published: this technique has no recorded trace and no scored
 result file yet, so nothing below is measured. It is illustrated.
@@ -76,8 +66,8 @@ result file yet, so nothing below is measured. It is illustrated.
 <Lane name="use" title="Use it">
 
 Approval steps in ordinary automation tools are the plainest version of this. Power Automate
-sells the feature directly: "Streamlined approval processes" that let you "create, manage, and
-share approval processes across your organization"<Cite n={2}/>: a flow runs up to a point, a
+sells the feature directly, under the heading "Streamlined approval processes": "Create, manage,
+and share approval processes across your organization"<Cite n={2}/>. A flow runs up to a point, a
 person is asked to approve or reject, and only an approval lets it continue. Coding agents put
 the pause at a different kind of irreversible step: Jules works from a plan you confirm ("That
 looks good. Continue!"), and when the work is done, "Jules creates a PR of the changes. Approve
@@ -114,6 +104,13 @@ supplied. A real system would serialize `PendingReview` the same way, hand it to
 ticket, and call `resume` whenever the decision comes back: hours or days later, in a different
 process entirely, with nothing about the code above needing to change.
 
+The two reasons `_needs_review` checks do not have to weigh equally. When missing a bad case
+costs far more than a false alarm, bias the rule on purpose: treat anything not confidently safe
+as needing a look, with the default for doubt the dangerous category, not the common one. You
+will review more than you strictly need to; that is the price of the asymmetry, and the number to
+watch afterward is how many of the dangerous cases in a labeled set still reached a person
+unpaused. It should be none.
+
 <CodeFile file="examples/human_in_the_loop/run.py" start={26} end={101} expect="LEVEL = 3" />
 
 Run it yourself:
@@ -131,6 +128,18 @@ later<Cite n={5}/>. These are the same two halves as `run` and `resume` above, w
 supplied. The decisions it names are the three this example takes plus one more: approve, edit,
 reject, and answer the model directly.
 
+`docs/THE-BENCH.md` draws this same line through an instrument's command set, written once in
+`examples/common/bench.py` as `READ_ONLY_HEADERS` and `is_read_only()`: a query runs unattended
+in production test, in engineering test, and in a precise measurement session alike, while
+anything that sets a voltage, a current limit or an output needs a person's approval before code
+will act on it, the same two-gate shape `run` and `resume` use here. The engineering recipes
+<Link href="/recipes/test-failure-triage/">test failure triage</Link>,
+<Link href="/recipes/requirements-to-test-plan/">requirements to a test plan</Link>,
+<Link href="/recipes/accuracy-specs-from-the-manual/">accuracy specs from the manual</Link> and
+<Link href="/recipes/bring-up-debug-assistant/">a bring-up debug assistant</Link> all turn on it:
+the approval gate is code's, never the model's, and a model never produces the reported
+measurement, the uncertainty, the margin or the verdict.
+
 </Lane>
 </Lanes>
 
@@ -142,7 +151,9 @@ nobody needed to check.
 
 Move up to a real approval gate once being wrong is expensive, hard to undo, or the kind of
 mistake nobody would notice until it was too late to matter, and pick the threshold from what
-actually made past answers wrong, not a guess.
+actually made past answers wrong, not a guess. This is the site's
+<Link href="/shapes/#plan-and-decompose">plan and decompose</Link> shape wherever the thing being
+approved is a plan rather than an answer: nothing happens until a person signs off.
 
 </WhenNot>
 
@@ -220,8 +231,9 @@ long a real queue of paused checkpoints takes a person to clear.
 
 <TryIt items={[
   { lane: 'use', body: 'Find a tool you use that asks you to approve something before it acts (a form, an agent, an automation). Time how long you actually spend reading before you click approve. Is that enough time to have caught a real mistake?' },
-  { lane: 'build', body: 'Run python -m examples.human_in_the_loop --model stub --question "What does HLV-2205 cost?" to see it pause, then add --decision reject to resume it as rejected instead. Then try a question with no good answer in the corpus and watch it pause for a different reason.' },
+  { lane: 'build', body: "Run python -m examples.human_in_the_loop --model stub --question 'zzqqx frobnitz wibble' to see it pause for low_confidence, then add --decision reject to resume it as rejected instead. Then try --question 'Is the HLV-2205 priced over $50?' and watch it pause for high_cost instead, because the retrieved parts pricing lands inside the stub's own echoed text." },
   { lane: 'either', body: 'Take an approval step you own and write down the last three things it stopped. If you cannot name one, the threshold is either too loose to catch anything or too tight to be read.' },
+  { lane: 'build', body: 'Open READ_ONLY_HEADERS and is_read_only in examples/common/bench.py, then output_on in the same file. Name the two things a person has to approve before it will send OUTP ON, and what happens if only one of them is supplied.' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

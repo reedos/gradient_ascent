@@ -3,40 +3,25 @@ slug: inference-time-reasoning
 level: 1
 run: inference-time-reasoning
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Thinking"
     url: "https://platform.claude.com/docs/en/build-with-claude/thinking"
     publisher: "Anthropic"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Thinking"
     url: "https://ai.google.dev/gemini-api/docs/thinking"
     publisher: "Google"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Reasoning models"
     url: "https://developers.openai.com/api/docs/guides/reasoning"
     publisher: "OpenAI"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Self-Consistency Improves Chain of Thought Reasoning in Language Models"
     url: "https://arxiv.org/abs/2203.11171"
     publisher: "arXiv (Google Research, UC Santa Barbara)"
     date: "2022-03-21"
-    accessed: "2026-09-18"
-  - title: "Learning to Reason with LLMs (read through the Internet Archive's capture of September 13, 2024)"
-    url: "https://web.archive.org/web/20240913000639/https://openai.com/index/learning-to-reason-with-llms/"
-    publisher: "OpenAI"
-    date: "2024-09-12"
-    accessed: "2026-09-18"
-  - title: "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning"
-    url: "https://arxiv.org/abs/2501.12948"
-    publisher: "arXiv (DeepSeek-AI)"
-    date: "2025-01-22"
-    accessed: "2026-09-18"
-  - title: "Introducing Operator (read through the Internet Archive's capture of January 23, 2025)"
-    url: "https://web.archive.org/web/20250123210058/https://openai.com/index/introducing-operator/"
-    publisher: "OpenAI"
-    date: "2025-01-23"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -55,45 +40,18 @@ import inferenceTimeReasoningRun from '../../data/runs/inference-time-reasoning.
 
 Inference-time reasoning is spending more computation after training to get a better answer,
 without changing the model itself. It comes in two shapes. The first scales one call: extended
-thinking or a reasoning-effort setting lets the model work through a problem in its own words
-before answering, and Anthropic says that reasoning is billed as output tokens even when the
-thinking text is not returned to you<Cite n={1}/>. The second scales the number of calls instead:
-ask the same question several times and combine the answers, the way self-consistency samples
-several reasoning paths and keeps whichever final answer most of them agree on<Cite n={4}/>.
+thinking or a reasoning-effort setting lets the model work through a problem before answering, and
+Anthropic says that reasoning is billed as output tokens even when the thinking text is not
+returned to you<Cite n={1}/>. The second scales the number of calls instead: ask the same question
+several times and combine the answers, the way self-consistency samples several reasoning paths
+and keeps the answer most of them agree on<Cite n={4}/>.
 
 Anthropic, Google and OpenAI each say close to the same thing about the first kind: more thinking
-helps on problems with real intermediate steps (math, debugging, planning) and mostly wastes tokens on
-ones that do not have any, like a lookup or a classification<Cite n={1}/><Cite n={2}/><Cite n={3}/>.
-This page's example uses the second kind, because it is the one a fixed `StubModel` can
-demonstrate honestly: sample the same question several times and take the answer most samples
-agree on.
-
-## What a reasoning model is, and what it added
-
-Until September 2024 the thinking was a prompt trick. You wrote "think step by step" and an
-ordinary model wrote out its working, because working looked like the text it had been trained on.
-A reasoning model is trained to do it. OpenAI introduced o1 as "a new large language model trained
-with reinforcement learning to perform complex reasoning", one that "can produce a long internal
-chain of thought before responding to the user"<Cite n={5}/>. What the training teaches is the
-part worth knowing: the model "learns to recognize and correct its mistakes", "to break down
-tricky steps into simpler ones" and "to try a different approach when the current one isn't
-working"<Cite n={5}/>. Four months later the DeepSeek-R1 paper reported that such reasoning "can
-be incentivized through pure reinforcement learning", with no human-written examples of reasoning
-to copy<Cite n={6}/>.
-
-It added two things. The first is test-time compute as a dial. OpenAI reported that o1 improves
-"with more time spent thinking (test-time compute)"<Cite n={5}/>, so a hard question can be given
-more effort instead of a bigger model. That dial is the thinking switch and the effort setting
-described below, and you pay for it in seconds and in output tokens<Cite n={1}/>.
-
-The second is what agents needed. Noticing a mistake, backing up and trying another way is what
-keeps a long task on course, and it is what a level 5 loop asks of a model at every step.
-OpenAI's post on Operator, its browser agent, credits "advanced reasoning through reinforcement
-learning" for the model that drives it<Cite n={7}/>. On <Link href="/timeline/#reasoning-models">this
-site's timeline</Link> reasoning models fall in the gap between tools (2023) and agents (2025).
-
-It is still level 1. A model that thinks for a minute inside one reply has not changed who decides
-the next step.
+helps on problems with real intermediate steps and mostly wastes tokens on ones that do not, like
+a lookup or a classification<Cite n={1}/><Cite n={2}/><Cite n={3}/>. This page's example uses the
+second kind, since it is the one a fixed `StubModel` can demonstrate honestly. Either shape is
+still level 1: the model deciding what to think about, or which of several samples to trust, has
+not changed who decides what happens next.
 
 This page is marked draft, not published: it has no recorded trace and no scored result file yet,
 so nothing below is measured. It is illustrated.
@@ -131,6 +89,9 @@ reasoning several times and voting only helps when the mistakes differ from run 
 they are systematic. If a product's answer is wrong, more reasoning effort is not automatically
 the fix to reach for first: whether the model had the information it needed in the first place is
 worth checking before spending more on reasoning about the wrong facts.
+
+Inference-time reasoning is one of the techniques behind the
+<Link href="/shapes/#transform-text">turn one piece of text into another</Link> job shape.
 
 </Lane>
 <Lane name="build" title="Build it">

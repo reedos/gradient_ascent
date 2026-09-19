@@ -3,20 +3,20 @@ slug: prompt-engineering
 level: 1
 run: prompt-engineering
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Prompt engineering"
     url: "https://developers.openai.com/api/docs/guides/prompt-engineering"
     publisher: "OpenAI"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Prompt engineering overview"
     url: "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview"
     publisher: "Anthropic"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Prompt design strategies"
     url: "https://ai.google.dev/gemini-api/docs/prompting-strategies"
     publisher: "Google"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -65,7 +65,7 @@ handful of moves that hold up across their different models.
 gets followed more reliably than "don't be too long."
 
 **Examples.** Show, not just tell, especially for a format that is hard to describe in words.
-OpenAI's guide calls one well-chosen example "few-shot learning"<Cite n={1}/>, and Google's
+OpenAI's guide calls one well-chosen example few-shot learning<Cite n={1}/>, and Google's
 guide goes further, recommending that few-shot examples always be included rather than left
 out<Cite n={3}/>.
 
@@ -113,9 +113,16 @@ stub run can show: it demonstrates the check a real prompt-tuning loop is built 
 finding about how any real model responds to more or less structure. The citations above are the
 actual claims about real models; this example is the machinery for testing your own.
 
+The same moves have an engineering use where a model may not invent a number.
+<Link href="/recipes/measurement-writeup/">Turning a measurement session into a report</Link> hands
+a model a lab notebook and a table of figures code already computed, inside a system prompt that
+spells out the rules: copy every number character for character, and never soften a "cannot say"
+verdict into a pass. That is instructions and format at work, in an engineering-test and a
+precise-measurement setting alike, while a check confirms the draft added no number of its own.
+
 Run it yourself:
 
-<CodeFile file="examples/prompt_engineering/README.md" start={14} end={15} lang="text" expect="python -m examples.prompt_engineering" />
+<CodeFile file="examples/prompt_engineering/README.md" start={16} end={17} lang="text" expect="python -m examples.prompt_engineering" />
 
 Every step is `decided_by: "code"`, the same as chat: the code always builds whichever prompt
 style it was asked for and asks the model exactly once. What changes between the two runs is

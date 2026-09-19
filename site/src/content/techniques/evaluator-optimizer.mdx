@@ -3,17 +3,17 @@ slug: evaluator-optimizer
 level: 3
 run: evaluator-optimizer
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Building effective agents"
     url: "https://www.anthropic.com/engineering/building-effective-agents"
     publisher: "Anthropic"
     date: "2024-12-19"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Optimizers: choosing one"
     url: "https://dspy.ai/current/diving-deeper/choosing-an-optimizer/"
     publisher: "DSPy (Stanford NLP)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -37,17 +37,14 @@ in a loop", and calls the workflow "particularly effective when we have clear ev
 and when iterative refinement provides measurable value": its examples are literary translation
 and "Complex search tasks that require multiple rounds of searching and analysis"<Cite n={1}/>.
 
-"Clear evaluation criteria" is the load-bearing phrase. A checker asked whether an answer is
-"good" is a second draft with extra steps: with no fixed thing to test for, its verdict drifts
-between calls the way the first draft's wording would. A checker asked one checkable question
-(does every citation the draft makes appear in the sources it was given) answers the same way on
-the same input every time, which is what makes looping on it worth doing.
+"Clear evaluation criteria" is the load-bearing phrase: a checker asked whether an answer is
+"good" just drafts again with extra steps, since a vague verdict drifts between calls, while one
+asked a specific checkable question, like whether every citation appears in its sources, answers
+the same way every time.
 
-A model's output does change what happens next here: the checker says pass or fail and the code
-branches on it. It is still level 3 because the code owns the loop. The `while` condition and the
-cap are written before either prompt runs, so the verdict is data the code reads, the same as a
-classifier's label one page earlier. Hand the model the loop (let it judge whether another
-revision is worth the cost) and the stop becomes a model decision, which is level 5.
+The checker's verdict does change what happens next, and the code branches on it. It is still
+level 3 because the code owns the loop, not the model: the `while` condition and the cap are
+written in advance. Hand the model the loop itself and the stop becomes a model decision: level 5.
 
 This page is marked draft, not published: this technique has no recorded trace and no scored
 result file yet, so nothing below is measured. It is illustrated.
@@ -64,9 +61,9 @@ of a person using this pattern from the outside: most of what looks like "the mo
 own work" in a chat app is either a single model reasoning at length before answering (a level-1
 technique) or an agent that runs a real test and decides what to do about a failure itself (level
 4 or 5), not a fixed, code-owned draft-check-revise loop with an outside cap. If you have used a
-tool that visibly shows a "reviewing..." or "double-checking..." step before the final answer
-appears, that is worth treating as an unverified claim until it is checked against how the
-product's own documentation describes it, not assumed to be this pattern.
+tool that visibly shows a reviewing or double-checking step before the final answer appears, that
+is worth treating as an unverified claim until it is checked against how the product's own
+documentation describes it, not assumed to be this pattern.
 
 What is worth watching for, in any product that claims to check its own output: whether the
 checking step is told a specific, testable thing to look for, or just asked whether the draft is
@@ -106,12 +103,19 @@ Run it yourself:
 <CodeFile file="examples/evaluator_optimizer/README.md" start={16} end={16} lang="text" expect="python -m examples.evaluator_optimizer" />
 
 The same shape (a metric-driven loop instead of a vibe-driven one) is what DSPy's optimizers do
-to a prompt itself, at build time rather than at answer time: "all optimizers read a numeric
+to a prompt itself, at build time rather than at answer time: "All optimizers read a numeric
 score per example," and each one "tunes one or more of: instructions, demos, or weights"<Cite
 n={2}/> to raise that score. DSPy loops over many training examples to improve the *prompt*
 before it ever answers a real question; this page's loop runs once, at answer time, to improve
 one *answer*. Both need the same thing to work at all: a criterion specific enough that two runs
 of the check agree.
+
+The <Link href="/recipes/design-review-checklist/">design review checklist</Link> recipe is the
+worked version of this loop for engineering test and precise measurement alike: one pass drafts a
+finding against a design-review rule's own text, a second checks that finding against the rule it
+cites and drops any that name none. Neither pass reports a measurement or a margin; where a rule
+is a number against a threshold, code computes it, and a person still decides whether an unmet
+rule ships or gets fixed.
 
 </Lane>
 </Lanes>
@@ -126,7 +130,8 @@ prompt at all.
 
 Move up to write and check once the failure you are trying to catch needs judgment against a
 written rule that plain code cannot express directly, but that a second prompt, told the rule in
-so many words, can apply consistently.
+so many words, can apply consistently. This is the site's
+<Link href="/shapes/#draft-and-check">draft and check</Link> shape.
 
 </WhenNot>
 
@@ -202,9 +207,10 @@ there are.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: 'Find a tool that shows a visible "checking" or "verifying" step before its final answer. Look at its own documentation: does it say what the check actually tests, or just that a check happens?' },
+  { lane: 'use', body: 'Find a tool that shows a visible checking or verifying step before its final answer. Look at its own documentation: does it say what the check actually tests, or just that a check happens?' },
   { lane: 'build', body: 'Run python -m examples.evaluator_optimizer --model stub with a question of your own from the repo root. Then edit CHECK_SYSTEM in examples/evaluator_optimizer/run.py to ask a vaguer question ("Is this a good answer?") instead of the specific citation test, and think through why that version would not reliably return the same verdict twice.' },
   { lane: 'either', body: 'Write the checking criterion you would use for a piece of work you actually review. Then decide honestly whether two people applying it to the same draft would reach the same verdict. If not, it is not a criterion yet.' },
+  { lane: 'build', body: "Read design-review-rules.md's DR-14 in the design-review-checklist recipe next to this page's own checker. Both catch one quotable, mechanical thing. Now find a rule in that same document that needs reading rather than arithmetic, and say why a single checker pass is less trustworthy on it." },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

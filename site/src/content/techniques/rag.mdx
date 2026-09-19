@@ -3,21 +3,21 @@ slug: rag
 level: 2
 run: rag
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks"
     url: "https://arxiv.org/abs/2005.11401"
     publisher: "arXiv (Meta AI Research, UCL, NYU)"
     date: "2020-05-22"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "What are Projects?"
     url: "https://support.claude.com/en/articles/9517075-what-are-projects"
     publisher: "Anthropic (Claude Help Center)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "File search"
     url: "https://developers.openai.com/api/docs/guides/tools-file-search"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -89,6 +89,10 @@ do instead. And it will not reliably tell you when it found nothing useful. A se
 back thin can still produce a confident-sounding answer built from whatever passages were
 closest, even if none of them actually address the question.
 
+RAG is one of the techniques behind the
+<Link href="/shapes/#answer-from-documents">answer questions from a body of documents</Link> job
+shape.
+
 </Lane>
 <Lane name="build" title="Build it">
 
@@ -122,6 +126,14 @@ system prompt instructs the model to answer using only those sources and to name
 used. Citations are then parsed back out of the model's answer with a regular expression, so
 the calling code always knows, in a form it can check automatically, which sources actually
 contributed to the answer.
+
+The same four steps work over an engineer's own documents, not just reference text. Orbeck Power
+Systems' SRB-5030 datasheet states one maximum input voltage; a later engineering change notice
+supersedes it for two of the board's three revisions, over a capacitor derating rule, and the
+datasheet is never reissued to say so. One search that retrieves both documents returns an answer
+with citations a reader can check by hand, in a production test or in a low-volume engineering
+bring-up alike. The model reports which document says what; it never assembles the number, the
+margin, or the verdict on which revision is safe.
 
 Here is the whole pipeline, constants first, as the example runs it:
 
@@ -239,6 +251,7 @@ cost of a real run before spending anything on one.
   { lane: 'build', body: 'Run python -m examples.rag --model stub with a question of your own from the repo root, then change TOP_K from 4 to 2 in examples/rag/run.py and ask it again. Which passages drop out, and does the answer get worse?' },
   { lane: 'build', body: 'Change the retriever. _retrieve in examples/rag/run.py is the only function that picks passages: it embeds the question and every section, then keeps the top k by cosine. Replace its body with a plain count of shared words, keep the signature, and run the same question again. Which kinds of question get better, and which get worse?' },
   { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose, using the synthetic documents in evals/corpus/.' },
+  { lane: 'either', body: 'Pick two documents you have that can disagree over time, such as a manual and a later errata sheet, or a policy and an amendment. Put both into a document search tool that shows citations, such as a chat app\'s file feature, and ask the question the older document alone would answer wrong. Does the answer cite both, or just the one that sounds authoritative?' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

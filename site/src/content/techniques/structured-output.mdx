@@ -3,7 +3,7 @@ slug: structured-output
 level: 1
 run: structured-output
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Structured Outputs"
     url: "https://developers.openai.com/api/docs/guides/structured-outputs"
@@ -12,20 +12,20 @@ sources:
   - title: "Structured output"
     url: "https://ai.google.dev/gemini-api/docs/structured-output"
     publisher: "Google"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Tool use with Claude"
     url: "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview"
     publisher: "Anthropic"
     accessed: "2026-09-18"
-  - title: "Pydantic: get started"
+  - title: "Pydantic Validation"
     url: "https://pydantic.dev/docs/validation/latest/get-started/"
     publisher: "Pydantic"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Introducing System One Models & Jev"
     url: "https://typesafe.ai/blog/introducing-system-one-models-and-jev"
     publisher: "TypeSafe AI"
     date: "2026-09-15"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -42,39 +42,23 @@ import Cite from '../../components/page/Cite.astro';
 import Link from '../../components/page/Link.astro';
 import structuredOutputRun from '../../data/runs/structured-output.json';
 
-Structured output means the reply comes back in a fixed shape (a JSON object with named fields)
-instead of a paragraph your code has to parse by guessing. Makers reach it two ways. A
-JSON-Schema response format constrains which tokens the model may produce next, so
-the output matches the schema: OpenAI says a model given one "will always generate responses that
-adhere to" it, and that there is then "no need to validate or retry incorrectly formatted
-responses"<Cite n={1}/>; Gemini takes the same approach through a schema in
-`response_format`<Cite n={2}/>. Anthropic gets there differently: define a tool with an input
-schema and have the model call it, adding `strict: true` to make the call match
-exactly<Cite n={3}/>.
+Structured output means the reply comes back in a fixed shape (a JSON object with named fields),
+not a paragraph your code has to parse by guessing. Makers reach it two ways. A JSON-Schema
+response format constrains which tokens the model may produce next, so OpenAI says a model given
+one "will always generate responses that adhere to" it, and lists among the benefits "No need to
+validate or retry incorrectly formatted responses"<Cite n={1}/>; Gemini takes the same approach
+through a schema in `response_format`<Cite n={2}/>. Anthropic gets there differently: define a
+tool with an input schema and have the model call it, adding `strict: true`<Cite n={3}/>. Either
+way it sits at level 1, one request and one response, in a shape your code chose first.
 
-Read the rest of that page, though: OpenAI lists cases where a reply still may not match: a
-refusal, or a response cut short by the token limit<Cite n={1}/>. And no schema check speaks to
-whether the values are right; a validly typed number can still be the wrong one. Validating your
-own side and retrying once, the way Pydantic raises "an error with a breakdown of what was
-wrong"<Cite n={4}/>, is still worth doing.
+OpenAI also lists cases where a reply still may not match: a refusal, or a response cut short by
+the token limit<Cite n={1}/>. And no schema check confirms the values are right. Validating your
+own side and retrying once is still worth doing, the way Pydantic raises "an error with a
+breakdown of what was wrong"<Cite n={4}/>.
 
-A model announced in September 2026 takes the idea to its end. Jev, from TypeSafe AI, generates no
-text at all. TypeSafe calls it a System One model, after psychology's fast, automatic System 1:
-"a new class of frontier models built to make fast, structured decisions that software can use
-directly", or "unstructured state in, typed probabilistic decisions out"<Cite n={5}/>. The
-possible outputs are defined in advance, every answer carries a probability, and the result comes
-back in one parallel pass instead of word by word; TypeSafe quotes "70ms-500ms" a call<Cite n={5}/>.
-The uses it lists are the fixed steps of a level 3 workflow: "classify, route, score, extract, or
-branch where hand-written logic is too brittle"<Cite n={5}/>. TypeSafe names three more. Checking
-other models: "Score, judge, verify, guardrail, and detect jailbreaks of LLM prompts, reasoning
-traces, and/or outputs"<Cite n={5}/>. Reading large piles of data: "Map-reducing over big data"
-<Cite n={5}/>. And anything a person is waiting on, where "100ms speeds means you can use AI in
-your applications where UX is critical"<Cite n={5}/>; its demo is a bot playing Doom from a text
-description of the game at "10 queries a second"<Cite n={5}/>. What it cannot do is write a
-sentence, so it replaces the deciding steps in a system and none of the writing ones. It is in early access behind a
-waitlist, and the speed, price and accuracy figures are TypeSafe's own. This site has measured
-none of them. See <Link href="/timeline/#system-one-models">the timeline</Link> for how it sits
-against reasoning models, which went the other way.
+A model announced in September 2026 takes the idea further: Jev, from TypeSafe AI, generates no
+text at all, only what TypeSafe calls "typed probabilistic decisions"<Cite n={5}/>. It is in
+early access behind a waitlist, and its published figures are TypeSafe's own, unmeasured here.
 
 This page is marked draft, not published: structured output has no recorded trace and no scored
 result file yet, so nothing below is measured. It is illustrated.
@@ -112,6 +96,10 @@ anything, especially anything costly to get wrong: a payment amount, a shipping 
 on a legal document. Its absence is invisible in a demo; it only shows up the first time the
 extraction is wrong.
 
+Structured output is one of the techniques behind the
+<Link href="/shapes/#extract-structure">pull structured data out of something unstructured</Link>
+job shape.
+
 </Lane>
 <Lane name="build" title="Build it">
 
@@ -141,6 +129,15 @@ only ever chooses the field values inside whatever shape it was given. Compare t
 <Link href="/techniques/function-calling/">function calling</Link> at level 4, where the model
 additionally decides whether to use a schema-shaped tool at all: the schema there is the same
 idea, but the decision of when to reach for it moves from your code to the model.
+
+The same schema-fill pattern serves the bench, too.
+<Link href="/recipes/accuracy-specs-from-the-manual/">Reading an instrument's programming manual
+and filling one schema row per range and per calibration interval</Link>, in ppm of reading and
+ppm of range with a temperature band and its outside-band coefficient, is the same
+validate-then-retry extraction as the warranty record above. Code computes the uncertainty budget
+from the rows; a person checks each row against the manual first, in engineering test and in
+precise measurement alike, since a right-looking number from the wrong interval or range reads
+like a correct one.
 
 </Lane>
 </Lanes>
@@ -229,6 +226,7 @@ by field against those records, and how often the retry was needed.
   { lane: 'use', body: 'Find a feature in an app you use that turns text into a form or a calendar event, and deliberately give it an ambiguous input. Does it ask you to confirm, or does it commit to a guess?' },
   { lane: 'build', body: 'Run python -m examples.structured_output --model stub --question "What is the DR-210\'s warranty?" from the repo root, then open run.py and change one field name in SCHEMA to see which test in tests/test_example_structured_output.py catches it.' },
   { lane: 'either', body: 'Write down the schema you would want for a task in your own life (a recipe, a receipt, a contact) before trying to get a model to fill it. Which fields are actually required, and which would you rather leave blank than have the model guess?' },
+  { lane: 'build', body: 'Open the accuracy specs from the manual recipe in the recipes section and find the schema for one row of the accuracy table. Which fields in that row would a person have to check against the manual before the row could be trusted?' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
