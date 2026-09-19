@@ -9,6 +9,12 @@ Read `docs/EVALS.md` first for what `scripts/eval_run.py` does. This file is the
 it in, one page at a time, plus `scripts/record_trace.py`, which records the trace a page's
 Build-it lane plays back.
 
+Both scripts take `--model stub`, `ollama:<tag>` or `claude:<id>`. Neither takes
+`stub:scripted`, the spec that plays an example's own written-down replies from the command line
+(`docs/RUNNING-AN-EXAMPLE.md`): that is a fixture for a demonstration, and a score or a recorded
+trace taken from one would be a measurement of a string somebody typed. The refusal is in
+`build_model`, so it is an error rather than a silent stub run.
+
 Every command below runs from the repository root with `C:\Program Files\Python314\python.exe`,
 written as `python` for short.
 
@@ -108,7 +114,13 @@ python scripts/record_trace.py --list
 This prints every example under `examples/` and, for the ones it cannot record, why: an entry
 point that is not named `run`, or a required argument `--question` cannot fill in.
 `.local/page-requests/wave6-traces.md` has the exact change each of those would need; most pages
-do not need it, since 39 of the 44 examples are recordable as they stand.
+do not need it. The last line of `--list` is the count of recordable examples out of the number
+discovered, which is read off the directory on every run rather than written down anywhere.
+
+An example that takes something narrower than a question as its first argument (a serial number
+that has to exist in the production log, a date, a document section) names a working one as
+`SAMPLE_INPUT` in its `run.py`, and `--question` may be left out for it. `--list` does not say
+which those are; `examples/<name>/README.md` prints the command.
 
 **Then project the call before making it**, the same discipline as `eval_run.py --dry`:
 

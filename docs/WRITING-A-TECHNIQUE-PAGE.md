@@ -52,6 +52,15 @@ Researchers introduced the approach in 2020<Cite n={1}/>.   {/* n = position in 
 Component props are plain strings: Markdown in them renders literally, so no backticks or
 `[text](url)` in `TryIt`, `FailureModes` or `RunIt`.
 
+**The command a reader runs comes from the example's own README**, embedded with `<CodeFile
+file="examples/<name>/README.md" start={N} end={N} lang="text" expect="python -m examples.<name>" />`
+rather than retyped into the page. Edit the README line, not the page, and run
+`scripts/validate.py` afterwards so a slid pin fails loudly. Before you write a `TryIt` item that
+tells a reader what they will see, run the command and look: `--model stub` echoes the question
+back and shows nothing an example varies in the system prompt or decides on the reply, while
+`--model stub:scripted` plays the example's own written-down replies and shows the technique
+working. `docs/RUNNING-AN-EXAMPLE.md` is the contract for both.
+
 **Pin code by name wherever you can.** `func=` and `cls=` survive the file being edited above
 them; a `start`/`end` range does not, and a slid range is the one CodeFile failure that builds
 green and shows the wrong code. When only part of a function is worth showing, a range is the

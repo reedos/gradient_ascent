@@ -307,6 +307,11 @@ One directory per recipe, `examples/bench_<name>/`, laid out like every other ex
       README.md       what it does, how to run it, what it does not do
     tests/test_example_bench_<name>.py
 
+`docs/RUNNING-AN-EXAMPLE.md` is the full contract for the command line: the arguments, the two
+stub models, the ordered `SCRIPTED` sequence that makes `--model stub:scripted` demonstrate what
+the page claims, and `SAMPLE_INPUT` for a recipe whose first argument is a serial number rather
+than a question.
+
 Rules, all of them already true of the existing examples:
 
 - **`run(text, model, tracer)`**, in that positional order, or
