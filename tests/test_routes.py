@@ -39,12 +39,15 @@ FENCE_RE = re.compile(r"```[\s\S]*?```")
 # by design: an agent is pointed at /llms.txt for the list instead, and /agents.md now says so.
 # Listed here so that a page kind losing its twin by accident still fails, rather than being
 # waved through by a rule that says "index pages are exempt".
+#
+# /method/ left this list on 09/19/2026: it is a written page rather than an index, the site's own
+# principles are cited from other pages, and it now renders from site/src/lib/method.ts with a
+# twin at /method.md the same way /agents/ and /shapes/ do.
 NO_TWIN = {
     "",  # the home page
     "failures",
     "glossary",
     "map",
-    "method",
     "names",
     "recipes",
     "search",
@@ -122,10 +125,6 @@ class InternalLinkTests(unittest.TestCase):
                     continue
                 checked += 1
                 if target is None or not target.is_file():
-                    # 404.html is served by GitHub Pages at every missing address, so its own
-                    # canonical necessarily names an address that is not a built file.
-                    if rel == "404.html" and href.rstrip("/").endswith("/404"):
-                        continue
                     broken.append(f"{rel} -> {href}")
         self.assertGreater(checked, 1000, "sanity: this crawl should be checking a lot of links")
         if broken:
@@ -207,6 +206,29 @@ class MarkdownTwinTests(unittest.TestCase):
                 guide,
                 f"/{rel}/ has no Markdown twin, so the agent guide has to say so",
             )
+
+    def test_the_method_twin_carries_the_premise_and_the_principles(self) -> None:
+        """techniques/evals.mdx cites "the site's own second principle, on the Method page", and
+        /llms.txt lists /method/. Both of those need an agent to be able to read the principles as
+        text. A twin that built but rendered an empty section would pass the existence check
+        above, so this one reads it."""
+        twin = DIST / "method.md"
+        self.assertTrue(twin.is_file(), "/method.md is not in the built site")
+        text = twin.read_text(encoding="utf-8")
+        for heading in ("## Premise", "## Principles", "## Method", "## What the site does not do"):
+            self.assertIn(heading, text, f"/method.md is missing the {heading!r} section")
+        self.assertIn(
+            "**Measure before claiming.**",
+            text,
+            "the second principle is what techniques/evals.mdx cites from this page",
+        )
+        # Ten principles, as the page has always had: one list item each, all in one block.
+        principles = text.split("## Principles", 1)[1].split("## ", 1)[0]
+        self.assertEqual(
+            len([ln for ln in principles.splitlines() if ln.startswith("- **")]),
+            10,
+            "the Method page lists ten principles",
+        )
 
 
 class PublishedFileTests(unittest.TestCase):

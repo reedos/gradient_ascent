@@ -1,42 +1,16 @@
 ---
+// /method/: the premise, the principles and the method. The words are in lib/method.ts, not here,
+// so that the Markdown twin at /method.md serves a reader's agent exactly what a person reads.
 import Base from '../layouts/Base.astro';
-import { url } from '../lib/url';
-import { taxonomy } from '../lib/content';
+import { inlineHtml, type Block } from '../lib/agents';
+import { absFor } from '../lib/agents-data';
+import { methodSections } from '../lib/method';
 
-const METHOD = [
-  {
-    title: 'How a level is defined',
-    // The rule itself comes from content/taxonomy.json, not a copy typed here: the glossary's
-    // "level" entry and /llms.txt print the same string, so the three cannot drift apart.
-    body:
-      `${taxonomy.level_rule} Levels 1 to 3 all leave the decisions with the person or the code; ` +
-      'they differ in how much has to be built around the model.',
-  },
-  {
-    title: 'How a technique gets a page',
-    body: 'It is described in primary sources from at least two independent makers or papers. It is placed at the lowest level where it applies. If it fits no level, the taxonomy gets a dated amendment.',
-  },
-  {
-    title: 'How a page is written',
-    body: 'Fixed anatomy, word budgets, sources for every factual claim, one production line: sources, draft, example and trace, eval, figure, review.',
-  },
-  {
-    title: 'How results are measured',
-    body: 'One task, run at every level, on three classes of model spanning small local to a frontier API. Result files are what the charts are built from; a number with no file cannot render.',
-  },
-  {
-    title: 'How names are checked',
-    body: "A registry entry needs a primary source, a checked date and a verified flag before a published page can cite it. Entries unchecked for 90 days are flagged.",
-  },
-  {
-    title: 'How the site changes',
-    body: 'Dated amendments to the taxonomy, a changelog per page, a review queue worked oldest first.',
-  },
-];
+const sections = methodSections(absFor(Astro.site));
 ---
 <Base
   title="Method · Gradient Ascent"
-  description="Premise, principles, method, and what the site does not do."
+  description="Premise, principles, method, what the registry is and is not, and what the site does not do."
 >
   <div class="page-hero">
     <div class="eyebrow muted"><span class="dot"></span>Method</div>
@@ -45,60 +19,27 @@ const METHOD = [
 
   <div class="prose-grid">
     <nav class="prose-nav" aria-label="On this page">
-      <a href="#premise">Premise</a>
-      <a href="#principles">Principles</a>
-      <a href="#method">Method</a>
-      <a href="#status">Where the site is today</a>
-      <a href="#not">What the site does not do</a>
+      {sections.map((s) => <a href={`#${s.id}`}>{s.nav}</a>)}
     </nav>
     <div class="prose">
-      <h2 id="premise">Premise</h2>
-      <p>
-        AI is a general-purpose technology. It is changing how work gets done in every industry:
-        the workflows people follow, the processes companies run, how productive a person or a
-        team can be, and how software and machines are operated, in the digital world and the
-        physical one. People who understand the full range of techniques will make better
-        decisions about where to use it. This site describes that range, shows how each
-        technique works, and will measure what each one costs.
-      </p>
-
-      <h2 id="principles">Principles</h2>
-      <ul>
-        <li><strong>Use the simplest approach that works.</strong> Every page says when the technique is not needed and what to try first.</li>
-        <li><strong>Measure before claiming.</strong> A page may say a level helps only when a committed result file shows it. No result file exists yet, so nothing on the site reports a measured number.</li>
-        <li><strong>Name real things.</strong> Every technique is tied to the models, products and tools that use it. Names come from a dated registry with sources.</li>
-        <li><strong>Show how it works.</strong> Each technique has a diagram, a recorded run the reader can step through, and code the reader can run.</li>
-        <li><strong>State the costs and the failures.</strong> Each page lists the cost in tokens and time, the common failure modes, and how to test for them.</li>
-        <li><strong>Stay current and say how current.</strong> Every page and every name carries the date it was last checked. Anything not checked in 90 days is flagged.</li>
-        <li><strong>One site for beginners and experts.</strong> Each page has a version with no code and a version with code. Both describe the same technique.</li>
-        <li><strong>Independent.</strong> No rankings, no sponsorship, no affiliate links. Where several companies make something, the page names more than one.</li>
-        <li><strong>Open.</strong> MIT licensed. The taxonomy, the registry and the result files are published as data. Corrections are welcome.</li>
-        <li><strong>Private data stays private.</strong> Examples, traces and test documents are synthetic.</li>
-      </ul>
-
-      <h2 id="method">Method</h2>
       {
-        METHOD.map((m) => (
+        sections.map((s) => (
           <>
-            <h3>{m.title}</h3>
-            <p>{m.body}</p>
+            <h2 id={s.id}>{s.heading}</h2>
+            {s.blocks.map((b: Block) => {
+              if (b.kind === 'h3') return <h3>{b.text}</h3>;
+              if (b.kind === 'p') return <p set:html={inlineHtml(b.text)} />;
+              if (b.kind === 'ol') return <ol>{b.items.map((it) => <li set:html={inlineHtml(it)} />)}</ol>;
+              if (b.kind === 'ul') return <ul>{b.items.map((it) => <li set:html={inlineHtml(it)} />)}</ul>;
+              return <pre>{b.text}</pre>;
+            })}
           </>
         ))
       }
-
-      <h2 id="status">Where the site is today</h2>
-      <p>
-        Every technique, topic and recipe page is a <strong>draft</strong>: written, sourced and
-        reviewed, but with no recorded run and no scored result file behind it. Nothing on this
-        site reports a measured number. Every cost-and-latency strip and every stepped trace is
-        an illustration, labeled as one above its figures, and a page becomes
-        <strong>published</strong> only once a real run and a real eval sit behind it. The
-        <a href={url('/techniques/evals/')}>evals</a> page describes how that
-        measurement works and what it will record.
+      <p class="footnote">
+        This page is also served as Markdown at <a href={absFor(Astro.site)('/method.md')}>/method.md</a>,
+        so a reader's own agent can quote the principles rather than read the markup around them.
       </p>
-
-      <h2 id="not">What the site does not do</h2>
-      <p>It does not rank vendors, predict the future, or give legal, financial or safety-critical advice.</p>
     </div>
   </div>
 </Base>
