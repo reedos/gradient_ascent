@@ -16,6 +16,7 @@ def page(slug, **extra):
 def taxonomy():
     return {
         "statuses": ["planned", "stub", "draft", "published"],
+        "domains": ["general", "engineering"],
         "relation_types": {"requires": "", "upgrades_to": ""},
         "tiers": [
             {"id": "a", "order": 0, "title": "A", "short": "short a", "who": "nobody",
@@ -25,7 +26,7 @@ def taxonomy():
         ],
         "tracks": [{"id": "evals", "pages": [page("grading")]}],
         "threads": [{"id": "t", "pages": ["two", "three"]}],
-        "recipes": [{"slug": "r", "uses": ["two", "evals"]}],
+        "recipes": [{"slug": "r", "domain": "general", "uses": ["two", "evals"]}],
         "teardowns": {"cap": 6, "expires_days": 180,
                       "first": [{"slug": "td", "title": "TD, decoded", "patterns": ["three"]}]},
         "relations": [
@@ -64,6 +65,62 @@ class ValidateTests(unittest.TestCase):
         self.assertEqual(report["level_pages"], 3)
         self.assertEqual(report["track_pages"], 1)
         self.assertEqual(report["unnamed"], ["three"])
+
+    # Rule 17: the recipes index groups by domain, so a recipe with no valid domain is a page
+    # that exists and appears under no heading.
+    def test_recipe_domain_must_be_declared(self):
+        tax = taxonomy()
+        tax["recipes"][0]["domain"] = "hardware"
+        self.assertIn("recipe r has no valid domain: 'hardware'", self.errors(tax))
+
+    def test_recipe_with_no_domain_at_all(self):
+        tax = taxonomy()
+        del tax["recipes"][0]["domain"]
+        self.assertIn("recipe r has no valid domain: None", self.errors(tax))
+
+    def test_every_declared_domain_is_accepted(self):
+        for domain in taxonomy()["domains"]:
+            tax = taxonomy()
+            tax["recipes"][0]["domain"] = domain
+            self.assertEqual(self.errors(tax), [], domain)
+
+    def test_taxonomy_must_declare_domains(self):
+        tax = taxonomy()
+        tax["domains"] = []
+        self.assertIn("taxonomy declares no domains", self.errors(tax))
+
+    def test_report_counts_recipes_by_domain(self):
+        tax = taxonomy()
+        tax["recipes"].append({"slug": "e", "domain": "engineering", "uses": ["two"]})
+        _, report = validate.validate(tax, landscape())
+        self.assertEqual(report["recipes_by_domain"], {"general": 1, "engineering": 1})
+
+    def test_the_real_taxonomy_gives_every_recipe_a_domain(self):
+        """The rule is only worth having if the shipped file obeys it."""
+        import json
+
+        real = json.loads((ROOT / "content" / "taxonomy.json").read_text(encoding="utf-8"))
+        declared = set(real["domains"])
+        self.assertTrue(declared)
+        for recipe in real["recipes"]:
+            self.assertIn(recipe.get("domain"), declared, recipe["slug"])
+        engineering = [r for r in real["recipes"] if r["domain"] == "engineering"]
+        self.assertGreaterEqual(len(engineering), 8)
+        # The level-0 recipe leads its group: it is the one that says most of this job needs
+        # no model at all, and it reads first on the page.
+        self.assertEqual(engineering[0]["slug"], "limits-without-a-model")
+        self.assertEqual(engineering[0]["uses"], ["order-zero"])
+
+    def test_every_engineering_recipe_has_a_page_file(self):
+        import json
+
+        real = json.loads((ROOT / "content" / "taxonomy.json").read_text(encoding="utf-8"))
+        for recipe in real["recipes"]:
+            if recipe["domain"] != "engineering":
+                continue
+            path = ROOT / "site" / "src" / "content" / "recipes" / f"{recipe['slug']}.mdx"
+            self.assertTrue(path.exists(), recipe["slug"])
+            self.assertIn(f"slug: {recipe['slug']}", path.read_text(encoding="utf-8"))
 
     def test_duplicate_slug(self):
         tax = taxonomy()

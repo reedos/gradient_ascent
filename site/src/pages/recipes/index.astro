@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import RecipeRow from '../../components/RecipeRow.astro';
 import RecipeMatrix from '../../components/RecipeMatrix.astro';
 import SectionTop from '../../components/SectionTop.astro';
-import { recipes, recipeLevels, allTechniqueSlugs, techniqueBySlug } from '../../lib/content';
+import { recipes, recipesInDomain, recipeLevels, allTechniqueSlugs, techniqueBySlug } from '../../lib/content';
 
 // The matrix takes plain data, not taxonomy objects (see lib/matrix.ts), so it is shaped here.
 const matrixTechniques = allTechniqueSlugs
@@ -12,6 +12,11 @@ const matrixTechniques = allTechniqueSlugs
 const matrixRecipes = recipes.map((r) => ({ slug: r.slug, title: r.title, uses: r.uses }));
 const usedSlugs = new Set(recipes.flatMap((r) => r.uses));
 const columnCount = matrixTechniques.filter((t) => usedSlugs.has(t.slug)).length;
+
+// Two audiences, one list each. The order inside a group is the taxonomy's order, so the recipe
+// a group is meant to be read first stays first.
+const engineering = recipesInDomain('engineering');
+const general = recipesInDomain('general');
 ---
 <Base
   title="Recipes · Gradient Ascent"
@@ -22,15 +27,36 @@ const columnCount = matrixTechniques.filter((t) => usedSlugs.has(t.slug)).length
     <h1>Common tasks and the levels they need</h1>
     <p>A recipe is a use case composed from techniques, with the reasoning for each choice. Every recipe names the techniques it uses.</p>
   </div>
+
   <section class="section">
     <SectionTop
-      eyebrow="All recipes"
-      title={`${recipes.length} recipes`}
-      aside="All twelve are drafts. The left column lists the levels a recipe draws on; the right names the highest one it needs."
+      eyebrow="For engineers"
+      title="For engineers: test, measurement, design and software"
+      aside={`${engineering.length} recipes, all drafts. They run on one bench: an invented regulator board, four instruments with a SCPI command set, a production test specification and a month of test data. The first one uses no model at all, which is the honest starting point for most test automation.`}
     />
     <div class="signal-list">
       {
-        recipes.map((r) => (
+        engineering.map((r) => (
+          <RecipeRow
+            slug={r.slug}
+            title={r.title}
+            summary={r.summary}
+            levels={recipeLevels(r)}
+          />
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <SectionTop
+      eyebrow="Everyday jobs"
+      title="For everyone: documents, mail, notes and teams"
+      aside={`${general.length} recipes, all drafts. The left column lists the levels a recipe draws on; the right names the highest one it needs.`}
+    />
+    <div class="signal-list">
+      {
+        general.map((r) => (
           <RecipeRow
             slug={r.slug}
             title={r.title}
@@ -47,7 +73,7 @@ const columnCount = matrixTechniques.filter((t) => usedSlugs.has(t.slug)).length
     <SectionTop
       eyebrow="Use case × pattern"
       title={`${recipes.length} recipes across ${columnCount} techniques`}
-      aside={`Every technique some recipe uses gets a column, grouped and colored by level; the ${matrixTechniques.length - columnCount} pages no recipe uses are left out. A filled cell means that recipe uses that technique. The grid scrolls sideways inside its own box; on a narrow screen it is a list instead.`}
+      aside={`Both domains in one grid. Every technique some recipe uses gets a column, grouped and colored by level; the ${matrixTechniques.length - columnCount} pages no recipe uses are left out. A filled cell means that recipe uses that technique. The grid scrolls sideways inside its own box; on a narrow screen it is a list instead.`}
     />
     <RecipeMatrix recipes={matrixRecipes} techniques={matrixTechniques} />
     <p class="footnote reading">

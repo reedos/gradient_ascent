@@ -42,11 +42,20 @@ export interface Track {
   pages?: TaxonomyPage[];
 }
 
+/**
+ * Which audience a recipe's page is written for. `general` is the everyday jobs the site opened
+ * with; `engineering` is the electronics test, measurement and design work that runs on the
+ * bench described in `docs/THE-BENCH.md`. The recipes index groups by this, and
+ * `scripts/validate.py` rule 17 requires every recipe to carry one of the declared values.
+ */
+export type Domain = 'general' | 'engineering';
+
 export interface Recipe {
   slug: string;
   title: string;
   summary: string;
   running_task?: boolean;
+  domain: Domain;
   uses: string[];
   /** Set only once a recipe has its own written page; absent means "outline only". */
   status?: Status;
@@ -114,6 +123,7 @@ export interface Taxonomy {
   tracks_overview: { title: string; who: string; description: string };
   tracks: Track[];
   threads: Thread[];
+  domains: Domain[];
   recipes: Recipe[];
   relations: Relation[];
   /** The one sentence that defines what starts a new level. The Method page, the worksheet and
@@ -156,6 +166,11 @@ export const landscape = landscapeData as unknown as Landscape;
 export const levels: Tier[] = [...taxonomy.tiers].sort((a, b) => a.order - b.order);
 export const tracks: Track[] = taxonomy.tracks;
 export const recipes: Recipe[] = taxonomy.recipes;
+
+/** The recipes in one domain, in taxonomy order. The index page's two headings read off this. */
+export function recipesInDomain(domain: Domain): Recipe[] {
+  return recipes.filter((r) => r.domain === domain);
+}
 export const stages: Stage[] = taxonomy.stages;
 export const threads: Thread[] = taxonomy.threads;
 

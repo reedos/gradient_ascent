@@ -33,6 +33,9 @@ Rules:
       least one registry id under `products`.
   16. An unverified registry entry may not be named by a `published` page, and may not be a
       teardown's `products` id at all.
+  17. Every recipe has a `domain` drawn from the declared `domains`, and at least one domain is
+      declared. The recipes index groups by domain; an unlisted one drops a recipe out of every
+      heading on the page.
 
 Techniques with no named example are reported, not failed.
 
@@ -255,7 +258,17 @@ def validate(taxonomy: dict, landscape: dict | None) -> tuple[list[str], dict]:
                 errors.append(f"relation references unknown id: {rel[end]}")
         if rel["type"] == "requires":
             requires.setdefault(rel["from"], []).append(rel["to"])
+    # Rule 17: a recipe's domain says which audience its page is written for, and the recipes
+    # index groups by it. An unlisted domain would silently drop a recipe out of both headings,
+    # which is a page that exists and is linked from nowhere.
+    domains = set(taxonomy.get("domains", []))
+    if not domains:
+        errors.append("taxonomy declares no domains")
     for recipe in taxonomy.get("recipes", []):
+        if recipe.get("domain") not in domains:
+            errors.append(
+                f"recipe {recipe['slug']} has no valid domain: {recipe.get('domain')!r}"
+            )
         for ref in recipe["uses"]:
             if ref not in ids:
                 errors.append(f"recipe {recipe['slug']} uses unknown id: {ref}")
@@ -353,6 +366,10 @@ def validate(taxonomy: dict, landscape: dict | None) -> tuple[list[str], dict]:
         "level_pages": len(level_pages),
         "track_pages": len(track_pages),
         "recipes": len(taxonomy.get("recipes", [])),
+        "recipes_by_domain": {
+            domain: sum(1 for r in taxonomy.get("recipes", []) if r.get("domain") == domain)
+            for domain in taxonomy.get("domains", [])
+        },
         "teardowns": len((taxonomy.get("teardowns") or {}).get("first", [])),
         "relations": len(taxonomy.get("relations", [])),
         "registry": counts,
@@ -987,6 +1004,9 @@ def main(argv: list[str]) -> int:
           f"({report['level_pages']} level pages, {report['track_pages']} track pages), "
           f"recipes {report['recipes']}, teardowns {report['teardowns']}, "
           f"relations {report['relations']}")
+    by_domain = report.get("recipes_by_domain") or {}
+    if by_domain:
+        print("recipes by domain: " + ", ".join(f"{k} {v}" for k, v in by_domain.items()))
     reg = report["registry"]
     print(f"registry: {reg['models']} models, {reg['products']} products, {reg['tools']} tools")
     if glossary_path.exists():
