@@ -44,8 +44,9 @@ its own command; `examples/rag/README.md` is the one to read first.
 | | |
 |---|---|
 | `examples/<technique>/` | One runnable example per technique: `run.py` (the technique, ~50 readable lines), `__main__.py` (the command line), `README.md` (what it shows and how to run it). |
-| `examples/common/` | The thin model interface (`model.py`), the trace recorder (`trace.py`), the shared tools and agent-loop plumbing. Start here to understand any example. |
+| `examples/common/` | The thin model interface (`model.py`), the trace recorder (`trace.py`), the shared tools and agent-loop plumbing, and the simulated electronics bench (`bench.py`). Start here to understand any example. |
 | `evals/` | The synthetic document set (`corpus/`), the 60 questions (`questions.json`), and the projected token budget (`budget.json`). |
+| `evals/bench/` | The second synthetic world, for the engineering recipes: twelve documents an engineer works from (`corpus/`), a month of production test data (`data/`), and the seeded script that writes it (`make_data.py`). Same loader, same `file#section` citations. |
 | `scripts/` | `validate.py` (content rules), `eval_run.py` (the eval runner), `record_trace.py` (records one run), `import_eci.py` (refreshes the capability snapshot; the only script that uses the network), `preview_server.py` (serves the built site under its base path). |
 | `tests/` | The Python suite. Stdlib `unittest`, no network, no fixtures outside the repository. |
 | `content/` | `taxonomy.json` (the levels, tracks, recipes, teardowns and typed edges between pages), `landscape.json` (the registry of named models, products and tools), `glossary.json`, `timeline.json`, `worksheet.json`, and `capability.json` (a dated snapshot of Epoch AI's Epoch Capabilities Index, CC BY 4.0, drawn on the timeline page). |
@@ -57,6 +58,8 @@ its own command; `examples/rag/README.md` is the one to read first.
 |---|---|
 | [docs/WRITING-A-TECHNIQUE-PAGE.md](docs/WRITING-A-TECHNIQUE-PAGE.md) | How to write a page: anatomy, components, word budgets, sourcing, the draft-to-published line. |
 | [docs/WRITING-A-TEARDOWN.md](docs/WRITING-A-TEARDOWN.md) | How to write a teardown: the sections, the frontmatter, the components allowed, the length, and the sourcing rule for a page about somebody else's product. |
+| [docs/THE-BENCH.md](docs/THE-BENCH.md) | The invented electronics test bench the engineering recipes run on: the board, the four instruments, the production test and its limits, the safety envelope, and the answer key to the six defects planted in the test data. |
+| [docs/WRITING-AN-ENGINEERING-RECIPE.md](docs/WRITING-AN-ENGINEERING-RECIPE.md) | How to write a recipe for engineers: what the page contains, how the example package is laid out, and the engineering-correctness bar. |
 | [docs/EVALS.md](docs/EVALS.md) | The eval runner: which examples the question set can score and which it cannot, how a question is graded, how to read a result file. |
 | [docs/FIRST-LIVE-RUN.md](docs/FIRST-LIVE-RUN.md) | The exact sequence for the first run against a real model, and the gate a page passes to become published. |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to send feedback or a correction, and what to run before a pull request. |
