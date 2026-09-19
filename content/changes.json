@@ -4,6 +4,23 @@
   "note": "What changed on this site, and why it matters to somebody reading it. Newest first. Entries are written for a reader, not for whoever made the change: they say what is different and what it is good for, never what a commit did. Every entry links the pages it touched. Several entries can share a date; within a date, file order is the order shown. docs/CHANGES.md says how to add one.",
   "changes": [
     {
+      "id": "two-shapes-joined",
+      "date": "2026-09-19",
+      "title": "A recipe that is honestly two job shapes joined",
+      "what": "A standing weekly watch over a fixed list of sources, joined to a per-item read that turns each new record into three sentences with its citation attached by code. The watch half calls no model and settles at level 0; the read half is one call per item and settles at level 1; the page argues each half separately and shows where they meet in the code.",
+      "why": "Every other recipe here illustrates exactly one shape, while the guide tells a reader's agent that most real jobs are two or three shapes joined. There was no worked example of a join to point it at.",
+      "pages": [
+        {
+          "label": "Watch a topic for new work",
+          "path": "/recipes/literature-watch/"
+        },
+        {
+          "label": "Job shapes",
+          "path": "/shapes/"
+        }
+      ]
+    },
+    {
       "id": "threads-across-levels",
       "date": "2026-09-19",
       "title": "Three more threads that follow one question up the ladder",

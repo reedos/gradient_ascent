@@ -1,0 +1,62 @@
+{
+  "illustrative": true,
+  "h": 510,
+  "title": "Literature watch, assembled",
+  "sub": "A level-0 watch decides what is new, a level-1 call reads each new item, and code attaches every citation.",
+  "pill": "Level 1 · Two shapes joined",
+  "nodes": [
+    { "id": "timer", "x": 170, "y": 34, "l": "The weekly timer fires", "k": "io" },
+    { "id": "query", "x": 170, "y": 110, "l": "Query the three fixed sources", "k": "code" },
+    { "id": "new", "x": 170, "y": 186, "l": "Work out what is new", "k": "code" },
+    { "id": "read", "x": 170, "y": 262, "l": "Summarize each new item, one call each", "k": "model" },
+    { "id": "cite", "x": 170, "y": 338, "l": "Attach each citation from its own record", "k": "code" },
+    { "id": "digest", "x": 170, "y": 414, "l": "Digest assembled", "k": "io" },
+    { "id": "reader", "x": 170, "y": 490, "l": "A person reads it and opens what matters", "k": "human" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "timer", "t": "query", "by": "code" },
+    { "id": "e2", "f": "query", "t": "new", "by": "code" },
+    { "id": "e3", "f": "new", "t": "read", "by": "code" },
+    { "id": "e4", "f": "read", "t": "cite", "by": "code" },
+    { "id": "e5", "f": "cite", "t": "digest", "by": "code" },
+    { "id": "e6", "f": "digest", "t": "reader", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The timer fires: nothing decided anything",
+      "d": "A weekly schedule, fixed when the watch was set up.\nThe sources and the topic were chosen by a person, once,\nand nothing in this run changes either",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code queries each source in the list",
+      "d": "3 sources, 5 records listed between them\ncity-open-data-notices returned nothing at all, which is\nreported as silence rather than as a quiet week",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e3",
+      "h": "Your code works out which records are new",
+      "d": "2 dropped as dated before the last run (09/15/2026)\n1 dropped as already reported: the journal version of last\nweek's preprint, same title, different id\n2 new",
+      "m": "no model call: this is the level-0 half"
+    },
+    {
+      "e": "e4",
+      "h": "One call per new item, with its title and abstract",
+      "d": "2 calls, not 5: the watch half decided what gets read\nEach reply is three fields, validated against the schema,\nwith one retry if it does not parse",
+      "m": "595 tokens in · 155 tokens out · 2 calls"
+    },
+    {
+      "e": "e5",
+      "h": "Your code attaches each citation from the source record",
+      "d": "authors, year, title, venue and address, built by _cite\nThe schema has no field for any of them, so the model has\nnowhere to write a citation of its own",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e6",
+      "h": "A person reads the digest",
+      "d": "2 items with citations, 1 already-reported item named,\n1 silent source named\nopens the full text of anything they intend to act on",
+      "m": "read before anything is cited elsewhere"
+    }
+  ]
+}

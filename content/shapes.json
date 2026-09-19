@@ -54,7 +54,8 @@
       ],
       "recipes": [
         "meeting-notes",
-        "measurement-writeup"
+        "measurement-writeup",
+        "literature-watch"
       ],
       "teardowns": [],
       "elsewhere": [
@@ -321,7 +322,8 @@
         "ops"
       ],
       "recipes": [
-        "nightly-monitor"
+        "nightly-monitor",
+        "literature-watch"
       ],
       "teardowns": [],
       "elsewhere": [

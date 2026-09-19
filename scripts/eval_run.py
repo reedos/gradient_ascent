@@ -320,6 +320,14 @@ NOT_SCORED = {
         "meetings: decisions found and missed, the owner and due date field by field, and how "
         "often a decision is dropped because its quote is not in the transcript."
     ),
+    "literature_watch": (
+        "it runs a weekly watch over fixture source records and summarizes the ones code found "
+        "to be new. The corpus holds no source feed and no reading history, so the 60-question "
+        "set has nothing to grade. Measure the two halves separately, because they fail "
+        "separately: for the watch, recall against a week a person checked by hand, counting a "
+        "missed item and a duplicate as different mistakes; for the read, whether a person who "
+        "opened the full text agrees with the three sentences written from its abstract."
+    ),
     "invoice_matching": (
         "it reads one invoice into a fixed record and then matches it against a purchase order "
         "and a goods-received record in code. It answers no question about the corpus and cites "

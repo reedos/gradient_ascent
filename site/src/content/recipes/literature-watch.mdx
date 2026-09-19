@@ -1,0 +1,206 @@
+---
+slug: literature-watch
+reviewed: 2026-09-19
+sources: []
+---
+
+import Run from '../../components/page/Run.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import Link from '../../components/page/Link.astro';
+import litRun from '../../data/runs/recipe-literature-watch.json';
+
+Somebody keeping up with a field wants the same thing every Monday: what came out last week that
+they have not already seen, and enough about each item to decide whether to open it. That is two
+<Link href="/shapes/">job shapes</Link> joined, and the join is what this page is about. The first
+half is keeping an eye on sources and saying what changed: a fixed schedule, a fixed list of
+sources, and code working out which records are new. The second half is turning one piece of text
+into another: one call per new item, reading a title and an abstract and writing three sentences
+about it. Every other recipe on this site works one shape through. This one is two, because the
+job is two, and the two settle at different levels.
+
+One rule holds the join together, and it is the reason the halves can meet at all: the citation is
+written by code, from the source record, and never by the model. The schema the model answers in
+has no field for a link, an author or a year, so there is nowhere for it to put one, and the line
+under each title in the digest is built from the record the summary was made from. A digest whose
+citations came out of a model is a digest nobody can trust at a glance, which defeats the point of
+having one.
+
+Not in scope: choosing what to watch, following a reference to the next paper, or deciding when
+enough has been read. Nothing here reads a full text either; it reads what the source listed. And
+nothing here is a substitute for opening the work: the digest tells a person which two items are
+worth an hour, and they spend the hour.
+
+## The assembled diagram
+
+<Run data={litRun} label="Level 1 · Two shapes joined" runKey="literature-watch" />
+
+## Why this level, and why not higher
+
+Two shapes, so two answers. The worksheet is walked once per half, which is what it asks for any
+job that is more than one shape, and the joined job needs whichever half is higher.
+
+**The watch half is level 0.** Walk the questions against the job of finding the records nobody
+has seen yet. The sources are a list a person wrote down once. What counts as new is a date
+comparison against the last run, and then a set difference against the titles already reported.
+There is no free text to read and no judgment to make: two people given the same five records and
+the same history would produce the same two. That is the floor, and the whole half sits on it.
+
+The shape this half belongs to usually settles at level 3, and it is worth saying why this one
+does not. A watch usually lands there because it asks a model one question about each change,
+normally whether the change matters. Here that question is the other half of the job, and once it
+is pulled out, what is left is arithmetic. Splitting the job is what made the lower answer visible;
+a single verdict over the whole thing would have said level 3 and been wrong about most of the
+work.
+
+**The read half is level 1.** Everything one summary needs is in the record handed to it. No fact
+has to be looked up, which is the question that would push it to level 2. Nothing has to pass a
+check before anyone sees it, which is what would push it to level 3: a person reads the digest
+before anything in it is cited elsewhere, and that person is the check. One call, a fixed shape,
+one retry if the reply does not parse.
+
+**So the joined job settles at level 1**, the higher of the two halves, and that is lower than
+where either shape's usual answer would have left it.
+
+**Why this is not level 5 research, and what would make it so.** A researcher at level 5 decides
+what to look for next: it reads something, notices a term it did not have, searches that, follows
+a reference, and stops when it judges it has enough. Every one of those is the model choosing what
+happens next, which is what level 5 means on this site. Nothing here chooses anything. A person
+picked the sources and the topic once, the schedule is a timer, and the code reads exactly the
+records the sources listed and no others. What would move it to level 5 is a question that cannot
+be answered item by item: whether anybody has resolved a disagreement between two papers, or what
+the current state of a subject is. Neither can be answered from a fixed source list, because
+answering them means deciding what to read next. That job is <Link
+href="/recipes/research-brief/">the research brief</Link>, and it costs accordingly. The other
+climb is level 7, where deciding what is worth watching at all becomes the standing job rather
+than a decision a person made once.
+
+Staying below level 1 is worth a moment too. If every new record is worth reading regardless, drop
+the model: the watch half alone, mailed out as a list of titles and links, is a complete and honest
+answer at level 0. The read half earns its cost only when there are more new items each week than
+a person will open, which is the reason to write three sentences about each one.
+
+## Walkthrough
+
+The watch half is one function, and no model is anywhere near it:
+
+<CodeFile file="examples/literature_watch/run.py" func="_select_new" />
+
+Against the sample week, with the watch having last run on 09/15/2026, three sources list five
+records between them. Two are dated before the last run and are dropped. One is the peer-reviewed
+version of a preprint last week's digest already carried: a different id, a different date and a
+different capitalization, the same work, and comparing normalized titles is what catches it. One
+source returns nothing at all, which the report keeps separate from returning nothing new, because
+a broken feed and a quiet week look identical in a digest that only lists items. Two records come
+out the other side.
+
+This is the seam. `_select_new` decided which records exist as far as the rest of the run is
+concerned, and the read half never sees the other three. Everything downstream is a loop over that
+list: one call each, validated against the schema, one retry if the reply does not parse, and a
+record whose reply never validates is named in the digest rather than dropped from it.
+
+The other side of the seam is the citation, which is the one thing the model is structurally
+unable to write:
+
+<CodeFile file="examples/literature_watch/run.py" func="_cite" />
+
+`run` calls that for every item it keeps, with the record the summary was made from. A model that
+writes a link into its prose anyway is flagged by name in the digest rather than published
+quietly, because a link inside a digest entry reads as a citation and the citation here is
+`_cite`'s alone. A model that writes a plausible wrong author and year into a sentence is not
+caught by anything, and the line under the title is still the record's; that limit is in the
+failure modes below.
+
+The run ends with a digest holding two items, each with three sentences and a citation, one
+already-reported item named, one silent source named, and a history of three titles for next
+week's run to compare against.
+
+## What it costs
+
+<CostStrip
+  level={1}
+  stats={[
+    { label: 'Model calls, one week', value: '2, one per new item' },
+    { label: 'Records listed by the sources', value: '5' },
+    { label: 'Tokens in, this run', value: '595' },
+    { label: 'Tokens out, this run', value: '155' },
+  ]}
+  comparedTo={{
+    label: 'summarizing every record the sources list, with no watch half',
+    note:
+      'Dropping the level-0 half and handing all five listed records to the model costs 1,355 tokens in and 420 out on the same fixtures, a little over twice this run, and produces a digest with three entries a reader has already seen or already decided about. At a real weekly volume that ratio is the whole economics of this recipe: the sources list what they list, and the watch half decides how much of it anything pays to read. Both figures come from the stub, so they are an illustration of the ratio and not a measurement.',
+  }}
+/>
+
+The unit is per week, and the number to watch is not the token count. It is how many of the
+records the sources listed actually reached a model: two of five here, and at a real source list
+it is a much smaller fraction. That ratio is set entirely by the half that calls no model.
+
+## How it fails
+
+<FailureModes modes={[
+  {
+    name: 'The watch half: a source that went silent',
+    notice: 'A week reads as quiet, and it was not. A feed moved, a query stopped matching, or an account expired, and the source returns an empty list, which looks exactly like a week in which nothing new came out.',
+    test: 'tests/test_example_literature_watch.py checks that a source returning nothing at all is reported as having returned nothing, separately from a source that returned records but nothing new. Watch that line in the digest: a source that is silent two weeks running is broken, not quiet. Nothing in this recipe can tell the difference for you.',
+  },
+  {
+    name: 'The watch half: the same work, retitled',
+    notice: 'An item a previous digest already carried comes through again, because the title changed between the preprint and the printed version, and the history is compared on normalized titles.',
+    test: 'tests/test_example_literature_watch.py proves both directions: the journal version of last week’s preprint is caught when the title is the same apart from capitalization, and slips through as new when the title is genuinely different. Comparing on a stable identifier instead, where the sources publish one, is the fix, and no source list here has one in common.',
+  },
+  {
+    name: 'The read half: three fluent sentences about an abstract',
+    notice: 'A summary reads well, sits under a correct citation, and misdescribes the work, usually by stating as a finding something the abstract raised as a question, or by dropping the condition a result holds under.',
+    test: 'Nothing downstream catches this, and the tests say so rather than pretending otherwise: an abstract is a summary already, and a summary of a summary can be wrong in a way that only the full text shows. Read the full text of anything you intend to cite or act on, and treat the digest as a decision about what to open.',
+  },
+  {
+    name: 'The read half: a citation the model wrote',
+    notice: 'A link or a reference appears inside the summary prose, where a reader will take it for the item’s own address.',
+    test: 'This one is caught structurally rather than by inspection: the schema has no field for a citation, and tests/test_example_literature_watch.py scripts a reply carrying a link in its prose and confirms the digest’s citation is still the record’s, with the offending field named for a person. A wrong author and year written into a sentence is not caught, which is the limit worth knowing about.',
+  },
+]} />
+
+## What to measure
+
+<HowToEval>
+
+Score the two halves separately, because they fail separately and a single number over the digest
+hides which one moved. For the watch half, take a week a person has already gone through by hand
+and compare: every item the person found that the watch missed, and every item the watch reported
+that the person had already seen. Those are different mistakes with different costs. A missed item
+is the expensive one, because nothing later in the pipeline can recover it; a duplicate costs a
+reader three seconds.
+
+For the read half, the labeled set is the reader's own judgment after opening the full text: for
+each item, would a person who read it write the same three sentences. Ten to fifteen items is
+enough to see the common failure, which is usually a condition dropped rather than a fact
+invented. Score that against the summary, not against the abstract: an abstract the model copied
+faithfully can still be a bad description of the work, and the digest's job is to be a good one.
+
+No result file exists for this recipe, so it claims no score. What is above is the method for
+building one, and the split is the part worth keeping.
+
+</HowToEval>
+
+## Variations
+
+- Replace the fixture records with whatever a real source returns. The watch half is the only part
+  that changes, and the seam is the reason: everything downstream takes a record, not a feed.
+- Compare on a stable identifier instead of a normalized title wherever the sources publish one,
+  and keep the title comparison as a second pass for the sources that do not.
+- Send the digest to several people with different topics by running the same code once per topic
+  with its own source list and its own history. Nothing in either half is shared between runs
+  except the code.
+- Add <Link href="/techniques/evaluator-optimizer/">a checking pass</Link> at level 3 only once
+  real weeks show summaries a reader disagrees with often enough to be worth a second call. A
+  check over three sentences written from an abstract can only catch what the abstract also says,
+  so it is a smaller gain here than on a page that writes from a full document.
+- The same watch half, over a different mechanism, is <Link href="/recipes/nightly-monitor/">the
+  nightly monitor</Link>: that one diffs a page against last night's copy, this one takes the
+  difference between two result sets. Same shape, same level, different arithmetic.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}
