@@ -10,17 +10,23 @@ import CostStrip from '../../components/page/CostStrip.astro';
 import CodeFile from '../../components/page/CodeFile.astro';
 import Link from '../../components/page/Link.astro';
 
-Before Orbeck releases a board, someone checks it against DR-0100, the seven-rule design review
-document: a bill of materials, a netlist summary, and every rule in `design-review-rules.md`
-checked one at a time, met, not met or not applicable, with the numbers that support each answer.
-DR-0100 is explicit about what counts: "A finding that does not name a rule is a comment, not a
-finding, and does not hold a release." A reviewer who cannot tell from the documents whether a
-rule is met records that too, and it counts as not met until the documents say otherwise.
+This is design work rather than test work, and it happens before there is a board to power at all:
+the review reads documents against documents, and nothing in it goes near an instrument. It sits
+in front of all three of the settings this bench covers, because the production line, the
+characterization sweep and the one careful measurement all run on a board some review like this
+one released. Before Orbeck releases a board, someone checks it against DR-0100, the seven-rule
+design review document: a bill of materials, a netlist summary, and every rule in
+`design-review-rules.md` checked one at a time, met, not met or not applicable, with the numbers
+that support each answer. DR-0100 is explicit about what counts: "A finding that does not name a
+rule is a comment, not a finding, and does not hold a release." A reviewer who cannot tell from
+the documents whether a rule is met records that too, and it counts as not met until the documents
+say otherwise.
 
-Nothing below decides whether the board ships. A rule marked not met still needs a person to fix
-the design or waive it in writing, by name, with a reason; no output here marks anything waived,
-and no model call in this recipe reaches an instrument or a fixture. This checklist produces the
-record a person then acts on.
+Nothing below decides whether the board ships, and no model here produces a measurement, an
+uncertainty or a margin: where a rule is a number against a threshold, code computes it. A rule
+marked not met still needs a person to fix the design or waive it in writing, by name, with a
+reason; no output here marks anything waived. This checklist produces the record a person then
+acts on.
 
 ## The lowest level that does it, and why not higher
 
@@ -34,11 +40,11 @@ Five of DR-0100's seven rules need no model, and code settles all five. DR-14 is
 voltage stated in the product's own datasheet." C1 and C2, the SRB-5030's input capacitors on
 revisions A and B, are 50 V parts. 50 / 1.5 = 33.3 V, so a 50 V part supports a 33.3 V rail and
 not a 36.0 V one: that arithmetic is exactly what ECN-2608-04 cites to justify lowering the
-board's maximum input to 32.0 V for revisions A and B. Code does the division and compares it
-with whichever ceiling governs the revision under review, using the part that revision actually
-carries: 50 V parts against the ECN's 32.0 V on revisions A and B, and on revision C the 63 V
-parts the same notice specifies, where 63 / 1.5 = 42 V is what lets that revision keep the
-datasheet's 36.0 V. A model asked to do that division is only an added way to get 33.3 wrong.
+board's maximum input to 32.0 V for revisions A and B. Code does the division and compares it with
+whichever ceiling governs the revision under review, using the part that revision actually
+carries: 50 V parts against the ECN's 32.0 V on revisions A and B, and revision C's 63 V parts,
+where 63 / 1.5 = 42 V, against the datasheet's 36.0 V. A model asked to do that division is only
+an added way to get 33.3 wrong.
 
 DR-10 (inductor saturation margin) and DR-20's placement thresholds are the same shape: a number
 off the bill of materials or the netlist summary, a factor or a distance the rule names, one
@@ -50,12 +56,12 @@ rather than dressing them up as calculations.
 Two rules cannot be settled that way. DR-24 sets a numeric limit (junction temperature at or below
 125 degC) but also requires the calculation shown "term by term, not as a single number," and
 disclaims one specific wrong argument by name: a design that reaches thermal shutdown in normal
-use does not meet the rule, "whatever the protection does." Telling whether a piece of submitted
-evidence actually argues from the computed number, rather than from the shutdown being there,
-needs reading. DR-30 names several things at once (test points sized for a probe, a switch-node
-test point marked for scope use and excluded as a fixture contact, a silkscreen character that
-matches the assembly number) and checking a netlist summary against all of them together is a
-reading task too. Those two, and only those two, go to a model, through
+use does not meet the rule, "whatever the protection does." Telling whether submitted evidence
+argues from the computed number, rather than from the shutdown being there, needs reading. DR-30
+names several things at once (test points sized for a probe, a switch-node test point marked for
+scope use and excluded as a fixture contact, a silkscreen character that matches the assembly
+number), and checking a netlist summary against all of them is a reading task too. Those two, and
+only those two, go to a model, through
 <Link href="/techniques/structured-output/">structured output</Link> so each finding comes back
 as a rule, a status and evidence, and <Link href="/techniques/evaluator-optimizer/">evaluator
 optimizer</Link> so a second, separate pass checks each drafted finding against the rule's own
@@ -63,25 +69,23 @@ full text before it reaches a person.
 
 Climbing to level 4 would let a model decide which rule needs a second look instead of running
 both passes on every rule; that buys nothing here, because DR-0100 does not change between boards
-and every rule is checked every time regardless. Climbing to
-<Link href="/techniques/debate-review/">review and debate</Link> (level 6) would add a third,
-independent reader for cases where a wrong finding is expensive enough to want two model opinions
-to agree before anyone sees it. The DR-24 catch below is exactly that kind of case; a reader whose
-false findings hold up a real release should read that page next.
+and every rule is checked every time regardless. <Link href="/techniques/debate-review/">Review
+and debate</Link> (level 6) would add a third, independent reader where a wrong finding is
+expensive enough to want two model opinions to agree first. The DR-24 catch below is that kind of
+case, and a reader whose false findings hold up a real release should read that page next.
 
 ## Walkthrough
 
 No trace has been recorded for this example (see `docs/EVALS.md`), so this is an illustrated run
-on `StubModel`, not a measured one: the numeric steps below are the actual arithmetic the code
-runs, and the two model responses are scripted stub text chosen to demonstrate one specific catch,
-not a live model's output. Two inputs are written into the example rather than read from the bench
-corpus, because the corpus has neither: the netlist summary's placement figures, and the evidence
-a reviewer submitted for the two rules that need reading. The bill of materials, DR-0100 and the
-change notice are all real files in `evals/bench/corpus/`.
+on `StubModel`: the numeric steps below are the actual arithmetic the code runs, and the two model
+responses are scripted stub text chosen to demonstrate one catch. Two inputs are written into the
+example rather than read from the bench corpus, because the corpus has neither: the netlist
+summary's placement figures, and the evidence submitted for the two rules that need reading. The
+bill of materials, DR-0100 and the change notice are real files in `evals/bench/corpus/`.
 
-Checking SRB-5030 revision B, which is the revision the run is asked about. A request naming a
-revision this board does not have is refused rather than reviewed against the wrong bill of
-materials, and one naming none gets revision B, the revision in production:
+Checking SRB-5030 revision B. A request naming a revision this board does not have is refused
+rather than reviewed against the wrong bill of materials, and one naming none gets revision B, the
+revision in production:
 
 1. Code loads DR-0100 and keys its seven rules by id: DR-10, DR-12, DR-14, DR-16, DR-20, DR-24,
    DR-30.
@@ -100,11 +104,11 @@ materials, and one naming none gets revision B, the revision in production:
    rejects the DR-24 finding: "DR-24 says a design whose junction temperature reaches the shutdown
    threshold in any rated operating condition does not meet this rule, whatever the protection
    does; citing the shutdown as the reason it is met is the opposite of what the rule says." It
-   confirms DR-30, whose evidence does address every clause the rule names.
-5. Code merges the two passes. DR-30 ships as drafted, "met," attributed to the model. DR-24 does
-   not ship as drafted: it is recorded "not met," with the checker's reason attached, so a person
-   redoes it against the evidence that would actually support "met," the 110.3 degC figure the
-   submission itself computed but did not cite for this rule.
+   confirms DR-30, whose evidence addresses every clause the rule names.
+5. Code merges the two passes. DR-30 ships as drafted, "met," attributed to the model. DR-24 is
+   recorded "not met," with the checker's reason attached, so a person redoes it against the
+   evidence that would actually support "met," the 110.3 degC figure the submission computed but
+   did not cite for this rule.
 
 The final record covers all seven rules for revision B, five checked by code and two by the two
 model passes, none of them a release decision.
@@ -131,9 +135,9 @@ itself shows only the five numeric findings; the scripted two-pass catch above i
 ## What it costs
 
 Two model calls happen no matter how many rules DR-0100 has, because both passes read every
-judgment rule at once rather than one rule at a time. That is worth stating because it does not
-scale with rule count the way a per-rule call would: adding an eighth rule that needs reading adds
-tokens to the same two calls, not a third and fourth call.
+judgment rule at once rather than one rule at a time. It does not scale with rule count the way a
+per-rule call would: an eighth rule that needs reading adds tokens to the same two calls, not a
+third and fourth call.
 
 <CostStrip
   stats={[
@@ -145,11 +149,10 @@ tokens to the same two calls, not a third and fourth call.
   level={3}
 />
 
-This recipe does not run per unit the way a production test does. A design review runs once per
-board revision, or once per engineering change on an existing revision, not once per board built.
-If the SRB-5030 sees roughly one ECN a quarter, that is 2 model calls and under 1,200 tokens a
-quarter, not a per-unit cost multiplied across a production run of 200 boards. The five arithmetic
-rules cost nothing per review, the same way a limit check costs nothing per unit on
+The unit here is the review, not the board. A design review runs once per board revision, or once
+per engineering change on one, not once per board built: if the SRB-5030 sees roughly one ECN a
+quarter, that is 2 model calls and under 1,200 tokens a quarter. The five arithmetic rules cost
+nothing per review, the same way a limit check costs nothing per unit on
 <Link href="/recipes/limits-without-a-model/">limits without a model</Link>.
 
 ## How it fails, specifically
@@ -187,22 +190,21 @@ handed. A right answer here is a finding whose status and cited rule agree with 
 checking DR-0100 by hand would write for the same bill of materials and netlist summary.
 
 Build a labeled set before tuning anything: DR-0100's seven rules against a handful of bills of
-materials and netlist summaries with known right answers, including at least one board that
-should fail each rule and one drafted finding you already know cites its rule wrong, the way
-DR-24's does here. A few dozen rule and finding pairs, not sixty questions, is enough to start.
+materials and netlist summaries with known right answers, including one board that should fail
+each rule and one drafted finding you know cites its rule wrong, the way DR-24's does here. A
+review runs once a revision, so a few dozen rule and finding pairs is both enough to start and
+about all a reader will have.
 
 The confusion that matters most is a false "met": it is what a wrong pass ships. Watch it
 separately from a false "not met," which only costs a person's time re-checking something that
-was actually fine, and separately again from how often the second pass rejects the first (a
-disagreement rate worth sampling by hand occasionally, since a checker that rejects everything or
-nothing is not actually checking).
+was fine, and separately again from how often the second pass rejects the first, since a checker
+that rejects everything or nothing is not checking.
 
 </HowToEval>
 
 ## How to adapt it
 
-No command in this recipe reaches an instrument; it checks documents against other documents, so
-the instrument-porting story other recipes on this bench carry does not apply here. What does port
+The instrument-porting story other recipes on this bench carry does not apply here. What does port
 is the split and the two-pass shape: read every rule once, decide by a fixed test in code whether
 a rule is arithmetic or judgment, compute the arithmetic ones directly, and for the rest draft a
 finding and check it against the rule's own full text before a person sees it. What does not port

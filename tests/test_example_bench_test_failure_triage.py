@@ -58,6 +58,15 @@ class LoadFailuresTests(unittest.TestCase):
         serials = {f.serial for f in failures}
         self.assertIn(DEAD_ON_OFFSET_FIXTURE_SERIAL, serials)
 
+    def test_the_counts_the_page_quotes(self) -> None:
+        """The page's opening says 200 units produce eight VOUT failures, which is small enough
+        for a person to read; its cost strip says six of those eight carry a note and reach the
+        model. Count all three from the file rather than typing them into the prose."""
+        failures = load_failures("VOUT")
+        self.assertEqual(len(failures), 8)
+        self.assertEqual(sum(1 for f in failures if f.note.strip()), 6)
+        self.assertEqual(sum(1 for f in failures if f.fixture == "FIX-03"), 6)
+
     def test_a_measurement_with_no_failures_returns_an_empty_list(self) -> None:
         # R_OUT (step 1) only fails on the two shorted units, which never reach VOUT; asking for
         # a measurement that never failed at all should not raise.

@@ -4,13 +4,203 @@ reviewed: 2026-09-19
 sources: []
 ---
 
-The measurements are done, the arithmetic is done, and what is left is the part that takes the
-afternoon: turning a lab notebook and a table of computed results into a report a reviewer can
-read. Code computes every number and places it. The model writes the sentences around the numbers
-and is never asked for one. A check in code then confirms that every figure in the draft is a
-figure code produced, character for character, before a person reads it. That check costs nothing
-and it is what makes one model call safe to make here.
+import Link from '../../components/page/Link.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
 
-Draft in progress. This page is a slot: the taxonomy entry, the techniques it composes and the
-level it needs are settled, and the writing is not. See `docs/WRITING-AN-ENGINEERING-RECIPE.md`
-for what belongs here, and `docs/THE-BENCH.md` for the bench every engineering recipe runs on.
+This is an engineering-test page. Five revision C prototypes of the Orbeck SRB-5030 spent three
+days in a chamber, swept over line, load and temperature, and the sweep is done: the margins are
+computed, the uncertainty budget behind them is computed, the guardbanded verdicts are computed.
+What is left is the afternoon's other job, turning a lab notebook
+(`evals/bench/corpus/characterization-notebook.md`) and a table of numbers into a short
+characterization report somebody else can read without re-deriving any of it. Code has already
+decided every number in that report. What it has not decided is how to say it in sentences that
+connect one finding to the next and do not quietly drop a caveat the notebook is honest about.
+
+## Level 1, and why not higher
+
+Code computes every figure this report can quote:
+<Link href="/recipes/characterize-a-design/">the corner margin for all five boards</Link>, the
+expanded uncertainty behind the thinnest one, and the three-ambient line regulation figures and
+guardbanded verdict for the one board whose margin the measurement cannot quite decide. None of
+that arithmetic is new to this page; it is the same `dc_voltage_budget`, `combined_uncertainty`,
+`expanded_uncertainty`, `guarded_verdict` and `margin_to_limit` functions every other page on this
+bench that touches uncertainty imports rather than reimplements. This recipe's own job starts
+after all of that: turning the figures and the notebook's prose into paragraphs a reviewer reads
+in under a minute.
+
+That job is one model call, level 1, <Link href="/techniques/order-zero/">order zero</Link>
+composed with <Link href="/techniques/prompt-engineering/">prompt engineering</Link>. A fixed
+template could produce a report too, but a session's actual story does not have a fixed shape:
+which board is thinnest, whether a line regulation reading lands on a pass, a fail or a cannot-say,
+which open items from the notebook still matter, all of it changes sweep to sweep, and a template
+that tries to cover every combination turns into a maze of conditionals that is itself a program
+nobody is checking with the same rigor as the arithmetic underneath it. One call to write connected
+prose around numbers that cannot move is cheaper than that maze and safer than skipping the prose
+and handing a reviewer a bare table.
+
+The reasons to climb are reasons this page deliberately has none of. There is nothing to retrieve
+that is not already in the notebook and the figures, so <Link href="/techniques/rag/">RAG</Link>
+buys nothing. The output is prose a person reads directly, not a payload another program parses,
+so there is no schema for <Link href="/techniques/structured-output/">structured output</Link> to
+hold it to. Nothing here decides what happens next or calls a tool, so there is no case for an
+agent loop. The one thing this level needs that level 0 does not have is a model at all, because
+level 0 is a template and a template is the maze above.
+
+## The run, stepped
+
+`compute_results` reads `evals/bench/data/characterization-2026-09.csv` and returns the corner
+margins for all five boards, the uncertainty budget for the thinnest one, and board
+SRB5030-2609-0005's line regulation figures and verdicts at all three ambients. The corner budget,
+for SRB5030-2609-0003 at 9.0 V in, 3.000 A out, 70 degC, is four named lines the same way every
+other budget on this bench is:
+
+| Contribution | Standard uncertainty |
+| --- | --- |
+| Meter accuracy, 1 year, 10 V range | 128.3 uV |
+| Resolution, 10 uV per count | 2.9 uV |
+| Repeatability, 5 readings | 36.1 uV |
+| Leads and connections | 115.5 uV |
+| Combined | 176.4 uV |
+| Expanded, k = 2 | 352.7 uV |
+
+Against that, the corner margin is 20.4 mV: over fifty times the expanded uncertainty, so the
+measurement is not in doubt even though the margin is thin. Board SRB5030-2609-0005's line
+regulation at 25 degC is a different case: 0.299 percent against a 0.300 percent limit, with
+0.0075 percentage points of expanded uncertainty on the difference. `guarded_verdict` returns
+`"cannot say"` there, `"pass"` at 0 degC and `"fail"` at 70 degC, and all three verdicts are
+figures the model is handed, not conclusions it draws.
+
+Every figure is formatted once, as a `Figure(label, text)` pair, and that formatted string is the
+only form the model is allowed to reproduce:
+
+<CodeFile file="examples/bench_measurement_writeup/run.py" func="compute_results" />
+
+The notebook's own prose (`evals/bench/corpus/characterization-notebook.md`, loaded whole) and the
+figures block go into one prompt. The system message is explicit that every number in the reply
+has to be copied from the figures, character for character, and that anything else (a count, a
+comparison between ambients) gets written in words, not digits. One call, and the model's only job
+is the sentences:
+
+<CodeFile file="examples/bench_measurement_writeup/run.py" func="run" />
+
+## The check
+
+`unsupported_numbers` is the whole argument for why this one call is safe to make unattended up to
+the point a person reads the result. It scans the draft for every numeric token and returns
+whichever ones are not, character for character, one of the figures code produced:
+
+<CodeFile file="examples/bench_measurement_writeup/run.py" func="unsupported_numbers" />
+
+`tests/test_example_bench_measurement_writeup.py` runs it both ways: a clean draft, built only
+from the figures above, comes back with nothing unsupported, and the same draft with its
+uncertainty quietly rounded from 352.7 uV to a tidier 350 uV comes back naming `"350"`, the exact
+token that was never one of the figures. The check does not retry and does not repair a draft it
+rejects; `run` hands the rejected text back with the failing tokens named, so a review starts from
+the specific sentence to look at rather than from "something in here is wrong."
+
+The regular expression behind the check has to tell a quoted number apart from a serial number's
+digits, or every board's ID would have to be pre-approved as a figure. `SRB5030-2609-0003` is
+never read as the numbers 5030, 2609 and 0003, because every digit inside it sits next to a letter,
+another digit, or the hyphen that joins the three groups, and the check only starts a match where
+none of those touch it on either side.
+
+## What it costs
+
+<CostStrip
+  stats={[
+    { label: "Model calls per session report", value: "1" },
+    { label: "Tokens in / out", value: "2,706 / 340" },
+    { label: "Figures computed and handed over", value: "23" },
+    { label: "Cost per run, at typical rates", value: "a fraction of a cent" },
+  ]}
+  comparedTo={{
+    label: "characterize-a-design",
+    note: "That page finds the same corner margin and the same cannot-say verdict for zero model calls: grouping, a subtraction, a root sum of squares. This page spends exactly one call on top of the same arithmetic, to turn the finding into prose a reviewer does not have to reassemble from a table themselves.",
+  }}
+/>
+
+This is an engineering-test cost, counted per run and per session, not per unit: the notebook this
+recipe reads took three days on the bench, and the report about it is written once. A tenth of a
+cent a run is not a number worth optimizing; the number worth comparing it against is the afternoon
+a person would otherwise spend writing the same paragraphs by hand, and the half hour lost if a
+report ships with a number nobody checked, which is what the check above exists to catch before it
+costs that much.
+
+## How it fails on a real bench, specifically
+
+<FailureModes modes={[
+  {
+    name: "A right number attached to the wrong claim",
+    notice: "The draft says SRB5030-2609-0003 held 20.4 mV of margin, correctly, and then says SRB5030-2609-0002 held it, which is 58.2 mV in the figures. Both numbers are real figures code produced; the check only confirms each token appears somewhere among them, not which board or which claim it is sitting next to.",
+    test: "A person checks the binding, not just the digits: for every figure the draft quotes, read the sentence around it against the label compute_results gave that figure. This is the one thing the automated check cannot do, and it is why a person still reads every report before it ships.",
+  },
+  {
+    name: "A caveat from the notebook left out",
+    notice: "The notebook's own section 6 says the 200 uV lead and connection contribution is an assumption, not something measured on this harness, and that everything above it moves if that number is wrong. A draft that quotes every figure correctly but drops that sentence reads as more certain than the session actually was, and the check has nothing to compare an omission against: there is no missing number to flag.",
+    test: "Keep a short list of the notebook's own open items (section 7) next to the draft and confirm each one that is still genuinely open appears somewhere in the report. A number-only check cannot do this; a person with the notebook open in the other window can, in under a minute.",
+  },
+  {
+    name: "A short figure that is common enough to be a coincidence",
+    notice: "The coverage factor, 2, is one of this recipe's own figures, because docs/THE-BENCH.md requires stating it next to any expanded uncertainty. A bare \"2\" is also one of the most common tokens in ordinary prose, so the check would wave through an unrelated wrong number that happened to also be a bare 2. Nothing on this bench currently puts a fabricated single-digit figure next to a real finding, but the check's guarantee is about matching tokens, not about matching what a number means.",
+    test: "Treat a short bare figure (one or two digits, no unit attached) as the one class of number the check is weakest on, and give it the same read-the-sentence attention as a claim-binding problem, not the confidence a five- or six-character figure earns.",
+  },
+  {
+    name: "A model copies a real number from the notebook that code never produced",
+    notice: "The notebook's own uncertainty example (section 6) states 351.6 uV for a representative reading; this recipe's own code recomputes 352.7 uV for the specific corner it reports on, from that corner's own five readings. Both numbers are honestly arrived at, and they disagree by about a microvolt because they are not the same reading. If a draft quotes the notebook's 351.6 instead of code's own 352.7, the check correctly rejects it: this recipe trusts its own recomputation, not the notebook's arithmetic, even when the notebook is right.",
+    test: "When the check rejects a number that also appears in the notebook, do not treat that as the check being wrong. Confirm which of the two the report should be reporting (almost always code's own recomputation, over the notebook's illustrative figure), and redraft from the figures, not from the notebook's own numbers.",
+  },
+]} />
+
+## How to evaluate it
+
+<HowToEval>
+
+There is no 60-question set to grade this against: `scripts/eval_run.py` measures document
+question answering over `evals/corpus/`, and this recipe reads a different document set and a
+different data set entirely. What it measures instead is the share of drafts in which every figure
+in the prose is one that code produced, which `unsupported_numbers` turns into a plain pass or a
+fail rather than a judgment call: run a session's worth of drafts, count how many come back clean,
+and a number under 100 percent means the prompt is losing the "copy the figure, do not compute
+one" instruction, not that the arithmetic underneath is wrong.
+
+That check is necessary and not sufficient. It cannot catch a right figure attached to the wrong
+board, and it cannot catch a caveat the notebook states plainly that the draft leaves out, because
+neither of those is a number the check can compare against anything. Before trusting this recipe
+on a real session, keep a small set of past reports (five or six is enough at this volume, since
+there is no golden run to score against and no second unit to catch a mistake the way production
+volume would) and read each one against its own notebook and figures the way the failure modes
+above describe, specifically checking the claim a number sits next to and the open items a report
+is supposed to carry forward.
+
+</HowToEval>
+
+## How to adapt it
+
+Every figure above, and the notebook it is drawn from, is this bench's own. A real characterization
+session has its own datasheet limits, its own uncertainty budget and its own notebook format; the
+part that ports is the shape, not the numbers: compute every figure first, format each one exactly
+once, hand the model the figures and the source text and nothing else it could compute a number
+from, and check the draft's numbers against the figures before anyone reads it.
+
+That shape is not specific to a bench. It is <Link href="/techniques/prompt-engineering/">turning
+one piece of text into another</Link> with the facts pinned down in advance: a test report written
+from a results table a suite already produced, release notes drafted from a list of commits, a
+status update written from what a tracker already says about a sprint. In every case the numbers or
+the facts exist before the model is asked to write anything, so the same rule applies: a model
+writes the sentences, code supplies and checks the facts, and nothing downstream trusts the prose
+for a number it could have gotten from the table instead.
+
+Where this stays level 1 and does not climb to
+<Link href="/recipes/accuracy-specs-from-the-manual/">the kind of write and check that needs two
+model passes</Link>: one draft, read by one person, with nothing else consuming it. It would move
+to <Link href="/techniques/evaluator-optimizer/">write and check</Link> the day a report started
+generating unattended on a schedule with nobody reading each one before it went out, or the day
+something downstream, a dashboard, another program, a second model, started parsing this report's
+prose instead of a person reading it. Neither is true here, and a page that added a second model
+pass anyway would be spending a call to guard against a risk this recipe does not have.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}

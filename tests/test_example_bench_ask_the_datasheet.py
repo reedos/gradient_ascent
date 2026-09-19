@@ -1,6 +1,6 @@
 """End-to-end tests for the ask-the-datasheet example.
 
-Three things are being pinned here, and they are different kinds of claim:
+Four things are being pinned here, and they are different kinds of claim:
 
 - **Retrieval actually finds both conflicting sources.** For the question this recipe is built
   around, `evals.bench`'s datasheet section and its engineering change notice both come back in
@@ -11,6 +11,9 @@ Three things are being pinned here, and they are different kinds of claim:
   same contract `examples/structured_output/run.py` tests for its own schema.
 - **Every step is `decided_by: "code"`.** Calling the model is not a model decision; nothing here
   chooses what happens next except the fixed retrieve-prompt-validate-retry sequence.
+- **The measurement question lands on the meter's accuracy table, and the trap is inside it.**
+  The page quotes the corpus size, the first two hits for that question and the three accuracy
+  figures; each is computed here rather than typed into the prose.
 """
 from __future__ import annotations
 
@@ -23,8 +26,9 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from evals.bench import load_bench_sections  # noqa: E402
+from evals.bench import load_bench_documents, load_bench_sections  # noqa: E402
 from examples.bench_ask_the_datasheet.run import LEVEL, SCHEMA, _retrieve, run  # noqa: E402
+from examples.common.bench import meter_accuracy_limit_v  # noqa: E402
 from examples.common.model import StubEmbedder, StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
 
@@ -32,6 +36,14 @@ QUESTION = (
     "What is the maximum input voltage of the SRB-5030, revision B, per its recommended "
     "operating conditions?"
 )
+#: The second question the page works: the answer is a row of the meter's accuracy table, and
+#: which row is right depends on the calibration interval and the range, not on the board.
+ACCURACY_QUESTION = (
+    "The MDN-6100 was calibrated eleven months ago. What is its DC volts accuracy for a "
+    "4.9930 V reading on the 10 V range?"
+)
+ACCURACY_CITE = "mdn6100-programming-manual#2"  # "Accuracy": the table, every interval in it
+BUDGET_CITE = "mdn6100-programming-manual#8"  # "Worked Example: an Uncertainty Budget"
 DATASHEET_CITE = "srb5030-datasheet#3"  # "Recommended Operating Conditions": states 36.0 V
 ECN_CITE = "ecn-2608-04#1"  # "Change": supersedes it to 32.0 V for revisions A and B
 CORRECT_RECORD = {
@@ -62,6 +74,39 @@ class RetrievalTests(unittest.TestCase):
         hits = {s.cite for s in _retrieve(narrow_question, sections, StubEmbedder(), k=2)}
         self.assertIn(DATASHEET_CITE, hits)
         self.assertNotIn(ECN_CITE, hits, "a top-2 cut here finds the datasheet without the notice")
+
+    def test_the_corpus_size_the_page_quotes(self) -> None:
+        """The page counts the documents and the sections in several places. Pin both here so a
+        fourteenth document cannot arrive and leave the prose quoting the old number."""
+        self.assertEqual(len(load_bench_documents()), 13)
+        self.assertEqual(len(load_bench_sections()), 87)
+
+
+class AccuracyRowTests(unittest.TestCase):
+    """The measurement question, where the trap is a row rather than a revision.
+
+    The manual states DC volts accuracy per range and per calibration interval, so the same
+    4.9930 V reading has a different accuracy on every row. Retrieval is not what goes wrong:
+    one search puts the table first, and the right row and the wrong one are inside it together.
+    """
+
+    def test_one_search_finds_the_accuracy_table_and_the_worked_budget(self) -> None:
+        sections = load_bench_sections()
+        hits = [s.cite for s in _retrieve(ACCURACY_QUESTION, sections, StubEmbedder(), k=8)]
+        self.assertEqual(hits[:2], [ACCURACY_CITE, BUDGET_CITE])
+
+    def test_the_right_row_and_the_wrong_row_are_in_the_same_retrieved_section(self) -> None:
+        text = load_bench_sections()[ACCURACY_CITE].text
+        for interval in ("24 hour", "90 day", "1 year"):
+            self.assertIn(interval, text)
+
+    def test_the_accuracy_figures_the_page_quotes(self) -> None:
+        """79.9 uV on the 24 hour row, 224.8 uV on the one year row the meter is actually on, and
+        824.7 uV for the same reading taken on the 100 V range. All three are real rows."""
+        uv = lambda v: round(v * 1e6, 1)  # noqa: E731
+        self.assertEqual(uv(meter_accuracy_limit_v(4.9930, 10.0, interval="24 hour")), 79.9)
+        self.assertEqual(uv(meter_accuracy_limit_v(4.9930, 10.0, interval="1 year")), 224.8)
+        self.assertEqual(uv(meter_accuracy_limit_v(4.9930, 100.0, interval="1 year")), 824.7)
 
 
 class RunTests(unittest.TestCase):

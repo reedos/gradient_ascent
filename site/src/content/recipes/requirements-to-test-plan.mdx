@@ -10,16 +10,23 @@ import FailureModes from '../../components/page/FailureModes.astro';
 import CostStrip from '../../components/page/CostStrip.astro';
 import HowToEval from '../../components/page/HowToEval.astro';
 
-Orbeck's SRB-5030 datasheet states eight numbers a production board has to meet: an input
-voltage range, an output voltage window, two regulation percentages, a ripple ceiling, a no-load
-current draw, a switching frequency band and a current limit. Before a board ships, each of those
-numbers needs a step in the production test spec that actually measures it, on the right
-instrument, against the right limit. Drop one and a board can ship with a real requirement nobody
-tests for. Copy a number a later engineering change notice has since overridden and a good board
-can fail a test against a limit that is no longer the real one, or the test can quietly stop
-catching what it was written to catch. This recipe reads the datasheet's requirements, drafts one
-test per requirement, and builds a table proving every requirement traces to a test and every
-test traces back to a requirement, before a person signs off on the plan.
+Orbeck's SRB-5030 datasheet states eight numbers a board has to meet: an input voltage range, an
+output voltage window, two regulation percentages, a ripple ceiling, a no-load current draw, a
+switching frequency band and a current limit. Two different plans get drawn from that one list,
+and this page builds the production one. A design verification plan takes each requirement to its
+corners, reports the margin there with the uncertainty on it, and is read once by a design review;
+a production test plan checks each requirement against a limit, fast, on every unit that goes down
+the line. Same requirements, different documents, and a step written for one is usually wrong for
+the other. <Link href="/recipes/characterize-a-design/">Characterize a design</Link> is the
+verification side of the same list.
+
+Each of those numbers needs a step in the production test spec that actually measures it, on the
+right instrument, against the right limit. Drop one and a board can ship with a real requirement
+nobody tests for. Copy a number a later engineering change notice has overridden and a good board
+can fail against a limit that is no longer the real one, or the test can quietly stop catching
+what it was written to catch. This recipe reads the datasheet's requirements, drafts one test per
+requirement, and builds a table proving every requirement traces to a test and every test back to
+a requirement, before a person signs off on the plan.
 
 ## Level 3, and why not higher
 
@@ -34,20 +41,20 @@ paraphrase into a fixed shape <Link href="/techniques/structured-output/">struct
 output</Link>'s own page walks through.
 
 A model could also be handed the whole eight-row datasheet table at once and asked to draft the
-whole plan in one call. That would still be level 3: the same fixed steps run in the same order
-regardless of what comes back. What actually changes at level 3 is asking once per requirement,
-<Link href="/techniques/prompt-chaining/">prompt chaining</Link>'s own shape, so one requirement's
-mangled reply drops only that row instead of risking the whole table, and so the trace shows
-which specific call a bad proposal came from.
+plan in one call. That would still be level 3: the same fixed steps run in the same order
+regardless of what comes back. What asking once per requirement buys,
+<Link href="/techniques/prompt-chaining/">prompt chaining</Link>'s own shape, is that one mangled
+reply drops one row instead of the table, and the trace shows which call a bad proposal came from.
 
 Nothing here needs level 4 or level 5. Level 4 would let the model decide whether to look something
-up before answering, but every run reads the same two documents for the same board, so there is
-nothing to decide. Level 5 would let one proposal's content change what happens next, but it does
-not: even a proposal that copies a superseded limit does not change the chain's next step, only
-what the coverage check reports about that row once every proposal is already in. The order is
+up before answering, but every run reads the same two documents for the same board. Level 5 would
+let one proposal's content change what happens next, and it does not: a proposal that copies a
+superseded limit changes only what the coverage check reports about that row. The order is
 fixed by code before the first model call; the coverage check is code after the last one; the
-model only ever drafts what sits between them, and a person, not the check and not the model,
-is who decides whether the plan is adopted.
+model only ever drafts what sits between them. A drafted limit is data for the coverage check and
+not an answer, compared in code against the requirement it claims to answer and against the notice
+that supersedes it. Nothing a model writes here becomes a measurement, an uncertainty, a margin or
+a verdict, and a person, not the check and not the model, decides whether the plan is adopted.
 
 ## The run on the bench, stepped
 
@@ -109,22 +116,19 @@ plan adopted, as `Answer.text`, a plain comma-separated table with every source 
   level={3}
 />
 
-Eight calls, one per requirement, for one board revision's plan: no branching, so a ninth or
-tenth requirement adds one more call and nothing else. The 1,608 tokens in and 283 out above are
+The unit here is the plan, not the unit tested: eight calls buy one board revision's plan, and a
+ninth requirement adds one more call and nothing else. The 1,608 tokens in and 283 out above are
 `tracer.tokens_in_total()` and `tracer.tokens_out_total()` from a scripted stub run of all eight
-requirements for revision B, counted by `count_tokens` over the prompts the example actually
-builds and the replies scripted into the test. That is an estimate of what a backend would bill,
-not a measurement of one, and the test pins both numbers so this page cannot drift from the code.
-Building the traceability table and checking it costs nothing measured in tokens: both are loops
-over eight rows, the same level-0 arithmetic <Link
-href="/recipes/limits-without-a-model/">limits without a model</Link> argues most of test
-automation already is.
+requirements for revision B, counted by `count_tokens` over the prompts the example builds and the
+replies scripted into the test. That is an estimate of what a backend would bill, not a
+measurement of one, and the test pins both numbers so this page cannot drift from the code.
+Building the traceability table and checking it costs nothing in tokens: both are loops over eight
+rows, the same level-0 arithmetic <Link href="/recipes/limits-without-a-model/">limits without a
+model</Link> argues most of test automation already is.
 
-Compare that against the cost of the mistake the check exists to catch. A stale 36.0 V limit that
-ships on a revision B line either fails a good board on a rail the ECN says is actually fine at
-that voltage, or, worse, a test built from it never exercises the fixture near the 32.0 V ceiling
-that is the board's real one, on input capacitors the datasheet's own absolute maximum table
-allows all the way to 40.0 V before anything is actually damaged.
+Compare that against the mistake the check exists to catch. A stale 36.0 V limit on a revision B
+line either fails a good board on a rail the ECN says is fine at that voltage, or, worse, never
+exercises the fixture near the 32.0 V ceiling that is the board's real one.
 
 ## How it fails on a real bench, specifically
 
@@ -142,7 +146,7 @@ allows all the way to 40.0 V before anything is actually damaged.
   {
     name: 'A limit copied from a datasheet number an ECN superseded',
     notice: 'The plan looks complete and the test even runs; it checks a rail against 36.0 V on a board a later notice has capped at 32.0 V for the revisions actually in the field.',
-    test: '_stale_limit flags a proposed upper limit that matches the datasheet’s own figure for a requirement a notice supersedes; one test plants the stale figure on a revision B board and checks it is caught, another plants the identical figure on a revision C board, where it is correct, and checks it is not. A third checks the superseded sweep never reaches the model in the first place.',
+    test: '_stale_limit flags a proposed upper limit that matches the datasheet’s own figure for a requirement a notice supersedes; one test plants the stale figure on a revision B board and checks it is caught, another plants the identical figure on a revision C board, where it is correct, and checks it is not.',
   },
   {
     name: 'A test that answers a different requirement than the one it was asked about',
@@ -151,11 +155,11 @@ allows all the way to 40.0 V before anything is actually damaged.
   },
 ]} />
 
-One thing the check as written does not catch: an instrument that exists on this bench but is
-the wrong one for the measurement, the MDN-6100 proposed for REQ-RIPPLE instead of the TRN-1102.
-`check_coverage` only checks that a named instrument is one of the four here, not that it is the
-right one for what it is measuring; catching that needs a second, requirement-specific rule (a
-ripple test that does not name the scope fails, specifically), which this recipe leaves for a
+One thing the check does not catch: an instrument that exists on this bench but is the wrong one
+for the measurement, the MDN-6100 proposed for REQ-RIPPLE instead of the TRN-1102.
+`check_coverage` only checks that a named instrument is one of the four here, not that it suits
+what it is measuring; catching that needs a second, requirement-specific rule (a ripple test that
+does not name the scope fails, specifically), which this recipe leaves for a
 reader to add once real proposals show whether the model needs it.
 
 ## How to evaluate it
@@ -164,16 +168,15 @@ reader to add once real proposals show whether the model needs it.
 
 There is no right or wrong answer to grade here the way a question over a document set has one.
 `check_coverage`'s verdict is already a pass or fail, and a test proves what it catches, so what
-is worth measuring is how often the model's proposals need it: collect the plan for every
-requirement across a handful of real board revisions (ten to twenty requirements is enough to
-start seeing a pattern) and track two counts separately, since the cost of getting each wrong is
-different. False drops, a real requirement that gets no usable proposal, are the more expensive
-kind: a missing test is a missing test until somebody notices. False instruments and stale limits
-are the kind `check_coverage` catches for free, so what is worth watching there is whether the
-model converges on the same mistake repeatedly (always sending ripple to the meter, say) once a
-pattern like that shows up, since a repeated mistake is worth fixing in the prompt or the schema
-rather than re-catching in every plan. No result file exists for this example yet (see
-`docs/EVALS.md`), so none of this is claimed as a score, only as what to start counting.
+is worth measuring is how often the model's proposals need it. A plan is drafted once a revision,
+so the set is small by nature: collect the plans for a handful of board revisions, ten to twenty
+requirements in total, and track two counts separately. False drops, a real requirement that gets
+no usable proposal, are the expensive kind: a missing test is a missing test until somebody
+notices. False instruments and stale limits `check_coverage` catches for free, so what to watch
+there is whether the model converges on the same mistake (always sending ripple to the meter, say),
+which is worth fixing in the prompt or the schema rather than re-catching in every plan. No result
+file exists for this example yet (see `docs/EVALS.md`), so none of this is a score, only what to
+start counting.
 
 </HowToEval>
 
@@ -191,19 +194,17 @@ Nothing in this repo has been run against real hardware.
 
 What does not port is everything specific to this board: the SRB-5030's eight requirements, its
 `REQUIREMENTS` tuple, `BENCH_INSTRUMENTS`'s four names, and the ECN that supersedes two of them.
-Your own datasheet has its own list, your own test spec has its own gaps, and if a later notice
-has overridden one of your own numbers, that notice, not this page, is the one to check the
-proposed limit against. <Link href="/recipes/ask-the-datasheet/">Ask the datasheet</Link> is the
-same conflict read from the other end: what the documents say, before anyone drafts a test from
-them.
+Your own datasheet has its own list, your own test spec has its own gaps, and a notice that has
+overridden one of your own numbers is the document to check a proposed limit against.
+<Link href="/recipes/ask-the-datasheet/">Ask the datasheet</Link> is the same conflict read from
+the other end.
 
 The shape carries further than electronics. Anywhere a written list of requirements needs a
 matching, provably complete set of checks before anyone signs off, the same four steps apply: a
-project brief turned into tasks with an owner and a due date for each line, an incident report
-turned into a runbook step for each contributing cause, a compliance document checked clause by
-clause against whatever satisfies it. What moves between domains is the content of the check;
-what stays fixed is reading the requirements, drafting one check per requirement, building the
-table, and verifying coverage in code before a person, not the model, signs off.
+project brief turned into tasks with an owner each, an incident report turned into a runbook step
+per contributing cause, a compliance document checked clause by clause. What moves between domains
+is the content of the check; what stays fixed is reading the requirements, drafting one check per
+requirement, building the table, and verifying coverage in code before a person signs off.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
