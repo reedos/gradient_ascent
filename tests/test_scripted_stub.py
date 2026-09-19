@@ -1,10 +1,12 @@
 """Every example's own command, run.
 
-`--model stub:scripted` (`examples/common/cli.py`) plays an ordered sequence of replies, one per
-model call, written down in the example's own `__main__.py` as `SCRIPTED`. This file is the guard
-that keeps the sequence and the example together: it runs every example's demo command against
-its own `SCRIPTED` and fails if the run asks for a reply the sequence does not have, if the
-command exits nonzero, or if it prints nothing.
+`--model stub:scripted` (`examples/common/cli.py`) plays a sequence of replies, one per model
+call, written down in the example's own `__main__.py` as `SCRIPTED`: in call order, or matched
+against each call's prompt where the example calls the model from a thread pool and there is no
+call order to script against. This file is the guard that keeps the sequence and the example
+together: it runs every example's demo command against its own `SCRIPTED` and fails if the run
+asks for a reply the sequence does not have, if the command exits nonzero, or if it prints
+nothing.
 
 That is the failure that matters. A sequence kept anywhere other than beside the example drifts
 from it silently, and the first symptom is a "Run it" command on a published page that prints a
@@ -32,7 +34,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from examples.common.cli import SCRIPTED_SPEC  # noqa: E402
+from examples.common.cli import SCRIPTED_SPEC, WhenAsked  # noqa: E402
 from examples.common.model import StubResponse  # noqa: E402
 
 EXAMPLES_DIR = ROOT / "examples"
@@ -46,7 +48,6 @@ NO_SCRIPT = {
     "embeddings_search": "level 2 retrieval only: it embeds and ranks, and calls no model",
     "household_paperwork": "level 0: the renewal and bill dates are read and sorted by code",
     "knowledge_graphs": "its command plays a transcribed extraction of its own, so --model never reaches a stub",
-    "literature_watch": "the command reads the shortlist that code produced; no model call",
     "local_inference": "the command sizes a model in memory: arithmetic, no call",
     "observability": "the command reads recorded traces; nothing in it calls a model",
     "ops": "the command costs recorded traces out; nothing in it calls a model",
@@ -100,17 +101,25 @@ class ScriptedSequenceTests(unittest.TestCase):
             "add one, or add the example to NO_SCRIPT with the reason it calls no model",
         )
 
-    def test_a_scripted_sequence_is_replies_in_call_order(self) -> None:
+    def test_a_scripted_sequence_is_replies_in_call_order_or_matched_on_the_prompt(self) -> None:
         for name in example_names():
             script = getattr(load_main(name), "SCRIPTED", None)
             if script is None:
                 continue
             with self.subTest(example=name):
-                self.assertIsInstance(script, list, "SCRIPTED must be an ordered list, one entry per call")
+                self.assertIsInstance(script, list, "SCRIPTED must be a list, one entry per call")
                 self.assertTrue(script, "an empty SCRIPTED is the same as having none")
                 for entry in script:
-                    self.assertIsInstance(entry, (str, StubResponse))
-
+                    self.assertIsInstance(entry, (str, StubResponse, WhenAsked))
+                keyed = [e for e in script if isinstance(e, WhenAsked)]
+                self.assertIn(
+                    len(keyed),
+                    (0, len(script)),
+                    "a sequence is either all ordered or all matched on the prompt, never half of each",
+                )
+                # A `when` that also appears in another entry's prompt would pair a call with the
+                # wrong reply on some runs, which is the defect this form exists to prevent.
+                self.assertEqual(len({e.when for e in keyed}), len(keyed), "two entries share a `when`")
 
     def test_every_sequence_is_asserted_against_by_the_example_s_own_tests(self) -> None:
         """The other half of the guard. This file proves a sequence still *runs*; the example's
