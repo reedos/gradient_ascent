@@ -506,6 +506,40 @@ class CachingModel:
         return completion
 
 
+class CountingModel:
+    """Wraps a `Model` and adds up what it spent. Used for the grader.
+
+    The answering model's tokens are recorded by the `Tracer` each example passes around, but the
+    grader is called by the runner, outside any trace, so until this existed its tokens appeared
+    in no result file and in no projection. On a metered run that is a bill with no line item.
+    28 of the 60 questions are rubric-graded, and each of those that reaches the grader is a
+    second model call: fewer than 28, because an `unanswerable` answer that fails the code-checked
+    abstention gate is marked wrong before any grader sees it. `grader_calls` on the result file
+    is how many actually happened.
+    """
+
+    def __init__(self, inner: Model) -> None:
+        self.inner = inner
+        self.model_id = inner.model_id
+        self.tokens_in = 0
+        self.tokens_out = 0
+        self.calls = 0
+
+    def complete(
+        self,
+        messages: list[Message],
+        *,
+        tools: list[dict] | None = None,
+        schema: dict | None = None,
+        max_tokens: int = 1024,
+    ) -> Completion:
+        completion = self.inner.complete(messages, tools=tools, schema=schema, max_tokens=max_tokens)
+        self.calls += 1
+        self.tokens_in += completion.tokens_in
+        self.tokens_out += completion.tokens_out
+        return completion
+
+
 def generic_stub_model() -> StubModel:
     """The stub used when `--model stub` is passed on the command line. It never calls a tool
     and echoes a short placeholder, so the pipeline runs end to end without crashing; it is not
@@ -666,6 +700,8 @@ def run_example(
     `main`), kept separate so tests can pass a scripted `StubModel` directly.
     """
     run_fn, level = load_run_fn(name)
+    counted_grader = CountingModel(grader) if grader is not None else None
+    grader = counted_grader or grader
     results: list[QuestionResult] = []
     review_items: list[dict] = []
     tokens_so_far = 0
@@ -727,6 +763,12 @@ def run_example(
         budget_tokens=budget_tokens,
     )
     summary["interrupted"] = interrupted
+    # Kept separate from `tokens_in`/`tokens_out`, which are the technique's own cost and the only
+    # ones a page may quote. The grader's cost is real money on a metered run and belongs on the
+    # result file, but it is not part of what the technique cost to run.
+    summary["grader_calls"] = counted_grader.calls if counted_grader else 0
+    summary["grader_tokens_in"] = counted_grader.tokens_in if counted_grader else 0
+    summary["grader_tokens_out"] = counted_grader.tokens_out if counted_grader else 0
     summary["review"] = sample_for_review(review_items, seed=review_seed)
     return summary
 

@@ -1,4 +1,6 @@
-"""A stopped run must leave something a person can read.
+"""What a run leaves behind: a readable file when it is stopped, and an honest bill.
+
+A stopped run must leave something a person can read.
 
 `docs/FIRST-LIVE-RUN.md` tells the owner that Ctrl+C is safe at any point. It was safe for his
 wallet (every answer is cached by model id and prompt hash, so a resume re-pays only for the
@@ -198,6 +200,55 @@ class InterruptedMainTest(unittest.TestCase):
 
         self.assertEqual(code, 130)
         self.assertEqual(sorted(p.parent.name for p in self._tmp.glob("*/*.json")), ["one_call"])
+
+
+class GraderAccountingTest(unittest.TestCase):
+    """The grader is called by the runner, outside the trace every example carries, so its tokens
+    used to appear in no result file and in no projection: a metered run would have been billed
+    for calls that no number anywhere accounted for."""
+
+    def _rubric_questions(self, n: int) -> list[dict]:
+        return [
+            {
+                "id": f"R{i}",
+                "kind": "multi_hop",
+                "question": f"On unit {i}, what does the DW-300 manual say about the filter?",
+                "grading": "rubric",
+                "rubric": ["names the interval", "cites the manual"],
+            }
+            for i in range(n)
+        ]
+
+    def test_the_graders_calls_and_tokens_land_on_the_result(self) -> None:
+        grader = InterruptAfter(99)  # answers everything; the text is not PASS, so all ungraded
+        summary = eval_run.run_example(
+            "one_call",
+            model=InterruptAfter(99),
+            embedder=StubEmbedder(),
+            grader=grader,
+            questions=self._rubric_questions(5),
+            stub=False,
+            dry=False,
+        )
+        self.assertEqual(summary["grader_calls"], 5, "one grader call per rubric question")
+        self.assertEqual(summary["grader_tokens_in"], 50)
+        self.assertEqual(summary["grader_tokens_out"], 25)
+        # And it is kept out of the technique's own cost, which is what a page may quote.
+        self.assertEqual(summary["tokens_in"], 50)
+
+    def test_a_run_with_no_grader_reports_zero_rather_than_nothing(self) -> None:
+        summary = eval_run.run_example(
+            "one_call",
+            model=InterruptAfter(99),
+            embedder=StubEmbedder(),
+            grader=None,
+            questions=_questions(2),
+            stub=False,
+            dry=False,
+        )
+        self.assertEqual(summary["grader_calls"], 0)
+        self.assertEqual(summary["grader_tokens_in"], 0)
+        self.assertEqual(summary["grader_tokens_out"], 0)
 
 
 class StubRefusalTest(unittest.TestCase):

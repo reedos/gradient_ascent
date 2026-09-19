@@ -179,7 +179,11 @@ Only after the local run is clean, and only for the pages you actually intend to
 
    No key is needed for this: `--dry` never builds a real backend. Compare the numbers with
    `evals/budget.json`; if they have moved since the file's own date, an example changed and the
-   budget is stale.
+   budget is stale. The projection covers the answering model only. A grader is a second model
+   call on each rubric question and the dry run cannot project it, because its prompt contains an
+   answer that does not exist yet; its output is capped at 10 tokens a call. After Step 3 you will
+   have real numbers for it: `grader_calls`, `grader_tokens_in` and `grader_tokens_out` on the
+   result file. Multiply those out before you commit to the metered run.
 3. Multiply the token figures by the maker's published price on the day you run. No price is
    written in this repository on purpose; see the `dollars` note in `evals/budget.json`.
 4. Run one example, with a cap, and read the result before the next:
