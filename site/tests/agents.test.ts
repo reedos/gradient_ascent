@@ -165,6 +165,15 @@ test('the job is matched to a shape, and a recipe is an illustration, never the 
   assert.ok(!/closest recipe/i.test(text), 'the guide must not send an agent looking for the closest recipe');
 });
 
+test('a person who would rather buy than build gets a way to judge, not a ranking', () => {
+  // A cold sitting for an office manager: the guide told the agent to name registry products,
+  // and the registry is a technique registry with no prices and no office software in it.
+  const text = guideText();
+  assert.match(text, /whether they mean to build this or would rather use something that exists/);
+  assert.match(text, /It is not a buyer’s guide: it carries no prices, does not rank/);
+  assert.match(text, /who else holds their text/);
+});
+
 test('the guide lists every shape lowest level first, and says when one has no recipe', () => {
   const text = guideText();
   const low = text.indexOf('**Turn one text into another.** Usually level 1. No recipe yet');
