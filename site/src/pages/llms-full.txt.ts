@@ -3,12 +3,13 @@
 import type { APIRoute } from 'astro';
 import { levels, tracks, recipes, teardowns, threads } from '../lib/content';
 import { techniqueMarkdown, recipeMarkdown, teardownMarkdown, threadMarkdown } from '../lib/indexes';
-import { agentGuide, worksheetBlocks, toMarkdown, GUIDE_TITLE, WORKSHEET_TITLE } from '../lib/agents';
-import { guideInput, agentWorksheet, agentLevels, absFor } from '../lib/agents-data';
+import { agentGuide, worksheetBlocks, shapesBlocks, toMarkdown, GUIDE_TITLE, WORKSHEET_TITLE, SHAPES_TITLE } from '../lib/agents';
+import { guideInput, agentWorksheet, agentLevels, agentShapes, absFor } from '../lib/agents-data';
 
 export const GET: APIRoute = async ({ site }) => {
   const parts: string[] = [
     toMarkdown(GUIDE_TITLE, agentGuide(guideInput(site))),
+    toMarkdown(SHAPES_TITLE, shapesBlocks(agentShapes(site), absFor(site))),
     toMarkdown(WORKSHEET_TITLE, worksheetBlocks(agentWorksheet(), agentLevels(), absFor(site))),
   ];
   const techniqueSlugs = [

@@ -17,6 +17,8 @@ import {
   worksheetBlocks,
   type AgentLevel,
   type AgentWorksheet,
+  shapesBlocks,
+  type AgentShape,
   type GuideInput,
 } from '../src/lib/agents.ts';
 
@@ -26,6 +28,34 @@ const levels: AgentLevel[] = [
   { order: 0, title: 'No model', who: 'Your code.', description: 'd0' },
   { order: 5, title: 'Agents', who: 'The model, in a loop.', description: 'd5' },
 ];
+const fixtureShapes: AgentShape[] = [
+  {
+    id: 'do-a-task',
+    title: 'Carry out a task',
+    what: 'The steps are not known in advance.',
+    signals: ['The goal is clear.', 'The path is not.'],
+    usual_level: 5,
+    lower_when: 'The steps can be written down.',
+    higher_when: 'The parts are independent.',
+    elsewhere: ['Fix a failing test', 'Bring up a new board'],
+    techniques: [{ slug: 'agent-loop', title: 'The agent loop', markdown: abs('/techniques/agent-loop.md') }],
+    recipes: [{ slug: 'repo-assistant', title: 'Repo assistant', domain: 'engineering', markdown: abs('/recipes/repo-assistant.md') }],
+    teardowns: [],
+  },
+  {
+    id: 'rewrite',
+    title: 'Turn one text into another',
+    what: 'Text in, text out.',
+    signals: ['One input.'],
+    usual_level: 1,
+    lower_when: 'A template does it.',
+    higher_when: 'It needs facts the text lacks.',
+    elsewhere: ['Summarize a meeting'],
+    techniques: [{ slug: 'prompting', title: 'Prompting', markdown: abs('/techniques/prompting.md') }],
+    recipes: [],
+    teardowns: [],
+  },
+];
 const input = (over: Partial<GuideInput> = {}): GuideInput => ({
   abs,
   levelRule: 'A new level starts where the answer to who decides changes.',
@@ -34,6 +64,7 @@ const input = (over: Partial<GuideInput> = {}): GuideInput => ({
   namesAsOf: '2026-09-18',
   allDraft: true,
   domainCounts: { general: 15 },
+  shapes: fixtureShapes,
   ...over,
 });
 const sheet: AgentWorksheet = {
@@ -120,7 +151,36 @@ test('the guide points at engineering recipes only when the data has some', () =
   assert.ok(!guideText().includes('engineering'), 'no engineering use cases, so no mention of them');
   const withSome = toMarkdown('T', agentGuide(input({ domainCounts: { general: 15, engineering: 8 } })));
   assert.match(withSome, /8 of them have the domain `engineering`/);
-  assert.match(withSome, /prefer those/);
+  assert.match(withSome, /read those first/);
+});
+
+test('the job is matched to a shape, and a recipe is an illustration, never the answer', () => {
+  // The owner asked whether "find the closest recipe" builds things too narrow. It did.
+  const text = guideText();
+  assert.match(text, /Name the shape of the job/);
+  assert.match(text, /Match on what the work is, not on what it is about/);
+  assert.match(text, /Use recipes as illustrations, not as the answer/);
+  assert.match(text, /do not stretch one: compose the answer from the shape\u2019s techniques and say that is what you did/);
+  assert.match(text, /Do not bend the job to fit an example/);
+  assert.ok(!/closest recipe/i.test(text), 'the guide must not send an agent looking for the closest recipe');
+});
+
+test('the guide lists every shape lowest level first, and says when one has no recipe', () => {
+  const text = guideText();
+  const low = text.indexOf('**Turn one text into another.** Usually level 1. No recipe yet');
+  const high = text.indexOf('**Carry out a task.** Usually level 5. Worked in: Repo assistant.');
+  assert.ok(low > 0 && high > low, text);
+});
+
+test('the shapes text carries what moves a job lower or higher, and other fields with the same shape', () => {
+  const text = toMarkdown('S', shapesBlocks(fixtureShapes, abs));
+  assert.ok(text.indexOf('## Turn one text into another') < text.indexOf('## Carry out a task'));
+  assert.match(text, /\*\*Lower when\.\*\* The steps can be written down\./);
+  assert.match(text, /\*\*Higher when\.\*\* The parts are independent\./);
+  assert.match(text, /\*\*The same shape in other fields\.\*\* Fix a failing test\. Bring up a new board\./);
+  assert.match(text, /\[Repo assistant\]\(https:\/\/example\.org\/site\/recipes\/repo-assistant\.md\) \(engineering\)/);
+  assert.match(text, /take its reasoning and leave its subject/);
+  assert.match(text, /\*\*Worked examples\.\*\* None yet\. Compose the answer from the techniques above\./);
 });
 
 test('an answer built by analogy has to say so', () => {

@@ -6,7 +6,7 @@
 // The structure follows the site, not the file tree:
 //   Levels       the ladder itself, eight rungs
 //   Techniques   every page, how they connect, and the topics that cut across the levels
-//   In practice  what to do with it: find your level, build a recipe, read a teardown
+//   In practice  what to do with it: find your level, name the shape of the job, build a recipe, read a teardown
 //   Reference    when things arrived, who makes what, what the words mean, how the site works
 
 export interface NavLevel {
@@ -87,6 +87,7 @@ export function buildNav(levels: NavLevel[], tracks: NavTrack[]): NavGroup[] {
         {
           items: [
             { label: 'Find your level', path: '/worksheet/', hint: 'Seven questions, one recommendation' },
+            { label: 'Job shapes', path: '/shapes/', hint: 'What kind of job is it? Match the work, not the subject' },
             { label: 'Recipes', path: '/recipes/', hint: 'Whole jobs, built from techniques' },
             { label: 'Teardowns', path: '/teardowns/', hint: 'Products you have used, taken apart' },
             { label: 'Failure modes', path: '/failures/', hint: 'How each technique goes wrong' },
@@ -144,7 +145,7 @@ export function navContext(path: string, levels: NavLevel[], tracks: NavTrack[])
     return { group: 'techniques' };
   }
   if (p === '/techniques/' || p.startsWith('/map/') || p.startsWith('/threads/')) return { group: 'techniques' };
-  if (p.startsWith('/worksheet/') || p.startsWith('/recipes/') || p.startsWith('/teardowns/') || p.startsWith('/failures/')) return { group: 'practice' };
+  if (p.startsWith('/worksheet/') || p.startsWith('/shapes/') || p.startsWith('/recipes/') || p.startsWith('/teardowns/') || p.startsWith('/failures/')) return { group: 'practice' };
   if (p.startsWith('/timeline/') || p.startsWith('/names/') || p.startsWith('/glossary/') || p.startsWith('/method/') || p.startsWith('/agents/')) return { group: 'reference' };
   // tracks is accepted so a future rule can use it; topic pages already resolve above.
   void tracks;

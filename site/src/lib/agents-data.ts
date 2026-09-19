@@ -16,7 +16,11 @@ import { glossaryTerms } from './indexes';
 import { milestones } from './timeline';
 import { resolveWorksheet } from './worksheet';
 import { url } from './url';
-import type { AgentLevel, AgentWorksheet, GuideInput, UseCase } from './agents';
+import shapesData from '../../../content/shapes.json';
+import { orderedShapes, shapesFor, type Shape, type ShapesFile } from './shapes';
+import type { AgentLevel, AgentShape, AgentWorksheet, GuideInput, UseCase } from './agents';
+
+export const shapes: Shape[] = orderedShapes((shapesData as unknown as ShapesFile).shapes);
 
 export function absFor(site: URL | undefined): (path: string) => string {
   return (path: string) => new URL(url(path), site).toString();
@@ -33,6 +37,27 @@ export function agentWorksheet(): AgentWorksheet {
 
 function allPages(): { status?: string }[] {
   return [...levels.flatMap((l) => l.pages), ...tracks.flatMap((t) => t.pages ?? []), ...recipes];
+}
+
+/** The shapes with every slug resolved to a title and an address. */
+export function agentShapes(site: URL | undefined): AgentShape[] {
+  const abs = absFor(site);
+  return shapes.map((sh) => ({
+    id: sh.id,
+    title: sh.title,
+    what: sh.what,
+    signals: sh.signals,
+    usual_level: sh.usual_level,
+    lower_when: sh.lower_when,
+    higher_when: sh.higher_when,
+    elsewhere: sh.elsewhere,
+    techniques: sh.techniques.map((slug) => ({ slug, title: techniqueBySlug(slug)?.title ?? slug, markdown: abs(`/techniques/${slug}.md`) })),
+    recipes: sh.recipes.map((slug) => {
+      const r = recipes.find((x) => x.slug === slug);
+      return { slug, title: r?.title ?? slug, domain: (r as { domain?: string } | undefined)?.domain ?? 'general', markdown: abs(`/recipes/${slug}.md`) };
+    }),
+    teardowns: sh.teardowns.map((slug) => ({ slug, title: teardowns.find((x) => x.slug === slug)?.title ?? slug, markdown: abs(`/teardowns/${slug}.md`) })),
+  }));
 }
 
 export function guideInput(site: URL | undefined): GuideInput {
@@ -54,6 +79,7 @@ export function guideInput(site: URL | undefined): GuideInput {
       acc[c.domain] = (acc[c.domain] ?? 0) + 1;
       return acc;
     }, {}),
+    shapes: agentShapes(site),
   };
 }
 
@@ -83,6 +109,7 @@ export function useCases(site: URL | undefined): UseCase[] {
       summary: r.summary,
       // `domain` arrives with the engineering recipes; a recipe without one is a general one.
       domain: (r as { domain?: string }).domain ?? 'general',
+      shapes: shapesFor(shapes, r.slug).map((x) => x.id),
       needs_level: lv.length ? Math.max(...lv) : null,
       levels: lv,
       techniques: techniqueRefs(r.uses, abs),
@@ -98,6 +125,7 @@ export function useCases(site: URL | undefined): UseCase[] {
       title: t.title,
       summary: 'A kind of product people already use, taken apart into the techniques it is built from, from its makers’ own pages.',
       domain: 'general',
+      shapes: shapesFor(shapes, t.slug).map((x) => x.id),
       needs_level: lv.length ? Math.max(...lv) : null,
       levels: [...new Set(lv)].sort((a, b) => a - b),
       techniques: techniqueRefs(t.patterns, abs),

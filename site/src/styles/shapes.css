@@ -1,0 +1,36 @@
+/* /shapes/: one panel per job shape, tinted by the level it usually settles at. */
+.shape-jump { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px }
+.shape-jump a { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid var(--line-control); border-radius: 999px; font-size: 12.5px; color: var(--muted); transition: color .15s, border-color .15s }
+.shape-jump a:hover { color: var(--text); border-color: var(--c) }
+.shape-jump i, .shape-level i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); flex: 0 0 auto }
+
+.shape-list { display: flex; flex-direction: column; gap: 16px }
+.shape { display: flex; flex-direction: column; gap: 16px; padding: 24px; border-top: 2px solid var(--c); scroll-margin-top: 120px }
+.shape-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px }
+.shape-top h3 { font-size: 19px; letter-spacing: -.4px; text-wrap: balance }
+.shape-level { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: var(--text); white-space: nowrap }
+.shape-level span { font-weight: 400; color: var(--muted) }
+.shape-level:hover { color: var(--accent) }
+.shape-what { font-size: 15px; line-height: 1.7; color: var(--text); max-width: 78ch }
+
+.shape h4 { font: 600 10px var(--font); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px }
+.shape-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 20px 32px }
+.shape-grid p, .shape-grid li { font-size: 13.5px; line-height: 1.65; color: var(--muted) }
+.shape-grid p + h4 { margin-top: 14px }
+.shape-grid ul { margin: 0; padding-left: 1.1rem; list-style: disc; display: flex; flex-direction: column; gap: 6px }
+
+.shape-else ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px }
+.shape-else li { font-size: 12.5px; line-height: 1.45; color: var(--muted); background: var(--panel2); border-radius: 6px; padding: 5px 10px }
+
+.shape-refs { display: flex; flex-direction: column; gap: 8px; margin: 0; padding-top: 14px; border-top: 1px solid var(--line) }
+.shape-refs > div { display: grid; grid-template-columns: 130px 1fr; gap: 12px; align-items: baseline }
+.shape-refs dt { font: 600 10px var(--font); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted) }
+.shape-refs dd { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--muted) }
+.shape-refs a { color: var(--accent) }
+.shape-refs a:hover { text-decoration: underline }
+
+@media (max-width: 560px) {
+  .shape { padding: 18px }
+  .shape-refs > div { grid-template-columns: 1fr; gap: 4px }
+  .shape-level { white-space: normal }
+}

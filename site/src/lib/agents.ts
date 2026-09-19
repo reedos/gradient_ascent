@@ -20,6 +20,7 @@
 
 export const GUIDE_TITLE = 'Gradient Ascent: a guide for an AI agent helping someone choose';
 export const WORKSHEET_TITLE = 'Find the lowest level that does the job';
+export const SHAPES_TITLE = 'What kind of job is it?';
 
 export type Block =
   | { kind: 'h2'; text: string }
@@ -66,12 +67,29 @@ export interface AgentWorksheet {
   cross_questions: AgentCrossQuestion[];
 }
 
+/** A job shape as the guide needs it. See lib/shapes.ts and content/shapes.json. */
+export interface AgentShape {
+  id: string;
+  title: string;
+  what: string;
+  signals: string[];
+  usual_level: number;
+  lower_when: string;
+  higher_when: string;
+  techniques: { slug: string; title: string; markdown: string }[];
+  recipes: { slug: string; title: string; domain: string; markdown: string }[];
+  teardowns: { slug: string; title: string; markdown: string }[];
+  elsewhere: string[];
+}
+
 export interface UseCase {
   kind: 'recipe' | 'teardown';
   slug: string;
   title: string;
   summary: string;
   domain: string;
+  /** The job shapes this use case illustrates (ids from /data/shapes.json). */
+  shapes: string[];
   /** The highest level the job needs: the level to settle on before this use case fits. */
   needs_level: number | null;
   levels: number[];
@@ -92,6 +110,7 @@ export interface GuideInput {
    *  domain that has something in it: a cold sitting on 09/19/2026 caught the first version
    *  telling agents to prefer `engineering` recipes before a single one existed. */
   domainCounts: Record<string, number>;
+  shapes: AgentShape[];
 }
 
 /** The files an agent can fetch, in the order it should want them. One list, used by the guide,
@@ -101,11 +120,13 @@ export function agentFiles(abs: (p: string) => string): { path: string; url: str
   return [
     f('/agents.md', 'This guide: how to turn a person’s job into a recommendation.'),
     f('/worksheet.md', 'The decision tree as text: seven questions that settle the level, four that change the advice.'),
-    f('/data/use-cases.json', 'Every recipe and teardown: the job, the level it needs, the techniques it is made from, and where to read it.'),
+    f('/shapes.md', 'The kinds of job, by the shape of the work and not its subject: how to recognize each, where it usually settles, what moves it lower or higher, and jobs from other fields with the same shape.'),
+    f('/data/use-cases.json', 'Every recipe and teardown: the shapes it illustrates, the level it needs, the techniques it is made from, and where to read it.'),
     f('/llms.txt', 'An index of every page with a one-line description.'),
     f('/llms-full.txt', 'Every technique, recipe, teardown and thread page as Markdown in one file. Large.'),
     f('/data/taxonomy.json', 'Levels, techniques, recipes and the typed relations between pages (requires, upgrades_to with its condition, combines_with, alternative_to with its question).'),
     f('/data/worksheet.json', 'The decision tree as data, with every reason resolved to plain text.'),
+    f('/data/shapes.json', 'The job shapes as data.'),
     f('/data/landscape.json', 'The registry of named models, products and tools, each with its maker, what it demonstrates, a source and the date it was checked. Names change: read retired and superseded_by.'),
     f('/data/glossary.json', 'The terms the site uses, each defined from the page that explains it.'),
     f('/data/timeline.json', 'Dated milestones per level, with sources.'),
@@ -118,7 +139,7 @@ export function agentGuide(input: GuideInput): Block[] {
   const engineering = input.domainCounts.engineering ?? 0;
   const engineeringAdvice =
     engineering > 0
-      ? ` ${engineering} of them have the domain \`engineering\`: whole jobs from electronics test, measurement, design and analysis, worked on a shared simulated test bench. If the person writes software for that kind of work, prefer those.`
+      ? ` ${engineering} of them have the domain \`engineering\`: whole jobs from electronics test, measurement, design and analysis, worked on a shared simulated test bench. If the person writes software for that kind of work, read those first: they will be the nearest illustrations.`
       : '';
   const ladder = [...levels].sort((a, b) => a.order - b.order).map((l) => `**Level ${l.order}, ${l.title}.** ${l.who}`);
   return [
@@ -148,12 +169,24 @@ export function agentGuide(input: GuideInput): Block[] {
       kind: 'ol',
       items: [
         '**Get the job straight before recommending anything.** You need: what comes in (and how messy it is), what has to come out, how often it runs and how fast it must answer, who or what checks the result, what a wrong answer costs, what data it touches and where that data is allowed to go, and what they have already tried. Ask for whatever is missing. If they cannot say what a correct result looks like, tell them that is the first thing to settle, because nothing at any level can be evaluated without it.',
-        `**Walk the seven questions in order** (${abs('/worksheet.md')}). Each question tests one level, lowest first. Stop at the first level whose test passes. Do not skip ahead because a higher level sounds more capable, and do not let the word the person used ("agent", "RAG", "fine-tune") choose the level for you. Some questions will not fit the shape of the job: the question about searching documents means little for a job that sorts incoming messages and acts on them. When a question does not apply, the answer is no, and you go on to the next one. Say that you did.`,
-        '**Then ask the four cross-cutting questions.** They never change the level. They change the advice: what to check, what to log, what needs a person’s approval, what must stay on the person’s own hardware.',
-        `**Look for the closest recipe** in ${abs('/data/use-cases.json')}. A recipe is a whole job already worked through: which techniques, at which level, and the reasoning.${engineeringAdvice} If one fits, recommend it and adapt it. If none fits, compose the answer from technique pages at the level you settled on, and say that you did: an answer built by analogy from general pages should not read as though the site had covered their case.`,
+        `**Name the shape of the job** (${abs('/shapes.md')}). Match on what the work is, not on what it is about: sorting tenant emails, support tickets and failed production units are one shape. Most real requests are two or three shapes joined together (a standing report, plus free-text notes to sort, plus a script to draft). Split them, and settle each part separately. A part that is a lookup or arithmetic stays at level 0 whatever the rest needs.`,
+        `**Walk the seven questions in order for each part** (${abs('/worksheet.md')}). Each question tests one level, lowest first. Stop at the first level whose test passes. The shape tells you where jobs like this usually settle; the questions decide where this one does, and what the shape says would move it lower is worth checking first. Do not skip ahead because a higher level sounds more capable, and do not let the word the person used ("agent", "RAG", "fine-tune") choose the level for you. When a question does not fit the shape of the job, the answer is no, and you go on. Say that you did.`,
+        '**Then ask the four cross-cutting questions.** They never change the level. They change the advice: what to check, what to log, what needs a person\u2019s approval, what must stay on the person\u2019s own hardware.',
+        `**Use recipes as illustrations, not as the answer.** Each shape lists the recipes that work one instance of it through (${abs('/data/use-cases.json')} has them all).${engineeringAdvice} Take a recipe\u2019s reasoning (why this level, why not higher, what to measure, how it fails) and leave its subject behind. If no recipe under the shape is close, do not stretch one: compose the answer from the shape\u2019s techniques and say that is what you did. Either way, tell the person which parts of your answer the site works through and which you reasoned out yourself: an answer built by analogy from general pages should not read as though the site had covered their case.`,
         `**Read the pages you are about to recommend**, in their \`.md\` form, before you recommend them. Every technique page says when you do not need it, how it fails, what it costs and how to evaluate it. Use the relations in ${abs('/data/taxonomy.json')}: \`requires\` is what to read or build first, \`upgrades_to\` carries the condition under which moving up is justified, \`alternative_to\` carries the question that decides between two techniques.`,
         '**Answer in the shape below.**',
       ],
+    },
+    { kind: 'h2', text: 'The shapes' },
+    {
+      kind: 'p',
+      text: `${input.shapes.length} kinds of job, lowest usual level first. The full description of each, with how to recognize it and what moves it lower or higher, is at ${abs('/shapes.md')}.`,
+    },
+    {
+      kind: 'ul',
+      items: [...input.shapes]
+        .sort((a, b) => a.usual_level - b.usual_level)
+        .map((sh) => `**${sh.title}.** Usually level ${sh.usual_level}. ${sh.recipes.length ? `Worked in: ${sh.recipes.map((r) => r.title).join('; ')}.` : 'No recipe yet: compose from its techniques.'}`),
     },
     { kind: 'h2', text: 'What a good answer contains' },
     {
@@ -180,6 +213,7 @@ export function agentGuide(input: GuideInput): Block[] {
           : 'Pages marked Draft have no recorded run behind them; only a page marked Published carries measured numbers. Say which kind you are quoting.',
         `**Names go out of date.** The registry was last checked on ${input.namesAsOf}. Products are renamed and retired; read \`retired\`, \`superseded_by\` and \`formerly\` before you name one, and say when the registry was checked.`,
         '**Attribute, do not absorb.** Claims about a product on this site are quoted from that product’s maker and sourced. Pass them on as the maker’s claim, with the link, and not as your own knowledge or the site’s finding.',
+        '**Do not bend the job to fit an example.** The recipes are a few worked stories, not a catalog of what is possible, and the person\u2019s job is almost certainly not one of them. The level comes from the worksheet and the approach from the shape and its techniques. If you find yourself describing their job in a recipe\u2019s words, go back to theirs.',
         '**Do not invent a page.** If the site does not cover something, say it does not. The list of what exists is in `llms.txt`.',
         '**If you cannot settle the level** because the person does not know the answer to one of the seven questions, tell them which question is open and what finding out would involve. That is a better answer than a guess.',
         '**If the honest answer is level 0**, say so, even when they asked for an agent.',
@@ -246,6 +280,39 @@ export function worksheetBlocks(sheet: AgentWorksheet, levels: AgentLevel[], abs
       }),
     });
   });
+  return blocks;
+}
+
+/** The job shapes as text. */
+export function shapesBlocks(shapes: AgentShape[], abs: (p: string) => string): Block[] {
+  const blocks: Block[] = [
+    {
+      kind: 'p',
+      text:
+        'The kinds of job people bring to a language model, described by the shape of the work and not by its subject. Match a job on what the work is. ' +
+        'Most real requests are two or three of these joined together; split them and settle each part on its own. ' +
+        `"Usually level N" is where the worksheet (${abs('/worksheet.md')}) most often settles for that shape. It is an expectation to test, never a verdict.`,
+    },
+  ];
+  for (const sh of [...shapes].sort((a, b) => a.usual_level - b.usual_level)) {
+    blocks.push({ kind: 'h2', text: sh.title });
+    blocks.push({ kind: 'p', text: `${sh.what} **Usually level ${sh.usual_level}.**` });
+    blocks.push({ kind: 'p', text: `**How to recognize it.** ${sh.signals.join(' ')}` });
+    blocks.push({ kind: 'p', text: `**Lower when.** ${sh.lower_when}` });
+    blocks.push({ kind: 'p', text: `**Higher when.** ${sh.higher_when}` });
+    blocks.push({ kind: 'p', text: `**The same shape in other fields.** ${sh.elsewhere.join('. ')}.` });
+    blocks.push({ kind: 'p', text: `**Techniques.** ${sh.techniques.map((t) => `[${t.title}](${t.markdown})`).join(', ')}.` });
+    const worked = [
+      ...sh.recipes.map((r) => `[${r.title}](${r.markdown})${r.domain !== 'general' ? ` (${r.domain})` : ''}`),
+      ...sh.teardowns.map((t) => `[${t.title}](${t.markdown}) (teardown)`),
+    ];
+    blocks.push({
+      kind: 'p',
+      text: worked.length
+        ? `**Worked examples.** ${worked.join(', ')}. Each is one instance of the shape: take its reasoning and leave its subject.`
+        : '**Worked examples.** None yet. Compose the answer from the techniques above.',
+    });
+  }
   return blocks;
 }
 

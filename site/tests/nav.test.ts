@@ -55,7 +55,7 @@ test('a topic page, the index, the map and a thread belong to TECHNIQUES', () =>
 });
 
 test('practice and reference pages resolve, including their children', () => {
-  for (const p of ['/worksheet/', '/recipes/', '/recipes/support-desk/', '/teardowns/coding-agent/', '/failures/']) {
+  for (const p of ['/worksheet/', '/shapes/', '/recipes/', '/recipes/support-desk/', '/teardowns/coding-agent/', '/failures/']) {
     assert.equal(navContext(p, levels, tracks).group, 'practice', p);
   }
   for (const p of ['/timeline/', '/names/', '/glossary/', '/method/', '/agents/']) {
@@ -73,7 +73,7 @@ test('home, search and unknown paths have no section, so no rail', () => {
 
 test('the rail shows the ladder on a level page and the group\'s own pages elsewhere', () => {
   assert.deepEqual(railItems(groups, { group: 'levels', level: 5 }).map((i) => i.level), [0, 1, 5]);
-  assert.deepEqual(railItems(groups, { group: 'practice' }).map((i) => i.path), ['/worksheet/', '/recipes/', '/teardowns/', '/failures/']);
+  assert.deepEqual(railItems(groups, { group: 'practice' }).map((i) => i.path), ['/worksheet/', '/shapes/', '/recipes/', '/teardowns/', '/failures/']);
   // Techniques: the browse links only; five topics would not fit a rail and live in the menu.
   assert.deepEqual(railItems(groups, { group: 'techniques' }).map((i) => i.path), ['/techniques/', '/map/', '/threads/graph-engineering/']);
 });

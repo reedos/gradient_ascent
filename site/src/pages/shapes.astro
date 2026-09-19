@@ -1,0 +1,106 @@
+---
+// /shapes/: the kinds of job, by the shape of the work and not its subject. A recipe is one worked
+// story, and matching a job to the nearest story invites bending the job to fit it. A shape is the
+// general thing: the reader finds theirs here, the worksheet settles its level, and the recipes
+// listed under it are illustrations. The same data is served to agents at /shapes.md.
+import Base from '../layouts/Base.astro';
+import SectionTop from '../components/SectionTop.astro';
+import { url } from '../lib/url';
+import { levels, recipes, teardowns, techniqueBySlug } from '../lib/content';
+import { shapes } from '../lib/agents-data';
+import '../styles/shapes.css';
+
+const levelTitle = (n: number) => levels.find((l) => l.order === n)?.title ?? '';
+const rows = shapes.map((sh) => ({
+  ...sh,
+  techniqueLinks: sh.techniques.map((slug) => ({ slug, title: techniqueBySlug(slug)?.title ?? slug })),
+  recipeLinks: sh.recipes.map((slug) => ({ slug, title: recipes.find((r) => r.slug === slug)?.title ?? slug })),
+  teardownLinks: sh.teardowns.map((slug) => ({ slug, title: teardowns.find((t) => t.slug === slug)?.title ?? slug })),
+}));
+const withoutRecipe = rows.filter((r) => r.recipeLinks.length === 0).length;
+---
+<Base
+  title="What kind of job is it? · Gradient Ascent"
+  description="The kinds of job people bring to a language model, described by the shape of the work and not its subject: how to recognize each, where it usually settles, and what moves it lower or higher."
+>
+  <div class="page-hero">
+    <div class="eyebrow muted"><span class="dot"></span>Job shapes</div>
+    <h1>What kind of job is it?</h1>
+    <p>
+      Sorting tenant emails, support tickets and failed production units is one job done three
+      times. What the items are about changes nothing; what the work is decides the approach. So
+      find your job here by its shape, not its subject, then let the{' '}
+      <a href={url('/worksheet/')} style="color:var(--accent)">worksheet</a> settle the level. Most
+      real requests are two or three of these joined together. Split them, and settle each part on
+      its own.
+    </p>
+  </div>
+
+  <section class="section">
+    <SectionTop
+      eyebrow={`${rows.length} shapes`}
+      title="Lowest usual level first"
+      aside="“Usually level N” is where the worksheet most often settles for jobs of that shape. It is an expectation to test, never a verdict."
+    />
+    <nav class="shape-jump" aria-label="Jump to a shape">
+      {rows.map((r) => (
+        <a href={`#${r.id}`} style={`--c:var(--o${r.usual_level})`}><i />{r.title}</a>
+      ))}
+    </nav>
+
+    <div class="shape-list">
+      {rows.map((r) => (
+        <article class="panel shape" id={r.id} style={`--c:var(--o${r.usual_level})`}>
+          <header class="shape-top">
+            <h3>{r.title}</h3>
+            <a class="shape-level" href={url(`/levels/${r.usual_level}/`)}>
+              <i />Usually level {r.usual_level}<span> · {levelTitle(r.usual_level)}</span>
+            </a>
+          </header>
+          <p class="shape-what">{r.what}</p>
+          <div class="shape-grid">
+            <div>
+              <h4>How to recognize it</h4>
+              <ul>{r.signals.map((s) => <li>{s}</li>)}</ul>
+            </div>
+            <div>
+              <h4>Lower when</h4>
+              <p>{r.lower_when}</p>
+              <h4>Higher when</h4>
+              <p>{r.higher_when}</p>
+            </div>
+          </div>
+          <div class="shape-else">
+            <h4>The same shape in other fields</h4>
+            <ul>{r.elsewhere.map((e) => <li>{e}</li>)}</ul>
+          </div>
+          <dl class="shape-refs">
+            <div>
+              <dt>Built from</dt>
+              <dd>
+                {r.techniqueLinks.map((t) => <a href={url(`/techniques/${t.slug}/`)}>{t.title}</a>)}
+              </dd>
+            </div>
+            <div>
+              <dt>Worked examples</dt>
+              <dd>
+                {r.recipeLinks.map((x) => <a href={url(`/recipes/${x.slug}/`)}>{x.title}</a>)}
+                {r.teardownLinks.map((x) => <a href={url(`/teardowns/${x.slug}/`)}>{x.title} (teardown)</a>)}
+                {r.recipeLinks.length + r.teardownLinks.length === 0 && <span>None yet. Compose it from the techniques.</span>}
+              </dd>
+            </div>
+          </dl>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <p class="footnote reading">
+    A recipe is one worked instance of a shape. Take its reasoning (why this level, why not
+    higher, what to measure, how it fails) and leave its subject behind.
+    {withoutRecipe > 0 && ` ${withoutRecipe === 1 ? 'One shape has' : `${withoutRecipe} shapes have`} no recipe yet, and says so.`}
+    The same list is served to a reader’s own agent at{' '}
+    <a href={url('/shapes.md')} style="color:var(--accent)">/shapes.md</a>; see{' '}
+    <a href={url('/agents/')} style="color:var(--accent)">For your agent</a>.
+  </p>
+</Base>

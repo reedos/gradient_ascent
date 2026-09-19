@@ -1,0 +1,446 @@
+{
+  "version": 1,
+  "note": "The kinds of job people bring to a language model, described by the shape of the work and not by its subject. A shape is what is general; a recipe is one worked instance of it. `usual_level` is where the worksheet most often settles for that shape and is a starting expectation, never a verdict: the worksheet decides the level for a particular job. `lower_when` and `higher_when` say what moves it. `elsewhere` lists jobs from unrelated fields that have the same shape, so that a reader (or a reader's agent) matches on what the work is rather than on what it is about. `recipes` and `teardowns` are slugs from content/taxonomy.json and may be empty: a shape with no recipe yet is still a shape, and the answer is composed from its techniques.",
+  "shapes": [
+    {
+      "id": "look-up-or-calculate",
+      "title": "Look something up, or work it out from numbers you already have",
+      "what": "The input is structured and the right answer is fixed by a rule, a table or arithmetic. Two people given the same input would always produce the same output.",
+      "signals": [
+        "The data is already in columns, fields or records.",
+        "You could write the logic down as if/then, a formula or a query.",
+        "A wrong answer is unacceptable and the right one is checkable."
+      ],
+      "usual_level": 0,
+      "lower_when": "It cannot go lower. This is the floor, and a great deal of real work lives here.",
+      "higher_when": "Only the part that reads free text or judges something a rule cannot capture moves up. The decision itself stays in code.",
+      "techniques": [
+        "order-zero"
+      ],
+      "recipes": [
+        "limits-without-a-model"
+      ],
+      "teardowns": [],
+      "elsewhere": [
+        "Pass or fail a measurement against its limits, and compute yield and Cpk",
+        "Flag invoices over an approval threshold",
+        "Find scheduling conflicts in a calendar",
+        "Reorder stock when a count falls below a minimum",
+        "Convert units or currencies",
+        "Check a bill of materials for end-of-life parts against a supplier list"
+      ]
+    },
+    {
+      "id": "transform-text",
+      "title": "Turn one piece of text into another",
+      "what": "Everything needed is in the text you hand over: summarize it, rewrite it, translate it, explain it, or draft from notes. One request, one response.",
+      "signals": [
+        "The source text fits in one request.",
+        "No outside facts are needed.",
+        "A person reads the result before it matters."
+      ],
+      "usual_level": 1,
+      "lower_when": "The transformation is mechanical (reformatting, find and replace, a template with blanks). That is level 0.",
+      "higher_when": "It needs facts that are not in the text (level 2), or the output must pass a check before anyone sees it (level 3, write and check).",
+      "techniques": [
+        "chat",
+        "prompt-engineering",
+        "inference-time-reasoning"
+      ],
+      "recipes": [],
+      "teardowns": [],
+      "elsewhere": [
+        "Summarize a meeting transcript",
+        "Explain a compiler error or a stack trace",
+        "Write release notes from a list of commits",
+        "Rewrite a test procedure for a less experienced operator",
+        "Translate a supplier's datasheet excerpt",
+        "Turn bullet points into a status report"
+      ]
+    },
+    {
+      "id": "extract-structure",
+      "title": "Pull structured data out of something unstructured",
+      "what": "A document, a photo, a recording or a free-text note goes in; a record with fixed fields comes out.",
+      "signals": [
+        "You know the fields you want in advance.",
+        "The input varies in layout or wording.",
+        "The records feed a database, a spreadsheet or another program."
+      ],
+      "usual_level": 3,
+      "lower_when": "The layout never changes, so a parser or a regular expression does it (level 0). Or a person checks every record anyway and one call with a schema is enough (level 1).",
+      "higher_when": "Filling a field needs a lookup the model has to choose to make (level 4).",
+      "techniques": [
+        "structured-output",
+        "multimodal",
+        "prompt-chaining",
+        "human-in-the-loop"
+      ],
+      "recipes": [
+        "document-extraction",
+        "voice-notes",
+        "maintenance-log"
+      ],
+      "teardowns": [],
+      "elsewhere": [
+        "Invoices and receipts into an accounting system",
+        "Key parameters from a datasheet into a parts database",
+        "Operator failure notes into cause, location and severity",
+        "Resumes into a candidate record",
+        "Lab reports into a results table",
+        "Log lines into typed events"
+      ]
+    },
+    {
+      "id": "classify-and-route",
+      "title": "Sort incoming items and send each where it belongs",
+      "what": "Items arrive one at a time. Each gets a label from a short fixed list, and the label decides what happens next. The steps are the same every time; only the label needs judgment.",
+      "signals": [
+        "A stream of items, not a single question.",
+        "A small, stable set of categories.",
+        "What happens after the label is already decided by you."
+      ],
+      "usual_level": 3,
+      "lower_when": "The wording is predictable enough for keywords or a dropdown (level 0). Run the rule anyway as a second check where one category is dangerous to miss.",
+      "higher_when": "Deciding where something goes needs a live fact the item does not contain, such as who is on call or whose account it is (level 4).",
+      "techniques": [
+        "routing",
+        "structured-output",
+        "human-in-the-loop"
+      ],
+      "recipes": [
+        "inbox-triage",
+        "test-failure-triage"
+      ],
+      "teardowns": [],
+      "elsewhere": [
+        "Tenant, customer or patient messages by urgency",
+        "Support tickets by product area",
+        "Failed units by likely cause: fixture, lot, handling or design",
+        "Bug reports by component and severity",
+        "Monitoring alerts by who should be paged",
+        "Incoming leads by fit"
+      ]
+    },
+    {
+      "id": "answer-from-documents",
+      "title": "Answer questions from a body of documents",
+      "what": "The answer exists in your documents and the work is finding the right passage and answering from it, with a citation a person can check.",
+      "signals": [
+        "The documents are yours and the model was not trained on them.",
+        "One search usually finds what is needed.",
+        "People need to see where the answer came from."
+      ],
+      "usual_level": 2,
+      "lower_when": "Keyword search already finds the passage and a person reads it (level 0). Or the whole set fits in one request, which is still level 2 but needs no retrieval.",
+      "higher_when": "A good answer needs several searches, each depending on the last (level 5, agentic RAG), or the documents disagree and the revision that applies has to be worked out.",
+      "techniques": [
+        "rag",
+        "embeddings-search",
+        "context-engineering",
+        "knowledge-graphs",
+        "structured-output"
+      ],
+      "recipes": [
+        "document-qa",
+        "ask-the-datasheet"
+      ],
+      "teardowns": [],
+      "elsewhere": [
+        "A policy handbook or a set of standard operating procedures",
+        "Datasheets, errata and engineering change notices for the parts on a board",
+        "Instrument programming manuals",
+        "Contracts and their amendments",
+        "A codebase's design documents",
+        "Product manuals for a support team"
+      ]
+    },
+    {
+      "id": "help-desk",
+      "title": "Answer people in conversation, looking things up and taking small actions",
+      "what": "A person asks, and a good reply needs a lookup or a small action chosen for that request: check a status, find a record, book something, open a ticket.",
+      "signals": [
+        "A conversation, not a batch.",
+        "A handful of well-defined lookups and actions.",
+        "Some requests have to be handed to a person."
+      ],
+      "usual_level": 4,
+      "lower_when": "Every question is answered from the same documents with no lookup (level 2), or a form would serve people better than a conversation (level 0).",
+      "higher_when": "Resolving a request takes many dependent steps the model has to plan (level 5).",
+      "techniques": [
+        "function-calling",
+        "rag",
+        "routing",
+        "human-in-the-loop",
+        "memory"
+      ],
+      "recipes": [
+        "support-desk"
+      ],
+      "teardowns": [],
+      "elsewhere": [
+        "Customer support",
+        "An internal IT or HR help desk",
+        "Booking shared lab equipment and checking its calibration status",
+        "Order and delivery status",
+        "A parts-availability assistant for a purchasing team"
+      ]
+    },
+    {
+      "id": "draft-and-check",
+      "title": "Produce something that has to meet a standard, and check it before anyone sees it",
+      "what": "A draft is only useful if it passes a test you can state: it compiles, it uses only documented commands, it follows the template, it stays inside the brand rules. One step writes, another checks, and the loop repeats until it passes or gives up.",
+      "signals": [
+        "You can say what makes a draft acceptable.",
+        "Some of that can be checked by code.",
+        "A bad draft reaching a person wastes their time."
+      ],
+      "usual_level": 3,
+      "lower_when": "A person reviews every draft anyway and first drafts are usually fine (level 1).",
+      "higher_when": "Fixing a failed check needs the model to go and find things out (level 5).",
+      "techniques": [
+        "evaluator-optimizer",
+        "prompt-chaining",
+        "code-execution",
+        "structured-output"
+      ],
+      "recipes": [
+        "content-pipeline",
+        "instrument-script-from-the-manual"
+      ],
+      "teardowns": [],
+      "elsewhere": [
+        "Marketing copy against brand and legal rules",
+        "An instrument control script checked against the documented command set and run on a simulator",
+        "Code against its tests",
+        "A SQL query against the schema",
+        "A report against a required template",
+        "A test procedure against the requirement it verifies"
+      ]
+    },
+    {
+      "id": "review-against-criteria",
+      "title": "Check a piece of work against written rules",
+      "what": "The work already exists. The job is finding where it breaks rules that are written down, and reporting each finding with the rule it breaks.",
+      "signals": [
+        "The criteria are written, numbered or listable.",
+        "Findings need to point at both the work and the rule.",
+        "A person decides what to do about each finding."
+      ],
+      "usual_level": 3,
+      "lower_when": "A rule is mechanical (a clearance, a naming convention, a required field). Those checks belong in code at level 0, and the model takes only the ones that need reading.",
+      "higher_when": "False findings are costly enough that a second, independent reviewer should check each one against the rule text (level 6, review and debate).",
+      "techniques": [
+        "parallelization",
+        "structured-output",
+        "evaluator-optimizer",
+        "debate-review",
+        "human-in-the-loop"
+      ],
+      "recipes": [
+        "design-review-checklist"
+      ],
+      "teardowns": [],
+      "elsewhere": [
+        "A schematic, bill of materials or layout against design-review rules",
+        "A pull request against a style and security guide",
+        "A contract against a negotiation playbook",
+        "A test plan against its requirements for coverage",
+        "A document against a compliance checklist",
+        "A safety case against a standard's clauses"
+      ]
+    },
+    {
+      "id": "plan-and-decompose",
+      "title": "Turn a goal or a set of requirements into a structured plan",
+      "what": "Requirements go in; a plan comes out in a fixed structure, with every item traceable back to what asked for it. A person approves it before anyone acts on it.",
+      "signals": [
+        "The output has a known structure.",
+        "Traceability matters.",
+        "Nothing happens until a person signs off."
+      ],
+      "usual_level": 3,
+      "lower_when": "The mapping is one to one and a template fills itself in (level 0).",
+      "higher_when": "Writing the plan needs investigation the model has to direct itself (level 5).",
+      "techniques": [
+        "prompt-chaining",
+        "structured-output",
+        "human-in-the-loop"
+      ],
+      "recipes": [
+        "requirements-to-test-plan"
+      ],
+      "teardowns": [],
+      "elsewhere": [
+        "Requirements into a test plan with a traceability table",
+        "A project brief into tasks and owners",
+        "An incident report into a runbook",
+        "A learning goal into a syllabus",
+        "A customer request into a statement of work"
+      ]
+    },
+    {
+      "id": "watch-and-report",
+      "title": "Keep an eye on sources and say what changed",
+      "what": "A fixed list of places is checked on a schedule. Code finds what changed; a model is asked one question about each change, usually whether it matters and why.",
+      "signals": [
+        "The sources are known in advance.",
+        "Most checks find nothing.",
+        "The schedule is a timer, not a judgment."
+      ],
+      "usual_level": 3,
+      "lower_when": "Any change at all is worth a notification, so a diff and an email do it (level 0).",
+      "higher_when": "Deciding what to watch, or following a change to its consequences, is itself the job (level 5 or 7).",
+      "techniques": [
+        "prompt-chaining",
+        "structured-output",
+        "routing",
+        "ops"
+      ],
+      "recipes": [
+        "nightly-monitor"
+      ],
+      "teardowns": [],
+      "elsewhere": [
+        "Regulatory and standards pages",
+        "Product change and end-of-life notices for the parts in a bill of materials",
+        "Releases of the libraries you depend on",
+        "Competitor pricing pages",
+        "New papers in a field",
+        "A supplier's errata for a chip you have designed in"
+      ]
+    },
+    {
+      "id": "explore-data",
+      "title": "Ask questions of data you do not fully understand yet",
+      "what": "You have a table and a question, and the next thing to compute depends on what the last computation showed. The model writes analysis code, code runs it in a sandbox, and the numbers come from the code and never from the model.",
+      "signals": [
+        "The standing reports did not answer the question.",
+        "Each answer suggests the next question.",
+        "Every number must be reproducible."
+      ],
+      "usual_level": 5,
+      "lower_when": "The questions are the same every week. Then it is a dashboard, which is level 0, and building it should come first: grouping by the obvious dimensions answers most questions before a model is involved. One question needing one computation is level 4.",
+      "higher_when": "Rarely. One agent with one tool is enough for one dataset.",
+      "techniques": [
+        "code-execution",
+        "single-agent",
+        "function-calling"
+      ],
+      "recipes": [
+        "data-analysis",
+        "test-data-by-conversation"
+      ],
+      "teardowns": [],
+      "elsewhere": [
+        "A production yield drop: bad lot, drifting fixture or real design margin",
+        "A fall in sales in one region",
+        "Survey results",
+        "Server logs after an incident",
+        "Results of an experiment with many factors",
+        "Characterization data across temperature and voltage"
+      ]
+    },
+    {
+      "id": "research-and-synthesize",
+      "title": "Find out about something across many sources and write it up",
+      "what": "The question is open, the sources are not known in advance, and the result is a written answer in which every claim points at where it came from.",
+      "signals": [
+        "Nobody can list the sources up front.",
+        "Several rounds of searching and reading.",
+        "Citations are part of the deliverable."
+      ],
+      "usual_level": 5,
+      "lower_when": "The sources are a known set of documents (level 2).",
+      "higher_when": "The topic is broad enough to split among parallel searchers, or the claims are important enough for an independent check (level 6).",
+      "techniques": [
+        "agentic-rag",
+        "evaluator-optimizer",
+        "parallelization",
+        "debate-review"
+      ],
+      "recipes": [
+        "research-brief"
+      ],
+      "teardowns": [
+        "deep-research-mode"
+      ],
+      "elsewhere": [
+        "A literature review",
+        "Comparing candidate parts or suppliers from their public documentation",
+        "Due diligence on a company",
+        "What a standard requires and how others have met it",
+        "A market overview"
+      ]
+    },
+    {
+      "id": "carry-out-a-task",
+      "title": "Carry out a multi-step task in software, where the steps depend on what it finds",
+      "what": "You describe the outcome. The model reads, acts, looks at the result and decides what to do next, inside limits your code enforces, and says when it is done.",
+      "signals": [
+        "The steps cannot be written down in advance.",
+        "There is a way to tell whether it worked, such as a test.",
+        "Its actions can be limited and undone."
+      ],
+      "usual_level": 5,
+      "lower_when": "You can write the steps down after all. Most tasks that feel open-ended have a fixed skeleton, and that is a level 3 workflow.",
+      "higher_when": "The task is too large for one context window, or independent review of the result is worth its cost (level 6).",
+      "techniques": [
+        "single-agent",
+        "agent-harness",
+        "coding-agents",
+        "function-calling",
+        "skills",
+        "safety",
+        "human-in-the-loop"
+      ],
+      "recipes": [
+        "repo-assistant",
+        "bring-up-debug-assistant"
+      ],
+      "teardowns": [
+        "coding-agent"
+      ],
+      "elsewhere": [
+        "Fix a bug or add a feature in a repository",
+        "Work a bring-up problem with read-only queries to instruments, the log and the datasheet",
+        "Reconcile records between two systems",
+        "Migrate configuration from one format to another",
+        "Reproduce a reported defect"
+      ]
+    },
+    {
+      "id": "standing-work",
+      "title": "Work that should happen without anyone asking",
+      "what": "Something other than a person starts the work: a schedule, an event, an inbox. The agent runs on a machine of its own, remembers earlier sessions, and holds risky actions for approval.",
+      "signals": [
+        "The work recurs or is triggered.",
+        "It spans many sessions.",
+        "Someone has to be able to see and stop what it is doing."
+      ],
+      "usual_level": 7,
+      "lower_when": "Almost always ask this first: if a timer starts it and the steps are fixed, it is a scheduled workflow at level 3, which is far cheaper to run and to trust.",
+      "higher_when": "It cannot go higher.",
+      "techniques": [
+        "agent-teammates",
+        "long-horizon",
+        "memory",
+        "human-in-the-loop",
+        "safety",
+        "organizations-swarms"
+      ],
+      "recipes": [
+        "assistant-team"
+      ],
+      "teardowns": [
+        "agent-teammate"
+      ],
+      "elsewhere": [
+        "A personal assistant that manages mail and calendar",
+        "An agent that keeps documentation in step with a codebase",
+        "Overnight regression triage that files its findings by morning",
+        "An assistant that prepares a weekly operations review"
+      ]
+    }
+  ]
+}
