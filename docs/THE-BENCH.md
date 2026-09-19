@@ -3,11 +3,34 @@
 Every general example on this site runs on one synthetic world: "Halvorsen," a fictional appliance
 brand, in `evals/corpus/`. The engineering examples run on a second one, described here. It is a
 small electronics test bench: one circuit board, four instruments, a production test specification,
-a month of test data and the documents an engineer actually works from.
+two data sets, and the documents an engineer actually works from.
 
 This file is the design of that bench and the answer key to the data hidden in it. It is written
 to be read, by the people writing the engineering recipe pages and by anyone who wants to check
 that the numbers hold up.
+
+## One bench, three ways of using it
+
+The same board, the same four instruments and the same documents serve three different jobs, and
+a page built on this bench should say which one it is for. They are not three benches. They are
+three sets of questions asked of one.
+
+| | Production test | Engineering test | Precise measurement |
+| --- | --- | --- | --- |
+| How many units | 200 a month, fixed sequence | five prototypes, swept | one number, taken carefully |
+| What comes out | a pass or a fail per step | a margin at every corner | a value, an uncertainty and a verdict |
+| What it costs | amortized over units per day | a person's afternoon, five runs of a script | the time to write the budget down |
+| The data | `production-run-2026-08.csv` and the two files with it | `characterization-2026-09.csv` | either, plus the meter's accuracy table |
+| The documents | the test specification, the failure analysis guide | the two notebooks, the datasheet | the programming manual, the calibration procedure |
+| What goes wrong | a fixture drifts, a lot goes bad | a corner is never visited, a condition is mislabeled | the wrong range, the wrong calibration interval, an offset that does not cancel |
+
+What changes between them is the economics and the shape of the answer, not the levels. A sweep is
+a loop, a margin is a subtraction, an uncertainty budget is a root sum of squares and a guardband
+is a subtraction. Level 0 does nearly all of it in all three settings.
+
+What does not change is who produces a number. A model may read a manual, triage free text, draft
+a script that code then checks, or write the prose around numbers code computed. A model never
+produces a reported measurement, an uncertainty, a margin or a verdict.
 
 ## Everything here is invented
 
@@ -22,6 +45,12 @@ alphanumeric strings collide with something somewhere, so the check is on the fu
 "Orbeck SRB-5030," "Maridun MDN-4010," "Tarnley TRN-2400," "Tarnley TRN-1102." Internal part
 numbers only ever appear inside Orbeck's own documents, where they are Orbeck's internal numbers
 by definition.
+
+Wave 8 added a characterization session, an accuracy table and three recipe slots and introduced
+no new company, product or part name. The five prototypes are serials in the existing
+`SRB5030-YYMM-NNNN` format, the accuracy table belongs to the MDN-6100 that was already checked,
+and the only new label in any document is "lead set L4", which is a piece of wire in Orbeck's own
+notebook. Nothing new needed a search, and the searches above still stand.
 
 What is not invented is the engineering. SCPI, IEEE 488.2, the buck converter ripple equations,
 Ohm's law, capacitance derating under DC bias and the standard formula for Cpk are all real, are
@@ -106,7 +135,7 @@ leaves `-113,"Undefined header"` in the error queue.
 | Instrument | Role | Range | Resolution | Accuracy |
 | --- | --- | --- | --- | --- |
 | Maridun MDN-4010 | programmable DC supply | 0 to 40 V, 0 to 10 A, 200 W | 1 mV, 1 mA programming | +/-(0.05% + 10 mV), +/-(0.1% + 5 mA) |
-| Maridun MDN-6100 | 6 1/2 digit multimeter | 100 mV to 1000 V DC, 100 ohm to 100 Mohm | 100 nV on the lowest range | +/-(0.0035% of reading + 0.0005% of range) on 10 V DC |
+| Maridun MDN-6100 | 6 1/2 digit multimeter | 100 mV to 1000 V DC, 100 ohm to 100 Mohm | range over a million: 100 nV on 100 mV, 10 uV on 10 V | per range and per calibration interval, in ppm of reading + ppm of range; 35 + 5 on 10 V DC at one year |
 | Tarnley TRN-2400 | electronic load | 0 to 60 V, 0 to 30 A, 300 W | 1 mA CC | +/-(0.1% + 10 mA) CC |
 | Tarnley TRN-1102 | oscilloscope | 100 MHz, 1 GSa/s, 8 bit | vertical scale / 32 per bit | +/-2% of amplitude |
 
@@ -114,6 +143,13 @@ The scope is here because ripple is a scope measurement. The MDN-6100's AC volts
 300 kHz, and most of what makes a switching regulator's measured ripple bigger than its computed
 ripple is above that. Using the meter instead would be the wrong instrument, stated confidently,
 which is exactly the kind of thing an engineer notices.
+
+The MDN-6100 is the only instrument here whose accuracy is stated per range and per calibration
+interval, because it is the only one a page is allowed to quote a precise figure from. Its full
+table, its temperature coefficient and a worked uncertainty budget are in
+`mdn6100-programming-manual.md` sections 2, 7 and 8, and the arithmetic that prices a reading
+from it is in `examples/common/bench.py`. The supply and the load state one readback row each,
+which is enough to price an efficiency and not enough to report a voltage.
 
 ### The command set
 
@@ -206,7 +242,7 @@ person approves the enable, and only then does the instrument act. On this bench
 simulated, so the whole thing is a rehearsal. The point of rehearsing it is that the same code runs
 when it is not.
 
-## The production test
+## The production test: eight steps, 200 units
 
 Eight steps, in order, on one of four fixtures. Full text in
 `evals/bench/corpus/srb5030-test-spec.md`.
@@ -230,7 +266,7 @@ fixture has an offset and a trap when the board is dead: a board with no output 
 points, scores a regulation of about zero, and passes. Step 3 measures the absolute voltage, which
 is why it comes first.
 
-## The data, and the six stories in it
+## The production data, and the six stories in it
 
 `evals/bench/make_data.py` writes three files into `evals/bench/data/` from seed 20260824. Rerun
 it and the bytes are identical; `tests/test_bench_data.py` proves that by generating into a
@@ -543,18 +579,27 @@ carefully, of a condition nobody asked for.
 
 ## What this bench is for
 
-Two claims run through every engineering page built on it.
+Two claims run through every engineering page built on it, in all three settings.
 
-**Most of test automation is level 0.** A limit check is a comparison. A Cpk is arithmetic. A
-sequencer is a loop. A control chart is a mean, a standard deviation and a plot. Grouping a
-measurement by lot and by fixture is a `GROUP BY`. All six stories above are findable with no model
-anywhere: four of them by grouping, one by a run chart, one by looking at the magnitude of a
-number. The recipe that teaches this leads the engineering list, and every recipe above it in
-level says plainly which part of the job actually needed the model.
+**Most of this work is level 0.** A limit check is a comparison. A Cpk is arithmetic. A sequencer
+is a loop and a sweep is a nested one. A margin is a subtraction. An uncertainty budget is a root
+sum of squares and a guardband is another subtraction. Grouping a measurement by lot, by fixture
+or by meter range is a `GROUP BY`. All ten stories above are findable with no model anywhere: by
+grouping, by a subtraction, by a run chart, by comparing a margin against an uncertainty, by
+noticing that a number is a thousand times too big, and by noticing that a power balance is
+impossible. The two recipes that teach this
+lead the engineering list, one for production test and one for engineering test, and every recipe
+above them in level says plainly which part of the job actually needed a model.
 
-**The pass or fail decision never involves a model.** Not as a check, not as a tie-breaker, not as
-a summarizer of a borderline reading. A wrong pass ships a bad unit, and a model that is right 99
-times in 100 is a defect rate of one percent added to a line that measures its defect rate in parts
-per million. The model's place on this bench is reading a manual, triaging free text, drafting a
-script that code then checks, and exploring data conversationally after the dashboard has run out
-of answers.
+**A model never produces a reported measurement, an uncertainty, a margin or a verdict.** That is
+the general form of the rule this site started with, which was that the pass or fail decision
+never involves a model. The reasons are the same in all three settings and they compound. In
+production a wrong pass ships a bad unit, and a model that is right 99 times in 100 adds a one
+percent defect rate to a line that measures defects in parts per million. In engineering test a
+wrong margin is a design decision made on a number nobody can reproduce. In precise measurement a
+figure without a budget behind it is not a measurement at all, and a figure with a budget a model
+assembled is worse, because it looks like one.
+
+The model's place on this bench is reading a manual, triaging free text, drafting a script that
+code then checks, writing the prose around numbers code computed, and exploring data
+conversationally after the dashboard has run out of answers.
