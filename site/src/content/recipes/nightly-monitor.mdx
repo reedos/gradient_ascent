@@ -14,6 +14,13 @@ schedules, published guidance) and wants to know when one changes, without a per
 tabs every morning to compare them by eye. The job runs unattended, every night, with nobody
 around to notice if it quietly stops working.
 
+The mechanism below is a diff against last night's copy of a page that stays at one address. The
+same shape, at the same level, covers a source that grows instead of changing, where the question
+is which records are new since the last query rather than which lines moved. Everything about the
+reasoning here carries over; only the comparison changes, from a text diff to a set difference.
+<Link href="/recipes/literature-watch/">A weekly watch over a growing result set</Link> works that
+version through, and joins it to a second shape.
+
 ## The assembled diagram
 
 <Run data={runData} label="Level 3 · assembled for this recipe" runKey="nightly-monitor" />
