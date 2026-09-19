@@ -24,6 +24,8 @@
       "teardowns": [],
       "elsewhere": [
         "Pass or fail a measurement against its limits, and compute yield and Cpk",
+        "Work out the margin to a specification at every corner of a sweep",
+        "Build an uncertainty budget and guardband a limit by it",
         "Flag invoices over an approval threshold",
         "Find scheduling conflicts in a calendar",
         "Reorder stock when a count falls below a minimum",
@@ -57,6 +59,7 @@
         "Explain a compiler error or a stack trace",
         "Write release notes from a list of commits",
         "Rewrite a test procedure for a less experienced operator",
+        "Write a characterization report around numbers that are already computed",
         "Translate a supplier's datasheet excerpt",
         "Turn bullet points into a status report"
       ]
@@ -89,6 +92,8 @@
       "elsewhere": [
         "Invoices and receipts into an accounting system",
         "Key parameters from a datasheet into a parts database",
+        "An instrument accuracy table into rows per range and per calibration interval",
+        "A calibration certificate into as-found and as-left readings for a drift record",
         "Operator failure notes into cause, location and severity",
         "Resumes into a candidate record",
         "Lab reports into a results table",
@@ -154,6 +159,7 @@
         "A policy handbook or a set of standard operating procedures",
         "Datasheets, errata and engineering change notices for the parts on a board",
         "Instrument programming manuals",
+        "A calibration procedure and the records it requires",
         "Contracts and their amendments",
         "A codebase's design documents",
         "Product manuals for a support team"
@@ -216,6 +222,7 @@
       "elsewhere": [
         "Marketing copy against brand and legal rules",
         "An instrument control script checked against the documented command set and run on a simulator",
+        "A measurement report checked figure by figure against the numbers code computed",
         "Code against its tests",
         "A SQL query against the schema",
         "A report against a required template",
@@ -250,6 +257,7 @@
         "A pull request against a style and security guide",
         "A contract against a negotiation playbook",
         "A test plan against its requirements for coverage",
+        "A measurement report against what its method requires it to state: value, uncertainty, coverage factor, conditions",
         "A document against a compliance checklist",
         "A safety case against a standard's clauses"
       ]
@@ -277,6 +285,7 @@
       "teardowns": [],
       "elsewhere": [
         "Requirements into a test plan with a traceability table",
+        "Every datasheet parameter into the corners a design verification plan measures it at",
         "A project brief into tasks and owners",
         "An incident report into a runbook",
         "A learning goal into a syllabus",
@@ -308,6 +317,7 @@
       "elsewhere": [
         "Regulatory and standards pages",
         "Product change and end-of-life notices for the parts in a bill of materials",
+        "Calibration due dates across a bench of instruments",
         "Releases of the libraries you depend on",
         "Competitor pricing pages",
         "New papers in a field",
@@ -342,7 +352,8 @@
         "Survey results",
         "Server logs after an incident",
         "Results of an experiment with many factors",
-        "Characterization data across temperature and voltage"
+        "Characterization data across temperature and voltage",
+        "Why one block of readings in a session scatters wider than the rest"
       ]
     },
     {
@@ -408,6 +419,7 @@
       "elsewhere": [
         "Fix a bug or add a feature in a repository",
         "Work a bring-up problem with read-only queries to instruments, the log and the datasheet",
+        "Reproduce somebody else's measurement from their notebook and say where the two differ",
         "Reconcile records between two systems",
         "Migrate configuration from one format to another",
         "Reproduce a reported defect"
@@ -443,6 +455,7 @@
         "A personal assistant that manages mail and calendar",
         "An agent that keeps documentation in step with a codebase",
         "Overnight regression triage that files its findings by morning",
+        "An overnight soak that records readings and has the ones that left the limits waiting by morning",
         "An assistant that prepares a weekly operations review"
       ]
     }
