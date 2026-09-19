@@ -1,0 +1,15 @@
+.local/
+.local*
+__pycache__/
+*.pyc
+.env
+node_modules/
+test-results/
+.claude/
+api-keys.json
+
+# Astro site build output and local-only artifacts
+site/dist/
+site/.astro/
+site/node_modules/
+site/.shots/

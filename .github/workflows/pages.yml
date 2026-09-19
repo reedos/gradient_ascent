@@ -1,0 +1,70 @@
+# Build the Astro site and deploy it to GitHub Pages.
+#
+# MANUAL ONLY, ON PURPOSE. The only trigger is workflow_dispatch: this workflow never runs on a
+# push, on a schedule, or on a merge. A deploy is a decision: every page is still `draft`, and
+# dispatching by hand is a perfectly good way to publish a site that changes a few times a month.
+# Run it with `gh workflow run pages.yml` or from the Actions tab.
+#
+# Before the first dispatch, confirm `site` and `base` in site/astro.config.mjs match the
+# repository this is running in. A wrong base path builds green and breaks every link except the
+# home page's.
+
+name: pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; never cancel one in flight, because a half-finished deploy to Pages is
+# worse than a queued one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Configure Pages
+        # Exposes the base URL Pages will serve from. It does not override astro.config.mjs,
+        # which is the source of truth for `site` and `base`.
+        uses: actions/configure-pages@v5
+
+      - name: Install the site's dependencies
+        working-directory: site
+        run: npm ci
+
+      - name: Build the site
+        working-directory: site
+        run: npm run build
+
+      - name: Upload the built site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # astro.config.mjs sets output: 'static' with the default outDir.
+          path: site/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

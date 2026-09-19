@@ -1,0 +1,59 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+import '../styles/print.css'; // finish-indexes: the print handout stylesheet, see its own file comment
+import { url } from '../lib/url';
+import { feedbackUrl } from '../lib/site';
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const feedback = feedbackUrl(canonical, title);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0c0f17" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href={url('/favicon.svg')} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- finish-weight: only the weights actually set anywhere in site/src/styles or an island's
+         inline style are requested here -- DM Sans 400/500/550/600/650, Manrope 450/500/550/750
+         (checked by grepping every "font:"/"font-weight:" declaration; see the commit message).
+         Was 7 weights per family (14 faces); this is 5 + 4 = 9. -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;550;600;650&family=Manrope:wght@450;500;550;750&display=swap"
+    />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <aside class="page-feedback" aria-label="Feedback on this page">
+      <p>
+        <b>Something wrong, unclear or missing on this page?</b>
+        Every claim here is meant to be checked against its source. If one is off, say so.
+      </p>
+      <a class="page-feedback-link" href={feedback} rel="noopener">Give feedback on this page <span aria-hidden="true">&rarr;</span></a>
+    </aside>
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,218 @@
+---
+slug: distillation
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Model distillation"
+    url: "https://developers.openai.com/api/docs/guides/distillation"
+    publisher: "OpenAI (API documentation)"
+    accessed: "2026-09-18"
+  - title: "Commercial Terms of Service"
+    url: "https://www.anthropic.com/legal/commercial-terms"
+    publisher: "Anthropic"
+    date: "2025-06-17"
+    accessed: "2026-09-18"
+  - title: "Gemini API Additional Terms of Service"
+    url: "https://ai.google.dev/gemini-api/terms"
+    publisher: "Google"
+    date: "2026-03-23"
+    accessed: "2026-09-18"
+  - title: "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning"
+    url: "https://arxiv.org/abs/2501.12948"
+    publisher: "arXiv (DeepSeek-AI)"
+    date: "2025-01-22"
+    accessed: "2026-09-18"
+---
+
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+
+A larger teacher model produces material; a smaller student model is trained on that instead of on
+data a person wrote. That is distillation, and it belongs to
+<Link href="/techniques/adaptation/">changing the model</Link> alongside
+<Link href="/techniques/fine-tuning/">fine-tuning</Link>, which is what the student's training run
+actually is once the dataset exists.
+
+OpenAI's own distillation guide describes the mechanism as two steps: "Capture results generated
+from your model" and then "Use the captured responses from the large model that fit your criteria
+to generate a dataset"<Cite n={1}/> — the teacher's outputs, filtered before anything is trained on
+them. What gets captured need not stop at the final answer. DeepSeek's paper on its R1 model
+reports that "the emergent reasoning patterns exhibited by these large-scale models can be
+systematically harnessed to guide and enhance the reasoning capabilities of smaller
+models"<Cite n={4}/>: what that paper describes carrying over is reasoning patterns, not a list of
+conclusions.
+
+This page is marked draft, not published: no training run has happened for this site, and the
+example below stops exactly where a real project would start paying for one.
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+A small, fast model marketed as unusually good at one narrow job may well be a distilled one: a
+maker ran a larger model over many examples of that job and trained a smaller model on the results.
+Two questions are worth asking about one. The first is about the dataset rather than the model:
+what task were the captured answers filtered for, and does your use fall inside that task or
+outside it?
+
+The second question is not technical, and it arrives as soon as you are building a product rather
+than using one: whether a maker's terms let you train on its model's outputs at all. This site
+gives no legal advice and cannot tell you how a clause applies to your plan. It can quote two
+documents as they read today.
+
+Anthropic's Commercial Terms of Service, effective 2025-06-17 and read 2026-09-18, state under Use
+Restrictions that "Customer may not and must not attempt to (a) access the Services to build a
+competing product or service, including to train competing AI models or resell the Services except
+as expressly approved by Anthropic"<Cite n={2}/>. Those are the commercial terms; Anthropic
+publishes separate consumer terms this page has not read. Google's Gemini API Additional Terms of
+Service, dated 2026-03-23, state that "You may not use the Services to develop models that compete
+with the Services (e.g., Gemini API or Google AI Studio)"<Cite n={3}/>. On the separate subject of
+what Google does with your content, the same document says "Google only uses content that you
+import or upload to our model tuning feature for that express purpose"<Cite n={3}/> — a statement
+about Google's use of uploaded data, not an exception to the restriction above.
+
+A third maker is missing on purpose: OpenAI's policy pages refused this site's fetcher on
+2026-09-18, so nothing here says what its terms restrict. That is a page which could not be opened,
+not one read and found silent.
+
+Distillation inherits whatever the teacher got wrong. A captured answer that reads fluently and
+would pass a casual glance is not the same as a correct one, and a student trained on enough
+confidently wrong examples learns to be confidently wrong the same way, just faster and cheaper.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+`examples/distillation` runs the capture-then-filter half of the pipeline OpenAI's guide
+describes<Cite n={1}/>: no student model is ever trained here, the same way
+<Link href="/techniques/fine-tuning/">the fine-tuning page's</Link> example never calls a training
+API. A teacher model answers the 32 of the site's 60 questions that are graded `"exact"` rather
+than `"rubric"` — a rubric question needs a grader model reading free text, which this example does
+not call, so those are left out rather than approximately graded by a check they were never written
+for.
+
+`grade_exact` is the filter, the same accept/require/reject contract `docs/EVALS.md` describes for
+the site's own eval runner:
+
+<CodeFile file="examples/distillation/run.py" func="grade_exact" />
+
+`run` calls the teacher once per exact-graded question, grades what comes back, and writes only
+what passed as chat-format JSONL — the teacher's own words in the assistant turn, not the
+question set's answer key:
+
+<CodeFile file="examples/distillation/run.py" func="run" />
+
+Every step is `decided_by: "code"`: the code always calls the teacher, always grades the same way,
+and the model's output never changes what happens next — the same rule `examples/rag` follows for
+its own single model call. Against the real question set, `python -m examples.distillation --model
+stub --out .local/scratch/distillation/student.jsonl` keeps nothing: the interactive stub's
+placeholder text matches no question's pattern, so all 32 are dropped. That is not a bug in the
+filter; it is what an honest filter does to an answer that was never actually trying to be right,
+and it is the same reason a real captured dataset needs a real teacher model before the filter's
+pass rate means anything.
+
+Two things this example does not do, on purpose. It never checks whether a passed answer's
+reasoning was any good, only whether its final text matches a pattern — an exact-match filter is
+blind to a right answer reached by a wrong method, and to the reasoning patterns DeepSeek's paper
+describes harnessing<Cite n={4}/>. And it captures every passing answer once, with no deduplication
+against near-identical phrasings; the Build it lane on
+<Link href="/techniques/synthetic-data/">synthetic data</Link> covers the checks a larger generated
+set needs and this one, at 32 questions, does not yet require.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try the teacher model itself, with a good prompt, before distilling anything from it. If a
+well-written prompt against the larger model already gets the accuracy and consistency you need,
+training a smaller model on its outputs adds a dataset to build, a filter to trust, and a training
+run to pay for, in exchange for a cost saving you have not yet shown you need.
+
+Distillation earns its cost once the larger model's per-call price or latency, multiplied by real
+call volume, is the actual problem — not before. A task called a few times a day rarely justifies
+building and maintaining a captured, filtered dataset just to run it on cheaper hardware.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'A shallow filter passes a right-looking wrong answer',
+    notice: "A captured answer matches the exact-match pattern the way the filter shown on this page checks it, but is wrong for a reason the pattern was never built to catch — the right number attached to the wrong appliance, say.",
+    test: 'Hand-read a sample of what the filter kept, not just its pass rate. A pattern check only ever tests what its author thought to write a pattern for.',
+  },
+  {
+    name: 'The student inherits the teacher’s confident mistakes',
+    notice: "The teacher model is systematically wrong about one thing, every captured answer about it reads fluently and passes the filter, and the student learns the same wrong answer, now delivered faster and cheaper.",
+    test: "Before training on a captured set, check the teacher's own accuracy on a sample graded by a person, not only by the pattern filter this page's example uses.",
+  },
+  {
+    name: 'Narrow capture mistaken for broad capability',
+    notice: "A student distilled on one task's captured answers performs well on that task and confidently wrong outside it, in the same way a fine-tuned model does, because nothing about distillation preserves what the teacher could do beyond what was captured.",
+    test: "Ask the student a question clearly outside the captured task and compare its answer against the teacher's own; a gap that only shows up outside the task is this failure.",
+  },
+  {
+    name: 'Captured outputs used without reading the terms',
+    notice: "A team builds and ships a product trained on a hosted model's captured outputs, and nobody has read what that maker's current terms say about training models on them. Both makers quoted on this page carry a clause about competing models; a third maker's pages could not be opened at all.",
+    test: "Before capturing anything, open the current terms of the maker you are actually using and find the use-restriction section. Whether your plan falls inside a clause is a question for someone who can advise on it, not for a technique page.",
+  },
+  {
+    name: 'No filter at all for a rubric-graded task',
+    notice: 'A captured dataset for an open-ended task has no exact-match pattern to filter by, so everything the teacher produced goes into training unfiltered, including answers a person would have rejected.',
+    test: "Check whether every kept example passed some check, even a cheap one, before training on it; 'the teacher produced it' is not a filter.",
+  },
+]} />
+
+## How to eval it
+
+<HowToEval>
+
+The example answers questions from the teacher model's own knowledge, with no retrieval and no
+citations, so the site's 60-question grading contract — which checks citations against the corpus —
+has nothing to grade it on (see `docs/EVALS.md`). The number it does produce is its filter's pass
+rate over the 32 exact-graded questions, and that number is not accuracy: a question with one short
+accept pattern is easier to pass than one carrying several `require` patterns, so the rate reflects
+how the patterns were written as much as how good the teacher was.
+
+The measurement that would settle anything happens after training, not during capture. Score the
+finished student on the same 60 questions the site runs against every other technique, against the
+same questions run on whatever it replaced, and report both. A pass rate collected while building
+the dataset is not a result about the student.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="The captured dataset's pass rate against the filter over time, and, on a sample, whether
+  the teacher's own answers were actually right — a filter checks the pattern, not the fact."
+  costAtVolume="Capturing and filtering is a one-time or periodic cost that scales with how many
+  examples you capture, not with how many times the student answers afterward; the student's
+  own per-call cost is what should fall once it is trained and serving real traffic."
+  failsInProduction="The teacher model the dataset was captured from is replaced or updated by its
+  maker, and the student, trained on the old teacher's answers, keeps giving the old teacher's
+  answer to a question the new teacher would now answer differently."
+  whatToLog="The teacher model id and the date it was captured, the filter's pass rate, and the
+  training data's version, so a question about the student's behavior can be traced to which
+  teacher, and which filtered set, produced it."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: "Find a small model or product marketed as distilled from, or trained on the outputs of, a larger one. Check the maker's own page for what task the distillation covered, and try it on something clearly outside that task." },
+  { lane: 'build', body: 'Run python -m examples.distillation --model stub --out .local/scratch/distillation/student.jsonl from the repo root and read the dropped list it prints. Then open examples/distillation/run.py and change TEACHER_SYSTEM_PROMPT to ask for a one-word answer instead of a sentence; do you expect the pass rate against a real teacher to go up or down, and why?' },
+  { lane: 'either', body: "Pick one exact-graded question from evals/questions.json and write two answers to it by hand: one that is factually right and fails grade_exact, and one that is factually wrong and passes it. If you can construct both, that's the filter's blind spot, not a bug." },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

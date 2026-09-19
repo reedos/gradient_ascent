@@ -1,0 +1,275 @@
+---
+slug: adaptation
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "LoRA: Low-Rank Adaptation of Large Language Models"
+    url: "https://arxiv.org/abs/2106.09685"
+    publisher: "arXiv (Microsoft)"
+    date: "2021-06-17"
+    accessed: "2026-09-18"
+  - title: "Fine-tuning data preparation"
+    url: "https://docs.together.ai/docs/fine-tuning-data-preparation"
+    publisher: "Together AI"
+    accessed: "2026-09-18"
+  - title: "Model distillation"
+    url: "https://developers.openai.com/api/docs/guides/distillation"
+    publisher: "OpenAI (API documentation)"
+    accessed: "2026-09-18"
+  - title: "Reinforcement fine-tuning"
+    url: "https://developers.openai.com/api/docs/guides/reinforcement-fine-tuning"
+    publisher: "OpenAI (API documentation)"
+    accessed: "2026-09-18"
+  - title: "DSPy"
+    url: "https://github.com/stanfordnlp/dspy"
+    publisher: "Stanford NLP"
+    accessed: "2026-09-18"
+  - title: "distilabel"
+    url: "https://github.com/argilla-io/distilabel"
+    publisher: "Argilla"
+    accessed: "2026-09-18"
+---
+
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+
+Every other technique on this site changes what you send the model, on every call. Adaptation
+changes the model itself, once, so a later call can be shorter, cheaper or more consistent
+without repeating the same instructions or examples. Fine-tuning trains further on your own
+examples. LoRA and other adapters train a small add-on instead of the whole model: the LoRA paper
+describes freezing the pretrained weights and injecting trainable "rank decomposition matrices"
+into each layer, and reports that this cuts trainable parameters by 10,000 times and GPU memory
+by 3 times against fine-tuning GPT-3 175B with Adam<Cite n={1}/>. Distillation trains a smaller
+model on a larger one's outputs. Reinforcement fine-tuning trains against a scored reward instead
+of fixed example answers. Synthetic data generates training examples with a model. Automated
+prompt optimization searches for a better prompt instead of a person hand-editing one.
+
+Adaptation is orthogonal to the eight levels: an adapted model can sit under a single chat call
+or under one seat in a team of agents. It is the alternative to writing the same instructions
+into every prompt — <Link href="/techniques/prompt-engineering/">prompt engineering</Link>'s
+"say it every time" against adaptation's "train it in once."
+
+This page is marked draft, not published: no training run has happened for this site, so nothing
+below is measured. It describes the choice and shows how the data for it gets prepared.
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+You are unlikely to fine-tune a model yourself, but you already use products built on adapted
+ones: a smaller model priced and marketed for one narrow job (fast customer-support replies, code
+completion) is often a distilled or fine-tuned version of a larger one, trained the way OpenAI's
+own distillation guide documents — capture a larger model's outputs that meet your bar, then use
+that captured set to train a smaller model on the same task<Cite n={3}/>. The question worth
+asking about a claim like "our small model matches the big one on this task" is: matches it on
+what, exactly — the same narrow task it was trained for, or everything the big model could do?
+Training on one task's examples optimizes for that task; nothing about it preserves the rest of
+what the larger model could do, so the scope of the comparison is the part to check.
+
+The practical choice most people actually face is not whether to fine-tune but whether a product
+should be trusted to have done it well. A support bot that always answers in the same rigid
+format, or a coding assistant that is unusually fast but only within one language, is showing the
+signature of adaptation: narrow and consistent instead of broad and instructable. Neither trait
+is a defect by itself; the question is whether it fits what you need done.
+
+Fine-tuning does not fix a model that does not know your facts. Training a model further makes
+its behavior more consistent on the kind of input it was trained on; it does not reliably store
+new facts the way handing it a document does, and a model asked to recall a specific number it
+saw a few times during training is not the same as a model reading that number off the page in
+front of it right now. A vendor's page that blurs "we trained it on our docs" into "it knows our
+docs" is worth reading twice.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+Nothing on this site trains a model: no example here calls a fine-tuning API, and no result file
+exists for any adaptation technique. What a builder can do without one is prepare the data a
+fine-tuning job would actually need, and check that it is not broken before spending anything on
+a training run.
+
+The example turns the site's own 60-question set into a small supervised fine-tuning file. Each
+question becomes one line in chat format — a `system`/`user`/`assistant` message list — the shape
+Together AI's fine-tuning data preparation guide documents: each message has "a role (`system`,
+`user`, or `assistant`) and `content`", and a conversation "must start with `system` or `user`
+and alternate `user` and `assistant` afterwards"<Cite n={2}/>. The same guide recommends holding
+out a validation file rather than training on everything, so training progress can be checked
+against examples the run never saw<Cite n={2}/>; the example splits the 60 questions into a
+training file and a validation file with a fixed random seed, so the same seed always produces
+the same split.
+
+<CodeFile file="examples/adaptation/run.py" func="load_examples" />
+
+A held-out split only means something if training never saw the held-out questions under a
+different guise. `leaked_questions` checks every validation question's normalized text against
+the training file's, and reports any that show up in both:
+
+<CodeFile file="examples/adaptation/run.py" func="leaked_questions" />
+
+`_normalize` lowercases, drops punctuation and collapses whitespace, so two questions that differ
+only in styling count as one. On this set the check comes back empty: all 60 questions normalize
+to distinct strings. The test file proves it catches a leak by putting the same question,
+restyled, on opposite sides of the split — and proves what it misses, by letting a genuine
+paraphrase through. Equality over normalized text is the floor. Catching paraphrases needs a
+similarity measure instead, usually an embedding of each question, and that is the gap that
+starts to matter on a larger set built partly from generated questions — the job Argilla's
+distilabel describes itself as built for, "a framework for synthetic data and AI
+feedback"<Cite n={6}/>.
+
+Two techniques this page covers have no data-preparation step to show. Reinforcement fine-tuning
+trains against a grader's score rather than fixed example answers: OpenAI's own guide says the
+method "samples several responses per prompt, scores them with the grader, and applies
+policy-gradient updates based on those rewards"<Cite n={4}/>, so there is no training file to
+build at all. Automated prompt optimization tunes a prompt or its few-shot examples against a
+metric instead of retraining weights; DSPy's own description is "algorithms for optimizing their
+prompts and weights" so a program does not depend on "brittle prompts"<Cite n={5}/>, which is
+closer to what this site's own eval loop would drive than to a training file.
+
+Which of these a maker currently sells changes faster than the methods do. Both OpenAI guides
+cited here carried this notice when they were read for this page: "OpenAI is winding down the
+fine-tuning platform. The platform is no longer accessible to new users, but existing users of
+the fine-tuning platform will be able to create training jobs for the coming months," with
+fine-tuned models remaining available for inference until their base models are
+deprecated<Cite n={3}/><Cite n={4}/>; the reinforcement fine-tuning guide also limits that method
+to one reasoning model id<Cite n={4}/>. Together AI's fine-tuning documentation carries no such
+notice<Cite n={2}/>. Read the maker's own page before planning around a service; the methods
+outlast the platforms that sell them.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try a better prompt, a few-shot example, or <Link href="/techniques/rag/">RAG</Link> first. Most
+of what looks like a reason to fine-tune is actually a prompt problem — the instructions were not
+specific enough — or a retrieval problem — the model was never given the fact it needed — and
+both are cheaper to fix and faster to test than a training run.
+
+Adaptation earns its cost once the same instructions are sent enough times that training them in
+once is cheaper than repeating them on every call, or once a task needs a model to behave more
+consistently than any prompt can reliably hold it to. Neither condition is about the model being
+wrong on one specific question, which prompting and retrieval already fix more cheaply; both are
+about the shape and volume of the calls.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'A validation leak inflates the score',
+    notice: 'Validation accuracy looks strong but real traffic performs worse, because a near-duplicate of a validation question was also present, reworded, in the training file.',
+    test: "Run the example's leaked_questions check, or an embedding-similarity version of it, on the actual split before trusting a validation number; exact-text matching alone lets a reworded duplicate through.",
+  },
+  {
+    name: 'Narrow training mistaken for broad knowledge',
+    notice: 'A distilled or fine-tuned model handles the task it was trained for well, then confidently gets something outside that task wrong in a way the larger model it was trained from would not have.',
+    test: "Ask the adapted model a question clearly outside the narrow task it was trained for and compare the answer against the base model's; a gap that only appears outside the training task is this failure.",
+  },
+  {
+    name: 'Trained facts read as current facts',
+    notice: 'The model states something it learned during training as fact, with nothing in the answer flagging that the world may have moved on since the training data was collected.',
+    test: 'Ask about something in the training domain that has since changed, with no document attached, and check whether the model states the old fact with the same confidence as a current one.',
+  },
+  {
+    name: 'The training platform is wound down',
+    notice: 'A fine-tuning or reinforcement fine-tuning job that used to work can no longer be created, though inference on models already trained keeps working, because the maker retired the training service without retiring what it produced.',
+    test: "Read the maker's own guide for a notice like the one this page quotes before planning around a training service, not just the date the last job was submitted.",
+  },
+  {
+    name: 'A reward the grader can game',
+    notice: "A reinforcement-fine-tuned model's score against its own reward model climbs while its answers, read by a person, do not actually improve — the same grader-hacking risk this site's evals topic covers, applied to training instead of testing.",
+    test: "Hand-check a sample of the reward grader's own verdicts the way this site's eval runner checks a rubric grader's, rather than trusting the trend of the reward curve alone.",
+  },
+]} />
+
+## At each level
+
+- <Link href="/levels/0/">No model</Link>: a classical model such as the ones on the
+  <Link href="/techniques/order-zero/">level 0 page</Link> is, by definition, already fit to your
+  data every time it is trained — the questions this page raises about adaptation do not arise
+  until there is a language model to adapt.
+- <Link href="/levels/1/">One call</Link>: a fine-tuned model can replace a long, repeated
+  <Link href="/techniques/prompt-engineering/">prompt-engineered</Link> system prompt with a
+  shorter call that already behaves the trained way, at the cost of retraining whenever the
+  instructions change.
+- <Link href="/levels/2/">Context</Link>: adaptation does not substitute for
+  <Link href="/techniques/rag/">retrieval</Link> — training a model further changes how it
+  behaves, not what current facts it can reliably recall, so a fine-tuned model still needs
+  documents in front of it for anything that changes after training.
+- <Link href="/levels/3/">Workflows</Link>: a fixed step that is called the same way thousands of
+  times, with the same instructions and shape of input every time — one step of
+  <Link href="/techniques/prompt-chaining/">prompt chaining</Link>, say — is the cheapest place
+  to swap a small adapted model in for a large general one.
+- <Link href="/levels/4/">Tools</Link>: a model fine-tuned on your own tool set can produce fewer
+  malformed <Link href="/techniques/function-calling/">function calls</Link> than a general model
+  prompted with the same tool definitions, since it has seen your schemas specifically rather
+  than schemas in general.
+- <Link href="/levels/5/">Agents</Link>: reinforcement fine-tuning fits
+  <Link href="/techniques/single-agent/">a single agent</Link>'s loop especially well, because it
+  trains directly against whether the task got done, the same thing the loop's own stop decision
+  is trying to get right, instead of imitating example transcripts.
+- <Link href="/levels/6/">Teams of agents</Link>: a fixed role played by one agent every time — an
+  author, a <Link href="/techniques/debate-review/">reviewer</Link> — is a narrow, repeated task,
+  the case adaptation is built for; each seat could run its own smaller adapted model instead of
+  every seat running the same large one.
+- <Link href="/levels/7/">Always-on agents</Link>: an
+  <Link href="/techniques/agent-teammates/">always-on assistant</Link> logs every action it
+  proposed and what happened to it, which is exactly the raw material a later fine-tuning or
+  distillation pass would use — and exactly the data the
+  <Link href="/techniques/safety/">safety, privacy and governance</Link> topic's questions about
+  retention and training use apply to.
+
+## Practices
+
+- Before fine-tuning, try the cheaper alternative first: a better prompt, a few-shot example, or
+  retrieval. Adaptation is worth the cost when the same instructions are sent enough times that
+  training once is cheaper than prompting every time, not by default.
+- Hold out a validation split and never train on it. A model that has only ever been graded on
+  data it was also trained on has not been graded.
+- Check a prepared training file for near-duplicate examples straddling the train/validation
+  split before spending anything on a training run; a leak inflates validation scores without
+  improving anything real.
+- Do not treat a fine-tuned model as a substitute for giving it current documents. Ask what the
+  model was trained to do, separately from what it was trained to know.
+- Keep the data a fine-tuning job is built from somewhere it can be regenerated or re-audited —
+  the same discipline `evals/questions.json` follows for this site's own eval set.
+- Four pages under this one go further than this page does on each way of adapting a model:
+  <Link href="/techniques/fine-tuning/">fine-tuning and adapters</Link>,
+  <Link href="/techniques/distillation/">distillation</Link>,
+  <Link href="/techniques/synthetic-data/">synthetic data</Link> and
+  <Link href="/techniques/prompt-optimization/">prompt optimization</Link>.
+
+## Run it
+
+<RunIt
+  monitor="Whether the fine-tuned model's behavior on real traffic still matches what the
+  validation split predicted; a gap that grows over time usually means real inputs have drifted
+  away from the training data's shape, not that the model got worse."
+  costAtVolume="A training run is a one-time or periodic cost; a fine-tuned or distilled small
+  model can then cost less per call than a large general model prompted the long way, but only on
+  the narrow task it was trained for — traffic outside that task still needs the general model."
+  failsInProduction="The world changes and the training data doesn't: a model fine-tuned on last
+  quarter's product line answers confidently and wrong about this quarter's, with nothing in its
+  own output flagging that its training predates the change."
+  whatToLog="The training data's version or commit, the base model id, and the date of the run,
+  so a later question about why the model behaves a certain way can be traced to what it was
+  actually trained on."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Find a product that advertises a "custom-trained" or "fine-tuned" small model. Read what task it claims to be good at, and ask whether that claim is about behavior on that one task or about general knowledge — the page usually only supports the first.' },
+  { lane: 'build', body: 'Run python -m examples.adaptation --out .local/scratch/adaptation from the repo root, open val.jsonl, and check that every line has exactly one system, one user and one assistant message in that order.' },
+  { lane: 'either', body: "Pick two questions from evals/questions.json that ask about the same appliance in different words, and decide whether they're similar enough that putting one in training and one in validation would leak. Write down what made the call." },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

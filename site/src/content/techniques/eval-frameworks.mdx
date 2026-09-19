@@ -1,0 +1,258 @@
+---
+slug: eval-frameworks
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Promptfoo documentation"
+    url: "https://www.promptfoo.dev/docs/intro/"
+    publisher: "promptfoo"
+    accessed: "2026-09-18"
+  - title: "Get started"
+    url: "https://www.braintrust.dev/docs/start"
+    publisher: "Braintrust"
+    accessed: "2026-09-18"
+  - title: "Autoevals"
+    url: "https://www.braintrust.dev/docs/reference/autoevals"
+    publisher: "Braintrust"
+    accessed: "2026-09-18"
+  - title: "Self-hosting"
+    url: "https://www.braintrust.dev/docs/guides/self-hosting"
+    publisher: "Braintrust"
+    accessed: "2026-09-18"
+  - title: "LangSmith"
+    url: "https://docs.langchain.com/langsmith/home"
+    publisher: "LangChain (LangSmith documentation)"
+    accessed: "2026-09-18"
+  - title: "Evaluation concepts"
+    url: "https://docs.langchain.com/langsmith/evaluation-concepts"
+    publisher: "LangChain (LangSmith documentation)"
+    accessed: "2026-09-18"
+  - title: "DeepEval"
+    url: "https://github.com/confident-ai/deepeval"
+    publisher: "Confident AI"
+    accessed: "2026-09-18"
+  - title: "Ragas"
+    url: "https://github.com/vibrantlabsai/ragas"
+    publisher: "Ragas maintainers (repository README)"
+    accessed: "2026-09-18"
+  - title: "Deprecations"
+    url: "https://developers.openai.com/api/docs/deprecations"
+    publisher: "OpenAI (API documentation)"
+    accessed: "2026-09-18"
+  - title: "Promptfoo is joining OpenAI"
+    url: "https://www.promptfoo.dev/blog/promptfoo-joining-openai/"
+    publisher: "promptfoo"
+    date: "2026-03-09"
+    accessed: "2026-09-18"
+---
+
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+
+Evaluation frameworks is a page under <Link href="/techniques/evals/">evals</Link>: the tools that
+run a golden set, grade what came back, and compare runs, instead of a team building that machinery
+from scratch. What they do for you, in the shape <Link href="/techniques/evals/">the evals
+page</Link> already describes generically, is: hold a dataset of examples, run a program or prompt
+against every one of them, grade each result, and let two runs be compared. Some also record a
+trace of what happened inside each run, not only the final answer.
+
+Five of them are set out side by side below, described only in their own documentation's words, read
+2026-09-18. There is no ranking and no "best for" here: what fits a team depends on things this
+page cannot know — what is already being traced, who has to read a result, and whether the data
+being graded may leave the machine at all. A sixth tool, OpenAI Evals, is mid-shutdown and is
+reported separately rather than compared. <Link href="/techniques/prompt-optimization/">Prompt
+optimization</Link> is the technique that consumes whatever one of these produces.
+
+This page is marked draft, not published: no result from any of these tools exists for this site,
+so nothing below reports a measured number.
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Most people meet these tools as someone else's dashboard: "our evals run in Braintrust," "CI runs
+promptfoo," "check the LangSmith experiment." Before trusting a number one of them reports, four
+checks apply, each a version of a question <Link href="/techniques/evals/">the evals page</Link>
+already raises about any score, now aimed at a tool a team adopted rather than built.
+
+First, what graded it — a pattern match, or a model reading a rubric — and if a model graded it,
+has anyone checked a sample of its verdicts against a person's own judgment? A dashboard that shows
+one aggregate number rarely shows this by default; it is usually a setting or a second report
+someone has to go looking for. Second, is the number comparable to the last one — same dataset, same
+grading configuration, or did either one quietly change between runs? A framework that versions
+datasets and grading configs separately makes this easy to check; one that does not makes it easy to
+compare two different things without noticing. Third, were any items ungraded — a malformed grader
+reply, a run that errored out — and were they excluded from the score or folded into it as a
+failure? And fourth, if the tool is a hosted service, where does the data being graded actually go:
+a locally run, open-source tool and a cloud dashboard answer that question very differently, which
+matters most for anything that should not leave the machine it runs on.
+
+None of these four checks require reading a line of the tool's code. They are questions to ask
+whoever set the dashboard up, or checks to run once against a report before trusting the next ten.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The same four questions, asked of five tools, answered out of each one's own current
+documentation. Nothing below is this site's assessment of any of them.
+
+**promptfoo.** Calls itself "an open-source CLI and library for evaluating and red-teaming LLM
+apps." On where the data goes: "This software runs completely locally. The evals run on your
+machine and talk directly with the LLM." No licence on the page read. Grading is metrics a user
+defines over prepared test cases, displayed in "matrix views that let you quickly evaluate outputs
+across many prompts"<Cite n={1}/>. Separately, promptfoo announced on 2026-03-09 that it was
+joining OpenAI, saying "Promptfoo will remain open source and we will continue to serve users and
+customers"<Cite n={10}/>.
+
+**Braintrust.** Calls itself "the active observability platform for instrumenting, understanding,
+and improving agents," with a workflow it names as instrument, observe, annotate, evaluate, deploy
+and admin<Cite n={2}/>. On where the data goes: hosted, with a self-hosting guide that "offers a
+self-hosted deployment option that separates data storage from platform management" — the customer
+runs the storage, Braintrust runs the managed interface — and marks self-hosting as available only
+on the Enterprise plan<Cite n={4}/>. No licence on the pages read. Grading is its autoevals
+library, which "bundles together a variety of automatic evaluation methods including" LLM-as-a-judge,
+heuristic (it gives Levenshtein distance) and statistical (BLEU)<Cite n={3}/>.
+
+**LangSmith.** Describes itself through what it covers: observability, evaluation, prompt
+engineering and deployment. On where the data goes: "cloud, hybrid, or self-hosted," and its docs
+say all three options include those same four capabilities<Cite n={5}/>. No licence on the pages
+read. Grading is "evaluators," which are "workspace-level resources that score application
+performance," run over a dataset — "a collection of examples," where "an example is a test input,
+reference output pair" — and each experiment "captures outputs, evaluator scores, and execution
+traces for every example in the dataset"<Cite n={6}/>.
+
+**DeepEval.** Calls itself "a simple-to-use, open-source LLM evaluation framework, for evaluating
+large-language model systems." On where the data goes: its metrics "run locally on your machine,"
+with an opt-in cloud — using the `deepeval` platform "will allow you to generate sharable testing
+reports on the cloud." Licence: "DeepEval is licensed under Apache 2.0." Grading uses
+"LLM-as-a-judge and other NLP models"<Cite n={7}/>.
+
+**Ragas.** Describes itself as "Objective metrics, intelligent test generation, and data-driven
+insights for LLM apps." On where the data goes: installed from PyPI and run locally. Licence: an
+Apache-2.0 badge on its README. Grading is metrics "both LLM-based and traditional," and the
+quickstart ships one template today, `rag_eval`, "Evaluate RAG systems," with agent, benchmark,
+prompt and workflow templates listed under "Coming Soon"<Cite n={8}/>.
+
+**OpenAI Evals** is the sixth, described apart because it is being withdrawn — and it is the hosted
+platform being withdrawn, not the separate open-source repository of that name. OpenAI's
+deprecations page gives the dates: announced June 3, 2026, "Existing evals become read-only" on Oct
+31, 2026, and "The Evals dashboard and API are scheduled to shut down" on Nov 30, 2026, with a
+linked migration path to promptfoo<Cite n={9}/>. Two further eval tools sit in this site's registry
+without a description here, Inspect and lm-evaluation-harness. Five is what fits on a page, not a
+shortlist.
+
+This site's own `scripts/eval_run.py`, described in full on
+<Link href="/techniques/evals/">the evals page</Link>, is not a general framework and is not one of
+the five: it is one script for one task, the site's own 60-question set, with no dataset format and
+no dashboard. Two of its defaults are worth lifting out, whatever tool you use. It refuses to write a
+scored result file for a stub run unless explicitly told to, and it draws a fixed 10% sample of
+every rubric grader's verdicts for hand-checking on every run:
+
+<CodeFile file="scripts/eval_run.py" func="sample_for_review" />
+
+And ungraded is a tracked outcome rather than a silent failure — a grader reply that does not parse
+as PASS or FAIL is `None`, counted and excluded from the score, never scored as wrong:
+
+<CodeFile file="scripts/eval_run.py" func="parse_verdict" />
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Before adopting any of these, try the version that takes an afternoon: twenty questions in a
+spreadsheet, the answers pasted in beside them, read by a person. Most teams asking which framework
+to pick have not yet written down what a good answer looks like, and a framework will not do that
+for them — it will run whatever they have, faster. A tool is worth installing once the same
+comparison has to be made repeatedly, or more than one person has to trust the number, which is the
+threshold <Link href="/techniques/evals/">evals</Link> sets for building a golden set at all,
+applied now to buying instead of writing.
+
+A rubric model is not a shortcut past reading a sample by hand either. Every one of the five above
+still needs someone reading a slice of the verdicts, which is what this site's own runner does by
+default rather than on request.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'An aggregate score with no visible grading method',
+    notice: "A dashboard reports one number, and nobody looking at it can tell whether it came from an exact pattern match or a model reading a rubric, or how many items were graded by each.",
+    test: 'Find the per-item grading method in the tool, not just the summary score, before repeating the number in a meeting.',
+  },
+  {
+    name: 'Two experiments compared across a changed dataset or grader',
+    notice: "A 'before' and 'after' number in the same dashboard turn out to come from different dataset versions, different grading configurations, or a grader model the vendor updated between the two runs.",
+    test: "Check the dataset version and grader configuration recorded on each experiment, not just its score, before treating a difference as real.",
+  },
+  {
+    name: 'Ungraded items folded into the failure count',
+    notice: "A framework's default report treats an errored run, a timeout, or an unparseable grader reply the same as a real failure, so the score looks worse than the system that was actually tested, or better, if such items are silently dropped instead.",
+    test: "Find how many items were ungraded or errored on a given run, and read the tool's own docs for how those are counted before trusting the pass rate.",
+  },
+  {
+    name: 'Eval data sent to a hosted service that should have stayed local',
+    notice: "A team adopts a hosted dashboard for convenience and later realizes the prompts and outputs being graded include data that was never supposed to leave the machine it ran on.",
+    test: "Read the deployment options out of each tool's own documentation before adopting it, the way the five entries above do, rather than after data has already been sent.",
+  },
+  {
+    name: 'A shut-down platform leaves old numbers with no way to reproduce them',
+    notice: "A score reported months ago came from a platform that has since been withdrawn, and nobody can re-run the same evaluation to check whether it still holds.",
+    test: "Before citing an old score as still meaningful, check the maker's own deprecations page for the tool. OpenAI's gives two dates for Evals — read-only, then shut down — which is the kind of notice worth finding before the second one passes.",
+  },
+]} />
+
+## How to eval it
+
+<HowToEval>
+
+There is no example on this page, because adopting a framework is a decision rather than a
+technique the 60-question set can run. What can be checked is the framework itself, and the check
+is the same whichever one is installed: a claim that a system improved needs the same dataset and
+the same grading configuration run before and after, a hand-checked sample of any rubric grader's
+verdicts, and an honest count of what went ungraded instead of being scored as a failure. If a
+tool cannot tell you which of those three it did, that is the finding.
+
+For this site's own runner, `python scripts/eval_run.py --example rag --model stub --dry` projects
+what a real run would cost before anything is spent; it is described in full on
+<Link href="/techniques/evals/">the evals page</Link>. Whether each tool above offers the same
+projection is a question for its own documentation.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="The hand-check agreement rate between a rubric grader and a person, tracked over time
+  in whichever tool is running the evals — not just read once at adoption and never checked again."
+  costAtVolume="A hosted service comes with a bill; a self-hosted, open-source one comes with an
+  operator instead. Neither is the main number: the model calls being graded, and the grader
+  model's own calls on top of them, are what scale with the size of the set."
+  failsInProduction="A grading configuration or dataset changes inside the tool with no version
+  recorded, and a later comparison against an old score is quietly comparing two different tests
+  without anyone noticing."
+  whatToLog="The dataset version, the grading configuration, and which items were ungraded, for
+  every run — exactly what an experiment or a result file needs to carry so a number can be
+  checked later without re-running anything."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: "Find a dashboard or report at work, or in a project you use, that shows an eval score. Can you tell from it how items were graded, and how many were not graded at all? Ask whoever set it up; the answer is usually available and rarely on screen." },
+  { lane: 'build', body: 'Run python scripts/eval_run.py --example rag --model stub --dry from the repo root and read the projected token count. Then open the documentation of one tool above and look for its own dry run or cost projection. Note whether you found one, and how long it took to find.' },
+  { lane: 'either', body: "Pick one of the five tools above and read its documentation for how it treats an item that errored or whose grader reply could not be parsed. Excluded from the score, counted as a failure, or not stated anywhere? All three answers happen." },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

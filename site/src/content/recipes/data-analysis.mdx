@@ -1,0 +1,113 @@
+---
+slug: data-analysis
+reviewed: 2026-09-18
+sources: []
+---
+
+import Run from '../../components/page/Run.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import Link from '../../components/page/Link.astro';
+import dataAnalysisRun from '../../data/runs/recipe-data-analysis.json';
+
+Sales and returns for a small retailer live in a spreadsheet, and nobody built a dashboard for
+every question somebody might ask of it. A manager wants something specific — which category has
+the worst return rate this quarter, and how that compares with last quarter — answered from the
+data rather than guessed fluently.
+
+Data analysis by conversation is that job: a single agent writes and runs code against the
+dataset itself, one question at a time, seeing each result before deciding whether it needs
+another pass or already has enough to answer.
+
+## The assembled diagram
+
+<Run data={dataAnalysisRun} label="Level 5 · Data analysis by conversation" runKey="data-analysis" />
+
+## Why these techniques, and why not lower or higher
+
+Two techniques compose this recipe. <Link href="/techniques/code-execution/">Code execution</Link>
+is the sandbox: the model writes a short piece of code, and a restricted interpreter — never the
+model itself — actually runs it and returns whatever it computed. <Link
+href="/techniques/single-agent/">A single agent</Link> is what lets that happen more than once:
+the model sees each result and decides, itself, whether another computation is needed or the
+question is already answered.
+
+Code execution alone — one write-and-run cycle, bounded from outside — would be enough if every
+question here needed exactly one computation. Some do. Many ad hoc questions don't: answering "how
+does this quarter compare to last" means computing one quarter, looking at what came back, and
+only then knowing that a second, comparable computation is needed before there's anything to
+compare. The single agent page states the condition directly — move up once the number and order
+of actions cannot be known before the model sees the question — and that is exactly what a
+"how does X compare to Y" or "what changed since last time" question does: the second step's shape
+depends on the first step's result, not on anything decided in advance.
+
+It is not worth climbing past a single agent for this job. One agent with one broad sandbox tool
+already reruns, refines and compares on its own; a second model would help only if the questions
+needed independent verification of a specific number, or spanned more data than one context window
+holds, and an ordinary ad hoc question over one spreadsheet is neither. Multiple agents would add
+cost and coordination for a comparison one agent already reaches by looking at its own last
+result.
+
+## Walkthrough
+
+The loop composes the runnable code already on the single agent and code execution pages, adapted
+in one specific way: single agent's own example offers two tools, `search` and `lookup_part`, over
+the site's document corpus; this job offers one, `run_python(snippet)`, over a dataset instead.
+The plan-then-loop shape carries over exactly — a first call writes a short plan your code moves
+on from regardless of what it says, then a loop lets the model pick an action, see the result, and
+decide whether to act again or stop, matching `examples/single_agent/run.py`'s own two hard caps
+on steps and tokens.
+
+Code execution's own example is honest about a real limit worth carrying into this job: its
+sandbox is an arithmetic whitelist — numbers, `+ - * /`, nothing else — built to make one safe
+numeric answer, not to run a real analysis over a table. A sandbox built for this recipe needs a
+wider allow-list — filtering, grouping, aggregating a table — while keeping the same shape that
+example's whitelist does: refuse anything that isn't on it, rather than trying to recognize an
+attack. The production containers that page quotes are bounded from the outside the same way — it
+cites one maker's own settings, internet access disabled, fixed memory, a maximum execution time —
+so whatever the model writes can only compute against the data it was given.
+
+The run above shows two computations run in sequence. The model computes this quarter's return
+rate by category, sees that outdoor gear stands out, and — without being told to — runs the
+comparable query for last quarter before answering, because the question asked for a comparison,
+not one number.
+
+Two things the composition doesn't settle. The dataset has to be inside the sandbox before the
+first snippet runs, put there by your code, since a sandbox with no network cannot go and fetch
+it. And every result the sandbox returns goes into the model's context, so rows it computes over
+are rows it reads; log each snippet, the result it produced, and whether the allow-list refused
+it.
+
+## What to measure
+
+<HowToEval>
+
+Single agent is scored by the site's shared 60-question set (see `docs/EVALS.md`); its
+`model_decided_steps` count and its cap-hit rate both carry over directly to this job, on
+different questions. Code execution is not — it answers only the 12 `numeric` questions there —
+and a spreadsheet task needs its own set regardless: a small, fixed dataset with known answers
+computed by hand, and a batch of questions ranging from one computation to several. Score final
+answer accuracy against those known answers, the average and worst-case number of actions a
+question takes, and — the number code execution's own page tracks separately from a correct
+answer — the refusal rate on a snippet that tries to reach outside the sandbox's allow-list. No
+result file exists for either technique on this task yet, so this recipe cannot claim a score for
+any of it.
+
+</HowToEval>
+
+## Variations
+
+- Widen the sandbox's allow-list toward real tabular operations while keeping it off the network
+  and the filesystem; <Link href="/techniques/code-execution/">code execution</Link>'s own failure
+  modes cover the tension between a whitelist too strict to be useful and one too permissive to be
+  safe.
+- Tighten the step cap for a dataset with a small, known set of useful queries, so a loop that
+  isn't making progress fails fast instead of burning the whole cap.
+- Add <Link href="/techniques/human-in-the-loop/">human approval</Link> before a computed number
+  turns into a report or a decision with a real consequence, the same gate <Link
+  href="/recipes/support-desk/">support desk</Link> uses before a costly reply ships.
+- If the same few questions get asked every week, a fixed query or a dashboard answers them for
+  less than an agent re-deriving them each time; save the agent for the question nobody wrote a
+  query for yet.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}

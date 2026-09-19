@@ -1,0 +1,54 @@
+{
+  "illustrative": true,
+  "h": 420,
+  "title": "Context engineering",
+  "sub": "Assemble one request from fixed parts, cache-friendly order first, and ask once.",
+  "pill": "Level 2 · Context",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 34, "l": "Question + history", "k": "io" },
+    { "id": "static", "x": 170, "y": 104, "l": "Build the static block", "k": "code" },
+    { "id": "hist", "x": 170, "y": 176, "l": "Fit history to budget", "k": "code" },
+    { "id": "prompt", "x": 170, "y": 250, "l": "Build the final prompt", "k": "code" },
+    { "id": "llm", "x": 170, "y": 322, "l": "answers once", "k": "model" },
+    { "id": "a", "x": 170, "y": 392, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "static", "by": "code" },
+    { "id": "e2", "f": "static", "t": "hist", "by": "code" },
+    { "id": "e3", "f": "hist", "t": "prompt", "by": "code" },
+    { "id": "e4", "f": "prompt", "t": "llm", "by": "code" },
+    { "id": "e5", "f": "llm", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question and the conversation so far arrive",
+      "d": "\"What is the DW-300's Normal cycle water use?\"\n2 prior turns of history",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code builds the static block: instructions plus every document",
+      "d": "12 documents, alphabetical order\nsame bytes on every call, so a caching\nbackend can reuse this part unchanged",
+      "m": "6,934 tokens"
+    },
+    {
+      "e": "e3",
+      "h": "Your code fits the history into what the budget has left",
+      "d": "budget 8,000 − 6,934 static = 1,066 left\nkept 2 of 2 turns (30 tokens); the oldest\nturn would be the first one dropped",
+      "m": "30 tokens · 2 of 2 turns kept"
+    },
+    {
+      "e": "e4",
+      "h": "Your code assembles the final prompt",
+      "d": "documents first (unchanged), then history,\nthen the question last (changes every call)",
+      "m": "6,964 tokens assembled"
+    },
+    {
+      "e": "e5",
+      "h": "The model answers once, from the full context",
+      "d": "\"3.2 gallons of water per Normal cycle,\nper dw300-manual#4.\"",
+      "m": "7,021 in · 14 out · 1.6 s"
+    }
+  ]
+}

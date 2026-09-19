@@ -1,0 +1,30 @@
+---
+// The 200-word production block for the person who already built this: what to monitor, what
+// it costs at volume, how it fails in production, and what to log. Four fixed rows so every
+// page answers the same four questions in the same order.
+interface Props {
+  monitor: string;
+  costAtVolume: string;
+  failsInProduction: string;
+  whatToLog: string;
+}
+const { monitor, costAtVolume, failsInProduction, whatToLog } = Astro.props;
+const rows: [string, string][] = [
+  ['What to monitor', monitor],
+  ['Cost at volume', costAtVolume],
+  ['How it fails in production', failsInProduction],
+  ['What to log', whatToLog],
+];
+---
+
+<div class="panel reading run-it">
+  {
+    rows.map(([label, body]) => (
+      <div class="run-it-row">
+        {/* h3, not h4: this block sits directly under the page's "## Run it" h2. */}
+        <h3>{label}</h3>
+        <p>{body}</p>
+      </div>
+    ))
+  }
+</div>

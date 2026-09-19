@@ -1,0 +1,54 @@
+{
+  "illustrative": true,
+  "h": 420,
+  "title": "Knowledge graphs",
+  "sub": "Extract triples from two documents, build a small graph, and walk two hops for one answer.",
+  "pill": "Level 2 · Context",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
+    { "id": "e1", "x": 170, "y": 104, "l": "Extract triples: parts list", "k": "model" },
+    { "id": "e2", "x": 170, "y": 176, "l": "Extract triples: warranty policy", "k": "model" },
+    { "id": "g", "x": 170, "y": 250, "l": "Graph", "k": "store" },
+    { "id": "walk", "x": 170, "y": 322, "l": "Walk two hops", "k": "code" },
+    { "id": "a", "x": 170, "y": 392, "l": "Answer + path", "k": "io" }
+  ],
+  "edges": [
+    { "id": "x1", "f": "q", "t": "e1", "by": "code" },
+    { "id": "x2", "f": "e1", "t": "e2", "by": "code" },
+    { "id": "x3", "f": "e2", "t": "g", "by": "code" },
+    { "id": "x4", "f": "g", "t": "walk", "by": "code" },
+    { "id": "x5", "f": "walk", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "x1",
+      "h": "The question arrives",
+      "d": "\"What warranty class covers the model that\nHLV-5520 fits?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "x2",
+      "h": "The model extracts fitment triples from the parts list",
+      "d": "HLV-5510 fits DR-210\nHLV-5520 fits DR-520\nHLV-6601 fits DR-210, DR-520\nHLV-7735 fits DR-520",
+      "m": "parts-list#3 · 210 in · 48 out"
+    },
+    {
+      "e": "x3",
+      "h": "The model extracts warranty triples from the warranty policy",
+      "d": "DR-210 warranty_class 7-year limited\n(drum and motor), parts only\nDR-520 warranty_class 7-year limited\n(drum and motor), parts only",
+      "m": "warranty-policy#2 · 180 in · 52 out"
+    },
+    {
+      "e": "x4",
+      "h": "Your code builds the graph from the two extractions",
+      "d": "9 edges over 8 subjects",
+      "m": "9 edges"
+    },
+    {
+      "e": "x5",
+      "h": "Your code walks the two-hop path and shows it as the answer's provenance",
+      "d": "HLV-5520 --fits--> DR-520 [parts-list#3]\nDR-520 --warranty_class--> \"7-year limited\n(drum and motor), parts only\" [warranty-policy#2]",
+      "m": "2 edges walked · 2 citations"
+    }
+  ]
+}

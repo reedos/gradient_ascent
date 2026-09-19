@@ -1,0 +1,276 @@
+---
+// The site header: brand, four menus that mirror the site's structure, search, the one action
+// the site most wants a newcomer to take, and (under it) a rail of the current section's pages.
+// Everything it lists comes from src/lib/nav.ts, which the footer's sitemap reads too.
+//
+// Works without JavaScript: the menus open on hover and on keyboard focus, and the phone's Menu
+// button is a plain link to the footer sitemap. The script below only adds click-to-pin, Escape,
+// click-outside, and the phone sheet.
+import Logo from './Logo.astro';
+import { url } from '../lib/url';
+import { levels, tracks } from '../lib/content';
+import { buildNav, navContext, railItems, isCurrent, type NavLevel, type NavTrack } from '../lib/nav';
+import { REPO_URL } from '../lib/site';
+import '../styles/header.css';
+
+const base = import.meta.env.BASE_URL;
+let path = Astro.url.pathname;
+if (path.startsWith(base)) path = '/' + path.slice(base.length);
+if (!path.startsWith('/')) path = `/${path}`;
+
+const navLevels: NavLevel[] = levels.map((l) => ({ order: l.order, title: l.title, short: l.short, slugs: l.pages.map((p) => p.slug) }));
+const navTracks: NavTrack[] = tracks.map((t) => ({ id: t.id, title: t.title, slugs: (t.pages ?? []).map((p) => p.slug) }));
+const groups = buildNav(navLevels, navTracks);
+const ctx = navContext(path, navLevels, navTracks);
+const rail = railItems(groups, ctx);
+const railGroup = groups.find((g) => g.id === ctx.group);
+// On a page that sits at a level, the header's one accent (the active underline, the rail's
+// marker) takes that level's hue, so the section you are in is visible before you read a word.
+const sectionStyle = ctx.level !== undefined ? `--sec:var(--o${ctx.level})` : undefined;
+const onSearch = path.startsWith('/search/');
+const feedbackHref = `${REPO_URL}/issues/new?template=feedback.yml`;
+---
+<header class="site-header" style={sectionStyle}>
+  <div class="header-inner">
+    <a class="brand" href={url('/')} aria-label="Gradient Ascent, home">
+      <Logo id="header" />
+      <span>gradient<span class="brand-light">ascent</span><span class="brand-dot">.</span></span>
+    </a>
+
+    <nav class="primary-nav" aria-label="Main navigation">
+      <ul>
+        {
+          groups.map((g) => (
+            <li class:list={['nav-group', `nav-group-${g.id}`]} data-nav-group>
+              <button
+                type="button"
+                class="nav-trigger"
+                id={`nav-trigger-${g.id}`}
+                aria-expanded="false"
+                aria-controls={`nav-panel-${g.id}`}
+                data-current={ctx.group === g.id ? 'true' : undefined}
+              >
+                {g.label}
+                <svg width="9" height="6" viewBox="0 0 9 6" fill="none" aria-hidden="true"><path d="M1 1l3.5 3.5L8 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              </button>
+              <div class:list={['nav-panel', `nav-panel-${g.id}`]} id={`nav-panel-${g.id}`} role="group" aria-labelledby={`nav-trigger-${g.id}`}>
+                <p class="nav-blurb">{g.blurb}</p>
+                {g.id === 'levels' ? (
+                  <>
+                    <div class="nav-levels">
+                      {g.sections[0].items.map((it) => (
+                        <a class="nav-level" href={url(it.path)} style={`--c:var(--o${it.level})`} aria-current={isCurrent(it, path, ctx) ? 'true' : undefined}>
+                          <span class="nav-level-n">{it.level}</span>
+                          <span class="nav-level-t">{it.label}</span>
+                          {it.hint && <span class="nav-level-s">{it.hint}</span>}
+                        </a>
+                      ))}
+                    </div>
+                    <div class="nav-panel-foot">
+                      <a href={url('/techniques/')}>All techniques <span aria-hidden="true">&rarr;</span></a>
+                      <a href={url('/map/')}>The map <span aria-hidden="true">&rarr;</span></a>
+                      <a href={url('/worksheet/')}>Not sure which level? <span aria-hidden="true">&rarr;</span></a>
+                    </div>
+                  </>
+                ) : (
+                  <div class:list={['nav-cols', g.sections.length > 1 && 'is-two']}>
+                    {g.sections.map((s) => (
+                      <div class="nav-col">
+                        {s.heading && <p class="nav-heading">{s.heading}</p>}
+                        <ul>
+                          {s.items.map((it) => (
+                            <li>
+                              <a class="nav-link" href={url(it.path)} aria-current={isCurrent(it, path, ctx) ? 'page' : undefined}>
+                                <span class="nav-link-t">{it.label}</span>
+                                {it.hint && <span class="nav-link-s">{it.hint}</span>}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {g.id === 'reference' && (
+                  <div class="nav-panel-foot">
+                    <a href={feedbackHref} rel="noopener">Give feedback <span aria-hidden="true">&rarr;</span></a>
+                    <a href={REPO_URL} rel="noopener">Source on GitHub <span aria-hidden="true">&rarr;</span></a>
+                  </div>
+                )}
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a class="nav-search" href={url('/search/')} id="nav-search-link" aria-current={onSearch ? 'page' : undefined}>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="4.4" stroke="currentColor" stroke-width="1.4" /><path d="M9.4 9.4L13 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" /></svg>
+        <span>Search</span>
+        <kbd aria-hidden="true">/</kbd>
+      </a>
+      <a class="nav-cta" href={url('/worksheet/')}>Find your level</a>
+      <a class="nav-burger" href="#sitemap" id="nav-burger" role="button" aria-expanded="false" aria-controls="nav-sheet">
+        <span class="nav-burger-bars" aria-hidden="true"><i></i><i></i></span>
+        <span class="nav-burger-label">Menu</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="nav-sheet" id="nav-sheet" hidden>
+    <div class="nav-sheet-inner">
+      <a class="nav-sheet-cta" href={url('/worksheet/')}>
+        <b>Find your level</b>
+        <span>Seven questions, one recommendation <span aria-hidden="true">&rarr;</span></span>
+      </a>
+      {
+        groups.map((g) => (
+          <section class="nav-sheet-group">
+            <h2>{g.label}</h2>
+            {g.id === 'levels' ? (
+              <div class="nav-sheet-levels">
+                {g.sections[0].items.map((it) => (
+                  <a href={url(it.path)} style={`--c:var(--o${it.level})`} aria-current={isCurrent(it, path, ctx) ? 'true' : undefined}>
+                    <span class="nav-level-n">{it.level}</span>
+                    <span>{it.label}</span>
+                  </a>
+                ))}
+              </div>
+            ) : (
+              g.sections.map((s) => (
+                <>
+                  {s.heading && g.sections.length > 1 && <p class="nav-heading">{s.heading}</p>}
+                  <ul>
+                    {s.items.map((it) => (
+                      <li>
+                        <a href={url(it.path)} aria-current={isCurrent(it, path, ctx) ? 'page' : undefined}>
+                          <span>{it.label}</span>
+                          {it.hint && <small>{it.hint}</small>}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ))
+            )}
+          </section>
+        ))
+      }
+      <section class="nav-sheet-group">
+        <h2>This site</h2>
+        <ul>
+          <li><a href={feedbackHref} rel="noopener"><span>Give feedback</span><small>Tell us what is wrong, unclear or missing</small></a></li>
+          <li><a href={REPO_URL} rel="noopener"><span>Source on GitHub</span><small>MIT licensed</small></a></li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</header>
+
+{
+  rail.length > 0 && railGroup && (
+    <nav class:list={['section-rail', ctx.group === 'levels' && 'is-levels']} aria-label={`${railGroup.label}: pages in this section`} style={sectionStyle}>
+      <div class="section-rail-inner">
+        <span class="section-rail-label">{railGroup.label}</span>
+        <div class="section-rail-items" data-rail>
+          {rail.map((it) => (
+            <a
+              href={url(it.path)}
+              style={it.level !== undefined ? `--c:var(--o${it.level})` : undefined}
+              aria-current={isCurrent(it, path, ctx) ? 'true' : undefined}
+            >
+              {it.level !== undefined && <span class="section-rail-n">{it.level}</span>}
+              <span class="section-rail-t">{it.label}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </nav>
+  )
+}
+
+<script>
+  // Menus: click pins a panel open (hover and keyboard focus already open it in CSS), Escape and
+  // a click outside close it. The phone sheet: the Menu link stops being a link to the footer
+  // sitemap and opens a full-height sheet under the bar.
+  const groups = Array.from(document.querySelectorAll<HTMLElement>('[data-nav-group]'));
+  const closeAll = (except?: HTMLElement) => {
+    for (const g of groups) {
+      if (g === except) continue;
+      g.classList.remove('is-open');
+      g.querySelector('.nav-trigger')?.setAttribute('aria-expanded', 'false');
+    }
+  };
+  for (const g of groups) {
+    const trigger = g.querySelector<HTMLButtonElement>('.nav-trigger');
+    if (!trigger) continue;
+    trigger.addEventListener('click', () => {
+      const open = !g.classList.contains('is-open');
+      closeAll(g);
+      g.classList.toggle('is-open', open);
+      trigger.setAttribute('aria-expanded', String(open));
+      if (!open) trigger.blur();
+    });
+  }
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Node)) return;
+    if (!groups.some((g) => g.contains(event.target as Node))) closeAll();
+  });
+
+  const burger = document.getElementById('nav-burger');
+  const sheet = document.getElementById('nav-sheet');
+  const setSheet = (open: boolean) => {
+    if (!burger || !sheet) return;
+    sheet.hidden = !open;
+    burger.setAttribute('aria-expanded', String(open));
+    document.documentElement.classList.toggle('nav-sheet-open', open);
+    const label = burger.querySelector('.nav-burger-label');
+    if (label) label.textContent = open ? 'Close' : 'Menu';
+  };
+  burger?.addEventListener('click', (event) => {
+    event.preventDefault();
+    setSheet(sheet ? sheet.hasAttribute('hidden') : true);
+  });
+  burger?.addEventListener('keydown', (event) => {
+    if (event.key === ' ') {
+      event.preventDefault();
+      setSheet(sheet ? sheet.hasAttribute('hidden') : true);
+    }
+  });
+  window.matchMedia('(min-width: 1000px)').addEventListener('change', (e) => {
+    if (e.matches) setSheet(false);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      const open = groups.find((g) => g.classList.contains('is-open') || g.contains(document.activeElement));
+      closeAll();
+      if (open) (document.activeElement as HTMLElement | null)?.blur();
+      if (sheet && !sheet.hasAttribute('hidden')) {
+        setSheet(false);
+        burger?.focus();
+      }
+      return;
+    }
+    // Site-wide "/" shortcut: focus the search box if this page has one, otherwise go to the
+    // search page. Never fires while typing in a field.
+    if (event.key !== '/' || event.metaKey || event.ctrlKey || event.altKey || event.isComposing) return;
+    const active = document.activeElement as HTMLElement | null;
+    const tag = active && active.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || (active && active.isContentEditable)) return;
+    const input = document.getElementById('search-input');
+    event.preventDefault();
+    if (input) {
+      input.focus();
+      return;
+    }
+    const link = document.getElementById('nav-search-link');
+    if (link instanceof HTMLAnchorElement) window.location.href = link.href;
+  });
+
+  // Keep the current page visible in a rail that scrolls sideways on a phone.
+  const rail = document.querySelector<HTMLElement>('[data-rail]');
+  const current = rail?.querySelector<HTMLElement>('[aria-current="true"]');
+  if (rail && current) rail.scrollLeft = Math.max(0, current.offsetLeft - rail.clientWidth / 2 + current.offsetWidth / 2);
+</script>

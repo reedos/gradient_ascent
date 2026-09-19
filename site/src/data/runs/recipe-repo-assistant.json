@@ -1,0 +1,93 @@
+{
+  "illustrative": true,
+  "h": 660,
+  "title": "Coding assistant on your own repo",
+  "sub": "Propose, test and load a skill in a loop; a code-side check gates the branch it opens.",
+  "pill": "Level 5 · Agents",
+  "nodes": [
+    { "id": "issue", "x": 170, "y": 34, "l": "Issue", "k": "io" },
+    { "id": "agent", "x": 170, "y": 180, "l": "Agent plans and acts", "k": "model" },
+    { "id": "skill", "x": 82, "y": 326, "l": "load_skill(name)", "k": "tool" },
+    { "id": "edit", "x": 258, "y": 326, "l": "propose_edit + run tests", "k": "tool" },
+    { "id": "gate", "x": 170, "y": 472, "l": "Check the diff and commands are in scope", "k": "code" },
+    { "id": "out", "x": 170, "y": 618, "l": "Branch opened for review", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "issue", "t": "agent", "by": "code" },
+    { "id": "e2", "f": "agent", "t": "skill", "by": "model", "b": -22 },
+    { "id": "e3", "f": "skill", "t": "agent", "by": "code", "b": -22 },
+    { "id": "e4", "f": "agent", "t": "edit", "by": "model", "b": 22 },
+    { "id": "e5", "f": "edit", "t": "agent", "by": "code", "b": 22 },
+    { "id": "e6", "f": "agent", "t": "gate", "by": "model" },
+    { "id": "e7", "f": "gate", "t": "agent", "by": "code", "b": -46 },
+    { "id": "e8", "f": "gate", "t": "out", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The issue arrives",
+      "d": "\"parse_duration() raises on '1h30m'; add a test\nand fix it.\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The agent loads a skill",
+      "d": "→ load_skill(\"test-file-convention\")",
+      "m": "240 in · 14 out · 0.5 s"
+    },
+    {
+      "e": "e3",
+      "h": "Your code returns the skill body",
+      "d": "\"New tests for src/x go in tests/test_x.py,\none function per case, named test_<behavior>.\"",
+      "m": "310 tokens · 6 ms"
+    },
+    {
+      "e": "e4",
+      "h": "The agent proposes an edit and runs the tests",
+      "d": "→ propose_edit(parse_duration: handle combined h+m)",
+      "m": "890 in · 140 out · 1.3 s"
+    },
+    {
+      "e": "e5",
+      "h": "Your code returns the test result",
+      "d": "3 of 4 cases pass. '1h30m' still raises: the new\nbranch was never reached.",
+      "m": "4 cases · 18 ms"
+    },
+    {
+      "e": "e4",
+      "h": "The agent tries again",
+      "d": "→ propose_edit(fix the branch order in parse_duration)",
+      "m": "1,180 in · 155 out · 1.4 s"
+    },
+    {
+      "e": "e5",
+      "h": "Your code returns the test result",
+      "d": "4 of 4 cases pass, including the new one.",
+      "m": "4 cases · 17 ms"
+    },
+    {
+      "e": "e6",
+      "h": "The agent asks to open a branch",
+      "d": "diff: src/x.py, tests/test_x.py,\n  .github/workflows/ci.yml (bumped the Python version)",
+      "m": "1,540 in · 96 out · 1.2 s"
+    },
+    {
+      "e": "e7",
+      "h": "The check refuses part of the request",
+      "d": "\".github/workflows/ci.yml is outside this issue's scope.\nDrop it and ask again with only the fix and its test.\"",
+      "m": "0 tokens · 4 ms"
+    },
+    {
+      "e": "e6",
+      "h": "The agent asks again, in scope",
+      "d": "diff: src/x.py, tests/test_x.py only",
+      "m": "1,610 in · 41 out · 0.9 s"
+    },
+    {
+      "e": "e8",
+      "h": "The check approves it",
+      "d": "Both paths match the issue. Branch fix/parse-duration-1h30m\nopened for review.",
+      "m": "0 tokens · 5 ms"
+    }
+  ]
+}

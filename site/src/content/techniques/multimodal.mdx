@@ -1,0 +1,229 @@
+---
+slug: multimodal
+level: 1
+run: multimodal
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Vision"
+    url: "https://platform.claude.com/docs/en/build-with-claude/vision"
+    publisher: "Anthropic"
+    accessed: "2026-09-18"
+  - title: "Audio understanding"
+    url: "https://ai.google.dev/gemini-api/docs/audio"
+    publisher: "Google"
+    accessed: "2026-09-18"
+  - title: "Image generation"
+    url: "https://developers.openai.com/api/docs/guides/image-generation"
+    publisher: "OpenAI"
+    accessed: "2026-09-18"
+  - title: "Veo"
+    url: "https://deepmind.google/models/veo/"
+    publisher: "Google DeepMind"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import multimodalRun from '../../data/runs/multimodal.json';
+
+Multimodal means the model takes more than text — images, audio, video and documents in, and for
+some models, images, audio and video out. What changes is not the one-call shape; this is still
+level 1, still one request and one response. What changes is what goes inside the request and the
+reply, and what it costs to check whether the reply is right.
+
+An image is not free the way a sentence is: Claude turns one into visual tokens by dividing it
+into 28×28-pixel patches, so a single 1000×1000 photo costs over a thousand tokens before any
+text is read<Cite n={1}/>. Gemini bills audio by the second — about 1,920 tokens per minute — and
+can describe tone or a sound with no words in it at all<Cite n={2}/>. Generated output changes the
+picture again: there is no source to check it against. What the makers do instead is filter and
+mark it. OpenAI says every prompt and every generated image is filtered against its content
+policy<Cite n={3}/>, and Google DeepMind marks every video Veo produces with SynthID, an
+invisible watermark that can later identify it as generated<Cite n={4}/>.
+
+This page is marked draft, not published: this technique has no recorded trace and no scored
+result file yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={multimodalRun} label="Level 1 · Multimodal" runKey="multimodal" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+You have used multimodal chat any time you uploaded a photo, a screenshot or a PDF into a chat
+app and asked about it, or spoke instead of typing and got a transcribed, answered reply back.
+Claude, ChatGPT and Gemini all take images and documents directly in the same conversation as
+text, and most also offer voice input that gets turned into text before the model ever sees it.
+
+What is worth noticing, compared to a plain text question, is cost and how much you can actually
+check. An image or a long audio clip is not free the way typing a sentence is: Claude turns each
+image into visual tokens by dividing it into small patches, so one large photo can cost as many
+tokens as several paragraphs of text before the model has said anything back<Cite n={1}/>; Gemini
+bills audio by the second<Cite n={2}/>. Attaching ten photos to one question is a real cost
+difference from attaching one, in a way that is easy to forget, since nothing in most chat
+interfaces shows a running token count.
+
+Checking the reply is also different by direction. Text answered from an uploaded document can
+still be checked against that document, the same way a citation in RAG can be checked against a
+source passage. A generated image or video has no source passage to check it against — the whole
+point was to make something that did not exist before. That is why Google DeepMind marks every
+video Veo produces with an invisible watermark rather than relying on a person recognizing it by
+eye<Cite n={4}/>; a reader cannot perform that check unassisted and has to trust the mark, or the
+product, instead.
+
+For anything generated and then used somewhere that matters — a document, a report, a decision —
+treat it the way you would treat a first draft from someone whose work you have not checked
+before: useful, but not yet verified.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+A multimodal request is not a different kind of call. It is the same one call with a different
+kind of message: the content is a list of parts rather than a single string. Anthropic's guide
+puts an `image` block beside a `text` block in one user turn, and says a model does best when the
+image comes before the text asking about it<Cite n={1}/>. The example below builds exactly that,
+a photograph of an appliance's rating plate followed by the question about it:
+
+<CodeFile file="examples/multimodal/run.py" func="build_request" />
+
+The picture is a reference here, not bytes. Both documented backends take an image as base64 —
+Anthropic's `image` block accepts a base64 source, a URL or an uploaded `file_id`<Cite n={1}/>,
+Ollama's chat API takes an `images` array of base64 strings — so a real caller reads the file and
+passes base64. Nothing in this repository ships a photograph, and an example that runs against a
+stub has nothing to look at anyway, so the part carries a label and the trace prints that.
+
+Audio does not go in as audio, on either of those two backends. Neither documents an audio input
+block, so both raise rather than guess a wire format, and the working shape is the one the
+example takes: transcribe first, send the transcript as text beside the picture. Gemini is the
+counter-example — it takes audio directly, and can describe tone or a sound with no words in it
+at all<Cite n={2}/> — which is the thing a transcription step throws away.
+
+The rest of the run is an ordinary one call, and the check at the end is the part worth copying:
+
+<CodeFile file="examples/multimodal/run.py" func="run" />
+
+Ask for a named format, then test the reply against it, and an unreadable plate comes back as
+unreadable instead of as a plausible serial number. Every step is `decided_by: "code"`.
+
+Two things beyond the code shape. **Cost is per input, not per call**: an image's cost follows
+its resolution — Claude divides it into 28×28-pixel patches and counts one visual token per
+patch, downscaling past a limit<Cite n={1}/> — and audio's follows its duration, about 1,920
+tokens a minute on Gemini<Cite n={2}/>. The same code path can cost ten times as much depending
+on what was attached to it. And **preprocessing is often cheaper than a bigger model**: downsizing
+an image, trimming an audio clip to the part that matters, or pulling text out of a document with
+plain OCR before any model is called, is <Link href="/techniques/order-zero/">level 0, no model at all</Link>
+applied to one step of a multimodal pipeline rather than to the whole task.
+
+Generated output is the one direction with nothing to check against. A model reading a document
+can be tested against the document; a model that makes an image, a clip or a video made something
+that did not exist, and the only marks on it are the ones the generator left, like
+SynthID<Cite n={4}/>. Decide what "correct" means for it before generating, not after.
+
+Run it yourself:
+
+<CodeFile file="examples/multimodal/README.md" start={19} end={19} lang="text" expect="python -m examples.multimodal" />
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Skip attaching an image, a document or audio at all if plain text already says everything the
+model needs — a photo of a label is worth sending only when the text you would otherwise type is
+longer or less precise than the picture. And if the only reason to attach a document is to search
+it once, typing the relevant passage directly, or using
+<Link href="/techniques/context-engineering/">context engineering</Link>, is cheaper than sending
+the whole file as an attachment.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'Confident description of something not really there',
+    notice: "The model describes a detail in an image with full confidence that is not actually present, or miscounts objects in a photo. Makers document this directly as a known limitation, not an edge case.",
+    test: "Ask about a specific, countable detail in an image you already know the answer to, and check the reply against what is actually there.",
+  },
+  {
+    name: 'Compression destroys the thing being asked about',
+    notice: "An image gets compressed or downscaled before the model sees it, automatically past a size limit or by the app itself, and small text or a fine detail in the original becomes illegible in what the model actually received.",
+    test: "Check what resolution actually reached the model, not what was uploaded; a maker's own resizing rule states what survives and what does not.",
+  },
+  {
+    name: 'No source to check a generated output against',
+    notice: 'A generated image, audio clip or video looks finished and confident, but unlike a model reading a document, there was never a source passage it could be right or wrong against.',
+    test: "Write down what \"correct\" means for this specific output before generating it, not after.",
+  },
+  {
+    name: 'Non-text content silently dropped or misrouted',
+    notice: 'A pipeline built for text quietly ignores an attached image or audio file, or a document with both text and images loses everything but the text, with no visible error.',
+    test: 'Check the actual request payload sent to the API, not just the code that built it, to confirm the attachment made it into the request.',
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: '1000×1000px image (Claude)', value: '~1,300 tokens' },
+    { label: '1 minute of audio (Gemini)', value: '~1,920 tokens' },
+    { label: 'A plain text question', value: '~40 tokens' },
+  ]}
+  comparedTo={{
+    label: 'chat (level 1)',
+    note: 'A single attached image, or a minute of audio, can cost more tokens than the entire text conversation around it. Cost here comes from what is attached, not from how the question is phrased.',
+  }}
+  level={1}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+Multimodal does not fit the site's shared 60-question document-qa task, since every document in
+`evals/corpus/` is plain text — there is no image, audio or video in it to test against.
+`scripts/eval_run.py` will not score this example for that reason, and says so rather than
+returning a number measured on the wrong inputs (`docs/EVALS.md`).
+
+The eval this technique needs is its own set: real photographs and clips with the right answer
+written down beside each one. Two numbers from it. Field accuracy, per field, against those
+labels — a serial number read off a plate is either right or wrong, character for character, so
+this half needs no grader model. And the refusal rate on inputs that genuinely cannot be read: a
+blurred plate should come back unreadable, and an invented serial that happens to look plausible
+is the failure this measurement exists to catch. Report cost beside both, since the token cost
+here follows the size of the attachment rather than the difficulty of the question.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="Token cost per attachment type (image, audio, document), tracked separately from text tokens, since attachments are usually the larger and more variable share of the bill."
+  costAtVolume="Dominated by what gets attached, not by how many questions are asked. A feature that lets people attach photos should be budgeted by expected image size and count, not by request count alone."
+  failsInProduction={"A user attaches a much larger or longer file than anything tested with, and the request is either rejected outright past a size limit or silently downscaled to something the model can no longer read clearly."}
+  whatToLog="The type and size of every attachment (not its content, if sensitive), the resulting token count, and the reply, so a cost spike or a bad answer can be traced to a specific kind of input."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Upload a photo with small text in it (a label, a receipt) to a chat app and ask it to read the text back exactly. Does it get every character right, or does it paraphrase and guess at anything blurry?' },
+  { lane: 'build', body: 'Run python -m examples.multimodal --model stub, then pass an AudioPart instead of an ImagePart to a real backend and read the error it raises. What does it tell you to do instead, and why can it not do it for you?' },
+  { lane: 'either', body: 'Ask a chat app to generate an image, then write down exactly what you would check before using that image somewhere that matters. Is there anything to check it against, or only judgment?' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

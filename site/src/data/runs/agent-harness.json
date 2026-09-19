@@ -1,0 +1,70 @@
+{
+  "illustrative": true,
+  "h": 1180,
+  "title": "The agent harness",
+  "sub": "The model picks each action; the harness around it decides what the model can see, what may run, and when to stop.",
+  "pill": "Level 5 · Agents",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 30, "l": "Question", "k": "io" },
+    { "id": "act1", "x": 170, "y": 190, "l": "model picks an action", "k": "model" },
+    { "id": "tool1", "x": 170, "y": 350, "l": "search(\"DW-300 warranty\")", "k": "tool" },
+    { "id": "trim", "x": 170, "y": 510, "l": "context policy trims old tool results", "k": "code" },
+    { "id": "act2", "x": 170, "y": 670, "l": "model tries a second action", "k": "model" },
+    { "id": "veto", "x": 170, "y": 830, "l": "hook vetoes the call", "k": "code" },
+    { "id": "stop", "x": 170, "y": 990, "l": "model sees the denial and stops", "k": "model" },
+    { "id": "a", "x": 170, "y": 1150, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "act1", "by": "code" },
+    { "id": "e2", "f": "act1", "t": "tool1", "by": "model" },
+    { "id": "e3", "f": "tool1", "t": "trim", "by": "code" },
+    { "id": "e4", "f": "trim", "t": "act2", "by": "code" },
+    { "id": "e5", "f": "act2", "t": "veto", "by": "model" },
+    { "id": "e6", "f": "veto", "t": "stop", "by": "code" },
+    { "id": "e7", "f": "stop", "t": "a", "by": "model" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"What does the DW-300's drain pump cost, and\nhow long is it under warranty?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The model calls a tool from what the registry offers",
+      "d": "→ search(\"DW-300 warranty term\")",
+      "m": "260 in · 18 out · 0.6 s"
+    },
+    {
+      "e": "e3",
+      "h": "Your code runs the search and returns three sections",
+      "d": "dw300-manual#9, warranty-policy#2, care-and-cleaning-guide#2\n(\"2-year full warranty\" is in warranty-policy#2)",
+      "m": "260 tokens of tool result · 21 ms"
+    },
+    {
+      "e": "e4",
+      "h": "The context policy decides what of that the model still sees",
+      "d": "keep_everything: the full result stays in context\ntrim_to_budget(15): the same result is replaced with a placeholder",
+      "m": "0 or 260 tokens kept, depending on the policy in force"
+    },
+    {
+      "e": "e5",
+      "h": "The model tries a second action",
+      "d": "→ lookup_part(\"HLV-2201\")",
+      "m": "180 in · 14 out · 0.6 s"
+    },
+    {
+      "e": "e6",
+      "h": "A hook vetoes it before the registry ever runs it",
+      "d": "deny_after(1): \"tool budget of 1 call(s) already spent\"",
+      "m": "0 ms — the tool function never runs"
+    },
+    {
+      "e": "e7",
+      "h": "Told the call was denied, the model answers with what it has",
+      "d": "The search result was trimmed and the part lookup never ran, so:\n\"I could not confirm the price or the warranty term from what's\nin front of me.\"",
+      "m": "310 in · 24 out · 0.7 s"
+    }
+  ]
+}

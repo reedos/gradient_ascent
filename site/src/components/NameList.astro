@@ -1,0 +1,42 @@
+---
+// Renders the "Out there" block: named products, tools and models grouped by kind, the way the
+// prototype's selectLevel() does. Pass groups in display order; empty groups are skipped.
+import type { NamedEntry } from '../lib/content';
+
+interface Group {
+  label: string;
+  entries: NamedEntry[];
+}
+interface Props {
+  groups: Group[];
+  emptyText?: string;
+}
+const { groups, emptyText = 'No names listed for this yet.' } = Astro.props;
+const nonEmpty = groups.filter((g) => g.entries.length > 0);
+---
+{
+  nonEmpty.length ? (
+    nonEmpty.map((g) => (
+      <div class="name-group">
+        <div class="subhead">
+          {g.label}
+          <span>{g.entries.length}</span>
+        </div>
+        <ul class="name-list">
+          {g.entries.map((n) => (
+            <li>
+              <b>{n.name}</b>
+              <span>
+                {n.maker} &middot; {n.category}
+                {n.formerly ? ` · formerly ${n.formerly.replace(/ \(.*/, '')}` : ''}
+              </span>
+              {n.retirement ? <span class="pill gone">{n.retirement}</span> : null}
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))
+  ) : (
+    <p class="footnote">{emptyText}</p>
+  )
+}

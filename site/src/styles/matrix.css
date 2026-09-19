@@ -1,0 +1,177 @@
+/* The recipe x technique matrix on /recipes/ (components/RecipeMatrix.astro). Two renderings of
+   the same data, swapped by one media query the way ClimbCurve and Timeline do it: a grid above
+   700px, and below that a list of recipes with their techniques as level-coloured pills. The grid
+   is genuinely unpleasant on a phone -- thirty-odd columns, each a rotated label -- so the narrow
+   view is a different shape rather than the same table squeezed. No client JavaScript. */
+
+.mx-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  /* The scroll container is the one place on the site a horizontal scrollbar is allowed, per the
+     look rules: wide tables scroll inside their own box, never the page. */
+  scrollbar-width: thin;
+}
+
+.mx-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* The first column stays put while the grid scrolls under it, so a filled cell forty columns
+   along still has a recipe name beside it. */
+.mx-table th.mx-side,
+.mx-table th.mx-corner {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--panel);
+  text-align: left;
+  min-width: 168px;
+  max-width: 168px;
+  border-right: 1px solid var(--line);
+}
+.mx-table th.mx-corner {
+  z-index: 3;
+  vertical-align: bottom;
+  font: 600 10px var(--font);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 12px 10px;
+}
+.mx-table th.mx-side {
+  font-weight: 450;
+  font-size: 12px;
+  color: var(--text);
+  padding: 0 12px;
+  height: 34px;
+  border-bottom: 1px solid var(--line);
+}
+.mx-table th.mx-side a { color: var(--text) }
+.mx-table th.mx-side a:hover { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px }
+.mx-table tr:last-child th.mx-side,
+.mx-table tr:last-child td { border-bottom: 0 }
+
+.mx-group {
+  font: 600 9.5px var(--font);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--c, var(--muted));
+  padding: 12px 0 6px;
+  border-bottom: 1px solid color-mix(in srgb, var(--c, var(--line)) 45%, transparent);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Column headings read bottom-to-top: thirty of them side by side is the one place on this site
+   where a rotated label earns its keep, and vertical text keeps each column 26px wide instead of
+   the 120px a horizontal name would need. */
+.mx-head {
+  height: 132px;
+  width: 26px;
+  min-width: 26px;
+  padding: 6px 0 8px;
+  vertical-align: bottom;
+  border-bottom: 1px solid var(--line);
+}
+.mx-head span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-weight: 450;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--muted);
+  white-space: nowrap;
+  max-height: 118px;
+  overflow: hidden;
+}
+.mx-head a { color: var(--muted) }
+.mx-head a:hover { color: var(--text) }
+
+.mx-table td {
+  width: 26px;
+  min-width: 26px;
+  height: 34px;
+  text-align: center;
+  border-bottom: 1px solid var(--line);
+  border-left: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+}
+.mx-table td.is-on i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 100%;
+  background: var(--c);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--c) 45%, transparent);
+}
+.mx-count {
+  font-size: 10px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  padding-top: 8px;
+  text-align: center;
+  border-left: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+}
+.mx-count-side {
+  position: sticky;
+  left: 0;
+  background: var(--panel);
+  z-index: 2;
+  text-align: left;
+  padding: 8px 12px 0;
+  font: 600 9.5px var(--font);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-right: 1px solid var(--line);
+}
+
+/* Read by a screen reader, off screen for everyone else: a filled cell is a dot, which is nothing
+   at all without this. */
+.mx-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The phone rendering: one row per recipe, its techniques as level-coloured pills. */
+.mx-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px }
+.mx-list li {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel);
+  padding: 14px 15px;
+}
+.mx-list h3 { font: 550 13.5px var(--font); letter-spacing: 0; margin-bottom: 4px }
+.mx-list h3 a { color: var(--text) }
+.mx-list .mx-list-meta { font-size: 10px; color: var(--muted); margin-bottom: 10px }
+.mx-list .mx-pills { display: flex; flex-wrap: wrap; gap: 6px }
+.mx-list .mx-pill {
+  font-size: 10px;
+  line-height: 1.5;
+  padding: 4px 9px;
+  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--c) 45%, var(--line));
+  color: var(--text);
+  background: color-mix(in srgb, var(--c) 12%, transparent);
+  white-space: normal;
+}
+
+.mx-wide { display: block }
+.mx-narrow { display: none }
+
+@media (max-width: 699.98px) {
+  .mx-wide { display: none }
+  .mx-narrow { display: block }
+}

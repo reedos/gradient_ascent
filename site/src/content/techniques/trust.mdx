@@ -1,0 +1,180 @@
+---
+slug: trust
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Claude prompting best practices"
+    url: "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"
+    publisher: "Anthropic (Claude Platform Docs)"
+    accessed: "2026-09-18"
+  - title: "Automation-Induced Complacency Potential: Development and Validation of a New Scale"
+    url: "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2019.00225/full"
+    publisher: "Frontiers in Psychology (Merritt et al.)"
+    date: "2019-02-19"
+    accessed: "2026-09-18"
+  - title: "Measuring and mitigating overreliance to build human-compatible AI"
+    url: "https://arxiv.org/abs/2509.08010"
+    publisher: "arXiv (Ibrahim et al.)"
+    date: "2025-09-08"
+    accessed: "2026-09-18"
+---
+
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+
+Calibrating trust means keeping how much you rely on a model without checking in line with how
+often it has actually been right on tasks like the one in front of you. It is a record, not an
+impression, and it is built one checked result at a time — which is why
+<Link href="/techniques/reviewing/">reviewing</Link> comes first: the reviews are the entries.
+It is the last of the four skills on the <Link href="/techniques/operator-craft/">operator
+craft</Link> topic, and what the record is *for* is the next round of
+<Link href="/techniques/delegating/">delegating</Link>.
+
+Both directions cost something. Over-trust looks exactly like things going well, right up until
+the wrong answer that mattered goes through unread. Under-trust looks like diligence: re-doing
+work a model has done reliably a hundred times, or avoiding a task it would genuinely help with
+because a different task went badly once. Neither shows up as an error anywhere.
+
+The unit of trust is a task type, not a model. Reliably right at summarizing a document you can
+check says nothing about arithmetic, or about a question outside anything it was trained on. A
+single global "I trust this one" hides which specific things it has earned.
+
+This page is marked draft, not published: no result file exists for anything below, so nothing
+here reports a measured number.
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+A record for one person is five columns and takes about twenty seconds a row. Keep it wherever
+you already keep notes:
+
+| Date | Task type | What you checked | Right? | What you changed |
+|---|---|---|---|---|
+| 12 Mar | renewal dates from a contract | all 4 dates against the clauses | yes | nothing |
+| 12 Mar | plain-language summary of a policy | the 2 exclusions it listed | no | added the third exclusion |
+
+The columns that do the work are the second and the fifth. **Task type** is what makes the record
+usable later — "renewal dates from a contract" and "tone of a client reply" are separate lines
+even if the same product did both. **What you changed** is the only column that says how wrong it
+was: nothing, a word, or the whole answer. A month of that tells you, per task type, how often
+you are actually editing rather than accepting, and that number is your sampling rate for the
+next month.
+
+Two rules keep the record honest. Log the checks you *did*, including the ones that came back
+fine; a record of corrections alone reads as a catastrophe. And re-check the record whenever what
+you are trusting changes — a new model version, an edited prompt, a new tool. Anthropic states
+this for its own published techniques: where one names a specific model, "treat it as measured on
+that model and re-check it against your own evals before applying it to another."<Cite n={1}/> A
+record built on last quarter's version does not transfer just because the product name did.
+
+It is worth being careful about what the research here establishes. A 2019 scale for automation
+complacency was built from a survey of 475 online-panel participants whose automation experience
+was mostly low-stakes. Its authors summarize prior work as expecting trust and complacency to go
+together, then report that their own monitoring subscale overlapped far less with a general
+propensity to trust machines than their other subscale did<Cite n={2}/>. Being a trusting person,
+in that data, did not predict whether you kept watching. Those participants were not supervising
+models, so this is not a finding about your work — but it is a reason to keep a count per task
+rather than trusting a disposition you think you have.
+
+A 2025 position paper surveying over-reliance research defines the risk as "relying on LLMs
+beyond their capabilities" and locates it across "diverse domains from healthcare to personal
+advice"<Cite n={3}/>. It argues for measurement rather than reporting a measurement — which is
+the same conclusion as the table above, from a much larger literature.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+A team cannot keep one person's notebook. What replaces it is a fixed set of checkable questions,
+scored the same way every time and kept as a file — the <Link href="/techniques/evals/">evals</Link>
+topic pointed at a running system rather than at a prompt being drafted. "We have been using it a
+while and it seems fine" is the thing the file exists to replace.
+
+Three properties make a team record worth keeping:
+
+- **Broken out by task kind**, the way this site's own eval set splits its questions, so a good
+  score on easy lookups cannot stand in for the record on the cases nobody re-checked.
+- **Versioned by what produced it** — model id, prompt version, tool set. A rise or a fall is
+  only informative if you can name what changed; without that, the record is a mood.
+- **Fed automatically where it can be.** A result that carries a citation, the way
+  <Link href="/techniques/rag/">RAG</Link>'s does, can have the mechanical part checked by
+  machine: the reviewing page's own checker reports whether a figure the answer states appears in
+  the section it cites. That is one row of evidence per answer without a person reading the whole
+  thing — and it is a presence check, so it is a floor under the record, not the record.
+
+Sample by hand on top of that, at a rate you write down. The machine check and the human sample
+answer different questions, and an automated number rising while nobody has read an output in
+six weeks is exactly the state that looks safest and is not.
+
+One design decision belongs here rather than in the record: what the system does when its own
+confidence is low. A system that can say "I did not find this" gives a reviewer a signal worth
+logging; one that always produces an answer makes every result look identical from outside, and
+a record over identical-looking results is much more expensive to keep.
+
+</Lane>
+</Lanes>
+
+## At each level
+
+- <Link href="/levels/0/">No model</Link>: nothing to calibrate — a rule passes its tests or it
+  does not, and it behaves the same way tomorrow.
+- <Link href="/levels/1/">One call</Link>: every reply is independent, so the record is simply a
+  tally per task type with nothing else to attribute a change to.
+- <Link href="/levels/2/">Context</Link>: the record has to separate "found the right source and
+  read it wrong" from "never found it", because those two have different fixes.
+- <Link href="/levels/3/">Workflows</Link>: the steps are fixed, so trust can be tracked per
+  step, and one unreliable stage stops dragging down the ones around it.
+- <Link href="/levels/4/">Tools</Link>: the record now needs to cover the action taken, not only
+  the sentence produced — a wrong call can be reported in perfectly correct prose.
+- <Link href="/levels/5/">Agents</Link>: the unit becomes a whole run of variable length, so the
+  record tracks outcomes and cost per run rather than accuracy per answer.
+- <Link href="/levels/6/">Teams of agents</Link>: agreement between agents is not evidence. The
+  record has to cover the division of labour, since a team can be confidently wrong together.
+- <Link href="/levels/7/">Always-on agents</Link>: the record is the only thing standing in for
+  someone watching, so it has to be written by the system itself and read by a person on a
+  schedule.
+
+## Practices
+
+- Keep the record per task type. "It has been good lately" is not a record.
+- Log the checks that came back fine as well as the ones that did not; otherwise the record only
+  contains disasters and reads like one.
+- Set the sampling rate from the last month's edit rate, and write the number down where someone
+  else can see it.
+- Re-check after any change to the model, the prompt or the tools, and mark the record with what
+  changed.
+- Name the tasks you deliberately do not trust, and what evidence would change that. An untested
+  assumption in the cautious direction is still an untested assumption.
+
+## Run it
+
+<RunIt
+  monitor="Per task type, the edit rate — how often a result is accepted unchanged — next to the
+  sampling rate actually being used. Those two numbers moving apart is the whole subject of this
+  page, in either direction."
+  costAtVolume="Keeping the record costs roughly the same per checked result at any volume, so
+  the sampling rate, not the traffic, sets the bill. What volume changes is the cost of being
+  miscalibrated: the same error rate is a nuisance at ten results a day and a recall at ten
+  thousand."
+  failsInProduction="The record stops being written before it stops being cited. Months later a
+  decision is justified with 'it has been reliable', and the last entry anyone made was before
+  two model upgrades and a prompt rewrite."
+  whatToLog="Every checked result against what was actually correct, tagged with the task type
+  and with the model and prompt version that produced it. Untagged accuracy cannot be compared
+  across a change, which is the only comparison that matters."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Pick a task you now let a model do without checking. Write down when you last verified one of its answers and what you found. If you cannot remember, that gap is the distance between your trust and your record — and the next five results are the cheapest rows you will ever add.' },
+  { lane: 'build', body: 'Take one output type from a system you use or built. Sketch the automatic check for it — what would a machine compare against what — and say what that check would NOT catch. The second half is what the human sample is for.' },
+  { lane: 'either', body: 'Name one task you trust a model on and one you deliberately do not. For each, write the evidence the position rests on. If either answer is a feeling rather than a count, that is the one to start a record for.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

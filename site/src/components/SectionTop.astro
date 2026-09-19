@@ -1,0 +1,17 @@
+---
+import Eyebrow from './Eyebrow.astro';
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  aside?: string;
+}
+const { eyebrow, title, aside } = Astro.props;
+---
+<div class="section-top">
+  <div>
+    <Eyebrow label={eyebrow} muted dot={false} />
+    <h2>{title}</h2>
+  </div>
+  {aside && <p>{aside}</p>}
+</div>

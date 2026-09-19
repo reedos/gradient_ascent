@@ -1,0 +1,62 @@
+{
+  "illustrative": true,
+  "h": 720,
+  "title": "Structured output: extract, validate, retry once",
+  "sub": "Ask for JSON matching a fixed schema, validate the reply, and retry once if it fails.",
+  "pill": "Level 1 · One call",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
+    { "id": "find", "x": 170, "y": 130, "l": "Find appliance, load passage", "k": "code" },
+    { "id": "llm1", "x": 170, "y": 226, "l": "Ask for JSON", "k": "model" },
+    { "id": "val1", "x": 170, "y": 322, "l": "Validate: one field is wrong", "k": "code" },
+    { "id": "llm2", "x": 170, "y": 418, "l": "Ask again with the error", "k": "model" },
+    { "id": "val2", "x": 170, "y": 514, "l": "Validate: passes", "k": "code" },
+    { "id": "a", "x": 170, "y": 610, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "find", "by": "code" },
+    { "id": "e2", "f": "find", "t": "llm1", "by": "code" },
+    { "id": "e3", "f": "llm1", "t": "val1", "by": "code" },
+    { "id": "e4", "f": "val1", "t": "llm2", "by": "code" },
+    { "id": "e5", "f": "llm2", "t": "val2", "by": "code" },
+    { "id": "e6", "f": "val2", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"What is the DW-480's warranty?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code finds the appliance and loads the warranty passage",
+      "d": "DW-480 · warranty-policy#1, #2, #3",
+      "m": "~180 tokens in prompt"
+    },
+    {
+      "e": "e3",
+      "h": "The model answers with JSON",
+      "d": "{\"model\": \"DW-480\", \"full_warranty_years\": 2,\n \"limited_years\": 5, \"limited_scope\": \"motor and tub\",\n \"commercial_rental_days\": \"90 days\"}",
+      "m": "180 in · 42 out · 0.5s"
+    },
+    {
+      "e": "e4",
+      "h": "Your code checks the reply against the schema — one field is wrong",
+      "d": "commercial_rental_days must be an integer, got \"90 days\"\n→ code appends the error and asks again",
+      "m": "1 problem found"
+    },
+    {
+      "e": "e5",
+      "h": "The model answers again, now with a valid integer",
+      "d": "{\"model\": \"DW-480\", \"full_warranty_years\": 2,\n \"limited_years\": 5, \"limited_scope\": \"motor and tub\",\n \"commercial_rental_days\": 90}",
+      "m": "222 in · 40 out · 0.4s"
+    },
+    {
+      "e": "e6",
+      "h": "Your code validates and accepts the record",
+      "d": "valid · cited to warranty-policy#1, #2, #3",
+      "m": "0 problems found"
+    }
+  ]
+}

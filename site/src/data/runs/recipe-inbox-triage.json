@@ -1,0 +1,71 @@
+{
+  "illustrative": true,
+  "h": 530,
+  "title": "Sort an inbox, assembled",
+  "sub": "Classify the message, extract a ticket record, and pause before filing anything costly or unclear.",
+  "pill": "Level 3 · Workflows",
+  "nodes": [
+    { "id": "msg", "x": 170, "y": 34, "l": "Message arrives", "k": "io" },
+    { "id": "classify", "x": 170, "y": 110, "l": "Classify the category", "k": "model" },
+    { "id": "dispatch", "x": 170, "y": 186, "l": "Route to the billing handler", "k": "code" },
+    { "id": "extract", "x": 170, "y": 262, "l": "Extract ticket fields", "k": "model" },
+    { "id": "check", "x": 170, "y": 338, "l": "Check the gate", "k": "code" },
+    { "id": "reviewer", "x": 310, "y": 414, "l": "Person decides", "k": "human" },
+    { "id": "resume", "x": 170, "y": 414, "l": "File or send back", "k": "code" },
+    { "id": "a", "x": 170, "y": 490, "l": "Ticket filed", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "msg", "t": "classify", "by": "code" },
+    { "id": "e2", "f": "classify", "t": "dispatch", "by": "code" },
+    { "id": "e3", "f": "dispatch", "t": "extract", "by": "code" },
+    { "id": "e4", "f": "extract", "t": "check", "by": "code" },
+    { "id": "e5pass", "f": "check", "t": "a", "by": "code", "b": 140 },
+    { "id": "e5pause", "f": "check", "t": "resume", "by": "code" },
+    { "id": "e6", "f": "reviewer", "t": "resume", "by": "code" },
+    { "id": "e7", "f": "resume", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The message arrives",
+      "d": "\"Subject: Refund? — the drain pump I bought (HLV-2205)\nfailed after three weeks, can I get the $46.00 back?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code asks the model for one label",
+      "d": "label: billing",
+      "m": "58 tokens in · 1 token out · 190 ms"
+    },
+    {
+      "e": "e3",
+      "h": "Your code reads the label and picks a handler",
+      "d": "label='billing' -> billing handler\n(the support and general handlers were not taken this run)",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e4",
+      "h": "The model extracts a ticket record in a fixed shape",
+      "d": "{\"category\": \"billing\", \"summary\": \"Refund request, part HLV-2205\",\n \"amount\": \"$46.00\", \"priority\": \"normal\"}",
+      "m": "150 tokens in · 34 tokens out · 480 ms"
+    },
+    {
+      "e": "e5pause",
+      "h": "Your code checks the gate and pauses the run",
+      "d": "reason=high_cost (a dollar figure is in the record)\nthe run returns a checkpoint here; no ticket is filed\nuntil a person decides\n(the direct pass-through to Ticket filed, below, was not taken this run)",
+      "m": "0 tokens · paused"
+    },
+    {
+      "e": "e6",
+      "h": "A person reviews the paused ticket and decides",
+      "d": "sees: the full message, the extracted record, reason: high_cost\ndecides: approve",
+      "m": "decision: approve"
+    },
+    {
+      "e": "e7",
+      "h": "Your code resumes and files the ticket",
+      "d": "billing queue <- {\"category\": \"billing\", \"amount\": \"$46.00\", ...}",
+      "m": "0 tokens · 0 ms"
+    }
+  ]
+}

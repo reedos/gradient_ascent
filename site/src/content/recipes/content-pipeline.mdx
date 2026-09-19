@@ -1,0 +1,105 @@
+---
+slug: content-pipeline
+reviewed: 2026-09-18
+sources: []
+---
+
+import Run from '../../components/page/Run.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import Link from '../../components/page/Link.astro';
+import pipelineRun from '../../data/runs/recipe-content-pipeline.json';
+
+Every week a product team turns a handful of bullet points about what shipped into an update
+email a customer would actually want to read. Someone has to make sure the email covers
+everything that shipped, and separately, that it reads like the rest of the company's writing —
+no unverified superlatives, no promises the bullets didn't make.
+
+Drafting with a reviewer splits those two checks apart, because they're different kinds of
+question. Whether every bullet made it into the draft is something plain code can check for
+itself. Whether the draft's tone matches the style guide is not — that needs a second prompt,
+told the rule, checking the first prompt's work.
+
+## The assembled diagram
+
+<Run data={pipelineRun} label="Level 3 · Drafting with a reviewer" runKey="content-pipeline" />
+
+## Why these techniques, and why not higher
+
+Two techniques compose this recipe, in sequence rather than as alternatives. <Link
+href="/techniques/prompt-chaining/">Prompt chaining</Link> runs first: rewrite the bullets into a
+short outline, then check in plain code that every bullet's subject actually appears in it — a
+set-membership test, the same shape prompt chaining's own citation check uses, needing no second
+model call because the thing being checked is objective. <Link
+href="/techniques/evaluator-optimizer/">Write and check</Link> runs second, once there's a full
+draft: a separate prompt checks it against the style rubric, and if it fails, the draft revises
+and the check runs again, up to a fixed cap.
+
+The split matters because the two checks need different tools. Evaluator-optimizer's own page
+makes the case for using plain code wherever a check can be code: it's cheaper, always consistent,
+and doesn't need a second prompt at all. Whether the outline mentions "sync bug" is exactly that
+kind of check. Whether a sentence reads as an unapproved superlative is not — no fixed string test
+tells "amazing" from a plain factual claim in general, so that check needs a criterion specific
+enough for a second prompt to apply consistently, which is what write and check is for.
+
+Both stay level 3 because the code owns the loop in each case: a fixed number of chain steps, and
+a `while` condition and a revision cap written before either prompt runs. Handing either loop to
+the model — let it decide whether another revision is worth the cost, or how many outline passes
+to try — is what would raise this to level 5, and nothing here needs that: the criteria are fixed
+in advance, and a checker told a specific rule answers the same way on the same draft every time.
+The one real risk at this level is the one evaluator-optimizer's own page names directly: a writer
+and a checker built from the same kind of model can share a blind spot, passing a draft that's
+confidently wrong in a way neither prompt would catch. Its own upgrade path is exactly that
+failure — move to <Link href="/techniques/debate-review/">review and debate</Link> once one
+reviewer shares the author's blind spots, when a second opinion built to differ on purpose earns
+its cost.
+
+## Walkthrough
+
+The pipeline composes the runnable code already on the prompt chaining and evaluator-optimizer
+pages, in the order described above, with this job's own outline-and-rubric content in place of
+their own citation-checking example. Neither example writes email in the repository; the diagram
+is their two loops chained and pointed at this job.
+
+The run above starts with three bullets and an outline that covers all of them, so the chain's own
+gate passes without a second model call. Decide in advance what a dropped bullet does: the gate
+can ask for the outline once more, or stop and hand the bullets back, but it must not pass a
+draft that was never going to mention the thing that shipped. The draft that follows reads fine
+on its surface but uses
+"amazing" — a word the style rubric flags as an unverified superlative — and the checker's one-word
+verdict is specific enough that the revision fixes exactly that, nothing else, on the first try.
+`PASS_TOKEN` is the entire contract the checker and the code share: the code never has to judge
+what "good" means, only whether that exact token came back.
+
+## What to measure
+
+<HowToEval>
+
+Evaluator-optimizer and prompt chaining are each scored on their own by the site's shared
+60-question set (see `docs/EVALS.md`); this job needs its own set instead, since it drafts an
+email rather than answering a question about documents. Build one from real or synthetic bullet
+lists with a known-good outline and a small style rubric written down in advance. Three numbers:
+outline coverage (does every bullet's subject appear, the same test the chain's own gate runs);
+the average revisions per draft and the share that hit the cap still failing the rubric, the two
+numbers evaluator-optimizer's own page tracks; and, run twice on the same draft, whether the
+checker's verdict agrees with itself — a checker that doesn't is adding cost without adding
+reliability, which its own page warns against directly. No result file exists for either
+technique on this task yet, so this recipe cannot claim a score for any of it.
+
+</HowToEval>
+
+## Variations
+
+- Add a second, unrelated checker for a second rubric (length, a required legal footer) rather
+  than widening one prompt's criteria; two narrow checks stay more testable than one broad one.
+- Move to <Link href="/techniques/debate-review/">review and debate</Link> once the same kind of
+  error keeps passing the checker — evidence the writer and the checker share a blind spot rather
+  than that the rubric needs one more rule.
+- Route by content type first with <Link href="/techniques/routing/">routing</Link> if the team
+  drafts more than one kind of message (a release note, a status update) needing a different
+  outline shape and a different rubric.
+- Add <Link href="/techniques/human-in-the-loop/">human approval</Link> as a last step before
+  sending, for the first several weeks, until the rubric has actually been checked against enough
+  real drafts to trust unattended.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}

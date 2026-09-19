@@ -1,0 +1,61 @@
+{
+  "illustrative": true,
+  "h": 330,
+  "title": "Write and check",
+  "sub": "One call drafts, another checks against one explicit criterion, and the loop repeats until it passes or hits a cap.",
+  "pill": "Level 3 · Workflows",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 30, "l": "Question", "k": "io" },
+    { "id": "retrieve", "x": 170, "y": 92, "l": "Retrieve sources", "k": "code" },
+    { "id": "draft", "x": 170, "y": 154, "l": "Draft", "k": "model" },
+    { "id": "check", "x": 170, "y": 226, "l": "Check", "k": "model" },
+    { "id": "revise", "x": 310, "y": 226, "l": "Revise", "k": "model" },
+    { "id": "a", "x": 170, "y": 300, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "retrieve", "by": "code" },
+    { "id": "e2", "f": "retrieve", "t": "draft", "by": "code" },
+    { "id": "e3", "f": "draft", "t": "check", "by": "code" },
+    { "id": "e4", "f": "check", "t": "revise", "by": "code", "b": 22 },
+    { "id": "e5", "f": "revise", "t": "check", "by": "code", "b": 22 },
+    { "id": "e6", "f": "check", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"How often should the DW-300's filter be cleaned?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code retrieves the top 4 sources",
+      "d": "care-and-cleaning-guide#1, care-and-cleaning-guide#4,\ndw300-manual#7, parts-list#1",
+      "m": "4 sections · 8 ms"
+    },
+    {
+      "e": "e3",
+      "h": "The model drafts an answer",
+      "d": "\"Every 30 cycles. Sources: dw300-manual#6\"",
+      "m": "310 in · 14 out · 0.9 s"
+    },
+    {
+      "e": "e4",
+      "h": "The checker finds an unsupported citation",
+      "d": "\"MISSING: dw300-manual#6\"\n(that section was never one of the 4 given to the draft step)",
+      "m": "340 in · 9 out · 0.6 s"
+    },
+    {
+      "e": "e5",
+      "h": "The model revises using the checker's own feedback",
+      "d": "\"Every 30 cycles, per the care and cleaning guide.\nSources: care-and-cleaning-guide#1\"",
+      "m": "365 in · 16 out · 1.0 s"
+    },
+    {
+      "e": "e6",
+      "h": "The checker confirms every citation is now supported",
+      "d": "\"ALL CITATIONS SUPPORTED\" → loop stops, 1 of 2 revisions used",
+      "m": "350 in · 4 out · 0.4 s"
+    }
+  ]
+}

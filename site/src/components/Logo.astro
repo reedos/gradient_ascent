@@ -1,0 +1,30 @@
+---
+// The Path mark: a curve that starts flat and keeps steepening to a point (the shape of an
+// exponential, the same curve as the home page's climb chart), drawn in the level gradient,
+// freestanding with no app-icon box. Ported from prototype/look.src.html's LOGOS "path" entry. Each usage
+// gets its own gradient id so two logos (header + footer) never collide.
+interface Props {
+  id?: string;
+  size?: number;
+}
+const { id = 'mark', size = 34 } = Astro.props;
+const gradId = `mg-${id}`;
+---
+<svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true">
+  <defs>
+    <linearGradient id={gradId} gradientUnits="userSpaceOnUse" x1="0" y1="36" x2="0" y2="3">
+      <stop offset="0" style="stop-color:var(--mk1)" />
+      <stop offset=".38" style="stop-color:var(--mk2)" />
+      <stop offset=".72" style="stop-color:var(--mk3)" />
+      <stop offset="1" style="stop-color:var(--mk4)" />
+    </linearGradient>
+  </defs>
+  <path
+    d="M5 33.5C17.2 32.7 27.6 25.1 34 7.2"
+    fill="none"
+    stroke={`url(#${gradId})`}
+    stroke-width="4"
+    stroke-linecap="round"
+  />
+  <circle cx="34" cy="7.2" r="4.2" fill="var(--mk4)" />
+</svg>

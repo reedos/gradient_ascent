@@ -1,0 +1,221 @@
+---
+slug: embeddings-search
+level: 2
+run: embeddings-search
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Vector embeddings"
+    url: "https://developers.openai.com/api/docs/guides/embeddings"
+    publisher: "OpenAI (API documentation)"
+    accessed: "2026-09-18"
+  - title: "Cohere's Rerank Model"
+    url: "https://docs.cohere.com/docs/rerank"
+    publisher: "Cohere (documentation)"
+    accessed: "2026-09-18"
+  - title: "pgvector"
+    url: "https://github.com/pgvector/pgvector"
+    publisher: "pgvector (GitHub README)"
+    accessed: "2026-09-18"
+  - title: "Semantic indexing for Microsoft Copilot"
+    url: "https://learn.microsoft.com/en-us/microsoftsearch/semantic-index-for-copilot"
+    publisher: "Microsoft (Microsoft Learn)"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import embeddingsSearchRun from '../../data/runs/embeddings-search.json';
+
+An embedding is a list of floating-point numbers standing in for a piece of text. OpenAI's
+documentation states what makes that useful: the distance between two embeddings measures how
+related the texts are, small distances meaning high relatedness, and it recommends cosine
+similarity — how closely two vectors point the same way — for the comparison<Cite n={1}/>.
+
+Search built on this has three fixed parts: documents are cut into chunks small enough to
+retrieve on their own; every chunk is embedded once into a vector index, a database such as
+pgvector, Pinecone, Weaviate or Qdrant; and a question is embedded the same way and ranked
+against that index. Two more are optional. Hybrid search runs a keyword index alongside the
+vectors and merges the two lists, which is what pgvector documents doing with Postgres full-text
+search<Cite n={3}/>. Reranking re-scores a larger first cut of candidates with a second model:
+Cohere describes its rerank models as sorting text by relevance to a query, over results an
+existing search already returned<Cite n={2}/>.
+
+This is the retrieval half of <Link href="/techniques/rag/">RAG</Link> without the answer. It sits
+at level 2 with no model in the loop at all: your code chunks, embeds, ranks and stops.
+
+Marked draft, not published: no recorded trace, no scored result file, and an example that embeds
+with a bag-of-words stub rather than a trained model.
+
+## A run, step by step
+
+<Run data={embeddingsSearchRun} label="Level 2 · Embeddings and search" runKey="embeddings-search" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+You rarely meet this labeled "embeddings" or "vector search." It shows up inside other products
+as "search your files," "related items," or a chat app answering a question about a document you
+uploaded. Sometimes a maker documents it plainly: Microsoft says Microsoft 365 Copilot builds a
+vectorized semantic index of an organization's files, in which material with similar meaning
+sits close together, so a search can return more than exact matches — and that it runs alongside
+the ordinary keyword index rather than replacing it<Cite n={4}/>. More often nothing says so; the
+rest of the named examples are on the <Link href="/techniques/rag/">RAG page</Link>, since
+embeddings and search is usually the mechanism under a product rather than the product.
+
+There is a simple test for whether a search box is running on keywords alone or also on meaning:
+search for something using a word that is not literally in the document you are looking for — a
+synonym, a description, a rephrasing — and see whether it still finds it. A pure keyword search
+comes back empty or wrong when the words do not match. A search backed by embeddings, or a hybrid
+of the two, has a chance of finding the right result anyway, because it is comparing meaning, not
+spelling.
+
+Some search tools expose the choice directly, as a toggle between "keyword" and "smart" or
+"semantic" search. When one of them gives you a wrong or missing result, try the other mode
+before concluding the tool cannot find the answer, and try it in both directions: matching on
+meaning is what finds a passage worded differently than your question, and matching on literal
+words is what reliably finds an exact string — a part number, an order id, a serial number — that
+a vector comparison has no special reason to rank first. Running both and merging them is the
+hybrid arrangement pgvector documents<Cite n={3}/>.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example below indexes the same synthetic corpus RAG uses, then answers one query two ways
+instead of one: by embedding every chunk and ranking them by cosine similarity to the query, and
+separately by BM25 keyword score over the same chunks. It reports where the two result sets agree
+and where they diverge, instead of answering the question — this level searches, it does not
+answer.
+
+What the example embeds with is not an embedding model, and nothing it returns is evidence about
+one. `StubEmbedder` (`examples/common/model.py`) hashes words into 64 buckets and counts them: a
+bag of words with no notion that "quiet" and "dBA" are related unless the words themselves
+overlap. Run it on a query that shares real words with the corpus — "DW-300 Normal cycle water
+use" — and its top hit matches keyword search's top hit exactly, which tells you the pipeline
+works and nothing about semantics. Run it on "Which dishwasher is quieter, the DW-300 or the
+DW-480?" and neither method finds `specs-comparison#2`, the section that actually gives both
+decibel ratings, because the word "quieter" never appears in the corpus at all. A trained model is
+what would close that gap, and where one would go is `OllamaEmbedder`, behind the same `Embedder`
+interface. Read every score below as the shape of the mechanism, not as a result.
+
+<CodeFile file="examples/embeddings_search/run.py" func="run" />
+
+The similarity function `_semantic_search` calls, just above it in the same file, divides by both
+vectors' lengths instead of taking a bare dot product, so the ranking is a true cosine whichever
+`Embedder` is plugged in and not only for one that happens to return unit vectors. Every step is
+`decided_by: "code"`: what gets embedded, how many results come back, and how the two result sets
+get compared are fixed before anything runs. The example implements neither of the two optional
+parts above — no hybrid fusion of the two lists it prints, and no reranking.
+
+Run it yourself:
+
+<CodeFile file="examples/embeddings_search/README.md" start={17} end={17} lang="text" expect="python -m examples.embeddings_search" />
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try <Link href="/techniques/order-zero/">level 0, no model at all</Link>, plain keyword search, first if your
+questions reliably use the same words as the documents — a part number, an exact phrase, a
+serial number. It is simpler, needs no index to keep in sync, and often wins outright on exact
+identifiers.
+
+Move to embeddings and search once questions are worded differently than the source text — a
+synonym, a paraphrase, a description instead of the term the document uses — which is exactly
+where keyword matching stops working.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'Chunk boundaries split a fact',
+    notice: 'A number and the sentence explaining it end up in two different chunks, so a search that finds one chunk misses the other half of the answer.',
+    test: 'Check whether a fact and the context it needs to be understood ever sit in the same chunk. If a chunk boundary regularly falls in the middle of one idea, the chunking, not the search, is the problem.',
+  },
+  {
+    name: 'Query and index embedded with different models',
+    notice: 'Every result comes back with a low, flat similarity score and none of them look related to the query, even for an easy question.',
+    test: 'Confirm the model id used to build the index matches the model id used to embed the query. Two different embedding models do not share a vector space, even at the same number of dimensions.',
+  },
+  {
+    name: 'Exact identifiers get lost in semantic-only search',
+    notice: 'A search for a part number, an order id, or a serial number returns plausible-looking but wrong results, because nothing in the corpus is a closer semantic match than something else.',
+    test: 'Search for a known exact identifier with the semantic path alone, then with keyword search alone. If keyword search wins outright, the system needs the hybrid combination, not a better embedding model.',
+  },
+  {
+    name: 'Under-trained or low-dimensional embeddings blur unrelated content together',
+    notice: 'Results include documents with no topical connection to the query at all, not just imperfect ones.',
+    test: 'Run a query with almost no literal word overlap with the target passage and see what comes back. This repo\'s own stub embedder shows the failure directly: a hashing bag of words with only 64 buckets collides often enough that its "semantic" results are sometimes worse than plain keyword search on the same query.',
+  },
+  {
+    name: 'Stale index',
+    notice: 'A source document changes and search keeps returning the old text, since the index was built at write time, not read time.',
+    test: 'Change a document without rebuilding the index and search for the changed fact. The old embedding is still what gets compared.',
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, one question', value: '0' },
+    { label: 'Chunks indexed', value: '79' },
+    { label: 'Embedding calls', value: '1 (batched)' },
+    { label: 'Wall time', value: '~40ms' },
+  ]}
+  comparedTo={{
+    label: 'RAG (level 2, same corpus)',
+    note: 'The same retrieval work RAG does, without the one model call RAG adds afterward to turn the results into an answer.',
+  }}
+  level={2}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+`scripts/eval_run.py` will not score this example: it returns a comparison between two result
+sets rather than an answer the site's 60-question set can grade, so asking the runner for a
+score prints that reason and stops. What it would still be measured on, the same way the
+retrieval half of RAG is, is
+**citation hit rate**: whether the top-k results for a question's kind actually include the
+section the question's grading rule expects. A retrieval-only technique like this one should be
+judged on that, kind by kind, separately from whatever answers it up to.
+
+No result file exists for retrieval quality on this technique yet (see `docs/EVALS.md`).
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="The distribution of top-result similarity scores across real queries. A growing share of queries with a low top score usually means the index and the query are drifting apart, not that the questions got harder."
+  costAtVolume="Indexing cost scales with corpus size and happens once (or incrementally, as documents change); query-time cost scales with query volume, one small embedding call per query. Reindexing the whole corpus on every change, instead of only the changed documents, is the usual way this gets expensive."
+  failsInProduction="The corpus changes but the index is not rebuilt, so search keeps returning stale text. Or the embedding model gets swapped for a newer one without reindexing everything, so old and new vectors sit in the same index and are no longer comparable to each other."
+  whatToLog="The query, the top-k results and their similarity scores from each method if running hybrid, the embedding model id and index build date, so a bad result traces back to a stale index or a model mismatch without re-running anything."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Search a tool you already use for something using a word that does not literally appear in the document you expect to find. Does it still find it, or does it come back empty?' },
+  { lane: 'build', body: 'Run python -m examples.embeddings_search --model stub --question "Which dishwasher is quieter, the DW-300 or the DW-480?" and compare the two result sets in the output. Neither one finds specs-comparison#2, the section that actually answers this, because the word "quieter" never appears in the corpus.' },
+  { lane: 'either', body: 'Change TOP_K from 3 to 6 in examples/embeddings_search/run.py and rerun a query from above. Does the overlap between the semantic and keyword result sets grow?' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

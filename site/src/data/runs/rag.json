@@ -1,0 +1,66 @@
+{
+  "illustrative": true,
+  "h": 420,
+  "title": "Retrieval-augmented generation (RAG)",
+  "sub": "Search the documents, give the closest passages to the model, and ask once.",
+  "pill": "Level 2 · Context",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
+    { "id": "emb", "x": 170, "y": 104, "l": "Embed the question", "k": "code" },
+    { "id": "vs", "x": 170, "y": 176, "l": "Vector store", "k": "store" },
+    { "id": "ctx", "x": 170, "y": 250, "l": "Build the prompt", "k": "code" },
+    { "id": "llm", "x": 170, "y": 322, "l": "answers once", "k": "model" },
+    { "id": "a", "x": 170, "y": 392, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "emb", "by": "code" },
+    { "id": "e2", "f": "emb", "t": "vs", "by": "code" },
+    { "id": "e3", "f": "vs", "t": "ctx", "by": "code" },
+    { "id": "e4", "f": "ctx", "t": "llm", "by": "code" },
+    { "id": "e5", "f": "llm", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"How long is the warranty on the DW-480,\nand what voids it?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code turns the question into a vector",
+      "d": "embed(question) → 768 numbers",
+      "m": "14 tokens · 12 ms"
+    },
+    {
+      "e": "e3",
+      "h": "Your code takes the four closest passages",
+      "d": "0.83  dw480-manual.md  §9 Warranty\n0.79  dw480-manual.md  §9.2 Exclusions\n0.61  dw300-manual.md  §8 Warranty\n0.58  install-guide.md  §2",
+      "m": "4 passages · 31 ms"
+    },
+    {
+      "e": "e4",
+      "h": "Your code builds one prompt",
+      "d": "SYSTEM   Answer only from the sources. Cite them.\nSOURCES  [1] … [4]\nQUESTION How long is the warranty …",
+      "m": "1,850 tokens in"
+    },
+    {
+      "e": "e5",
+      "h": "The model answers",
+      "d": "\"Two years from delivery [1]. Void if installed\nwithout the anti-tip bracket or run on a\ngenerator without a line conditioner [2].\"",
+      "m": "1,850 in · 64 out · 2.1 s"
+    }
+  ],
+  "climbT": "When to move up",
+  "climb": "Move up when one search is not enough and the next search depends on the result of the last one. In this run RAG found two of the three exclusions and could not tell that one was missing.",
+  "use": {
+    "t": "Where you have used this",
+    "p": "If you have uploaded files to a chat app and asked questions about them, you have used RAG. The product searched your files for the passages closest to your question, gave them to the model, and asked once. It searches only once, so it cannot tell if the search missed something.",
+    "names": ["Gemini Notebook", "ChatGPT Projects", "Claude Projects", "Perplexity"]
+  },
+  "build": {
+    "t": "Minimal version",
+    "code": "q_vec  = embed(question)\nchunks = store.search(q_vec, k=4)\nprompt = render(SYSTEM, sources=chunks, question=question)\nanswer = model.complete(prompt)      # one call. your code chose every step.",
+    "names": ["LlamaIndex", "Haystack", "pgvector", "Nomic Embed"]
+  }
+}

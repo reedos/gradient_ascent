@@ -1,0 +1,270 @@
+---
+slug: embodied
+level: 7
+run: embodied
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Gemini Robotics"
+    url: "https://deepmind.google/models/gemini-robotics/"
+    publisher: "Google DeepMind"
+    date: "2026-07-30"
+    accessed: "2026-09-18"
+  - title: "NVIDIA/Isaac-GR00T"
+    url: "https://github.com/NVIDIA/Isaac-GR00T"
+    publisher: "NVIDIA (GitHub README)"
+    accessed: "2026-09-18"
+  - title: "π0: Our First Generalist Policy"
+    url: "https://www.pi.website/blog/pi0"
+    publisher: "Physical Intelligence"
+    date: "2024-10-31"
+    accessed: "2026-09-18"
+  - title: "π0.7: an update on our AI foundation model"
+    url: "https://www.pi.website/blog/pi07"
+    publisher: "Physical Intelligence"
+    date: "2026-04-16"
+    accessed: "2026-09-18"
+  - title: "Introducing Figure 03"
+    url: "https://www.figure.ai/news/introducing-figure-03"
+    publisher: "Figure AI"
+    date: "2025-10-09"
+    accessed: "2026-09-18"
+  - title: "NEO"
+    url: "https://www.1x.tech/neo"
+    publisher: "1X"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import embodiedRun from '../../data/runs/embodied.json';
+
+An embodied model controls something that can physically hurt someone or break something, which
+is what makes level 7 different here than anywhere else on this site: the "always-on" part is
+optional — plenty of robots only move when asked — but the model deciding what happens next
+without a person checking every step is not, and a wrong step is not just a wrong sentence.
+
+Google DeepMind calls the mechanism plainly: a model that "converts vision and language input
+into motor control, enabling a robot to take action"<Cite n={1}/> — a vision-language-action
+model, or VLA. NVIDIA's GR00T is built the same way: "an open vision-language-action (VLA) model
+for generalized humanoid robot skills," taking "multimodal input, including language and images,
+to perform manipulation tasks"<Cite n={2}/>. The loop underneath is perceive (read the scene),
+plan (the model proposes what to do), act — and act is the one step this page insists cannot be
+the model's alone.
+
+This page is marked draft, not published: it has no recorded trace and no scored result file
+yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={embodiedRun} label="Level 7 · Robots and machines" runKey="embodied" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Robotics models moved fast in 2026. Google DeepMind's current robotics model is Gemini Robotics
+2<Cite n={1}/>. Physical Intelligence's π0.7 "can follow new language commands and perform tasks
+that were never seen in its training data" and "can compose and recombine the skills it learned
+to solve new tasks", per its own post — which compares it against that maker's earlier specialist
+models, not against π0<Cite n={4}/>.
+
+Latency is not an abstraction here the way it is for a chat reply. Physical Intelligence's post
+about π0 says "Dexterous robot manipulation requires π0 to output motor commands at a high
+frequency, up to 50 times per second"<Cite n={3}/>. A model too slow for that rate is not a worse
+robot; it is a robot that cannot do the task at all, however correct each single decision is.
+
+Safety, on machines that ship today, mostly lives in hardware, not the model. Figure AI's 2025
+announcement for its Figure 03 robot describes "strategically placed multi-density foam to
+protect against pinch points" and "safeguards at the Battery Management System (BMS), cell,
+interconnect, and pack levels"<Cite n={5}/>. 1X's page for NEO says "Tendon-driven actuators
+create safe movements," that "NEO's joints are covered from outside access, making the surface
+entirely pinch proof," and lists figures for head-injury criterion and audible noise<Cite n={6}/>.
+None of that is the model checking itself; it is a physical limit that holds whatever the model
+decides. Each is its maker's claim about its own machine, dated to the page it appears on.
+
+1X's page also describes a person in the loop: "For complex tasks NEO doesn't know, an Expert
+from 1X can remotely supervise its actions at scheduled times to help it learn new abilities and
+get the job done"<Cite n={6}/>. Read the whole sentence — the remote person finishes the job as
+well as teaching it, so "the robot did this" and "a person drove it" are not always
+distinguishable from outside.
+
+Three questions to ask of any machine like this, because the answer is rarely on the marketing
+page. What persists between runs — a learned routine, a map of your rooms, recorded video — and
+where it is kept. What it may do unattended, and what waits for a person: the same split
+<Link href="/techniques/agent-teammates/">always-on assistants</Link> make in software, with a
+worse failure if it is wrong. And how you stop it: a physical button within reach that cuts
+power, because stopping must not depend on the thing you are stopping.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example is a text-simulated gripper, not a real robot: perceive is a short scene description,
+plan is the model calling `move(x, y, z, speed)`, and act is a safety `envelope` the model never
+sees and cannot call. A real system's safety layer has to be independent hardware or independent
+code for the same reason: a model cannot be the check on its own output. NVIDIA's README does
+not describe a safety layer, but it does show how bounded the perceive-plan half is. It gives
+GR00T's architecture as "a combination of vision-language foundation model and diffusion
+transformer head that denoises continuous actions", and lists inference as needing "1 GPU with
+16 GB+ VRAM (e.g., RTX 4090, L40, H100, Jetson AGX Thor/Orin, DGX Spark)"<Cite n={2}/> — a fixed
+budget this example sidesteps entirely by simulating in text.
+
+<CodeFile file="examples/embodied/run.py" func="envelope" />
+
+Four things about `envelope` matter more than the specific numbers, and three of them are
+mistakes that are easy to make and hard to see.
+
+It refuses a nonsense number instead of clamping it. `_valid` runs first, because Python's `min`
+and `max` pass a NaN through rather than rejecting it: `min(speed, 250.0)` returns NaN when
+`speed` is NaN, and nothing in a one-sided speed cap stops a negative speed at all. Both would
+otherwise be actuated. A number that means nothing cannot be clamped into a number that means
+something, so it is refused.
+
+It clamps bounds and speed but *refuses* a forbidden zone: clamping a target inside a zone back
+to the zone's edge would still be a target inside the zone, so a zone violation is never
+something a clamp can fix.
+
+The order matters. The function clamps to the workspace bounds *before* checking zones, so a
+proposal that is out of bounds on one axis and would clamp into a forbidden zone is still
+caught. Checking the raw proposal first would have missed exactly that case.
+
+And the zone check runs on the path, not the target. Two targets can each sit outside every zone
+while the straight line between them cuts through one, so an endpoint-only check would let a
+sequence of individually legal moves sweep the arm through the operator station.
+`_path_enters` clips the segment from the arm's current position against each axis' pair of
+planes and asks whether anything is left — exact for a box, rather than sampling points along
+the line and hoping none of a thin crossing falls between two samples. The current position is
+the last move that actually reached the actuator, which is why the same target is allowed from
+one place and refused from another. `tests/test_example_embodied.py` has a test for each of
+these four, including the two-legal-endpoints attack.
+
+<CodeFile file="examples/embodied/run.py" func="run_step" />
+
+Every proposed move is `decided_by: "model"`; every clamp and every refusal is `decided_by:
+"code"`, and the envelope's decision never reads anything about *why* the model proposed a move
+— only the numbers. Run it yourself:
+
+<CodeFile file="examples/embodied/README.md" start={16} end={16} lang="text" expect="python -m examples.embodied" />
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try <Link href="/techniques/computer-use/">computer use</Link> or
+<Link href="/techniques/single-agent/">a single agent</Link> first if the model's actions can only
+touch software — a browser, a file, an API. Nothing about controlling a screen needs a safety
+envelope with physical units in it.
+
+Skip a learned policy entirely, embodied or not, for a machine whose every motion can be written
+down in advance: a fixed pick-and-place cycle on a factory line does not need a model deciding
+what to do next, only a program executing a known sequence, which is
+<Link href="/techniques/order-zero/">level 0, no model at all</Link> wearing a robot arm.
+
+Move up to an embodied model once the task genuinely varies — the part is never quite in the same
+place twice, the packaging changes, the room is not laid out the same way from one run to the
+next — enough that no fixed program covers it, but the safety envelope around it still has to be
+written and tested like any other piece of code, before the first real move, not after.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'A forbidden-zone target survives clamping',
+    notice: "A move that should have been refused outright instead gets clamped to the nearest in-bounds point, and that point turns out to still be inside a forbidden zone.",
+    test: "Propose a target that is both out of the workspace bounds and, once clamped back in, still inside a forbidden zone. The envelope must refuse it, not clamp it (this page's own test suite scripts exactly this case).",
+  },
+  {
+    name: 'Every target is legal and the path between two of them is not',
+    notice: "Each individual move passes the zone check, and the machine still travels through a zone, because the check was written against the target point rather than the line the machine takes to reach it.",
+    test: "Propose two targets that both sit outside every zone but whose straight line crosses one, in that order. The second must be refused. This example checks the segment from the last actuated position against each zone exactly, rather than sampling points along it, since a sampled check can step over a thin crossing.",
+  },
+  {
+    name: 'A NaN or a negative number is clamped instead of refused',
+    notice: "A sensor glitch or a malformed tool call produces a target or speed that is not a real number, and the clamp turns it into a large, plausible-looking move nobody asked for.",
+    test: "Send NaN, positive and negative infinity, and a negative speed. Each must be refused with nothing actuated. Python's min and max propagate a NaN rather than rejecting it, so a clamp written the obvious way passes one straight through to the motors.",
+  },
+  {
+    name: 'The safety check reads the model’s reasoning instead of its numbers',
+    notice: "A dangerous move gets approved because the model's explanation sounded reasonable, or a safe move gets refused because the wording looked alarming -- the check is judging text, not the actual target and speed.",
+    test: 'Send the same numeric proposal with two very different explanations attached. The envelope’s decision must not change; if it does, the check is reading the wrong thing.',
+  },
+  {
+    name: 'Latency drops the control loop below what the task needs',
+    notice: "The perceive-plan step takes long enough that the actual target has moved, or the manipulation itself needs a correction rate the model cannot sustain -- not a wrong decision, a decision arriving too late to be right.",
+    test: "Measure wall-clock time from scene to proposed move under load, not just on an idle machine, and compare it against the control frequency the task actually needs.",
+  },
+  {
+    name: 'A hardware safety limit and a software one disagree',
+    notice: "The code-side envelope allows a move that a mechanical limit switch or a hardware speed governor would reject anyway, so the two layers give contradictory signals about what almost happened.",
+    test: "Check the two limits' numbers against each other directly, not just each against its own tests. A software cap set looser than the hardware behind it is not a second layer of safety, just an inconsistent one.",
+  },
+  {
+    name: 'Simulation success does not transfer to the real machine',
+    notice: "A policy trained or tested only in simulation behaves differently once real sensors, real friction, and real timing are involved, and the gap is not visible until hardware is already running.",
+    test: "Compare the same scenario's outcome in simulation against the real machine before trusting simulated results for anything the envelope does not already constrain by fixed numbers.",
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, one perceive-plan-act step', value: '1' },
+    { label: 'Control frequency Physical Intelligence reports for π0', value: 'up to 50/s' },
+    { label: 'Tokens in, one step (this example)', value: '~60' },
+    { label: 'Wall time, one step (this example)', value: '~0.2s' },
+  ]}
+  comparedTo={{
+    label: 'the control frequency a real VLA policy runs at',
+    note: 'This example calls a model once per step with no loop, illustrated at a scale that says nothing about real hardware timing. Physical Intelligence’s own reported figure for π0, up to 50 calls a second, is the maker’s number, not something this example reproduces.',
+  }}
+  level={7}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={0} kinds={[]}>
+
+This example proposes and clamps motor commands in a simulated workspace; it does not answer
+questions about the document corpus, so the site's shared 60-question set does not apply, the
+same reason it does not apply to <Link href="/techniques/computer-use/">computer use</Link>. What
+would be measured here: whether any proposed move that should have been refused or clamped ever
+reaches the actuator log under adversarial scripting (this should be exactly zero —
+`tests/test_example_embodied.py` checks it on the stub every run), how often a legitimate,
+in-bounds move gets refused or clamped by mistake (a false positive costs real task completions,
+not just safety), and the wall-clock time from scene to actuated move under load.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="The rate of refused and clamped moves against total proposals -- a rising rate is worth reading as a sign the model is drifting toward the envelope's edges, not just a number to alert on -- and the wall-clock time of the perceive-plan step against the control frequency the task actually needs."
+  costAtVolume="Cost tracks calls per second, which for a real control loop is fixed by the task (up to 50 a second for dexterous manipulation, per Physical Intelligence's own figure for π0), not by how many decisions turn out to matter -- most steps are ordinary and cost the same as the ones that trip the envelope."
+  failsInProduction="The envelope and a hardware limit disagree about what is safe, or a policy that only ever saw simulation makes a confident, wrong move against real friction or real sensor noise the simulation never modeled."
+  whatToLog="Every proposed move, the envelope's decision and why, the move actually sent to the actuator when one was, and the wall-clock time for the whole perceive-plan-act step -- so a near-miss can be reconstructed from the log without needing the robot to reproduce it."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: "Read one robotics maker's own safety page (Google DeepMind's for Gemini Robotics, or 1X's specs for NEO) and list which safety claims are about the AI model and which are about the physical machine. Which kind would you trust more, and why?" },
+  { lane: 'build', body: 'Run python -m examples.embodied --model stub --question "..." with a scene of your own, then open tests/test_example_embodied.py and read test_clamping_toward_a_zone_edge_is_still_refused_not_clamped_in to see why the envelope checks zones after clamping, not before.' },
+  { lane: 'either', body: "Pick one of the failure modes above and try to cause it on purpose: for the forbidden-zone failure, change FORBIDDEN_ZONES in examples/embodied/run.py to overlap the whole workspace and rerun the tests to see which ones start failing." },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

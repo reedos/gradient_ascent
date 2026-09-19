@@ -1,0 +1,616 @@
+/* /timeline/ (Timeline.astro, the page itself) and the home page's compact strip
+   (TimelineStrip.astro). Built entirely from the site's existing tokens -- no new colour, font,
+   radius or shadow. `.tl-*` is the wide interactive chart and the page's own sections (how fast,
+   measures, list, closing); `.tls-*` is the compact per-level strip shared by the home page and
+   /timeline/'s own narrow view. Both stay inside a `.panel`-style frame so they read as siblings
+   of the rest of the site's figures. */
+
+/* -- Kind shapes: circle (research), square (model/product), triangle (tool/standard) -- shared
+   by the wide chart and the legend. -- */
+.tl-shape-circle { border-radius: 50%; }
+.tl-shape-square { border-radius: 2px; }
+.tl-shape-triangle { clip-path: polygon(50% 4%, 5% 96%, 95% 96%); border-radius: 0; }
+
+/* ================================================================================================
+   Wide chart (>= 850px)
+   ================================================================================================ */
+
+.tl-chart {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel);
+  padding: 22px 26px 18px 0;
+  overflow: visible;
+}
+.tl-chart-scale-note {
+  font-size: 10px;
+  color: var(--muted);
+  padding: 0 0 12px 150px;
+}
+.tl-body {
+  display: flex;
+  align-items: stretch;
+}
+.tl-labels {
+  flex: 0 0 150px;
+  min-width: 0;
+}
+.tl-years-spacer {
+  height: 26px;
+}
+.tl-lane-label {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-left: 22px;
+  border-bottom: 1px dashed color-mix(in srgb, var(--line) 70%, transparent);
+}
+.tl-lane-label:last-child { border-bottom: 0; }
+.tl-lane-num {
+  font: 700 11px var(--display);
+  color: var(--c);
+  width: 18px;
+  text-align: right;
+  flex: 0 0 auto;
+}
+.tl-lane-title {
+  font-size: 11.5px;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.tl-plot {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  padding-right: 62px;
+}
+.tl-years {
+  position: relative;
+  height: 26px;
+}
+.tl-year-tick {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.tl-year-rule {
+  position: absolute;
+  top: 26px;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+  opacity: 0.5;
+}
+.tl-stub-label {
+  position: absolute;
+  top: 0;
+  left: 4px;
+  font-size: 9.5px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.tl-stub-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed var(--muted);
+  opacity: 0.6;
+}
+
+.tl-lane-track {
+  position: relative;
+  /* Tall enough that an "above" or "below" label (one line of text, plus its margin from the dot)
+     never reaches into the NEXT lane's own territory: a label needing about 18px of clearance
+     from the lane's own centre must still fit inside half of this height. 46px (half = 23px) was
+     not quite enough -- two adjacent lanes' labels could meet exactly at the shared boundary. */
+  height: 60px;
+  border-bottom: 1px dashed color-mix(in srgb, var(--line) 70%, transparent);
+}
+.tl-lane-track:last-child { border-bottom: 0; }
+.tl-connector {
+  position: absolute;
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+  background: var(--c);
+  opacity: 0.35;
+  border-radius: 2px;
+}
+
+.tl-point {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.tl-dot {
+  display: block;
+  cursor: default;
+  padding: 6px;
+  margin: -6px;
+  border-radius: 100%;
+}
+.tl-dot:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.tl-dot-mark {
+  display: block;
+  width: 7px;
+  height: 7px;
+  background: var(--c);
+  border: 1.5px solid var(--c);
+  opacity: 0.78;
+}
+.tl-point.tl-marked .tl-dot-mark { width: 11px; height: 11px; opacity: 1; }
+.tl-point.tl-mark-described .tl-dot-mark { background: var(--panel); border-width: 2px; }
+.tl-point.tl-mark-available .tl-dot-mark { background: var(--c); border-width: 2px; }
+.tl-point.tl-mark-extra .tl-dot-mark {
+  background: var(--c);
+  border-width: 2px;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--panel);
+}
+.tl-point.tl-unverified .tl-dot-mark { border-style: dashed; }
+
+.tl-dot-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 4px;
+  font-size: 10px;
+  line-height: 1.15;
+  color: var(--muted);
+  white-space: nowrap;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+.tl-dot-label.tl-label-above { top: auto; bottom: 100%; margin-top: 0; margin-bottom: 4px; }
+
+.tl-tip {
+  position: absolute;
+  z-index: 20;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 250px;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 13px;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--muted);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.12s;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+.tl-point:hover .tl-tip,
+.tl-point:focus-within .tl-tip {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.tl-tip-date {
+  display: block;
+  font: 600 10px var(--font);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--c);
+  margin-bottom: 4px;
+}
+.tl-tip-title { display: block; font: 550 13.5px var(--display); color: var(--text); letter-spacing: -0.1px; }
+.tl-tip-maker { display: block; font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+.tl-tip-what { display: block; margin-top: 7px; }
+.tl-tip-links { display: flex; flex-direction: column; gap: 4px; margin-top: 9px; padding-top: 9px; border-top: 1px solid var(--line); }
+.tl-tip a { color: var(--accent); }
+.tl-tip a:hover { text-decoration: underline; }
+.tl-tip-unverified { display: block; margin-top: 8px; font-size: 10.5px; color: var(--o4); }
+.tl-tip-kind { display: inline-block; margin-top: 6px; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); }
+
+/* A shift in the models themselves: one rule crossing every lane, because it belongs to no single
+   level. It starts under the year ticks and stops above the label band, so it crosses the lanes
+   and nothing else. Its labels live in that band, which is in normal flow at the foot of the plot
+   -- no dot label and no year tick can reach it. */
+.tl-shift {
+  position: absolute;
+  top: 26px;
+  bottom: 24px;
+  width: 0;
+  border-left: 1px solid var(--text);
+  opacity: 0.26;
+}
+.tl-shift-band {
+  position: relative;
+  height: 24px;
+}
+.tl-shift-label {
+  position: absolute;
+  top: 5px;
+  font-size: 10px;
+  line-height: 1;
+  color: var(--muted);
+  white-space: nowrap;
+  background: var(--panel);
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+.tl-shift-label:hover { color: var(--text); }
+/* Which side of its own rule the label hangs on: to the right by default, to the left once the
+   rule is far enough right that a right-hanging label would run into the Today rule or the
+   panel's edge. */
+.tl-shift-label.is-right { transform: translateX(6px); }
+.tl-shift-label.is-left { transform: translateX(calc(-100% - 6px)); }
+
+.tl-today {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1.5px dashed var(--accent);
+  opacity: 0.75;
+}
+/* The label sits to the LEFT of the rule and reads right-aligned against it. Hanging it off the
+   right (translateX(100%)) pushed it past the panel's edge, where it was clipped. */
+.tl-today-label {
+  position: absolute;
+  right: 6px;
+  top: 0;
+  text-align: right;
+  font-size: 10px;
+  color: var(--accent);
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.tl-legend {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.tl-legend-row { display: flex; flex-wrap: wrap; gap: 10px 22px; font-size: 10.5px; color: var(--muted); }
+.tl-legend-row + .tl-legend-row { margin-top: 10px; }
+.tl-legend-item { display: flex; align-items: center; gap: 7px; }
+.tl-legend-swatch { display: inline-block; width: 9px; height: 9px; background: var(--muted); flex: 0 0 auto; }
+.tl-legend-swatch.tl-legend-hollow { background: var(--panel); border: 1.5px solid var(--muted); }
+.tl-legend-swatch.tl-legend-solid { background: var(--muted); border: 1.5px solid var(--muted); }
+.tl-legend-swatch.tl-legend-extra { background: var(--muted); border: 1.5px solid var(--accent); }
+.tl-legend-swatch.tl-legend-unverified { background: var(--panel); border: 1.5px dashed var(--muted); }
+
+.tl-wide-only { display: block; }
+.tl-narrow-only { display: none; }
+
+@media (max-width: 849.98px) {
+  .tl-wide-only { display: none; }
+  .tl-narrow-only { display: block; }
+}
+
+/* ================================================================================================
+   Compact strip (TimelineStrip.astro) -- shared by the home page and /timeline/'s narrow view.
+   ================================================================================================ */
+
+.tls {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel);
+  padding: 18px 20px 14px;
+}
+/* Two columns, like Timeline.astro's own .tl-body/.tl-labels/.tl-plot: a fixed-width label column
+   and a plot column whose full width is the ONE coordinate system every percentage `left` in it
+   (year ticks, spans, caps, the stub divider, the today rule) is computed against. Labels sit
+   beside the plot, never on top of it, so a span compressed near the left edge (level 0, in the
+   pre-2017 stub) is never hidden under its own row's label. */
+.tls-body { display: flex; align-items: stretch; }
+.tls-labels { flex: 0 0 108px; min-width: 0; }
+.tls-years-spacer { height: 18px; }
+.tls-row-label {
+  height: 26px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.25;
+  padding-right: 10px;
+}
+.tls-row-num { font: 700 10px var(--display); color: var(--c); flex: 0 0 auto; }
+
+.tls-plot { position: relative; flex: 1; min-width: 0; }
+.tls-years { position: relative; height: 18px; }
+.tls-year-tick {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-size: 9.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.tls-stub-divider {
+  position: absolute;
+  top: 18px;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed var(--muted);
+  opacity: 0.55;
+}
+.tls-track-row { height: 26px; }
+.tls-track { position: relative; height: 100%; }
+.tls-span {
+  position: absolute;
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+  background: var(--c);
+  opacity: 0.32;
+  border-radius: 2px;
+}
+.tls-cap {
+  position: absolute;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1.5px solid var(--c);
+  transform: translate(-50%, -50%);
+}
+/* The paper is the quiet end, the product is the loud one. */
+.tls-cap.tls-cap-start { background: var(--panel); width: 6px; height: 6px; border-width: 1px; opacity: 0.75; }
+.tls-cap.tls-cap-end { background: var(--c); width: 10px; height: 10px; box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 22%, transparent); }
+.tls-product {
+  position: absolute;
+  top: 50%;
+  font-size: 10px;
+  line-height: 1;
+  color: var(--text);
+  white-space: nowrap;
+  background: var(--panel);
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-variant-numeric: tabular-nums;
+}
+.tls-product.is-left { transform: translate(calc(-100% - 9px), -50%); }
+.tls-product.is-right { transform: translate(9px, -50%); }
+.tls-today {
+  position: absolute;
+  top: 18px;
+  bottom: 0;
+  right: 0;
+  width: 0;
+  border-left: 1.5px dashed var(--accent);
+  opacity: 0.75;
+}
+.tls-figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px 40px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.tls-figure b {
+  display: block;
+  font: 550 27px var(--display);
+  letter-spacing: -1px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.tls-figure span { font-size: 11px; color: var(--muted); }
+.tls-arith {
+  font-size: 10.5px;
+  color: var(--muted);
+  margin-top: 14px;
+  line-height: 1.7;
+}
+.tls-arith a { color: var(--accent); }
+.tls-arith a:hover { text-decoration: underline; }
+
+@media (max-width: 600px) {
+  .tls-labels { flex-basis: 84px; }
+  .tls-row-label { font-size: 9.5px; padding-right: 6px; }
+  .tls-product { font-size: 9px; padding: 2px 3px; }
+  .tls-product.is-left { transform: translate(calc(-100% - 7px), -50%); }
+}
+
+/* ================================================================================================
+   How fast / measures / full list / closing (site/src/pages/timeline.astro)
+   ================================================================================================ */
+
+/* min-width keeps every column at a readable width instead of squeezing dates and interval
+   phrases onto three or four lines each on a phone; the scroll wrapper, not the page, carries the
+   overflow this creates below that width -- the site's own established pattern for a table or
+   code block that cannot shrink to fit (see .code-file pre, .lane pre in global.css). */
+.tl-howfast-scroll { overflow-x: auto; }
+.tl-howfast-table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 12px; }
+.tl-howfast-table td, .tl-howfast-table th { white-space: nowrap; }
+.tl-howfast-table .tl-hf-level { white-space: normal; }
+.tl-howfast-table th {
+  text-align: left;
+  font: 600 10px var(--font);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 12px 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+.tl-howfast-table td {
+  padding: 11px 12px 11px 0;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  color: var(--muted);
+}
+.tl-howfast-table tr:last-child td { border-bottom: 0; }
+.tl-howfast-table .tl-hf-level { display: flex; align-items: center; gap: 8px; color: var(--text); font-weight: 550; }
+.tl-howfast-table .tl-hf-months { font-variant-numeric: tabular-nums; color: var(--text); font-weight: 550; }
+.tl-howfast-note { font-size: 11px; color: var(--muted); margin-top: 14px; line-height: 1.8; max-width: 70ch; }
+.tl-howfast-note a { color: var(--accent); }
+.tl-howfast-note a:hover { text-decoration: underline; }
+.tl-hf-missing { color: var(--muted); font-style: italic; }
+.tl-notes-list { margin-top: 4px; padding-top: 10px; border-top: 1px dashed var(--line); display: flex; flex-direction: column; gap: 6px; }
+.tl-notes-list .tl-howfast-note { margin-top: 0; max-width: 80ch; }
+
+/* "What each marked date beat": the candidates behind every mark, one group per level. */
+#candidates { margin-top: 20px; }
+#candidates h3 { font: 550 14px var(--display); margin: 0 0 8px; }
+.tl-cand-group { margin-top: 18px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.tl-cand-group h4 {
+  font: 550 12px var(--display);
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tl-cand-group h4 a { color: inherit; }
+.tl-cand-group h4 a:hover { color: var(--accent); }
+.tl-cand-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+.tl-cand-list li {
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--muted);
+  padding-left: 0;
+}
+.tl-cand-list li strong { color: var(--text); }
+.tl-cand-list a { color: var(--accent); }
+.tl-cand-list a:hover { text-decoration: underline; }
+.tl-cand-list .tl-item-pill { margin-right: 6px; }
+
+.tl-gap-list { display: flex; flex-direction: column; gap: 0; margin-top: 22px; }
+.tl-gap-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--muted);
+  align-items: baseline;
+}
+.tl-gap-row:last-child { border-bottom: 0; }
+.tl-gap-row b { color: var(--text); font-variant-numeric: tabular-nums; }
+
+.tl-measure {
+  border-left: 2px solid var(--accent);
+  background: var(--panel2);
+  border-radius: 0 6px 6px 0;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+}
+.tl-measure:last-child { margin-bottom: 0; }
+.tl-measure blockquote {
+  margin: 0 0 10px;
+  font: 500 15px/1.6 var(--display);
+  letter-spacing: -0.2px;
+  color: var(--text);
+}
+.tl-measure-meta { font-size: 11.5px; color: var(--muted); line-height: 1.8; }
+.tl-measure-meta a { color: var(--accent); }
+.tl-measure-meta a:hover { text-decoration: underline; }
+.tl-measure-scope { font-size: 11.5px; color: var(--muted); margin-top: 6px; line-height: 1.8; }
+
+.tl-year-group { margin-bottom: 28px; }
+.tl-year-group:last-child { margin-bottom: 0; }
+.tl-year-heading {
+  font: 600 13px var(--display);
+  letter-spacing: -0.2px;
+  color: var(--text);
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.tl-item {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 4px 16px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line);
+  scroll-margin-top: 110px;
+}
+.tl-item:last-child { border-bottom: 0; }
+.tl-item-date { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 1px; }
+.tl-item-body h3 { font: 550 13.5px var(--font); letter-spacing: 0; margin: 0 0 3px; display: flex; align-items: center; gap: 8px; }
+.tl-item-body p { font-size: 12px; color: var(--muted); margin: 3px 0 0; line-height: 1.7; }
+.tl-item-maker { font-size: 11px; color: var(--muted); }
+.tl-item-links { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 6px; font-size: 11px; }
+.tl-item-links a { color: var(--accent); }
+.tl-item-links a:hover { text-decoration: underline; }
+.tl-item-unverified {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 10.5px;
+  color: var(--o4);
+  border: 1px dashed color-mix(in srgb, var(--o4) 50%, var(--line));
+  border-radius: 4px;
+  padding: 3px 7px;
+}
+.tl-item-pill {
+  font-size: 8.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 2px 5px;
+}
+
+.tl-closing-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+.tl-closing-grid .panel { min-width: 0; }
+.tl-closing-grid h3 { font: 550 14px var(--display); margin: 0 0 8px; }
+.tl-closing-grid p { font-size: 12.5px; color: var(--muted); line-height: 1.8; }
+.tl-closing-grid a { color: var(--accent); }
+.tl-closing-grid a:hover { text-decoration: underline; }
+
+@media (max-width: 850px) {
+  .tl-closing-grid { grid-template-columns: 1fr; }
+  .tl-gap-row { grid-template-columns: 1fr; }
+  .tl-item { grid-template-columns: 1fr; }
+  .tl-item-date { padding-top: 0; }
+}
+
+/* The key under the strip: what each end of every bar is, with its date and the months between.
+   Without it the dots were unexplained, which is what made the strip read as odd. */
+.tls-key { list-style: none; padding: 0; margin: 18px 0 0; display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.tls-key li { display: grid; grid-template-columns: 170px minmax(0, 1fr) auto; gap: 4px 16px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+.tls-key-level { color: var(--text); }
+.tls-key-level b { font: 600 12px var(--display); color: var(--c); margin-right: 6px; }
+.tls-key-ends a { color: var(--text); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.tls-key-ends a:hover { text-decoration-color: var(--c); }
+.tls-key-months { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tls-key-ends a.tls-key-product { font-weight: 600; }
+.tls-key-opened { color: var(--muted); }
+.tls-key-paper { display: block; margin-top: 2px; font-size: 11px; }
+.tls-key-paper a { color: var(--muted); }
+@media (max-width: 700px) {
+  .tls-key li { grid-template-columns: minmax(0, 1fr) auto; }
+  .tls-key-ends { grid-column: 1 / -1; grid-row: 2; }
+}
+
+/* Model shifts: a rule across every lane on the strip, and the block under the key. */
+.tls-shift { position: absolute; top: 18px; bottom: 0; width: 0; border-left: 1px solid var(--text); opacity: 0.28; }
+.tls-shift-label {
+  position: absolute; bottom: 5px; transform: translateX(calc(-100% - 7px));
+  font-size: 9.5px; line-height: 1; color: var(--text); white-space: nowrap;
+  background: var(--panel); padding: 2px 4px; border-radius: 3px;
+}
+.tls-shifts { margin-top: 22px; }
+.tls-shifts h3 { font: 600 11px/1 var(--font, inherit); letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+.tls-shifts ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.tls-shifts li { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 13px 15px; display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+.tls-shifts li a { color: var(--text); font-size: 13px; }
+.tls-shifts li a b { font-weight: 600; }
+.tls-shifts li a:hover { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+.tl-shiftcard { margin-top: 16px; }
+.tl-shiftcard h3 { margin: 0 0 10px; }
+.tl-shiftcard-when { color: var(--muted); font-weight: 400; }
+.tl-shiftcard p.reading { margin: 0 0 12px; max-width: 72ch; }
+.tl-shiftcard-apps { margin: 0 0 14px; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 9px; max-width: 72ch; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.tl-shiftcard-apps li b { color: var(--text); font-weight: 600; }
+.tl-shiftcard-apps li a { color: var(--accent); white-space: nowrap; }

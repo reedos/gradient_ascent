@@ -1,0 +1,92 @@
+# Everything that can be checked without calling a model. Runs on every push and pull request.
+#
+# NO STEP HERE CALLS A MODEL. The Python tests run against StubModel, which makes no network
+# call; scripts/validate.py reads JSON and MDX off disk. That is a property of the code, not of
+# this file, and tests/test_common.py has a test for it. Nothing here needs an API key, and no
+# secret is referenced: if a step ever asks for one, something has changed that should not have.
+#
+# Order matters in one place: the Astro build runs BEFORE the Python tests, because 13 tests in
+# tests/test_indexes.py check the generated glossary, failure gallery and per-page Markdown by
+# reading site/dist. Without a build they skip cleanly, with a message, and the suite still
+# reports OK -- which is exactly the kind of green that means nothing. Building first is what
+# makes those 13 run.
+
+name: checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          # The project is stdlib-only: there is nothing to install and no requirements file.
+          # 3.13 rather than the repo's own 3.14 so a runner image change cannot fail the build;
+          # the code targets 3.11+ (the project plan, Build).
+          python-version: '3.13'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          # site/package.json declares engines.node >= 22.12.0.
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install the site's dependencies
+        working-directory: site
+        # ci, not install: it installs exactly what package-lock.json pins and fails if the
+        # lockfile and package.json disagree, which is the check worth having in CI.
+        run: npm ci
+
+      - name: Type-check the site
+        working-directory: site
+        run: npx astro check
+
+      - name: Build the site
+        working-directory: site
+        run: npm run build
+
+      - name: Validate the content files
+        # Taxonomy, registry, glossary, internal links, CodeFile pins and run-diagram geometry.
+        # Reads site/src, not site/dist, so it does not depend on the build above.
+        run: python scripts/validate.py
+
+      - name: Run the Python tests
+        # Reads site/dist for the generated-index tests, which is why the build is above this.
+        run: python -m unittest discover -s tests --verbose
+
+      - name: Fail if any test skipped
+        # A skip here means the build did not produce what test_indexes expects, which would
+        # otherwise pass as a green run. Kept as its own step so the reason is readable.
+        run: |
+          python - <<'PY'
+          import sys, unittest
+          result = unittest.TextTestRunner(verbosity=0, stream=open('/dev/null', 'w')).run(
+              unittest.TestLoader().discover('tests')
+          )
+          if result.skipped:
+              print(f'{len(result.skipped)} test(s) skipped, which CI treats as a failure:')
+              for test, reason in result.skipped:
+                  print(f'  {test.id()}: {reason}')
+              sys.exit(1)
+          print(f'{result.testsRun} tests, none skipped')
+          PY
+
+      - name: Run the site's own tests
+        working-directory: site
+        run: npm test

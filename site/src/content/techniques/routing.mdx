@@ -1,0 +1,230 @@
+---
+slug: routing
+level: 3
+run: routing
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Building effective agents"
+    url: "https://www.anthropic.com/engineering/building-effective-agents"
+    publisher: "Anthropic"
+    date: "2024-12-19"
+    accessed: "2026-09-18"
+  - title: "Paths"
+    url: "https://zapier.com/features/paths"
+    publisher: "Zapier"
+    accessed: "2026-09-18"
+  - title: "semantic-router"
+    url: "https://github.com/aurelio-labs/semantic-router"
+    publisher: "Aurelio Labs (GitHub README)"
+    accessed: "2026-09-18"
+  - title: "Introducing System One Models & Jev"
+    url: "https://typesafe.ai/blog/introducing-system-one-models-and-jev"
+    publisher: "TypeSafe AI"
+    date: "2026-09-15"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import routingRun from '../../data/runs/routing.json';
+
+Routing looks at an input, decides which of several fixed kinds it is, and sends it down the
+path built for that kind. Anthropic's own description: "routing classifies an input and directs
+it to a specialized followup task," which lets you build "more specialized prompts" for each
+kind instead of one prompt that has to handle every case<Cite n={1}/>. Its other example spends
+the same idea on cost rather than on prompt content: easy questions to a smaller, cheaper model,
+hard ones to a larger, more capable one<Cite n={1}/>.
+
+The classifying step is a code-owned decision even though a model produces the label. The model
+answers a narrow question with one word; your code reads that word and looks it up in a table of
+handlers it wrote in advance. The line to level 4 falls exactly there. At level 4 the model is
+offered a tool and its output invokes one directly; here the label is only a value your code
+branches on, the same as any other text a model returns.
+
+Routing sits at level 3, workflows. Your code owns every handler, the mapping from label to
+handler, and the fallback when no label fits confidently.
+
+A model built for exactly this step appeared in September 2026. TypeSafe AI's Jev generates no
+text; it returns a typed choice with a probability, and TypeSafe lists "classify, route, score,
+extract, or branch where hand-written logic is too brittle" as what it is for, at "70ms-500ms" a
+call<Cite n={4}/>. A probability is useful to a router in a way a bare label is not: send the
+confident cases straight through and the doubtful ones to a person or a larger model. It is in
+early access, and the figures are TypeSafe's own, unmeasured here.
+
+This page is marked draft, not published: routing has no recorded trace and no scored result
+file yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={routingRun} label="Level 3 · Routing" runKey="routing" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+If you have built an automation that sends different kinds of incoming items down different
+branches — a support inbox split into billing, technical and general queues, a form that files
+into different systems depending on what it asked for — you have built a router. Zapier's Paths
+feature is a direct product version of this: "if 'A' happens in your first app, then do this, but
+if 'B' happens, do something else"<Cite n={2}/>, with a rule for each path controlling what is
+allowed to reach it.
+
+A model-based router replaces the rule with a classification call: instead of writing "if the
+subject line contains 'refund', send to billing," you ask a model to read the whole message and
+say which of the fixed categories it belongs to. That is more forgiving of wording the rule
+writer did not anticipate, and more expensive and less predictable than a rule, since two
+similar messages can occasionally get different labels.
+
+A router is only as good as its smallest category. If "unclear" or "other" quietly becomes the
+largest bucket, the router is not routing — it is mostly declining, and whatever handles that
+bucket needs to be a real path rather than a quiet drop, because "unclear" is usually where the
+questions that need a person's judgment end up. Sending that bucket to someone is <Link
+href="/techniques/human-in-the-loop/">human approval</Link>, the last technique at this level.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example classifies a question as `lookup`, `numeric` or `unclear` with one small model call,
+then dispatches to one of three fixed handlers. Only the lookup handler calls the model again;
+the numeric handler answers from an exact part-number match in the parts list with no model call
+at all, and the fallback answers nothing on purpose rather than guess. A question that reaches
+the cheapest handler that can actually answer it costs less than one that reaches the most
+capable one by default — the point Anthropic makes about routing to a smaller model for easy
+questions<Cite n={1}/> generalizes to routing to no model at all when a plain lookup will do.
+
+`_parse_label` is the whole boundary between what the model decided and what the code decided:
+it takes the model's raw text, keeps only the first word, and returns it if and only if it is one
+of the three known labels — anything else, including a hedge like "probably lookup," becomes
+`unclear`. The routing table itself, `ROUTES = {"lookup": ..., "numeric": ..., "unclear": ...}`,
+is a plain dict the code wrote before the first question ever arrived. The model can steer which
+value comes out of `_parse_label`; it cannot add a fourth key to `ROUTES`.
+
+The fallback route matters as much as the working ones. `_numeric_route` calls the fallback
+itself when the label says "numeric" but no part number pattern actually appears in the question
+— the classifier can be confident about the wrong thing, and the honest response is to defer
+rather than to force an answer out of a handler that has nothing to work with.
+
+<CodeFile file="examples/routing/run.py" start={24} end={97} expect="LEVEL = 3" />
+
+Run it yourself:
+
+<CodeFile file="examples/routing/README.md" start={15} end={15} lang="text" expect="python -m examples.routing" />
+
+The classify step does not have to be a model call. Semantic Router, a library built around this
+one pattern, compares the question's embedding against a few example utterances per route and
+picks the closest, which its own README describes as making the decision in semantic vector space
+rather than waiting for a model to generate it<Cite n={3}/>. That is the same boundary drawn in a
+cheaper place: a table of routes your code wrote, and a classifier that can only choose among
+them.
+
+A router is worth measuring on its own, separately from whether the final answer was right. Feed
+it a small set of questions you have hand-labeled with the *intended* route, and score the
+classify step alone: what share got the label a person would have picked. A router that is 95%
+accurate but only used 60% of the time (because most traffic quietly falls to "unclear") is a
+different problem than one that is used 95% of the time but wrong on a fifth of what it routes,
+and a single end-to-end accuracy number cannot tell those apart.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try a plain rule (a keyword, a regular expression, a dropdown the user picks from) first if the
+categories are few and easy to tell apart from the surface form of the input — a rule is free to
+run, free to test, and never drifts between two similar inputs the way a classifier can. That is
+<Link href="/techniques/order-zero/">level 0, no model at all</Link>: no model at all.
+
+Move up to routing once the categories are real but the wording that signals each one is too
+varied to write as a rule, and a wrong route is cheap enough to tolerate at the rate a classifier
+gets it wrong.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'Confident misroute',
+    notice: "The classifier names a label with no hedge, the handler runs, and the answer is fluent and wrong, because the input actually needed a different route than the one it confidently got.",
+    test: "Score the classify step alone against a hand-labeled set of questions and their intended routes, separately from whether the final answer was correct, so a wrong route and a wrong answer from a right route are not the same number.",
+  },
+  {
+    name: 'The fallback route is missing or too weak',
+    notice: '"unclear" or an unrecognized label reaches a handler that guesses anyway instead of declining, because the fallback path was never given as much attention as the main ones.',
+    test: 'Send it questions built to be genuinely ambiguous and confirm the fallback route actually defers, rather than picking one of the other handlers by default.',
+  },
+  {
+    name: 'Category drift',
+    notice: "The share of questions landing in each category shifts over time (a new kind of question starts arriving that fits none of the categories well), and the router keeps forcing it into the closest existing one.",
+    test: "Track the label distribution over time, not just per-run accuracy; a category whose share moves a lot without a matching shift in the real input mix is worth a manual sample.",
+  },
+  {
+    name: 'A route that is cheaper but does not actually answer',
+    notice: 'The cheap, model-free route (a lookup table, a fixed rule) is chosen because the label matched, but the specific case is one that route cannot really handle, so it returns a technically-on-topic but wrong or incomplete answer.',
+    test: "Check the numeric route specifically against questions naming a part number pattern that is not actually in the parts list, and confirm it reports 'not found' rather than inventing a price.",
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, lookup route', value: '2' },
+    { label: 'Model calls, numeric or unclear route', value: '1' },
+    { label: 'Classify tokens in', value: '~64' },
+    { label: 'Classify tokens out', value: '1' },
+  ]}
+  comparedTo={{
+    label: 'RAG (level 2), every question',
+    note: 'RAG spends one full retrieval-and-answer call on every question regardless of kind. Routing spends a small classification call on every question, but only the questions routed to the lookup handler pay for a second, larger call.',
+  }}
+  level={3}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+Two numbers matter here, not one. End-to-end accuracy on the same 60-question set as every other
+technique is the first; routing accuracy — whether the classify step's label matches the kind a
+person would assign the question — is the second, and the site scores them separately so a wrong
+route and a right route with a wrong answer are not confused with each other.
+
+The `numeric` kind maps directly onto the example's part-number handler; `unanswerable`
+questions are the clearest test of the fallback, since the right behavior is to decline rather
+than force an answer through whichever handler the classifier happened to name. No result file
+exists yet (see `docs/EVALS.md`). Run `python scripts/eval_run.py --example routing --model
+<spec> --dry` to project the cost of a real run before spending anything on one.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="The label distribution over time, and accuracy of the classify step against a small hand-labeled sample, tracked separately from end-to-end answer accuracy. A route whose share of traffic changes sharply, with no matching change in the real input mix, is worth a manual look."
+  costAtVolume="Every question pays for one small classification call; only the questions routed to a model-calling handler pay for a second, larger one. Cost tracks the mix of routes actual traffic takes, not a fixed per-question number the way a single-path technique's cost does."
+  failsInProduction="A new kind of question starts arriving that fits none of the categories, and the classifier keeps forcing it into the closest existing label instead of the fallback, because nothing told it that kind did not exist yet when it was built."
+  whatToLog="The question, the raw classification text before parsing, the parsed label, and which handler actually ran, so a wrong answer can be traced to a misclassification, a parsing bug, or a handler that ran correctly on the wrong input."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Find a form or a support inbox that already sorts incoming items into a few fixed categories. Write down what happens to something that fits none of them well. Is there a real fallback, or does it get forced into the closest category?' },
+  { lane: 'build', body: 'Run python -m examples.routing --model stub with a question that names a part number not in the parts list (try "What does HLV-9999 cost?"), then one with no part number in it at all ("What does the drain pump cost?"). Which route does each one reach, and how does the answer differ?' },
+  { lane: 'either', body: 'Write five questions on purpose to land in the "unclear" fallback. How easy was that? A route that is too easy to fall into is a sign the other categories are drawn too narrowly.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

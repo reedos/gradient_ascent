@@ -1,0 +1,235 @@
+---
+slug: context-engineering
+level: 2
+run: context-engineering
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Prompt caching"
+    url: "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+    publisher: "Anthropic (Claude Platform documentation)"
+    accessed: "2026-09-18"
+  - title: "Prompt caching"
+    url: "https://developers.openai.com/api/docs/guides/prompt-caching"
+    publisher: "OpenAI (API documentation)"
+    accessed: "2026-09-18"
+  - title: "Context Rot: How Increasing Input Tokens Impacts LLM Performance"
+    url: "https://www.trychroma.com/research/context-rot"
+    publisher: "Chroma Research"
+    date: "2025-07-14"
+    accessed: "2026-09-18"
+  - title: "Contextual Retrieval"
+    url: "https://www.anthropic.com/engineering/contextual-retrieval"
+    publisher: "Anthropic (Engineering blog)"
+    accessed: "2026-09-18"
+  - title: "What are Projects?"
+    url: "https://support.claude.com/en/articles/9517075-what-are-projects"
+    publisher: "Anthropic (Claude Help Center)"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import contextEngineeringRun from '../../data/runs/context-engineering.json';
+
+Context engineering is deciding what goes into the request: which instructions, which examples,
+which documents, and how much of the conversation so far. The model knows only what it was
+trained on and what the request contains, so everything else is a choice your code makes, on
+every call.
+
+Two things about that choice matter beyond fitting the content in. Order affects cost: Anthropic
+and OpenAI both cache a matching prefix of a request and bill the reused part at a lower rate, and
+both tell you to put the content that never changes first and the content that changes every call
+last<Cite n={1}/><Cite n={2}/>. Length affects quality on its own: Chroma's research across 18
+models reports that models do not use their context uniformly, and that performance grows
+increasingly unreliable as input length grows, even on simple tasks<Cite n={3}/>. A longer request
+is not free just because it still fits.
+
+Context engineering sits at level 2, context. Nothing here searches and nothing is decided by the
+model: your code fixes what goes in, and in what order, before the request is sent.
+
+This page is marked draft, not published: context engineering has no recorded trace and no scored
+result file yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={contextEngineeringRun} label="Level 2 · Context engineering" runKey="context-engineering" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+If you have used a chat app's "project" or "custom instructions" feature — pinning files and
+instructions that apply to every conversation in that project, instead of retyping them each
+time — you have done context engineering by hand. Anthropic's Claude Projects keeps a project's
+files and instructions available to every conversation inside it: that pinned material is the
+stable part of the request, and what you type each turn is the part that changes<Cite n={5}/>.
+Other makers' chat apps have the same feature; the ones this site has checked are listed under
+Out there at the foot of this page.
+
+Two habits follow. First, put material worth reusing — a style guide, a product's specs, a
+policy document — into the part of the tool that stays fixed across the conversation, rather than
+pasting it into every message; that is both cheaper, if the product passes the saving on, and
+keeps your typed message focused on what actually changed. Second, do not assume a very long
+project or a chat you have been running for hours is still as reliable per turn as a short one,
+even though it technically still fits: more tokens in the request measurably costs answer
+quality, not just money<Cite n={3}/>.
+
+There is a ceiling on this habit. Once the material stops fitting comfortably in one request, a
+product stops sending all of it and starts searching instead, which is
+<Link href="/techniques/rag/">RAG</Link>; Claude Projects makes that switch on its own, and the
+RAG page quotes what Anthropic claims for it. Where the line falls is the next block down.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example below builds one request from parts that change at different rates: system
+instructions and the reference documents never change between calls; conversation history and the
+question change every call. It puts the parts that never change first and the parts that change
+last, which is the ordering a caching backend needs to reuse the front of the request<Cite n={1}/>
+<Cite n={2}/>. Nothing here searches for anything — the whole synthetic document set goes in, the
+same way regardless of the question — so this is what <Link href="/techniques/rag/">RAG</Link>'s
+"put it all in the window" alternative actually looks like in code.
+
+The static block is built once per call from every document in `evals/corpus/`, concatenated in a
+fixed, alphabetical order so its bytes are identical from one question to the next. A
+`token_budget` caps the whole request; what is left after the static block is what the
+conversation history gets to use. When history does not fit, the code drops the oldest turns
+first and never touches the documents, since the documents are the part later calls can still
+reuse from cache. This is the one place the code makes a real decision, and it is a fixed rule,
+not a judgment call — nothing here is decided by the model.
+
+Ordering the request is necessary for caching but not sufficient, and the two makers cited above
+differ in a way worth reading before you count on a discount. OpenAI documents caching as on by
+default for supported models, matching a prefix automatically, with a minimum of 1,024 tokens on
+its current models; it says reused tokens are billed at a reduced rate, discounted up to
+90%<Cite n={2}/>. Anthropic requires you to mark the end of the reusable prefix with a
+`cache_control` field, has a per-model minimum below which a marked prompt is silently not cached,
+and prices cache reads at a tenth of its base input rate against a write that costs more than an
+uncached call<Cite n={1}/>. Those are the makers' own published terms, not numbers this site has
+measured, and the write premium is why caching pays off over repeated calls rather than on the
+first one.
+
+<CodeFile file="examples/context_engineering/run.py" func="run" />
+
+Every step is `decided_by: "code"`: what goes in, in what order, and what gets cut when it does
+not fit are all fixed before the model ever sees the request. Run it yourself:
+
+<CodeFile file="examples/context_engineering/README.md" start={13} end={13} lang="text" expect="python -m examples.context_engineering" />
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Skip this and write a single prompt directly if there is nothing beyond the question itself to
+include — no documents, no reusable instructions, no history worth keeping. That is plain
+<Link href="/techniques/chat/">chat</Link> or <Link href="/techniques/prompt-engineering/">prompt
+engineering</Link>.
+
+Retrieve instead once the material outgrows the window. This page and
+<Link href="/techniques/rag/">RAG</Link> are the two answers to the same question, and four
+things separate them. Size: Anthropic's engineering team says include a knowledge base under
+about 200,000 tokens in full and reach for retrieval as it grows past that<Cite n={4}/>. Quality:
+a request that still fits can still answer worse, since performance grows less reliable as input
+length grows<Cite n={3}/>, while retrieval keeps the request short whatever the corpus does.
+Cost: everything you send is billed on every call, discounted to a tenth of the input rate on a
+cache hit<Cite n={1}/> but never to nothing, where a search bills only the few passages it
+returns. And what you give up by retrieving is the guarantee that the answer's source was in the
+request at all: a search can miss the passage, and sending everything cannot.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'A cache that never hits',
+    notice: 'Every call costs and takes as much as the first one, even though most of the request is the same material as last time.',
+    test: 'Look at what sits before the first part that changes between calls: a timestamp, a random id, or a reordered document list at or near the front invalidates the cached prefix every call. Then check the two things ordering cannot fix — whether the provider needs caching switched on explicitly for this request, and whether the prefix clears the provider\'s minimum cacheable length, below which nothing is cached and no error is returned.',
+  },
+  {
+    name: 'Context rot: worse answers from a request that still fits',
+    notice: 'A question the model could answer easily in a short prompt gets a wrong, vague, or lower-confidence answer once the request grows, with nothing over the model\'s stated context limit.',
+    test: 'Ask the same question with a small slice of the material and with the full set included. A large gap between the two, on a question the full set does not need, is context rot rather than a missing fact.',
+  },
+  {
+    name: 'Silent truncation drops the fact that mattered',
+    notice: 'The answer is confidently wrong or generic, and the one passage that would have answered it correctly was cut to fit the budget without anyone noticing.',
+    test: 'Log what was actually cut, not just that a cut happened. Rerun a failing question with the budget doubled and see whether the answer changes.',
+  },
+  {
+    name: 'Prompt injection through included material',
+    notice: 'A document contains text written to look like an instruction, and the answer follows it instead of answering the question.',
+    test: 'Add a section containing an embedded instruction to the included material and see whether the answer changes to match it.',
+  },
+  {
+    name: 'Stale static content',
+    notice: 'The static block was built once and reused across many calls; a source document changes and the answer keeps reflecting the old text.',
+    test: 'Change a document after the static block has been assembled, without rebuilding it, and ask a question the change affects.',
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, one question', value: '1' },
+    { label: 'Tokens in, first call', value: '~7,020' },
+    { label: 'Tokens out', value: '~64' },
+    { label: 'Wall time', value: '~1.6s' },
+  ]}
+  comparedTo={{
+    label: 'RAG (level 2, retrieving from the same 12 documents)',
+    note: 'About 3.8 times the tokens of the illustrated RAG run, since nothing is retrieved: the whole document set goes in on every call, cache discount aside.',
+  }}
+  level={2}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+This technique would be scored against the same 60-question synthetic set as every other level,
+over the document set in `evals/corpus/`. Because nothing is retrieved, every source is present
+for every question kind, so multi-hop and conflicting-source questions would test whether the
+model can still find and join facts inside a long request, not whether the right passage was
+fetched. Lookup and numeric questions are the ones most exposed to context rot: a fact the model
+could state easily on its own gets buried in material that has nothing to do with the question.
+
+No result file exists for this technique yet (see `docs/EVALS.md`), so this page cannot say a
+number for any of it. Run `python scripts/eval_run.py --example context_engineering --model
+<spec> --dry` to project the cost of a real run first. Expect a large number: this is the level
+that sends the whole document set on every question.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="Cache hit rate on the static block, and tokens billed at the full input rate versus the cached rate. A hit rate that drops for no reason usually means something changed in the part of the request meant to stay fixed."
+  costAtVolume="Dominated by tokens in, most of which is the same material sent again on every call; the caching discount is what keeps that affordable at volume, so a change that breaks caching is a cost regression even if nothing else about the answers changes."
+  failsInProduction="Someone adds a per-request value, such as a timestamp or a reordered list, ahead of the static block and the cache stops hitting. Or the reference material grows past the context window and starts getting silently cut, dropping whichever fact happened to be last."
+  whatToLog="The token count of the static block versus the dynamic part, whether the call was a cache hit, what (if anything) was trimmed to fit the budget, and the full assembled prompt, so a bad answer traces back to a missing fact rather than a model mistake."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Open a chat app\'s project or custom-instructions feature. Put a document there instead of pasting it into your message, ask a question about it, then ask a second, unrelated question in the same project. Does the second question still see the document?' },
+  { lane: 'build', body: 'Run python -m examples.context_engineering --model stub with a question of your own, then lower TOKEN_BUDGET in examples/context_engineering/run.py until it is smaller than the static block. What happens to the request, and what does the trace say got cut?' },
+  { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose, using the synthetic documents in evals/corpus/.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

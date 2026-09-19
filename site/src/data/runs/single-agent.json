@@ -1,0 +1,68 @@
+{
+  "illustrative": true,
+  "h": 630,
+  "title": "Single agent",
+  "sub": "The model writes a short plan, then picks each action itself and decides when to stop.",
+  "pill": "Level 5 · Agents",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 30, "l": "Question", "k": "io" },
+    { "id": "plan", "x": 170, "y": 170, "l": "writes a plan", "k": "model" },
+    { "id": "act", "x": 170, "y": 310, "l": "picks the next action", "k": "model" },
+    { "id": "search", "x": 82, "y": 450, "l": "search(query)", "k": "tool" },
+    { "id": "lookup", "x": 258, "y": 450, "l": "lookup_part(id)", "k": "tool" },
+    { "id": "a", "x": 170, "y": 590, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "plan", "by": "code" },
+    { "id": "e2", "f": "plan", "t": "act", "by": "code" },
+    { "id": "e3", "f": "act", "t": "search", "by": "model", "b": 22 },
+    { "id": "e4", "f": "search", "t": "act", "by": "code", "b": 22 },
+    { "id": "e5", "f": "act", "t": "lookup", "by": "model", "b": 22 },
+    { "id": "e6", "f": "lookup", "t": "act", "by": "code", "b": 22 },
+    { "id": "e7", "f": "act", "t": "a", "by": "model" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"What does the DW-300's drain pump cost, and\nhow long is it under warranty?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The model writes a plan; your code moves on regardless of what it says",
+      "d": "\"1. Search for the DW-300 warranty term.\n2. Look up the drain pump's part number and price.\"",
+      "m": "210 in · 34 out · 0.6 s"
+    },
+    {
+      "e": "e3",
+      "h": "The model chooses to search first",
+      "d": "→ search(\"DW-300 drain pump warranty\")",
+      "m": "340 in · 16 out · 0.7 s"
+    },
+    {
+      "e": "e4",
+      "h": "Your code returns the search results",
+      "d": "warranty-policy#1 (2-year full warranty),\nparts-list#2 (drain pump listed, no price shown here)",
+      "m": "2 passages · 24 ms"
+    },
+    {
+      "e": "e5",
+      "h": "The model looks up the exact part instead of trusting the search snippet",
+      "d": "→ lookup_part(\"HLV-2201\")",
+      "m": "520 in · 14 out · 0.7 s"
+    },
+    {
+      "e": "e6",
+      "h": "Your code returns the part line",
+      "d": "\"HLV-2201, Drain Pump, $46.00, fits DW-300.\"",
+      "m": "1 line · 9 ms"
+    },
+    {
+      "e": "e7",
+      "h": "The model decides it has enough and stops",
+      "d": "\"The DW-300 drain pump (HLV-2201) is $46.00.\nIt is covered under the 2-year full warranty.\"",
+      "m": "610 in · 28 out · 0.9 s"
+    }
+  ]
+}

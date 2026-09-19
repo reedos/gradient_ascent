@@ -1,0 +1,261 @@
+---
+slug: agent-teammates
+level: 7
+run: agent-teammates
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Introducing Grok Bot"
+    url: "https://x.ai/news/introducing-grok-bot"
+    publisher: "xAI (SpaceXAI)"
+    date: "2026-08-11"
+    accessed: "2026-09-18"
+  - title: "Introducing Muse, our personal AI agent"
+    url: "https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/"
+    publisher: "Meta"
+    date: "2026-09-08"
+    accessed: "2026-09-18"
+  - title: "Claude Cowork and chat are now one Claude"
+    url: "https://claude.com/blog/cowork-is-now-claude"
+    publisher: "Anthropic"
+    date: "2026-09-16"
+    accessed: "2026-09-18"
+  - title: "The next evolution of the Gemini app"
+    url: "https://blog.google/innovation-and-ai/products/gemini-app/next-evolution-gemini-app/"
+    publisher: "Google"
+    accessed: "2026-09-18"
+  - title: "OpenClaw"
+    url: "https://openclaw.ai/"
+    publisher: "OpenClaw Foundation"
+    accessed: "2026-09-18"
+  - title: "Hermes Agent"
+    url: "https://hermes-agent.nousresearch.com/"
+    publisher: "Nous Research"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import agentTeammatesRun from '../../data/runs/agent-teammates.json';
+
+An always-on assistant is built around a computer of its own, so it can keep existing between
+the moments you talk to it. xAI describes Grok Bot's version of this plainly: "Bots share a
+computer of their own in the cloud, so jobs do not stall when you step away"<Cite n={1}/>. Meta
+says the same thing about Muse: it "runs on its own dedicated computer in the cloud, contained so
+no one else's agent can reach it"<Cite n={2}/>.
+
+Two decisions move off the person at this level. A scheduler or an event decides *when* a session
+starts — a tick, a new message, a calendar reminder — and that part is ordinary code, no
+different from a cron job. What is new is that the *model* decides what happens once it is
+running: whether anything needs attention at all, and if so, what to do about it.
+
+Everything past that decision is a design problem for the product, not the model: what it may do
+without asking, what needs a person first, and what it may never do however it is asked.
+
+This page is marked draft, not published: it has no recorded trace and no scored result file
+yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={agentTeammatesRun} label="Level 7 · Always-on assistants" runKey="agent-teammates" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Grok Bot, Muse and Gemini Spark all launched in 2026; Out there, below, dates each one. Claude
+Cowork is retired: Anthropic's post says "Claude Cowork and chat are merging into one Claude" as
+of 2026-09-16, and describes what that leaves as "hand over a report due at noon, and Claude
+takes it from there, even after you've closed your laptop"<Cite n={3}/>.
+
+Delegate what is routine and reversible; keep anything that spends money, sends something
+outside, or is hard to undo behind an approval. Several makers build that split in. Muse "checks
+with the person before sensitive actions like sending an email or making a purchase"<Cite n={2}/>;
+Gemini Spark is "designed to ask you first before performing high-stakes actions like spending
+money or sending emails"<Cite n={4}/>. Anthropic makes it a setting: "By default, Claude asks
+before taking an action," with an option to "check in only when something needs a closer
+look"<Cite n={3}/>.
+
+A roster is the more advanced version. Grok Bot's own page: "People inside SpaceXAI often run
+multiple Bots in parallel, with one to manage the others. A chief of staff sits on top, with a
+specialist for each lane"<Cite n={1}/>. The same page describes how a bot learns a routine: "The
+best way for a Bot to learn your workflow is to ask it to follow along the next time you do a
+job. It watches the steps and remembers how you like the work done"<Cite n={1}/> — demonstration,
+not a written spec.
+
+Three mechanisms matter though you rarely see them. A credential vault: "Muse has no visibility
+into people's passwords or payment methods. Any credentials a person shares go into secure
+storage, so Muse can use them without seeing them"<Cite n={2}/>. A credential good for one
+purchase instead of a card on file: Meta says Muse checks out with Link, built by Stripe, whose
+"wallet for agents generates a one-time-use card so your real card details stay hidden"<Cite
+n={2}/>. And one system checking another rather than a model checking itself: "A separate
+Sentinel agent runs on that same machine, kept apart from Muse at the system level. Nothing Muse
+does reaches the internet unless the Sentinel approves it, and it asks the person for permission
+when needed"<Cite n={2}/>.
+
+Find three things before relying on any of them: what it keeps between sessions, what it may do
+while you are asleep, and how to stop it without the assistant's cooperation. Then read the
+approval queue and the overnight activity log each morning — the only account you get of what
+happened while you were away.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example is the piece behind all of the approval behavior above: one scheduled tick, a model
+that proposes actions, and a fixed, code-side policy that sorts each one into exactly three
+classes regardless of what the model asked for. `run_tick` takes a digest of what changed,
+offers the model one tool per action type, and records whatever it calls — zero calls is a valid
+answer, meaning the model decided nothing needed doing.
+
+<CodeFile file="examples/agent_teammates/run.py" func="run_tick" />
+
+`POLICY` is the whole security model: a plain dict from an action name to `"auto"`, `"approval"`,
+or `"forbidden"`. An action type the table does not mention falls back to `DEFAULT_POLICY`, which
+is `"forbidden"` — the same least-privilege default
+<Link href="/techniques/safety/">the safety topic</Link> argues for at every level, applied here
+to actions instead of tool calls. `make_payment` and `share_credential` are pinned to `forbidden`
+outright: no digest, no phrasing, no scripted plan gets either of them run, because the code never
+routes a `forbidden` action anywhere `_EXECUTORS` can reach it. `approval`-class actions go on a
+list and stop there; only a separate call, `approve`, made when a person actually looks at the
+queue, can run one:
+
+<CodeFile file="examples/agent_teammates/run.py" func="approve" />
+
+`approve` checks the policy again rather than trusting the item it finds in the queue. The queue
+is persisted and the table is code, so the two can disagree: an action reclassified `forbidden`
+after it was queued must not still run on a click. It also takes an `approver` and refuses a
+blank one, which makes "a recorded approval" a thing the code requires rather than a thing the
+log happens to mention. And the model has no way to approve anything of its own: its tools are
+generated from `POLICY`, and approving is not an entry in it.
+
+If you are building rather than subscribing to one of the products above, two self-hosted options
+document the same shape. Nous Research's Hermes Agent, MIT licensed, offers "natural-language
+scheduling for reports, backups, and briefings — running unattended through the gateway"<Cite
+n={6}/> and "isolated subagents with their own conversations, terminals, and Python RPC scripts"
+for a roster rather than one assistant<Cite n={6}/>. OpenClaw, also MIT licensed, describes the
+unattended half as "cron jobs, reminders, background tasks" and the approval half as "remote
+action approvals paired to your own Gateway"<Cite n={5}/>. This example builds neither a scheduler
+nor a roster; it is the policy layer any of them still needs once the tick fires and the model has
+said what it wants to do. For the scheduler and the state that survives between ticks, see
+<Link href="/techniques/long-horizon/">long-running tasks</Link>.
+
+`tests/test_example_agent_teammates.py` scripts a model that proposes one action from each of the
+three classes in a single tick and checks all three outcomes at once — the `auto` one ran, the
+`approval` one sits queued and unrun, and the `forbidden` one never touches `Mailbox` — plus
+separate tests that an action type nobody classified defaults to forbidden rather than auto, that
+a forbidden item planted directly in the queue is still refused at approval time, and that an
+approval with nobody's name on it runs nothing. Run it yourself:
+
+<CodeFile file="examples/agent_teammates/README.md" start={16} end={16} lang="text" expect="python -m examples.agent_teammates" />
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try <Link href="/techniques/single-agent/">a single agent</Link> first if a person is the one
+starting each run. What makes this level different is the trigger, not the loop — if nothing
+needs to happen unless someone asks, you do not need a scheduler deciding when to wake the model
+up.
+
+Try <Link href="/techniques/human-in-the-loop/">human approval</Link> on its own, without a
+standing assistant, if you need a person to sign off on a model's output but nothing needs to run
+unattended between one request and the next.
+
+Move up to an always-on assistant once the work genuinely needs to happen without anyone asking
+for it that day, and once you are ready to build or configure the three-way policy this page's
+example shows — because without one, "the model decides" and "runs unattended" is the same
+sentence as "nothing stops it."
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'An action type is missing from the policy table',
+    notice: "A new tool or action ships, nobody adds it to the policy, and it runs unattended by accident — the opposite of what a missing entry should mean.",
+    test: 'Check the default. A policy whose unclassified default is "auto" fails open; this example\'s default is "forbidden", so a missing entry fails closed instead — confirm that is still true after any change to the policy table.',
+  },
+  {
+    name: 'The approval queue grows and nobody looks at it',
+    notice: 'Every tick still reports success, but a person has not opened the queue in days, and whatever it contains is stale by the time anyone does.',
+    test: "Check the age of the oldest queued item. A queue with no staleness alert can hide an ignored approval for as long as nobody happens to look.",
+  },
+  {
+    name: 'A roster action is attributed to the wrong bot',
+    notice: 'With several assistants running in parallel, an action taken by one is logged or approved as if it came from another, so the record of who did what is wrong.',
+    test: 'Run two roster members against overlapping tasks and check that every logged action carries an identifier for which one actually proposed it, not just which one happened to be running.',
+  },
+  {
+    name: 'A credential meant to be scoped turns out not to be',
+    notice: "A payment method or login handed to the assistant works for more than the one purchase or the one site it was meant for, so a compromised session can do more damage than the design intended.",
+    test: "Use the credential once for its intended purpose, then try to use it again for something else. A properly scoped one-time credential should fail the second time; if it doesn't, the scoping is cosmetic.",
+  },
+  {
+    name: 'A supervising check runs on the same machine it is checking',
+    notice: "The approval or safety check that is supposed to catch a bad action shares infrastructure with the assistant proposing it, so a compromise of one compromises both.",
+    test: "Check whether the approval mechanism is actually a separate system, the way Meta's Sentinel is kept apart from Muse at the system level, or just another function the same process calls.",
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, one tick', value: '1' },
+    { label: 'Actions proposed, one tick', value: '0–3' },
+    { label: 'Tokens in, one tick', value: '~310' },
+    { label: 'Wall time, one tick', value: '~0.7s' },
+  ]}
+  comparedTo={{
+    label: 'a single agent (level 5) asked to do the same three things in one sitting',
+    note: 'Close to the same model cost per action proposed. What a single sitting does not pay for is the ticks that find nothing to do: an always-on assistant spends a model call on every scheduled check, whether or not anything comes of it, which a single agent never runs at all unless asked.',
+  }}
+  level={7}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={0} kinds={[]}>
+
+This example does not answer questions about a document set, so the site's shared 60-question set
+does not apply, the same reason it does not apply to
+<Link href="/techniques/computer-use/">computer use</Link>. What would be measured here is the
+policy, not an answer: the share of proposed actions correctly sorted into each of the three
+classes against a labelled set of action types, the share of `forbidden` actions that reach
+`_EXECUTORS` under any input (this should be exactly zero, always — `tests/test_example_agent_teammates.py`
+checks it on the stub every time the suite runs), and the average age of a queued approval before
+a person resolves it.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="Approval queue depth and the age of its oldest item, the count of forbidden actions the policy refused this period (a sudden rise is worth reading, not just alerting on), and the ratio of ticks that proposed nothing to ticks that proposed something, which says whether the schedule is well matched to how often anything actually changes."
+  costAtVolume="One model call per tick regardless of whether anything gets proposed, so cost tracks the schedule's frequency, not the workload. A tick interval shorter than how often anything meaningful actually changes spends money finding nothing to do."
+  failsInProduction="An action type ships without a policy entry and the default silently governs it — safe if the default is forbidden, dangerous if it is auto. Or a queue fills with approvals nobody is checking, and the assistant's practical unattended scope quietly shrinks to just the auto class, without anyone deciding that on purpose."
+  whatToLog="Every proposed action and which class the policy put it in, who approved or rejected each queued item and when, and every refusal of a forbidden action — refusals are not errors here, and hiding them from the log is how a policy gap goes unnoticed."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: "If you use one of these products, find its approval or activity history and check one week back. How many actions ran without asking you, how many waited for you, and is there anything in the first group you would rather have been in the second?" },
+  { lane: 'build', body: 'Run python -m examples.agent_teammates --model stub --question "..." with a made-up digest of your own, then open tests/test_example_agent_teammates.py and read test_all_three_policy_classes_in_one_tick to see a model that actually proposes all three kinds of action in one call.' },
+  { lane: 'either', body: "Pick one of the failure modes above and try to cause it on purpose: for the missing-policy-entry failure, add a new tool to ACTION_TOOLS in examples/agent_teammates/run.py without adding it to POLICY, and confirm it still comes out refused rather than auto-run." },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

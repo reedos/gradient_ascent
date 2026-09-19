@@ -1,0 +1,233 @@
+---
+slug: parallelization
+level: 3
+run: parallelization
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Building effective agents"
+    url: "https://www.anthropic.com/engineering/building-effective-agents"
+    publisher: "Anthropic"
+    date: "2024-12-19"
+    accessed: "2026-09-18"
+  - title: "Introducing Agent 4, built for creativity"
+    url: "https://replit.com/blog/introducing-agent-4-built-for-creativity"
+    publisher: "Replit"
+    accessed: "2026-09-18"
+  - title: "Subagents"
+    url: "https://code.claude.com/docs/en/subagents"
+    publisher: "Anthropic (Claude Code documentation)"
+    accessed: "2026-09-18"
+  - title: "Batch processing"
+    url: "https://platform.claude.com/docs/en/build-with-claude/batch-processing"
+    publisher: "Anthropic"
+    accessed: "2026-09-18"
+  - title: "Batch API"
+    url: "https://developers.openai.com/api/docs/guides/batch"
+    publisher: "OpenAI"
+    accessed: "2026-09-18"
+  - title: "Batch API"
+    url: "https://ai.google.dev/gemini-api/docs/batch-api"
+    publisher: "Google"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import parallelRun from '../../data/runs/parallelization.json';
+
+Parallel calls run more than one model call at the same time instead of one after another, and
+combine the results in code. Anthropic describes two distinct variations<Cite n={1}/>. **Sectioning**
+breaks one task into independent subtasks that each run in parallel — one call screens a request
+for policy violations while another handles it, or several calls each evaluate a different
+aspect of the same output. **Voting** runs the *same* task several times and combines the
+outputs — several prompts review the same code for vulnerabilities, or several prompts judge the
+same content against different thresholds and the results are combined into one verdict.
+
+Both stay at level 3 as long as your code decides how many calls to make, what each one gets,
+and how to combine what comes back, before any call goes out. The model fills in each call's
+answer; it does not decide how many branches exist or how they are merged. The line runs through
+those two decisions: a system where the model reads the task and works out what the subtasks are,
+or reads the branches and writes the merged answer itself, is <Link
+href="/techniques/orchestrator-workers/">lead agent and workers</Link> at level 6, not this.
+
+This page is marked draft, not published: parallelization has no recorded trace and no scored
+result file yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={parallelRun} label="Level 3 · Parallel calls" runKey="parallelization" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Coding agents that split a task and work on the pieces at once are a visible product example of
+sectioning. Replit, announcing the fourth version of Replit Agent: "Independent tasks can run in
+parallel, with progress visible and coordinated," and for larger jobs it "can split a single task
+into smaller pieces, work on them simultaneously with sub-agents, and recombine the
+results"<Cite n={2}/>.
+Claude Code's subagents feature documents the same pattern for research rather than code: "For
+independent investigations, spawn multiple subagents to work simultaneously"; then "each subagent
+explores its area independently, then Claude synthesizes the findings"<Cite n={3}/>. That is
+sectioning with a model doing the combining, which is the part that sits above this level.
+
+Voting is harder to spot from the outside: several runs of the same question, combined into one
+answer. It costs several times what asking once costs, so it earns its place only where a wrong
+answer costs more than the extra calls — a security review, a policy judgment, a number somebody
+is about to act on.
+
+The habit worth building either way: before firing several calls at once, check whether the task
+actually splits into genuinely independent parts. If two of the "sections" you're about to run in
+parallel actually depend on each other's answer, that is a sequence, and running it in parallel
+does not fix that; it just makes the dependency invisible until the combine step falls apart.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example is sectioning: it retrieves a fixed set of candidate document sections, asks the
+model to answer from each one *alone* — never seeing the other sections or the other calls — and
+combines whichever sections actually answered part of the question. Because each call already
+knows which single section it saw, citations are exact by construction; nothing has to be parsed
+back out of free text the way RAG and prompt chaining do.
+
+`ThreadPoolExecutor.map` is what makes this parallel rather than sequential: it submits every
+call to the pool at once, and the calls run concurrently, but the returned iterator still yields
+results in the order the candidates were given, regardless of which call actually finishes
+first. That is what keeps the example deterministic without an explicit sort: order comes from
+retrieval, never from a race between threads.
+
+Every `tracer.record` call happens on the main thread, after `list(pool.map(...))` has already
+collected every result — the trace itself is never written to from more than one thread at once.
+A `StubModel` built from a fixed list of canned responses is not safe to call from several
+threads concurrently, since it advances a shared counter with no lock; the example's tests build
+their stub from a function that reads the prompt instead, which has no shared state to race on.
+
+The trace above shows a real cost of naive sectioning: two of the three candidate sections
+happened to answer the same sub-question, so the combined text states the filter fact twice.
+Nothing in a fixed combine step notices the overlap, because each section answered without
+seeing what the others said.
+
+<CodeFile file="examples/parallelization/run.py" start={22} end={75} expect="LEVEL = 3" />
+
+Run it yourself:
+
+<CodeFile file="examples/parallelization/README.md" start={16} end={16} lang="text" expect="python -m examples.parallelization" />
+
+Real-time parallel calls like these are for when the answer is needed now. When it is not — a
+nightly re-score of every open ticket, a one-time pass over a large document set — the batch
+APIs three model makers publish do the same "many calls, one submission" idea asynchronously and
+cheaper: Anthropic's Message Batches API "reduc[es] costs by 50%... with most batches finishing
+in less than 1 hour"<Cite n={4}/>; OpenAI's Batch API gives "a 50% cost discount compared to
+synchronous APIs" with each batch completing "within 24 hours (and often more quickly)"<Cite
+n={5}/>; Google states that its Gemini Batch API processes requests at "50% of the standard cost"
+and that "the target turnaround time is 24 hours, but in majority of cases, it is much
+quicker"<Cite n={6}/>. Each of those is the maker's own published figure, checked on the date in
+the source list below, and each is the same trade: give up the immediate response, halve the
+price.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try <Link href="/techniques/prompt-chaining/">prompt chaining</Link> or a single call first if
+the task's parts actually depend on each other — a later part needs an earlier part's answer,
+or the sections would overlap and need to be reconciled against each other. Running dependent
+work in parallel does not make it independent; it just hides the dependency until the combine
+step produces a contradiction.
+
+Move up to parallelization once the task genuinely splits into parts that do not need each
+other's answers, and the parts are already known before any call runs — a section list you
+retrieved, a fixed set of checks to run, a fixed number of independent opinions to gather.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'Overlapping sections restate the same fact',
+    notice: "The combined answer repeats itself, or states the same fact in two slightly different ways, because two sections happened to cover the same ground and neither call could see the other's answer.",
+    test: "Retrieve candidates for a question you know has redundant coverage across sections (the DW-480's filter is described in both its own manual and the shared care-and-cleaning guide) and check whether the combined text repeats the fact.",
+  },
+  {
+    name: 'A fixed combine step cannot resolve a disagreement',
+    notice: 'Two sections answer the same question differently — an old figure and a superseding one — and a plain concatenation states both without saying which is current, because nothing in the combine step compares them against each other.',
+    test: "Run a question over sections you know conflict (an original spec and a later correction) and check whether the combined answer states both values with no indication of which one is authoritative.",
+  },
+  {
+    name: 'A shared, mutable stub races under real concurrency',
+    notice: "A test or a manual run using a list-based StubModel raises IndexError or returns answers in the wrong order under a thread pool, because the stub's internal counter is not safe to advance from more than one thread.",
+    test: "Run the example's own test suite; it is deliberately built on a callable-based stub for exactly this reason, and a regression toward a list-based stub under the thread pool would surface as an intermittent failure, not a consistent one.",
+  },
+  {
+    name: 'Rate limits under real load',
+    notice: 'Firing many calls at once against a live API returns 429 rate-limit errors once concurrency crosses the provider’s per-minute limit, which a small stub run never exercises.',
+    test: 'Check the provider’s published rate limits against the number of parallel calls one request triggers, before running the example against a live model at any real question volume.',
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, one question', value: '3' },
+    { label: 'Tokens in (summed)', value: '~520' },
+    { label: 'Tokens out (summed)', value: '~47' },
+    { label: 'Wall time', value: '~0.65s' },
+  ]}
+  comparedTo={{
+    label: 'prompt chaining (level 3, sequential)',
+    note: 'Cost sums across the three calls, the same as a sequential chain would. Wall time does not: it tracks the slowest single call, not their sum, which is the entire latency argument for running independent work in parallel instead of one call after another.',
+  }}
+  level={3}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+The same 60 questions, the same corpus, plus one number of its own: what share of a question's
+`must_cite` sections were actually covered by *some* section's answer. Multi-hop questions test
+that directly, since they need more than one section's fact combined into a single answer.
+
+Conflicting-source questions are the interesting case to watch: sectioning retrieves both sides
+of a deliberate contradiction as readily as RAG does, but its fixed combine step has no way to
+compare them, only to concatenate whatever each section said. Whether that scores better or worse
+than RAG's single stuffed-context prompt is exactly the kind of question this site can only
+answer once a result file exists (see `docs/EVALS.md`); none does yet. Run `python
+scripts/eval_run.py --example parallelization --model <spec> --dry` to project the cost of a real
+run first.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="Per-branch latency and error rate, not just the overall run's. One slow or failing branch in a thread pool can dominate wall time even though the others finished quickly; averaging across branches hides exactly the branch worth investigating."
+  costAtVolume="Cost is the number of parallel calls times the number of questions, same as a sequential chain of the same length — parallelism buys latency, not a lower bill. For volume that does not need an immediate answer, a maker's batch API halves the per-call cost in exchange for asynchronous delivery."
+  failsInProduction="Concurrency crosses a provider's per-minute rate limit once real question volume arrives, producing errors a low-volume stub or manual test never triggers. Separately, a thread pool sized for a fixed number of sections silently under-uses itself if fewer candidates come back than expected, or queues up if more do."
+  whatToLog="Each branch's input, output, token counts and wall time individually, plus which branches were kept versus dropped by the combine step, so a bad or missing final answer traces back to one specific branch rather than to 'the parallel step' as a whole."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Ask a coding agent or research tool that advertises parallel subagents to work on a task with three genuinely independent parts. Watch whether it actually runs them at once, and whether the combined result repeats anything across parts.' },
+  { lane: 'build', body: 'Run python -m examples.parallelization --model stub with the default question from the repo root, then change CANDIDATES_K from 3 to 5 in examples/parallelization/run.py. Does the combined answer change, or just get longer?' },
+  { lane: 'either', body: 'Cause the overlap failure on purpose: find a question the synthetic documents in evals/corpus/ answer in two places, run it, and count how many times the combined answer says the same thing.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

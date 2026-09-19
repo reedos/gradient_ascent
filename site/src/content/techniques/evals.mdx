@@ -1,0 +1,262 @@
+---
+slug: evals
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Define success criteria and build evaluations"
+    url: "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests"
+    publisher: "Anthropic (Claude Platform Docs)"
+    accessed: "2026-09-18"
+  - title: "Graders"
+    url: "https://developers.openai.com/api/docs/guides/graders"
+    publisher: "OpenAI (API documentation)"
+    accessed: "2026-09-18"
+  - title: "Evaluation"
+    url: "https://docs.langchain.com/langsmith/evaluation"
+    publisher: "LangChain (LangSmith documentation)"
+    accessed: "2026-09-18"
+  - title: "Evaluate systematically"
+    url: "https://www.braintrust.dev/docs/evaluate"
+    publisher: "Braintrust"
+    accessed: "2026-09-18"
+---
+
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+
+Evals are how a claim that a change made things better gets checked instead of assumed. A
+golden set is a fixed list of questions with a known right answer, or a rubric for judging one,
+run the same way before and after a change so the two runs can be compared. Grading is either
+exact — the answer must match a pattern, the way a test asserts a return value — or done by
+another model reading the answer against a rubric, for answers too open-ended to match with a
+pattern. A rubric grader is itself a model call and can be wrong, so some share of its verdicts
+needs checking by a person. None of this belongs to one level: a single prompt, a fixed workflow
+and an agent that runs for hours all make claims only an eval can check.
+
+This is the site's own second principle, on the <Link href="/method/">Method page</Link>: a page
+here may say a level helped only when a result file backs it. This is a topic, not a level.
+
+This page is marked draft, not published: no eval on this site has a scored result file yet
+(see `docs/EVALS.md`), so nothing below reports a measured number. It describes how the
+measuring works.
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Most people meet an eval as someone else's number: a vendor's benchmark score, a coworker's "the
+new prompt tested better." Two questions turn that number from a claim into something you can
+check. First, how was it graded — did the answer have to match exactly, or did another model
+read it and decide? A rubric grader is a judgment call made by software. Anthropic's own guidance
+on building evaluations calls exact-match grading "perfect for tasks with clear-cut, categorical
+answers like sentiment analysis (positive, negative, neutral)", and points to model-based grading
+on a rating scale for qualities like tone and coherence instead<Cite n={1}/>; a page that reports
+one number with no mention of which kind was used has left out something that changes how much to
+trust it. Second, was any of the grading checked by a person? OpenAI's own documentation on
+graders says "writing grader prompts is an iterative process," and warns that "models being
+trained sometimes learn to exploit weaknesses in model graders, also known as 'grader hacking'".
+The detection it describes is to run both kinds and compare: a model that has hacked the grader
+"will score highly on model grader evals but score poorly on expert human evaluations"<Cite
+n={2}/>. A number nobody has checked by hand carries that risk with no way to tell from the
+outside.
+
+A before/after claim needs both runs on the same questions. If a team says a new prompt "tested
+better," ask what it was tested against and whether the old prompt was run on the identical
+question set — LangSmith's own documentation lists regression tests among the things comparing
+evaluation runs is for, and describes running evaluations as the way to "catch regressions, and
+track quality over time"<Cite n={3}/>, which only works if nothing about the test itself moved
+between the two runs.
+
+A number that only reports accuracy is half the story. Braintrust's documentation distinguishes
+evaluation that runs before a change ships, against a fixed set of examples, from evaluation that
+runs continuously on production traffic once the ground truth is not known in advance<Cite
+n={4}/>. A one-time score from before launch says nothing about how the same system is doing
+against real questions six months later; a page or a dashboard that only ever shows the launch
+number is answering a question nobody is currently asking.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+This site measures every technique against one running task: 60 synthetic questions about a
+synthetic document set, in five kinds — lookup, multi-hop, numeric, unanswerable, conflicting
+sources — 12 of each, in `evals/questions.json`. Every question carries its own grading contract:
+`accept` and `require` patterns for exact matching, or a `rubric` list for a grader model to
+check against. `scripts/eval_run.py` runs one example, or all the examples that do this site's
+own task, against that set.
+
+Before a real run spends anything, `--dry` projects its cost. It never calls a model; it runs
+every example through a stand-in that counts real input tokens and reports the `max_tokens` cap
+as the worst-case output, so the number it prints is a ceiling, not a guess:
+
+<CodeFile file="scripts/eval_run.py" cls="DryRunModel" />
+
+That ceiling holds for an example whose control flow does not read the model's text. `routing`
+picks its branch from the model's answer, so the stand-in's placeholder text sends it down the
+cheapest branch and the projection comes in low; `docs/EVALS.md` says to project a branching
+example from the branch you expect to be busiest instead.
+
+A real run caches every response by the model id and a hash of the exact prompt, so re-running
+after a small prompt edit only pays for the questions whose prompt actually changed, and a run
+can be stopped early with `--budget-tokens` and resumed later without re-paying for what already
+ran. A run against the stub model — the one used for testing — is refused a result file unless
+the caller passes `--allow-stub`, and is marked `"stub": true` even then, because a stub answers
+nothing real:
+
+<CodeFile file="scripts/eval_run.py" start={778} end={780} expect="--allow-stub" />
+
+A result file (`evals/results/<example>/<model-id>.json`) records `score_overall` over graded
+questions only, a per-kind breakdown, `citation_hit_rate`, tokens in and out, wall time, and
+`model_decided_steps` — the count of trace steps the model itself chose, defined in
+`examples/common/trace.py` — alongside the run date and commit, so a chart built from it can be
+traced back to exactly what produced it. An `ungraded` question (no grader configured, or a
+grader reply that was not readable as PASS or FAIL) is counted and excluded from the score rather
+than scored as wrong, and 10% of every rubric grader's verdicts are written to a `.review.json`
+file for a person to check by hand.
+
+No example in this repository has a non-stub result file yet: nothing here has been measured
+against a live model, local or metered. `docs/EVALS.md` lists exactly which of the site's
+examples this question set scores and which it does not, and why — an example that does a
+different task, such as extracting a record instead of answering a question, gets a different
+measurement described on its own page rather than a meaningless number from this one.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Skip building a golden set and a grader, and just read five or ten real outputs by hand, when a
+change is small, reversible, and you are the only person who has to trust the verdict — a prompt
+tweak checked before lunch does not need a maintained question set to back it. That is still
+evaluation, just done directly instead of automated;
+<Link href="/techniques/prompt-engineering/">prompt engineering</Link>'s own advice to check a
+new version against the same cases the old one had to pass is exactly this, at spreadsheet scale.
+
+Build the harness once any of that stops holding: the same comparison gets made more than once,
+more than one person has to trust the number, or a wrong verdict is expensive enough that "it
+read fine to me" is not a good enough answer on its own.
+
+And there is nothing to evaluate before there is a claim to check. An eval measures whether a
+specific change made a specific, already-running task better or worse; get the task running
+first.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'Grader hacking',
+    notice: "A model or a prompt scores well against a rubric grader, but a person reading the same answers by hand rates them worse — the split a maker's own guidance names as the sign of a model that has learned to exploit the grader rather than do the task.",
+    test: "Run the hand-check sample this site's own runner writes for every rubric verdict, and compare its pass rate against the grader's own pass rate on the same questions.",
+  },
+  {
+    name: 'An ungraded question counted as a zero',
+    notice: "A report's accuracy number is lower than it should be because a question the grader could not parse a verdict from was folded into the score as a failure instead of excluded and counted separately.",
+    test: "Check a result file's ungraded count against its overall score; a report that never mentions ungraded questions may be silently treating every one of them as wrong.",
+  },
+  {
+    name: 'Before and after were never the same test',
+    notice: "A \"tested better\" claim turns out to compare two different question sets, two different grading rules, or two runs of a rubric grader whose own verdicts are not perfectly repeatable.",
+    test: "Re-run the old version against the exact question file and grading contract the new version used, rather than trusting a score that was recorded before the test itself changed.",
+  },
+  {
+    name: 'A rubric with nothing specific to check',
+    notice: "The grader's verdict on the same answer changes between two runs, because the rubric asks something open-ended — is this good — instead of one specific, checkable claim.",
+    test: 'Run the grader on the same answer twice and see whether the verdict is stable. If it moves, no amount of hand-checking makes the number underneath it trustworthy.',
+  },
+  {
+    name: 'A golden set that stopped matching the real task',
+    notice: 'The score holds steady release after release, but the questions arriving in production have moved on from what the golden set covers, so the number is stable and unrepresentative at the same time.',
+    test: 'Sample real traffic and check what share of it resembles a question actually in the set; a low share means the score is still answering yesterday\'s question.',
+  },
+]} />
+
+## At each level
+
+- <Link href="/levels/0/">No model</Link>: there is no model call to grade, so this is ordinary
+  software testing — fixed inputs, known outputs, run exhaustively rather than sampled, the way
+  <Link href="/techniques/order-zero/">level 0</Link>'s own search can be tested exhaustively
+  rather than sampled.
+- <Link href="/levels/1/">One call</Link>: grading one prompt's answer is the simplest case;
+  exact match works when a task has one right phrasing, the way
+  <Link href="/techniques/structured-output/">structured output</Link> can be scored on whether
+  the reply is valid at all, separately from whether its values are right, and a rubric grader is
+  needed as soon as a task has no one right phrasing.
+- <Link href="/levels/2/">Context</Link>: what got retrieved changes the answer, so grading has
+  to check citations as well as the final text — whether
+  <Link href="/techniques/rag/">RAG</Link>'s answer used the passage that actually holds the
+  fact, not merely a plausible one.
+- <Link href="/levels/3/">Workflows</Link>: a fixed chain of steps can be graded step by step,
+  not only on the final output — <Link href="/techniques/prompt-chaining/">prompt chaining</Link>'s
+  own citation check is exactly this, so a wrong route or a dropped step shows up even when a
+  later step happens to recover.
+- <Link href="/levels/4/">Tools</Link>: grading has to check whether the right tool was called
+  with the right arguments, since <Link href="/techniques/function-calling/">function
+  calling</Link>'s own failure modes show a wrong tool call can still produce an answer that
+  reads fine.
+- <Link href="/levels/5/">Agents</Link>: the model decides when to stop, so an eval has to weigh
+  how many steps and tool calls <Link href="/techniques/single-agent/">a single agent</Link> took,
+  and whether it stopped too early or kept going too long, alongside whether the final answer is
+  right.
+- <Link href="/levels/6/">Teams of agents</Link>: one agent's output being graded correct is not
+  enough for a <Link href="/techniques/debate-review/">review or debate</Link> setup — the
+  agreement between the agents needs measuring too, since two agents can share a blind spot and
+  agree while both are wrong.
+- <Link href="/levels/7/">Always-on agents</Link>: there is no single run to grade before it
+  ships, the reason <Link href="/techniques/long-horizon/">long-running tasks</Link>' own eval
+  section gives for why the site's question set does not apply to it. Evaluation shifts from a
+  one-time offline pass on a fixed set toward continuous scoring of what the agent actually did
+  once it was already running<Cite n={4}/>.
+
+## Practices
+
+- Ask how a number was graded before trusting it: exact match, or a model reading a rubric. The
+  two carry different failure modes.
+- You do not have to build the machinery. <Link href="/techniques/eval-frameworks/">Evaluation
+  frameworks</Link> sets six tools that run a set, grade it and compare runs side by side, in
+  their own documentation's words.
+- If a grader model is used, check some of its verdicts by hand. This site's own runner writes
+  10% of them to a file for exactly that.
+- Never treat an ungraded question as a wrong answer, and never let a report quietly do the same;
+  a grader that returns nothing readable is a gap, not a zero.
+- Re-run the same question set before and after a change, not a new set each time, or the
+  comparison is not measuring the change.
+- Report cost and latency next to the score, not separately. A prompt that scores two points
+  higher at ten times the tokens is a different trade than the score alone shows; the
+  <Link href="/techniques/ops/">operations</Link> topic is where those numbers are managed.
+
+## Run it
+
+<RunIt
+  monitor="The hand-check agreement rate between a rubric grader and a person, per run, not just
+  once at launch. A grader whose PASS rate climbs across unrelated commits is a sign it has
+  started rewarding its own habits instead of the checklist."
+  costAtVolume="A dry run's projected tokens, times the question count, times how many examples
+  or levels are being scored, sets the ceiling before a metered run starts. The response cache
+  means a prompt edit only pays again for the questions whose prompt actually changed."
+  failsInProduction="A grader model is updated by its maker and its verdicts shift with no change
+  to the thing being graded, which looks in a result file exactly like the graded system getting
+  better or worse."
+  whatToLog="Every grader verdict next to the question and answer it graded, not only the
+  aggregate score, plus the model id of both the system under test and the grader, the run date
+  and the commit, so a question about one number can be answered by rereading a file instead of
+  running anything again."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: "Find a benchmark score a product or model page states, and check whether the page says how the answer was graded and whether a person checked any of the verdicts by hand. If it doesn't say, that's the gap this page is about." },
+  { lane: 'build', body: 'Run python scripts/eval_run.py --example rag --model stub --dry from the repo root and read the projected tokens it prints, then change TOP_K in examples/rag/run.py from 4 to 2 and run it again. Did the projection change, and does that match what you\'d expect from fewer retrieved chunks?' },
+  { lane: 'either', body: "Pick one of the five question kinds in evals/questions.json (lookup, multi-hop, numeric, unanswerable, conflicting sources) and write, on paper, one new question of that kind against evals/corpus/ — the question, the accepted answer pattern, and which section it must cite." },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

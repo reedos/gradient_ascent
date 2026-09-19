@@ -1,0 +1,159 @@
+/* The site header, its menus, the phone sheet and the section rail under it.
+   One accent only: --sec, which is the current level's hue on a page that sits at a level and the
+   site's cobalt everywhere else. */
+
+.site-header {
+  position: sticky; top: 0; z-index: 30;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--line);
+}
+.header-inner { max-width: 1392px; margin: auto; padding: 0 48px; display: flex; align-items: center; height: 68px; gap: 44px }
+.site-header .brand { font-size: 21px; gap: 10px; flex: 0 0 auto }
+
+/* ---- primary navigation ---- */
+.primary-nav { flex: 1 1 auto; min-width: 0 }
+.primary-nav > ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 4px; height: 68px }
+.nav-group { position: relative; display: flex; align-items: stretch }
+.nav-trigger {
+  position: relative; display: inline-flex; align-items: center; gap: 7px;
+  padding: 0 14px; font-size: 13.5px; color: var(--muted); white-space: nowrap; transition: color .15s;
+}
+.nav-trigger svg { opacity: .6; transition: transform .2s, opacity .2s }
+.nav-trigger::after {
+  content: ""; position: absolute; left: 14px; right: 14px; bottom: -1px; height: 2px;
+  background: var(--sec, var(--accent)); border-radius: 2px 2px 0 0; opacity: 0; transition: opacity .15s;
+}
+.nav-trigger[data-current="true"] { color: var(--text) }
+.nav-trigger[data-current="true"]::after { opacity: 1 }
+.nav-trigger:focus-visible { outline-offset: -6px }
+
+.nav-panel {
+  position: absolute; top: calc(100% + 1px); left: -18px; z-index: 40;
+  width: 340px; padding: 20px 20px 16px;
+  background: var(--panel); border: 1px solid var(--line); border-top-color: transparent; border-radius: 0 0 12px 12px;
+  box-shadow: 0 28px 60px -24px rgba(0, 0, 0, .75);
+  opacity: 0; visibility: hidden; transform: translateY(-6px);
+  transition: opacity .16s ease, transform .16s ease, visibility 0s linear .16s;
+}
+.nav-panel-levels { width: 620px }
+.nav-panel-techniques { width: 560px }
+.nav-group.is-open .nav-panel,
+.nav-group:focus-within .nav-panel { opacity: 1; visibility: visible; transform: none; transition-delay: 0s }
+@media (hover: hover) {
+  .nav-group:hover .nav-panel { opacity: 1; visibility: visible; transform: none; transition-delay: 0s }
+  .nav-group:hover .nav-trigger { color: var(--text) }
+  .nav-group:hover .nav-trigger svg { transform: rotate(180deg); opacity: 1 }
+}
+.nav-group.is-open .nav-trigger,
+.nav-group:focus-within .nav-trigger { color: var(--text) }
+.nav-group.is-open .nav-trigger svg { transform: rotate(180deg); opacity: 1 }
+
+.nav-blurb { font-size: 12.5px; line-height: 1.55; color: var(--muted); max-width: 52ch; margin: 0 0 16px }
+.nav-heading { font: 600 10px/1 var(--font); letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; opacity: .8 }
+
+.nav-levels { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, auto); grid-auto-flow: column; gap: 2px 14px }
+.nav-level {
+  display: grid; grid-template-columns: 24px 1fr; column-gap: 8px; align-items: baseline;
+  padding: 9px 10px; border-radius: 7px; border-left: 2px solid transparent; transition: background .15s;
+}
+.nav-level:hover, .nav-level:focus-visible { background: var(--panel2) }
+.nav-level[aria-current="true"] { background: var(--panel2); border-left-color: var(--c) }
+.nav-level-n { font: 600 13px var(--display); color: var(--c); font-variant-numeric: tabular-nums }
+.nav-level-t { font-size: 13.5px; color: var(--text) }
+.nav-level-s { grid-column: 2; font-size: 11.5px; color: var(--muted); line-height: 1.45 }
+
+.nav-panel-foot { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted) }
+.nav-panel-foot a:hover { color: var(--text) }
+
+.nav-cols { display: grid; gap: 4px 26px }
+.nav-cols.is-two { grid-template-columns: 1.15fr 1fr }
+.nav-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px }
+.nav-link { display: flex; flex-direction: column; gap: 1px; padding: 8px 10px; margin: 0 -10px; border-radius: 7px; transition: background .15s }
+.nav-link:hover, .nav-link:focus-visible { background: var(--panel2) }
+.nav-link-t { font-size: 13.5px; color: var(--text) }
+.nav-link-s { font-size: 11.5px; color: var(--muted); line-height: 1.45 }
+.nav-link[aria-current="page"] .nav-link-t { color: var(--accent) }
+
+/* ---- actions ---- */
+.header-actions { display: flex; align-items: center; gap: 10px; flex: 0 0 auto }
+.nav-search {
+  display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 10px 0 11px;
+  border: 1px solid var(--line); border-radius: 8px; font-size: 12.5px; color: var(--muted); transition: color .15s, border-color .15s;
+}
+.nav-search:hover, .nav-search[aria-current="page"] { color: var(--text); border-color: color-mix(in srgb, var(--line) 40%, var(--muted)) }
+.nav-search kbd { font: 500 10.5px var(--font); color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; margin-left: 8px }
+.nav-cta {
+  display: inline-flex; align-items: center; height: 34px; padding: 0 14px; border-radius: 8px;
+  font-size: 12.5px; font-weight: 600; color: var(--on-accent); background: var(--accent); transition: filter .15s;
+}
+.nav-cta:hover { filter: brightness(1.1) }
+.nav-burger { display: none; align-items: center; gap: 9px; height: 34px; padding: 0 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 12.5px; color: var(--text) }
+.nav-burger-bars { position: relative; width: 14px; height: 8px; display: block }
+.nav-burger-bars i { position: absolute; left: 0; right: 0; height: 1.5px; background: currentColor; border-radius: 2px; transition: transform .2s, top .2s }
+.nav-burger-bars i:first-child { top: 0 }
+.nav-burger-bars i:last-child { top: 6.5px }
+.nav-burger[aria-expanded="true"] .nav-burger-bars i:first-child { top: 3.25px; transform: rotate(45deg) }
+.nav-burger[aria-expanded="true"] .nav-burger-bars i:last-child { top: 3.25px; transform: rotate(-45deg) }
+
+/* ---- phone sheet ---- */
+/* The header's backdrop-filter makes it the containing block for fixed descendants, so the sheet
+   hangs from the bar's bottom edge and takes the rest of the viewport by height. */
+.nav-sheet { position: absolute; left: 0; right: 0; top: 100%; height: calc(100dvh - 61px); z-index: 29; overflow-y: auto; overscroll-behavior: contain; background: var(--bg); border-top: 1px solid var(--line) }
+.nav-sheet-inner { max-width: 640px; margin: 0 auto; padding: 18px 20px 48px; display: flex; flex-direction: column; gap: 26px }
+.nav-sheet-cta { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; border-radius: 10px; background: var(--accent); color: var(--on-accent) }
+.nav-sheet-cta b { font: 600 16px var(--display); letter-spacing: -.3px }
+.nav-sheet-cta span { font-size: 12.5px; opacity: .85 }
+.nav-sheet-group h2 { font: 600 10.5px/1 var(--font); letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; padding-bottom: 10px; border-bottom: 1px solid var(--line) }
+.nav-sheet-group .nav-heading { margin: 14px 0 4px }
+.nav-sheet-group ul { list-style: none; margin: 0; padding: 0 }
+.nav-sheet-group li a { display: flex; flex-direction: column; gap: 1px; padding: 10px 0; font-size: 15px; color: var(--text) }
+.nav-sheet-group li a small { font-size: 12px; color: var(--muted) }
+.nav-sheet-group li a[aria-current="page"] > span { color: var(--accent) }
+.nav-sheet-levels { display: grid; grid-template-columns: 1fr 1fr; gap: 6px }
+.nav-sheet-levels a { display: flex; align-items: baseline; gap: 9px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 13.5px; background: var(--panel) }
+.nav-sheet-levels a[aria-current="true"] { border-color: var(--c); background: var(--panel2) }
+html.nav-sheet-open { overflow: hidden }
+
+/* ---- section rail ---- */
+.section-rail { border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 55%, var(--bg)) }
+.section-rail-inner { max-width: 1392px; margin: auto; padding: 0 48px; display: flex; align-items: center; gap: 22px; height: 44px }
+.section-rail-label { flex: 0 0 auto; font: 600 10px/1 var(--font); letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); padding-right: 22px; border-right: 1px solid var(--line); height: 16px; display: flex; align-items: center }
+.section-rail-items { display: flex; align-items: stretch; gap: 2px; height: 100%; min-width: 0; overflow-x: auto; scrollbar-width: none }
+.section-rail-items::-webkit-scrollbar { display: none }
+.section-rail-items a { position: relative; display: inline-flex; align-items: center; gap: 7px; padding: 0 12px; font-size: 12.5px; color: var(--muted); white-space: nowrap; transition: color .15s }
+.section-rail-items a:hover { color: var(--text) }
+.section-rail-items a[aria-current="true"] { color: var(--text) }
+.section-rail-items a[aria-current="true"]::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: -1px; height: 2px; border-radius: 2px 2px 0 0; background: var(--c, var(--sec, var(--accent))) }
+.section-rail-items a:focus-visible { outline-offset: -4px }
+.section-rail-n { font: 600 12px var(--display); color: var(--c); font-variant-numeric: tabular-nums }
+
+/* ---- responsive ---- */
+@media (max-width: 1240px) {
+  .header-inner { gap: 26px }
+  .nav-trigger { padding: 0 11px }
+  .nav-trigger::after { left: 11px; right: 11px }
+  .nav-search span { display: none }
+  .nav-search kbd { margin-left: 2px }
+}
+@media (max-width: 1150px) {
+  .header-inner, .section-rail-inner { padding-left: 30px; padding-right: 30px }
+}
+@media (max-width: 999.98px) {
+  .primary-nav, .nav-cta, .nav-search kbd { display: none }
+  .nav-burger { display: inline-flex }
+  .nav-search { width: 34px; padding: 0; justify-content: center }
+  .header-inner { height: 60px; justify-content: space-between }
+  /* On a phone the rail's level titles would not fit: numbers for all, the title for the one you are on. */
+  .section-rail.is-levels .section-rail-items a:not([aria-current="true"]) .section-rail-t { display: none }
+  .section-rail.is-levels .section-rail-items a { padding: 0 11px }
+}
+@media (max-width: 600px) {
+  .header-inner, .section-rail-inner { padding-left: 20px; padding-right: 20px }
+  .site-header .brand { font-size: 19px; gap: 8px }
+  .section-rail-inner { gap: 12px; height: 42px }
+  .section-rail-label { padding-right: 12px }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-panel, .nav-trigger svg, .nav-burger-bars i { transition: none }
+}

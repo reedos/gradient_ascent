@@ -1,0 +1,210 @@
+---
+slug: workflow-graphs
+level: 3
+run: workflow-graphs
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Graph API overview"
+    url: "https://docs.langchain.com/oss/python/langgraph/graph-api"
+    publisher: "LangChain (LangGraph documentation)"
+    accessed: "2026-09-18"
+  - title: "Dify"
+    url: "https://dify.ai/"
+    publisher: "LangGenius"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import graphRun from '../../data/runs/workflow-graphs.json';
+
+A workflow graph describes a process as nodes and edges instead of nested code: each node does
+one unit of work, and each edge decides what runs next. LangGraph, a framework built around the
+idea, defines both plainly. Nodes are "functions that encode the logic of your agents. They
+receive the current state as input, perform some computation or side-effect, and return an
+updated state." Edges are "functions that determine which node to execute next based on the
+current state." State is "a shared data structure that represents the current snapshot of your
+application"<Cite n={1}/>, passed from node to node rather than living in local variables.
+
+At this level every edge function is code your program wrote in advance, reading state a model
+call helped fill in. That is the whole difference from <Link
+href="/techniques/agent-graphs/">agent graphs</Link> at level 6, where a node can be an agent
+that picks its own edge. Here the graph is fixed control flow that happens to pass through some
+model calls, not a plan the model draws at run time. It is also the middle page of the site's
+<Link href="/threads/graph-engineering/">graph engineering thread</Link>:
+<Link href="/techniques/knowledge-graphs/">knowledge graphs</Link> connect information, agent
+graphs connect work, and a workflow graph is what you draw when the work is settled in advance.
+
+This page is marked draft, not published: workflow graphs has no recorded trace and no scored
+result file yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={graphRun} label="Level 3 · Workflow graphs" runKey="workflow-graphs" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+If you have built an automation with an if/else branch on a visual canvas — send it here if the
+amount is over some threshold, otherwise send it there — you have built a small workflow graph,
+whether or not the tool calls it that. Dify describes the appeal as a visible plan rather than a
+hidden prompt: "visual building blocks and AI prompts to define how an app thinks, retrieves
+data, makes decisions, uses tools, asks for human input, and completes tasks," turning "Prompt
+Logic Into a Visible Execution Path"<Cite n={2}/>.
+
+The thing to check in a tool like this is exactly what decides each branch. A branch driven by a
+fixed rule ("if the category field equals X") is this level: fully predictable, fully testable
+in isolation, and it never surprises you by taking a path you didn't design for. A branch driven
+by asking a model which way to go, inside the same node, is a different thing wearing the same
+visual shape — the diagram looks identical, but the behavior underneath has moved up a level,
+and testing "every possible path" stops being something you can enumerate in advance.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example is the same draft/check/revise loop as <Link
+href="/techniques/evaluator-optimizer/">write and check</Link>, run through a small graph
+executor instead of a hand-written loop, plus one branch a single loop does not express as
+cleanly: if retrieval finds nothing, the graph goes straight to a dead end (`no_match`) instead
+of drafting from zero sources.
+
+A node is a plain function of the shared state that returns an updated state, and nothing else.
+This one is the whole of `retrieve`:
+
+<CodeFile file="examples/workflow_graphs/run.py" func="_node_retrieve" />
+
+`NODES` collects five of those under their ids; `EDGES` holds one function per node, each
+reading the state and returning the id of the next node, or `None` to stop. The runner is one
+`while` loop: run the current node, record what it did, ask its edge function what comes next,
+write a checkpoint, move on. The draft, check and revise nodes are the same
+prompts <Link href="/techniques/evaluator-optimizer/">write and check</Link> uses, so they are
+left out below; the graph machinery is the part worth reading here.
+
+<CodeFile file="examples/workflow_graphs/run.py" start={95} end={154} expect="NODES: dict[str, Callable" />
+
+The checkpoint is the concrete payoff graphs are usually sold on. `state`'s durable fields are
+all plain values — strings, an int, a list of citation strings — so recording it after every node
+is a real `json.dumps`, not an idea that would need a redesign to actually implement. A crashed
+run could resume from the last written checkpoint by loading that same dict and re-entering the
+loop at the node the checkpoint names, with no change to `NODES` or `EDGES` at all.
+
+Whether the graph is worth it here is a fair question, and the honest answer is: barely, for
+this exact example. Five nodes and a handful of edge functions do the same job
+write-and-check's plain `while` loop does in fewer lines, with one extra indirection (looking a
+function up in a dict instead of calling it directly) that buys nothing when there is only one
+reasonable order to run things in. The place a graph earns that cost back is where this example
+starts to gesture at it but does not fully need it: a genuine branch (`no_match`) that a nested
+`if` inside a longer function would have buried, a state shape simple enough to checkpoint for
+real, and node functions that would still make sense wired into a different graph — none of
+which a straight-line function forbids, but a graph makes structurally obvious rather than
+something a reader has to reconstruct from control flow.
+
+Run it yourself:
+
+<CodeFile file="examples/workflow_graphs/README.md" start={17} end={17} lang="text" expect="python -m examples.workflow_graphs" />
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try a plain function with an ordinary `if`/`while`, the way <Link
+href="/techniques/evaluator-optimizer/">write and check</Link>'s example does, first if the
+process has one obvious order and no real branch — a graph's nodes-and-edges indirection is
+ceremony when there is only one path through the code anyway.
+
+Move up to a workflow graph once the process has a real branch that a nested `if` would bury, a
+state shape worth checkpointing between steps, or node functions you expect to reuse in more
+than one wiring.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'An edge function with a bug routes to the wrong node silently',
+    notice: 'The run completes and returns an answer, but a later step is missing something an earlier node actually produced, because an edge function read the wrong state field or compared it wrong.',
+    test: "Unit test every edge function directly, with a small hand-built state dict for each branch it can take, the same way you would test any other pure function — no model or graph run required.",
+  },
+  {
+    name: 'The graph has an unreachable node',
+    notice: 'A node exists in NODES but no edge function ever returns its id, so it is dead code that looks, from the diagram, like part of the live process.',
+    test: 'List every node id and confirm each one appears as at least one edge function’s return value somewhere in EDGES; one that never does is either genuinely dead or the sign of a typo in an edge function.',
+  },
+  {
+    name: 'A cycle with no exit condition',
+    notice: "Two edge functions route back and forth between the same two nodes forever, because neither one's condition can ever become the one that stops the loop.",
+    test: "Trace every cycle in the edge graph by hand and confirm at least one edge function's condition is guaranteed to change monotonically (a counter that only increases, capped in code) rather than depending only on model output that might never satisfy it.",
+  },
+  {
+    name: 'The checkpoint is incomplete',
+    notice: "A resumed run behaves differently from an uninterrupted one, because some field the process actually depends on was never part of the checkpointed state (it lived in a local variable, or a node's closure) and so was lost across the resume.",
+    test: "Serialize the state after each node with the real checkpoint mechanism, load it back into a fresh process, and resume from there; compare the final answer against an uninterrupted run on the same question.",
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Nodes visited, no revision needed', value: '3' },
+    { label: 'Model calls, no revision needed', value: '2' },
+    { label: 'Trace steps per node visited', value: '2' },
+    { label: 'Wall time, no revision needed', value: '~1.4s' },
+  ]}
+  comparedTo={{
+    label: 'write and check (level 3, same task)',
+    note: 'Same model calls as the hand-written loop for the same outcome; the graph runner adds a checkpoint step after each node, which is bookkeeping cost in trace size and code, not in tokens spent on the model.',
+  }}
+  level={3}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+The same 60 questions as every other technique, with a narrow interest in the result. Because
+the graph runs the same logic as write and check, its score on citation hit rate and revision
+count should match
+that page's result file once one exists — a divergence between the two would point at a bug in
+the graph wiring, not a difference in what the technique can do. The `no_match` branch is what
+`unanswerable` questions specifically exercise: whether retrieval finding nothing correctly ends
+the run at a dead end rather than drafting from an empty source list.
+
+No result file exists yet (see `docs/EVALS.md`). Run `python scripts/eval_run.py --example
+workflow_graphs --model <spec> --dry` to project the cost of a real run first.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="Which node a run stopped on and why (an edge function's return value), not just the final answer. A node that is visited far more or less often than expected is a sign a branch condition drifted from what real traffic actually looks like."
+  costAtVolume="The same as whatever the underlying nodes cost, since the graph runner itself makes no model calls of its own. The checkpoint write after every node adds a small, fixed storage cost per node visited, independent of question difficulty."
+  failsInProduction="An edge function's condition stops matching reality (a state field's shape changed upstream and the comparison silently always takes the same branch), which nothing catches unless every edge function is tested against the specific states it is meant to branch on."
+  whatToLog="The full state dict at every checkpoint, and which edge each transition took, not just the final node's output. A wrong final answer is only debuggable if you can see the exact state the run was in when it decided each turn."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Find an automation tool with a visual if/else or branch node. Open one branch condition and read exactly what it checks. Is it a fixed rule, or does a model decide which way to go inside that node?' },
+  { lane: 'build', body: 'Run python -m examples.workflow_graphs --model stub with a question from the repo root, then with a question built from gibberish words so retrieval finds nothing. Which node does the run stop on in each case, and how many checkpoints does the trace record?' },
+  { lane: 'either', body: 'Draw a process you run as nodes and edges on paper, then count the edges whose condition you could not write as a line of code. Those are the places it is not this level.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

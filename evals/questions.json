@@ -1,0 +1,755 @@
+{
+  "version": 1,
+  "corpus_dir": "evals/corpus",
+  "kinds": ["lookup", "multi_hop", "numeric", "unanswerable", "conflicting"],
+  "abstain_patterns": [
+    "\\b(?:do|does|did) not (?:say|state|specify|mention|give|list|provide|include|rate|publish|record)",
+    "\\b(?:don't|doesn't|didn't) (?:say|state|specify|mention|give|list|provide|include)",
+    "\\bnot (?:stated|given|specified|mentioned|listed|provided|published|documented|available|found)\\b",
+    "\\bno (?:information|figure|number|mention|data|rating|price|weight|capacity|record|answer)\\b",
+    "\\b(?:cannot|can't|could not|couldn't|unable to) (?:be )?(?:determined|determine|answer|answered|find|found|tell)\\b",
+    "\\b(?:is|are) silent\\b",
+    "\\bnothing in (?:the|these) documents\\b"
+  ],
+  "questions": [
+    {
+      "id": "L01",
+      "kind": "lookup",
+      "question": "How many place settings does the DW-300 dishwasher hold?",
+      "answer": "12 place settings.",
+      "accept": ["12 place setting"],
+      "must_cite": ["dw300-manual#1"],
+      "grading": "exact"
+    },
+    {
+      "id": "L02",
+      "kind": "lookup",
+      "question": "What is the noise rating of the DW-480 dishwasher during its Normal cycle?",
+      "answer": "44 dBA.",
+      "accept": ["44 dBA"],
+      "must_cite": ["dw480-manual#2"],
+      "grading": "exact"
+    },
+    {
+      "id": "L03",
+      "kind": "lookup",
+      "question": "How many cubic feet is the DR-520 dryer's drum?",
+      "answer": "7.8 cubic feet.",
+      "accept": ["7\\.8 cubic (foot|feet)"],
+      "must_cite": ["dr520-manual#1"],
+      "grading": "exact"
+    },
+    {
+      "id": "L04",
+      "kind": "lookup",
+      "question": "What electrical circuit does a DR-210 dryer require?",
+      "answer": "A dedicated 240V, 30A circuit.",
+      "accept": ["240V,? ?30A"],
+      "must_cite": ["dr210-manual#2"],
+      "grading": "exact"
+    },
+    {
+      "id": "L05",
+      "kind": "lookup",
+      "question": "How often should the DW-300's fine filter be cleaned?",
+      "answer": "Every 30 cycles.",
+      "accept": ["every 30 cycles"],
+      "must_cite": ["dw300-manual#6"],
+      "grading": "exact"
+    },
+    {
+      "id": "L06",
+      "kind": "lookup",
+      "question": "Which dryer error code indicates the thermal fuse has opened?",
+      "answer": "F2.",
+      "accept": ["F2"],
+      "must_cite": ["troubleshooting#3"],
+      "grading": "exact"
+    },
+    {
+      "id": "L07",
+      "kind": "lookup",
+      "question": "How long is the DW-300's Quick Wash cycle?",
+      "answer": "30 minutes.",
+      "accept": ["30 minutes"],
+      "must_cite": ["dw300-manual#3"],
+      "grading": "exact"
+    },
+    {
+      "id": "L08",
+      "kind": "lookup",
+      "question": "What is the price of the universal dryer vent cleaning kit, part HLV-9002?",
+      "answer": "$19.99.",
+      "accept": ["\\$?19\\.99"],
+      "must_cite": ["parts-list#4"],
+      "grading": "exact"
+    },
+    {
+      "id": "L09",
+      "kind": "lookup",
+      "question": "How long is the full parts-and-labor warranty on Halvorsen dishwashers and dryers?",
+      "answer": "2 years from the original date of purchase.",
+      "accept": ["2 years"],
+      "must_cite": ["warranty-policy#1"],
+      "grading": "exact"
+    },
+    {
+      "id": "L10",
+      "kind": "lookup",
+      "question": "What is the maximum drain hose length for a dishwasher installation?",
+      "answer": "8 feet.",
+      "accept": ["8 feet"],
+      "must_cite": ["installation-guide#3"],
+      "grading": "exact"
+    },
+    {
+      "id": "L11",
+      "kind": "lookup",
+      "question": "What does the DW-480's leak cutoff do when it trips?",
+      "answer": "It shuts off the water supply and stops the cycle immediately.",
+      "accept": ["shuts? off (its |the )?water supply"],
+      "must_cite": ["dw480-manual#5"],
+      "grading": "exact"
+    },
+    {
+      "id": "L12",
+      "kind": "lookup",
+      "question": "What is the empty weight of the DR-210 dryer?",
+      "answer": "110 lb.",
+      "accept": ["110 lb"],
+      "must_cite": ["dr210-manual#2"],
+      "grading": "exact"
+    },
+    {
+      "id": "M01",
+      "kind": "multi_hop",
+      "question": "What does the DW-480's drain pump cost, and which document confirms that part number is actually used in the DW-480?",
+      "answer": "The drain pump is part HLV-2205, priced at $52.00 in the parts list; the DW-480 owner's manual confirms HLV-2205 is the drain pump used in that model.",
+      "accept": ["HLV-2205"],
+      "require": ["\\$?52\\.00"],
+      "must_cite": ["parts-list#2", "dw480-manual#8"],
+      "grading": "exact"
+    },
+    {
+      "id": "M02",
+      "kind": "multi_hop",
+      "question": "What does the DR-210's door latch switch cost, and which manual confirms that part fits the DR-210?",
+      "answer": "Part HLV-7734, priced at $12.50 in the parts list; the DR-210 owner's manual confirms HLV-7734 is the door latch switch used on the DR-210.",
+      "accept": ["HLV-7734"],
+      "require": ["\\$?12\\.50"],
+      "must_cite": ["parts-list#3", "dr210-manual#7"],
+      "grading": "exact"
+    },
+    {
+      "id": "M03",
+      "kind": "multi_hop",
+      "question": "A customer's DR-210 was manufactured in February 2023. Is it covered by a recall, and what is the remedy?",
+      "answer": "Yes. Recall Notice RC-2026-02 covers DR-210 units manufactured January through March 2023 (serial prefixes 23A01-23A03) for a power cord defect; Halvorsen replaces the power cord at no charge through authorized service.",
+      "accept": ["23A01", "no charge"],
+      "must_cite": ["dr210-manual#8", "recall-notice#2", "recall-notice#4"],
+      "grading": "rubric",
+      "rubric": [
+        "States the DR-210 is covered by recall RC-2026-02 because it was made in the January-March 2023 window",
+        "States the remedy is a free power cord replacement through authorized service",
+        "Does not claim any other part of the unit is affected"
+      ]
+    },
+    {
+      "id": "M04",
+      "kind": "multi_hop",
+      "question": "A DW-300's control panel shows error code E5. Is that an expected condition for this model?",
+      "answer": "No. The troubleshooting guide defines E5, the overflow or leak sensor code, for the DW-480 only, and the DW-300 has no leak cutoff sensor; the DW-300 manual says a code its table does not list for this model should be reported to service rather than acted on.",
+      "accept": ["DW-480 only", "leak cutoff sensor"],
+      "must_cite": ["dw300-manual#1", "dw300-manual#7", "troubleshooting#2"],
+      "grading": "rubric",
+      "rubric": [
+        "States E5 is not a normal or expected code for the DW-300",
+        "States E5 is defined for the DW-480 only and that the DW-300 has no leak sensor",
+        "Recommends reporting it to service rather than treating it as a real fault"
+      ]
+    },
+    {
+      "id": "M05",
+      "kind": "multi_hop",
+      "question": "A DR-210 owner is quoted for part HLV-6601 eighteen months after purchase. What kind of part is it, and is it covered by the warranty at that point?",
+      "answer": "HLV-6601 is the drive belt. It is not covered: the warranty policy treats belts as normal wear parts, covered for 90 days from purchase only, even during the 2-year full warranty period.",
+      "accept": ["Drive Belt", "90 days"],
+      "must_cite": ["parts-list#3", "warranty-policy#5"],
+      "grading": "rubric",
+      "rubric": [
+        "Identifies HLV-6601 as the drive belt",
+        "States belts are normal wear parts covered for 90 days only",
+        "Concludes the replacement is not covered at eighteen months"
+      ]
+    },
+    {
+      "id": "M06",
+      "kind": "multi_hop",
+      "question": "A recalled DR-210 is installed in a rental property and is six months old. How long is its warranty, and can the owner still get the recall remedy?",
+      "answer": "In a rental property the warranty is limited to 90 days from purchase, so at six months the unit is out of warranty. The recall remedy is still available: the free power cord replacement is provided regardless of the unit's warranty status.",
+      "accept": ["90 days", "regardless of the unit's warranty status"],
+      "must_cite": ["warranty-policy#3", "recall-notice#4"],
+      "grading": "rubric",
+      "rubric": [
+        "States rental or commercial use limits the warranty to 90 days, so the unit is out of warranty at six months",
+        "States the recall cord replacement is still free because it does not depend on warranty status",
+        "Does not claim the recall extends or restores the warranty"
+      ]
+    },
+    {
+      "id": "M07",
+      "kind": "multi_hop",
+      "question": "Which of the two Halvorsen dishwashers is quieter, and how often does that model's filter need manual cleaning?",
+      "answer": "The DW-480, at 44 dBA against the DW-300's 52 dBA. Its filter is self-cleaning and needs no routine manual cleaning under normal use.",
+      "accept": ["44 dBA", "self-cleaning"],
+      "must_cite": ["specs-comparison#2", "dw480-manual#6"],
+      "grading": "rubric",
+      "rubric": [
+        "Names the DW-480 as the quieter model, at 44 dBA against the DW-300's 52 dBA",
+        "States the DW-480's filter is self-cleaning and needs no routine manual cleaning",
+        "Does not give the DW-300's every-30-cycles schedule as the answer"
+      ]
+    },
+    {
+      "id": "M08",
+      "kind": "multi_hop",
+      "question": "The care and cleaning guide prescribes a monthly dishwasher deep clean on one cycle. Which cycle is it, and how long does that cycle run on a DW-300?",
+      "answer": "The Heavy cycle, run empty with a dishwasher-safe cleaner. On the DW-300 the Heavy cycle runs 130 minutes.",
+      "accept": ["Heavy"],
+      "require": ["130"],
+      "must_cite": ["care-and-cleaning-guide#2", "dw300-manual#3"],
+      "grading": "exact"
+    },
+    {
+      "id": "M09",
+      "kind": "multi_hop",
+      "question": "The installation guide requires one cycle to be run on a new dryer before regular use. Which cycle, and how long does it take on a DR-520?",
+      "answer": "One Air Fluff cycle, which runs 20 minutes on the DR-520.",
+      "accept": ["Air Fluff"],
+      "require": ["20 minutes"],
+      "must_cite": ["installation-guide#6", "dr520-manual#3"],
+      "grading": "exact"
+    },
+    {
+      "id": "M10",
+      "kind": "multi_hop",
+      "question": "Does the DW-300 have the leak cutoff protection the DW-480 has?",
+      "answer": "No. The DW-300 owner's manual lists a leak cutoff sensor as a feature the model does not include; the DW-480 manual describes its leak cutoff as a float sensor in the base pan that shuts off the water supply, and that feature is specific to the DW-480.",
+      "accept": ["leak cutoff sensor", "float sensor"],
+      "must_cite": ["dw300-manual#1", "dw480-manual#5"],
+      "grading": "rubric",
+      "rubric": [
+        "States the DW-300 does not have the leak cutoff",
+        "States the leak cutoff is a DW-480 feature, a float sensor in the base pan",
+        "Does not claim the DW-300 has any equivalent leak sensor"
+      ]
+    },
+    {
+      "id": "M11",
+      "kind": "multi_hop",
+      "question": "A DW-300 owner wants to fit a new drain pump themselves. What is the part and its price, and what does doing the work themselves mean for the warranty?",
+      "answer": "The DW-300 drain pump is part HLV-2201, $46.00. Fitting it themselves voids the remainder of the warranty: any repair or part substitution by anyone other than an authorized Halvorsen service provider voids both the full and the limited periods.",
+      "accept": ["HLV-2201", "voids the remainder of the warranty"],
+      "must_cite": ["parts-list#2", "warranty-policy#4"],
+      "grading": "rubric",
+      "rubric": [
+        "Gives the part number HLV-2201 and the price $46.00",
+        "States that a repair by anyone other than an authorized service provider voids the rest of the warranty",
+        "Does not claim self-installation is covered or harmless"
+      ]
+    },
+    {
+      "id": "M12",
+      "kind": "multi_hop",
+      "question": "A dishwasher under 8 months old shows error code E4. Is a repair covered under warranty, and what does E4 mean?",
+      "answer": "Yes. E4 is a heating element fault per the troubleshooting guide; at 8 months old the unit is well within the 2-year full parts-and-labor warranty, so the repair is covered.",
+      "accept": ["Heating Element Fault", "2 years"],
+      "must_cite": ["troubleshooting#2", "warranty-policy#1"],
+      "grading": "rubric",
+      "rubric": [
+        "Identifies E4 as a heating element fault",
+        "States the unit is within the 2-year full warranty at 8 months old",
+        "Concludes the repair is covered"
+      ]
+    },
+    {
+      "id": "N01",
+      "kind": "numeric",
+      "question": "How many gallons of water does a DW-300 use over 10 Normal cycles?",
+      "answer": "32 gallons.",
+      "accept": ["32 gallons"],
+      "must_cite": ["dw300-manual#3"],
+      "grading": "exact",
+      "inputs": {"gallons_per_normal_cycle": 3.2, "cycles": 10},
+      "corpus_inputs": ["3.2"],
+      "compute": "gallons_per_normal_cycle * cycles",
+      "expected": 32
+    },
+    {
+      "id": "N02",
+      "kind": "numeric",
+      "question": "Using the rate assumption in the specifications comparison, what is the DW-480's estimated annual electricity cost?",
+      "answer": "$33.60 per year (240 kWh x $0.14/kWh).",
+      "accept": ["\\$?33\\.60?\\b"],
+      "must_cite": ["dw480-manual#3", "specs-comparison#1"],
+      "grading": "exact",
+      "inputs": {"kwh_per_year": 240, "rate_per_kwh": 0.14},
+      "corpus_inputs": ["240", "0.14"],
+      "compute": "kwh_per_year * rate_per_kwh",
+      "expected": 33.60
+    },
+    {
+      "id": "N03",
+      "kind": "numeric",
+      "question": "What is the difference in estimated annual energy use, in kWh, between the DW-300 and the DW-480?",
+      "answer": "20 kWh (260 - 240).",
+      "accept": ["20 kWh"],
+      "must_cite": ["dw300-manual#3", "dw480-manual#3"],
+      "grading": "exact",
+      "inputs": {"dw300_kwh": 260, "dw480_kwh": 240},
+      "corpus_inputs": ["260", "240"],
+      "compute": "dw300_kwh - dw480_kwh",
+      "expected": 20
+    },
+    {
+      "id": "N04",
+      "kind": "numeric",
+      "question": "Over 20 Normal cycles each, how many more gallons does a DW-300 use than a DW-480?",
+      "answer": "4 gallons ((3.2 - 3.0) x 20).",
+      "accept": ["4 gallons"],
+      "must_cite": ["dw300-manual#3", "dw480-manual#3"],
+      "grading": "exact",
+      "inputs": {"dw300_gal": 3.2, "dw480_gal": 3.0, "cycles": 20},
+      "corpus_inputs": ["3.2", "3.0"],
+      "compute": "(dw300_gal - dw480_gal) * cycles",
+      "expected": 4
+    },
+    {
+      "id": "N05",
+      "kind": "numeric",
+      "question": "What is the total price to replace the heating elements on both a DW-300 and a DW-480?",
+      "answer": "$79.50 ($38.50 + $41.00).",
+      "accept": ["\\$?79\\.50?\\b"],
+      "must_cite": ["parts-list#2"],
+      "grading": "exact",
+      "inputs": {"dw300_element": 38.50, "dw480_element": 41.00},
+      "corpus_inputs": ["38.50", "41.00"],
+      "compute": "dw300_element + dw480_element",
+      "expected": 79.50
+    },
+    {
+      "id": "N06",
+      "kind": "numeric",
+      "question": "What is the total price of a DR-210 heating element and a DR-210 drive belt?",
+      "answer": "$66.75 ($57.00 + $9.75).",
+      "accept": ["\\$?66\\.75"],
+      "must_cite": ["parts-list#3"],
+      "grading": "exact",
+      "inputs": {"heating_element": 57.00, "belt": 9.75},
+      "corpus_inputs": ["57.00", "9.75"],
+      "compute": "heating_element + belt",
+      "expected": 66.75
+    },
+    {
+      "id": "N07",
+      "kind": "numeric",
+      "question": "How many minutes longer is the DW-480's Heavy cycle than the DW-300's Heavy cycle?",
+      "answer": "10 minutes (140 - 130).",
+      "accept": ["10 minutes"],
+      "must_cite": ["dw300-manual#3", "dw480-manual#3"],
+      "grading": "exact",
+      "inputs": {"dw480_heavy": 140, "dw300_heavy": 130},
+      "corpus_inputs": ["130", "140"],
+      "compute": "dw480_heavy - dw300_heavy",
+      "expected": 10
+    },
+    {
+      "id": "N08",
+      "kind": "numeric",
+      "question": "A DR-520 runs a Normal cycle (42 minutes) twice and a Steam Refresh cycle (20 minutes) once in one day. How many total minutes of cycles is that?",
+      "answer": "104 minutes (42 x 2 + 20).",
+      "accept": ["104 minutes"],
+      "must_cite": ["dr520-manual#3"],
+      "grading": "exact",
+      "inputs": {"normal_minutes": 42, "normal_runs": 2, "steam_minutes": 20},
+      "corpus_inputs": ["42", "20"],
+      "compute": "normal_minutes * normal_runs + steam_minutes",
+      "expected": 104
+    },
+    {
+      "id": "N09",
+      "kind": "numeric",
+      "question": "Using the rate assumption in the specifications comparison, what is the estimated water cost of one DW-480 Normal cycle?",
+      "answer": "$0.03 (3.0 gallons x $0.010/gallon).",
+      "accept": ["\\$?0\\.030?\\b"],
+      "must_cite": ["dw480-manual#3", "specs-comparison#1"],
+      "grading": "exact",
+      "inputs": {"gallons": 3.0, "rate_per_gallon": 0.010},
+      "corpus_inputs": ["3.0", "0.010"],
+      "compute": "gallons * rate_per_gallon",
+      "expected": 0.03
+    },
+    {
+      "id": "N10",
+      "kind": "numeric",
+      "question": "How many DW-300 Quick Wash cycles (30 minutes each), run back-to-back, fit into a 180-minute window?",
+      "answer": "6 cycles (180 / 30).",
+      "accept": ["6 (cycles|Quick Wash)"],
+      "must_cite": ["dw300-manual#3"],
+      "grading": "exact",
+      "inputs": {"window_minutes": 180, "cycle_minutes": 30},
+      "corpus_inputs": ["30"],
+      "compute": "window_minutes / cycle_minutes",
+      "expected": 6
+    },
+    {
+      "id": "N11",
+      "kind": "numeric",
+      "question": "What is the weight difference between the gas and electric versions of the DR-520?",
+      "answer": "3 lb (128 - 125).",
+      "accept": ["3 lb"],
+      "must_cite": ["dr520-manual#2"],
+      "grading": "exact",
+      "inputs": {"gas_lb": 128, "electric_lb": 125},
+      "corpus_inputs": ["125", "128"],
+      "compute": "gas_lb - electric_lb",
+      "expected": 3
+    },
+    {
+      "id": "N12",
+      "kind": "numeric",
+      "question": "What is the total cost to replace the door latch switch on both a DR-210 and a DR-520?",
+      "answer": "$25.75 ($12.50 + $13.25).",
+      "accept": ["\\$?25\\.75"],
+      "must_cite": ["parts-list#3"],
+      "grading": "exact",
+      "inputs": {"dr210_latch": 12.50, "dr520_latch": 13.25},
+      "corpus_inputs": ["12.50", "13.25"],
+      "compute": "dr210_latch + dr520_latch",
+      "expected": 25.75
+    },
+    {
+      "id": "U01",
+      "kind": "unanswerable",
+      "question": "What color finishes are available for the DW-480 dishwasher?",
+      "answer": "The documents do not state any color or finish options for the DW-480.",
+      "accept": ["not stated", "does not say", "no information"],
+      "reject": ["\\b(?:stainless|white|black|slate|graphite|bisque|navy|silver|panel-ready)\\b"],
+      "must_cite": [],
+      "grading": "rubric",
+      "absent_terms": ["color"],
+      "rubric": [
+        "States the documents do not give color or finish options",
+        "Does not invent a specific color or finish"
+      ]
+    },
+    {
+      "id": "U02",
+      "kind": "unanswerable",
+      "question": "What is the maximum stacking height when a DR-520 is placed on a pedestal riser?",
+      "answer": "The documents do not mention a pedestal riser or stacking height for the DR-520.",
+      "accept": ["not stated", "does not say", "no information"],
+      "reject": ["\\d+ ?(?:inch|inches|feet|ft|cm|mm)\\b"],
+      "must_cite": [],
+      "grading": "rubric",
+      "absent_terms": ["pedestal"],
+      "rubric": [
+        "States the documents do not mention a pedestal riser or stacking height",
+        "Does not invent a height figure"
+      ]
+    },
+    {
+      "id": "U03",
+      "kind": "unanswerable",
+      "question": "What is the noise rating, in dBA, of the DR-210 dryer?",
+      "answer": "Not given. The specifications comparison says Halvorsen does not rate either dryer's noise level in decibels; no dBA figure is published for the DR-210 or the DR-520.",
+      "accept": ["no dBA figure is published"],
+      "reject": ["\\d+ ?dBA"],
+      "must_cite": ["specs-comparison#3"],
+      "grading": "rubric",
+      "rubric": [
+        "States no dBA figure is published for the DR-210",
+        "Does not invent a decibel number",
+        "May note the documents rate dishwasher noise but not dryer noise"
+      ]
+    },
+    {
+      "id": "U04",
+      "kind": "unanswerable",
+      "question": "What is the manufacturer's suggested retail price of a new DW-300 unit, not a replacement part?",
+      "answer": "The documents do not give a retail price for a DW-300 unit; only replacement part prices are listed.",
+      "accept": ["not stated", "does not say", "no information"],
+      "reject": ["\\$ ?\\d[\\d,]{2,}"],
+      "must_cite": [],
+      "grading": "rubric",
+      "absent_terms": ["suggested retail price"],
+      "rubric": [
+        "States no unit retail price is given for the DW-300",
+        "Does not invent a dollar figure for the whole unit",
+        "May note that only part prices are listed"
+      ]
+    },
+    {
+      "id": "U05",
+      "kind": "unanswerable",
+      "question": "Is a stacking kit available for mounting a Halvorsen dryer above a washing machine?",
+      "answer": "The documents do not mention a stacking kit or a washing machine at all.",
+      "accept": ["not stated", "does not say", "no information"],
+      "reject": ["\\bHLV-\\d{4}\\b"],
+      "must_cite": [],
+      "grading": "rubric",
+      "absent_terms": ["stacking kit"],
+      "rubric": [
+        "States a stacking kit is not mentioned in the documents",
+        "Does not claim one exists or does not exist as a product fact"
+      ]
+    },
+    {
+      "id": "U06",
+      "kind": "unanswerable",
+      "question": "What is Halvorsen's customer support phone number?",
+      "answer": "The documents mention contacting customer support but do not give a phone number.",
+      "accept": ["not stated", "does not say", "no information"],
+      "reject": ["\\d{3}[-. ]\\d{3}[-. ]\\d{4}", "1-?800", "\\(\\d{3}\\)"],
+      "must_cite": [],
+      "grading": "rubric",
+      "absent_terms": ["phone"],
+      "rubric": [
+        "States no phone number is given",
+        "Does not invent a phone number"
+      ]
+    },
+    {
+      "id": "U07",
+      "kind": "unanswerable",
+      "question": "At what maximum altitude are Halvorsen dryers rated to operate?",
+      "answer": "The documents do not give an altitude rating for any Halvorsen dryer.",
+      "accept": ["not stated", "does not say", "no information"],
+      "reject": ["\\d[\\d,]* ?(?:feet|ft\\b|meters|metres)"],
+      "must_cite": [],
+      "grading": "rubric",
+      "absent_terms": ["altitude"],
+      "rubric": [
+        "States no altitude rating is given",
+        "Does not invent an altitude figure"
+      ]
+    },
+    {
+      "id": "U08",
+      "kind": "unanswerable",
+      "question": "At what water hardness level does the DW-480's self-cleaning filter stop functioning?",
+      "answer": "The documents do not state a hardness level at which the DW-480's filter stops working; the care guide gives a hardness threshold for descaling, not for filter failure.",
+      "accept": ["not stated", "does not say", "no information"],
+      "must_cite": [],
+      "grading": "rubric",
+      "absent_terms": ["stops functioning"],
+      "rubric": [
+        "States the documents do not give a hardness level at which the filter stops working",
+        "Does not confuse this with the descaling threshold (7 grains per gallon)"
+      ]
+    },
+    {
+      "id": "U09",
+      "kind": "unanswerable",
+      "question": "How many milliliters of rinse aid does the DW-480's dispenser hold?",
+      "answer": "The documents mention the rinse aid dispenser and its refill kit but do not give its capacity.",
+      "accept": ["not stated", "does not say", "no information"],
+      "reject": ["\\d+ ?(?:ml\\b|milliliter|millilitre|ounce|oz\\b)"],
+      "must_cite": [],
+      "grading": "rubric",
+      "absent_terms": ["milliliter", "rinse aid capacity"],
+      "rubric": [
+        "States no rinse aid dispenser capacity is given",
+        "Does not invent a volume"
+      ]
+    },
+    {
+      "id": "U10",
+      "kind": "unanswerable",
+      "question": "What is the activation sequence for the DW-480's child lock feature?",
+      "answer": "The documents do not mention a child lock feature on the DW-480 at all.",
+      "accept": ["not stated", "does not say", "no information"],
+      "reject": ["press(?:ing)? and hold", "\\bhold\\b[^.]{0,40}\\d+ ?seconds"],
+      "must_cite": [],
+      "grading": "rubric",
+      "absent_terms": ["child lock"],
+      "rubric": [
+        "States a child lock feature is not mentioned for the DW-480",
+        "Does not invent an activation sequence"
+      ]
+    },
+    {
+      "id": "U11",
+      "kind": "unanswerable",
+      "question": "How many total units of DR-210 dryers were sold before the 2026 recall?",
+      "answer": "The documents do not give a sales or production count for the DR-210.",
+      "accept": ["not stated", "does not say", "no information"],
+      "reject": ["\\b\\d{1,3}(?:,\\d{3})+\\b", "\\b\\d+(?:\\.\\d+)? ?(?:thousand|million)\\b"],
+      "must_cite": [],
+      "grading": "rubric",
+      "absent_terms": ["sold"],
+      "rubric": [
+        "States no sales or unit count figure is given",
+        "Does not invent a number of units"
+      ]
+    },
+    {
+      "id": "U12",
+      "kind": "unanswerable",
+      "question": "What is the shipping weight, including packaging, of a DW-480 unit?",
+      "answer": "The documents do not give a shipping weight; only unit dimensions are given for the DW-480.",
+      "accept": ["not stated", "does not say", "no information"],
+      "reject": ["\\d+ ?(?:lb|lbs|pounds|kg|kilograms)\\b"],
+      "must_cite": [],
+      "grading": "rubric",
+      "absent_terms": ["shipping weight"],
+      "rubric": [
+        "States no shipping weight is given",
+        "Does not invent a weight figure"
+      ]
+    },
+    {
+      "id": "C01",
+      "kind": "conflicting",
+      "question": "What is the maximum allowed vent run for a DR-520 installation?",
+      "answer": "25 feet, per Service Bulletin SB-2026-07 (2026-06-01), which supersedes the DR-520 owner's manual's 35-foot figure (revision 2024-03-01).",
+      "accept": ["25 feet"],
+      "must_cite": ["dr520-manual#4", "service-bulletin#2"],
+      "grading": "exact"
+    },
+    {
+      "id": "C02",
+      "kind": "conflicting",
+      "question": "How many elbows are currently allowed in a DR-520 vent run at the maximum length?",
+      "answer": "3 elbows, per the 2026 service bulletin, which supersedes the manual's original figure of 4.",
+      "accept": ["3 elbows"],
+      "must_cite": ["dr520-manual#4", "service-bulletin#2"],
+      "grading": "exact"
+    },
+    {
+      "id": "C03",
+      "kind": "conflicting",
+      "question": "For a DR-520, is the maximum vent run 35 feet or 25 feet, and why do the documents differ?",
+      "answer": "25 feet is current. The DR-520 owner's manual (2024-03-01) originally published 35 feet; Service Bulletin SB-2026-07 (2026-06-01) revised it down to 25 feet after field reports of reduced airflow, and a later bulletin supersedes the manual.",
+      "accept": ["25 feet", "35 feet"],
+      "must_cite": ["dr520-manual#4", "service-bulletin#2"],
+      "grading": "rubric",
+      "rubric": [
+        "States 25 feet is the current, correct figure",
+        "Identifies the manual's 35-foot figure as the older, superseded one",
+        "Explains the bulletin is newer and takes precedence"
+      ]
+    },
+    {
+      "id": "C04",
+      "kind": "conflicting",
+      "question": "Which document represents the current, authoritative maximum vent run for the DR-520?",
+      "answer": "Service Bulletin SB-2026-07 (2026-06-01); it explicitly supersedes the DR-520 owner's manual and the Installation Guide on this figure.",
+      "accept": ["supersedes", "25 feet"],
+      "must_cite": ["dr520-manual#4", "service-bulletin#2"],
+      "grading": "rubric",
+      "rubric": [
+        "Names the service bulletin as the current authoritative source",
+        "States it supersedes the owner's manual figure"
+      ]
+    },
+    {
+      "id": "C05",
+      "kind": "conflicting",
+      "question": "An installer follows the 2024 DR-520 owner's manual and installs 35 feet of vent. Is this correct per current guidance?",
+      "answer": "No. The 2026 service bulletin lowered the DR-520 maximum to 25 feet, superseding the manual's 35-foot figure, so a 35-foot run no longer meets specification.",
+      "accept": ["25 feet"],
+      "must_cite": ["dr520-manual#4", "service-bulletin#2"],
+      "grading": "rubric",
+      "rubric": [
+        "States the 35-foot installation is not correct per current guidance",
+        "Cites the 25-foot bulletin figure as the reason"
+      ]
+    },
+    {
+      "id": "C06",
+      "kind": "conflicting",
+      "question": "Which two documents disagree about the DR-520's maximum vent run, and what is the date of each?",
+      "answer": "The DR-520 owner's manual (revision 2024-03-01, 35 feet) and Service Bulletin SB-2026-07 (issued 2026-06-01, 25 feet); the bulletin is newer and governs.",
+      "accept": ["2024-03-01", "2026-06-01"],
+      "must_cite": ["service-bulletin#1", "service-bulletin#2"],
+      "grading": "rubric",
+      "rubric": [
+        "Names the DR-520 owner's manual and Service Bulletin SB-2026-07 as the two disagreeing documents",
+        "Gives the manual's date (2024-03-01) and the bulletin's date (2026-06-01)",
+        "States the bulletin, being newer, is the correct figure"
+      ]
+    },
+    {
+      "id": "C07",
+      "kind": "conflicting",
+      "question": "Is the DR-210's maximum vent run affected by the 2026 service bulletin about DR-520 venting?",
+      "answer": "No. The bulletin explicitly states the DR-210 vent specification is not affected and remains 35 feet with up to 4 elbows; only the DR-520 figure changed.",
+      "accept": ["not affected"],
+      "must_cite": ["dr210-manual#4", "service-bulletin#2"],
+      "grading": "rubric",
+      "rubric": [
+        "States the DR-210 is not affected by the bulletin",
+        "States the DR-210 maximum remains 35 feet with up to 4 elbows"
+      ]
+    },
+    {
+      "id": "C08",
+      "kind": "conflicting",
+      "question": "According to the most recent source, how many elbows are allowed in a DR-520 vent run, and which document says so?",
+      "answer": "3 elbows, per Service Bulletin SB-2026-07, which is newer than the owner's manual's original 4-elbow figure.",
+      "accept": ["3 elbows"],
+      "must_cite": ["dr520-manual#4", "service-bulletin#2"],
+      "grading": "rubric",
+      "rubric": [
+        "States 3 elbows is the current figure",
+        "Names the service bulletin as the source"
+      ]
+    },
+    {
+      "id": "C09",
+      "kind": "conflicting",
+      "question": "What is the difference, in feet, between the DR-520 manual's original maximum vent run and the figure in Service Bulletin SB-2026-07?",
+      "answer": "10 feet (35 - 25).",
+      "accept": ["10 feet"],
+      "must_cite": ["dr520-manual#4", "service-bulletin#2"],
+      "grading": "exact",
+      "corpus_inputs": ["35 feet", "25 feet"]
+    },
+    {
+      "id": "C10",
+      "kind": "conflicting",
+      "question": "For DR-520 vent specifications, which takes precedence: the Installation Guide, the owner's manual, or the service bulletin?",
+      "answer": "The service bulletin. The Installation Guide itself states that a bulletin issued after it supersedes both the guide and the owner's manual for that model.",
+      "accept": ["supersedes"],
+      "must_cite": ["installation-guide#4", "dr520-manual#4", "service-bulletin#2"],
+      "grading": "rubric",
+      "rubric": [
+        "Names the service bulletin as taking precedence",
+        "References the Installation Guide's own rule that a newer bulletin supersedes it and the manual"
+      ]
+    },
+    {
+      "id": "C11",
+      "kind": "conflicting",
+      "question": "A DR-520 installed in 2025 has a 30-foot vent run with 3 elbows. Does it meet the current maximum vent run specification?",
+      "answer": "No. Even though 3 elbows is within the current 3-elbow limit, 30 feet exceeds the current 25-foot maximum set by Service Bulletin SB-2026-07.",
+      "accept": ["25[- ](feet|foot)"],
+      "must_cite": ["dr520-manual#4", "service-bulletin#2"],
+      "grading": "rubric",
+      "rubric": [
+        "States the installation does not meet current specification",
+        "Identifies the 30-foot run as exceeding the current 25-foot maximum"
+      ]
+    },
+    {
+      "id": "C12",
+      "kind": "conflicting",
+      "question": "What was the DR-520's maximum vent run according to its original owner's manual, before the 2026 revision?",
+      "answer": "35 feet, with up to 4 elbows.",
+      "accept": ["35 feet"],
+      "must_cite": ["dr520-manual#4"],
+      "grading": "exact"
+    }
+  ]
+}

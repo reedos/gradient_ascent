@@ -1,0 +1,53 @@
+{
+  "illustrative": true,
+  "h": 630,
+  "title": "Skills",
+  "sub": "A short description is always in context; the model chooses one and the body loads only then.",
+  "pill": "Level 5 · Agents",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 30, "l": "Question", "k": "io" },
+    { "id": "list", "x": 170, "y": 170, "l": "list descriptions only", "k": "code" },
+    { "id": "act", "x": 170, "y": 310, "l": "picks the next action", "k": "model" },
+    { "id": "tool", "x": 170, "y": 450, "l": "load_skill(name)", "k": "tool" },
+    { "id": "a", "x": 170, "y": 590, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "list", "by": "code" },
+    { "id": "e2", "f": "list", "t": "act", "by": "code" },
+    { "id": "e3", "f": "act", "t": "tool", "by": "model", "b": 22 },
+    { "id": "e4", "f": "tool", "t": "act", "by": "code", "b": 22 },
+    { "id": "e5", "f": "act", "t": "a", "by": "model" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"Is the DW-480 drain pump covered under warranty,\nand for how long?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code lists what's always in context: names and one-line descriptions only",
+      "d": "warranty-checklist: use when a question asks whether\nsomething is covered, or for how long.\nunit-conversion: use for measurement conversions.\ncitation-style: use for how to cite a source.",
+      "m": "~90 tokens · 3 skills · 2 ms"
+    },
+    {
+      "e": "e3",
+      "h": "The model chooses a skill to load",
+      "d": "→ load_skill(\"warranty-checklist\")",
+      "m": "210 in · 12 out · 0.6 s"
+    },
+    {
+      "e": "e4",
+      "h": "Your code loads that skill's full body into context; the other two stay unloaded",
+      "d": "\"1. State the warranty length that applies.\n2. Check whether anything voids it.\n3. Say plainly whether it is covered.\"",
+      "m": "~40 tokens · 2 ms"
+    },
+    {
+      "e": "e5",
+      "h": "The model answers, following the loaded skill",
+      "d": "\"Covered: the 2-year full warranty applies, and\nnothing about this case voids it.\"",
+      "m": "290 in · 22 out · 0.7 s"
+    }
+  ]
+}

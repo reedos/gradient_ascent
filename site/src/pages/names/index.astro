@@ -1,0 +1,88 @@
+---
+import Base from '../../layouts/Base.astro';
+import { url } from '../../lib/url';
+import { named, asOf, counts, namesChecked, techniqueBySlug, type Kind } from '../../lib/content';
+
+// One alphabetical list per kind. A reader who arrives knowing a name looks it up; the maker
+// rides in the entry's meta line rather than becoming a heading of its own, so every entry stays
+// one dense grid instead of 90 near-empty groups.
+const KIND_LABEL: Record<Kind, string> = { model: 'Models', product: 'Products', tool: 'Tools' };
+const KIND_BLURB: Record<Kind, string> = {
+  product: 'Things you can use. A product runs on one or more models.',
+  tool: 'Things you build with: frameworks, runtimes, protocols and libraries.',
+  model: 'Things a developer trains. A product runs on one or more of these.',
+};
+const KIND_ORDER: Kind[] = ['product', 'tool', 'model'];
+
+const sections = KIND_ORDER.map((kind) => {
+  const entries = named.filter((n) => n.kind === kind).sort((a, b) => a.name.localeCompare(b.name));
+  return {
+    kind,
+    label: KIND_LABEL[kind],
+    blurb: KIND_BLURB[kind],
+    makers: new Set(entries.map((n) => n.maker)).size,
+    entries,
+  };
+});
+---
+<Base
+  title="Named things · Gradient Ascent"
+  description="The registry of named models, products and tools, and which techniques each one demonstrates."
+>
+  <div class="page-hero">
+    <div class="eyebrow muted"><span class="dot"></span>Registry</div>
+    <h1>Named things</h1>
+    <p>
+      A developer trains models; a product runs on one or more models; a tool is what a builder
+      assembles products from. {counts.named} entries are listed as of {asOf}, each with the
+      techniques it uses.
+    </p>
+  </div>
+
+  <p class="footnote reading">
+    Names listed {asOf}. {namesChecked.verified} of {namesChecked.total} registry entries have
+    been checked against the maker's own page; the registry marks the rest as unchecked. An
+    unchecked entry cannot be cited on a published page until it has a primary source, a checked
+    date, and is marked verified, and any entry unchecked for 90 days is flagged when the site is
+    built. Where a technique has more than one maker, a page names at least two; the site ranks
+    nothing and links no affiliate.
+  </p>
+
+  {
+    sections.map((section) => (
+      <section class="section">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow muted">Registry</div>
+            <h2>{section.label}</h2>
+          </div>
+          <p>
+            {section.entries.length} entries from {section.makers} makers. {section.blurb}
+          </p>
+        </div>
+        <ul class="name-list">
+          {section.entries.map((n) => (
+            <li>
+              <b>{n.name}</b>
+              <span>
+                {n.maker} &middot; {n.category}
+                {n.formerly ? ` · formerly ${n.formerly.replace(/ \(.*/, '')}` : ''}
+              </span>
+              <span class="uses">
+                {n.demonstrates.map((slug, i) => {
+                  const t = techniqueBySlug(slug);
+                  return t ? (
+                    <>
+                      {i > 0 && ', '}
+                      <a href={url(`/techniques/${t.slug}/`)}>{t.title}</a>
+                    </>
+                  ) : null;
+                })}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</Base>

@@ -1,0 +1,10 @@
+---
+// An inline citation marker, e.g. "...answers using only the source passages<Cite n={1}/>." Use
+// inside prose in an MDX file; n is the 1-based position in that page's <Sources> list.
+interface Props {
+  n: number;
+}
+const { n } = Astro.props;
+---
+
+<a class="cite" href={`#src-${n}`} aria-label={`Source ${n}`}>[{n}]</a>

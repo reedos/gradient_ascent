@@ -1,0 +1,1385 @@
+{
+  "version": 5,
+  "note": "Working taxonomy for Gradient Ascent. A tier is a level ordered by who controls the flow; a track applies at every tier; a thread cuts across tiers; relations are typed edges between pages. Slugs are page ids and must stay stable once published. Every page defaults to status 'planned' until its file says otherwise, so the map always shows the whole territory, written or not.",
+  "statuses": [
+    "planned",
+    "stub",
+    "draft",
+    "published"
+  ],
+  "lanes": {
+    "use": "No code. Where this technique already lives in products a reader has, and how to work it well.",
+    "build": "Runnable example, trace, failure modes, eval."
+  },
+  "relation_types": {
+    "requires": "Read the target first. Must stay acyclic.",
+    "upgrades_to": "Climb to the target when this level fails for the stated reason.",
+    "combines_with": "Commonly used together.",
+    "alternative_to": "Solves the same problem a different way; the page pair carries a comparison table."
+  },
+  "tiers": [
+    {
+      "id": "no-model",
+      "order": 0,
+      "title": "No model",
+      "control": "Your code, entirely. The lowest order that passes is sometimes none.",
+      "pages": [
+        {
+          "slug": "order-zero",
+          "title": "When not to use a model",
+          "covers": [
+            "rules and regex",
+            "search",
+            "forms",
+            "classical ML",
+            "the cost of a wrong answer"
+          ],
+          "summary": "How to tell when ordinary code, search or a form is enough.",
+          "status": "draft"
+        }
+      ],
+      "short": "Rules, search, forms",
+      "who": "Your code. No model is involved.",
+      "description": "Some tasks do not need a model. If you can write the rule down, or a search or a form does the job, that is cheaper, faster and easier to test."
+    },
+    {
+      "id": "one-call",
+      "order": 1,
+      "title": "One call",
+      "control": "Nobody. One request, one response.",
+      "pages": [
+        {
+          "slug": "chat",
+          "title": "Chat",
+          "summary": "Asking a model a question in a chat app.",
+          "status": "draft"
+        },
+        {
+          "slug": "prompt-engineering",
+          "title": "Prompt engineering",
+          "summary": "Writing instructions that get consistent results.",
+          "status": "draft"
+        },
+        {
+          "slug": "structured-output",
+          "title": "Structured output",
+          "summary": "Getting answers in a fixed format such as JSON.",
+          "status": "draft"
+        },
+        {
+          "slug": "inference-time-reasoning",
+          "title": "Reasoning at answer time",
+          "covers": [
+            "extended thinking",
+            "self-consistency",
+            "best-of-N"
+          ],
+          "summary": "Letting the model think for longer before it answers.",
+          "status": "draft"
+        },
+        {
+          "slug": "multimodal",
+          "title": "Images, audio and video",
+          "covers": [
+            "images and documents in",
+            "image, audio and video out"
+          ],
+          "summary": "Giving the model images, audio, video and documents, and getting them back.",
+          "status": "draft"
+        }
+      ],
+      "short": "One question, one answer",
+      "who": "Nobody. There is only one step.",
+      "description": "You send one request and get one response. Most everyday use of chat apps is at this level. What you write in the request has a large effect on the result."
+    },
+    {
+      "id": "context",
+      "order": 2,
+      "title": "Context",
+      "control": "You, through what you put in the window.",
+      "pages": [
+        {
+          "slug": "context-engineering",
+          "title": "Context engineering",
+          "summary": "Deciding what goes into the request, and caching the parts that repeat.",
+          "status": "draft"
+        },
+        {
+          "slug": "embeddings-search",
+          "title": "Embeddings and search",
+          "summary": "Finding text by meaning instead of by keyword.",
+          "status": "draft"
+        },
+        {
+          "slug": "rag",
+          "title": "Retrieval-augmented generation (RAG)",
+          "summary": "Searching your documents and giving the results to the model.",
+          "status": "draft"
+        },
+        {
+          "slug": "knowledge-graphs",
+          "title": "Knowledge graphs and GraphRAG",
+          "graph_engineering": "information",
+          "covers": [
+            "entities and relations",
+            "multi-hop questions",
+            "provenance"
+          ],
+          "summary": "Storing facts as entities and relations, for questions that span several documents.",
+          "status": "draft"
+        },
+        {
+          "slug": "memory",
+          "title": "Memory",
+          "summary": "Keeping information from one conversation to the next.",
+          "status": "draft"
+        }
+      ],
+      "short": "You pick what it sees",
+      "who": "You. You decide what information the model is given.",
+      "description": "The model only knows what is in its training data and what you put in the request. These techniques find the right information and put it in front of the model."
+    },
+    {
+      "id": "workflows",
+      "order": 3,
+      "title": "Workflows",
+      "control": "Your code. The model fills in steps; it never chooses the next one.",
+      "pages": [
+        {
+          "slug": "prompt-chaining",
+          "title": "Prompt chaining",
+          "summary": "Splitting a task into steps, each with its own prompt.",
+          "status": "draft"
+        },
+        {
+          "slug": "routing",
+          "title": "Routing",
+          "summary": "Sorting inputs and sending each one to the right prompt.",
+          "status": "draft"
+        },
+        {
+          "slug": "parallelization",
+          "title": "Parallel calls",
+          "covers": [
+            "sectioning",
+            "voting"
+          ],
+          "summary": "Running several prompts at once and combining the results.",
+          "status": "draft"
+        },
+        {
+          "slug": "evaluator-optimizer",
+          "title": "Write and check",
+          "summary": "One prompt writes, another checks, and the loop repeats until the check passes.",
+          "status": "draft"
+        },
+        {
+          "slug": "workflow-graphs",
+          "title": "Workflow graphs",
+          "graph_engineering": "work",
+          "covers": [
+            "nodes as steps",
+            "edges as transitions",
+            "shared state",
+            "checkpoints"
+          ],
+          "summary": "Describing a workflow as steps and the connections between them.",
+          "status": "draft"
+        },
+        {
+          "slug": "human-in-the-loop",
+          "title": "Human approval",
+          "summary": "Pausing for a person to approve or correct.",
+          "status": "draft"
+        }
+      ],
+      "short": "Your code runs the steps",
+      "who": "Your code. The model fills in each step and never chooses the next one.",
+      "description": "A task is split into fixed steps, and code decides the order. This is predictable and easy to test, and it covers a large share of real business use."
+    },
+    {
+      "id": "tools",
+      "order": 4,
+      "title": "Tools",
+      "control": "The model picks an action; your code runs it.",
+      "pages": [
+        {
+          "slug": "function-calling",
+          "title": "Function calling",
+          "summary": "Letting the model call functions that you define.",
+          "status": "draft"
+        },
+        {
+          "slug": "code-execution",
+          "title": "Code execution",
+          "summary": "Letting the model write code and run it in a sandbox.",
+          "status": "draft"
+        },
+        {
+          "slug": "mcp",
+          "title": "Model Context Protocol",
+          "summary": "A standard way to connect models to tools and data.",
+          "status": "draft"
+        },
+        {
+          "slug": "computer-use",
+          "title": "Computer and browser use",
+          "summary": "Letting the model operate a screen, a mouse and a keyboard.",
+          "status": "draft"
+        }
+      ],
+      "short": "It picks, your code acts",
+      "who": "The model picks an action. Your code carries it out.",
+      "description": "The model can ask for an action, such as looking something up, running code or clicking a button. Your code performs the action and returns the result."
+    },
+    {
+      "id": "agents",
+      "order": 5,
+      "title": "Agents",
+      "control": "The model, in a loop, until it decides it is done.",
+      "pages": [
+        {
+          "slug": "single-agent",
+          "title": "Single agent",
+          "covers": [
+            "ReAct",
+            "plan-and-execute"
+          ],
+          "summary": "A model that plans, acts and checks its own work in a loop.",
+          "status": "draft"
+        },
+        {
+          "slug": "agent-harness",
+          "title": "The agent harness",
+          "summary": "Everything around the model in an agent: the loop, tools, context handling, permissions, caps and sandbox.",
+          "status": "draft"
+        },
+        {
+          "slug": "agentic-rag",
+          "title": "Agentic RAG and deep research",
+          "summary": "An agent that runs its own searches until it has an answer.",
+          "status": "draft"
+        },
+        {
+          "slug": "coding-agents",
+          "title": "Coding agents",
+          "summary": "Agents that read, write, run and test code.",
+          "status": "draft"
+        },
+        {
+          "slug": "skills",
+          "title": "Skills",
+          "summary": "Reusable instructions that an agent loads when it needs them.",
+          "status": "draft"
+        },
+        {
+          "slug": "voice-agents",
+          "title": "Voice agents",
+          "summary": "Agents you talk to in real time.",
+          "status": "draft"
+        }
+      ],
+      "short": "It repeats until done",
+      "who": "The model. It chooses each step and decides when the task is finished.",
+      "description": "The model works in a loop: it plans, takes an action, looks at the result and decides what to do next. This handles tasks where the steps cannot be known in advance. It costs more and is harder to predict."
+    },
+    {
+      "id": "teams",
+      "order": 6,
+      "title": "Teams of agents",
+      "control": "Several models. One usually divides the work among the others.",
+      "pages": [
+        {
+          "slug": "orchestrator-workers",
+          "title": "Lead agent and workers",
+          "summary": "A lead agent splits the task and hands parts to other agents.",
+          "status": "draft"
+        },
+        {
+          "slug": "agent-graphs",
+          "title": "Agent graphs",
+          "graph_engineering": "work",
+          "covers": [
+            "nodes as agents",
+            "handoffs",
+            "shared state",
+            "supervision",
+            "agent-to-agent protocols"
+          ],
+          "summary": "Describing a team of agents and how work passes between them.",
+          "status": "draft"
+        },
+        {
+          "slug": "debate-review",
+          "title": "Review and debate",
+          "summary": "Agents that check, or argue with, each other's work.",
+          "status": "draft"
+        }
+      ],
+      "short": "Agents split the work",
+      "who": "Several models. One usually divides the work among the others.",
+      "description": "A lead agent splits a task and gives the parts to other agents, or several agents check each other's work. This helps when a task is too large for one context window or benefits from a second opinion."
+    },
+    {
+      "id": "always-on",
+      "order": 7,
+      "title": "Always-on agents",
+      "control": "The models, including when to start work.",
+      "pages": [
+        {
+          "slug": "long-horizon",
+          "title": "Long-running tasks",
+          "covers": [
+            "compaction",
+            "checkpoints",
+            "schedules"
+          ],
+          "summary": "Tasks that run for hours or days.",
+          "status": "draft"
+        },
+        {
+          "slug": "agent-teammates",
+          "title": "Always-on assistants",
+          "covers": [
+            "a computer of its own",
+            "bot roster and a chief of staff",
+            "routines taught by demonstration",
+            "approvals and escalation",
+            "credential vault",
+            "supervisor agent on outbound actions"
+          ],
+          "examples_as_of": "2026-09-18",
+          "examples": [
+            "Grok Bot (SpaceXAI, beta 2026-08-11)",
+            "Muse (Meta, 2026-09-08)",
+            "Claude Cowork",
+            "ChatGPT Work",
+            "Gemini Spark",
+            "OpenClaw (self-hosted)"
+          ],
+          "note": "The capstone page: nearly every lower level composes here (model, computer, storage, tools, memory, routines).",
+          "summary": "Agents with their own computer that work without being asked.",
+          "status": "draft"
+        },
+        {
+          "slug": "organizations-swarms",
+          "title": "Organizations of agents",
+          "summary": "Large groups of agents with roles and shared goals.",
+          "status": "draft"
+        },
+        {
+          "slug": "embodied",
+          "title": "Robots and machines",
+          "summary": "Models that control robots and other machines.",
+          "status": "draft"
+        }
+      ],
+      "short": "It runs on its own",
+      "who": "The models, including when to start work.",
+      "description": "These agents keep running. They have their own computer, remember past work, follow schedules and start tasks without being asked. They check in with a person when approval is needed. Robots that act in the physical world belong here too."
+    }
+  ],
+  "stages": [
+    {
+      "id": "skip",
+      "title": "Skip the model",
+      "levels": [
+        0
+      ],
+      "kinds": "Rules, search, forms",
+      "line": "Some jobs need no model at all. If you can write the rule down, use the rule."
+    },
+    {
+      "id": "ask",
+      "title": "Ask",
+      "levels": [
+        1,
+        2
+      ],
+      "kinds": "Chat apps, and assistants that read your files",
+      "line": "You ask a question. It answers, using what you give it."
+    },
+    {
+      "id": "task",
+      "title": "Hand over a task",
+      "levels": [
+        3,
+        4
+      ],
+      "kinds": "Automations, and copilots inside your tools",
+      "line": "You run the process. It does the steps, and can use the tools you allow."
+    },
+    {
+      "id": "outcome",
+      "title": "Delegate an outcome",
+      "levels": [
+        5
+      ],
+      "kinds": "Agents",
+      "line": "You say what done looks like. It works out the steps and tells you when it has finished."
+    },
+    {
+      "id": "function",
+      "title": "Staff a function",
+      "levels": [
+        6,
+        7
+      ],
+      "kinds": "Agent teams and always-on assistants",
+      "line": "You set the goals and the limits. They divide the work, keep going, and ask when they need approval."
+    }
+  ],
+  "tracks": [
+    {
+      "id": "evals",
+      "title": "Evals",
+      "why": "Every level claims to beat the one below it. This is how the claim is tested.",
+      "summary": "Measuring whether a change made the results better.",
+      "status": "draft",
+      "pages": [
+        {
+          "slug": "eval-frameworks",
+          "title": "Evaluation frameworks",
+          "summary": "The tools that run test sets and graders for you, and what to check before trusting their numbers.",
+          "status": "draft"
+        }
+      ]
+    },
+    {
+      "id": "adaptation",
+      "title": "Changing the model",
+      "covers": [
+        "fine-tuning",
+        "LoRA",
+        "distillation",
+        "reinforcement fine-tuning",
+        "synthetic data",
+        "automated prompt optimization"
+      ],
+      "why": "Orthogonal to the ladder: any level can run on a specialized model.",
+      "summary": "Fine-tuning, distillation, synthetic data and automated prompt tuning.",
+      "status": "draft",
+      "pages": [
+        {
+          "slug": "fine-tuning",
+          "title": "Fine-tuning and adapters",
+          "summary": "Training a model further on your own examples, in full or with small adapters such as LoRA.",
+          "status": "draft"
+        },
+        {
+          "slug": "distillation",
+          "title": "Distillation",
+          "summary": "Training a smaller model to reproduce what a larger one does on your task.",
+          "status": "draft"
+        },
+        {
+          "slug": "synthetic-data",
+          "title": "Synthetic data",
+          "summary": "Using a model to write training or test examples, and checking them before they are used.",
+          "status": "draft"
+        },
+        {
+          "slug": "prompt-optimization",
+          "title": "Prompt optimization",
+          "summary": "Letting a program search for better prompts against a test set.",
+          "status": "draft"
+        }
+      ]
+    },
+    {
+      "id": "safety",
+      "title": "Safety, privacy and governance",
+      "covers": [
+        "prompt injection",
+        "permissions",
+        "sandboxing",
+        "guardrails",
+        "local vs cloud data handling",
+        "consent",
+        "audit trails"
+      ],
+      "summary": "Prompt injection, permissions, data handling and audit.",
+      "status": "draft",
+      "pages": [
+        {
+          "slug": "guardrails",
+          "title": "Guardrails",
+          "summary": "Checks on what goes into a model and what comes out, and the limits of those checks.",
+          "status": "draft"
+        },
+        {
+          "slug": "red-teaming",
+          "title": "Red teaming",
+          "summary": "Attacking your own system on purpose, before someone else does, and turning what you find into tests.",
+          "status": "draft"
+        }
+      ]
+    },
+    {
+      "id": "ops",
+      "title": "Operations",
+      "covers": [
+        "cost",
+        "latency",
+        "local vs cloud",
+        "observability",
+        "model selection"
+      ],
+      "summary": "Cost, speed, monitoring and running models on your own hardware.",
+      "status": "draft",
+      "pages": [
+        {
+          "slug": "observability",
+          "title": "Observability",
+          "summary": "Recording what each run did, so a bad result can be traced to the step that caused it.",
+          "status": "draft"
+        },
+        {
+          "slug": "ai-gateways",
+          "title": "AI gateways",
+          "summary": "One entry point in front of several model providers, for keys, routing, limits, fallback and logs.",
+          "status": "draft"
+        },
+        {
+          "slug": "cost-optimization",
+          "title": "Cost optimization",
+          "summary": "Spending fewer tokens and less time for the same result: caching, batching, smaller models, shorter context.",
+          "status": "draft"
+        },
+        {
+          "slug": "local-inference",
+          "title": "Running models locally",
+          "summary": "Running open-weight models on your own hardware: what fits, quantization, and what you give up.",
+          "status": "draft"
+        }
+      ]
+    },
+    {
+      "id": "operator-craft",
+      "title": "Working with a model",
+      "why": "The human half of the manual: the skill of working with a model rises with every order.",
+      "pages": [
+        {
+          "slug": "briefing",
+          "title": "Briefing: saying what you want",
+          "summary": "Saying what you want clearly enough that the model does not have to guess.",
+          "status": "draft"
+        },
+        {
+          "slug": "reviewing",
+          "title": "Reviewing work you did not do",
+          "summary": "Checking work you did not do yourself before it goes anywhere.",
+          "status": "draft"
+        },
+        {
+          "slug": "delegating",
+          "title": "Deciding what to hand over",
+          "summary": "Deciding which parts of a task to hand to a model and which to keep.",
+          "status": "draft"
+        },
+        {
+          "slug": "trust",
+          "title": "Calibrating trust",
+          "summary": "Learning, from results over time, how much to rely on a model without checking.",
+          "status": "draft"
+        }
+      ],
+      "summary": "How to brief a model, review its work and decide what to hand over.",
+      "status": "draft"
+    }
+  ],
+  "threads": [
+    {
+      "id": "graph-engineering",
+      "title": "Graph engineering",
+      "line": "Knowledge graphs connect information; agent graphs connect work.",
+      "pages": [
+        "knowledge-graphs",
+        "workflow-graphs",
+        "agent-graphs"
+      ],
+      "summary": "Two uses of graphs that are often confused: graphs that connect information, and graphs that connect work.",
+      "status": "draft"
+    }
+  ],
+  "recipes": [
+    {
+      "slug": "document-qa",
+      "title": "Answer questions about a set of documents",
+      "running_task": true,
+      "status": "draft",
+      "uses": [
+        "rag",
+        "structured-output",
+        "evals"
+      ],
+      "summary": "Uses RAG, structured output and an eval set. Level 2 is enough because a single search answers most questions."
+    },
+    {
+      "slug": "inbox-triage",
+      "title": "Sort an inbox",
+      "status": "draft",
+      "uses": [
+        "routing",
+        "structured-output",
+        "human-in-the-loop"
+      ],
+      "summary": "Sorts mail into fixed categories and produces structured output. A person approves anything that gets sent. The categories are known in advance, so an agent is not needed."
+    },
+    {
+      "slug": "research-brief",
+      "title": "Write a research brief with citations",
+      "status": "draft",
+      "uses": [
+        "agentic-rag",
+        "evaluator-optimizer"
+      ],
+      "summary": "Uses agentic RAG to find sources and a fixed check on every claim against the section it cites. It needs level 5 for the searching; the checking is level 3."
+    },
+    {
+      "slug": "repo-assistant",
+      "title": "Coding assistant on your own repo",
+      "status": "draft",
+      "uses": [
+        "coding-agents",
+        "skills",
+        "safety"
+      ],
+      "summary": "A coding agent that reads, edits, runs and tests code in your repository, using skills for repeated tasks and a safety review before anything ships."
+    },
+    {
+      "slug": "document-extraction",
+      "title": "Turn photos and PDFs into records",
+      "status": "draft",
+      "uses": [
+        "multimodal",
+        "structured-output",
+        "human-in-the-loop"
+      ],
+      "summary": "Reads the image or PDF, fills a fixed schema, and saves the record once a person confirms it."
+    },
+    {
+      "slug": "voice-notes",
+      "title": "Voice notes into structured entries",
+      "status": "draft",
+      "uses": [
+        "multimodal",
+        "prompt-chaining",
+        "evals"
+      ],
+      "summary": "Transcribes a voice note, splits it into steps, and turns each step into a structured entry that an eval set checks for accuracy."
+    },
+    {
+      "slug": "support-desk",
+      "title": "Support desk",
+      "status": "draft",
+      "uses": [
+        "routing",
+        "rag",
+        "function-calling",
+        "human-in-the-loop"
+      ],
+      "summary": "Routes an incoming ticket, searches the documentation for an answer, calls a tool when an action is needed, and hands off to a person when it is unsure."
+    },
+    {
+      "slug": "nightly-monitor",
+      "title": "Nightly source monitor",
+      "status": "draft",
+      "uses": [
+        "routing",
+        "structured-output",
+        "evals",
+        "ops"
+      ],
+      "summary": "Runs on a timer, diffs a set of public pages in code, and asks a model one question about each change. Level 3: the schedule and the checkpoint are infrastructure, not agency."
+    },
+    {
+      "slug": "data-analysis",
+      "title": "Data analysis by conversation",
+      "status": "draft",
+      "uses": [
+        "code-execution",
+        "single-agent"
+      ],
+      "summary": "A single agent writes and runs code against a dataset, one question at a time, to answer questions a fixed query could not anticipate."
+    },
+    {
+      "slug": "content-pipeline",
+      "title": "Drafting with a reviewer",
+      "status": "draft",
+      "uses": [
+        "evaluator-optimizer",
+        "prompt-chaining"
+      ],
+      "summary": "One prompt drafts a piece of writing and another checks it against a rubric, repeating until the draft passes."
+    },
+    {
+      "slug": "assistant-team",
+      "title": "A team of personal assistants",
+      "status": "draft",
+      "uses": [
+        "agent-teammates",
+        "agent-graphs",
+        "memory",
+        "safety"
+      ],
+      "summary": "Several always-on agents split personal tasks among themselves, sharing memory and staying inside the same safety rules."
+    },
+    {
+      "slug": "maintenance-log",
+      "title": "Plain-language maintenance log",
+      "status": "draft",
+      "uses": [
+        "function-calling",
+        "structured-output",
+        "knowledge-graphs"
+      ],
+      "summary": "Turns a plain-language description of work done into a structured log entry, saved with a tool call and linked to the equipment it concerns through a small knowledge graph."
+    }
+  ],
+  "relations": [
+    {
+      "from": "prompt-engineering",
+      "type": "requires",
+      "to": "chat"
+    },
+    {
+      "from": "structured-output",
+      "type": "requires",
+      "to": "prompt-engineering"
+    },
+    {
+      "from": "inference-time-reasoning",
+      "type": "requires",
+      "to": "prompt-engineering"
+    },
+    {
+      "from": "multimodal",
+      "type": "requires",
+      "to": "chat"
+    },
+    {
+      "from": "context-engineering",
+      "type": "requires",
+      "to": "prompt-engineering"
+    },
+    {
+      "from": "rag",
+      "type": "requires",
+      "to": "embeddings-search"
+    },
+    {
+      "from": "rag",
+      "type": "requires",
+      "to": "context-engineering"
+    },
+    {
+      "from": "knowledge-graphs",
+      "type": "requires",
+      "to": "rag"
+    },
+    {
+      "from": "memory",
+      "type": "requires",
+      "to": "context-engineering"
+    },
+    {
+      "from": "prompt-chaining",
+      "type": "requires",
+      "to": "structured-output"
+    },
+    {
+      "from": "routing",
+      "type": "requires",
+      "to": "structured-output"
+    },
+    {
+      "from": "parallelization",
+      "type": "requires",
+      "to": "prompt-chaining"
+    },
+    {
+      "from": "evaluator-optimizer",
+      "type": "requires",
+      "to": "prompt-chaining"
+    },
+    {
+      "from": "workflow-graphs",
+      "type": "requires",
+      "to": "prompt-chaining"
+    },
+    {
+      "from": "workflow-graphs",
+      "type": "requires",
+      "to": "routing"
+    },
+    {
+      "from": "function-calling",
+      "type": "requires",
+      "to": "structured-output"
+    },
+    {
+      "from": "code-execution",
+      "type": "requires",
+      "to": "function-calling"
+    },
+    {
+      "from": "mcp",
+      "type": "requires",
+      "to": "function-calling"
+    },
+    {
+      "from": "computer-use",
+      "type": "requires",
+      "to": "function-calling"
+    },
+    {
+      "from": "computer-use",
+      "type": "requires",
+      "to": "multimodal"
+    },
+    {
+      "from": "single-agent",
+      "type": "requires",
+      "to": "function-calling"
+    },
+    {
+      "from": "agentic-rag",
+      "type": "requires",
+      "to": "rag"
+    },
+    {
+      "from": "agentic-rag",
+      "type": "requires",
+      "to": "single-agent"
+    },
+    {
+      "from": "coding-agents",
+      "type": "requires",
+      "to": "single-agent"
+    },
+    {
+      "from": "coding-agents",
+      "type": "requires",
+      "to": "code-execution"
+    },
+    {
+      "from": "skills",
+      "type": "requires",
+      "to": "single-agent"
+    },
+    {
+      "from": "voice-agents",
+      "type": "requires",
+      "to": "single-agent"
+    },
+    {
+      "from": "voice-agents",
+      "type": "requires",
+      "to": "multimodal"
+    },
+    {
+      "from": "orchestrator-workers",
+      "type": "requires",
+      "to": "single-agent"
+    },
+    {
+      "from": "agent-graphs",
+      "type": "requires",
+      "to": "workflow-graphs"
+    },
+    {
+      "from": "agent-graphs",
+      "type": "requires",
+      "to": "orchestrator-workers"
+    },
+    {
+      "from": "debate-review",
+      "type": "requires",
+      "to": "evaluator-optimizer"
+    },
+    {
+      "from": "debate-review",
+      "type": "requires",
+      "to": "orchestrator-workers"
+    },
+    {
+      "from": "long-horizon",
+      "type": "requires",
+      "to": "single-agent"
+    },
+    {
+      "from": "long-horizon",
+      "type": "requires",
+      "to": "memory"
+    },
+    {
+      "from": "agent-teammates",
+      "type": "requires",
+      "to": "long-horizon"
+    },
+    {
+      "from": "agent-teammates",
+      "type": "requires",
+      "to": "skills"
+    },
+    {
+      "from": "agent-teammates",
+      "type": "requires",
+      "to": "computer-use"
+    },
+    {
+      "from": "agent-teammates",
+      "type": "combines_with",
+      "to": "safety"
+    },
+    {
+      "from": "agent-teammates",
+      "type": "combines_with",
+      "to": "human-in-the-loop"
+    },
+    {
+      "from": "organizations-swarms",
+      "type": "requires",
+      "to": "agent-graphs"
+    },
+    {
+      "from": "organizations-swarms",
+      "type": "requires",
+      "to": "long-horizon"
+    },
+    {
+      "from": "embodied",
+      "type": "requires",
+      "to": "single-agent"
+    },
+    {
+      "from": "embodied",
+      "type": "requires",
+      "to": "multimodal"
+    },
+    {
+      "from": "rag",
+      "type": "upgrades_to",
+      "to": "knowledge-graphs",
+      "when": "The answer needs facts joined across documents, or you must show where each fact came from."
+    },
+    {
+      "from": "rag",
+      "type": "upgrades_to",
+      "to": "agentic-rag",
+      "when": "One retrieval is not enough and the next query depends on what the last one found."
+    },
+    {
+      "from": "prompt-chaining",
+      "type": "upgrades_to",
+      "to": "single-agent",
+      "when": "The steps cannot be written down in advance."
+    },
+    {
+      "from": "parallelization",
+      "type": "upgrades_to",
+      "to": "orchestrator-workers",
+      "when": "The subtasks cannot be known until the task is read."
+    },
+    {
+      "from": "evaluator-optimizer",
+      "type": "upgrades_to",
+      "to": "debate-review",
+      "when": "One reviewer shares the author's blind spots."
+    },
+    {
+      "from": "workflow-graphs",
+      "type": "upgrades_to",
+      "to": "agent-graphs",
+      "when": "A node needs its own loop and tools, not one call."
+    },
+    {
+      "from": "function-calling",
+      "type": "upgrades_to",
+      "to": "single-agent",
+      "when": "The next action depends on what the last one returned, so the model has to choose again and decide when to stop."
+    },
+    {
+      "from": "code-execution",
+      "type": "upgrades_to",
+      "to": "coding-agents",
+      "when": "The code has to be run, read and rewritten until it works, with the model deciding when it is done."
+    },
+    {
+      "from": "computer-use",
+      "type": "upgrades_to",
+      "to": "single-agent",
+      "when": "One action is not enough: the task needs a sequence of reads and actions, which is what every real computer-use run does."
+    },
+    {
+      "from": "single-agent",
+      "type": "upgrades_to",
+      "to": "long-horizon",
+      "when": "The work outlives one context window or one sitting."
+    },
+    {
+      "from": "skills",
+      "type": "combines_with",
+      "to": "memory"
+    },
+    {
+      "from": "human-in-the-loop",
+      "type": "combines_with",
+      "to": "workflow-graphs"
+    },
+    {
+      "from": "human-in-the-loop",
+      "type": "combines_with",
+      "to": "function-calling"
+    },
+    {
+      "from": "evaluator-optimizer",
+      "type": "combines_with",
+      "to": "evals"
+    },
+    {
+      "from": "computer-use",
+      "type": "combines_with",
+      "to": "safety"
+    },
+    {
+      "from": "long-horizon",
+      "type": "combines_with",
+      "to": "ops"
+    },
+    {
+      "from": "rag",
+      "type": "alternative_to",
+      "to": "context-engineering",
+      "question": "Retrieve, or put it all in the window?"
+    },
+    {
+      "from": "adaptation",
+      "type": "alternative_to",
+      "to": "prompt-engineering",
+      "question": "Train it in, or say it every time?"
+    },
+    {
+      "from": "workflow-graphs",
+      "type": "alternative_to",
+      "to": "single-agent",
+      "question": "Draw the path, or let the model find it?"
+    },
+    {
+      "from": "mcp",
+      "type": "alternative_to",
+      "to": "function-calling",
+      "question": "A protocol server, or tools defined inline?"
+    },
+    {
+      "from": "chat",
+      "type": "requires",
+      "to": "order-zero"
+    },
+    {
+      "from": "order-zero",
+      "type": "upgrades_to",
+      "to": "chat",
+      "when": "The input is language you cannot write rules for, and a wrong answer is cheap to catch."
+    },
+    {
+      "from": "briefing",
+      "type": "combines_with",
+      "to": "prompt-engineering"
+    },
+    {
+      "from": "reviewing",
+      "type": "combines_with",
+      "to": "human-in-the-loop"
+    },
+    {
+      "from": "delegating",
+      "type": "combines_with",
+      "to": "single-agent"
+    },
+    {
+      "from": "trust",
+      "type": "combines_with",
+      "to": "evals"
+    },
+    {
+      "from": "chat",
+      "type": "upgrades_to",
+      "to": "rag",
+      "when": "The answer needs facts the model was never trained on, not just what it already knows."
+    },
+    {
+      "from": "prompt-engineering",
+      "type": "upgrades_to",
+      "to": "structured-output",
+      "when": "The reply's format has to be valid on every single call, not just usually valid."
+    },
+    {
+      "from": "structured-output",
+      "type": "upgrades_to",
+      "to": "function-calling",
+      "when": "The model itself has to decide whether to use the schema-shaped output at all, not just fill in values for a shape your code already chose."
+    },
+    {
+      "from": "inference-time-reasoning",
+      "type": "upgrades_to",
+      "to": "evaluator-optimizer",
+      "when": "The same mistake shows up across every sample or every extra round of thinking, so more computation on the same approach stops helping and the draft needs checking against a stated criterion instead."
+    },
+    {
+      "from": "multimodal",
+      "type": "upgrades_to",
+      "to": "human-in-the-loop",
+      "when": "The model is generating an image, audio or video rather than reading one, so there is no source to check the result against, and a wrong one is expensive or hard to undo where it is going."
+    },
+    {
+      "from": "orchestrator-workers",
+      "type": "upgrades_to",
+      "to": "long-horizon",
+      "when": "The task cannot finish inside one bounded team run and has to pick up again across separate sessions."
+    },
+    {
+      "from": "agent-graphs",
+      "type": "upgrades_to",
+      "to": "organizations-swarms",
+      "when": "The roster of agents itself has to change while the work is in progress, not stay fixed for one run."
+    },
+    {
+      "from": "debate-review",
+      "type": "upgrades_to",
+      "to": "agent-teammates",
+      "when": "The checking has to run continuously against everything a standing assistant does, not once against one finished draft."
+    },
+    {
+      "from": "embeddings-search",
+      "type": "upgrades_to",
+      "to": "rag",
+      "when": "The person asking wants an answer with the passages behind it, not a ranked list of passages to read themselves."
+    },
+    {
+      "from": "knowledge-graphs",
+      "type": "upgrades_to",
+      "to": "agentic-rag",
+      "when": "Which entity to follow next depends on what the last hop returned, so the queries cannot be written in advance."
+    },
+    {
+      "from": "memory",
+      "type": "upgrades_to",
+      "to": "long-horizon",
+      "when": "What has to survive between sessions is work still in progress, not facts about the person you are talking to."
+    },
+    {
+      "from": "routing",
+      "type": "upgrades_to",
+      "to": "function-calling",
+      "when": "The right destination depends on something the message does not say, so the choice needs a lookup before it can be made."
+    },
+    {
+      "from": "mcp",
+      "type": "upgrades_to",
+      "to": "agent-harness",
+      "when": "The tools are connected and what is missing is everything around the model: the loop, the permissions, the caps and the sandbox."
+    },
+    {
+      "from": "agentic-rag",
+      "type": "upgrades_to",
+      "to": "orchestrator-workers",
+      "when": "The searches do not depend on each other and there are more of them than one agent's context can carry."
+    },
+    {
+      "from": "coding-agents",
+      "type": "upgrades_to",
+      "to": "orchestrator-workers",
+      "when": "The change is larger than one agent can hold at once and splits into parts that can be worked separately."
+    },
+    {
+      "from": "agent-harness",
+      "type": "requires",
+      "to": "single-agent"
+    },
+    {
+      "from": "coding-agents",
+      "type": "combines_with",
+      "to": "agent-harness"
+    },
+    {
+      "from": "skills",
+      "type": "combines_with",
+      "to": "agent-harness"
+    },
+    {
+      "from": "long-horizon",
+      "type": "combines_with",
+      "to": "agent-harness"
+    },
+    {
+      "from": "fine-tuning",
+      "type": "requires",
+      "to": "adaptation"
+    },
+    {
+      "from": "distillation",
+      "type": "requires",
+      "to": "fine-tuning"
+    },
+    {
+      "from": "synthetic-data",
+      "type": "requires",
+      "to": "adaptation"
+    },
+    {
+      "from": "prompt-optimization",
+      "type": "requires",
+      "to": "evals"
+    },
+    {
+      "from": "prompt-optimization",
+      "type": "combines_with",
+      "to": "prompt-engineering"
+    },
+    {
+      "from": "observability",
+      "type": "requires",
+      "to": "ops"
+    },
+    {
+      "from": "ai-gateways",
+      "type": "requires",
+      "to": "ops"
+    },
+    {
+      "from": "cost-optimization",
+      "type": "requires",
+      "to": "ops"
+    },
+    {
+      "from": "local-inference",
+      "type": "requires",
+      "to": "ops"
+    },
+    {
+      "from": "cost-optimization",
+      "type": "combines_with",
+      "to": "routing"
+    },
+    {
+      "from": "cost-optimization",
+      "type": "combines_with",
+      "to": "context-engineering"
+    },
+    {
+      "from": "guardrails",
+      "type": "requires",
+      "to": "safety"
+    },
+    {
+      "from": "red-teaming",
+      "type": "requires",
+      "to": "safety"
+    },
+    {
+      "from": "red-teaming",
+      "type": "combines_with",
+      "to": "evals"
+    },
+    {
+      "from": "guardrails",
+      "type": "combines_with",
+      "to": "human-in-the-loop"
+    },
+    {
+      "from": "eval-frameworks",
+      "type": "requires",
+      "to": "evals"
+    },
+    {
+      "from": "observability",
+      "type": "combines_with",
+      "to": "evals"
+    }
+  ],
+  "page_blocks": {
+    "use": "No code. Where this lives in products the reader has.",
+    "build": "Runnable example, trace, failure modes, eval.",
+    "run": "200 words: what to monitor, cost at volume, how it fails in production, what to log.",
+    "try": "Two or three exercises, at least one per lane.",
+    "out_there": "Named developers, models, products and tools that embody this order, by id from landscape.json. At least two makers where two exist."
+  },
+  "teardowns": {
+    "cap": 6,
+    "expires_days": 180,
+    "first": [
+      {
+        "slug": "deep-research-mode",
+        "title": "A deep-research mode, decoded",
+        "patterns": [
+          "agentic-rag",
+          "parallelization",
+          "debate-review",
+          "orchestrator-workers"
+        ]
+      },
+      {
+        "slug": "coding-agent",
+        "title": "A coding agent, decoded",
+        "patterns": [
+          "agent-harness",
+          "single-agent",
+          "coding-agents",
+          "skills",
+          "orchestrator-workers",
+          "safety"
+        ]
+      },
+      {
+        "slug": "agent-teammate",
+        "title": "An always-on agent teammate, decoded",
+        "patterns": [
+          "agent-teammates",
+          "long-horizon",
+          "computer-use",
+          "human-in-the-loop"
+        ]
+      }
+    ]
+  },
+  "recipe_backlog": {
+    "note": "Planned nodes only. They show breadth on the matrix and cost nothing until a phase picks them up.",
+    "personal": [
+      "household paperwork",
+      "trip planning with bookings",
+      "personal knowledge base"
+    ],
+    "knowledge-work": [
+      "meeting to decisions and owners",
+      "contract review against a checklist",
+      "literature review"
+    ],
+    "engineering-and-lab": [
+      "datasheet question answering",
+      "design review against requirements",
+      "test log triage",
+      "lab notebook to report"
+    ],
+    "business-operations": [
+      "invoice matching",
+      "lead qualification",
+      "incident response runbook"
+    ],
+    "creative": [
+      "storyboard from a script",
+      "brand-consistent image sets"
+    ],
+    "education": [
+      "tutor that follows a syllabus",
+      "grading against a rubric with a human check"
+    ]
+  },
+  "level_rule": "A new level starts where the answer to “who decides the next step” changes: nobody, you, your code, the model for one action, the model for every step, several models, the models including when to start.",
+  "tracks_overview": {
+    "title": "Topics at every level",
+    "who": "These topics apply whichever level you use.",
+    "description": "Five topics cut across all the levels. Each has its own set of pages."
+  }
+}

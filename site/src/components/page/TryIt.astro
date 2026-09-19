@@ -1,0 +1,24 @@
+---
+// Two or three exercises, tagged by lane so a reader on either side of the switch can find the
+// one meant for them. `either` is for an exercise that works from both lanes.
+interface Exercise {
+  lane: 'use' | 'build' | 'either';
+  body: string;
+}
+interface Props {
+  items: Exercise[];
+}
+const { items } = Astro.props;
+const LABEL: Record<Exercise['lane'], string> = { use: 'Use it', build: 'Build it', either: 'Either lane' };
+---
+
+<ol class="try-it">
+  {
+    items.map((it) => (
+      <li>
+        <span class="pill">{LABEL[it.lane]}</span>
+        <p>{it.body}</p>
+      </li>
+    ))
+  }
+</ol>

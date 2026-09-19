@@ -1,0 +1,52 @@
+{
+  "illustrative": true,
+  "h": 380,
+  "title": "Routing",
+  "sub": "Classify the question, then send it to the cheapest handler that can answer it.",
+  "pill": "Level 3 · Workflows",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
+    { "id": "classify", "x": 170, "y": 104, "l": "Classify the question", "k": "model" },
+    { "id": "dispatch", "x": 170, "y": 176, "l": "Route on the label", "k": "code" },
+    { "id": "lookup", "x": 30, "y": 262, "l": "Lookup prompt", "k": "model" },
+    { "id": "numeric", "x": 170, "y": 262, "l": "Numeric route", "k": "code" },
+    { "id": "person", "x": 310, "y": 262, "l": "Ask a person", "k": "code" },
+    { "id": "a", "x": 170, "y": 348, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "classify", "by": "code" },
+    { "id": "e2", "f": "classify", "t": "dispatch", "by": "code" },
+    { "id": "e3l", "f": "dispatch", "t": "lookup", "by": "code" },
+    { "id": "e3n", "f": "dispatch", "t": "numeric", "by": "code" },
+    { "id": "e3p", "f": "dispatch", "t": "person", "by": "code" },
+    { "id": "e4l", "f": "lookup", "t": "a", "by": "code" },
+    { "id": "e4n", "f": "numeric", "t": "a", "by": "code" },
+    { "id": "e4p", "f": "person", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"How often should the DW-300's filter be cleaned?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code asks the model for one label",
+      "d": "label: lookup",
+      "m": "64 tokens in · 1 token out · 210 ms"
+    },
+    {
+      "e": "e3l",
+      "h": "Your code reads the label and picks a handler",
+      "d": "label='lookup' -> lookup route\n(the other two routes below were not taken this run)",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e4l",
+      "h": "The lookup route answers with retrieved sources",
+      "d": "\"Every 30 cycles. Sources: dw300-manual#6\"",
+      "m": "290 tokens in · 12 tokens out · 780 ms"
+    }
+  ]
+}

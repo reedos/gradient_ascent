@@ -1,0 +1,82 @@
+---
+import Base from '../../layouts/Base.astro';
+import TechniqueRow from '../../components/TechniqueRow.astro';
+import { url } from '../../lib/url';
+import { levels, tracks, taxonomy } from '../../lib/content';
+
+const trackItems = tracks.flatMap((t) => [
+  { slug: t.id, title: t.title, summary: t.summary, status: t.status },
+  ...(t.pages ?? []).map((p) => ({ slug: p.slug, title: p.title, summary: p.summary, status: p.status })),
+]);
+---
+<Base
+  title="Techniques · Gradient Ascent"
+  description="Every technique the site describes, grouped by level, with its current status."
+>
+  <div class="page-hero">
+    <div class="eyebrow muted"><span class="dot"></span>All techniques</div>
+    <h1>Every technique, by level</h1>
+    <p>Every known technique has an entry from day one, with a status: Planned, Outline, Draft or Published. Every page here is a Draft: written, but with no recorded run and no scored result behind it. The map is complete even when the pages are not.</p>
+    <p><a href={url('/map/')} style="color:var(--accent)">See the same pages as a graph &rarr;</a></p>
+  </div>
+
+  {
+    levels.map((tier) => (
+      <section class="section">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow muted" style={`--c:var(--o${tier.order})`}>
+              Level {String(tier.order).padStart(2, '0')}
+            </div>
+            <h2>
+              <a href={url(`/levels/${tier.order}/`)}>{tier.title}</a>
+            </h2>
+          </div>
+          <p>{tier.short}</p>
+        </div>
+        <div class="panel reading">
+          {tier.pages.map((p) => (
+            <TechniqueRow slug={p.slug} title={p.title} summary={p.summary} status={p.status} color={`var(--o${tier.order})`} />
+          ))}
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section">
+    <div class="section-top">
+      <div>
+        <div class="eyebrow muted" style="--c:var(--ot)">Topics</div>
+        <h2>
+          <a href={url('/levels/tracks/')}>{taxonomy.tracks_overview.title}</a>
+        </h2>
+      </div>
+      <p>{taxonomy.tracks_overview.description}</p>
+    </div>
+    <div class="panel reading">
+      {trackItems.map((p) => <TechniqueRow slug={p.slug} title={p.title} summary={p.summary} status={p.status} color="var(--ot)" />)}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-top">
+      <div>
+        <div class="eyebrow muted" style="--c:var(--ot)">Threads</div>
+        <h2>One idea across several levels</h2>
+      </div>
+      <p>A thread is a word people use for two different techniques. Its page says which is which and where each one lives.</p>
+    </div>
+    <div class="panel reading">
+      {taxonomy.threads.map((t) => (
+        <TechniqueRow
+          slug={t.id}
+          href={url(`/threads/${t.id}/`)}
+          title={t.title}
+          summary={t.line}
+          status={t.status}
+          color="var(--ot)"
+        />
+      ))}
+    </div>
+  </section>
+</Base>

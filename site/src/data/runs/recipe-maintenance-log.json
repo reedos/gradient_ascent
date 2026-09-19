@@ -1,0 +1,65 @@
+{
+  "illustrative": true,
+  "h": 490,
+  "title": "Plain-language maintenance log, assembled",
+  "sub": "Extract a fixed record, walk the graph to the equipment it concerns, and let the model decide between logging it and flagging it.",
+  "pill": "Level 4 · Tools",
+  "nodes": [
+    { "id": "note", "x": 170, "y": 30, "l": "Note arrives", "k": "io" },
+    { "id": "extract", "x": 170, "y": 100, "l": "Extract a fixed record", "k": "model" },
+    { "id": "walk", "x": 170, "y": 170, "l": "Walk the equipment graph", "k": "code" },
+    { "id": "decide", "x": 170, "y": 240, "l": "Log it, or flag it", "k": "model" },
+    { "id": "save", "x": 82, "y": 310, "l": "save_log_entry(record)", "k": "tool" },
+    { "id": "flag", "x": 258, "y": 310, "l": "flag_for_review(reason)", "k": "tool" },
+    { "id": "result", "x": 170, "y": 380, "l": "Link into equipment history", "k": "code" },
+    { "id": "a", "x": 170, "y": 450, "l": "Log entry saved", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "note", "t": "extract", "by": "code" },
+    { "id": "e2", "f": "extract", "t": "walk", "by": "code" },
+    { "id": "e3", "f": "walk", "t": "decide", "by": "code" },
+    { "id": "e4save", "f": "decide", "t": "save", "by": "model" },
+    { "id": "e4flag", "f": "decide", "t": "flag", "by": "model" },
+    { "id": "e5save", "f": "save", "t": "result", "by": "code" },
+    { "id": "e5flag", "f": "flag", "t": "result", "by": "code" },
+    { "id": "e6", "f": "result", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "A technician's note arrives",
+      "d": "\"Replaced the belt on pump 3, it was fraying and\nstarting to smell hot before I shut it down.\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The model extracts a fixed record from the plain-language note",
+      "d": "{\"equipment\": \"pump-3\", \"action\": \"belt replacement\",\n \"condition_noted\": \"fraying, smell of overheating\",\n \"date\": \"2026-09-18\"}",
+      "m": "120 tokens in · 38 tokens out · 0.6 s"
+    },
+    {
+      "e": "e3",
+      "h": "Your code walks the graph from the equipment id",
+      "d": "pump-3 -> cooling line, Building B\ncooling line -> last serviced 62 days ago",
+      "m": "2 hops · 6 ms"
+    },
+    {
+      "e": "e4flag",
+      "h": "The model reads \"smell hot\" as a possible safety issue and flags it",
+      "d": "→ flag_for_review(record, reason=\"overheating noted alongside\nworn belt; recommend inspection before next run\")\n(it could have logged this routinely instead; nothing forced\nthe escalation)",
+      "m": "310 tokens in · 26 tokens out · 0.9 s"
+    },
+    {
+      "e": "e5flag",
+      "h": "Your code runs the tool and returns the result",
+      "d": "\"Flagged for review, assigned to facilities lead\"",
+      "m": "1 result · 20 ms"
+    },
+    {
+      "e": "e6",
+      "h": "Your code links the entry into the equipment's own history",
+      "d": "pump-3 history: + belt replacement, 2026-09-18, flagged",
+      "m": "0 tokens · 0 ms"
+    }
+  ]
+}

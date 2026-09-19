@@ -1,0 +1,54 @@
+---
+// Model calls, tokens in, tokens out and wall time for one question, plus which level it is
+// compared with. Values come from a run file (still marked illustrative until a real one is
+// recorded) or are written by hand as "illustrative" -- either way the strip says which.
+//
+// The "illustrative" notice is printed ABOVE the numbers on purpose. Below them, at footnote
+// size, it was a 10 px line under four 27 px figures: a reader scanning the strip would take
+// the numbers as measured, which is the one thing this site must not let happen.
+interface Stat {
+  label: string;
+  value: string;
+}
+interface CompareTo {
+  label: string;
+  note: string;
+}
+interface Props {
+  stats: Stat[];
+  comparedTo?: CompareTo;
+  illustrative?: boolean;
+  /** Tier order 0..7, tints the compare block the way the rest of the page's level does. */
+  level?: number;
+}
+const { stats, comparedTo, illustrative = true, level } = Astro.props;
+const color = typeof level === 'number' ? `var(--o${level})` : undefined;
+---
+
+{
+  illustrative && (
+    <p class="cost-illustrative">
+      Illustrative, not measured: no result file exists for this technique yet, so every number
+      below is a worked example. See <code>docs/EVALS.md</code> for how a real run is recorded
+      and scored.
+    </p>
+  )
+}
+<div class="cost-strip">
+  {
+    stats.map((s) => (
+      <div class="cost-stat">
+        <b>{s.value}</b>
+        <span>{s.label}</span>
+      </div>
+    ))
+  }
+</div>
+{
+  comparedTo && (
+    <div class="connection" style={color ? `--c:${color}` : undefined}>
+      <strong>Compared with {comparedTo.label}</strong>
+      {comparedTo.note}
+    </div>
+  )
+}

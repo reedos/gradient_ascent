@@ -1,0 +1,278 @@
+---
+// The main timeline chart: a wide, interactive lane chart (>= 850px) and, below 850px, the
+// compact per-level strip (TimelineStrip.astro, variant="compact") in its place -- the wide
+// chart's percentage-positioned dots and hover panels do not stay legible at phone width, so the
+// narrow view is a genuinely different, simpler rendering rather than a squeezed copy. No client
+// JavaScript anywhere: hover and keyboard-focus tooltips are CSS only (:hover / :focus-within),
+// and both the wide and narrow layouts render at build time and are swapped with a media query,
+// the same technique ClimbCurve.astro uses for its own two layouts.
+import { url } from '../lib/url';
+import { levels as taxonomyLevels, techniqueBySlug, named } from '../lib/content';
+import {
+  levelSeriesTopDown,
+  buildMainAxis,
+  decimalYear,
+  formatDate,
+  shapeForKind,
+  KIND_LABEL,
+  verificationNote,
+  selectLabeledMilestones,
+  assignLabelSides,
+  markExtent,
+  markLabel,
+  asOf,
+  shifts,
+  milestone as milestoneById,
+  type Milestone,
+  type ResolvedMark,
+} from '../lib/timeline';
+import TimelineStrip from './TimelineStrip.astro';
+import '../styles/timeline.css';
+
+interface Props {
+  /** The id of the heading that introduces the full list below this chart -- wired as
+   *  aria-describedby on the chart itself, per the task's "the list below serves as its text
+   *  alternative" requirement. */
+  listHeadingId: string;
+}
+const { listHeadingId } = Astro.props;
+
+const axis = buildMainAxis();
+const series = levelSeriesTopDown();
+const stubIndexById = new Map(axis.stubMilestones.map((m, i) => [m.id, i]));
+
+function fractionFor(m: Milestone): number {
+  const idx = stubIndexById.get(m.id);
+  return idx !== undefined ? axis.stubFraction(idx) : axis.toFraction(decimalYear(m.date, m.precision));
+}
+
+function levelTitle(order: number): string {
+  return taxonomyLevels.find((t) => t.order === order)?.title ?? `Level ${order}`;
+}
+
+function techLink(m: Milestone) {
+  if (!m.technique) return undefined;
+  const t = techniqueBySlug(m.technique);
+  return t ? { title: t.title, href: url(`/techniques/${t.slug}/`) } : undefined;
+}
+function registryLink(m: Milestone) {
+  if (!m.registry_id) return undefined;
+  const n = named.find((e) => e.id === m.registry_id);
+  return n ? { name: n.name } : undefined;
+}
+
+// Every distinct marked-date key beyond described/available actually used anywhere -- today that
+// is "buildable", but the legend is built from whatever the data actually carries, so a fourth
+// key added later needs no line of code changed here.
+const extraMarkKeys = [...new Set(series.flatMap((s) => s.marks.map((mk) => mk.key)).filter((k) => k !== 'described' && k !== 'available'))];
+
+interface LanePoint {
+  milestone: Milestone;
+  fraction: number;
+  shape: 'circle' | 'square' | 'triangle';
+  mark?: ResolvedMark;
+  labeled: boolean;
+  /** Which side of the lane a visible label prints on -- alternated over the LABELED points only,
+   *  in x order, so two adjacent visible labels never land on the same side just because an
+   *  unlabelled dot happened to fall between them in the milestone list (a plain CSS
+   *  nth-child(odd) over every dot does not track this: most dots on a lane carry no label at
+   *  all, so its odd/even parity has nothing to do with which ones are actually visible). */
+  labelSide?: 'above' | 'below';
+  unverified: boolean;
+  unverifiedReason?: string;
+  tech?: { title: string; href: string };
+  registry?: { name: string };
+}
+
+interface Lane {
+  level: number;
+  title: string;
+  color: string;
+  connector?: { fromPct: number; toPct: number };
+  points: LanePoint[];
+}
+
+const lanes: Lane[] = series.map((s) => {
+  const markByMsId = new Map(s.marks.map((mk) => [mk.milestone.id, mk]));
+  const points0 = s.milestones.map((m) => ({ id: m.id, fraction: fractionFor(m) }));
+  const markedIds = new Set(s.marks.map((mk) => mk.milestone.id));
+  // minGap wider than a fraction-only rule might suggest: two labels can sit "far enough" apart
+  // by axis fraction and still collide, because label TEXT has real pixel width the fraction does
+  // not know about. maxExtra 1 (not 2) keeps a crowded lane (level 1, level 5) from stacking a
+  // third unmarked label into the same dense stretch as the marked ones.
+  const labeled = selectLabeledMilestones(points0, markedIds, { minGap: 0.07, maxExtra: 1 });
+  const labelSideById = assignLabelSides(points0, labeled);
+
+  const points: LanePoint[] = s.milestones.map((m) => ({
+    milestone: m,
+    fraction: fractionFor(m),
+    shape: shapeForKind(m.kind),
+    mark: markByMsId.get(m.id),
+    labeled: labeled.has(m.id),
+    labelSide: labelSideById.get(m.id),
+    unverified: !m.verified,
+    unverifiedReason: verificationNote(m),
+    tech: techLink(m),
+    registry: registryLink(m),
+  }));
+
+  // The connector runs from the lane's chronologically EARLIEST marked date to its LATEST -- not
+  // from `described` to `available` by name, since a level's `buildable` can fall on either side
+  // of `available` (content/timeline.json says so explicitly; see markExtent's own comment).
+  const extent = markExtent(s.marks);
+  const connector =
+    extent && extent.earliest !== extent.latest
+      ? { fromPct: fractionFor(extent.earliest.milestone) * 100, toPct: fractionFor(extent.latest.milestone) * 100 }
+      : undefined;
+
+  return { level: s.level, title: levelTitle(s.level), color: `var(--o${s.level})`, connector, points };
+});
+
+// Changes in the models themselves (content/timeline.json's `shifts`): not levels, so they are
+// drawn as a vertical rule crossing every lane rather than as a dot on one. The compact strip
+// already draws these; the wide chart did not, which left /timeline/ saying two different things
+// about the same data above and below 850px. Every shift is drawn here, not only the ones flagged
+// `strip: true` -- that flag exists because the strip is 26px a lane and cannot carry more than
+// one or two labels, a constraint this chart does not have.
+//
+// Positions come from this component's own `fractionFor`, so a shift anchored to a pre-2017
+// milestone lands in the compressed stub exactly where its dot does. Labels sit in a band under
+// the lanes, clear of the year ticks at the top and of every dot label inside a lane, and flip to
+// the left of their rule in the right-hand third so the last one is not clipped by the panel edge.
+const shiftRules = shifts
+  .map((sh) => ({ sh, m: milestoneById(sh.milestone) }))
+  .filter((x): x is { sh: (typeof shifts)[number]; m: Milestone } => Boolean(x.m))
+  .map(({ sh, m }) => ({
+    id: sh.id,
+    title: sh.title,
+    pct: fractionFor(m) * 100,
+    when: formatDate(m.date.slice(0, 7), 'month'),
+    labelLeft: fractionFor(m) > 0.62,
+  }));
+
+function markClass(p: LanePoint): string {
+  if (!p.mark) return '';
+  if (p.mark.key === 'described') return 'tl-mark-described';
+  if (p.mark.key === 'available') return 'tl-mark-available';
+  return 'tl-mark-extra';
+}
+---
+
+<div class="tl-wide-only">
+  <p class="tl-chart-scale-note">
+    To scale from {Math.floor(axis.startYear)} onward. {axis.stubMilestones.length > 0 && `Before that, level 0's early history is compressed and not to scale.`}
+  </p>
+  <div class="tl-chart" tabindex="0" role="img" aria-describedby={listHeadingId} aria-label={`A chart of ${lanes.length} levels from ${Math.floor(axis.startYear)} to ${asOf}, each level as a horizontal lane with its dated milestones. The full list below has the same milestones as text.`}>
+    <div class="tl-body">
+      <div class="tl-labels">
+        <div class="tl-years-spacer" />
+        {lanes.map((l) => (
+          <div class="tl-lane-label" style={`--c:${l.color}`}>
+            <span class="tl-lane-num">{l.level}</span>
+            <span class="tl-lane-title">{l.title}</span>
+          </div>
+        ))}
+      </div>
+      <div class="tl-plot">
+        <div class="tl-years">
+          {axis.stubMilestones.length > 0 && (
+            <>
+              <span class="tl-stub-label">before 2017</span>
+              <span class="tl-stub-divider" style={`left:${axis.stubWidth * 100}%`} />
+            </>
+          )}
+          {axis.yearTicks.map((y) => (
+            <span class="tl-year-tick" style={`left:${axis.toFraction(y) * 100}%`}>{y}</span>
+          ))}
+        </div>
+        {axis.yearTicks.map((y) => <span class="tl-year-rule" style={`left:${axis.toFraction(y) * 100}%`} />)}
+        {shiftRules.map((x) => <span class="tl-shift" style={`left:${x.pct}%`} />)}
+
+        {lanes.map((l) => (
+          <div class="tl-lane-track">
+            {l.connector && (
+              <span class="tl-connector" style={`left:${l.connector.fromPct}%;width:${Math.max(l.connector.toPct - l.connector.fromPct, 0)}%`} />
+            )}
+            {l.points.map((p) => (
+              <span
+                class:list={['tl-point', { 'tl-marked': Boolean(p.mark), 'tl-unverified': p.unverified }, markClass(p)]}
+                style={`left:${p.fraction * 100}%;--c:${l.color}`}
+              >
+                <span
+                  class="tl-dot"
+                  tabindex="0"
+                  aria-label={`${p.mark ? p.mark.label + ': ' : ''}${p.milestone.title}, ${formatDate(p.milestone.date, p.milestone.precision)}, level ${l.level} ${l.title}. ${p.milestone.what}${p.unverifiedReason ? ' Not verified: ' + p.unverifiedReason : ''}`}
+                >
+                  {/* The shape class belongs HERE, on the element with the actual fill/border, not
+                      on .tl-point above: an earlier version put it there, where border-radius was
+                      a harmless no-op (so "circle" and "square" marks looked identical) but
+                      clip-path was not -- a triangle .tl-point clipped away its own descendants,
+                      silently deleting that dot's label and tooltip. */}
+                  <span class:list={['tl-dot-mark', `tl-shape-${p.shape}`]} />
+                </span>
+                {p.labeled && (
+                  <span class:list={['tl-dot-label', p.labelSide === 'above' ? 'tl-label-above' : 'tl-label-below']}>
+                    {p.mark ? `${p.mark.label} · ${formatDate(p.milestone.date, p.milestone.precision)}` : p.milestone.title}
+                  </span>
+                )}
+                <span class="tl-tip" role="note">
+                  <span class="tl-tip-date">{p.mark ? `${p.mark.label} · ` : ''}{formatDate(p.milestone.date, p.milestone.precision)}</span>
+                  <span class="tl-tip-title">{p.milestone.title}</span>
+                  <span class="tl-tip-maker">{p.milestone.maker}</span>
+                  <span class="tl-tip-kind">{KIND_LABEL[p.milestone.kind]}</span>
+                  <span class="tl-tip-what">{p.milestone.what}</span>
+                  <span class="tl-tip-links">
+                    <a href={p.milestone.source.url} target="_blank" rel="noopener noreferrer">{p.milestone.source.publisher} &#8599;</a>
+                    {p.tech && <a href={p.tech.href}>{p.tech.title} &rarr;</a>}
+                    {p.registry && <a href={url('/names/')}>{p.registry.name} in the registry &rarr;</a>}
+                    <a href={`#${p.milestone.id}`}>Full entry in the list below &darr;</a>
+                  </span>
+                  {p.unverifiedReason && <span class="tl-tip-unverified">Not verified: {p.unverifiedReason}</span>}
+                </span>
+              </span>
+            ))}
+          </div>
+        ))}
+
+        {
+          shiftRules.length > 0 && (
+            <div class="tl-shift-band">
+              {shiftRules.map((x) => (
+                <a
+                  class:list={['tl-shift-label', x.labelLeft ? 'is-left' : 'is-right']}
+                  style={`left:${x.pct}%`}
+                  href={url(`/timeline/#${x.id}`)}
+                >
+                  {x.title} · {x.when}
+                </a>
+              ))}
+            </div>
+          )
+        }
+
+        <span class="tl-today" />
+        <span class="tl-today-label">Today<br />{formatDate(asOf, 'day')}</span>
+      </div>
+    </div>
+
+    <div class="tl-legend">
+      <div class="tl-legend-row">
+        <span class="tl-legend-item"><span class="tl-legend-swatch tl-shape-circle" />Research</span>
+        <span class="tl-legend-item"><span class="tl-legend-swatch tl-shape-square" />Model / product</span>
+        <span class="tl-legend-item"><span class="tl-legend-swatch tl-shape-triangle" />Tool / standard</span>
+      </div>
+      <div class="tl-legend-row">
+        <span class="tl-legend-item"><span class="tl-legend-swatch tl-legend-hollow" />Described (first)</span>
+        {extraMarkKeys.map((k) => (
+          <span class="tl-legend-item"><span class="tl-legend-swatch tl-legend-extra" />{markLabel(k)} (first)</span>
+        ))}
+        <span class="tl-legend-item"><span class="tl-legend-swatch tl-legend-solid" />Available (first)</span>
+        <span class="tl-legend-item"><span class="tl-legend-swatch tl-legend-unverified" />Not verified today &mdash; see focus for why</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tl-narrow-only">
+  <TimelineStrip variant="compact" />
+</div>

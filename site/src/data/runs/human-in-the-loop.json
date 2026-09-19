@@ -1,0 +1,63 @@
+{
+  "illustrative": true,
+  "h": 400,
+  "title": "Human approval",
+  "sub": "Pause on a fixed threshold, hand back a checkpoint, resume once a person decides.",
+  "pill": "Level 3 · Workflows",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 26, "l": "Question", "k": "io" },
+    { "id": "retrieve", "x": 170, "y": 88, "l": "Retrieve sources", "k": "code" },
+    { "id": "draft", "x": 170, "y": 150, "l": "Draft", "k": "model" },
+    { "id": "check", "x": 170, "y": 212, "l": "Check thresholds", "k": "code" },
+    { "id": "reviewer", "x": 310, "y": 280, "l": "Reviewer decides", "k": "human" },
+    { "id": "resume", "x": 170, "y": 280, "l": "Resume", "k": "code" },
+    { "id": "a", "x": 170, "y": 346, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "retrieve", "by": "code" },
+    { "id": "e2", "f": "retrieve", "t": "draft", "by": "code" },
+    { "id": "e3", "f": "draft", "t": "check", "by": "code" },
+    { "id": "e4pass", "f": "check", "t": "a", "by": "code", "b": 140 },
+    { "id": "e4pause", "f": "check", "t": "resume", "by": "code" },
+    { "id": "e5", "f": "reviewer", "t": "resume", "by": "code" },
+    { "id": "e6", "f": "resume", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"What does HLV-2205 cost?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code retrieves sources",
+      "d": "parts-list#2",
+      "m": "1 section · 6 ms"
+    },
+    {
+      "e": "e3",
+      "h": "The model drafts an answer",
+      "d": "\"It costs $52.00. Sources: parts-list#2\"",
+      "m": "180 in · 12 out · 0.5 s"
+    },
+    {
+      "e": "e4pause",
+      "h": "Your code checks the thresholds and pauses the run",
+      "d": "reason=high_cost (a dollar figure is in the draft)\nthe run returns a checkpoint here; no further model\ncall happens until a person decides\n(the direct pass-through to Answer, below, was not taken this run)",
+      "m": "0 tokens · paused"
+    },
+    {
+      "e": "e5",
+      "h": "A person reviews the paused draft and decides",
+      "d": "sees: \"It costs $52.00. Sources: parts-list#2\", reason: high_cost\ndecides: approve",
+      "m": "decision: approve"
+    },
+    {
+      "e": "e6",
+      "h": "Your code resumes with the reviewer's decision",
+      "d": "\"It costs $52.00. Sources: parts-list#2\"",
+      "m": "0 tokens · 0 ms"
+    }
+  ]
+}

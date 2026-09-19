@@ -1,0 +1,166 @@
+---
+slug: agent-teammate
+products: [gemini-spark, claude-cowork, grok-bot, muse, hermes-agent, openclaw]
+reviewed: 2026-09-18
+sources:
+  - title: "The Gemini app becomes more agentic, delivering proactive, 24/7 help"
+    url: "https://blog.google/innovation-and-ai/products/gemini-app/next-evolution-gemini-app/"
+    publisher: "Google"
+    accessed: "2026-09-18"
+  - title: "Gemini Spark updates: macOS launch, connected apps and more"
+    url: "https://blog.google/innovation-and-ai/products/gemini-app/gemini-spark-updates-june-2026/"
+    publisher: "Google"
+    accessed: "2026-09-18"
+  - title: "Release notes"
+    url: "https://support.claude.com/en/articles/12138966-release-notes"
+    publisher: "Anthropic (Claude Help Center)"
+    accessed: "2026-09-18"
+  - title: "Claude Cowork and chat are now one Claude"
+    url: "https://claude.com/blog/cowork-is-now-claude"
+    publisher: "Anthropic"
+    date: "2026-09-16"
+    accessed: "2026-09-18"
+  - title: "Introducing Grok Bot"
+    url: "https://x.ai/news/introducing-grok-bot"
+    publisher: "SpaceXAI"
+    date: "2026-08-11"
+    accessed: "2026-09-18"
+  - title: "Introducing Muse: The World's First Personal AI Agent Built for Everyone"
+    url: "https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/"
+    publisher: "Meta"
+    date: "2026-09-08"
+    accessed: "2026-09-18"
+  - title: "GitHub - NousResearch/hermes-agent: The agent that grows with you"
+    url: "https://github.com/NousResearch/hermes-agent"
+    publisher: "Nous Research (GitHub README)"
+    accessed: "2026-09-18"
+  - title: "Hermes Agent - Open-Source AI Agent That Grows With You"
+    url: "https://hermes-agent.nousresearch.com/"
+    publisher: "Nous Research"
+    accessed: "2026-09-18"
+  - title: "GitHub - openclaw/openclaw"
+    url: "https://github.com/openclaw/openclaw"
+    publisher: "OpenClaw Foundation (GitHub README)"
+    accessed: "2026-09-18"
+---
+
+import Link from '../../components/page/Link.astro';
+import Cite from '../../components/page/Cite.astro';
+
+## What you see
+
+Sometime in 2026 the chat apps you already had grew a second self. Google's Gemini Spark,
+Anthropic's Claude Cowork, SpaceXAI's Grok Bot and Meta's Muse each sell a version of the same
+offer: hand over a task, close the laptop, and the assistant keeps going without you. It takes on a
+recurring job on a schedule, watches an inbox or a connected app for something worth acting on, and
+messages you back, sometimes minutes later and sometimes the next morning, with finished work or a
+question it needs answered first. Two open-source projects, Nous Research's Hermes Agent and
+OpenClaw, offer the same shape of product as something you run on your own machine. What you
+experience across all six is a chat thread that keeps having things to say on days you never
+opened the app.
+
+## What is happening underneath
+
+Nothing here starts because you typed a message. A schedule, a new item in an inbox, or a trigger
+you set up starts the session instead, in ordinary code, no different from a cron job. What happens
+once it is running is the model's to decide: whether anything actually needs doing, and what to do
+about it. That is <Link href="/techniques/agent-teammates/">always-on assistants</Link>, level 7 for
+exactly that reason. A scheduled reminder where you pick the time and the model writes one answer
+is not this; the level turns on the session running to a conclusion, unattended, with the model
+choosing every step in between. Google lists "Set recurring tasks or triggers"<Cite n={1}/> among
+the things you can hand Spark, and describes it as "a 24/7 personal AI agent" that "keeps working
+in the background even when you close your laptop or lock your phone"<Cite n={1}/>. Grok Bot's bots
+"share a computer of their own in the cloud, so jobs do not stall when you step away"<Cite n={5}/>.
+
+A single session cannot run forever, so carrying a task from one session to the next is what
+<Link href="/techniques/long-horizon/">long-running tasks</Link> is about: a written checkpoint
+outside any one process, not a live connection you left open. Nous Research says its own agent
+keeps that state across restarts. "Hermes stores conversations, memories, and skills so you can
+return to your work in a later session."<Cite n={8}/> Its FAQ is equally direct about what running
+your own copy costs: "Tasks that need an active agent will not run while it is stopped; hosted
+agents are managed separately in Nous Portal."<Cite n={8}/> OpenClaw takes that trade further: its
+README says "State, memory, and credentials live on your hardware"<Cite n={9}/> and that the
+project "has no paid tier, hosted service, or token"<Cite n={9}/>.
+
+Some of these assistants act on a real interface instead of calling a fixed API. Meta documents
+that for Muse, which runs on "a dedicated secure computer with its own browser"<Cite n={6}/> and
+"can open a browser, fill out forms, and negotiate on their behalf"<Cite n={6}/>. Meta does not
+document what happens inside that loop. <Link href="/techniques/computer-use/">Computer use</Link>
+is the page that explains the mechanism any product needs to drive a screen: a screenshot, one
+action, a new screenshot, repeated until the task is done or something needs a person.
+
+None of the four subscription products lets the model spend money or send something irreversible
+purely on its own say-so. <Link href="/techniques/human-in-the-loop/">Human approval</Link> is the
+base version of that gate, where code decides when to pause rather than the model, and each of the
+four documents some version of it. Grok Bot's bots "finish jobs end to end, and only come back when
+something needs your approval"<Cite n={5}/>. Muse "checks with the person before sensitive actions
+like sending an email or making a purchase"<Cite n={6}/>.
+
+## Which page explains each part
+
+| What you see | What it is | The page |
+|---|---|---|
+| It does something without you asking that day | A trigger starts a session in code; the model decides whether anything needs doing | <Link href="/techniques/agent-teammates/">Always-on assistants</Link> |
+| It still knows what happened last week | State written to a checkpoint outside any one session | <Link href="/techniques/long-horizon/">Long-running tasks</Link> |
+| It clicks through a website or app for you | A model that reads a screen and picks one action at a time, in a loop | <Link href="/techniques/computer-use/">Computer use</Link> |
+| It stops and asks before doing something risky | A rule pauses the run and hands the decision to a person | <Link href="/techniques/human-in-the-loop/">Human approval</Link> |
+
+## What the makers say
+
+Google describes Spark's approval behaviour as part of the product rather than a setting you have
+to find: "Spark operates under your direction. You choose whether to turn it on and what apps it
+connects to, and it's designed to ask you first before performing high-stakes actions like
+spending money or sending emails"<Cite n={1}/>.
+
+Anthropic's release notes date the shift from a desktop tool to an always-on one precisely. The
+entry for 12 January 2026 introduces Cowork as a research preview on Claude Desktop, macOS only,
+for Max plans, and says it "runs locally on your computer in an isolated VM"<Cite n={3}/>. A person
+starts every session on their own machine there, so this site places that release at level 5, not
+level 7. The entry for 7 July 2026 is what moves it: "Cowork runs your sessions remotely (in beta),
+so your sessions and files are saved to your Claude account and go where you go, on any device.
+Work continues when you close your laptop, and scheduled tasks run with no device online"<Cite
+n={3}/>, rolling out first on the Max plan. On 16 September 2026 Anthropic folded the product back
+into Claude itself: "Claude Cowork and chat are merging into one Claude"<Cite n={4}/>, on Pro and
+Max plans.
+
+Meta documents a second system checking the first, rather than the same model checking itself: "A
+separate Sentinel agent runs on that same machine, kept apart from Muse at the system level.
+Nothing Muse does reaches the internet unless the Sentinel approves it, and it asks the person for
+permission when needed."<Cite n={6}/>
+
+## Where it fails
+
+The always-on part arrives in pieces, and each maker says which piece is missing. Grok Bot launched
+in beta for named SuperGrok and Cursor plans on desktop and iOS, with enterprise access still a
+waitlist<Cite n={5}/>. Google's June 2026 update scopes the Spark desktop app to "Beta to Google AI
+Ultra subscribers aged 18 and over, starting in the US"<Cite n={2}/>, and puts the part that would
+run a task on your own machine while you are away in the future tense: "coming soon, you'll even be
+able to run tasks remotely"<Cite n={2}/>. Meta does the same with Muse's strongest privacy claim. A
+Muse Confidential VM, in which "the whole VM, including a person's data and conversations with
+Muse, is encrypted with a key only they hold, so not even Meta can access it"<Cite n={6}/>, is
+something Meta says it will introduce "Later this year"<Cite n={6}/>. For the two projects you run
+yourself the gap is different in kind: a stopped agent runs nothing<Cite n={8}/>, so the always-on
+property is your own uptime.
+
+## If you build one
+
+Decide what a login can reach, and for how long, before you hand one over. Meta's design puts that
+answer in the credential layer rather than trusting the model to behave around a live password:
+"Muse has no visibility into people's passwords or payment methods. Any credentials a person shares
+go into secure storage, so Muse can use them without seeing them"<Cite n={6}/>. A vault the
+assistant can use without reading is worth looking for in anything you connect a real account to.
+
+Treat the approval queue as part of the product rather than a formality. It is the one place you
+actually supervise unattended work, so it has to show enough for a person to judge, not a bare yes
+or no, which is what the failure modes on the
+<Link href="/techniques/human-in-the-loop/">human approval</Link> page describe. Write the split
+itself in code up front: run it automatically, hold it for approval, or never run it at all. That
+is what the example on the
+<Link href="/techniques/agent-teammates/">always-on assistants</Link> page does, and it is the one
+part of the system a prompt is the wrong place for.
+
+One question separates a genuinely always-on product from a scheduled chatbot: does it keep running
+with no device of yours online? Claude Cowork is the clearest test case, because by Anthropic's own
+account the same product went from a person starting every session on a Mac in January to sessions
+that "go where you go, on any device"<Cite n={3}/> in July. A demo that shows a session starting
+when you open the app has not answered it.

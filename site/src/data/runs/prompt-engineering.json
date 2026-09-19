@@ -1,0 +1,46 @@
+{
+  "illustrative": true,
+  "h": 460,
+  "title": "Prompt engineering: same facts, a structured ask",
+  "sub": "Add a role, a fixed format and one worked example to the same question and source passage.",
+  "pill": "Level 1 · One call",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 34, "l": "Question + source passage", "k": "io" },
+    { "id": "build", "x": 170, "y": 140, "l": "Add role, format, one example", "k": "code" },
+    { "id": "llm", "x": 170, "y": 246, "l": "answers once", "k": "model" },
+    { "id": "check", "x": 170, "y": 352, "l": "Check reply against the format", "k": "code" },
+    { "id": "a", "x": 170, "y": 428, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "build", "by": "code" },
+    { "id": "e2", "f": "build", "t": "llm", "by": "code" },
+    { "id": "e3", "f": "llm", "t": "check", "by": "code" },
+    { "id": "e4", "f": "check", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question and a source passage arrive",
+      "d": "\"What is the DW-480's drain pump part number and price?\"\npassage: \"...HLV-2205, available through authorized\nservice...priced at $52.00...\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code adds a role, a fixed format, and one worked example",
+      "d": "SYSTEM  You are a parts-desk assistant. Answer in exactly\n        this format: PART: <n>  PRICE: <p>\n        Example: 'heating element is HLV-4471, $38.50' ->\n        PART: HLV-4471  PRICE: $38.50",
+      "m": "~140 tokens in"
+    },
+    {
+      "e": "e3",
+      "h": "The model answers in the requested format",
+      "d": "\"PART: HLV-2205\nPRICE: $52.00\"",
+      "m": "140 in · 12 out · 0.4s"
+    },
+    {
+      "e": "e4",
+      "h": "Your code checks the reply against the format",
+      "d": "matched PART/PRICE · cites dw480-manual#8, parts-list#2",
+      "m": "2 citations"
+    }
+  ]
+}

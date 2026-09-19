@@ -1,0 +1,65 @@
+{
+  "illustrative": true,
+  "h": 610,
+  "title": "Coding agents",
+  "sub": "The model proposes an edit, your code runs the test, and the model decides whether to try again.",
+  "pill": "Level 5 · Agents",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 30, "l": "Task + buggy function", "k": "io" },
+    { "id": "runtest", "x": 170, "y": 170, "l": "run the failing test", "k": "code" },
+    { "id": "act", "x": 170, "y": 310, "l": "picks the next action", "k": "model" },
+    { "id": "tool", "x": 170, "y": 450, "l": "propose_edit(source)", "k": "tool" },
+    { "id": "a", "x": 170, "y": 590, "l": "Fix reported", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "runtest", "by": "code" },
+    { "id": "e2", "f": "runtest", "t": "act", "by": "code" },
+    { "id": "e3", "f": "act", "t": "tool", "by": "model", "b": 22 },
+    { "id": "e4", "f": "tool", "t": "act", "by": "code", "b": 22 },
+    { "id": "e5", "f": "act", "t": "a", "by": "model" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The task arrives with the buggy function attached",
+      "d": "\"Fix sum_evens so it returns the sum of the even\nnumbers in a list.\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code runs the starting code against the tests and shows the model why it fails",
+      "d": "sum_evens([1,2,3,4,5,6]) returned 9, expected 12\n(it sums the odd numbers, not the even ones)",
+      "m": "4 test cases · 3 ms"
+    },
+    {
+      "e": "e3",
+      "h": "The model proposes a fix",
+      "d": "→ propose_edit(source: \"...sum every number...\")",
+      "m": "260 in · 48 out · 0.8 s"
+    },
+    {
+      "e": "e4",
+      "h": "Your code runs the tests against the proposed edit",
+      "d": "sum_evens([1,2,3,4,5,6]) returned 21, expected 12\n(this version sums everything, not just the evens)",
+      "m": "4 test cases · 2 ms"
+    },
+    {
+      "e": "e3",
+      "h": "The model tries again, using what the failure said",
+      "d": "→ propose_edit(source: \"...if n % 2 == 0: total += n...\")",
+      "m": "410 in · 44 out · 0.7 s"
+    },
+    {
+      "e": "e4",
+      "h": "Your code runs the tests again",
+      "d": "all 4 test cases passed",
+      "m": "4 test cases · 2 ms"
+    },
+    {
+      "e": "e5",
+      "h": "The model decides the fix is done and stops",
+      "d": "\"Fixed: the condition checked for odd numbers\ninstead of even ones. sum_evens now passes all\nfour cases.\"",
+      "m": "470 in · 31 out · 0.6 s"
+    }
+  ]
+}

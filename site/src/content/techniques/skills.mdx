@@ -1,0 +1,210 @@
+---
+slug: skills
+level: 5
+run: skills
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Agent Skills"
+    url: "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview"
+    publisher: "Anthropic"
+    accessed: "2026-09-18"
+  - title: "Use Skills in Claude Code"
+    url: "https://code.claude.com/docs/en/skills"
+    publisher: "Anthropic (Claude Code documentation)"
+    accessed: "2026-09-18"
+  - title: "AGENTS.md"
+    url: "https://agents.md/"
+    publisher: "agents.md (stewarded by the Agentic AI Foundation, Linux Foundation)"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import skillsRun from '../../data/runs/skills.json';
+
+A skill is instructions an agent keeps on the shelf until it needs them, not text it carries into
+every turn. Anthropic's own documentation draws that line directly against a system prompt:
+"Unlike prompts (conversation-level instructions for one-off tasks), Skills load on demand, so you
+don't have to repeat the same guidance across conversations"<Cite n={1}/>. The mechanism is
+progressive disclosure, which Anthropic documents in three stages: a skill's name and description
+load at startup and stay in context; the body of its `SKILL.md`, the actual instructions, loads
+only when the skill is triggered; anything else it bundles — further reference files, scripts —
+costs nothing until it is read or run<Cite n={1}/>.
+
+A skill differs from <Link href="/techniques/rag/">RAG</Link> in what gets fetched — RAG retrieves
+facts, a skill supplies a procedure — and from <Link href="/techniques/adaptation/">fine-tuning</Link>
+in where the knowledge lives: fine-tuning bakes a behavior into the weights, while a skill loads
+per request and can be edited or removed in seconds.
+
+Choosing which skill to load, if any, is the level-5 decision here, the same shape as choosing a
+tool in <Link href="/techniques/single-agent/">single agent</Link>. Your code runs the lookup,
+appends the body, and can cap how many skills load before forcing an answer.
+
+This page is marked draft, not published: skills has no recorded trace and no scored result file
+yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={skillsRun} label="Level 5 · Skills" runKey="skills" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Claude Code is where a reader is most likely to meet a skill directory, and AGENTS.md is the
+closest thing to an open convention across coding agents for standing instructions: the file holds
+"the extra, sometimes detailed context coding agents need: build steps, tests, and
+conventions"<Cite n={3}/>. Anthropic's documentation puts token costs on each stage: about 100
+tokens per skill for the always-on name and description, under 5,000 for a body that loads only
+once a skill is triggered, and nothing at all for bundled files until they are read<Cite n={1}/> —
+the published figures, not a measurement this site has made.
+
+The security point is not incidental. A skill is instructions written by someone else, and
+Anthropic's own warning is direct: "a malicious Skill can direct Claude to invoke tools or execute
+code in ways that don't match the Skill's stated purpose," with risks the documentation names as
+"data exfiltration" and "unauthorized system access"<Cite n={1}/>. Its guidance is to use skills
+only from sources you trust, and to audit one thoroughly — every bundled file, not just the
+description — before running it against anything that matters.
+
+Treat a skill like code you didn't write, because in every way that matters it is one. Claude
+Code's own documentation makes this concrete for one specific risk: `allowed-tools` in a skill's
+frontmatter pre-approves the tools it lists for the turn that invokes the skill, and Anthropic
+notes that workspace trust does not gate that field — "A skill can grant itself broad tool access,
+so review the `allowed-tools` of skills checked into a repository before you run Claude Code
+there"<Cite n={2}/>. That is the same review you would give any other change before it merges, not
+a one-time check when a skill is first added.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example holds three skills in a small registry, each a `Skill(name, description, body)`. Every
+description is folded into the system prompt up front — cheap, and always available for the model
+to match against. No body is. The model reads the question, decides whether one of the three
+descriptions actually fits, and if so calls `load_skill` with its name; your code looks it up and
+appends the body as a new message, and only then has the model actually seen the instructions it
+chose.
+
+Every `load_skill` call, and the decision to stop, are `decided_by: "model"`; listing the
+descriptions up front and loading a chosen body are always `decided_by: "code"`, the same split
+<Link href="/techniques/single-agent/">single agent</Link>'s example makes between what the model
+picks and what the program carries out. An unknown skill name is reported back rather than raised,
+so a model that guesses a name that does not exist gets a chance to try again instead of crashing
+the run. `max_steps` (3) and `max_tokens` (1500) are the hard caps; hitting either forces a final
+answer that is `decided_by: "code"`.
+
+<CodeFile file="examples/skills/run.py" func="run" />
+
+Run it yourself:
+
+<CodeFile file="examples/skills/README.md" start={17} end={17} lang="text" expect="python -m examples.skills" />
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try a plain system prompt — <Link href="/techniques/prompt-engineering/">prompt engineering</Link>
+— first if there is only one procedure the agent ever needs; paying to keep even a short
+description of it in context buys nothing a fixed instruction does not already give you for free.
+
+Try <Link href="/techniques/routing/">routing</Link> instead if you can tell, from the question
+alone and in code, which instructions apply — a classifier that always attaches the same fixed
+text for the same category is cheaper and more predictable than asking the model to choose.
+
+Move up to skills once there are several distinct procedures, the right one depends on judgment a
+fixed classifier cannot make reliably, and loading every one of them on every request would waste
+more context than it is worth.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'The wrong skill gets picked',
+    notice: "The model matches a description on a surface keyword rather than what the question actually needs, and loads instructions that do not fit the task.",
+    test: "Write two descriptions that share a word but cover different needs (this page's own unit-conversion and warranty-checklist skills are deliberately distinct) and confirm the model's choice tracks the actual task, not just shared vocabulary.",
+  },
+  {
+    name: 'A skill does what its description does not say',
+    notice: 'Anthropic warns directly that "a malicious Skill can direct Claude to invoke tools or execute code in ways that don\'t match the Skill\'s stated purpose."',
+    test: "Read the full body of a skill before trusting its description, especially one from outside your own team; the description is what gets matched against, not what necessarily runs.",
+  },
+  {
+    name: 'A checked-in skill is never actually reviewed',
+    notice: "A skill's permissions or instructions change over time the way any file in a repository can, without the same review a code change would get.",
+    test: "Check whether a skill went through the same review as the code around it before it was trusted, not just when it was first added.",
+  },
+  {
+    name: 'A loaded skill goes unused',
+    notice: "The model loads a skill's body, spending the tokens progressive disclosure was supposed to save, and then answers without actually following it.",
+    test: "Compare the loaded skill's instructions against what the final answer actually did. A load with no visible effect on the answer is wasted, not just unnecessary.",
+  },
+  {
+    name: 'The cap ships an answer with no skill loaded',
+    notice: "A step or token cap is reached before the model ever loaded the skill the task needed, and the forced answer goes out without it.",
+    test: "Force a low cap on a question that needs a skill (this page's own test suite does exactly this) and check whether the returned citations list shows a skill was actually loaded.",
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, one skill loaded then answer', value: '2' },
+    { label: 'Tokens in, description listing', value: '~90' },
+    { label: 'Tokens in, one loaded body', value: '~40' },
+    { label: 'Wall time, one round trip', value: '~0.7s' },
+  ]}
+  comparedTo={{
+    label: 'always including every skill body (no progressive disclosure)',
+    note: 'Loading only the chosen skill keeps the unused bodies out of the prompt entirely; with three small skills the saving is modest, but Anthropic\'s own figures put a real skill body at up to 5,000 tokens, so the saving grows with how many skills a project actually has.',
+  }}
+  level={5}
+/>
+
+## How to eval it
+
+<HowToEval>
+
+`skills` does not do the site's own question-answering task — there is no document, no question
+about it, and no citation to grade — so it is not part of the shared 60-question set, the same way
+`embeddings_search` and `memory` are not (see `docs/EVALS.md`). What would actually be measured is
+specific to this task: given a labeled set of questions and the skill each one should trigger,
+selection accuracy (did it load the right one, none when none applies, and not an extra one it
+never used) and the token cost actually spent against what always-loading every skill would have
+cost. `scripts/eval_run.py` knows `skills` and refuses to score it, printing that reason; no
+runner for the measures above exists yet.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="Skill selection accuracy against a labeled set of tasks, how often a loaded skill's instructions show up in the final answer, and how often the model loads a skill and then ignores it."
+  costAtVolume="Cost scales with how many requests actually trigger a skill load, not with how many skills exist in the registry — a large registry with rare triggers costs close to nothing per request until one is chosen."
+  failsInProduction="A skill checked into the project changes without review, and the next session that triggers it inherits whatever it now says or whatever tool access it now grants, with no signal that anything changed."
+  whatToLog="The full list of descriptions offered, which skill (if any) was chosen, its complete body at the time it was loaded, and which cap (if any) forced the final answer."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Find a project that ships an AGENTS.md, CLAUDE.md, or a skills directory. Read one skill\'s full body, not just its description: does what it actually says match what its description promised?' },
+  { lane: 'build', body: 'Run python -m examples.skills --model stub with a question of your own from the repo root, then read tests/test_example_skills.py to see a scripted model that chooses a skill, one that names a skill that does not exist, and one that never stops.' },
+  { lane: 'either', body: 'Write two skill descriptions for a task you do regularly, worded so that a person skimming them, not just a model, could tell which one applies to which situation. If you cannot tell them apart quickly, the model probably cannot either.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

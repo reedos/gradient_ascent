@@ -1,0 +1,38 @@
+{
+  "illustrative": true,
+  "h": 400,
+  "title": "Level 0: keyword search, no model",
+  "sub": "Score every section against the question with BM25 and return the best match, verbatim.",
+  "pill": "Level 0 · No model",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
+    { "id": "score", "x": 170, "y": 150, "l": "Score every section (BM25)", "k": "code" },
+    { "id": "best", "x": 170, "y": 266, "l": "Take the top-scoring section", "k": "code" },
+    { "id": "a", "x": 170, "y": 366, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "score", "by": "code" },
+    { "id": "e2", "f": "score", "t": "best", "by": "code" },
+    { "id": "e3", "f": "best", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"How often should the DW-300's filter be cleaned?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code scores every section against the question",
+      "d": "0.91  care-and-cleaning-guide#1  Dishwasher Filter Cleaning\n0.44  dw300-manual#6      Maintenance and Filter Cleaning\n0.00  ...9 more sections",
+      "m": "12 sections scored · BM25, no model"
+    },
+    {
+      "e": "e3",
+      "h": "Your code returns the top-scoring section's own text",
+      "d": "\"The DW-300 uses a manual fine filter and should be cleaned\nevery 30 cycles, as described in dw300-manual.md...\"",
+      "m": "1 section cited · <5 ms"
+    }
+  ]
+}

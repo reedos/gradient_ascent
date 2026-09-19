@@ -1,0 +1,209 @@
+---
+slug: order-zero
+level: 0
+run: order-zero
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Elasticsearch"
+    url: "https://www.elastic.co/elasticsearch"
+    publisher: "Elastic"
+    accessed: "2026-09-18"
+  - title: "OpenSearch"
+    url: "https://opensearch.org/"
+    publisher: "OpenSearch Software Foundation"
+    accessed: "2026-09-18"
+  - title: "scikit-learn: machine learning in Python"
+    url: "https://scikit-learn.org/stable/"
+    publisher: "scikit-learn"
+    accessed: "2026-09-18"
+  - title: "XGBoost Documentation"
+    url: "https://xgboost.readthedocs.io/en/stable/"
+    publisher: "XGBoost"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import orderZeroRun from '../../data/runs/order-zero.json';
+
+Level 0 is not using a model at all. Before reaching for a language model, ask whether a rule, a
+keyword search, a form, or a classical statistics model already answers the question. If the
+input is structured — a part number, a choice from five options — plain code reads it and cannot
+guess wrong. If the input is free text with a fixed vocabulary, a keyword search finds the
+passage whose words best match the question's, which is what search engines like Elasticsearch
+and OpenSearch do<Cite n={1}/><Cite n={2}/>. If the task is to predict a label or a number from
+examples you already have, that is a classical model's job: scikit-learn ships the standard
+algorithms, spam detection among the uses it names<Cite n={3}/>, and XGBoost's gradient boosting
+is another common choice<Cite n={4}/>.
+
+None of these decide anything while they run: the rule is the rule, the search always searches
+the same way, the classifier was trained once and only scores. Every path can be tested in
+advance, and a wrong answer costs what a bug costs, not what a confident, well-written guess
+costs.
+
+This page is marked draft, not published: level zero has no recorded trace and no scored result
+file yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={orderZeroRun} label="Level 0 · No model" runKey="order-zero" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+You already use level zero constantly without thinking of it that way. The search box on most
+documentation sites and helpdesks is keyword search — often Elasticsearch or OpenSearch running
+behind the scenes<Cite n={1}/><Cite n={2}/> — not a model reading every page for you. A form that
+asks "which appliance do you own" from a dropdown is a rule, not an AI feature, even on a site
+that also has a chatbot elsewhere. A spam filter is the textbook case of the third kind: one
+label predicted from past examples, millions of times a day, with no language model reading your
+mail — scikit-learn names spam detection as a classification job on its own front page<Cite n={3}/>.
+
+The question that matters here is not "could a model do this" — a model can usually attempt
+almost anything — it is whether ordinary code already does it as well, for a fraction of the
+cost. Whether it does, on your own data, is something to measure rather than assume in either
+direction. Two checks settle most cases. First: can the input be described as a fixed set of shapes (a
+part number, a five-option dropdown, an email address) or a small, known vocabulary? If so, a
+rule or a form is often enough, and it can be tested exhaustively rather than sampled. Second, and
+the one people skip: what does a wrong answer cost, and how would you notice it? A keyword search
+that returns the wrong manual section is annoying but visible — the passage is right there, and a
+reader can see it doesn't answer the question. A language model that confidently answers from the
+wrong section, or states a plausible number that is not the right one, can look identical to a
+correct answer until someone checks it by hand. If a wrong answer is cheap to catch and cheap to
+be wrong about, level 0's failure mode — an obviously irrelevant result — is the safer one to
+ship, even if a model would get more questions right overall. If getting it wrong is expensive —
+money moves, a part gets ordered, a warranty claim is approved — that argues for a level with an
+explicit check built in, whichever level ends up doing the work.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example below is the site's level 0: score every section of the document set against the
+question and return the highest-scoring section's own text as the answer, unchanged. It searches
+`evals/corpus/`, the same synthetic document set every level in the site's running task uses, so
+the same question can be compared level by level.
+
+The scoring function is BM25, a standard keyword-ranking formula: a document scores higher for a
+query word that appears often in it but rarely across the whole set, and the score is normalized
+so a long document is not automatically favored over a short one just for having more words.
+`evals/corpus.bm25_search` implements this from the standard library, with no search engine or
+vector database behind it, because at this corpus size a hand-written scorer is enough. A real
+system usually reaches for something built for the job, such as Elasticsearch or
+OpenSearch<Cite n={1}/><Cite n={2}/>, once the document count or the query rate outgrows a script.
+
+There is no drafting step. The function does not compose an answer out of the passage; it returns
+the passage's own words, citing the section they came from. That is deliberate: a level with no
+model in the loop should not paraphrase, because paraphrasing is exactly the judgment call a rule
+cannot make reliably. If no section scores above zero, it says so instead of returning the
+nearest miss dressed up as an answer.
+
+<CodeFile file="examples/order_zero/run.py" func="run" />
+
+Every step above is `decided_by: "code"`: the search always runs the same way regardless of what
+it finds, so there is nothing left for a model to decide. Run it yourself:
+
+<CodeFile file="examples/order_zero/README.md" start={14} end={14} lang="text" expect="python -m examples.order_zero" />
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Skip even this much code if the question is asked once and a person can just look at the
+document. Level 0 earns its keep when the same kind of question repeats often enough that
+writing the rule, the search, or the classifier once is cheaper than answering it by hand every
+time.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'Vocabulary mismatch',
+    notice: "The right section exists in the document set but never surfaces, because the question uses different words than the document does (a reader asks about a \"lint trap\", the manual says \"lint filter\").",
+    test: "Ask the same question again with a synonym the corpus does not use, and check whether the top-scoring section changes or drops out of contention.",
+  },
+  {
+    name: 'A weak match is returned with full confidence',
+    notice: "The top-scoring section barely scores above zero but comes back looking exactly as certain as a strong match, because the function has no way to say \"not sure\".",
+    test: "Ask about something the corpus does not cover at all, and check how close the returned score is to zero rather than trusting that a result was returned.",
+  },
+  {
+    name: 'No synthesis across sections',
+    notice: "A question whose answer needs two sections together (a part number in one, its price in another) gets only the single best-scoring section, which usually has half the answer.",
+    test: "Run a multi-hop question from the site's eval set and check whether the missing half is mentioned anywhere in what came back.",
+  },
+  {
+    name: 'The rule or the index goes stale silently',
+    notice: "A form field, a regular expression, or a search index built from an old copy of the documents keeps answering fine after the underlying facts change, because nothing here checks its assumptions against the world.",
+    test: "Change a fact in the corpus and rerun the same question with unchanged wording; a keyword match still returns the old text, with nothing to flag that it is out of date.",
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, one question', value: '0' },
+    { label: 'Tokens in', value: '0' },
+    { label: 'Tokens out', value: '0' },
+    { label: 'Wall time', value: '~1 ms' },
+  ]}
+  comparedTo={{
+    label: 'chat (level 1)',
+    note: 'Chat adds one model call, on the order of tens of tokens in and a few dozen out for a short question, and roughly a second of wait, in exchange for handling phrasing a keyword score cannot.',
+  }}
+  level={0}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+Level 0 is the floor every other level on this site is measured against, on the same
+60-question set described in `docs/EVALS.md`. It should do reasonably well on lookup questions
+whose wording matches the corpus, and poorly everywhere else by construction: multi-hop questions
+need two sections held together, numeric questions need arithmetic performed on a value it can
+only quote, unanswerable questions need it to notice an absence rather than hand back the nearest
+miss, and conflicting-source questions need it to compare two sections instead of returning
+whichever one scores higher.
+
+No result file exists yet for any level (see `docs/EVALS.md`), so this page cannot say a number
+for any of it. Run `python scripts/eval_run.py --example order_zero --model stub --dry` to see
+the projected cost of a run; for level 0 that projection should be zero tokens, since no model is
+ever called.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="The share of questions where the top score lands near zero, since that is this level's only signal that it found nothing useful. Track the score distribution over real traffic, not just whether a result came back."
+  costAtVolume="Compute only: no tokens, no per-call billing. Cost scales with how often the index has to be rebuilt as documents change, not with how many questions are asked."
+  failsInProduction="A document set changes and the index is not rebuilt, so a keyword match keeps returning superseded text with nothing to flag it. Or the questions people actually ask drift in vocabulary away from the documents' own wording, and the hit rate degrades slowly enough that nobody notices until someone complains."
+  whatToLog="The question, the top few scores (not just the winner), and which section was returned, so a bad answer can be told apart from a search that never had a chance."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Find a search box you use often (a help center, a docs site, your email client) and try a question phrased with a synonym instead of the site\'s own vocabulary. Does it still find the right result?' },
+  { lane: 'build', body: 'Run python -m examples.order_zero --question "How often should the DW-300\'s filter be cleaned?" from the repo root, then ask the same question about a fact the corpus never states. Compare the two scores.' },
+  { lane: 'either', body: 'Pick a task you do by hand today and write down what a wrong answer would actually cost you, in money or time, and how long it would take you to notice. That number is most of the decision this page is about.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

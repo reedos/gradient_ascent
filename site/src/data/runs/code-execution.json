@@ -1,0 +1,56 @@
+{
+  "illustrative": true,
+  "h": 766,
+  "title": "Code execution",
+  "sub": "The model writes one arithmetic expression; a restricted sandbox always runs it.",
+  "pill": "Level 4 · Tools",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
+    { "id": "search", "x": 170, "y": 174, "l": "search for numbers", "k": "code" },
+    { "id": "decide", "x": 170, "y": 314, "l": "writes an expression", "k": "model" },
+    { "id": "sandbox", "x": 170, "y": 454, "l": "evaluates the expression", "k": "tool" },
+    { "id": "final", "x": 170, "y": 594, "l": "answers using the result", "k": "model" },
+    { "id": "a", "x": 170, "y": 734, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "search", "by": "code" },
+    { "id": "e2", "f": "search", "t": "decide", "by": "code" },
+    { "id": "e3", "f": "decide", "t": "sandbox", "by": "model" },
+    { "id": "e4", "f": "sandbox", "t": "final", "by": "code" },
+    { "id": "e5", "f": "final", "t": "a", "by": "code" },
+    { "id": "e6", "f": "decide", "t": "a", "by": "model", "b": -160 },
+    { "id": "e7", "f": "sandbox", "t": "a", "by": "code", "b": 140 }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"What is the total price to replace the heating elements\non both a DW-300 and a DW-480?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code searches for passages with the needed numbers",
+      "d": "care-and-cleaning-guide#2, troubleshooting#2, parts-list#2\n(only the third one actually has the prices)",
+      "m": "3 passages · 9 ms"
+    },
+    {
+      "e": "e3",
+      "h": "The model writes an expression",
+      "d": "→ 38.50 + 41.00\n(it could have replied NONE instead; nothing forced an answer)",
+      "m": "~230 tokens in · 8 tokens out · 0.5 s"
+    },
+    {
+      "e": "e4",
+      "h": "Your code evaluates it in the sandbox",
+      "d": "38.50 + 41.00 = 79.5\n(only +, -, *, / and parentheses are on the whitelist)",
+      "m": "1 result · <1 ms"
+    },
+    {
+      "e": "e5",
+      "h": "The model answers using the result",
+      "d": "\"Replacing both heating elements costs $79.50\n[parts-list#2].\"",
+      "m": "~250 in · 18 out · 0.6 s"
+    }
+  ]
+}

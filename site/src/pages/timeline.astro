@@ -1,0 +1,334 @@
+---
+// /timeline/: a general framework for how the site's eight levels arrived and how quickly
+// capability is changing, built entirely from content/timeline.json (through site/src/lib/
+// timeline.ts) -- no date, id or count on this page is typed in by hand.
+import Base from '../layouts/Base.astro';
+import SectionTop from '../components/SectionTop.astro';
+import Timeline from '../components/Timeline.astro';
+import { url } from '../lib/url';
+import { levels as taxonomyLevels } from '../lib/content';
+import {
+  levelIntervals,
+  consecutiveLevelGaps,
+  milestonesByYearDesc,
+  measures,
+  shifts,
+  milestone as milestoneById,
+  criteria,
+  usedMarkKeys,
+  markLabel,
+  formatDate,
+  asOf,
+  type LevelIntervals,
+} from '../lib/timeline';
+import '../styles/timeline.css';
+
+const howFastRows: LevelIntervals[] = levelIntervals().slice().sort((a, b) => a.level - b.level);
+const gaps = consecutiveLevelGaps();
+const years = milestonesByYearDesc();
+const keys = usedMarkKeys();
+const hasBuildable = keys.includes('buildable');
+
+// Every level with a note, for the "notes" block under the how-fast table -- a note may explain a
+// missing mark (level 0 has no single `available` date) or an ordering quirk (a level's
+// `buildable` landing before `described` or after `available`); either way it is surfaced here
+// rather than left implicit.
+const levelNotes = howFastRows.filter((r) => r.note).map((r) => ({ level: r.level, note: r.note! }));
+
+// Every level that records what it considered for its marks. A marked date is a choice between
+// dated candidates, so the losing candidates and the one-line reason each lost are shown here
+// rather than left in the data file.
+const levelCandidates = howFastRows
+  .filter((r) => r.candidates.length > 0)
+  .map((r) => ({ level: r.level, candidates: r.candidates }));
+
+function levelTitle(order: number): string {
+  return taxonomyLevels.find((t) => t.order === order)?.title ?? `Level ${order}`;
+}
+function levelHref(order: number): string {
+  return url(`/levels/${order}/`);
+}
+
+// The aside under the page heading, built from whichever marked-date keys the data actually uses
+// today -- reads naturally whether there are two, three, or a key beyond that has been added, and
+// never assumes the marks fall in described/buildable/available date order (the data is explicit
+// that they sometimes do not).
+const keyList = keys.map((k) => markLabel(k).toLowerCase()).join(', ').replace(/, ([^,]*)$/, ' and $1');
+const markSentence =
+  `Each level below carries up to ${keys.length} marked dates: ${keyList}. A level with no single such date says so, and why. ` +
+  'The date this site treats as a level\'s arrival is the last of these: the launch of the widely known product that brought the level to the public. That is an editorial choice. Lesser-known products usually got there first, and each level\'s list of candidates below names them. ' +
+  'The marks are not always in that order: for some levels an open framework to build it with arrived before the idea was published, or after a product using it already shipped.';
+
+const pageDescription =
+  `When each of the site's levels was first ${keys.map((k) => markLabel(k).toLowerCase()).join(', first ')}, and how the gap between levels has changed, built from the site's own dated milestones.`;
+---
+<Base
+  title="Timeline · Gradient Ascent"
+  description={pageDescription}
+>
+  <div class="page-hero">
+    <div class="eyebrow muted"><span class="dot"></span>Timeline</div>
+    <h1>When each level arrived</h1>
+    <p>{markSentence} "First" means the earliest the site could verify, not necessarily the true first use of an idea — see the method note at the bottom of this page.</p>
+  </div>
+
+  <section class="section" id="chart">
+    <Timeline listHeadingId="timeline-list-heading" />
+  </section>
+
+  <section class="section" id="how-fast">
+    <SectionTop
+      eyebrow="How fast"
+      title="The gap between description and release, level by level"
+      aside="Computed from the dates above. Not a measurement of capability, and not a trend line."
+    />
+
+    <div class="panel">
+      <div class="tl-howfast-scroll">
+      <table class="tl-howfast-table">
+        <thead>
+          <tr>
+            <th>Level</th>
+            {keys.map((k) => <th>{markLabel(k)}</th>)}
+            <th>Described &rarr; available</th>
+            {hasBuildable && <th>Buildable &rarr; available</th>}
+          </tr>
+        </thead>
+        <tbody>
+          {howFastRows.map((row) => {
+            const byKey = new Map(row.marks.map((m) => [m.key, m]));
+            return (
+              <tr>
+                <td>
+                  <span class="tl-hf-level">
+                    <span class="row-dot" style={`--c:var(--o${row.level})`} />
+                    <a href={levelHref(row.level)}>{row.level} · {levelTitle(row.level)}</a>
+                    {row.note && <span class="tl-item-pill" title="See the notes below the table">note</span>}
+                  </span>
+                </td>
+                {keys.map((k) => {
+                  const mk = byKey.get(k);
+                  return <td>{mk ? formatDate(mk.milestone.date, mk.milestone.precision) : <span class="tl-hf-missing">No single date</span>}</td>;
+                })}
+                <td class="tl-hf-months">
+                  {row.describedToAvailable
+                    ? row.describedToAvailable.reversed
+                      ? `${row.describedToAvailable.months} mo — the product came first`
+                      : `${row.describedToAvailable.months} mo`
+                    : '—'}
+                </td>
+                {hasBuildable && (
+                  <td class="tl-hf-months">
+                    {row.buildableToAvailable
+                      ? row.buildableToAvailable.reversed
+                        ? `${row.buildableToAvailable.months} mo — the product came first`
+                        : `${row.buildableToAvailable.months} mo`
+                      : '—'}
+                  </td>
+                )}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      </div>
+      <p class="tl-howfast-note">
+        Every interval on this page is this site's own arithmetic over the dates above — calendar
+        months between two marked milestones, nothing more. "The product came first" marks a level
+        where the earliest open framework or API for it (buildable) was not published until after a
+        finished product (available) already existed — the interval is real, just run the other way.
+        "First" means the earliest this site could verify, not asserted as the true first use of an
+        idea; see the <a href={url('/method/')}>method page</a> for how a level is defined and how a
+        date can be corrected.
+      </p>
+      {levelNotes.length > 0 && (
+        <div class="tl-notes-list">
+          {levelNotes.map((n) => (
+            <p class="tl-howfast-note"><strong>Level {n.level}:</strong> {n.note}</p>
+          ))}
+        </div>
+      )}
+    </div>
+
+    {levelCandidates.length > 0 && (
+      <div class="panel" id="candidates">
+        <h3>What each marked date beat</h3>
+        <p class="tl-howfast-note">
+          Every date above is a choice between dated candidates. Each level lists what it
+          considered and the one-line reason each was or was not marked, so the choice can be
+          argued with rather than taken on trust. A candidate can sit at another level — that is
+          often why it lost.
+        </p>
+        {levelCandidates.map((lc) => (
+          <div class="tl-cand-group">
+            <h4>
+              <span class="row-dot" style={`--c:var(--o${lc.level})`} />
+              <a href={levelHref(lc.level)}>{lc.level} · {levelTitle(lc.level)}</a>
+            </h4>
+            <ul class="tl-cand-list">
+              {lc.candidates.map((c) => (
+                <li>
+                  <span class="tl-item-pill">{c.label}</span>
+                  {c.chosen ? <strong>Marked:</strong> : <span class="tl-hf-missing">Not marked:</span>}{' '}
+                  {c.milestone ? (
+                    <a href={`#${c.id}`}>
+                      {c.milestone.title}, {formatDate(c.milestone.date, c.milestone.precision)}
+                    </a>
+                  ) : (
+                    c.id
+                  )}
+                  {' — '}{c.why}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    )}
+
+    <div class="tl-gap-list">
+      {gaps.map((g) => (
+        <div class="tl-gap-row">
+          <span>
+            Level {g.fromLevel} ({levelTitle(g.fromLevel)}) to level {g.toLevel} ({levelTitle(g.toLevel)}) — available to available
+            {g.interval?.reversed && <> — level {g.toLevel} arrived first</>}
+          </span>
+          <b>{g.interval ? `${g.interval.months} mo` : 'no single available date for one of these levels'}</b>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {
+    shifts.length > 0 && (
+      <section class="section" id="shifts">
+        <SectionTop
+          eyebrow="Not levels"
+          title="Two changes in the models themselves"
+          aside="A level changes who decides the next step. These change the model that fills the step, and they matter to every level at once."
+        />
+        {shifts.map((sh) => {
+          const m = milestoneById(sh.milestone);
+          return (
+            <div class="panel tl-shiftcard" id={sh.id}>
+              <h3>{sh.title}{m && <span class="tl-shiftcard-when"> · {formatDate(m.date, m.precision)}</span>}</h3>
+              {sh.body.map((para) => <p class="reading">{para}</p>)}
+              {sh.applications && sh.applications.length > 0 && (
+                <>
+                  {sh.applications_intro && <p class="reading">{sh.applications_intro}</p>}
+                  <ul class="tl-shiftcard-apps">
+                    {sh.applications.map((a) => (
+                      <li>
+                        <b>{a.title}.</b> {a.text}
+                        {a.technique && <> <a href={url(`/techniques/${a.technique}/`)}>See the page &rarr;</a></>}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+              {sh.limits && <p class="reading">{sh.limits}</p>}
+              <p class="tl-howfast-note">
+                Sources, each on this page:{' '}
+                {[sh.milestone, ...(sh.also ?? [])].map((id, i) => {
+                  const x = milestoneById(id);
+                  return x ? <>{i > 0 && ', '}<a href={`#${x.id}`}>{x.title}</a></> : null;
+                })}
+                {sh.technique && <>. More on the <a href={url(`/techniques/${sh.technique}/`)}>technique page</a>.</>}
+              </p>
+            </div>
+          );
+        })}
+      </section>
+    )
+  }
+
+  {
+    measures.length > 0 && (
+      <section class="section" id="measures">
+        <SectionTop
+          eyebrow="Published measures"
+          title="What outside researchers have measured"
+          aside="Quoted exactly, with the scope the source itself gives. The site does not compute or extend these."
+        />
+        {measures.map((m) => (
+          <div class="tl-measure">
+            <blockquote>&ldquo;{m.quote}&rdquo;</blockquote>
+            <p class="tl-measure-meta">
+              <a href={m.source.url} target="_blank" rel="noopener noreferrer">{m.source.title}</a>
+              {' · '}{m.source.publisher}{' · '}{m.date}
+            </p>
+            <p class="tl-measure-scope"><strong>What it measures:</strong> {m.what_it_measures}</p>
+            <p class="tl-measure-scope"><strong>Scope:</strong> {m.scope}</p>
+          </div>
+        ))}
+      </section>
+    )
+  }
+
+  <section class="section" id="list">
+    <SectionTop
+      eyebrow="Every milestone"
+      title="Grouped by year, newest first"
+    />
+    <p class="footnote reading" id="timeline-list-heading">
+      Newest year first, newest date first within a year — the direction a reader checking "what's
+      new" would scan. This list is the chart's full text alternative: every milestone above
+      appears here once, with its date, maker, one-sentence description, source and links.
+    </p>
+
+    {years.map((group) => (
+      <div class="tl-year-group">
+        <h2 class="tl-year-heading">{group.year}</h2>
+        {group.items.map((m) => (
+          <article class="tl-item" id={m.id}>
+            <div class="tl-item-date">{formatDate(m.date, m.precision)}</div>
+            <div class="tl-item-body">
+              <h3>
+                <span class="row-dot" style={`--c:var(--o${m.level})`} />
+                {m.title}
+                <span class="tl-item-pill">Level {m.level}</span>
+              </h3>
+              <p class="tl-item-maker">{m.maker}</p>
+              <p>{m.what}</p>
+              <div class="tl-item-links">
+                <a href={m.source.url} target="_blank" rel="noopener noreferrer">{m.source.publisher} &#8599;</a>
+                {m.source.archive_url && (
+                  <a href={m.source.archive_url} target="_blank" rel="noopener noreferrer" title="The Internet Archive's capture of that same page, which is what this site read">
+                    Archived copy &#8599;
+                  </a>
+                )}
+                {m.availability && <span class="tl-item-pill">At launch: {m.availability}</span>}
+                {m.opened && <span class="tl-item-pill">Then: {m.opened.text}, {formatDate(m.opened.date, m.opened.precision)}</span>}
+                {m.technique && <a href={url(`/techniques/${m.technique}/`)}>Technique page &rarr;</a>}
+                {m.registry_id && <a href={url('/names/')}>Named registry entry &rarr;</a>}
+              </div>
+              {!m.verified && <div class="tl-item-unverified">Not verified today: {m.note ?? 'no primary source this site could open.'}</div>}
+            </div>
+          </article>
+        ))}
+      </div>
+    ))}
+  </section>
+
+  <section class="section" id="method">
+    <SectionTop eyebrow="Method" title="How this page is dated and corrected" />
+    <div class="tl-closing-grid">
+      <div class="panel">
+        <h3>What "first" means here</h3>
+        {Object.entries(criteria).map(([key, text]) => (
+          <p><strong>{markLabel(key)}:</strong> {text}</p>
+        ))}
+      </div>
+      <div class="panel">
+        <h3>Correcting a date</h3>
+        <p>
+          Nothing on this page is final: it is what this site could verify as of {asOf}. A reader
+          who finds an earlier verifiable source, or a wrong date, corrects it the way any page
+          here is corrected — see <a href={url('/method/')}>the method page</a> for how a level is
+          defined and how the site changes. The full method behind this specific page's dates is
+          in <code>docs/TIMELINE-METHOD.md</code> in the site's repository.
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>

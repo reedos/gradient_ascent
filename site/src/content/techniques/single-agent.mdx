@@ -1,0 +1,238 @@
+---
+slug: single-agent
+level: 5
+run: single-agent
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "ReAct: Synergizing Reasoning and Acting in Language Models"
+    url: "https://arxiv.org/abs/2210.03629"
+    publisher: "arXiv (Princeton University, Google Research)"
+    accessed: "2026-09-18"
+  - title: "Plan-and-Solve Prompting: Improving Zero-Shot Chain-of-Thought Reasoning by Large Language Models"
+    url: "https://arxiv.org/abs/2305.04091"
+    publisher: "arXiv"
+    accessed: "2026-09-18"
+  - title: "Building effective agents"
+    url: "https://www.anthropic.com/engineering/building-effective-agents"
+    publisher: "Anthropic"
+    date: "2024-12-19"
+    accessed: "2026-09-18"
+  - title: "How the agent loop works"
+    url: "https://code.claude.com/docs/en/agent-sdk/agent-loop"
+    publisher: "Anthropic (Claude Agent SDK documentation)"
+    accessed: "2026-09-18"
+  - title: "Running agents"
+    url: "https://openai.github.io/openai-agents-python/running_agents/"
+    publisher: "OpenAI (Agents SDK documentation)"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import singleAgentRun from '../../data/runs/single-agent.json';
+
+A single agent puts the model in charge of a loop, not just one choice. At
+<Link href="/techniques/function-calling/">function calling</Link>, the model picks one tool once
+and your code takes it from there. A single agent feeds its own output back in and decides again
+each time, including deciding when it is done.
+
+The research names two shapes for that loop. ReAct generates "both reasoning traces and
+task-specific actions in an interleaved manner", the traces there to help the model "induce,
+track, and update action plans as well as handle exceptions"<Cite n={1}/>. Plan-and-execute writes
+a plan first and works through it a step at a time; Wang et al. call this Plan-and-Solve and
+propose it against one of the three pitfalls they list in zero-shot chain-of-thought prompting,
+missing-step errors<Cite n={2}/>.
+
+Level 5 is the first level where two things are both the model's decision: which action to take,
+and when to stop. Your code still runs every tool and returns every result, and enforces caps the
+model cannot override — on steps, on tokens, and on which tools it may attempt at all. Hit a cap
+first and your code forces the final answer; that stop is the program's decision, not the
+model's.
+
+This page is marked draft, not published: single agent has no recorded trace and no scored result
+file yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={singleAgentRun} label="Level 5 · Single agent" runKey="single-agent" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+"Single agent" is rarely a label a product shows you; it is the loop running underneath a more
+specific feature. A coding agent deciding which file to open next, a deep-research mode deciding
+whether to search again, and a computer-use agent deciding where to click are all this same
+loop wearing a different set of tools — see <Link href="/techniques/coding-agents/">coding
+agents</Link>, <Link href="/techniques/agentic-rag/">agentic RAG</Link> and
+<Link href="/techniques/voice-agents/">voice agents</Link> for the named products in each case.
+<Link href="/techniques/skills/">Skills</Link> are the same loop choosing which instructions to
+load rather than which tool to call.
+
+What is worth watching for, in any product built this way, is the caps you cannot see. Anthropic's
+Agent SDK documents a `max_turns` limit on tool-use round trips and a separate `max_budget_usd`
+spend limit, and the run ends with a specific reason attached, `error_max_turns` or
+`error_max_budget_usd`, when either is hit rather than continuing indefinitely<Cite n={4}/>.
+OpenAI's Agents SDK works the same way: pass a `max_turns` argument, and the run raises a
+`MaxTurnsExceeded` exception once the loop's turn count passes it, unless you explicitly set
+`max_turns=None` to remove the limit<Cite n={5}/>. A tool the product runs on your behalf can also
+be capped on its own: the Agent SDK documents `allowed_tools` and `disallowed_tools` lists and a
+`permission_mode` that controls whether a tool call needs your approval before it runs at
+all<Cite n={4}/>. A session that stops partway through a long task, with no obvious error, is very
+likely hitting one of these caps, not failing silently.
+
+Recovery is also worth watching. Anthropic's documentation says that when a tool call is denied,
+"Claude receives a rejection message as the tool result and typically attempts a different
+approach or reports that it couldn't proceed"<Cite n={4}/> — the loop is built to keep going on a
+setback, which is usually good, but it means a wrong turn does not necessarily stop the run on its
+own. Anthropic separately writes that agents' autonomy brings "higher costs, and the potential for
+compounding errors," and recommends testing them in a sandbox with guardrails around what they can
+actually affect<Cite n={3}/>. Expect a single agent to cost more and behave less predictably than a
+fixed sequence of steps, and expect that unpredictability to show up as variable cost per question,
+not just as an occasional wrong answer.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example is plan-and-execute: one call with no tools asks the model to write a short plan, then
+a loop offers two tools, `search` and `lookup_part`, and lets the model act on the plan, revise it,
+and decide when to stop. This is deliberately not the same shape as
+<Link href="/techniques/agentic-rag/">agentic RAG</Link>'s example, which is a single continuous
+loop with no separate planning call — compare the two traces and the two papers behind them.
+ReAct interleaves reasoning traces with task-specific actions<Cite n={1}/>. Plan-and-Solve draws
+its plan up before any action: Wang et al. list three pitfalls in zero-shot chain-of-thought —
+calculation errors, missing-step errors and semantic misunderstanding errors — propose
+Plan-and-Solve against the missing steps, and extend it to PS+ for the calculation
+errors<Cite n={2}/>.
+
+The planning call is the one line in this example that looks like a model decision but is not
+one. It is `kind: "model"` because a model ran, but `decided_by: "code"`: your code always makes
+this call, and always moves on to the execution loop next, whatever the plan actually says — the
+same rule the single call in <Link href="/techniques/rag/">RAG</Link>'s example follows. Only once
+the loop starts offering tools does the model's own output pick what happens next: which tool,
+with what arguments, or to stop. Every one of those steps is `decided_by: "model"`, matching
+`examples/agentic_rag/`.
+
+`max_steps` (default 5) and `max_tokens` (default 3000) are the hard caps, checked after every
+tool result. Hitting either forces one last no-tools call for a final answer — `decided_by:
+"code"`, since the model never chose to stop — and the trace records which cap did it, so a
+partial answer never looks like a normal one. `tests/test_example_single_agent.py` scripts a model
+that never stops calling tools on its own and checks both caps actually cut the run short.
+
+<CodeFile file="examples/single_agent/run.py" func="run" />
+
+Run it yourself:
+
+<CodeFile file="examples/single_agent/README.md" start={17} end={17} lang="text" expect="python -m examples.single_agent" />
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try <Link href="/techniques/function-calling/">function calling</Link> first if one tool call,
+chosen once, is enough for the task — most single lookups are.
+
+Try a fixed sequence of steps instead — <Link href="/techniques/workflow-graphs/">workflow
+graphs</Link> or a simpler chain — if you can write down in advance which actions the task needs
+and in what order. A workflow like that is wrong the same way every time it is wrong, and it costs
+the same every time it runs, which a single agent does not.
+
+Move up to a single agent once the number and order of actions cannot be known before the model
+sees the question — a search that might take one lookup or five, depending on what the first one
+turns up.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'Looping without progress',
+    notice: 'The model calls the same tool with the same or a barely different argument several times in a row, learning nothing new from the result, until the step cap forces a stop.',
+    test: 'Run a question the tools cannot actually answer and read the tool-call arguments in order. Real progress looks like each call narrowing in on something; a loop looks like the same call repeated with cosmetic changes.',
+  },
+  {
+    name: 'Drift from the question',
+    notice: "The agent's later actions chase a detail it noticed mid-loop rather than the question it was actually asked. Anthropic describes this as part of the cost of autonomy: agents left to direct themselves carry \"the potential for compounding errors\".",
+    test: 'Read every tool call in order and ask whether each one still serves the original question, not just whether it returned something plausible.',
+  },
+  {
+    name: 'Tool misuse',
+    notice: 'The model calls a tool with an argument it invented rather than one it actually retrieved earlier in the trace — a part number it guessed, not one a search or a prior lookup returned.',
+    test: "Trace every tool argument back to where it came from: a prior tool result, or nowhere. An argument that traces to nowhere is a guess, whether or not the tool call itself succeeds.",
+  },
+  {
+    name: 'Overconfidence at the stop',
+    notice: "The model stops and states an answer with no hedge, even though an earlier tool result only partly supported it or the two results it gathered actually conflicted.",
+    test: "Compare the final answer's claims against the tool results actually returned in the trace, not against whether tools were called at all.",
+  },
+  {
+    name: 'The cap ships a known-partial answer',
+    notice: 'A step or token cap is reached before the model stopped on its own, and the forced final answer goes out anyway, silently unless the "Force a final answer" step is surfaced somewhere a person or a downstream system can see it.',
+    test: "Script a model that never stops calling tools (this page's own test suite does exactly this) and confirm the run still returns an answer, and that the answer's origin says which cap forced it.",
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, best case (plan, one action, stop)', value: '3' },
+    { label: 'Model calls, worst case (step cap reached)', value: '7' },
+    { label: 'Tokens in, one action round', value: '~340–610' },
+    { label: 'Wall time, one round trip', value: '~0.7s' },
+  ]}
+  comparedTo={{
+    label: 'a fixed workflow with the same steps (level 3)',
+    note: 'Cost here tracks how many actions the question actually needs, not a count fixed in advance: a question one action can answer costs close to what a two-call workflow costs, and one that reaches the cap costs several times that, for the same question.',
+  }}
+  level={5}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+`single_agent` answers a question about the documents and cites what it used, the same task `rag`
+and `agentic_rag` are scored on, so it fits the site's own 60-question set the same way: exact or
+rubric match, citation hit rate, and the count of trace steps the model itself decided against the
+ones the code decided, which the trace already carries.
+
+`scripts/eval_run.py` counts `single_agent` among the examples the question set can score. No
+result file exists for it yet, so this page cannot say a number for any of it. Run
+`python scripts/eval_run.py --example single_agent --model <spec> --dry` to project the cost of a
+real run before spending anything on one.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="The share of runs that end with a forced final answer instead of a real stop (the cap-hit rate), the average number of actions per run, and how often a tool call's argument cannot be traced back to an earlier result in the same run."
+  costAtVolume="Cost per question is not fixed the way a workflow's is: it depends on how many actions the model decides it needs. Budget for a run that uses the full step cap on every question, not the average, since a bad batch of questions becomes a bad batch of spend."
+  failsInProduction="The loop calls the same or a near-identical tool repeatedly without making progress, silently consuming the whole step cap on a question the tools were never going to answer."
+  whatToLog="The plan text, every tool call with its arguments and result, in order, and which cap (if any) forced the final answer, so a bad answer traces back to a specific decision instead of an unexplained partial result."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Ask a coding agent or a deep-research tool to do something that takes several steps, and watch what happens if it does not finish: does it say it hit a turn or time limit, or does it just hand back a partial answer with no explanation?' },
+  { lane: 'build', body: 'Run python -m examples.single_agent --model stub with a question of your own from the repo root. The interactive stub never calls a tool, so it always stops after the plan step; run python -m unittest tests.test_example_single_agent -v instead to see a scripted model that actually calls both tools and hits both caps.' },
+  { lane: 'either', body: 'Pick one of the failure modes above and try to script a StubModel response that causes it on purpose, using the pattern in tests/test_example_single_agent.py.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

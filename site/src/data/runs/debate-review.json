@@ -1,0 +1,61 @@
+{
+  "illustrative": true,
+  "h": 650,
+  "title": "Review and debate",
+  "sub": "An independent reviewer, with its own retrieval, decides what to check and rejects a draft it did not verify.",
+  "pill": "Level 6 · Teams of agents",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 30, "l": "Question", "k": "io" },
+    { "id": "retrieve", "x": 170, "y": 172, "l": "Author retrieves sources", "k": "code" },
+    { "id": "draft", "x": 170, "y": 314, "l": "Author drafts", "k": "model" },
+    { "id": "reviewer", "x": 170, "y": 456, "l": "Reviewer decides what to check", "k": "model" },
+    { "id": "search", "x": 310, "y": 456, "l": "Reviewer's own search", "k": "store" },
+    { "id": "a", "x": 170, "y": 598, "l": "Answer with verdict", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "retrieve", "by": "code" },
+    { "id": "e2", "f": "retrieve", "t": "draft", "by": "code" },
+    { "id": "e3", "f": "draft", "t": "reviewer", "by": "code" },
+    { "id": "e4", "f": "reviewer", "t": "search", "by": "model", "b": 22 },
+    { "id": "e5", "f": "search", "t": "reviewer", "by": "code", "b": 22 },
+    { "id": "e6", "f": "reviewer", "t": "a", "by": "model" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"What is the maximum vent run for the DR-520?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The author retrieves its own sources",
+      "d": "dr520-manual#4, service-bulletin#1,\nservice-bulletin#2, dr210-manual#4",
+      "m": "4 sections · 9 ms"
+    },
+    {
+      "e": "e3",
+      "h": "The author drafts an answer",
+      "d": "\"The DR-520's vent run is limited to 35 feet with\nup to 4 elbows [dr520-manual#4].\"",
+      "m": "612 in · 22 out · 1.0 s"
+    },
+    {
+      "e": "e4",
+      "h": "The reviewer, independently, decides what to check",
+      "d": "→ CHECK: \"DR-520 vent run service bulletin\"",
+      "m": "310 in · 12 out · 0.5 s"
+    },
+    {
+      "e": "e5",
+      "h": "The reviewer's own search runs — not the author's",
+      "d": "service-bulletin#1: \"this bulletin revises the\nmaximum vent run specification for the DR-520\ndryer. It does not affect the DR-210 …\"",
+      "m": "1 section · 11 ms"
+    },
+    {
+      "e": "e6",
+      "h": "The reviewer rejects, with a reason",
+      "d": "\"REJECT: the draft never checked for a superseding\nbulletin, and one exists — service-bulletin#1\nconfirms this figure has since been revised.\"",
+      "m": "520 in · 34 out · 0.8 s"
+    }
+  ]
+}

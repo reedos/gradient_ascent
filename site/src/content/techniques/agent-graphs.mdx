@@ -1,0 +1,219 @@
+---
+slug: agent-graphs
+level: 6
+run: agent-graphs
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Handoffs"
+    url: "https://openai.github.io/openai-agents-python/handoffs/"
+    publisher: "OpenAI (Agents SDK documentation)"
+    accessed: "2026-09-18"
+  - title: "Agent2Agent (A2A) Protocol"
+    url: "https://a2a-protocol.org/v1.0.0/"
+    publisher: "Linux Foundation (Agent2Agent Protocol)"
+    accessed: "2026-09-18"
+  - title: "microsoft/agent-framework"
+    url: "https://github.com/microsoft/agent-framework"
+    publisher: "Microsoft"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import agentGraphsRun from '../../data/runs/agent-graphs.json';
+
+Agent graphs is level 6 read as a graph: nodes are agents, not fixed steps; edges are handoffs
+between them; and the graph keeps shared state and a checkpoint after every node. It is the third
+page in the site's <Link href="/threads/graph-engineering/">graph engineering thread</Link>, after
+<Link href="/techniques/knowledge-graphs/">knowledge graphs</Link>, which connect information, and
+<Link href="/techniques/workflow-graphs/">workflow graphs</Link>, which connect work in code.
+
+The one thing that changes from workflow graphs, level 3, is who picks the edge. There, every
+transition rule is written in code before the graph ever runs: given this state, go here, always.
+Here, one node — usually called a supervisor — is itself a model call, and its own output selects
+which node runs next from an explicit list of names. OpenAI's Agents SDK documents the same
+arrangement: "If you have multiple possible destinations, register one handoff per destination and
+let the model choose among them."<Cite n={1}/>
+Nothing else about the shape changes: code still runs every node, still checkpoints state after
+each one, and a hop cap still stops the graph the model cannot see past.
+
+This page is marked draft, not published: agent graphs has no recorded trace and no scored result
+file yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={agentGraphsRun} label="Level 6 · Agent graphs" runKey="agent-graphs" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Agent graphs mostly runs where a reader cannot see it: inside a product's own orchestration layer,
+not as a feature with its own name. What is visible from outside is a multi-step assistant that
+changes strategy mid-task — a support conversation handed to a different specialist thread, or a
+coding agent whose plan clearly branches on what an earlier step found — rather than working
+through the same script every time.
+
+The names behind that are ones a reader following the tooling, not a chat app, is more likely to
+meet. LangGraph, Microsoft Agent Framework, CrewAI and Google's Agent Development Kit are all
+registered against this technique. One open protocol exists specifically so agents built on
+different ones of those frameworks can still hand work to each other. Agent2Agent (A2A) states its
+purpose as "Connect agents built on different platforms (LangGraph, CrewAI, Semantic Kernel, custom
+solutions) to create powerful, composite AI systems."<Cite n={2}/> Its own site says A2A was
+"Originally developed by Google and now donated to the Linux Foundation"<Cite n={2}/>, and is at
+version 1.0.
+
+Microsoft's own framework documentation names the shape plainly: "graph-based workflows supporting
+sequential, concurrent, handoff, and group collaboration patterns; includes checkpointing,
+streaming, human-in-the-loop, and time-travel"<Cite n={3}/> — checkpointing and handoff, named
+together, are exactly the two things that separate a graph of agents from a plain loop.
+
+What is worth watching for, in anything built this way: whether a supervisor or router agent's
+choice of who handled a request is visible anywhere — a label, a log line, a named specialist in
+the reply — or whether the handoff is invisible and the only sign one happened is that the tone or
+the accuracy of the answer changes partway through, with nothing told to you about why.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example extends the idea in <Link href="/techniques/workflow-graphs/">workflow graphs</Link>'
+own runner without editing that file: nodes are plain functions over shared state, and the runner
+checkpoints after every node. The only change is that one node, the supervisor, is not a fixed
+code rule; it is a model call, and the loop acts on whatever node name that call's output names.
+
+<CodeFile file="examples/agent_graphs/run.py" func="run" />
+
+Code never hands that name straight to a node without checking it first. `ALLOWED_HANDOFFS` plays
+the role OpenAI's own `is_enabled` handoff switch does — "a boolean or a function that returns a
+boolean, allowing you to dynamically enable or disable the handoff at runtime"<Cite n={1}/> — here
+fixed rather than dynamic: a name the model returns that is not `research` or `write` is caught
+before the graph acts on it, recorded as a `Handoff blocked` step, and the run is forced to `write`
+instead. `tests/test_example_agent_graphs.py` scripts exactly this: the model answers
+`delete_database`, and the test checks the run never treats that as a research hop, cites nothing,
+and still returns an answer rather than failing.
+
+`research` and `write` are ordinary code, the same as any node in a workflow graph. `research`
+re-searches the whole corpus for the original question, skipping any section already found, so a
+second hop turns up the next-best match instead of repeating the first — the reason this run needs
+three hops to gather the manual's figure, the bulletin that revises it, and the revised number
+itself, in that order. `MAX_RESEARCH_HOPS` (4 by default) caps how many times the supervisor may
+send the team back to `research`; past the cap, code forces `write` on its own without asking the
+model again, unlike a blocked handoff, which does still get one more supervisor call afterward.
+
+Run it yourself:
+
+<CodeFile file="examples/agent_graphs/README.md" start={17} end={17} lang="text" expect="python -m examples.agent_graphs" />
+
+Every "Supervisor picks the next agent" step is `decided_by: "model"`; every checkpoint, the
+blocked-handoff step and the hop-cap step are `decided_by: "code"` — the same distinction <Link
+href="/techniques/workflow-graphs/">workflow graphs</Link>' own page draws, with one more place a
+model, not code, now gets to choose.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try <Link href="/techniques/workflow-graphs/">workflow graphs</Link> first if every transition
+rule can be written down before the graph runs — most graphs can, and a fixed rule costs nothing
+to evaluate and is wrong the same way every time it is wrong.
+
+Try a <Link href="/techniques/single-agent/">single agent</Link> instead if one model, one loop and
+one context window is enough — a graph of separate agents is only worth its extra machinery once
+the task needs more than one agent's own context to hold.
+
+Move up to agent graphs once a node's own output has to pick which agent runs next, not just what
+a fixed step does — the same reason <Link href="/techniques/workflow-graphs/">workflow graphs</Link>
+justifies moving up from a plain chain, one level higher.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'A handoff outside the allowlist',
+    notice: "The supervisor's output names something that is not a real node — a slightly different word, or something invented outright — and unless it is caught, the graph either fails trying to run a node that does not exist or silently falls through to whatever the code happens to do by default.",
+    test: "Script the supervisor to return a name outside the allowlist (this page's own test suite does exactly this) and confirm the run is forced to a safe node instead of failing or quietly continuing as if nothing happened.",
+  },
+  {
+    name: 'The supervisor never converges',
+    notice: 'The supervisor keeps sending the team back to research, finding less and less that is new each time, until the hop cap forces a stop rather than the supervisor choosing to stop on its own.',
+    test: "Read what each hop's checkpoint actually added to the findings. Real progress narrows toward an answer; a stalled supervisor keeps asking for the same kind of information a later hop already supplied.",
+  },
+  {
+    name: 'A node reads state a checkpoint never wrote',
+    notice: "A node expects a field in the shared state that no earlier node actually set, so it either fails or silently treats it as empty, and the next handoff is decided on less information than the run actually gathered.",
+    test: "Compare every checkpoint's own record of what it wrote against what the next node reads. A field read but never written by anything upstream is this failure.",
+  },
+  {
+    name: 'The hop cap ships a thin answer',
+    notice: "The cap is reached before the supervisor chose to write on its own, and the write node drafts from whatever partial findings exist, silently unless the 'Hop cap reached' step is surfaced somewhere a person can see it.",
+    test: "Script a supervisor that always answers 'research' (this page's own test suite does exactly this) and confirm the run still returns an answer once the cap is hit, and that the trace says the cap forced it.",
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, best case (supervisor writes immediately)', value: '2' },
+    { label: 'Model calls, this run (3 research hops, then write)', value: '5' },
+    { label: 'Tokens in, one supervisor call', value: '~140–210' },
+    { label: 'Wall time, one hop (handoff plus checkpoint)', value: '~0.3s' },
+  ]}
+  comparedTo={{
+    label: 'workflow graphs, the same two nodes with every edge fixed in code (level 3)',
+    note: 'A workflow graph pays for exactly the nodes its code visits, every run, whether or not that is enough. This run cost five calls because the question needed three research hops; a simpler question through the same graph costs two, and a workflow graph could not tell the difference in advance.',
+  }}
+  level={6}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+`agent_graphs` answers the same question-about-the-documents task `rag` and `single_agent` are
+scored on — the write node's final answer cites the sections the research node actually found — so
+it fits the site's 60-question set the same way: exact or rubric match, citation hit rate, plus a
+number specific to this shape: hops used per question against the cap, which shows directly
+whether a question needed one pass through the graph or several.
+
+`scripts/eval_run.py` counts `agent_graphs` among the examples the question set can score (see
+`docs/EVALS.md`). No result file exists for it yet, so this page cannot say a number for any of
+it. Run `python scripts/eval_run.py --example agent_graphs --model <spec> --dry` to project the
+cost of a real run first; that projection assumes the full hop cap, which is the ceiling, not
+what a typical question costs.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="Hops used per question against the cap, the share of runs where a handoff was blocked as outside the allowlist, and how often the hop cap fires before the supervisor chooses to write on its own."
+  costAtVolume="Cost tracks hops, not a fixed step count: a question the graph resolves in one research hop costs two calls, and one that needs the full hop cap costs several times that, for the same question, the way a single agent's cost tracks how many actions it takes."
+  failsInProduction="The supervisor keeps handing off to research without making progress, silently spending the whole hop cap on a question the graph's two agents were never going to resolve, or a handoff target the model invented gets blocked and the run ships a thinner answer than the question needed."
+  whatToLog="Every supervisor decision with its full output text, every checkpoint's state, any blocked-handoff event, and which cap (if any) forced the stop, so a bad answer traces back to a specific handoff rather than an unexplained partial result."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Watch a multi-step assistant handle a task that plausibly needs more than one kind of expertise (research plus writing, say). Does anything in its reply say a different specialist or stage handled part of it, or is the switch invisible?' },
+  { lane: 'build', body: 'Run python -m examples.agent_graphs --model stub with a question of your own from the repo root. The interactive stub never says exactly "research" or "write", so every run gets its handoff blocked immediately; run python -m unittest tests.test_example_agent_graphs -v instead to see a scripted supervisor actually take three research hops before writing.' },
+  { lane: 'either', body: 'Pick one of the failure modes above and try to script a StubModel response that causes it on purpose, using the pattern in tests/test_example_agent_graphs.py.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

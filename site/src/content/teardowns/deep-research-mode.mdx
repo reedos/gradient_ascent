@@ -1,0 +1,163 @@
+---
+slug: deep-research-mode
+products: [gemini-deep-research, chatgpt-deep-research, claude-research, perplexity-deep-research]
+reviewed: 2026-09-18
+sources:
+  - title: "How we built our multi-agent research system"
+    url: "https://www.anthropic.com/engineering/multi-agent-research-system"
+    publisher: "Anthropic"
+    date: "2025-06-13"
+    accessed: "2026-09-18"
+  - title: "Deep Research"
+    url: "https://gemini.google/overview/deep-research/"
+    publisher: "Google"
+    accessed: "2026-09-18"
+  - title: "Introducing deep research"
+    url: "https://openai.com/index/introducing-deep-research/"
+    publisher: "OpenAI"
+    date: "2025-02-02"
+    accessed: "2026-09-18"
+  - title: "Introducing Perplexity Deep Research"
+    url: "https://www.perplexity.ai/hub/blog/introducing-perplexity-deep-research"
+    publisher: "Perplexity"
+    date: "2025-02-14"
+    accessed: "2026-09-18"
+  - title: "Claude takes research to new places"
+    url: "https://claude.com/blog/research"
+    publisher: "Anthropic"
+    date: "2025-04-15"
+    accessed: "2026-09-18"
+  - title: "Try Deep Research and our new experimental model in Gemini, your AI assistant"
+    url: "https://blog.google/products/gemini/google-gemini-deep-research/"
+    publisher: "Google"
+    date: "2024-12-11"
+    accessed: "2026-09-18"
+  - title: "Deep research"
+    url: "https://developers.openai.com/api/docs/guides/deep-research"
+    publisher: "OpenAI (API documentation)"
+    accessed: "2026-09-18"
+---
+
+import Link from '../../components/page/Link.astro';
+import Cite from '../../components/page/Cite.astro';
+
+## What you see
+
+Ask a question that needs more than one search to answer, and four products now do roughly the
+same thing: they go away, and several minutes later they come back with a long report, footnoted
+with citations, rather than a single paragraph. Gemini Deep Research, ChatGPT deep research,
+Claude Research and Perplexity Deep Research are the versions decoded here.
+
+While it works, most of them show you something: a plan, a list of searches under way. When it
+finishes, the report reads like a person wrote it after doing the reading, with full sentences, a
+structure, and links back to specific pages. In between was a loop of small, ordinary steps:
+search, read, decide what is still missing, search again. The model ran that loop itself rather
+than your code, and the rest of this page takes it apart in this site's terms.
+
+## What is happening underneath
+
+Start with the smallest piece, the one your own code would recognize: several calls fired at once
+instead of one after another, combined afterward. Anthropic's account of building Claude Research
+gives this as part of why the product is fast: "For speed, we introduced two kinds of
+parallelization: (1) the lead agent spins up 3-5 subagents in parallel rather than serially; (2)
+the subagents use 3+ tools in parallel."<Cite n={1}/> The second half is <Link
+href="/techniques/parallelization/">parallel calls</Link> in this site's sense, level 3: a fixed
+batch dispatched together, so wall-clock time tracks the slowest call rather than the sum. The
+first half is a different thing under the same word, a model deciding for itself how many
+subagents to create, and that is level 6. It comes back below.
+
+Strip the speed work away and what is left is the loop every one of these products runs: search,
+read, decide what is missing, search again or write the report. This is <Link
+href="/techniques/agentic-rag/">agentic RAG</Link>, one agent with a search tool, deciding for
+itself when it has enough. Google describes one turn of it: "At each step, the model has to ground
+itself on all information gathered so far, then identify missing information and discrepancies it
+wants to explore — all while trading off comprehensiveness with compute and user wait
+time"<Cite n={2}/>, continuing until "the model determines enough information has been
+gathered"<Cite n={2}/>. OpenAI describes the same loop from the user's side: "you give it a
+prompt, and ChatGPT will find, analyze, and synthesize hundreds of online sources to create a
+comprehensive report at the level of a research analyst"<Cite n={3}/>. Perplexity says its version
+"performs dozens of searches, reads hundreds of sources, and reasons through the material to
+autonomously deliver a comprehensive report"<Cite n={4}/>. Each page describes one model choosing
+its own next query. That is level 5: the model decides every step, and no second model decides for
+it.
+
+Claude Research is the one to read carefully, because Anthropic described it two different ways.
+The launch post uses the same singular language as the others: "Claude operates agentically,
+conducting multiple searches that build on each other while determining exactly what to
+investigate next."<Cite n={5}/> Two months later, an engineering post describes a different shape
+for the same feature: "Our Research system uses a multi-agent architecture with an
+orchestrator-worker pattern, where a lead agent coordinates the process while delegating to
+specialized subagents that operate in parallel."<Cite n={1}/> A lead agent that creates other
+agents for parts of the question is <Link href="/techniques/orchestrator-workers/">lead agent and
+workers</Link>, level 6, a step above the loop Google, OpenAI and Perplexity document. Neither page
+says whether the feature changed shape between April and June 2025 or was built this way from the
+start and only described that way later. Read only the launch post and you would place it at level
+5 like the others.
+
+One more agent runs after the loop stops, at least in Claude Research: "the system exits the
+research loop and passes all findings to a CitationAgent, which processes the documents and
+research report to identify specific locations for citations. This ensures all claims are properly
+attributed to their sources."<Cite n={1}/> A separate agent checking material another agent drafted
+is the shape <Link href="/techniques/debate-review/">review and debate</Link> names, level 6. What
+that checker actually checks matters, and the failure section comes back to it.
+
+## Which page explains each part
+
+| What you see | What it is | Page |
+|---|---|---|
+| A plan before the searches start, sometimes waiting for you to approve it | The loop's first move, decided by the model | <Link href="/techniques/agentic-rag/">Agentic RAG and deep research</Link> |
+| A source is read, then a narrower search follows | The loop deciding it does not have enough yet | <Link href="/techniques/agentic-rag/">Agentic RAG and deep research</Link> |
+| A panel, or an API response, listing the searches that ran | The run's own record of its tool calls | <Link href="/techniques/agentic-rag/">Agentic RAG and deep research</Link> |
+| Several searches going out at once | A fixed batch of calls, combined afterward | <Link href="/techniques/parallelization/">Parallel calls</Link> |
+| One model creating others to cover parts of the question | A lead agent handing out work | <Link href="/techniques/orchestrator-workers/">Lead agent and workers</Link> |
+| Every claim carries a citation | A separate pass, after the draft, locating what it already wrote | <Link href="/techniques/debate-review/">Review and debate</Link> |
+
+## What the makers say
+
+Each maker states something about the loop that is easy to miss on a first read. Google's launch
+post for Deep Research describes the plan step as something you act on rather than watch: it
+produces "a multi-step research plan for you to either revise or approve"<Cite n={6}/> before any
+searching starts. OpenAI's deep research API documentation says a finished run keeps a record of
+what it did, and the response "will contain a listing of web search calls, code interpreter calls,
+and remote MCP calls made to get to the answer"<Cite n={7}/>, logged even where a product's chat
+interface does not surface every one. Perplexity puts a number on its own wall-clock time,
+completing "most research tasks in under 3 minutes"<Cite n={4}/>. Anthropic prices the extra
+searching in tokens: "In our data, agents typically use about 4× more tokens than chat
+interactions, and multi-agent systems use about 15× more tokens than chats."<Cite n={1}/> Both
+numbers are a maker measuring its own product. None of these pages compares products.
+
+## Where it fails
+
+Anthropic is the most specific about what went wrong before its system worked as intended.
+Watching early versions of its research agents step by step "immediately revealed failure modes:
+agents continuing when they already had sufficient results, using overly verbose search queries,
+or selecting incorrect tools."<Cite n={1}/> The first of those is the level-5 stop decision going
+wrong, and it is what <Link href="/techniques/agentic-rag/">agentic RAG</Link>'s own failure modes
+predict for anything built this way.
+
+None of the four makers states how often a report's citations turn out to be correct rather than
+merely present, and this page does not invent a number. What is checkable is scope. Anthropic's
+sentence about the CitationAgent describes finding "specific locations for citations," not
+confirming that a source supports the sentence a citation gets attached to. A citation that is
+present, formatted and pointed at a real page is not the same as a citation that is correct, and
+only the first is what Anthropic's account says this pass does. <Link
+href="/techniques/debate-review/">Review and debate</Link> names the sharper version of the same
+gap: a reviewer built the way the author is built can share the author's blind spot.
+
+## If you build one
+
+Start at level 5. One agent, a search tool, and a hard cap your code enforces so the run ends
+whatever the model would have chosen next: that is <Link href="/techniques/agentic-rag/">agentic
+RAG</Link>, and it is enough to get a plan-search-read-decide loop working. Add <Link
+href="/techniques/parallelization/">parallel calls</Link> once a step needs several independent
+lookups at once. It buys wall-clock time, not a better answer, so add it after the loop works
+rather than before. Leave <Link href="/techniques/debate-review/">review and debate</Link> until a
+fixed, code-written check is not enough. Whether a citation names a real section that contains the
+sentence is a fixed check; whether the claim itself is true is not.
+
+This site's <Link href="/recipes/research-brief/">research brief recipe</Link> takes the cheaper
+route for the same job: agentic RAG for the searching, and <Link
+href="/techniques/evaluator-optimizer/">write and check</Link>, level 3, for a fixed check of each
+drafted sentence against the section it cites. The recipe as a whole is level 5, and it is level 5
+for the searching rather than for the checking. Move up to a reviewing agent only once the fixed
+check is shown to miss something it should have caught.

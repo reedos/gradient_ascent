@@ -1,0 +1,44 @@
+name: Feedback or correction
+description: Something on the site is wrong, unclear, out of date or missing.
+title: "Feedback: "
+labels: ["feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. Every claim on the site is meant to be checked against its source, so a correction with a link is the most useful thing you can send. Short is fine.
+  - type: input
+    id: page
+    attributes:
+      label: Which page?
+      description: The address of the page. It is filled in for you when you come from the site's feedback link.
+      placeholder: https://reedos.github.io/gradient_ascent/techniques/rag/
+    validations:
+      required: false
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of feedback is it?
+      options:
+        - Something is wrong (a fact, a date, a quotation, a name)
+        - Something is out of date (a product was renamed, retired or released)
+        - Something is unclear or hard to follow
+        - Something is missing
+        - The page is broken (layout, a link, a diagram, on a phone)
+        - An idea or a request
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: What did you find?
+      description: Quote the sentence if you can, and say what it should say.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: A source, if you have one
+      description: The maker's own page, the paper, or the standard. This is what gets a correction made quickly.
+    validations:
+      required: false

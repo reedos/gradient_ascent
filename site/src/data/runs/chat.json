@@ -1,0 +1,38 @@
+{
+  "illustrative": true,
+  "h": 400,
+  "title": "Chat: one call, no documents",
+  "sub": "Send the question straight to the model, with no retrieval and no tools, and return whatever comes back.",
+  "pill": "Level 1 · One call",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
+    { "id": "build", "x": 170, "y": 150, "l": "Build the prompt", "k": "code" },
+    { "id": "llm", "x": 170, "y": 266, "l": "answers once", "k": "model" },
+    { "id": "a", "x": 170, "y": 366, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "build", "by": "code" },
+    { "id": "e2", "f": "build", "t": "llm", "by": "code" },
+    { "id": "e3", "f": "llm", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"What voltage does a DR-210 need?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code sends the question as-is, with no documents attached",
+      "d": "SYSTEM  You answer questions about Halvorsen appliances. You\n        have not been given any manual. If you do not know a\n        fact, say so plainly instead of guessing.\nUSER    What voltage does a DR-210 need?",
+      "m": "~40 tokens in"
+    },
+    {
+      "e": "e3",
+      "h": "The model answers from what it already knows",
+      "d": "\"I don't have documentation on a 'Halvorsen DR-210', so I\ncan't state its voltage requirement without guessing. Check\nthe rating label or the installation manual.\"",
+      "m": "40 in · 55 out · 0.6s"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "illustrative": true,
+  "h": 780,
+  "title": "Nightly source monitor",
+  "sub": "Fetch and diff every page in code; a model labels only the pages that actually changed.",
+  "pill": "Level 3 · Workflows",
+  "nodes": [
+    { "id": "trigger", "x": 170, "y": 34, "l": "Nightly trigger", "k": "io" },
+    { "id": "fetch", "x": 170, "y": 174, "l": "Fetch and diff each page", "k": "code" },
+    { "id": "store", "x": 170, "y": 314, "l": "Checkpoint: last snapshot per source", "k": "store" },
+    { "id": "judge", "x": 170, "y": 454, "l": "Label the diff: substantive or not", "k": "model" },
+    { "id": "write", "x": 98, "y": 594, "l": "Write a structured finding", "k": "code" },
+    { "id": "discard", "x": 278, "y": 594, "l": "Log and drop, no finding", "k": "code" },
+    { "id": "out", "x": 170, "y": 734, "l": "Morning queue", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "trigger", "t": "fetch", "by": "code" },
+    { "id": "e2", "f": "fetch", "t": "store", "by": "code" },
+    { "id": "e3", "f": "store", "t": "judge", "by": "code" },
+    { "id": "e4", "f": "judge", "t": "write", "by": "code", "b": -18 },
+    { "id": "e5", "f": "judge", "t": "discard", "by": "code", "b": 18 },
+    { "id": "e6", "f": "write", "t": "out", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The timer starts the nightly job",
+      "d": "overnight run, 6 tracked pages. The schedule is code's;\nnothing decided that tonight was worth a look.",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Code fetches and diffs each page",
+      "d": "2 of 6 differ from last night's snapshot.\n4 match exactly and never reach the model.",
+      "m": "6 fetches · 6 diffs · 890 ms"
+    },
+    {
+      "e": "e3",
+      "h": "Code hands the first diff to the model",
+      "d": "filing-fee-schedule.html: one paragraph changed.",
+      "m": "310 in · 0 out · 4 ms"
+    },
+    {
+      "e": "e4",
+      "h": "The model labels it substantive; code takes that branch",
+      "d": "\"The late-filing fee changed from $75 to $125,\neffective next quarter.\" confidence: high",
+      "m": "310 in · 58 out · 0.9 s"
+    },
+    {
+      "e": "e6",
+      "h": "Code writes the finding to the morning queue",
+      "d": "1 finding queued, source and diff attached.",
+      "m": "1 finding · 3 ms"
+    },
+    {
+      "e": "e3",
+      "h": "Code hands the second diff to the model",
+      "d": "guidance-notes.html: whitespace and a re-ordered\nfooter link, no text changed.",
+      "m": "260 in · 0 out · 3 ms"
+    },
+    {
+      "e": "e5",
+      "h": "The model labels it cosmetic; code drops it",
+      "d": "\"No wording changed; only markup and link order.\"\nconfidence: high",
+      "m": "260 in · 21 out · 0.5 s"
+    }
+  ]
+}

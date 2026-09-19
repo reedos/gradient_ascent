@@ -1,0 +1,217 @@
+---
+slug: prompt-chaining
+level: 3
+run: prompt-chaining
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Building effective agents"
+    url: "https://www.anthropic.com/engineering/building-effective-agents"
+    publisher: "Anthropic"
+    date: "2024-12-19"
+    accessed: "2026-09-18"
+  - title: "n8n"
+    url: "https://n8n.io"
+    publisher: "n8n"
+    accessed: "2026-09-18"
+  - title: "Temporal"
+    url: "https://temporal.io"
+    publisher: "Temporal"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import chainRun from '../../data/runs/prompt-chaining.json';
+
+Prompt chaining splits one task into a fixed sequence of steps, and hands each step's output to
+the next. Anthropic's own description is direct: it "decomposes a task into a sequence of steps,
+where each LLM call processes the output of the previous one"<Cite n={1}/>. A model call can sit
+inside any step, but the sequence itself, and what happens between steps, is fixed by your code
+before the chain ever runs.
+
+The step between two model calls is usually a gate: ordinary code that checks the output so far
+before letting the chain continue. Anthropic gives two examples: generate marketing copy, then
+translate it, or write a document outline, check it against a rule, then write the document from
+that outline<Cite n={1}/>.
+
+Prompt chaining sits at level 3, workflows. The model fills in the content of each step; your
+code decides how many steps there are, what order they run in, and what gate sits between them.
+The line to level 4 falls where the model's output starts selecting what runs next — where it
+is offered a tool and can choose to call it.
+
+This page is marked draft, not published: prompt chaining has no recorded trace and no scored
+result file yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={chainRun} label="Level 3 · Prompt chaining" runKey="prompt-chaining" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+If you have built a multi-step automation where one step's result becomes the input to the next
+— summarize a document, then draft a reply from the summary; extract a list, then look each item
+up — you have built a prompt chain, whether or not a model sits inside every step. Automation
+services such as Zapier, Make, n8n and Power Automate are built around exactly this idea: a
+trigger, then an ordered list of steps, each one able to use what came before it. Whether such a
+tool is any good to work in comes down to what it will show you: n8n advertises "Every step of
+your agents' reasoning, traceable on the canvas"<Cite n={2}/>, and that is the thing to check for
+in any of them — can you open one step and see what it was given and what it returned, or only
+ever the final answer?
+
+The reason to chain steps instead of asking for everything in one prompt is that each step gets
+a simpler, more specific job, which a model does more reliably than one large, mixed instruction.
+The cost is that a chain runs every step every time, even on questions a single call could have
+answered, and a wrong turn early in the chain has nowhere to be caught unless a later step, or a
+person, is checking for it.
+
+Watch the middle of the chain, not just the ends. A translated document that reads fluently can
+still be a fluent translation of a document the first step got wrong; the failure is invisible
+at the final step because nothing there is checking against the original request, only against
+the previous step's output.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example runs the same four steps on every question, around a keyword search: rewrite the
+question into up to three short search queries, retrieve for each query separately, draft an
+answer from everything retrieved, then check the draft's citations against what retrieval
+actually found. Two of the four steps call the model — the rewrite and the draft — but the code
+decides that sequence before either call happens, and always runs all four steps regardless of
+what either call returns. That is the whole difference from level 4: here the model fills in
+step *content*; it never picks the next step.
+
+The fourth step is the gate. `_check_citations` takes the set of citations the draft actually
+claims and the set of sections retrieval actually found, and keeps only the intersection — a
+citation the model invented, to a section nothing ever retrieved, is silently dropped rather
+than trusted. This is what Anthropic means by adding "programmatic checks... on any intermediate
+steps to ensure that the process is still on track"<Cite n={1}/>: the check does not ask the
+model whether it did well, it tests the output against a fact the code can verify on its own.
+
+Because each step is an ordinary function that takes plain values and returns plain values, each
+one is testable without the others and without a real model. `_check_citations` takes a draft
+string and a list of sections and returns the grounded set — a test can hand it a draft that
+invents a citation and assert it gets dropped, with no model call anywhere in the test. The
+site's own test suite does exactly this for the chain as a whole, against a scripted stub model.
+
+A chain fails most often at its weakest single step, and the failure travels forward invisibly.
+If the rewrite step turns "is the vent length still 35 feet" into a query that only matches the
+original manual, retrieval never sees the correcting service bulletin, and the draft answers
+confidently from stale text — nothing downstream can tell that the search itself was incomplete.
+Frameworks built to run fixed multi-step processes at production scale — Temporal, Prefect,
+Apache Airflow, Inngest — exist mainly to make that first kind of failure recoverable rather than
+silent: Temporal's own description is that its workflows "automatically capture state at every
+step, and in the event of failure, can pick up exactly where they left off"<Cite n={3}/>, which
+is a durability guarantee this example's plain function calls do not have.
+
+<CodeFile file="examples/prompt_chaining/run.py" start={20} end={97} expect="LEVEL = 3" />
+
+Run it yourself:
+
+<CodeFile file="examples/prompt_chaining/README.md" start={16} end={16} lang="text" expect="python -m examples.prompt_chaining" />
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try <Link href="/techniques/rag/">RAG</Link> or a single call first if one retrieval pass and one
+answer already handles the question — a chain that always runs four fixed steps costs more than
+one that runs one, for no benefit on a question a single pass could already answer.
+
+Move up to prompt chaining once a task genuinely needs more than one model-filled step in a
+known order, with something worth checking in between — rewriting a query before searching,
+outlining before writing, drafting before verifying.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'A bad step early in the chain travels forward unnoticed',
+    notice: "A later step's output looks fine on its own, but is built from a wrong or incomplete result earlier in the chain that nothing re-checked against the original request.",
+    test: "Feed a deliberately bad output into the middle of the chain (call a later step directly with it) and see whether anything downstream catches it, or only whether the final text reads smoothly.",
+  },
+  {
+    name: 'A gate that never fails',
+    notice: "The programmatic check between two steps always passes, on every input, including ones it should catch — usually because the check tests something the step can never actually get wrong, rather than the thing that matters.",
+    test: "Deliberately produce the exact failure the gate exists to catch (an invented citation, an outline missing a required section) and confirm the gate rejects it, not just that it accepts good input.",
+  },
+  {
+    name: 'The chain runs every step, even when the question did not need them',
+    notice: 'A question a single call could answer still pays for all N steps and all N model calls, because the chain has no way to skip ahead.',
+    test: 'Time and cost a batch of easy, single-fact questions through the chain and compare against a single call; the gap is the fixed cost of running every step unconditionally.',
+  },
+  {
+    name: 'Step boundaries lose information',
+    notice: "A step is designed to pass forward only its stated output (a list of queries, a draft), so a detail the next step actually needed, but that was not part of the handoff, is gone by the time it would matter.",
+    test: "Compare what the first step could see (the full question) against what the last step can see (only what earlier steps decided to pass on) for a question with a qualifying detail buried in its middle.",
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, one question', value: '2' },
+    { label: 'Tokens in', value: '~430' },
+    { label: 'Tokens out', value: '~66' },
+    { label: 'Wall time', value: '~2.0s' },
+  ]}
+  comparedTo={{
+    label: 'RAG (level 2)',
+    note: 'One extra model call to rewrite the question into queries, in the illustrated run above. The citation check itself costs nothing extra: it runs in code, not as a model call.',
+  }}
+  level={3}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+Scored on the same 60-question set as every other technique, over the appliance documents in
+`evals/corpus/`. The citation check gives prompt chaining an extra number RAG does not have on
+its own: how often a citation the draft claims was actually something retrieval found, tracked
+separately from whether the final answer was correct.
+
+Conflicting-source and multi-hop questions are where the extra query rewrite step is expected to
+earn its cost: a single retrieval pass over "is the vent length still 35 feet" can miss the
+correcting service bulletin entirely, where a second, differently worded query aimed at it has a
+chance to find it. No result file exists yet (see `docs/EVALS.md`), so this page cannot say
+whether that expectation holds. Run `python scripts/eval_run.py --example prompt_chaining --model
+<spec> --dry` to project the cost of a real run before spending anything on one.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="How many steps a run actually completes versus how many it was supposed to; a chain that silently short-circuits is worse than one that errors loudly. Also track the citation-check drop rate: a rising share of invented citations is a sign the draft step is drifting."
+  costAtVolume="Cost scales with the number of steps times the number of questions, not with question difficulty, since every question runs every step. Two model calls per question here means roughly twice the language-model spend of a single-call or RAG pipeline at the same volume."
+  failsInProduction="An early step's prompt or the document set it depends on changes, and the step keeps returning plausible-looking output that is now subtly wrong; nothing downstream is positioned to notice, because each step only checks against the step before it, never against the original request."
+  whatToLog="Every step's input and output, not just the final answer, with the gate's verdict at each check. A bad final answer is only debuggable if you can see which of the N steps actually introduced the problem."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Find a multi-step automation you already use (an email rule, a form that files a ticket, a scheduled report) and write down its steps in order. Which step, if it silently got something wrong, would nobody downstream catch?' },
+  { lane: 'build', body: 'Run python -m examples.prompt_chaining --model stub with a question of your own from the repo root. Then edit MAX_QUERIES in examples/prompt_chaining/run.py from 3 down to 1 and run the same question again: does the rewrite step still find the correcting document?' },
+  { lane: 'either', body: 'Take the gate that never fails, above, and cause it on purpose: find a check in a process you run that has never once rejected anything, and work out whether that is because nothing bad has arrived or because the check cannot see the thing that would be bad.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

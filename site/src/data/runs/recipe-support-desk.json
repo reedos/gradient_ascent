@@ -1,0 +1,96 @@
+{
+  "illustrative": true,
+  "h": 692,
+  "title": "Support desk, assembled",
+  "sub": "Route the ticket, search the docs, let the model reach for a tool if it needs one, and pause before anything costly goes out.",
+  "pill": "Level 4 · Tools",
+  "nodes": [
+    { "id": "ticket", "x": 170, "y": 34, "l": "Ticket arrives", "k": "io" },
+    { "id": "classify", "x": 170, "y": 100, "l": "Classify the ticket", "k": "model" },
+    { "id": "dispatch", "x": 170, "y": 166, "l": "Route to the technical queue", "k": "code" },
+    { "id": "search", "x": 170, "y": 232, "l": "Search the docs", "k": "code" },
+    { "id": "decide", "x": 170, "y": 302, "l": "Answer, or call a tool", "k": "model" },
+    { "id": "tool", "x": 82, "y": 372, "l": "issue_replacement(part)", "k": "tool" },
+    { "id": "draft", "x": 170, "y": 442, "l": "Draft an answer", "k": "model" },
+    { "id": "check", "x": 170, "y": 512, "l": "Check confidence", "k": "code" },
+    { "id": "reviewer", "x": 310, "y": 582, "l": "Person decides", "k": "human" },
+    { "id": "resume", "x": 170, "y": 582, "l": "Resume", "k": "code" },
+    { "id": "closed", "x": 170, "y": 652, "l": "Ticket answered", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "ticket", "t": "classify", "by": "code" },
+    { "id": "e2", "f": "classify", "t": "dispatch", "by": "code" },
+    { "id": "e3", "f": "dispatch", "t": "search", "by": "code" },
+    { "id": "e4", "f": "search", "t": "decide", "by": "code" },
+    { "id": "e5tool", "f": "decide", "t": "tool", "by": "model" },
+    { "id": "e5direct", "f": "decide", "t": "draft", "by": "model", "b": -140 },
+    { "id": "e6", "f": "tool", "t": "draft", "by": "code" },
+    { "id": "e7", "f": "draft", "t": "check", "by": "code" },
+    { "id": "e8pass", "f": "check", "t": "closed", "by": "code", "b": 140 },
+    { "id": "e8pause", "f": "check", "t": "resume", "by": "code" },
+    { "id": "e9", "f": "reviewer", "t": "resume", "by": "code" },
+    { "id": "e10", "f": "resume", "t": "closed", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The ticket arrives",
+      "d": "\"The drain pump on my DW-300 (HLV-2205) failed under\nwarranty, still rattling after I replaced it once already.\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code asks the model for one label",
+      "d": "label: technical",
+      "m": "62 tokens in · 1 token out · 200 ms"
+    },
+    {
+      "e": "e3",
+      "h": "Your code reads the label and picks a queue",
+      "d": "label='technical' -> technical queue\n(the billing and general queues were not taken this run)",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e4",
+      "h": "Your code searches the docs and builds one prompt",
+      "d": "0.81  warranty-policy.md  §3 Warranty\n0.74  parts-list.md        §2 HLV-2205\n0.55  dw300-manual.md      §8 Warranty",
+      "m": "3 passages · 1,120 tokens in"
+    },
+    {
+      "e": "e5tool",
+      "h": "The model decides a tool is needed and calls it",
+      "d": "→ issue_replacement(part=\"HLV-2205\", reason=\"repeat failure under warranty\")\n(it could have answered directly instead; nothing forced this choice)",
+      "m": "1,120 in · 22 out · 0.8 s"
+    },
+    {
+      "e": "e6",
+      "h": "Your code runs the tool and returns the result",
+      "d": "\"Replacement HLV-2205 approved, ships in 3-5 days,\nno charge under warranty.\" [warranty-policy#3]",
+      "m": "1 result · 40 ms"
+    },
+    {
+      "e": "e7",
+      "h": "The model drafts an answer using the tool result",
+      "d": "\"A free replacement drain pump is on its way [3],\nsince this is a repeat failure under warranty.\"",
+      "m": "1,340 in · 34 out · 1.1 s"
+    },
+    {
+      "e": "e8pause",
+      "h": "Your code checks confidence and pauses the run",
+      "d": "reason=tool_used (a replacement was approved, not just answered)\nthe run returns a checkpoint here; no reply is sent until\na person decides\n(the direct pass-through to Ticket answered, below, was not\ntaken this run)",
+      "m": "0 tokens · paused"
+    },
+    {
+      "e": "e9",
+      "h": "A person reviews the paused ticket and decides",
+      "d": "sees: the ticket, the retrieved sources, the tool call and its result\ndecides: approve",
+      "m": "decision: approve"
+    },
+    {
+      "e": "e10",
+      "h": "Your code resumes and sends the reply",
+      "d": "\"A free replacement drain pump is on its way [3] ...\"",
+      "m": "0 tokens · 0 ms"
+    }
+  ]
+}

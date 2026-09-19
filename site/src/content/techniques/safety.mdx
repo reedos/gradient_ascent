@@ -1,0 +1,296 @@
+---
+slug: safety
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "LLM01:2025 Prompt Injection"
+    url: "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+    publisher: "OWASP Gen AI Security Project"
+    accessed: "2026-09-18"
+  - title: "AI Risk Management Framework"
+    url: "https://www.nist.gov/itl/ai-risk-management-framework"
+    publisher: "NIST"
+    accessed: "2026-09-18"
+  - title: "How long do you store my data?"
+    url: "https://privacy.claude.com/en/articles/10023548-how-long-do-you-store-my-data"
+    publisher: "Anthropic (Privacy Center)"
+    accessed: "2026-09-18"
+  - title: "Data controls in the OpenAI platform"
+    url: "https://developers.openai.com/api/docs/guides/your-data"
+    publisher: "OpenAI (API documentation)"
+    accessed: "2026-09-18"
+  - title: "NeMo Guardrails"
+    url: "https://github.com/NVIDIA-NeMo/Guardrails"
+    publisher: "NVIDIA"
+    accessed: "2026-09-18"
+  - title: "Llama Guard 4"
+    url: "https://developer.meta.com/ai/docs/model-cards-and-prompt-formats/llama-guard-4/"
+    publisher: "Meta"
+    accessed: "2026-09-18"
+---
+
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+
+A model reads instructions and data through the same channel, so anything it is shown can try to
+redirect it: the user's own message, or text sitting in a document, a search result, or a tool's
+output. The OWASP Top 10 for LLM Applications 2025 says direct prompt injections "occur when a
+user's prompt input directly alters the behavior of the model," indirect ones "occur when an LLM
+accepts input from external sources, such as websites or files," and that it is "unclear if there
+are fool-proof methods of prevention for prompt injection"<Cite n={1}/>. So the controls that
+hold are the ones outside the model: least privilege, a check in code before any action runs,
+human approval before anything irreversible, and a record of what happened. Data handling is a
+separate question: what a product does with what you send it, which each maker documents only
+for its own product.
+
+This topic is not a level on the ladder; it applies at every level. NIST's AI Risk Management
+Framework (AI RMF 1.0, NIST AI 100-1) is "intended for voluntary use," organized around four
+functions it names govern, map, measure and manage, for work toward what NIST calls trustworthy
+AI<Cite n={2}/>; this page covers the parts specific to language models.
+
+This page is marked draft, not published: no result file exists for anything below, so nothing
+here reports a measured number. It describes the mechanisms and the checks.
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Before pasting anything sensitive into a chat app, check what that product's own page says about
+retention and training — and check that the page covers the plan you are actually on. Anthropic's
+Privacy Center article for Claude Free, Pro and Max says that if you allow your chats to improve
+Claude, "we may retain your data in a de-identified format for up to 5 years in our model
+training pipelines," and that a conversation you delete is "deleted from our back-end storage
+systems within 30 days"; the article says Claude for Work, the Anthropic API and enterprise plans
+are covered separately<Cite n={3}/>. OpenAI documents a different default for its API, in a page
+that covers the API and not its consumer product: "data sent to the OpenAI API is not used to
+train or improve OpenAI models" unless you explicitly opt in, with abuse-monitoring logs
+"retained for up to 30 days"<Cite n={4}/>. Neither statement transfers to the other company, to
+the other product, or to a plan its own page does not name.
+
+Prompt injection is worth understanding even if you never write code. If you use a tool that
+reads a web page, a file, or an email on your behalf and then acts on it — books something,
+sends something, changes something — ask what stops it from following an instruction hidden in
+that content instead of yours. A page designed to be read by an assistant, not a person, can say
+anything; nothing about being "just a web page" stops it from containing a line that looks like a
+command. The honest answer from a well-built tool is that a person approves anything irreversible
+before it happens — OWASP's own guidance for builders is to "implement human-in-the-loop controls
+for privileged operations to prevent unauthorized actions"<Cite n={1}/> — and if a tool can't tell
+you what its approval step actually checks, that is worth treating as a real gap, not a detail.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example is one scenario built to show both halves of a defense working together: delimiting
+untrusted content, and a permission check that runs no matter what the model decided.
+
+A support assistant answers a customer using a note fetched from another system. The note in the
+"injected" scenario carries a line written to look like an internal instruction: a $500 refund to
+"issue... right away," which the customer never asked for. The code wraps the note in a delimiter
+before it reaches the model, and the system prompt says plainly that the note is data, not
+instructions:
+
+<CodeFile file="examples/safety/run.py" start={45} end={51} expect="SYSTEM_PROMPT = (" />
+
+Delimiting and a system-prompt warning lower the odds a model follows an embedded instruction;
+they are not a defense, because nothing stops it from following one anyway, and OWASP's own entry
+says no fool-proof prevention is known<Cite n={1}/>. The defense is the check in code, which is
+what OWASP's own mitigation list asks for: "provide the application with its own API tokens for
+extensible functionality, and handle these functions in code rather than providing them to the
+model"<Cite n={1}/>. Here that check permits a refund only when three things hold, none of them
+decided by the model: the customer's own message asks for a refund, that message names the same
+amount of money the call asks for, and the destination is the order this conversation was already
+about — an id the calling code passes in.
+
+Each of the three is doing separate work. `_MONEY` matches a figure written as money (`$40`,
+`40 dollars`), so amounts are compared as numbers rather than as substrings: a bare number the
+customer never wrote as a price, such as the order number in "order 4821," authorizes nothing,
+and a customer who writes "$40" still gets the refund when the model asks for `40.0`. The refund
+words stop a figure the customer merely mentioned — "I was charged $80.00 twice, can you explain
+why?" — from being turned into an authorization by a note asking for exactly that amount. The
+order id is the strongest of the three, because it is the only one that is not a reading of
+English: `order_id` arrives as a tool argument the model wrote, and a call naming any other order
+is refused and logged rather than quietly redirected.
+
+<CodeFile file="examples/safety/run.py" func="_permitted" />
+
+Run against a stub model scripted to fall for the injected note and call `issue_refund` with
+`$500`, no such amount appears in the customer's own "what's the status of my order?"
+message, so the call is refused and logged, and no refund is issued:
+
+<CodeFile file="examples/safety/run.py" start={151} end={162} expect="if not _permitted(call, user_message, order_id):" />
+
+The same code, given a customer who asks for a refund of an amount they state themselves, permits
+and runs the call, and pays it to the order the caller named rather than the one in the tool
+arguments. `tests/test_example_safety.py` scripts a compromised model (one made to call the tool
+from the injected note) and an honest one (one that answers directly), and checks that the
+refusal path never runs the tool, that an order number in the customer's message does not
+authorize a refund of that figure, and that the model's decision to call a tool at all is the
+only `decided_by: "model"` step in the trace.
+
+What the check does not do is worth as much as what it does, and the same test file pins it. Two
+attacks still work, both written down there rather than left for someone who copies this to find
+later. Matching refund words is a test of wording, not of meaning: "I do not want a refund of
+$40" reads to it exactly like a request for one. And an amount the customer authorized for one
+reason authorizes it for any reason — the check knows how much and where, never what for. Both
+are bounded by the third condition: the money can only reach this customer's own order, so the
+worst either can produce is a wrong refund to the right person. A system where that is already
+too expensive wants <Link href="/techniques/human-in-the-loop/">human approval</Link> in front of
+the action, not a longer regular expression. The 60-question set does not score this example —
+it refuses rather than answers — so `docs/EVALS.md` names what to measure instead: the share of
+injected requests refused against the share of legitimate ones permitted.
+
+Keeping the check outside the model is what the guardrail frameworks in this page's sources do
+too. NVIDIA's NeMo Guardrails describes itself as a toolkit for "adding programmable guardrails
+to LLM-based conversational systems," with input rails that "can reject the input," output rails
+on what the model generated, and execution rails "applied to input/output of custom actions
+(a.k.a. tools)"<Cite n={5}/>. Meta documents Llama Guard 4 as a separate safeguard model whose
+"guardrails can be applied both on the input and output of the model," answering `safe`, or
+`unsafe` with the categories it matched<Cite n={6}/>. Neither asks the model under test to
+police itself.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+There is no version of this topic to skip; anything that reads a model's output or acts on it
+can be misdirected by what it was shown, at every level. What changes with the situation is which
+control is worth building today, not whether to think about this at all.
+
+Skip a permission check, a delimiter and an audit log for a single-user tool that only reads and
+only answers you, with no retrieved content, no tool calls and nothing it can act on — direct
+prompt injection is the whole risk there, and the worst it can do is give you a bad answer to
+your own question. Build them in as soon as any one of those stops being true: another person's
+content reaches the model, or the model can call a tool that does something.
+
+Never skip two things, whatever the scale: reading the specific product's own data-handling page,
+not a different plan or product from the same company, before sending it anything sensitive; and
+a human approval step in front of anything irreversible once the model can act at all. Both are
+cheap enough, and the cost of skipping either is high enough, that "this is a small project" is
+not a reason to leave them out.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'A wording match approves the wrong thing',
+    notice: "A check that matches refund words or amounts as text passes an attack phrased to avoid the exact words it looks for — a sentence that mentions a figure while declining it reads to a substring check exactly like a request for one.",
+    test: "Feed the check a sentence that contains the trigger words but means the opposite, the way this page's own example's test file does, and confirm it is not treated as authorization.",
+  },
+  {
+    name: 'An authorized amount is reused for a different reason',
+    notice: "A figure the customer stated for one reason, once matched, is treated as authorizing any action for that amount, not only the one they actually asked for.",
+    test: "Script a request that asks for one action at an amount the customer mentioned for a different reason, and check whether the permission logic tells the two apart or only checks the number.",
+  },
+  {
+    name: 'Retrieved content is trusted like the user\'s own message',
+    notice: "Text pulled in by a search or a tool call changes the model's behavior exactly as if the user had typed it, with nothing in the prompt or the code marking it as less trustworthy.",
+    test: "Add a line to a retrieved document written to look like an instruction and see whether the answer follows it instead of answering the original question.",
+  },
+  {
+    name: 'A guardrail model is trusted the same as the check it backstops',
+    notice: "An input or output classifier such as a guardrail model returns a wrong verdict and nothing else catches it, because the code-level check was skipped on the assumption the classifier would cover it.",
+    test: "Turn off the classifier for one test run and confirm the code-level permission check alone still refuses the same attack; a system where only the classifier catches it has one layer, not two.",
+  },
+  {
+    name: 'The refusal is not logged',
+    notice: "A permission check quietly refuses a call and nothing records that it happened, so a rising rate of blocked attempts — the actual signal of an attack — is invisible until someone thinks to ask.",
+    test: "Trigger a refusal on purpose and check whether it produced a log entry with enough detail to reconstruct what was attempted, not just that something failed.",
+  },
+]} />
+
+## At each level
+
+- <Link href="/levels/0/">No model</Link>: there is no model to redirect, so the risks here are
+  ordinary software security — input validation, access control — the same ground
+  <Link href="/techniques/order-zero/">level 0</Link>'s own page already covers, not this topic's
+  own concerns.
+- <Link href="/levels/1/">One call</Link>: the user's own message is the only input in play, the
+  way <Link href="/techniques/chat/">chat</Link>'s one call has no search step and no tool call,
+  so direct prompt injection is the whole risk; there is no retrieved or tool-returned content yet
+  to carry an indirect one.
+- <Link href="/levels/2/">Context</Link>: retrieved text can carry instructions of its own, which
+  is why <Link href="/techniques/rag/">RAG</Link> lists prompt injection through retrieved text
+  among its own failure modes. The model reads whatever the retrieval step handed it exactly the
+  way it reads the user's message, with nothing marking one as more trustworthy than the other
+  unless the code does.
+- <Link href="/levels/3/">Workflows</Link>: a fixed pipeline gives a defender fixed places to put
+  a check between steps — the gate in <Link href="/techniques/prompt-chaining/">prompt
+  chaining</Link>'s own example is exactly that — but a compromised step's output still moves on
+  to the next step by default unless something explicitly stops it there.
+- <Link href="/levels/4/">Tools</Link>: a tool call can act on the world, not just produce a
+  sentence, so the same injected instruction that used to produce a wrong answer can now attempt
+  a real action, the risk <Link href="/techniques/function-calling/">function calling</Link>'s
+  own failure modes name directly — this is where a permission check like this page's example
+  earns its place.
+- <Link href="/levels/5/">Agents</Link>: the model chooses its own next step across many turns
+  with nobody reading each one, so a single injected instruction early in
+  <Link href="/techniques/single-agent/">a single agent</Link>'s long loop can steer several later
+  actions before a person sees any of them.
+- <Link href="/levels/6/">Teams of agents</Link>: one agent's output becomes another agent's
+  input, so an injected instruction can move from an agent that only reads content to one that
+  holds permissions the first agent never had — the reason
+  <Link href="/techniques/agent-graphs/">agent graphs</Link> checks a handoff against an allowlist
+  before acting on it.
+- <Link href="/levels/7/">Always-on agents</Link>: an agent acts when nobody is watching in real
+  time, so an audit trail — a record of what it did and why, kept independent of the agent itself
+  — has to stand in for the person who was not there to catch a problem as it happened, the
+  record <Link href="/techniques/agent-teammates/">always-on assistants</Link>' own policy layer
+  is built to leave behind.
+
+## Practices
+
+- Treat retrieved and tool-returned content as data: delimit it, and never let it alone authorize
+  an action. Corroborate a requested action against something the user actually said, the way the
+  example's permission check does.
+- Put a human-in-the-loop control on anything irreversible, matching OWASP's own guidance, rather
+  than trusting a system-prompt instruction to hold under an attack it was never tested against.
+- Give a model only the access its task needs. A tool the model never needs to call is a
+  permission it cannot misuse, redirected or not.
+- Check the specific product's own data-handling page before sending it anything sensitive; a
+  company's consumer product and its API can default to opposite retention and training rules.
+- Log what an action-taking system did and why, especially anything that ran with no person
+  watching at the time — the record is how a level 6 or 7 system gets checked after the fact.
+- Two pages under this one go further: <Link href="/techniques/guardrails/">guardrails</Link> on
+  what a check on the way in and out can and cannot promise, and
+  <Link href="/techniques/red-teaming/">red teaming</Link> on attacking your own system before
+  someone else does.
+
+## Run it
+
+<RunIt
+  monitor="How often the permission check refuses a call, and what triggered each refusal —
+  a rising refusal rate on ordinary traffic can mean a prompt regressed as easily as it can mean
+  an actual attack."
+  costAtVolume="A permission check like the example's is a few lines of code run on every tool
+  call; its cost is negligible next to the model call it is checking. A guardrail classifier such
+  as Llama Guard is a separate model call instead: one more per request if you screen the input,
+  two if you screen the output as well."
+  failsInProduction="An injected instruction is worded to slip past whatever check exists today; a
+  check tuned narrowly on one attack (a fixed phrase, one tool) misses the next one that asks for
+  the same thing a different way. The permission check itself, not the wording, is what has to
+  hold."
+  whatToLog="The untrusted content that reached the model, the model's tool call in full, whether
+  the permission check passed or refused and why, and who or what approved anything that needed
+  approval — enough to reconstruct the decision without asking the model again."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: "Open a chat app or assistant you use and find its privacy or data-usage settings. Does it say whether your conversations train future models, and for how long they're kept? Compare it with a different product from the same company if it has one (a chat app versus that company's API) — the two are often not the same." },
+  { lane: 'build', body: 'Run python -m examples.safety --model stub --scenario injected and --scenario legitimate from the repo root. Neither calls a tool against the interactive stub; open tests/test_example_safety.py and read the two tests that script a model into calling issue_refund, to see the refusal and the permitted call actually happen.' },
+  { lane: 'either', body: "Pick a tool or assistant you use that reads something you did not write — a web page, an email, a shared document — and then acts. Write down where the untrusted text enters, which actions it could reach, and the one check, outside the model, that would have to hold if the model followed an instruction in that text." },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

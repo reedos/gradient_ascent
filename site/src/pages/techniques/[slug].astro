@@ -1,0 +1,218 @@
+---
+import { getEntry, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import Pill from '../../components/Pill.astro';
+import NameList from '../../components/NameList.astro';
+import Sources from '../../components/page/Sources.astro';
+import Reviewed from '../../components/page/Reviewed.astro';
+import TechniqueRow from '../../components/TechniqueRow.astro';
+import { url } from '../../lib/url';
+import {
+  allTechniqueSlugs,
+  techniqueBySlug,
+  relationsFor,
+  namesFor,
+  asOf,
+  namesChecked,
+  tracks,
+  teardownsDecoding,
+  teardownIsStale,
+} from '../../lib/content';
+
+export function getStaticPaths() {
+  return allTechniqueSlugs.map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const technique = techniqueBySlug(slug!)!;
+const rel = relationsFor(slug!);
+const names = namesFor([slug!]);
+
+const entry = await getEntry('techniques', slug!);
+const rendered = entry ? await render(entry) : undefined;
+const Content = rendered?.Content;
+
+// Sources and the reviewed date are page furniture, not prose: they are rendered here from the
+// frontmatter the schema already validates, after the generated "how it connects" and "out
+// there" blocks, so the reviewed date is the last thing on every page and the source list
+// cannot drift from the frontmatter the way a second hand-written copy inside the MDX did.
+const sources = entry?.data.sources ?? [];
+const reviewedISO = entry ? entry.data.reviewed.toISOString().slice(0, 10) : undefined;
+
+const color = technique.level === 'tracks' ? 'var(--ot)' : `var(--o${technique.level})`;
+const levelHref = technique.level === 'tracks' ? url('/levels/tracks/') : url(`/levels/${technique.level}/`);
+const colorOf = (level: number | 'tracks') => (level === 'tracks' ? 'var(--ot)' : `var(--o${level})`);
+
+// Teardowns that decode this technique, dropped once they are past their expiry date: an expired
+// teardown stays readable at its own URL but is not recommended from a technique page until it has
+// been re-reviewed (the project plan, Scope control, rule 5). Rendered as one more relation block, so a
+// reader meets it in the same place as "read first" and "move up when".
+const decodedIn = (
+  await Promise.all(
+    teardownsDecoding(slug!).map(async (t) => {
+      const entry = await getEntry('teardowns', t.slug);
+      if (!entry) return undefined;
+      const reviewed = entry.data.reviewed.toISOString().slice(0, 10);
+      return teardownIsStale(reviewed) ? undefined : { title: t.title, slug: t.slug };
+    }),
+  )
+).filter((x): x is { title: string; slug: string } => Boolean(x));
+
+const relationBlocks: { label: string; items: { title: string; slug: string; note?: string; color: string; href?: string }[] }[] = [
+  { label: 'Read first', items: rel.requires.map((p) => ({ title: p.title, slug: p.slug, color: colorOf(p.level) })) },
+  {
+    label: 'Move up when',
+    items: rel.upgradesTo.map((u) => ({ title: u.page.title, slug: u.page.slug, note: u.when, color: colorOf(u.page.level) })),
+  },
+  { label: 'Often used with', items: rel.combinesWith.map((p) => ({ title: p.title, slug: p.slug, color: colorOf(p.level) })) },
+  {
+    label: 'Instead of',
+    items: rel.alternativeTo.map((a) => ({ title: a.page.title, slug: a.page.slug, note: a.question, color: colorOf(a.page.level) })),
+  },
+  { label: 'Pages that need this one', items: rel.requiredBy.map((p) => ({ title: p.title, slug: p.slug, color: colorOf(p.level) })) },
+  {
+    label: 'Decoded in',
+    items: decodedIn.map((t) => ({
+      title: t.title,
+      slug: t.slug,
+      href: url(`/teardowns/${t.slug}/`),
+      note: 'A product you have used, taken apart into this technique and the others under it',
+      color,
+    })),
+  },
+].filter((b) => b.items.length > 0);
+
+// A topic (track) page's own sub-pages, listed under the hero rather than only reachable from
+// the relation block at the foot of the page. Read from the taxonomy, so a new sub-page appears
+// here the moment it is added and no topic page keeps a hand-written list that can go stale.
+const subPages = tracks.find((t) => t.id === slug)?.pages ?? [];
+
+const nameGroups = [
+  { label: 'Products', entries: names.product },
+  { label: 'Tools', entries: names.tool },
+  { label: 'Models', entries: names.model },
+];
+---
+<Base title={`${technique.title} · Gradient Ascent`} description={technique.summary}>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href={url('/')}>Home</a>
+    <span aria-hidden="true">/</span>
+    <a href={url('/techniques/')}>Techniques</a>
+    <span aria-hidden="true">/</span>
+    <a href={levelHref}>{technique.levelLabel}</a>
+    <span aria-hidden="true">/</span>
+    <span>{technique.title}</span>
+  </nav>
+
+  <div class="page-hero leveled" style={`--c:${color}`}>
+    <Eyebrow label={technique.levelLabel} color={color} />
+    <h1>{technique.title}</h1>
+    <p>{technique.summary}</p>
+    {/* The level is already on the breadcrumb, the eyebrow and the hero's top rule; a fourth
+        copy as a pill beside the status was noise. */}
+    <p><Pill status={technique.status} /></p>
+  </div>
+
+  {
+    subPages.length > 0 && (
+      <section class="section">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow muted" style="--c:var(--ot)">In this topic</div>
+            <h2>{subPages.length} pages under {technique.title.toLowerCase()}</h2>
+          </div>
+          <p>Each one goes further into a part of this page than this page does.</p>
+        </div>
+        <div class="panel reading">
+          {subPages.map((p) => (
+            <TechniqueRow slug={p.slug} title={p.title} summary={p.summary} status={p.status} color="var(--ot)" />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    Content ? (
+      <div class="prose">
+        <Content />
+      </div>
+    ) : (
+      <p class="status-note">
+        This page is an outline. The diagram, a run you can step through, runnable code, failure
+        modes and an eval have not been written yet. The blocks below are generated from the
+        taxonomy and the registry, not written by hand.
+      </p>
+    )
+  }
+
+  {
+    relationBlocks.length > 0 && (
+      <section class="section">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow muted">How it connects</div>
+            <h2>Before, after and instead of this</h2>
+          </div>
+        </div>
+        <div class="relation-grid">
+          {relationBlocks.map((b) => (
+            <div class="relation-block">
+              <h3>{b.label}</h3>
+              <ul>
+                {b.items.map((item) => (
+                  <li>
+                    <i class="row-dot" style={`--c:${item.color}`}></i>
+                    <a href={item.href ?? url(`/techniques/${item.slug}/`)}>{item.title}</a>
+                    {item.note && <small>{item.note}</small>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section">
+    <div class="section-top">
+      <div>
+        <div class="eyebrow muted">Out there</div>
+        <h2>Named products, tools and models</h2>
+      </div>
+    </div>
+    <div class="panel">
+      <NameList
+        groups={nameGroups}
+        emptyText="No product, tool or model is registered against this page yet. The names index lists every one the site does name, and which technique each belongs to."
+      />
+      {names.product.length + names.tool.length + names.model.length === 0 && (
+        <p class="footnote" style="margin-top:10px">
+          <a href={url('/names/')} style="color:var(--accent)">Open the names index &rarr;</a>
+        </p>
+      )}
+    </div>
+    <p class="footnote">
+      Names listed {asOf}. {namesChecked.verified} of {namesChecked.total} registry entries have
+      been checked against the maker's own page; the registry marks the rest as unchecked.
+    </p>
+  </section>
+
+  {
+    sources.length > 0 && (
+      <section class="section">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow muted">Where this comes from</div>
+            <h2>Primary sources</h2>
+          </div>
+        </div>
+        <Sources sources={sources} />
+      </section>
+    )
+  }
+
+  {reviewedISO && <Reviewed date={reviewedISO} mdHref={url(`/techniques/${slug}.md`)} />}
+</Base>

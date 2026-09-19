@@ -1,0 +1,59 @@
+---
+import Base from '../../layouts/Base.astro';
+import RecipeRow from '../../components/RecipeRow.astro';
+import RecipeMatrix from '../../components/RecipeMatrix.astro';
+import SectionTop from '../../components/SectionTop.astro';
+import { recipes, recipeLevels, allTechniqueSlugs, techniqueBySlug } from '../../lib/content';
+
+// The matrix takes plain data, not taxonomy objects (see lib/matrix.ts), so it is shaped here.
+const matrixTechniques = allTechniqueSlugs
+  .map((slug) => techniqueBySlug(slug)!)
+  .map((t) => ({ slug: t.slug, title: t.title, level: t.level }));
+const matrixRecipes = recipes.map((r) => ({ slug: r.slug, title: r.title, uses: r.uses }));
+const usedSlugs = new Set(recipes.flatMap((r) => r.uses));
+const columnCount = matrixTechniques.filter((t) => usedSlugs.has(t.slug)).length;
+---
+<Base
+  title="Recipes · Gradient Ascent"
+  description="Common tasks and the levels they need. Each recipe lists the techniques it uses and why it does not need a higher level."
+>
+  <div class="page-hero">
+    <div class="eyebrow muted"><span class="dot"></span>Recipes</div>
+    <h1>Common tasks and the levels they need</h1>
+    <p>A recipe is a use case composed from techniques, with the reasoning for each choice. Every recipe names the techniques it uses.</p>
+  </div>
+  <section class="section">
+    <SectionTop
+      eyebrow="All recipes"
+      title={`${recipes.length} recipes`}
+      aside="All twelve are drafts. The left column lists the levels a recipe draws on; the right names the highest one it needs."
+    />
+    <div class="signal-list">
+      {
+        recipes.map((r) => (
+          <RecipeRow
+            slug={r.slug}
+            title={r.title}
+            summary={r.summary}
+            levels={recipeLevels(r)}
+            meta={r.running_task ? 'Used as the running example' : undefined}
+          />
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <SectionTop
+      eyebrow="Use case × pattern"
+      title={`${recipes.length} recipes across ${columnCount} techniques`}
+      aside={`Every technique some recipe uses gets a column, grouped and coloured by level; the ${matrixTechniques.length - columnCount} pages no recipe uses are left out. A filled cell means that recipe uses that technique. The grid scrolls sideways inside its own box; on a narrow screen it is a list instead.`}
+    />
+    <RecipeMatrix recipes={matrixRecipes} techniques={matrixTechniques} />
+    <p class="footnote reading">
+      The columns say which techniques earn their place across many jobs and which are specialised.
+      A recipe's own page gives the reasoning for each choice, and says why it does not need a
+      higher level.
+    </p>
+  </section>
+</Base>

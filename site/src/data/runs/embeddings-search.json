@@ -1,0 +1,54 @@
+{
+  "illustrative": true,
+  "h": 420,
+  "title": "Embeddings and search",
+  "sub": "Index the corpus once, then rank it two ways for the same query: by embedding, and by keyword.",
+  "pill": "Level 2 · Context",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 34, "l": "Query", "k": "io" },
+    { "id": "chunk", "x": 170, "y": 104, "l": "Chunk the corpus", "k": "code" },
+    { "id": "idx", "x": 170, "y": 176, "l": "Vector index", "k": "store" },
+    { "id": "sem", "x": 170, "y": 250, "l": "Rank by similarity", "k": "code" },
+    { "id": "key", "x": 170, "y": 322, "l": "Rank by keyword", "k": "code" },
+    { "id": "a", "x": 170, "y": 392, "l": "Compared result sets", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "chunk", "by": "code" },
+    { "id": "e2", "f": "chunk", "t": "idx", "by": "code" },
+    { "id": "e3", "f": "idx", "t": "sem", "by": "code" },
+    { "id": "e4", "f": "sem", "t": "key", "by": "code" },
+    { "id": "e5", "f": "key", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The query arrives",
+      "d": "\"DW-300 Normal cycle water use\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code chunks the corpus, section by section",
+      "d": "79 sections across 12 documents",
+      "m": "79 chunks"
+    },
+    {
+      "e": "e3",
+      "h": "Your code embeds every chunk once and ranks them by cosine similarity to the query",
+      "d": "dw300-manual#3   0.46\ndw300-manual#8   0.40\ndw480-manual#3   0.37",
+      "m": "79 chunks embedded · top 3 kept"
+    },
+    {
+      "e": "e4",
+      "h": "Your code ranks the same query by BM25 keyword score",
+      "d": "dw300-manual#3   12.40\ndw480-manual#3   10.61\nspecs-comparison#2   9.65",
+      "m": "top 3 kept"
+    },
+    {
+      "e": "e5",
+      "h": "Your code compares the two result sets",
+      "d": "2 of 3 sections agree: dw300-manual#3, dw480-manual#3\ntop hit matches on both sides",
+      "m": "no model call in this run"
+    }
+  ]
+}

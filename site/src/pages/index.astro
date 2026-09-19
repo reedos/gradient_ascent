@@ -1,0 +1,154 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionTop from '../components/SectionTop.astro';
+import ClimbCurve from '../components/ClimbCurve.astro';
+import TimelineStrip from '../components/TimelineStrip.astro';
+import Principles from '../components/Principles.astro';
+import RecipeRow from '../components/RecipeRow.astro';
+import LevelStack from '../components/islands/LevelStack';
+import LevelExplorer from '../components/islands/LevelExplorer';
+import RunDiagram from '../components/islands/RunDiagram';
+import type { RunData, RunDef } from '../components/islands/RunDiagram';
+import { url } from '../lib/url';
+import { levels, tracks, taxonomy, counts, asOf, recipes, recipeLevels, nameGroupsForLevel, namesChecked } from '../lib/content';
+import ragRun from '../data/runs/rag.json';
+import agenticRun from '../data/runs/agentic-rag.json';
+
+const levelStackItems = levels.map((t) => ({ order: t.order, title: t.title, short: t.short }));
+const levelDetails = levels.map((t) => ({
+  order: t.order,
+  title: t.title,
+  who: t.who,
+  description: t.description,
+  pages: t.pages.map((p) => ({ slug: p.slug, title: p.title, summary: p.summary, status: p.status })),
+  names: nameGroupsForLevel(t.order),
+}));
+const tracksDetail = {
+  title: taxonomy.tracks_overview.title,
+  who: taxonomy.tracks_overview.who,
+  description: taxonomy.tracks_overview.description,
+  // Each topic, followed by its own pages, the same shape techniques/index.astro uses.
+  pages: tracks.flatMap((t) => [
+    { slug: t.id, title: t.title, summary: t.summary, status: t.status },
+    ...(t.pages ?? []).map((p) => ({ slug: p.slug, title: p.title, summary: p.summary, status: p.status })),
+  ]),
+  names: nameGroupsForLevel('tracks'),
+};
+
+const runs: RunDef[] = [
+  { key: 'rag', label: 'Level 2 · RAG', data: ragRun as RunData },
+  { key: 'agentic-rag', label: 'Level 5 · Agentic RAG', data: agenticRun as RunData, accentPill: true },
+];
+
+// The four recipes the prototype shows on the home page. Everything about them, the running-task
+// flag included, comes from content/taxonomy.json.
+const HOME_RECIPES = ['document-qa', 'inbox-triage', 'research-brief', 'document-extraction'];
+const homeRecipes = HOME_RECIPES.map((slug) => {
+  const recipe = recipes.find((r) => r.slug === slug)!;
+  return {
+    recipe,
+    meta: recipe.running_task ? 'Used as the running example' : undefined,
+    levels: recipeLevels(recipe),
+  };
+});
+---
+<Base
+  title="Gradient Ascent — every way to work with AI, from a question to a workforce"
+  description="A guide to the main ways of using a language model, from one chat message to agents that run on their own, grouped into eight levels ordered by how much the model decides for itself."
+>
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="dot"></span>A guide to AI techniques, simplest first</div>
+      <h1>Every way to work with AI, from a question to a <em>workforce</em>.</h1>
+      <p class="hero-description">
+        AI is changing how work gets done. Here is the whole map: the main ways to use a language
+        model, from a single chat message to teams of agents that run on their own, grouped into
+        eight levels by how much the model decides for itself.
+      </p>
+      <div class="hero-actions">
+        <a class="button" href="#levels">Browse the levels <span aria-hidden="true">&rarr;</span></a>
+        <a class="text-link" href="#example">See a worked example <span aria-hidden="true">&rarr;</span></a>
+      </div>
+      <div class="hero-meta">
+        <span>{counts.techniques} techniques</span>
+        <span>{counts.recipes} recipes</span>
+        <span>{counts.named} named models, products and tools</span>
+        <span>Names listed {asOf}</span>
+      </div>
+    </div>
+    <div class="hero-art">
+      <div id="art">
+        <LevelStack levels={levelStackItems} client:load />
+      </div>
+      <div class="art-caption">
+        <span>Bottom: simplest</span>
+        <span>Top: most autonomous</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="climb">
+    <SectionTop
+      eyebrow="The climb"
+      title="Four ways to work with AI, and the eight levels underneath"
+      aside="Each step hands more of the work to the model. Pick the lowest one that does the job."
+    />
+    <ClimbCurve />
+  </section>
+
+  <section class="section" id="timeline">
+    <TimelineStrip variant="home" />
+  </section>
+
+  <p class="stack-thesis">
+    Each level adds capability. It also adds cost, delay and more ways to fail. <strong>Move up
+    a level only when the one below does not do the job.</strong>
+  </p>
+
+  <section class="section" id="levels">
+    <SectionTop
+      eyebrow="Levels"
+      title="Eight levels, and what is in each"
+      aside="Choose a level, here or on the diagram above, to see its techniques and the products, tools and models that use them."
+    />
+    <LevelExplorer levels={levelDetails} tracksDetail={tracksDetail} initialLevel={1} client:load />
+    <p class="footnote">
+      Names listed {asOf}. {namesChecked.verified} of {namesChecked.total} registry entries have
+      been checked against the maker's own page; the registry marks the rest as unchecked.
+    </p>
+  </section>
+
+  <section class="section" id="example">
+    <SectionTop
+      eyebrow="Worked example"
+      title="The same question at two levels"
+      aside="Step through each run. A solid line is a step your code chose. A dashed line is a step the model chose."
+    />
+    <RunDiagram runs={runs} client:visible />
+  </section>
+
+  <section class="section" id="recipes">
+    <SectionTop
+      eyebrow="Recipes"
+      title="Common tasks and the levels they need"
+      aside="Each recipe lists the techniques it uses and explains why it does not need a higher level."
+    />
+    <div class="signal-list">
+      {
+        homeRecipes.map(({ recipe, meta, levels: lv }) => (
+          <RecipeRow slug={recipe.slug} title={recipe.title} summary={recipe.summary} levels={lv} meta={meta} />
+        ))
+      }
+    </div>
+    <a class="section-link" href={url('/recipes/')}>See all recipes &rarr;</a>
+  </section>
+
+  <section class="section" id="principles">
+    <SectionTop
+      eyebrow="Premise and principles"
+      title="Why this site exists and how it works"
+      aside="The full method page covers how levels are defined, how pages are written and how results are measured."
+    />
+    <Principles />
+  </section>
+</Base>

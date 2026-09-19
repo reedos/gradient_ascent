@@ -1,0 +1,30 @@
+---
+import { url } from '../lib/url';
+
+interface Props {
+  slug: string;
+  title: string;
+  summary: string;
+  levels: number[];
+  meta?: string;
+}
+const { slug, title, summary, levels, meta } = Astro.props;
+const layerText = levels.length ? levels.map((l) => `Level ${l}`).join(' + ') : 'Topics';
+// The right-hand column says which level governs the recipe; repeating the left column there
+// tells the reader nothing.
+const metaText = meta ?? (levels.length ? `Needs level ${Math.max(...levels)}` : 'Topics only');
+---
+<div class="signal-row">
+  <div class="signal-layer">
+    {levels.map((l) => <i style={`--c:var(--o${l})`} />)}
+    <span>{layerText}</span>
+  </div>
+  <div class="signal-body">
+    <h3><a href={url(`/recipes/${slug}/`)}>{title}</a></h3>
+    <p>{summary}</p>
+  </div>
+  <div class="signal-meta">{metaText}</div>
+  <a href={url(`/recipes/${slug}/`)} aria-label={`Open ${title}`}>
+    &#8599;
+  </a>
+</div>

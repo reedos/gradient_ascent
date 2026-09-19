@@ -1,0 +1,55 @@
+{
+  "illustrative": true,
+  "h": 766,
+  "title": "Model Context Protocol",
+  "sub": "The model picks a tool listed by a server; a stand-in client and server carry the call.",
+  "pill": "Level 4 · Tools",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
+    { "id": "list", "x": 170, "y": 174, "l": "list tools (tools/list)", "k": "code" },
+    { "id": "decide", "x": 170, "y": 314, "l": "picks a tool, or answers", "k": "model" },
+    { "id": "server", "x": 170, "y": 454, "l": "MCP server (tools/call)", "k": "tool" },
+    { "id": "final", "x": 170, "y": 594, "l": "answers using the result", "k": "model" },
+    { "id": "a", "x": 170, "y": 734, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "list", "by": "code" },
+    { "id": "e2", "f": "list", "t": "decide", "by": "code" },
+    { "id": "e3", "f": "decide", "t": "server", "by": "model" },
+    { "id": "e4", "f": "server", "t": "final", "by": "code" },
+    { "id": "e5", "f": "final", "t": "a", "by": "code" },
+    { "id": "e6", "f": "decide", "t": "a", "by": "model", "b": -160 }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"What does part HLV-2205 cost?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code asks the server what tools it has",
+      "d": "tools/list → search_halvorsen_docs",
+      "m": "1 tool · 2 ms"
+    },
+    {
+      "e": "e3",
+      "h": "The model decides to call the tool",
+      "d": "→ search_halvorsen_docs(query=\"HLV-2205\")\n(it could have answered directly instead)",
+      "m": "~210 tokens in · 16 tokens out · 0.6 s"
+    },
+    {
+      "e": "e4",
+      "h": "The MCP server runs the search and replies",
+      "d": "tools/call → [parts-list#2] Dishwasher Parts\n\"HLV-2205, Drain Pump, $52.00\"",
+      "m": "1 result · 3 ms"
+    },
+    {
+      "e": "e5",
+      "h": "The model answers using the result",
+      "d": "\"HLV-2205 is a drain pump. It costs $52.00\n[parts-list#2].\"",
+      "m": "~230 in · 20 out · 0.7 s"
+    }
+  ]
+}

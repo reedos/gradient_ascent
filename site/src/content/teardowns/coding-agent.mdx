@@ -1,0 +1,182 @@
+---
+slug: coding-agent
+products: [claude-code, codex, cursor]
+reviewed: 2026-09-18
+sources:
+  - title: "Claude Code by Anthropic | AI Coding Agent, Terminal, IDE"
+    url: "https://claude.com/product/claude-code"
+    publisher: "Anthropic"
+    accessed: "2026-09-18"
+  - title: "How the agent loop works"
+    url: "https://code.claude.com/docs/en/agent-sdk/agent-loop"
+    publisher: "Anthropic (Claude Agent SDK documentation)"
+    accessed: "2026-09-18"
+  - title: "Create custom subagents"
+    url: "https://code.claude.com/docs/en/subagents"
+    publisher: "Anthropic (Claude Code documentation)"
+    accessed: "2026-09-18"
+  - title: "Agent Skills"
+    url: "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview"
+    publisher: "Anthropic"
+    accessed: "2026-09-18"
+  - title: "Extend Claude with skills"
+    url: "https://code.claude.com/docs/en/skills"
+    publisher: "Anthropic (Claude Code documentation)"
+    accessed: "2026-09-18"
+  - title: "Checkpointing"
+    url: "https://code.claude.com/docs/en/checkpointing"
+    publisher: "Anthropic (Claude Code documentation)"
+    accessed: "2026-09-18"
+  - title: "Sandbox"
+    url: "https://learn.chatgpt.com/codex/sandboxing"
+    publisher: "OpenAI (Codex documentation)"
+    accessed: "2026-09-18"
+  - title: "Agent approvals & security"
+    url: "https://learn.chatgpt.com/codex/agent-approvals-security"
+    publisher: "OpenAI (Codex documentation)"
+    accessed: "2026-09-18"
+  - title: "Search"
+    url: "https://cursor.com/docs/agent/tools/search"
+    publisher: "Cursor (Anysphere)"
+    accessed: "2026-09-18"
+  - title: "Agent overview"
+    url: "https://cursor.com/docs/agent/overview"
+    publisher: "Cursor (Anysphere)"
+    accessed: "2026-09-18"
+---
+
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+
+## What you see
+
+Type a request into a terminal or an editor: fix the bug where checkout charges twice, or add a
+dark-mode toggle. A few seconds later the tool has already read the files that matter, proposed or
+made a change, and run the project's tests. If a test fails, it reads the failure and tries again
+on its own. When it stops, it tells you what it did and shows a diff to review. Claude Code, Codex
+and Cursor all work this way.
+
+That loop is the whole difference from a chatbot that writes code. A chatbot hands you a code
+block; you paste it in, run it yourself, and copy any error back into the chat for another try. A
+coding agent runs the command itself, reads what came back, and decides whether that counts as
+done. The write-run-read-fix loop that used to live in your head now runs inside the tool, and the
+tool decides when to stop.
+
+## What is happening underneath
+
+Strip away the editor and the terminal, and a coding agent is a
+<Link href="/techniques/single-agent/">single agent</Link> whose tools happen to be read, search,
+edit and run, instead of a research agent's. Anthropic describes the mechanism plainly, and says
+the same loop powers Claude Code: "Claude evaluates your prompt, calls tools to take action,
+receives the results, and repeats until the task is complete"<Cite n={2}/>. The loop ends when a
+turn comes back with no tool call in it. Code fits it unusually well, because a test is a check a
+computer can run rather than a judgment call, and
+<Link href="/techniques/coding-agents/">coding agents</Link> is the page on why that matters.
+
+Getting to the right files is its own mechanism, and the two makers who document theirs document
+different ones. Claude Code's page says it "maps and explains entire codebases in a few seconds"
+using "agentic search to understand project structure and dependencies without you having to
+manually select context files"<Cite n={1}/>: it searches its way in, the way a person would. Cursor
+describes a search engine instead, "Instant Grep, a custom search engine that outperforms ripgrep
+on large codebases"<Cite n={9}/>, and says where it runs: "Instant Grep builds and queries its
+index on your machine."<Cite n={9}/> Cursor is also specific about what that does not cover: "When
+Agent opens a match, that file content can still be included in the model request."<Cite n={9}/>
+Search decides what the agent puts in the window, not what the window ends up holding.
+
+Beside the loop sits a place for standing instructions, and Anthropic's documentation separates two
+kinds by when they load. A project file loads once and stays: the SDK documentation lists
+`CLAUDE.md` files as loading at "Session start" with their "Full content in every request (but
+prompt-cached, so only the first request pays full cost)"<Cite n={2}/>. A skill does not: "Unlike
+CLAUDE.md content, a skill's body loads only when it's used, so long reference material costs
+almost nothing until you need it."<Cite n={5}/> That is the
+<Link href="/techniques/skills/">skills</Link> mechanism, a procedure kept on the shelf rather than
+carried into every request.
+
+A task too large for one context can spawn smaller agents instead. Anthropic's documentation puts
+it plainly: "Each subagent runs in its own context window with a custom system prompt, specific
+tool access, and independent permissions."<Cite n={3}/> Cursor's Explore subagent does a version of
+the same job: it "runs in its own context window with a faster model" and "executes many parallel
+searches without bloating the main conversation"<Cite n={9}/>. Either way this is the shape
+<Link href="/techniques/orchestrator-workers/">lead agent and workers</Link> names: one model's
+output decides what another model is asked to do, while your code still bounds every worker.
+
+What a coding agent may do without asking is a setting, not a personality trait. OpenAI's
+documentation names the split for Codex: a sandbox "is the boundary that lets the agent act
+autonomously without giving it unrestricted access to your machine"<Cite n={7}/>, and that is
+separate from permission: "The sandbox defines technical boundaries. The approval policy decides
+when the agent must stop and ask before crossing them."<Cite n={7}/> OpenAI also states Codex's
+starting position: "By default, the agent runs with network access turned off."<Cite n={8}/>
+Reviewing what ran inside that boundary is
+<Link href="/techniques/safety/">safety, privacy and governance</Link>'s territory.
+
+Long sessions outgrow the window. Anthropic's SDK documentation says that when the context window
+"approaches its limit, the SDK automatically compacts the conversation: it summarizes older history
+to free space, keeping your most recent exchanges and key decisions intact"<Cite n={2}/>. What
+survives a compaction is a harness decision, covered on
+<Link href="/techniques/agent-harness/">the agent harness</Link>, not a fact about the model
+answering that turn.
+
+## Which page explains each part
+
+| What you see | What it is | Page |
+|---|---|---|
+| Finds and edits the right files without being told which | A single agent's tool loop | <Link href="/techniques/single-agent/">Single agent</Link> |
+| Writes code, then runs the tests itself | A loop with a check a computer can run | <Link href="/techniques/coding-agents/">Coding agents</Link> |
+| Follows standing instructions, loads a procedure only when needed | A project file every turn, a skill on demand | <Link href="/techniques/skills/">Skills</Link> |
+| Hands part of a task to another instance, keeps only the summary | A lead model delegating to workers | <Link href="/techniques/orchestrator-workers/">Lead agent and workers</Link> |
+| Asks before touching the network or a file outside the project | Sandboxing and an approval policy | <Link href="/techniques/safety/">Safety, privacy and governance</Link> |
+| Keeps working through a long session without losing the task | Context compaction inside the harness | <Link href="/techniques/agent-harness/">The agent harness</Link> |
+
+## What the makers say
+
+Three makers, in their own words, on what sits around the model. Anthropic describes the safety net
+around a Claude Code session as a habit built into every turn rather than a manual save:
+checkpointing "automatically captures the state of your code before each prompt you send that
+starts a turn"<Cite n={6}/>. OpenAI describes the sandbox as a trust boundary rather than a
+judgment about the agent's intentions: "You aren't just trusting the agent's intentions; you are
+trusting that the agent is operating inside enforced limits."<Cite n={7}/> Cursor describes its
+agent as components it tunes per model: "Cursor's agent orchestrates these components for each
+model we support, tuning instructions and tools specifically for every frontier model"<Cite
+n={10}/>. All three describe a system built around the model, which is the reason this kind of
+product is worth taking apart.
+
+## Where it fails
+
+A fix that passes the test it was pointed at can still break something else.
+<Link href="/techniques/coding-agents/">Coding agents</Link>' own failure modes name that one first,
+and the check they give is running the whole suite after the agent reports success.
+
+A loaded skill can be the failure itself. Anthropic warns that "a malicious Skill can direct Claude
+to invoke tools or execute code in ways that don't match the Skill's stated purpose"<Cite n={4}/>,
+so a skill checked into a shared repo needs the same review as the code around it.
+
+An undo is narrower than it looks. Claude Code's documentation states two limits: "Checkpointing
+does not track files modified by Bash commands"<Cite n={6}/>, and "A subagent makes edits with
+Claude's file editing tools, but Claude Code usually doesn't capture those edits in your session's
+checkpoints"<Cite n={6}/>. A rewind can miss the change a shell command or a delegated worker made.
+
+A sandbox is only as tight as the mode it runs in. Codex's most permissive setting "removes the
+filesystem and network boundaries and should be used only when you want the agent to act with full
+access"<Cite n={7}/>, worth reading before switching to it for convenience.
+
+## If you build one
+
+Start at level 5, not higher. A <Link href="/techniques/single-agent/">single agent</Link> loop over
+a small, well-chosen tool set is most of the value here, and
+<Link href="/techniques/coding-agents/">coding agents</Link>' build lane shows a working version.
+Add a project instruction file next: it is the cheapest thing on this list, and Anthropic's own
+documentation treats it as the default home for standing facts, with skills for anything that has
+grown into a procedure<Cite n={5}/>.
+
+Reach for <Link href="/techniques/skills/">skills</Link> only once there is more than one standing
+procedure, and for <Link href="/techniques/orchestrator-workers/">lead agent and workers</Link> only
+once a task genuinely does not fit inside one context window. Both cost real tokens and real
+complexity.
+
+Decide the permission model and the sandbox boundary before the first real run rather than after a
+bad one. That is <Link href="/techniques/safety/">safety, privacy and governance</Link>'s
+territory, and OpenAI gives the reason to settle it early: a boundary you have already approved is
+what lets the agent "read files, make edits, and run routine project commands" without confirming
+each one<Cite n={7}/>. The closest recipe here is
+<Link href="/recipes/repo-assistant/">coding assistant on your own repo</Link>, which assembles
+those same three pieces.

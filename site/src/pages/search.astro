@@ -1,0 +1,85 @@
+---
+// /search/ -- a static, client-side search over the site's own data (finish-search). No
+// third-party service, and after the first load no server round trip: the whole index is
+// search-index.json.ts, built once from the same content.ts/indexes.ts helpers every other page
+// uses. With JavaScript off this page still works, as a plain listing of everything grouped by
+// kind -- a sitemap a person can search with the browser's own find. Progressive-enhancement
+// toggle (".search-js-only"/".search-noscript-only") matches worksheet.astro's pattern exactly.
+import Base from '../layouts/Base.astro';
+import Search from '../components/islands/Search';
+import { buildSearchDocs } from '../lib/search-docs';
+import { KIND_ORDER, KIND_LABEL, type SearchDoc } from '../lib/search';
+import '../styles/search.css';
+
+const docs = await buildSearchDocs();
+const groups = KIND_ORDER.map((kind) => ({
+  kind,
+  label: KIND_LABEL[kind],
+  items: docs.filter((d) => d.kind === kind),
+})).filter((g) => g.items.length > 0);
+
+function levelColor(level: SearchDoc['level']): string | undefined {
+  if (level === undefined) return undefined;
+  return level === 'tracks' ? 'var(--ot)' : `var(--o${level})`;
+}
+---
+<Base
+  title="Search · Gradient Ascent"
+  description={`Search every technique, recipe, level, glossary term, name and failure mode on the site -- ${docs.length} entries.`}
+>
+  <div class="page-hero">
+    <div class="eyebrow muted"><span class="dot"></span>Search</div>
+    <h1>Search the site</h1>
+    <p>
+      Every technique, recipe, level, glossary term, name and failure mode on the site --{' '}
+      {docs.length} entries in all. Nothing typed here is sent anywhere: the whole index loads
+      once and every search runs in your browser.
+    </p>
+  </div>
+
+  <div class="search-js-only">
+    <Search client:load />
+  </div>
+
+  <div class="search-noscript-only">
+    <p class="footnote reading" style="margin-bottom:22px">
+      JavaScript is off, or still loading, so here is everything on the site at once, grouped the
+      way search results would be. Use your browser's own find-in-page (usually Ctrl/Cmd-F) to
+      search this list.
+    </p>
+    {
+      groups.map((g) => (
+        <section class="search-group">
+          <div class="subhead">
+            {g.label}
+            <span>{g.items.length}</span>
+          </div>
+          <div class="search-results">
+            {g.items.map((item) => {
+              const color = levelColor(item.level);
+              return (
+                <div class="search-result">
+                  <a class="search-result-link" href={item.url}>
+                    {color && <i class="row-dot" style={`--c:${color}`} />}
+                    {item.title}
+                  </a>
+                  {item.meta && <span class="search-result-meta">{item.meta}</span>}
+                  {item.summary && <p class="search-result-summary">{item.summary}</p>}
+                  {item.secondaryUrl && (
+                    <a class="search-result-secondary" href={item.secondaryUrl}>
+                      {item.secondaryLabel ?? 'More'} &rarr;
+                    </a>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</Base>
+
+<script is:inline>
+  document.documentElement.classList.add('js');
+</script>

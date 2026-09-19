@@ -1,0 +1,32 @@
+---
+// Named failure modes: each with how to notice it in production and how to test for it before
+// production. Feeds the site's generated failure gallery later; for now this is the per-page
+// list the anatomy calls for.
+interface Mode {
+  name: string;
+  notice: string;
+  test: string;
+}
+interface Props {
+  modes: Mode[];
+}
+const { modes } = Astro.props;
+---
+
+<div class="panel reading failure-modes">
+  {
+    modes.map((m) => (
+      <div class="failure-mode">
+        {/* h3, not h4: this block sits directly under the page's "## Failure modes" h2, and a
+            jump from h2 to h4 breaks the heading outline a screen reader navigates by. */}
+        <h3>{m.name}</h3>
+        <dl>
+          <dt>How to notice it</dt>
+          <dd>{m.notice}</dd>
+          <dt>How to test for it</dt>
+          <dd>{m.test}</dd>
+        </dl>
+      </div>
+    ))
+  }
+</div>

@@ -1,0 +1,330 @@
+/* The worksheet page and island (site/src/pages/worksheet.astro, site/src/components/islands/
+   Worksheet.tsx). Built from the same tokens, hairlines, panel/pill/filter shapes as everything
+   in global.css -- no new colour, font, radius or shadow. Imported once, from the page, so the
+   same class names style both the server-rendered no-JS fallback and the client island. */
+
+/* Progressive-enhancement toggle: a tiny inline script on the page (not the island bundle) adds
+   "js" to <html> the moment it can run, before paint. Until then -- no JavaScript at all -- the
+   plain reading-list fallback shows and the interactive card stays hidden, so a no-JS visitor
+   never sees a question card whose buttons cannot do anything. */
+.ws-js-only {
+  display: none;
+}
+.ws-noscript-only {
+  display: block;
+}
+html.js .ws-js-only {
+  display: block;
+}
+html.js .ws-noscript-only {
+  display: none;
+}
+
+.ws-progress {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.ws-progress-bar {
+  flex: 1;
+  max-width: 260px;
+  height: 4px;
+  border-radius: 3px;
+  background: var(--line);
+  overflow: hidden;
+}
+.ws-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent);
+  transition: width 0.25s;
+}
+
+.ws-card {
+  max-width: 640px;
+}
+.ws-question h3 {
+  font-size: 21px;
+  letter-spacing: -0.4px;
+  line-height: 1.4;
+  margin: 0 0 10px;
+}
+.ws-help {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0 0 20px;
+}
+
+.ws-answers {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 0 0 22px;
+}
+.ws-answer.filter {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 13px 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  border-radius: 6px;
+}
+.ws-answer.filter:hover {
+  border-color: var(--muted);
+}
+
+.ws-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 4px;
+  border-top: 1px solid var(--line);
+  margin-top: 4px;
+  padding-top: 16px;
+}
+.ws-controls button {
+  font-size: 12px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  background: var(--panel2);
+  border-radius: 5px;
+  padding: 8px 14px;
+}
+.ws-controls button:hover:not(:disabled) {
+  border-color: var(--muted);
+  color: var(--text);
+}
+.ws-controls button:disabled {
+  opacity: 0.4;
+}
+
+/* -- Result view -- */
+.ws-result-hero {
+  border-top: 2px solid var(--c, var(--accent));
+  padding-top: 22px;
+  margin-bottom: 8px;
+}
+.ws-result-hero h2 {
+  font-size: clamp(28px, 4vw, 40px);
+  letter-spacing: -1.2px;
+  line-height: 1.15;
+  margin: 12px 0 12px;
+}
+.ws-result-hero p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+  max-width: 640px;
+}
+
+.ws-reasons {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.ws-reasons li {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+.ws-reasons li:first-child {
+  padding-top: 0;
+}
+.ws-reasons li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.ws-reasons b {
+  display: block;
+  color: var(--text);
+  font-weight: 550;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.ws-caution-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ws-caution {
+  padding: 15px 18px;
+  border-left: 2px solid var(--accent);
+  background: var(--panel2);
+  border-radius: 0 6px 6px 0;
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+.ws-caution strong {
+  display: block;
+  color: var(--text);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.ws-caution-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.ws-caution-links a {
+  font-size: 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: var(--text);
+  background: var(--panel);
+}
+.ws-caution-links a:hover {
+  border-color: var(--muted);
+}
+.ws-no-cautions {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.ws-next-up {
+  padding: 16px 20px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.ws-next-up strong {
+  display: block;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 550;
+  margin-bottom: 6px;
+}
+
+.ws-result-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 22px;
+  font-size: 12px;
+  margin-top: 4px;
+}
+.ws-result-links a {
+  color: var(--accent);
+}
+.ws-result-links a:hover {
+  text-decoration: underline;
+}
+
+/* -- No-JavaScript fallback: a plain numbered reading of the tree, then all eight results. -- */
+.ws-static-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: ws-q;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.ws-static-q {
+  counter-increment: ws-q;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+}
+.ws-static-q:first-child {
+  padding-top: 0;
+}
+.ws-static-q:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.ws-static-q > .ws-static-num {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 600 10px var(--font);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.ws-static-num::before {
+  content: counter(ws-q, decimal-leading-zero);
+  color: var(--accent);
+}
+.ws-static-q h3 {
+  font-size: 16px;
+  letter-spacing: -0.2px;
+  margin: 0 0 12px;
+}
+.ws-static-answers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ws-static-answers li {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+  padding-left: 16px;
+  position: relative;
+}
+.ws-static-answers li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line);
+}
+.ws-static-answers a {
+  color: var(--text);
+}
+.ws-static-answers a:hover {
+  text-decoration: underline;
+}
+.ws-static-outcome {
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+.ws-level-section {
+  scroll-margin-top: 110px;
+  padding: 30px 0;
+  border-top: 1px solid var(--line);
+}
+.ws-level-section:first-child {
+  border-top: 0;
+}
+
+@media (max-width: 600px) {
+  .ws-answer.filter {
+    padding: 12px 14px;
+    font-size: 12.5px;
+  }
+  .ws-progress {
+    flex-wrap: wrap;
+  }
+  .ws-progress-bar {
+    max-width: none;
+    width: 100%;
+    order: 2;
+  }
+}

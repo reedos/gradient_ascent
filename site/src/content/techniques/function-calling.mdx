@@ -1,0 +1,238 @@
+---
+slug: function-calling
+level: 4
+run: function-calling
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Tool use with Claude"
+    url: "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview"
+    publisher: "Anthropic"
+    accessed: "2026-09-18"
+  - title: "Handle tool calls"
+    url: "https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls"
+    publisher: "Anthropic"
+    accessed: "2026-09-18"
+  - title: "Parallel tool use"
+    url: "https://platform.claude.com/docs/en/agents-and-tools/tool-use/parallel-tool-use"
+    publisher: "Anthropic"
+    accessed: "2026-09-18"
+  - title: "Function calling"
+    url: "https://developers.openai.com/api/docs/guides/function-calling"
+    publisher: "OpenAI (API documentation)"
+    accessed: "2026-09-18"
+  - title: "Function calling with the Gemini API"
+    url: "https://ai.google.dev/gemini-api/docs/function-calling"
+    publisher: "Google (Gemini API documentation)"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import functionCallingRun from '../../data/runs/function-calling.json';
+
+Function calling gives the model a fixed list of actions your code defined, each with a name, a
+description and an argument schema, and lets it choose whether to use one, which one, and what to
+put in the arguments. Anthropic calls the same mechanism tool use: "Claude determines
+when to call a tool based on the user's request and the tool's description. It then returns a
+structured call that your application executes (client tools) or that Anthropic executes (server
+tools)"<Cite n={1}/>. The model produces a call, not an effect; this page is about the first of
+those two cases, where your own code runs it.
+
+Function calling sits at level 4, tools. The one real choice in a run is the model's: which
+action, if any, and with what arguments — the `decided_by: "model"` step in the run below. Your
+code decides which actions to offer, runs whichever one gets chosen, and asks for the final
+answer. That is the line to level 5: here the model chooses once, inside a run your code bounds;
+a single agent chooses again after every result, and leaves the loop only when it decides to.
+
+This page is marked draft, not published: function calling has no recorded trace and no scored
+result file yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={functionCallingRun} label="Level 4 · Function calling" runKey="function-calling" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+If a chat app's plugin, connector or "action" feature has ever done something beyond answering
+from its own knowledge — checked a calendar, looked something up in a connected tool, filed a
+ticket — you have used function calling. Custom GPTs with actions, Claude connectors and Gemini
+connected apps are the same mechanism wearing a product name: the app offers the model a list of
+actions, the model picks one when the request calls for it, and the product runs it for you.
+
+Whether anything gets called at all is a judgment call the model makes on its own, not a fixed
+switch. Anthropic documents the default this way: "It calls a tool when the request maps to that
+tool's described capability and the answer isn't already in context"<Cite n={1}/>. That cuts both
+ways. A question the model can already answer skips the tool entirely, which is usually what you
+want; a question that sounds like it needs a lookup but does not quite match any tool's
+description can also get answered from memory instead, with nothing in the chat bubble to tell
+you which one happened.
+
+That is the real question to ask about a product doing this on your behalf: not only whether it
+picked the right action, but what that action was allowed to do in the first place. OpenAI's own
+guide lists example tools ranging from a lookup to something with a real consequence: "Get
+today's weather for a location," "Access account details for a given user ID," and "Issue refunds
+for a lost order"<Cite n={4}/>. A tool that can only look something up fails safely if the model
+reaches for it by mistake; a tool that can issue a refund does not. If a product shows you the
+action and its arguments before it runs — not just the final answer — that is worth reading,
+especially for anything with a side effect.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+Every maker's API has the same two halves, so the code below is the shape you write against any
+of them. Google states the division plainly: "The model doesn't execute the function itself.
+Extract the name and args and execute in your application"<Cite n={5}/>.
+
+The example offers two tools, `search(query)` and `lookup_part(part_number)`, and lets the model
+call at most one of them. The system prompt says so directly, and the code enforces it a second
+way that does not depend on the model following instructions: only `first.tool_calls[0]` is ever
+run, and the follow-up call that asks for a final answer is not given the `tools` list at all, so
+there is nothing left for the model to call even if it wanted to. That second fact is where level
+4 stops and level 5 starts — capping the run at one action is a decision your code made in
+advance, not one the model makes about when to stop.
+
+<CodeFile file="examples/function_calling/run.py" func="run" />
+
+If the model's first response carries no tool call, that is still the one model decision this
+level records: it chose to answer directly rather than to act, the same kind of choice as the
+stop at level 5. If it asks for more than one tool at once — Anthropic notes that "by default,
+Claude may call multiple tools in a single response"<Cite n={3}/> — the code drops every call
+after the first and says so in the trace, rather than silently running one and hiding that a
+second was requested.
+
+`_run_tool` is the closest thing here to validating a call before acting on it: it checks the
+tool's name against the two it knows and falls through to `unknown_tool` for anything else,
+which reports the mismatch as text instead of raising. It does not check the *shape* of the
+arguments — `part_number` is read with a plain default, not checked against the schema — which
+is what a maker's own schema-conformance feature is for. Anthropic's tip on the same page as the
+quote above: "Add `strict: true` to your custom tool definitions to ensure Claude's tool calls
+always match your schema exactly"<Cite n={1}/>. OpenAI documents the same idea for its own
+schema: "Setting `strict` to `true` will ensure function calls reliably adhere to the function
+schema, instead of being best effort"<Cite n={4}/>. Run it yourself:
+
+<CodeFile file="examples/function_calling/README.md" start={16} end={16} lang="text" expect="python -m examples.function_calling" />
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try <Link href="/techniques/routing/">routing</Link> first if you already know, from the
+question's surface form, which single action applies — the model does not need to choose an
+action your code can already tell apart. Try <Link href="/techniques/prompt-chaining/">prompt
+chaining</Link>, or a plain conditional, if the set of actions is small and always runs in the
+same order regardless of what the model says.
+
+Move up to function calling once the right action depends on something only the model can judge
+from open-ended input — which of several tools applies, or whether none does — and getting that
+judgment wrong sometimes is cheap enough to tolerate.
+
+Two siblings at this level change where the action comes from rather than who chooses it. Reach
+for <Link href="/techniques/mcp/">MCP</Link> when more than one application needs the same tools,
+or the tools should come from a server you did not write: the model's decision is identical, and
+what moves is the boundary the call crosses. Reach for <Link
+href="/techniques/code-execution/">code execution</Link> when the thing you need done cannot be
+enumerated in advance as a list of named actions at all.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'Confident call, wrong or missing argument',
+    notice: "The model calls the right tool but the argument does not match anything real — a part number that was never in the parts list, a query that does not resemble the question — and the tool answers with whatever it was actually handed rather than what the reader meant.",
+    test: "Ask about a part number that does not exist and confirm the tool reports it as not found, rather than the model inventing a price to go with a citation that never backed one.",
+  },
+  {
+    name: 'Extra tool calls silently dropped',
+    notice: "The model asks for more than one action in a single turn, and only the first one visibly happens, with nothing telling you a second request existed at all.",
+    test: 'Script a model response with two tool calls and check the trace records that the extra one was dropped, not just that the first one ran.',
+  },
+  {
+    name: 'A tool result is treated as trustworthy text',
+    notice: 'A search result or a lookup can carry text written to look like an instruction, and nothing about being a tool result rather than a user message stops the model from reading it as one.',
+    test: "Anthropic's own guidance: \"an attacker who can influence it may embed instructions that try to redirect Claude (indirect prompt injection)\". Add a document section with an embedded instruction to the corpus and see whether a search that surfaces it changes the answer to match it.",
+  },
+  {
+    name: 'The model stops reaching for the tool at all',
+    notice: 'Across many similar questions, the share that get a tool call drops toward zero even though the documents still hold the answer, because the tool’s description drifted out of sync with what people actually ask.',
+    test: "Track how often decided_by: \"model\" ends in a tool call versus a direct answer over a batch of known-lookup questions; a falling rate with no change in the questions is a description problem, not a model problem.",
+  },
+  {
+    name: 'A tool is more powerful than the question needed',
+    notice: 'The call that ran was the right one, on the right input, but the tool itself could do more than this question ever required, so a future mistaken call has a bigger blast radius than a wrong answer.',
+    test: "List every tool offered for a given prompt and check whether each one's effect (what it can change, not just what it can read) matches what that prompt's questions actually need.",
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, tool used', value: '2' },
+    { label: 'Model calls, no tool needed', value: '1' },
+    { label: 'Tokens in, tool-call turn', value: '~190' },
+    { label: 'Tokens out, tool-call turn', value: '~14' },
+  ]}
+  comparedTo={{
+    label: 'RAG (level 2)',
+    note: 'RAG always retrieves and always calls the model once, so every question costs the same. Function calling asks the model first, so a question it can already answer costs one call instead of two; the second call only happens when the model decides a tool is needed.',
+  }}
+  level={4}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+Function calling is one of the examples the site's own 60-question set scores directly (see
+`docs/EVALS.md`), the same way RAG and routing are: it answers a question about the documents and
+cites what it used. Level 4 adds one more thing worth checking beyond the answer itself: a result
+file's `model_decided_steps` should equal the number of questions run, exactly — one model
+decision per question, never zero and never more than one. A number outside that range means the
+trace is wrong before the answer is even graded.
+
+Unlike routing, whose `--dry` projection follows the cheapest branch because the token-counting
+stand-in cannot produce a label the code recognizes, this example's branch depends on whether
+`tools` were offered, not on parsed text — and the stand-in calls the first tool every time tools
+are offered, so `--dry` already projects the tool-calling branch, the more expensive one.
+
+No result file exists for function calling yet. Run `python scripts/eval_run.py --example
+function_calling --model <spec> --dry` to project the cost of a real run before spending anything
+on one.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="The share of questions where decided_by is model that end in a tool call versus a direct answer, tracked over time against a batch of questions you know should call a tool. A falling rate with no change in the traffic is the tool description going stale, not the model getting worse."
+  costAtVolume="Every question pays for at least one call. Only the ones where the model reaches for a tool pay for the second, so cost tracks how often real traffic actually needs an action, not a fixed number per question."
+  failsInProduction="A tool with a side effect runs on an argument the model half-guessed, because nothing between the model's call and the tool's execution checked that the argument was real. A second tool call the model asked for is dropped with no record, and a person debugging a wrong answer has no way to know one was ever requested."
+  whatToLog="The full list of tools offered, which one (if any) was called and with what arguments, the raw tool result, and whether decided_by was model or code for every step, so a wrong answer traces back to the wrong tool, the wrong argument, or the model declining to act at all."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Find a chat app feature that can take an action beyond answering (a connector, a plugin, a custom action). Ask it something the action does not cover and see whether it tells you it could not act, or quietly answers from memory instead.' },
+  { lane: 'build', body: 'Run python -m examples.function_calling --model stub with a question naming a part number not in the parts list (try "What does HLV-9999 cost?"), then one with no part number and no obvious search term at all. Which one calls a tool, and which one does not?' },
+  { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose against the example or a product you use, using only the synthetic documents in evals/corpus/.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

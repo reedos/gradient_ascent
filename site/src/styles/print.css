@@ -1,0 +1,199 @@
+/* Print handout stylesheet (finish-indexes). Targets the class names global.css already defines
+   -- .site-header, .lanes > .filters, .lane-panel[hidden], .panel, .section, .code-file,
+   .reviewed-note and the rest -- rather than introducing new markup, since this file cannot edit
+   the page templates that render them. Loaded everywhere (one line in Base.astro) because the
+   task is "any level page and any technique page," and both share Base.astro as their only
+   common ancestor.
+
+   What a printed page keeps: light background, black text, the breadcrumb (useful context, not
+   really "nav"), both lanes, the diagrams at whatever frame they were on when printing started
+   (no script runs a print stylesheet, so this is the page's default first frame), the run-it,
+   try-it, failure-mode and cost panels, the sources list, and -- where the page has one -- the
+   reviewed-date footer. What it drops: the sticky header/nav, the lane switch and every other
+   button or filter control, the level pager, and drop shadows/animations that mean nothing on
+   paper. Per the task: link URLs are not printed inline -- the Sources list already names what
+   each citation points to by title, so repeating the raw href would be noise, not information. */
+@media print {
+  :root,
+  :root:not([data-theme='light']) {
+    color-scheme: light;
+  }
+
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  main {
+    max-width: none;
+    padding: 0 !important;
+  }
+
+  /* No nav: the sticky header, the skip link, the level pager (prev/next), and every button or
+     filter control (the lane switch, the trace scrubber, a filter row). */
+  .site-header,
+  .skip-link,
+  .level-pager,
+  .filters,
+  .lanes > .filters,
+  .controls,
+  button {
+    display: none !important;
+  }
+
+  /* The worksheet on paper is the static fallback, not the island. Every answer in the
+     interactive view is a <button>, and the rule above hides buttons, so printing with
+     JavaScript on produced one page: a hero, one question, and no answers. The fallback is the
+     whole worksheet -- every question, what each answer points to, and all eight results -- which
+     is exactly the handout. (--print-to-pdf, before this rule: 1 page. After: the full set.) */
+  html.js .ws-js-only {
+    display: none !important;
+  }
+  html.js .ws-noscript-only {
+    display: block !important;
+  }
+
+  /* Both lanes shown: override the lane switch's inline `hidden`, which the script sets on load
+     even though nothing prints it. */
+  .lane-panel[hidden] {
+    display: block !important;
+  }
+  .lane-panel + .lane-panel {
+    break-before: page;
+  }
+
+  a,
+  a:visited {
+    color: #111111 !important;
+  }
+  .prose a,
+  .connection a,
+  .sources-list a,
+  .glossary-entry a,
+  .fail-source-link {
+    color: #111111 !important;
+    text-decoration: underline;
+  }
+  /* Link URLs are not printed inline -- see the file comment above. */
+
+  .page-hero,
+  .breadcrumb {
+    max-width: none;
+  }
+
+  .panel,
+  .connection,
+  .code-file,
+  .relation-block,
+  .name-list,
+  .cost-strip,
+  .run-it,
+  .try-it {
+    background: #ffffff !important;
+    border-color: #bbbbbb !important;
+  }
+  .code-file-path {
+    background: #f2f2f2 !important;
+    color: #333333 !important;
+  }
+  .code-file pre,
+  .step pre,
+  .lane pre {
+    background: #f7f7f7 !important;
+    color: #111111 !important;
+    border-color: #cccccc !important;
+  }
+
+  .eyebrow,
+  .footnote,
+  .cost-illustrative,
+  .signal-meta {
+    color: #444444 !important;
+  }
+
+  svg text {
+    fill: #111111 !important;
+  }
+  .nd rect,
+  .nd path {
+    fill: #f2f2f2 !important;
+    stroke: #999999 !important;
+  }
+  .ed {
+    stroke: #999999 !important;
+  }
+  .ed.model {
+    stroke: #444444 !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    break-after: avoid;
+    color: #000000 !important;
+  }
+  .section {
+    break-inside: avoid-page;
+    border-top-color: #cccccc !important;
+    border-image: none !important;
+  }
+  .panel,
+  .failure-mode,
+  .code-file,
+  .relation-block,
+  .run-it-row,
+  .try-it li,
+  .cost-strip,
+  svg {
+    break-inside: avoid;
+  }
+
+  /* The reviewed-date footer (Reviewed.astro): a technique or recipe page prints its own
+     `reviewed` date; a level page prints the oldest date among the pages it lists, since
+     taxonomy.json carries no date for a tier itself. Restyled here as the printed footer of the
+     content, with the site name appended so the page still names itself once the header is gone.
+     The "Markdown version" link inside it is dropped: a URL is no use on paper. */
+  .reviewed-note .md-link {
+    display: none;
+  }
+  .reviewed-note {
+    display: block !important;
+    margin-top: 28px;
+    padding-top: 14px;
+    border-top: 1px solid #999999;
+    color: #333333 !important;
+    font-size: 9pt;
+  }
+  .reviewed-note::after {
+    content: ' Gradient Ascent.';
+  }
+
+  /* The global site footer still carries the site name on pages with no reviewed-date line
+     (levels, recipes without one, the home page); trim it to that instead of hiding it outright. */
+  .site-footer {
+    border-top: 1px solid #999999 !important;
+    margin-top: 24px !important;
+    padding: 14px 0 !important;
+  }
+  .site-footer .footer-bottom {
+    display: none;
+  }
+  .footer-top p {
+    display: none;
+  }
+
+  @page {
+    margin: 1.6cm;
+  }
+}

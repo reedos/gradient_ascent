@@ -1,0 +1,148 @@
+/* /search/ (site/src/pages/search.astro, components/islands/Search.tsx, finish-search). Built
+   from the same tokens, hairlines and .subhead/.row-dot shapes as everything in global.css --
+   no new colour, font, radius or shadow. Imported once, from the page, so it never touches a
+   page outside this territory. */
+
+/* Progressive-enhancement toggle, same pattern as worksheet.css: a tiny inline script on the
+   page adds "js" to <html> the moment it can run, before paint. Until then the plain grouped
+   listing shows and the interactive search stays hidden, so a no-JS visitor never sees an input
+   that cannot do anything. */
+.search-js-only {
+  display: none;
+}
+.search-noscript-only {
+  display: block;
+}
+html.js .search-js-only {
+  display: block;
+}
+html.js .search-noscript-only {
+  display: none;
+}
+
+.search-input-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.search-input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 13px 16px;
+  font-size: 15px;
+}
+.search-input::placeholder {
+  color: var(--muted);
+}
+/* type="search" adds a native clear button in some browsers with its own metrics; this keeps
+   the field's own border and radius as the only visible frame at every width. */
+.search-input::-webkit-search-cancel-button {
+  margin-left: 8px;
+}
+.search-count {
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.search-status {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 18px;
+}
+
+.search-empty {
+  padding: 22px 0 6px;
+}
+.search-empty p {
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.8;
+  max-width: 62ch;
+}
+.search-empty a {
+  color: var(--accent);
+}
+.search-empty a:hover {
+  text-decoration: underline;
+}
+
+.search-group {
+  padding: 28px 0;
+  border-top: 1px solid var(--line);
+}
+.search-group:first-of-type {
+  border-top: 0;
+  padding-top: 20px;
+}
+
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.search-result {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+.search-result:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.search-result-link {
+  display: inline-flex;
+  align-items: center;
+  font: 550 14px var(--font);
+  letter-spacing: -0.1px;
+}
+.search-result-link:hover {
+  text-decoration: underline;
+}
+.search-result-meta {
+  display: block;
+  font-size: 9.5px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.search-result-summary {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 6px;
+  line-height: 1.7;
+  max-width: 70ch;
+}
+.search-result-secondary {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--accent);
+}
+.search-result-secondary:hover {
+  text-decoration: underline;
+}
+
+/* No-JavaScript fallback: the plain grouped listing (search.astro renders it from the same
+   SearchDoc[] the JSON index is built from). Shares .search-group/.search-result above. */
+.search-noscript-only .search-group:first-of-type {
+  padding-top: 0;
+}
+
+@media (max-width: 600px) {
+  .search-input {
+    padding: 12px 14px;
+  }
+  .search-input-row {
+    gap: 8px;
+  }
+  .search-count {
+    order: 2;
+  }
+}

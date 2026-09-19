@@ -1,0 +1,76 @@
+{
+  "illustrative": true,
+  "h": 360,
+  "title": "Parallel calls (sectioning)",
+  "sub": "Answer from each candidate section alone, at the same time, then combine what came back.",
+  "pill": "Level 3 · Workflows",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 30, "l": "Question", "k": "io" },
+    { "id": "pick", "x": 170, "y": 96, "l": "Pick sections", "k": "code" },
+    { "id": "s1", "x": 30, "y": 178, "l": "care-guide#1", "k": "model" },
+    { "id": "s2", "x": 170, "y": 178, "l": "dw480-manual#3", "k": "model" },
+    { "id": "s3", "x": 310, "y": 178, "l": "dw480-manual#6", "k": "model" },
+    { "id": "combine", "x": 170, "y": 262, "l": "Combine", "k": "code" },
+    { "id": "a", "x": 170, "y": 332, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "pick", "by": "code" },
+    { "id": "e2a", "f": "pick", "t": "s1", "by": "code" },
+    { "id": "e2b", "f": "pick", "t": "s2", "by": "code" },
+    { "id": "e2c", "f": "pick", "t": "s3", "by": "code" },
+    { "id": "e3a", "f": "s1", "t": "combine", "by": "code" },
+    { "id": "e3b", "f": "s2", "t": "combine", "by": "code" },
+    { "id": "e3c", "f": "s3", "t": "combine", "by": "code" },
+    { "id": "e4", "f": "combine", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"What is the DW-480's Normal cycle water use, and how\noften should its filter be cleaned?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2a",
+      "h": "care-guide#1 answers alone, in parallel with the other two",
+      "d": "\"The DW-480's filter is self-cleaning and needs no\nroutine manual cleaning.\"",
+      "m": "180 in · 18 out · 640 ms"
+    },
+    {
+      "e": "e2b",
+      "h": "dw480-manual#3 answers alone, in parallel",
+      "d": "\"The Normal cycle uses 3.0 gallons of water.\"",
+      "m": "165 in · 11 out · 510 ms"
+    },
+    {
+      "e": "e2c",
+      "h": "dw480-manual#6 answers alone, in parallel",
+      "d": "\"The DW-480's filter is self-cleaning and needs no\nroutine manual cleaning.\"",
+      "m": "172 in · 18 out · 590 ms"
+    },
+    {
+      "e": "e3a",
+      "h": "Your code folds care-guide#1's answer into the combination",
+      "d": "kept (answered part of the question)",
+      "m": "1 of 3 kept so far"
+    },
+    {
+      "e": "e3b",
+      "h": "Your code folds dw480-manual#3's answer into the combination",
+      "d": "kept (answered part of the question)",
+      "m": "2 of 3 kept so far"
+    },
+    {
+      "e": "e3c",
+      "h": "Your code folds dw480-manual#6's answer into the combination",
+      "d": "kept (answered the same part again, redundantly)",
+      "m": "3 of 3 kept so far"
+    },
+    {
+      "e": "e4",
+      "h": "Your code assembles the final answer",
+      "d": "\"The DW-480's filter is self-cleaning and needs no\nroutine manual cleaning. The DW-480's filter is\nself-cleaning and needs no routine manual cleaning.\nThe Normal cycle uses 3.0 gallons of water.\"\ncited: care-and-cleaning-guide#1, dw480-manual#3, dw480-manual#6",
+      "m": "3 of 3 sections combined · 0 dropped"
+    }
+  ]
+}

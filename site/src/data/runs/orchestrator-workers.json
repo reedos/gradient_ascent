@@ -1,0 +1,128 @@
+{
+  "illustrative": true,
+  "trace_note": "Both assignments come from one split call, so the recorded trace counts one model-decided step where the diagram plays two: one model output selected both transitions.",
+  "h": 650,
+  "title": "Lead agent and workers",
+  "sub": "A lead splits the question into sub-questions no code could predict in advance, each worker answers from its own document, and the lead combines the results with citations.",
+  "pill": "Level 6 · Teams of agents",
+  "nodes": [
+    {
+      "id": "q",
+      "x": 170,
+      "y": 30,
+      "l": "Question",
+      "k": "io"
+    },
+    {
+      "id": "lead",
+      "x": 170,
+      "y": 172,
+      "l": "Lead splits the task",
+      "k": "model"
+    },
+    {
+      "id": "w1",
+      "x": 82,
+      "y": 314,
+      "l": "Worker 1",
+      "k": "model"
+    },
+    {
+      "id": "w2",
+      "x": 258,
+      "y": 314,
+      "l": "Worker 2",
+      "k": "model"
+    },
+    {
+      "id": "combine",
+      "x": 170,
+      "y": 456,
+      "l": "Lead combines results",
+      "k": "model"
+    },
+    {
+      "id": "a",
+      "x": 170,
+      "y": 598,
+      "l": "Answer",
+      "k": "io"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "f": "q",
+      "t": "lead",
+      "by": "code"
+    },
+    {
+      "id": "e2",
+      "f": "lead",
+      "t": "w1",
+      "by": "model"
+    },
+    {
+      "id": "e3",
+      "f": "lead",
+      "t": "w2",
+      "by": "model"
+    },
+    {
+      "id": "e4",
+      "f": "w1",
+      "t": "combine",
+      "by": "code"
+    },
+    {
+      "id": "e5",
+      "f": "w2",
+      "t": "combine",
+      "by": "code"
+    },
+    {
+      "id": "e6",
+      "f": "combine",
+      "t": "a",
+      "by": "code"
+    }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"What is the DW-300's annual energy use, and how\nmuch does the DR-520's drive belt cost?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The lead reads the question and assigns worker 1",
+      "d": "→ worker 1: \"What is the DW-300's annual energy use?\"",
+      "m": "196 in · 34 out · 0.6 s"
+    },
+    {
+      "e": "e3",
+      "h": "The same call also assigns worker 2",
+      "d": "→ worker 2: \"What does the DR-520's drive belt cost?\"",
+      "m": "same call · 0 additional ms"
+    },
+    {
+      "e": "e4",
+      "h": "Worker 1 answers from its own document",
+      "d": "\"260 kWh per year [dw300-manual#3].\"",
+      "m": "612 in · 18 out · 1.0 s"
+    },
+    {
+      "e": "e5",
+      "h": "Worker 2 answers from a different document",
+      "d": "\"$9.75, part HLV-6601 [parts-list#3].\"",
+      "m": "598 in · 16 out · 0.9 s"
+    },
+    {
+      "e": "e6",
+      "h": "The lead combines both, keeping their citations",
+      "d": "\"The DW-300 uses about 260 kWh per year\n[dw300-manual#3]. The DR-520's drive belt (HLV-6601)\ncosts $9.75 [parts-list#3].\"",
+      "m": "410 in · 42 out · 1.1 s"
+    }
+  ]
+}

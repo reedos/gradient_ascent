@@ -1,0 +1,243 @@
+---
+slug: fine-tuning
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "LoRA: Low-Rank Adaptation of Large Language Models"
+    url: "https://arxiv.org/abs/2106.09685"
+    publisher: "arXiv (Microsoft)"
+    date: "2021-06-17"
+    accessed: "2026-09-18"
+  - title: "Fine-tuning overview"
+    url: "https://docs.together.ai/docs/fine-tuning-overview"
+    publisher: "Together AI"
+    accessed: "2026-09-18"
+  - title: "Fine-tuning data preparation"
+    url: "https://docs.together.ai/docs/fine-tuning-data-preparation"
+    publisher: "Together AI"
+    accessed: "2026-09-18"
+  - title: "Model optimization"
+    url: "https://developers.openai.com/api/docs/guides/model-optimization"
+    publisher: "OpenAI (API documentation)"
+    accessed: "2026-09-18"
+  - title: "Supervised fine-tuning"
+    url: "https://developers.openai.com/api/docs/guides/supervised-fine-tuning"
+    publisher: "OpenAI (API documentation)"
+    accessed: "2026-09-18"
+  - title: "Reinforcement fine-tuning"
+    url: "https://developers.openai.com/api/docs/guides/reinforcement-fine-tuning"
+    publisher: "OpenAI (API documentation)"
+    accessed: "2026-09-18"
+---
+
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+
+Fine-tuning trains a model further on your own examples. It belongs to
+<Link href="/techniques/adaptation/">changing the model</Link>, a topic that runs across the eight
+levels instead of sitting on one: a fine-tuned model can answer a single chat call or fill one seat
+in a team of agents.
+
+It comes in two shapes. Full fine-tuning moves every weight, at a higher compute and memory cost.
+An adapter leaves the original weights alone and trains a small add-on instead: the LoRA paper
+describes freezing the pretrained weights and injecting trainable "rank decomposition matrices"
+into each layer of the Transformer architecture, and reports that "compared to GPT-3 175B
+fine-tuned with Adam, LoRA can reduce the number of trainable parameters by 10,000 times and the
+GPU memory requirement by 3 times"<Cite n={1}/> — two figures measured against that one model
+trained with that one optimizer, not a multiplier to expect from any job. Together AI calls LoRA
+"the default training mode" on its own hosted service<Cite n={2}/>.
+
+Two methods covered below train against something other than a fixed correct answer: preference
+tuning ranks one response over another, and reinforcement fine-tuning trains against a scored
+reward. The siblings under this topic are <Link href="/techniques/distillation/">distillation</Link>,
+<Link href="/techniques/synthetic-data/">synthetic data</Link> and
+<Link href="/techniques/prompt-optimization/">prompt optimization</Link>.
+
+This page is marked draft, not published: no training run has happened for this site, so nothing
+below is measured.
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+You are unlikely to run a training job yourself. You may well be the one deciding whether your team
+should, and on whose platform, and two things are worth checking first: how much data a job really
+needs, and whether the service will still be taking new jobs a year from now.
+
+On data, OpenAI's current guide states "the minimum number of examples you can provide for
+fine-tuning is 10," adds that "we see improvements from fine-tuning on 50–100 examples, but the
+right number for you varies greatly and depends on the use case," and recommends "starting with 50
+well-crafted demonstrations and evaluating the results." Its advice when that changes nothing is
+not more data: "If 50 examples have no impact, rethink your task or prompt before adding training
+data"<Cite n={5}/>. Those are OpenAI's numbers for OpenAI's platform rather than a fact about
+fine-tuning anywhere else, and still a useful check against a pitch that starts at thousands of
+examples.
+
+On durability, the same maker's documentation states "OpenAI is winding down the fine-tuning
+platform. The platform is no longer accessible to new users, but existing users of the fine-tuning
+platform will be able to create training jobs for the coming months," and that "all fine-tuned
+models will remain available for inference until their base models are deprecated"<Cite n={4}/>.
+Read 2026-09-18: the page puts no end date on "the coming months," so neither does this one.
+Together AI's fine-tuning overview, read the same day, carries no such notice and describes
+handling "the full lifecycle: data upload, training, hosting, and inference on a dedicated
+endpoint"<Cite n={2}/>. One maker's notice and another's silence on one date is not a rule about
+hosted fine-tuning; a service can stop taking new jobs while the models it already trained keep
+answering, and the platform you are actually considering has its own current page.
+
+A product described as "fine-tuned on our data" changed its weights once, in advance — a different
+claim from a product that reads your documents at answer time. Fine-tuning does not teach a model
+today's facts, so a question about something newer than the dataset gets whatever the model does
+when it does not know, not a lookup. That is <Link href="/techniques/rag/">retrieval</Link>'s job.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+Nothing on this site trains a model — no example here calls a fine-tuning API, on this page or on
+<Link href="/techniques/adaptation/">the adaptation page</Link> it hangs from. What
+`examples/adaptation` builds instead is the file a supervised fine-tuning job would actually need:
+a chat-format JSONL split into training and validation questions from the site's own 60-question
+set, with a check that no question leaks across the split. The adaptation page shows the part that
+turns a question into a training example and the leak check itself; this page shows the split those
+two functions sit between.
+
+`split` shuffles with a fixed seed and cuts a validation fraction off the top, so the same seed
+always produces the same partition:
+
+<CodeFile file="examples/adaptation/run.py" func="split" />
+
+The default, 20%, exists for the same reason Together AI's own fine-tuning data preparation guide
+gives: its instructions for carving "a validation set out of a single JSONL file" end with "then
+pass both files to the job and set `n_evals` above 0," so that "the model evaluates against the
+validation set at the specified intervals" during training<Cite n={3}/> — a held-out set is only
+useful if something is scored against it while the job runs, not just kept aside.
+
+`run` is the whole pipeline in order: load the questions, split them, write both files, then check
+the split for a leak.
+
+<CodeFile file="examples/adaptation/run.py" func="run" />
+
+Every step it records is `decided_by: "code"`: the split is a fixed shuffle-and-cut, not a choice
+a model makes, so this example contributes zero model-decided steps, the same as any other data
+preparation step.
+
+Preference tuning and reinforcement fine-tuning have no file to build the way supervised
+fine-tuning does, because neither trains against one fixed right answer. Together AI's own
+overview separates two of its training methods on exactly that line: supervised fine-tuning trains
+"on demonstration data with one target completion per example," while preference fine-tuning is
+"align a model with rankings over preferred and dispreferred responses using DPO"<Cite n={2}/>.
+OpenAI documents its own DPO option in the same shape, telling a reader to "Provide both a correct
+and incorrect example response for a prompt. Indicate the correct response to help the model
+perform better," and today lists three model ids it is available for: `gpt-4.1-2025-04-14`,
+`gpt-4.1-mini-2025-04-14` and `gpt-4.1-nano-2025-04-14`<Cite n={4}/>. Reinforcement fine-tuning
+goes further still: OpenAI's own guide says that during training the platform "samples several
+responses per prompt, scores them with the grader, and applies policy-gradient updates based on
+those rewards," and that the method "is supported on o-series reasoning models only, and currently
+only for o4-mini"<Cite n={6}/>. Both are OpenAI's terms for OpenAI's platform, read 2026-09-18;
+another maker's DPO offering is its own to describe. A training file for either would be pairs or
+grader code, not the chat JSONL this example writes.
+
+Self-run alternatives exist for anyone who would rather not depend on a hosted platform at all:
+Hugging Face's Transformers, TRL and PEFT, Unsloth, Axolotl and Apple's MLX all train adapters or
+full weights on your own hardware, at the cost of running the training yourself.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Most teams that ask about fine-tuning do not need it, and three questions usually settle that
+without spending anything. Can you write down what the model is getting wrong as a rule? Then it
+is a prompt, and a few-shot example in that prompt is a same-afternoon test. Is it getting a
+*fact* wrong? Then it was never given the fact, which is
+<Link href="/techniques/rag/">retrieval</Link>'s job and not a training one. Is it getting the
+wrong one of several jobs? Then the fix is <Link href="/techniques/routing/">routing</Link>
+between prompts, not one model taught to do all of them.
+
+What is left after those three is the case fine-tuning is actually for: a behavior you can
+demonstrate but not describe, on a call that runs often enough that carrying the instructions in
+every prompt costs more than training them in once. A handful of calls a day is not that case, and
+neither is a failure that happened twice.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'Not enough data to move the needle',
+    notice: "The fine-tuned model behaves the same as the base model on the task it was trained for, because the training set was too small or too repetitive to teach it anything the prompt didn't already say.",
+    test: "Follow OpenAI's own test for this, applied to any platform: add examples in batches and re-evaluate; if fifty good examples changed nothing, the fix is the task or the prompt, not more data.",
+  },
+  {
+    name: 'A validation leak inflates the score',
+    notice: 'Validation performance looks strong but real traffic is worse, because a near-duplicate of a validation question was also present, reworded, in the training file.',
+    test: "Run the leak check shown on this page and the adaptation page against the actual split before trusting a validation number; it catches an exact or punctuation-only duplicate, not a genuine paraphrase.",
+  },
+  {
+    name: 'Catastrophic forgetting on the rest of the model',
+    notice: "A model fine-tuned hard on one task gets measurably worse at things it used to do fine, because training changed weights that were doing useful work outside the trained task, not only inside it.",
+    test: "Before and after training, run the same handful of prompts from outside the trained task and compare the answers, not just the trained task's own score.",
+  },
+  {
+    name: 'The hosted platform stops taking new jobs',
+    notice: 'A workflow built around retraining periodically can no longer submit a new job, though models already trained keep serving inference, because the maker wound the training service down without retiring what it produced.',
+    test: "Read the maker's own current guide for a notice like the one this page quotes before planning around a training service, not just the date the last job succeeded.",
+  },
+  {
+    name: 'A reward the grader can game',
+    notice: "A reinforcement-fine-tuned model's score against its own grader climbs while answers read by a person do not improve — the training-time version of the grader-hacking risk the site's evals topic covers for testing.",
+    test: "Hand-check a sample of the grader's own verdicts on the training data, the way a rubric grader's verdicts are hand-checked at eval time, rather than trusting the reward curve alone.",
+  },
+]} />
+
+## How to eval it
+
+<HowToEval>
+
+This site's own 60-question set does not score fine-tuning: the example on this page builds and
+checks a training file, and answers no question about the corpus, so the grading contract in
+`evals/questions.json` has nothing to check it against (see `docs/EVALS.md`). What a real
+fine-tuning job would still want measured is the same question set run twice — once on the base
+model, once on the fine-tuned one — so a claim of improvement is a before/after score on the same
+60 questions rather than a training-time number alone, the way the <Link
+href="/techniques/evals/">evals</Link> page's own rule requires. Alongside that: the leak check
+this page shows, run against the real split before spending anything on a job, and a handful of
+off-task prompts checked before and after, to catch the forgetting failure mode above.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="Whether the fine-tuned model's behavior on real traffic still matches the last
+  validation run; a growing gap usually means real inputs have drifted from the training data's
+  shape, not that the model got worse on its own."
+  costAtVolume="Training is a one-time or periodic cost; the fine-tuned model can then cost less
+  per call than a large general model prompted the long way, but only on the narrow task it was
+  trained for. Traffic outside that task still needs the general model."
+  failsInProduction="The world moves and the training data doesn't. A model trained on last
+  quarter's catalog answers confidently and wrong about this quarter's, with nothing in its own
+  output flagging that its training predates the change."
+  whatToLog="The training data's version, the base model id, the method (supervised, DPO,
+  reinforcement) and the date of the run, so a question about the model's behavior later can be
+  traced to what it was actually trained on."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: "Find a product that advertises a small, fast, task-specific model. Look for whether its own page says LoRA/adapter, full fine-tuning, or doesn't say — and whether that silence changes how much you'd trust a claim that it 'matches' a bigger model." },
+  { lane: 'build', body: 'Run python -m examples.adaptation --out .local/scratch/fine-tuning from the repo root, then open val.jsonl and count the lines. Change --val-fraction to 0.1 and run it again; does the count change the way split\'s docstring says it should?' },
+  { lane: 'either', body: "Pick two questions from evals/questions.json about the same appliance and decide whether they're close enough that training on one and validating on the other would leak. Run the leak check and see whether your judgment matches leaked_questions's." },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

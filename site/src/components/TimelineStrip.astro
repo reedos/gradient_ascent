@@ -1,0 +1,238 @@
+---
+// The compact per-level strip: eight (however many the data has) horizontal lanes on a shared year
+// axis. The main mark on each lane is the launch of the widely known product that brought the
+// level to the public, named in the row; the paper that first described it is a small hollow dot with a
+// faint lead-in line. No client JavaScript -- everything here is plain HTML/CSS, positioned with percentages
+// computed at build time from lib/timeline.ts's own axis builder, the same one the wide chart on
+// /timeline/ uses, so the two never disagree about where a year sits.
+//
+// Two call sites:
+//  - the home page (variant="home"): SectionTop-style heading and aside, the strip, the single
+//    most useful figure or two, and a link to the full timeline.
+//  - /timeline/'s own narrow (< 850px) view (variant="compact"): the strip alone, embedded below
+//    that page's own SectionTop, replacing the wide chart which does not fit a phone.
+import SectionTop from './SectionTop.astro';
+import { url } from '../lib/url';
+import { levels as taxonomyLevels } from '../lib/content';
+import {
+  levelSeriesTopDown,
+  buildMainAxis,
+  decimalYear,
+  formatDate,
+  markExtent,
+  climbHeadline,
+  climbHeadlineText,
+  consecutiveLevelGaps,
+  asOf,
+  shifts,
+  milestone as milestoneById,
+  type Milestone,
+} from '../lib/timeline';
+import '../styles/timeline.css';
+
+interface Props {
+  variant?: 'home' | 'compact';
+}
+const { variant = 'home' } = Astro.props;
+
+const axis = buildMainAxis();
+const series = levelSeriesTopDown();
+const stubIndexById = new Map(axis.stubMilestones.map((m, i) => [m.id, i]));
+
+function fractionFor(m: Milestone): number {
+  const idx = stubIndexById.get(m.id);
+  return idx !== undefined ? axis.stubFraction(idx) : axis.toFraction(decimalYear(m.date, m.precision));
+}
+
+function levelTitle(order: number): string {
+  return taxonomyLevels.find((t) => t.order === order)?.title ?? `Level ${order}`;
+}
+
+const rows = series.map((s) => {
+  // Earliest to latest by ACTUAL DATE, not by key order: a level's `buildable` can fall before
+  // its `described` or after its `available` (content/timeline.json says so explicitly for
+  // several levels), so the span drawn here must not assume described <= buildable <= available.
+  // The strip shows ONE thing per level: from the first published description to the first
+  // product an ordinary customer could use. The owner looked at an earlier version, whose bars ran
+  // from "earliest marked date to latest", and called the dates odd; the dates were odd. That rule let
+  // a 2017 vector-search library start the Context bar three years before the paper, and let a
+  // 2024 open standard, not a product, end the Tools bar. The `buildable` dates stay on the full
+  // timeline, where each is labelled; they do not belong in a bar that claims a single meaning.
+  // A level with only one of the two dates gets no bar.
+  //
+  // A second call (2026-09-18): the date that says a level "arrived" is the product, not the
+  // paper. So the product end is the big labelled dot, the paper end is the small hollow one, and
+  // the line between them is faint. The key underneath leads with the product too.
+  const pair = s.marks.filter((mk) => mk.key === 'described' || mk.key === 'available');
+  const extent = pair.length === 2 ? markExtent(pair) : undefined;
+  return {
+    level: s.level,
+    title: levelTitle(s.level),
+    hasSpan: Boolean(extent),
+    startPct: extent ? fractionFor(extent.earliest.milestone) * 100 : 0,
+    endPct: extent ? fractionFor(extent.latest.milestone) * 100 : 0,
+    startLabel: extent ? `${extent.earliest.label} ${formatDate(extent.earliest.milestone.date, extent.earliest.milestone.precision)}` : undefined,
+    endLabel: extent ? `${extent.latest.label} ${formatDate(extent.latest.milestone.date, extent.latest.milestone.precision)}` : undefined,
+    // What each end of the bar IS, so nobody has to guess what a dot stands for.
+    from: extent ? { id: extent.earliest.milestone.id, title: extent.earliest.milestone.title, date: formatDate(extent.earliest.milestone.date, extent.earliest.milestone.precision), verified: extent.earliest.milestone.verified } : undefined,
+    opened: extent?.latest.milestone.opened ? `${extent.latest.milestone.opened.text}, ${formatDate(extent.latest.milestone.opened.date, extent.latest.milestone.opened.precision)}` : undefined,
+    to: extent ? { id: extent.latest.milestone.id, title: extent.latest.milestone.title, date: formatDate(extent.latest.milestone.date, extent.latest.milestone.precision), verified: extent.latest.milestone.verified } : undefined,
+    // In-row label for the product dot: a few words and month-year. It sits on whichever side of
+    // the dot has room -- products cluster in the right half of the axis, so usually the left.
+    productLabel: extent ? `${extent.latest.milestone.short ?? extent.latest.milestone.title} · ${formatDate(extent.latest.milestone.date.slice(0, 7), 'month')}` : undefined,
+    labelLeft: extent ? fractionFor(extent.latest.milestone) > 0.5 : false,
+    months: extent
+      ? Math.round((decimalYear(extent.latest.milestone.date, extent.latest.milestone.precision) - decimalYear(extent.earliest.milestone.date, extent.earliest.milestone.precision)) * 12)
+      : undefined,
+    note: s.note,
+  };
+});
+
+// Every whole year from the axis, thinned so labels do not collide at narrow widths: every year
+// on the wide render, every other year once the strip is this narrow -- both computed, not typed
+// in by hand.
+const allTicks = axis.yearTicks;
+const thinnedTicks = allTicks.filter((_, i) => i % 2 === 0 || i === allTicks.length - 1);
+
+// Changes in the models themselves, drawn as a vertical rule across every lane: they are not
+// levels, and a rule that crosses all of them says so.
+const shiftRows = shifts
+  .map((sh) => ({ sh, m: milestoneById(sh.milestone) }))
+  .filter((x): x is { sh: (typeof shifts)[number]; m: Milestone } => Boolean(x.m))
+  .map(({ sh, m }) => ({
+    id: sh.id,
+    title: sh.title,
+    summary: sh.summary,
+    onStrip: Boolean(sh.strip),
+    pct: axis.toFraction(decimalYear(m.date, m.precision)) * 100,
+    when: formatDate(m.date.slice(0, 7), 'month'),
+  }));
+
+const headline = climbHeadline();
+const gaps = consecutiveLevelGaps().filter((g) => g.interval !== null);
+const meanGapMonths = gaps.length ? Math.round(gaps.reduce((sum, g) => sum + g.interval!.months, 0) / gaps.length) : null;
+
+const headingText = headline ? climbHeadlineText(headline) : 'What the timeline shows';
+---
+
+{
+  variant === 'home' && (
+    <SectionTop
+      eyebrow="The timeline"
+      title={headingText}
+      aside="Each solid dot is the launch of the product that brought that level to the public. The small hollow dot behind it is the first paper that described the idea. Lesser-known products got to most levels earlier; the full timeline names them, with dates and sources, and says why each mark is the one people know."
+    />
+  )
+}
+
+<div class="tls" role="img" aria-label={`A strip chart of ${rows.length} levels, each marked at the launch of the product that brought it to the public, with the first paper behind it, from ${Math.floor(axis.startYear)} to ${asOf}.`}>
+  <div class="tls-body">
+    <div class="tls-labels">
+      <div class="tls-years-spacer" />
+      {rows.map((r) => (
+        <div class="tls-row-label" style={`--c:var(--o${r.level})`}>
+          <span class="tls-row-num">{r.level}</span>
+          <span>{r.title}</span>
+        </div>
+      ))}
+    </div>
+    {/* Years and every row's track share ONE coordinate system (this wrapper's width) so a
+        percentage `left` means the same year whichever row or the header it is on -- the label
+        column above sits OUTSIDE this element precisely so it cannot shift that alignment, the
+        bug an earlier overlay-label version of this component had (level 0's whole span,
+        compressed into the first few percent of the axis by the pre-2017 stub, rendered directly
+        underneath the label and was invisible). */}
+    <div class="tls-plot">
+      {shiftRows.filter((x) => x.onStrip).map((x) => (
+        <>
+          <span class="tls-shift" style={`left:${x.pct}%`} />
+          <span class="tls-shift-label" style={`left:${x.pct}%`}>{x.title} · {x.when}</span>
+        </>
+      ))}
+      <div class="tls-years">
+        {thinnedTicks.map((y) => (
+          <span class="tls-year-tick" style={`left:${axis.toFraction(y) * 100}%`}>{y}</span>
+        ))}
+      </div>
+      {rows.map((r) => (
+        <div class="tls-track-row">
+          <div class="tls-track">
+            {r.hasSpan && (
+              <>
+                <span class="tls-span" style={`left:${r.startPct}%;width:${Math.max(r.endPct - r.startPct, 0.6)}%;--c:var(--o${r.level})`} />
+                <span class="tls-cap tls-cap-start" style={`left:${r.startPct}%;--c:var(--o${r.level})`} title={r.startLabel} />
+                <span class="tls-cap tls-cap-end" style={`left:${r.endPct}%;--c:var(--o${r.level})`} title={r.endLabel} />
+                <span class:list={['tls-product', r.labelLeft ? 'is-left' : 'is-right']} style={`left:${r.endPct}%`}>{r.productLabel}</span>
+              </>
+            )}
+          </div>
+        </div>
+      ))}
+      {axis.stubMilestones.length > 0 && <span class="tls-stub-divider" style={`left:${axis.stubWidth * 100}%`} />}
+      <span class="tls-today" />
+    </div>
+  </div>
+</div>
+
+<ul class="tls-key">
+  {rows.filter((r) => r.from && r.to).map((r) => (
+    <li style={`--c:var(--o${r.level})`}>
+      <span class="tls-key-level"><b>{r.level}</b> {r.title}</span>
+      <span class="tls-key-ends">
+        <a class="tls-key-product" href={url(`/timeline/#${r.to!.id}`)}>{r.to!.title}</a>, {r.to!.date}{r.to!.verified === false && ' (not yet verified)'}
+        {r.opened && <span class="tls-key-opened"> · {r.opened}</span>}
+        <span class="tls-key-paper">
+          First described in <a href={url(`/timeline/#${r.from!.id}`)}>{r.from!.title}</a>, {r.from!.date}
+        </span>
+      </span>
+      <span class="tls-key-months">{r.months} months after the paper</span>
+    </li>
+  ))}
+</ul>
+
+{
+  shiftRows.length > 0 && (
+    <div class="tls-shifts">
+      <h3>Two changes in the models themselves</h3>
+      <ul>
+        {shiftRows.map((x) => (
+          <li>
+            <a href={url(`/timeline/#${x.id}`)}><b>{x.title}</b>, {x.when}</a>
+            <span>{x.summary}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+{
+  variant === 'home' && headline && (
+    <>
+      <div class="tls-figures">
+        <div class="tls-figure">
+          <b>{headline.months < 24 ? `${headline.months} mo` : `${Math.round(headline.years * 10) / 10} yr`}</b>
+          <span>
+            From level {headline.startLevel} reaching the public ({headline.startMark.milestone.short ?? headline.startMark.milestone.title}, {formatDate(headline.startMark.milestone.date, headline.startMark.milestone.precision)}) to level {headline.endLevel} doing so ({headline.endMark.milestone.short ?? headline.endMark.milestone.title}, {formatDate(headline.endMark.milestone.date, headline.endMark.milestone.precision)})
+          </span>
+        </div>
+        {meanGapMonths !== null && (
+          <div class="tls-figure">
+            <b>{meanGapMonths} mo</b>
+            <span>Average gap between one level's arrival and the next's, across {gaps.length} consecutive pairs (by size, regardless of which came first)</span>
+          </div>
+        )}
+      </div>
+      <p class="tls-arith">
+        Both figures are this site's own arithmetic over the dated milestones below, not a measurement of capability. See{' '}
+        <a href={url('/timeline/')}>the full timeline</a> for every date and its source, and how each is verified.
+      </p>
+    </>
+  )
+}
+
+{
+  variant === 'home' && (
+    <a class="section-link" href={url('/timeline/')}>See the full timeline &rarr;</a>
+  )
+}

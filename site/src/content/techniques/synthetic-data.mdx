@@ -1,0 +1,210 @@
+---
+slug: synthetic-data
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Self-Instruct: Aligning Language Models with Self-Generated Instructions"
+    url: "https://arxiv.org/abs/2212.10560"
+    publisher: "arXiv (University of Washington and others)"
+    date: "2022-12-20"
+    accessed: "2026-09-18"
+  - title: "The Curse of Recursion: Training on Generated Data Makes Models Forget"
+    url: "https://arxiv.org/abs/2305.17493"
+    publisher: "arXiv (Shumailov, Shumaylov, Zhao, Gal, Papernot, Anderson)"
+    date: "2023-05-27"
+    accessed: "2026-09-18"
+  - title: "distilabel"
+    url: "https://github.com/argilla-io/distilabel"
+    publisher: "Argilla"
+    accessed: "2026-09-18"
+---
+
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+
+A model writes the training or test examples instead of a person. That is synthetic data; it sits
+under <Link href="/techniques/adaptation/">changing the model</Link>, and it is where the examples
+<Link href="/techniques/fine-tuning/">fine-tuning</Link> and
+<Link href="/techniques/distillation/">distillation</Link> need can come from when nobody has time
+to write them.
+
+Generation is half of it. The Self-Instruct paper puts its own pipeline in one sentence: "Our
+pipeline generates instructions, input, and output samples from a language model, then filters
+invalid or similar ones before using them to finetune the original model"<Cite n={1}/> — generate,
+then filter, as two steps rather than one. The filter is the half that gets skipped. A 2023 paper
+titled *The Curse of Recursion* asks what becomes of a model "once LLMs contribute much of the
+language found online": "We find that use of model-generated content in training causes
+irreversible defects in the resulting models, where tails of the original content distribution
+disappear. We refer to this effect as Model Collapse and show that it can occur in Variational
+Autoencoders, Gaussian Mixture Models and LLMs."<Cite n={2}/> A finding about web-scale generated
+content, shown in three named settings — not a verdict on every dataset a model helped write.
+
+This page is marked draft, not published: no generated dataset has been used for anything on this
+site, so nothing below is measured.
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+You are unlikely to generate a training set yourself, but synthetic data shows up wherever a
+product claims a dataset that would have been too expensive to collect by hand: more languages, more
+edge cases, more examples of a rare situation than any team could write in a reasonable time. The
+question worth asking is the one Self-Instruct's own framing answers implicitly by including a
+filtering step at all<Cite n={1}/>: was the generated data checked before it was trained on, or was
+it trained on because it was cheap to produce. A number stated as "N synthetic examples used for
+training" says nothing on its own about whether any of them were verified.
+
+Model collapse names a specific pattern, not synthetic data as a category: unchecked model output
+trained on by the next model, round after round. What the 2023 paper says disappears is the tails
+of the distribution<Cite n={2}/> — the rare, unusual, edge-case examples, which are often precisely
+what a synthetic set was generated to add more of. One checked batch used once is a different
+situation from that loop.
+
+None of this is unique to text. The same question applies to a generated image set, a generated
+audio set, or a generated set of tool-call examples: was each one checked against something outside
+the model that produced it, or only against how plausible it looks.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+`examples/synthetic_data` paraphrases the site's own 32 exact-graded questions and keeps only what
+survives two checks. The first is deduplication and leakage together: a paraphrase that matches,
+once case and punctuation are stripped, any of the 60 questions already in the set or any
+paraphrase already accepted is rejected before it costs a second call. All 60, not just the 32 it
+generates from — a paraphrase that lands on one of the 28 rubric-graded questions is a fresh copy
+of a question the eval set already asks, and training on it would quietly spend the held-out value
+of that question.
+
+The second is label verification. The paraphrase is answered blind — the model sees the new
+question text and nothing else, not the seed's answer — and that answer is graded by
+<Link href="/techniques/distillation/">distillation</Link>'s `grade_exact` against the *seed's*
+accept, require and reject patterns. A paraphrase that reads fine but whose blind answer no longer
+grades the same way has probably stopped asking the seed's question, so it is dropped.
+
+<CodeFile file="examples/synthetic_data/run.py" func="run" />
+
+Nothing here is a model decision: the code generates, checks, asks and grades in the same order
+every time, so every recorded step is `decided_by: "code"`. Against the real set, `python -m
+examples.synthetic_data --model stub --out .local/scratch/synthetic-data/questions.jsonl` keeps
+nothing and rejects all 32 at verification — the interactive stub's placeholder answer matches no
+real grading pattern. That is the check working on an input that was never trying to be right.
+
+How much it actually catches is worth being precise about, so the tests attack it. A paraphrase
+that changes a number ("with the top rack removed") is rejected, because the blind answer states
+the new number and the seed's pattern wants the old one. A negation is rejected for the same
+reason — *unless* the answer denies the seed's own fact in the seed's own words, and "It does not
+hold 12 place settings" contains "12 place setting", so that one passes. That case is pinned as a
+test rather than left to be discovered: this is a pattern check, not a meaning check, and a
+paraphrase that quietly changed the question can still clear it. Diversity is the other blind
+spot. Thirty-two paraphrases that differ from each other and reword every question the same way
+grammatically pass everything here; the five question kinds in `docs/EVALS.md` — lookup,
+multi-hop, numeric, unanswerable, conflicting sources — are the structural variety a real
+generated set has to be checked for on top of text-level deduplication.
+
+Argilla's distilabel does this at a scale a 50-line example does not: its README calls it "the
+framework for synthetic data and AI feedback for engineers who need fast, reliable and scalable
+pipelines based on verified research papers"<Cite n={3}/>, and the same README opens by saying "The
+original authors have moved on to other projects" and that community collaborators have joined to
+maintain it<Cite n={3}/> — worth knowing before a pipeline depends on it.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Count what you already have before generating anything. A handful of real examples that cover the
+task, or an afternoon of someone writing the missing ones, beats a generated set outright: real
+examples need no filter before you can trust them, and building a filter you can trust is most of
+this work.
+
+Two conditions have to hold together before generating is the cheaper road. Real examples must be
+genuinely too rare, too expensive or too slow to collect at the volume a training or eval set needs
+— the situation Self-Instruct's paper set out to make cheaper<Cite n={1}/>. And somebody must
+actually be going to build the verification step, rather than skip it because generating was the
+interesting half. One without the other produces volume, not data.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'Generated data used with no filter at all',
+    notice: "A dataset is generated and trained on directly, with nothing checking whether any individual example is correct, diverse, or even different from another example already in the set.",
+    test: "Ask what checked a sample of the generated set before it was used. 'A model wrote it' is not an answer to that question.",
+  },
+  {
+    name: 'A filter that only checks surface form',
+    notice: "The checks on this page catch a repeat and an answer that stopped matching the seed's patterns. What they cannot catch is a paraphrase whose meaning changed but whose blind answer still contains the seed's accept text — a negation is the easy case, since denying a fact repeats it.",
+    test: "Hand-read a sample of what the filter kept, comparing each paraphrase's meaning against its seed question rather than its verdict. The example's own test suite pins one paraphrase that passes and should not.",
+  },
+  {
+    name: 'Model collapse from training on an unchecked chain',
+    notice: 'A generated set is used to train a model, whose own output later becomes the seed for the next round of generation, with no checked, real data reentering the loop.',
+    test: "Trace where each generation's seed data came from. If it is entirely the previous generation's own unchecked output, the loop the 2023 model-collapse paper describes is the one running.",
+  },
+  {
+    name: 'Narrow generation mistaken for broad coverage',
+    notice: "A large generated set looks comprehensive by its count, but every example was produced from the same handful of seed questions or the same prompt template, so it covers less variety than its size suggests.",
+    test: "Check how many distinct seeds or templates the set was generated from, not just how many examples came out the other end.",
+  },
+  {
+    name: 'Leakage between a generated training set and the real eval set',
+    notice: "A paraphrase generated for training turns out to be close enough to a question already in the eval set that training on it inflates a later score on that same question.",
+    test: "Check generated text against every question the eval set holds, not only against the seeds it was generated from — which is the wider net this page's example casts, and it still only catches identical text once normalized, never a genuine rewording.",
+  },
+]} />
+
+## How to eval it
+
+<HowToEval>
+
+The example produces questions rather than answers, so the grading contract in
+`evals/questions.json` has nothing to grade it against (see `docs/EVALS.md`). What it reports
+instead is yield and reasons: how many of the 32 seeds produced a kept paraphrase, and how many
+fell to a duplicate versus a failed verification. Watch the ratio rather than the total. A run that
+suddenly keeps more has usually loosened a check.
+
+For a generated set meant to train or test something else, the measurement is downstream and
+comparative: score the thing that was trained or tested on generated data the ordinary way, score
+the same thing built from real data only, and report both. A yield figure from the generator says
+nothing about either.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="The rejection breakdown (duplicate versus failed verification) on every generation run,
+  not only the final kept count; a rejection rate that suddenly drops usually means the checks
+  loosened, not that the generator improved."
+  costAtVolume="Two model calls per seed question here (paraphrase, then blind answer), so cost
+  scales with how many candidates are generated, not how many are kept — a low yield after
+  verification means paying for calls whose output gets thrown away, which is the price of
+  checking before training on any of it."
+  failsInProduction="A verification check that was tuned for one seed set's shape (a fixed
+  appliance-support format, say) silently waves through generated data from a different domain,
+  because nothing about the check was specific to what made the original examples right."
+  whatToLog="The generator model id, the seed each example came from, and which check it passed
+  or failed, so a bad example downstream traces back to whether it was a generation problem or a
+  gap in the filter."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: "Find a product or paper that reports a dataset size built partly or fully with a model. Search its page for the word 'filter', 'verify' or 'check'. A count with nothing beside it tells you how much was generated and nothing about how much was any good." },
+  { lane: 'build', body: 'Run python -m examples.synthetic_data --model stub --out .local/scratch/synthetic-data/questions.jsonl from the repo root and read the rejection counts it prints. Then open examples/synthetic_data/run.py and change ANSWER_SYSTEM_PROMPT to ask for a one-word answer; do you expect the failed-verification count to go up or down against a real model, and why?' },
+  { lane: 'either', body: "Take one question from evals/questions.json and write two paraphrases of it by hand: one that keeps the same answer and one that quietly changes what is being asked while still sounding like a paraphrase. Check both against grade_exact with the original question's contract and the answer you'd expect a good model to give. Does the check catch the second one?" },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

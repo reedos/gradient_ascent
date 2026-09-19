@@ -1,0 +1,30 @@
+---
+// Numbered source list, rendered from frontmatter (content.config.ts's `sources` field). Inline
+// <Cite n={1}/> markers in the prose point back to these by id.
+interface Source {
+  title: string;
+  url: string;
+  publisher?: string;
+  date?: string;
+  accessed?: string;
+}
+interface Props {
+  sources: Source[];
+}
+const { sources } = Astro.props;
+---
+
+<ol class="sources-list">
+  {
+    sources.map((s, i) => (
+      <li id={`src-${i + 1}`}>
+        <a href={s.url} target="_blank" rel="noopener noreferrer">
+          {s.title}
+        </a>
+        {s.publisher && <span> &middot; {s.publisher}</span>}
+        {s.date && <span>, {s.date}</span>}
+        {s.accessed && <span class="sources-accessed"> (accessed {s.accessed})</span>}
+      </li>
+    ))
+  }
+</ol>

@@ -1,0 +1,58 @@
+{
+  "illustrative": true,
+  "h": 490,
+  "title": "Voice agents",
+  "sub": "The model decides whether to keep talking; an interruption or a latency cap can cut it off first, and that part is never the model's choice.",
+  "pill": "Level 5 · Agents",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 30, "l": "Caller speaks (audio)", "k": "io" },
+    { "id": "act", "x": 170, "y": 170, "l": "keep talking, or yield", "k": "model" },
+    { "id": "tool", "x": 170, "y": 310, "l": "continue_speaking()", "k": "tool" },
+    { "id": "a", "x": 170, "y": 450, "l": "Floor returns to caller", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "act", "by": "code" },
+    { "id": "e2", "f": "act", "t": "tool", "by": "model", "b": 22 },
+    { "id": "e3", "f": "tool", "t": "act", "by": "code", "b": 22 },
+    { "id": "e4", "f": "act", "t": "a", "by": "model" },
+    { "id": "e5", "f": "tool", "t": "a", "by": "code", "b": -40 }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The caller speaks",
+      "d": "[audio] \"What time do you close tonight?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The model starts talking and chooses to continue",
+      "d": "\"We close at nine,\" → continue_speaking()",
+      "m": "180 in · 14 out · 0.4 s"
+    },
+    {
+      "e": "e3",
+      "h": "Your code lets the model add another chunk",
+      "d": "the floor stays with the agent",
+      "m": "1 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The model adds a second chunk and chooses to continue again",
+      "d": "\"and on weekends we close at ten,\" → continue_speaking()",
+      "m": "260 in · 15 out · 0.4 s"
+    },
+    {
+      "e": "e3",
+      "h": "Your code lets the model add a third chunk",
+      "d": "the floor stays with the agent",
+      "m": "1 ms"
+    },
+    {
+      "e": "e5",
+      "h": "The caller starts talking; code cuts the agent off immediately, mid-turn",
+      "d": "the third chunk is never generated; the floor\nreturns to the caller before the model is asked again",
+      "m": "interruption · 0 ms"
+    }
+  ]
+}

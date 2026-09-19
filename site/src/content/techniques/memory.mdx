@@ -1,0 +1,217 @@
+---
+slug: memory
+level: 2
+run: memory
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Use Claude's chat search and memory to build on previous context"
+    url: "https://support.claude.com/en/articles/11817273-use-claude-s-chat-search-and-memory-to-build-on-previous-context"
+    publisher: "Anthropic (Claude Help Center)"
+    accessed: "2026-09-18"
+  - title: "mem0ai/mem0"
+    url: "https://github.com/mem0ai/mem0"
+    publisher: "Mem0 (GitHub README)"
+    accessed: "2026-09-18"
+  - title: "Archival memory"
+    url: "https://docs.letta.com/guides/core-concepts/memory/archival-memory"
+    publisher: "Letta (documentation)"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import memoryRun from '../../data/runs/memory.json';
+
+Memory is keeping information from one conversation to the next. A chat has no memory of its
+own beyond the messages inside it, so a product that seems to remember you is writing facts down
+somewhere and reading them back into a later, otherwise unrelated conversation.
+
+Two different things get called memory. A summary is a compressed account of what happened, cheap
+to reread, but whatever it leaves out is gone. A record is closer to the raw fact — a purchase on
+a date, a preference stated once — kept on its own and searched later. Letta draws that line in
+its own product: a small "core" memory that stays in the context window, and a larger "archival"
+memory that cannot be pinned there and has to be queried on demand with a search
+tool<Cite n={3}/>. Mem0, which sells memory infrastructure for other people's products rather than
+a chat app, states the record approach outright: memories accumulate, nothing is overwritten, and
+a search returns the relevant ones<Cite n={2}/>.
+
+Memory sits at level 2, context: every write, search and deletion here is your code's, and the
+model only answers with what it was handed. This page is marked draft, not published: it has no
+recorded trace and no scored result file, so nothing below is measured.
+
+## A run, step by step
+
+<Run data={memoryRun} label="Level 2 · Memory" runKey="memory" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+If a chat app has ever surprised you by remembering something from an earlier, separate
+conversation — a preference, a project, a person you mentioned — you have used this. Several
+chat apps have the feature now; the ones this site has checked are listed under Out there at the
+foot of this page. They do not all behave the same way, so the three questions below are worth
+asking of whichever one you use, rather than assuming what you learned from another.
+
+**What is stored, and can you see it?** Anthropic documents Claude's answer: everything Claude
+memory holds is listed by topic in the settings, and you can open any topic to read it, edit it,
+or delete that one on its own. By default it does not store personal or sensitive subject matter
+— health, race, ethnicity, religious beliefs, politics, gender identity and similar areas — unless
+you turn that on<Cite n={1}/>.
+
+**Who can see it?** In Claude, memory is per person: Anthropic says an account's owners
+cannot view or edit an individual user's memories, and each project keeps its own separate memory
+space<Cite n={1}/>. That is one maker's design, not an industry rule, which is why it is worth
+checking on a shared or work account before you say something in front of one.
+
+**How do you get rid of it?** Two controls that sound similar are not. Anthropic documents pausing
+as keeping the existing memories while stopping new ones, and resetting as permanently deleting
+all of them, project memories included, with no undo. And deleting the conversation does not
+delete what it taught: Anthropic states that when a conversation expires or is deleted, the memory
+entries generated from it are not removed, so you delete those separately<Cite n={1}/>. Assume
+that is the default behavior elsewhere too until a product's own page says otherwise.
+
+None of this is a reason to avoid the feature. It is a reason to open the settings page once,
+since a memory that quietly gets everything right looks, from outside, exactly like one that got
+something wrong a year ago and nobody has read since.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example below is a small store with the three operations that matter: `write`, `recall`, and
+`forget`. It is handed a list of facts already stated — the extraction step a real product runs
+to decide what is worth keeping is its own model call this example does not duplicate, since
+<Link href="/techniques/knowledge-graphs/">the knowledge graphs example</Link> already shows that
+shape (one model call, always made, that fills in content rather than choosing what happens
+next). What this example shows instead is what happens after writing: `recall` ranks stored facts
+by cosine similarity to a new question, the same mechanism as
+<Link href="/techniques/embeddings-search/">embeddings and search</Link> and the same bag-of-words
+stub embedder, just over a handful of personal facts instead of a document corpus — so the scores
+it prints show the mechanism and say nothing about how a real embedding model would rank them.
+`forget` removes an entry outright; nothing recalled afterward can include it again, which is the
+whole reason the operation exists rather than being another kind of write.
+
+<CodeFile file="examples/memory/run.py" func="run" />
+
+Ask about a dishwasher's warranty with all four sample facts in memory, and recall surfaces the
+purchase date and the fact that the unit is in a rental property — both relevant, since rental
+use caps the warranty at 90 days regardless of the standard term. Forget the rental-property fact
+first and ask again: the recalled set and the citations both change, and the model is answering a
+different question, because that fact no longer exists anywhere the code can reach. Run it
+yourself:
+
+<CodeFile file="examples/memory/README.md" start={15} end={15} lang="text" expect="python -m examples.memory" />
+
+Every step is `decided_by: "code"`: the code always writes what it is given, always searches,
+always forgets what it is told to, and asks the model once at the end with whatever recall
+turned up.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try <Link href="/techniques/context-engineering/">context engineering</Link> first if everything
+relevant is already in the current conversation. Memory only matters for information that has to
+survive after a conversation ends — a single session never needs it.
+
+Move to memory once a product needs to answer questions using something a user said in a
+different, earlier conversation, not just the one open right now.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'Everything gets written and nothing gets pruned',
+    notice: 'The memory store grows without bound, recall gets slower, and old, stale, or contradicted facts start outranking current ones for no reason a user can see.',
+    test: 'Check whether anything ever gets removed automatically, and whether a fact that was later corrected by the user still shows up in recall.',
+  },
+  {
+    name: 'Recall surfaces a plausible but wrong memory',
+    notice: 'An answer confidently uses a fact that sounds related to the question but is not the one that actually applies, the same failure mode embedding-based search has generally.',
+    test: 'Ask a question with two stored facts that are superficially similar but say different things, and check which one recall actually returns.',
+  },
+  {
+    name: 'A deleted fact keeps influencing answers anyway',
+    notice: 'A user deletes a memory, but an answer still reflects it, because the fact was already folded into a summary, a cached embedding, or a derived record that deletion never touched.',
+    test: 'Delete a fact after it has already been used once, then ask a new question that only the deleted fact could answer. If the old answer still comes through in any form, deletion is not reaching everywhere the fact was copied to.',
+  },
+  {
+    name: 'Memory written in one context leaks into another',
+    notice: 'A fact stated in one setting (a work project, a shared account) surfaces in an unrelated one where it does not belong, especially on a shared or team plan.',
+    test: 'Write a fact under one context or project and check whether it is recalled from a different, unrelated one that should not have access to it.',
+  },
+  {
+    name: 'No relevant memory, but the model answers as if there were',
+    notice: 'Recall returns nothing useful, and the answer states something confidently anyway instead of saying it does not know.',
+    test: 'Ask a question with no relevant fact in memory at all, and confirm the answer says so rather than guessing.',
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, one question', value: '1' },
+    { label: 'Memories written', value: '4' },
+    { label: 'Memories recalled', value: '3' },
+    { label: 'Wall time', value: '~1.4s' },
+  ]}
+  comparedTo={{
+    label: 'RAG (level 2, a document corpus instead of a personal fact store)',
+    note: 'Recall here runs over a handful of memories instead of a whole document corpus, so the search itself is close to free. The ongoing cost this example does not show is deciding what is worth writing in the first place, which a real product spends a model call on for every conversation, not just once.',
+  }}
+  level={2}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+The site's shared 60-question set is asked within a single sitting over one document set, so it
+does not test what memory is actually for: a fact stated in one session and needed again in a
+separate, later one. A fair eval for this technique would need its own question set, written as
+pairs across sessions — a fact stated in session one, a question in session two that depends on
+recalling it, and a check that a fact explicitly forgotten between sessions no longer affects the
+answer.
+
+So `scripts/eval_run.py` will not score this example: asking it to prints that reason and stops,
+rather than returning a number measured on the wrong thing (see `docs/EVALS.md`). The three
+measurements that would mean something here are recall of a fact written in an earlier session,
+the share of answers that use a recalled fact when one applies, and a check that a forgotten
+fact never reaches an answer again.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="How many memories exist per user and how fast that count grows, recall hit rate on real questions, and the count of forget requests that succeed versus the count still pending. A pending forget older than a few minutes is worth a page in its own right."
+  costAtVolume="Storage and recall both scale with memory count per user, not with question volume; a store that never prunes or expires anything gets slower and less relevant over time even if nothing is technically wrong with it."
+  failsInProduction="A user asks to forget something and the entry disappears from the visible list, but a summary or a cached copy made before the deletion keeps influencing answers. Or a memory written for one context surfaces in an unrelated one on a shared account."
+  whatToLog="What was written and when, what was recalled for a given question and its relevance score, what was forgotten and when, and whether a forget request actually reached every place the fact had been copied to."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Open a chat app\'s memory settings, if it has them, and look at what it says it has stored about you. Delete one entry, then start a new conversation and ask something that entry would have answered. Does the answer still reflect it?' },
+  { lane: 'build', body: 'Run python -m examples.memory --model stub with a question of your own, then edit SAMPLE_FACTS in examples/memory/__main__.py to add a fact that contradicts an existing one. Which one does recall rank higher, and does the answer notice the contradiction?' },
+  { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose using the synthetic facts in examples/memory/__main__.py.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

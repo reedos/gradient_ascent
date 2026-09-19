@@ -1,0 +1,240 @@
+---
+slug: orchestrator-workers
+level: 6
+run: orchestrator-workers
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Building effective agents"
+    url: "https://www.anthropic.com/engineering/building-effective-agents"
+    publisher: "Anthropic"
+    date: "2024-12-19"
+    accessed: "2026-09-18"
+  - title: "How we built our multi-agent research system"
+    url: "https://www.anthropic.com/engineering/multi-agent-research-system"
+    publisher: "Anthropic"
+    date: "2025-06-13"
+    accessed: "2026-09-18"
+  - title: "Subagents"
+    url: "https://code.claude.com/docs/en/subagents"
+    publisher: "Anthropic (Claude Agent SDK documentation)"
+    accessed: "2026-09-18"
+  - title: "crewAI"
+    url: "https://github.com/crewAIInc/crewAI"
+    publisher: "CrewAI"
+    accessed: "2026-09-18"
+  - title: "AutoGen"
+    url: "https://github.com/microsoft/autogen"
+    publisher: "Microsoft"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import orchestratorRun from '../../data/runs/orchestrator-workers.json';
+
+Level 6 starts where a single model stops being the whole team. A lead model reads the task,
+decides how to split it, and hands each piece to a worker — itself either one call or a
+<Link href="/techniques/single-agent/">single agent</Link> loop — and a lead call combines what
+comes back. Anthropic names this shape orchestrator-workers: "a central LLM dynamically breaks
+down tasks, delegates them to worker LLMs, and synthesizes their results"<Cite n={1}/>, well
+suited, it says, to work "where you can't predict the subtasks needed"<Cite n={1}/>.
+
+What makes this level 6 and not level 5 is not that several models run a loop; a single agent
+already does that. It is that one model's own output now decides what *other* models are asked to
+do. Your code still runs every worker, moves every message and result between lead and worker,
+and enforces a cap on how many workers may spawn and how many tokens the whole team may spend —
+caps the lead cannot see or override, the same way a single agent's step cap works.
+
+This page is marked draft, not published: lead agent and workers has no recorded trace and no
+scored result file yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={orchestratorRun} label="Level 6 · Lead agent and workers" runKey="orchestrator-workers" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Claude Code's subagents are the clearest version of this a reader outside a research lab has
+likely used: "when Claude encounters a task that matches a subagent's description, it delegates to
+that subagent, which works independently and returns results"<Cite n={3}/>, each one running "in
+its own context window with a custom system prompt, specific tool access, and independent
+permissions"<Cite n={3}/> — the isolation is the point, not a side effect. Anthropic's own Claude
+Research feature works the same way at the product level: "the lead agent analyzes [a query],
+develops a strategy, and spawns subagents to explore different aspects simultaneously"<Cite
+n={2}/>. Grok Build and Devin Desktop are both registered as demonstrating this shape too, under
+their own names.
+
+The separate context window is the actual benefit, not a detail: each worker reads only its own
+slice of the problem, so a task too large for one window still fits, and a worker's dead ends
+never crowd the lead's own reasoning. Anthropic writes that "subagents facilitate compression by
+operating in parallel with their own context windows, exploring different aspects of the question
+simultaneously"<Cite n={2}/>.
+
+That isolation is also what the failures above look like. Without a specific brief, Anthropic's
+own team found "agents duplicate work, leave gaps, or fail to find necessary information"<Cite
+n={2}/>, and in an early version "agents made errors like spawning 50 subagents for simple
+queries"<Cite n={2}/> — a runaway team costs like a runaway single agent, multiplied by however
+many workers spawned. What to watch for in a product built this way: whether it names a cap on
+workers at all, and whether a stalled or duplicated-looking run tells you so or just returns an
+answer that quietly skipped something.
+
+Anthropic's own engineering team states the price of the shape plainly: "In our data, agents
+typically use about 4× more tokens than chat interactions, and multi-agent systems use about 15×
+more tokens than chats"<Cite n={2}/>. The 15× is the figure for this page's shape, and it is
+Anthropic's own measurement of its own system, not a rate to expect from yours: it says "in our
+data" and this site has measured nothing.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+One call asks the lead to split the question into independent sub-questions, one per line, at
+most `MAX_WORKERS` (3 by default). Code parses that text into a list, drops exact duplicates, and
+caps it at `MAX_WORKERS` if the lead asked for more — the lead's split is a proposal the code is
+free to cut down, never a command code obeys blindly. Anthropic's own research system names what a
+good brief needs: "each subagent needs an objective, an output format, guidance on the tools and
+sources to use, and clear task boundaries"<Cite n={2}/>; this example's brief is just the
+sub-question text, the simplest version of that, since every worker already shares one tool (the
+corpus) and one output shape (a cited answer).
+
+Each worker is `examples.rag.run.run`, imported and called unmodified — a level-2 single call, not
+a loop, which satisfies "a level 5 loop or a single call" at the cheap end. A team that needed a
+worker to search iteratively would hand it `examples.agentic_rag.run.run` instead; nothing else in
+this file would change, since both share the same `(question, model, embedder, tracer) -> Answer`
+signature.
+
+<CodeFile file="examples/orchestrator_workers/run.py" func="run" />
+
+`tracer.tokens_in_total() + tracer.tokens_out_total()` is the whole team's running spend, checked
+before every worker spawns; once it passes `MAX_TEAM_TOKENS` (6,000 by default) the remaining
+sub-questions are dropped and the run ends with whatever workers already answered, rather than
+spawning one more. The split call is the only step in this file with `decided_by: "model"` — the
+lead's output is what picks which sub-questions exist and how many workers run. Every worker's own
+steps stay `decided_by: "code"`, the same as <Link href="/techniques/rag/">RAG</Link>'s page,
+because retrieval inside a worker is still fixed. The diagram above draws that one call as two
+dashed edges, because a reader has to see both assignments happen; its own note says so, and the
+recorded trace counts the decision once.
+
+Run it yourself:
+
+<CodeFile file="examples/orchestrator_workers/README.md" start={16} end={16} lang="text" expect="python -m examples.orchestrator_workers" />
+
+CrewAI's own README describes a similar split: a "Crew" is built for "dynamic task delegation and
+collaboration"<Cite n={4}/>, and its optional hierarchical process "automatically assigns a manager
+to the defined crew to properly coordinate the planning and execution of tasks through delegation
+and validation of results"<Cite n={4}/> — the manager checks the work as well as parcelling it out,
+which this example's combine step does not. Microsoft's AutoGen, also registered against this
+technique, now carries a maintenance notice: "AutoGen is now in maintenance mode. It will not
+receive new features or enhancements and is community managed going forward." and "New users
+should start with Microsoft Agent Framework."<Cite n={5}/> A framework named in a tutorial today
+may not be the one to build on by the time you read this.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try a <Link href="/techniques/single-agent/">single agent</Link> first if one model, in one loop,
+can hold the whole task in its own context window — most tasks can. A team only pays for itself
+once the work genuinely does not fit one window or one line of reasoning.
+
+Try <Link href="/techniques/parallelization/">parallel calls</Link> instead if you already know,
+before the question arrives, what the fixed set of subtasks is — sectioning a document into three
+known parts, for instance. That costs the same every run and needs no lead call to decide anything.
+
+Move up to a lead and workers once the split itself cannot be written down in advance: the number
+and shape of the subtasks depend on what the specific question turns out to need.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'Duplicated work',
+    notice: "Two or more workers researched the same sub-question from slightly different angles, wasting the tokens of every worker but the first, because the lead's split overlapped instead of dividing the task.",
+    test: "Read every worker's sub-question side by side. Two that would be answered by the same passage of the same document are a duplicate, whatever words the lead used to phrase them.",
+  },
+  {
+    name: 'Runaway spawning',
+    notice: 'The lead asks for far more workers than the question has independent parts, and the team cost multiplies with every one, whether or not any of them found something the others missed.',
+    test: "Count the sub-questions the split step actually proposed against the worker cap. A simple question that asks for the cap's full width, every time, is asking for more workers than it needs.",
+  },
+  {
+    name: 'The lead drops a worker at combine time',
+    notice: "A worker returned a real, cited answer, but the combined final answer never uses it — the same failure RAG has when a retrieved passage goes unused, one level up.",
+    test: "Compare every worker's citations against the final answer's citations. A worker's citation that never appears in the combined answer was dropped, not wrong.",
+  },
+  {
+    name: 'The team budget ships a partial answer',
+    notice: "The token cap is reached before every worker ran, and the lead combines only the workers that did, silently unless the run is inspected for how many sub-questions the split actually proposed.",
+    test: "Script a split that proposes more sub-questions than a small token budget can afford (this page's own test suite does exactly this) and confirm the run still returns an answer built from whichever workers actually ran.",
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, 2 workers (split, 2 workers, combine)', value: '4' },
+    { label: 'Model calls, worst case (3 workers, all spawn)', value: '5' },
+    { label: 'Tokens in, the split call', value: '~80' },
+    { label: 'Wall time, 2 workers run one after another', value: '~3.5s' },
+  ]}
+  comparedTo={{
+    label: 'a single agent answering the same question (level 5)',
+    note: 'Every worker pays roughly what a RAG call alone costs, on top of the split and combine calls, so a two-worker run costs on the order of three single calls, not one — before counting a bigger team or a worker that is itself a loop.',
+  }}
+  level={6}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+`orchestrator_workers` answers the same question-about-the-documents task `rag` and
+`single_agent` are scored on: every worker cites what it retrieved, and the lead's combined
+answer keeps those citations, so it fits the site's 60-question set the same way — exact or
+rubric match, citation hit rate — plus the split-specific numbers a team adds: workers spawned per
+question, and the share of questions where the team token budget cut a worker off before it ran.
+
+`scripts/eval_run.py` counts `orchestrator_workers` among the examples the question set can
+score, alongside `agent_graphs` and `debate_review` (see `docs/EVALS.md`). No result file exists
+for it yet, so this page cannot say a number for any of it. Run
+`python scripts/eval_run.py --example orchestrator_workers --model <spec> --dry` to project the
+cost of a real run first: a team's projection is the one to look at before spending, because the
+ceiling counts every worker the cap allows.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="Workers spawned per question against the cap, the share of splits that propose a duplicate sub-question, and the share of runs where the team token budget cut a worker off before it ran."
+  costAtVolume="Cost multiplies with team size, not just question count: a split that asks for the full worker cap on every question costs several times what a single-agent answer to the same question would, whether or not the extra workers found anything the first one missed."
+  failsInProduction="The lead asks for more workers than the question has independent parts, or two workers investigate the same thing from different angles, so the team spends several times a single agent's cost without a proportional gain in the answer."
+  whatToLog="The split call's full text, every worker's sub-question and citations, which worker (if any) the team budget cut off, and the lead's combine call, so a bad answer traces back to a bad split, a dropped citation, or a genuine gap no worker covered."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Give a coding agent that has subagents (Claude Code, for one) a task big enough that it might delegate part of it. Does it tell you it spawned a subagent, and if so, what was that subagent asked to do?' },
+  { lane: 'build', body: 'Run python -m examples.orchestrator_workers --model stub with a question of your own from the repo root. The interactive stub never really splits (it echoes one placeholder line back as the only sub-question), so run python -m unittest tests.test_example_orchestrator_workers -v instead to see a scripted lead actually split a question, hit the worker cap, and hit the team token budget.' },
+  { lane: 'either', body: "Write a two-part question a single call could not answer well, then write what you would tell two separate people to go find, if you were the lead instead of a model. Compare that split to what the example's stub test scripts the lead to propose." },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

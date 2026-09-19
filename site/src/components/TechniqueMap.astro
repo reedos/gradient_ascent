@@ -1,0 +1,252 @@
+---
+// The whole technique graph: every /techniques/<slug>/ page as a node, positioned once at build
+// time by src/lib/map.ts (eight level bands, level 7 on top to level 0 on the bottom, plus a
+// ninth band for the five cross-cutting topics), with the taxonomy's typed relations drawn as
+// edges. No client layout and no physics -- the same static-SVG approach ClimbCurve.astro and
+// Timeline.astro use for their own build-time figures.
+//
+// `requires` and `upgrades_to` draw by default; `combines_with` and `alternative_to` are frequent
+// enough to turn the drawing into a hairball, so they stay off until a reader turns on one of the
+// checkboxes below (pure CSS, :has()) or points at (or tabs to) a single node (the small script at
+// the foot of this file, which only ever toggles a class -- it adds no layout and reads no data
+// the markup does not already carry in `data-*` attributes).
+import { url } from '../lib/url';
+import { mapLayout, edgesByBand, computeEdgeGeometry, edgePathD, RELATION_LABEL, relationTypes, type RelationType } from '../lib/map';
+import '../styles/map.css';
+
+const layout = mapLayout;
+const grouped = edgesByBand(layout);
+
+const RELATION_ORDER: RelationType[] = ['requires', 'upgrades_to', 'combines_with', 'alternative_to'];
+const edgeCount: Record<RelationType, number> = { requires: 0, upgrades_to: 0, combines_with: 0, alternative_to: 0 };
+for (const e of layout.edges) edgeCount[e.type]++;
+
+const FILTER_ID: Record<RelationType, string> = {
+  requires: 'map-f-requires',
+  upgrades_to: 'map-f-upgrades',
+  combines_with: 'map-f-combines',
+  alternative_to: 'map-f-alt',
+};
+// requires and upgrades_to draw by default; the other two start off, per the brief above.
+const CHECKED_BY_DEFAULT: Record<RelationType, boolean> = {
+  requires: true,
+  upgrades_to: true,
+  combines_with: false,
+  alternative_to: false,
+};
+
+const bySlug = new Map(layout.nodes.map((n) => [n.slug, n]));
+// Keyed by y, not band: two topics-band nodes can share a band index while sitting in different
+// track rows (see computeEdgeGeometry's own note on this), so "the row" a node shares with another
+// is whichever other nodes sit at exactly the same y, not merely the same band.
+const nodesByRowY = new Map<number, typeof layout.nodes>();
+for (const n of layout.nodes) nodesByRowY.set(n.y, [...(nodesByRowY.get(n.y) ?? []), n]);
+
+const drawableEdges = layout.edges
+  .map((e) => {
+    const fromNode = bySlug.get(e.from)!;
+    const toNode = bySlug.get(e.to)!;
+    // A straight (or midpoint-only) line between two nodes in the same row would run right
+    // through anything sitting between them -- computeEdgeGeometry arcs it clear instead.
+    const rowNodes = fromNode.y === toNode.y ? (nodesByRowY.get(fromNode.y) ?? []) : [];
+    const geometry = computeEdgeGeometry(fromNode, toNode, rowNodes);
+    return { ...e, fromNode, toNode, d: edgePathD(geometry) };
+  })
+  // requires and upgrades_to first, so they sit under combines_with/alternative_to when a reader
+  // turns those on -- the rarer, hover-revealed lines read as an overlay, not the base picture.
+  .sort((a, b) => RELATION_ORDER.indexOf(a.type) - RELATION_ORDER.indexOf(b.type));
+---
+
+<div class="map-wrap">
+<div class="map-filters panel" role="group" aria-label="Which relations to draw">
+  <p class="map-filters-label">Relations to draw</p>
+  <div class="map-filters-row">
+    {
+      RELATION_ORDER.map((type) => (
+        <label class="filter-check" data-type={type}>
+          <input type="checkbox" id={FILTER_ID[type]} checked={CHECKED_BY_DEFAULT[type]} />
+          <span class="map-swatch" data-type={type} aria-hidden="true" />
+          {RELATION_LABEL[type]} <span class="map-filter-count">({edgeCount[type]})</span>
+        </label>
+      ))
+    }
+  </div>
+  <p class="footnote">
+    Turning on the other two kinds adds {edgeCount.combines_with + edgeCount.alternative_to} more
+    lines, so they start off. Turn one on above, or point at (or tab to) a single technique to see
+    just its own.
+  </p>
+</div>
+
+<div class="map-row">
+  <div class="map-labels" style={`height:${layout.height}px`}>
+    {
+      layout.bands.map((band) => (
+        <div
+          class="map-band-label"
+          data-kind={band.kind}
+          style={`top:${band.y}px;height:${band.h}px;--c:${band.kind === 'level' ? `var(--o${band.level})` : 'var(--ot)'}`}
+        >
+          {band.kind === 'level' && <span class="map-band-num">{String(band.level).padStart(2, '0')}</span>}
+          <span class="map-band-title">{band.shortTitle}</span>
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="map-scroll">
+    <svg
+      class="map-svg"
+      width={layout.width}
+      height={layout.height}
+      viewBox={`0 0 ${layout.width} ${layout.height}`}
+      role="img"
+      aria-labelledby="map-svg-title map-svg-desc"
+    >
+      <title id="map-svg-title">The technique graph</title>
+      <desc id="map-svg-desc">
+        {layout.nodes.length} techniques across eight levels and five wrapped topic rows, connected by {layout.edges.length} relations.
+        The full list below the drawing has the same relations as text.
+      </desc>
+      <defs>
+        <marker id="map-arrow" viewBox="0 0 8 8" refX="6.4" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L8,4 L0,8 Z" fill="var(--accent)" />
+        </marker>
+      </defs>
+
+      {
+        layout.bands.map((band, i) => (
+          <line
+            x1="0"
+            x2={layout.width}
+            y1={i === 0 ? 1 : band.y}
+            y2={i === 0 ? 1 : band.y}
+            class="map-row-rule"
+            data-kind={band.kind}
+          />
+        ))
+      }
+
+      {
+        drawableEdges.map((e) => (
+          <path
+            d={e.d}
+            class:list={['map-edge', `map-edge-${e.type.replace(/_/g, '-')}`]}
+            data-from={e.from}
+            data-to={e.to}
+            data-type={e.type}
+            marker-end={e.type === 'upgrades_to' ? 'url(#map-arrow)' : undefined}
+          />
+        ))
+      }
+
+      {
+        layout.nodes.map((node) => (
+          <a
+            href={url(`/techniques/${node.slug}/`)}
+            class="map-node"
+            data-slug={node.slug}
+            aria-label={`${node.title}. ${node.levelLabel}.`}
+          >
+            <rect x={node.x} y={node.y} width={node.w} height={node.h} rx="6" class="map-node-body" style={`--c:${node.color}`} />
+            {/* The level's hue as a solid 3px bar along the node's top edge, the same idiom
+                ClimbCurve.astro's cards and the leveled page-hero use (a 2px rule in var(--oN)) --
+                the band label alone was not enough for the colour to "carry across the row" the
+                way it does elsewhere on the site. Square corners: at this scale the sliver of
+                overlap past the rect's own 6px-radius corner is under a pixel and invisible. */}
+            <rect x={node.x} y={node.y} width={node.w} height="3" class="map-node-accent" style={`--c:${node.color}`} />
+            <text x={node.x + node.w / 2} y={node.y + node.h / 2}>
+              {node.title}
+            </text>
+          </a>
+        ))
+      }
+    </svg>
+  </div>
+</div>
+
+<div class="map-legend">
+  <h3 class="map-legend-heading">What each line means</h3>
+  <dl class="map-legend-list">
+    {
+      RELATION_ORDER.map((type) => (
+        <div class="map-legend-row">
+          <dt>
+            <span class="map-swatch" data-type={type} aria-hidden="true" />
+            {RELATION_LABEL[type]}
+          </dt>
+          <dd>{relationTypes[type]}</dd>
+        </div>
+      ))
+    }
+  </dl>
+</div>
+
+<div class="map-edge-list">
+  {
+    grouped.map(({ band, edges }) => {
+      const nodesInBand = layout.nodes.filter((n) => n.band === band.index);
+      // The topics band wraps into one row per track in the drawing (see TechniqueMap's own
+      // note on why); the text version groups the same way, one line per track, root page
+      // first, rather than one long run-on line that no longer matches what the drawing shows.
+      const rows =
+        band.kind === 'topics'
+          ? Array.from(new Set(nodesInBand.map((n) => n.row))).map((r) => nodesInBand.filter((n) => n.row === r).sort((a, b) => a.col - b.col))
+          : [nodesInBand];
+      return (
+        <div class="map-band-group">
+          <h3 style={`--c:${band.kind === 'level' ? `var(--o${band.level})` : 'var(--ot)'}`}>
+            <i class="row-dot" style={`--c:${band.kind === 'level' ? `var(--o${band.level})` : 'var(--ot)'}`} />
+            {band.label}
+          </h3>
+          {rows.map((row) => (
+            <p class="map-band-pages">
+              {row.map((n, i) => (
+                <>
+                  {i > 0 && ', '}
+                  <a href={url(`/techniques/${n.slug}/`)}>{n.title}</a>
+                </>
+              ))}
+            </p>
+          ))}
+          {edges.length > 0 && (
+            <ul class="map-edge-items">
+              {edges.map((e) => (
+                <li>
+                  <a href={url(`/techniques/${e.from}/`)}>{e.fromNode.title}</a>{' '}
+                  <span class="map-rel-label">{RELATION_LABEL[e.type].toLowerCase()}</span>{' '}
+                  <a href={url(`/techniques/${e.to}/`)}>{e.toNode.title}</a>
+                  {e.when && <small>Climb when: {e.when}</small>}
+                  {e.question && <small>The question: {e.question}</small>}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      );
+    })
+  }
+</div>
+</div>
+
+<script>
+  // A node's combines-with and alternative-to edges light up while it is hovered or focused, even
+  // when their filter checkbox is off -- the other half of the brief's "hover or a filter"
+  // instruction, and independent of the CSS-only :has() filter above (see map.css): this script
+  // only ever adds or removes one class, and every edge and node already carries the data-*
+  // attributes it reads, so a build with JavaScript disabled loses nothing but this convenience.
+  const svg = document.querySelector<SVGSVGElement>('.map-svg');
+  if (svg) {
+    const edges = Array.from(svg.querySelectorAll<SVGPathElement>('.map-edge-combines-with, .map-edge-alternative-to'));
+    svg.querySelectorAll<SVGAElement>('.map-node').forEach((node) => {
+      const slug = node.dataset.slug;
+      const related = edges.filter((e) => e.dataset.from === slug || e.dataset.to === slug);
+      const show = () => related.forEach((e) => e.classList.add('hl'));
+      const hide = () => related.forEach((e) => e.classList.remove('hl'));
+      node.addEventListener('mouseenter', show);
+      node.addEventListener('mouseleave', hide);
+      node.addEventListener('focus', show);
+      node.addEventListener('blur', hide);
+    });
+  }
+</script>

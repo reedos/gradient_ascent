@@ -1,0 +1,11 @@
+---
+interface Props {
+  title: string;
+  color?: string;
+}
+const { title, color } = Astro.props;
+---
+<div class="connection" style={color ? `--c:${color}` : undefined}>
+  <strong>{title}</strong>
+  <slot />
+</div>

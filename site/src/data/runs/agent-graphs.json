@@ -1,0 +1,77 @@
+{
+  "illustrative": true,
+  "h": 650,
+  "title": "Agent graphs",
+  "sub": "A supervisor's own output picks the next agent from an allowlist, hop by hop, until it has enough to write.",
+  "pill": "Level 6 · Teams of agents",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 30, "l": "Question", "k": "io" },
+    { "id": "sup", "x": 170, "y": 172, "l": "Supervisor picks the next agent", "k": "model" },
+    { "id": "research", "x": 82, "y": 314, "l": "Research agent", "k": "model" },
+    { "id": "write", "x": 258, "y": 456, "l": "Write agent", "k": "model" },
+    { "id": "a", "x": 170, "y": 598, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "sup", "by": "code" },
+    { "id": "e2", "f": "sup", "t": "research", "by": "model", "b": 22 },
+    { "id": "e3", "f": "research", "t": "sup", "by": "code", "b": 22 },
+    { "id": "e4", "f": "sup", "t": "write", "by": "model" },
+    { "id": "e5", "f": "write", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"What is the maximum vent run for the DR-520, and\ndoes anything supersede the manual's figure?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The supervisor hands off to research (hop 1 of 4)",
+      "d": "→ 'research'",
+      "m": "142 in · 3 out · 0.3 s"
+    },
+    {
+      "e": "e3",
+      "h": "The research agent reports back; state is checkpointed",
+      "d": "dr520-manual#4: \"a maximum total vent run of 35 feet\nand up to 4 elbows … always check for a newer\nservice bulletin.\"",
+      "m": "1 finding · 14 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The supervisor is not satisfied and hands off again (hop 2 of 4)",
+      "d": "→ 'research'",
+      "m": "168 in · 3 out · 0.3 s"
+    },
+    {
+      "e": "e3",
+      "h": "A second finding, but no number yet",
+      "d": "service-bulletin#1: \"this bulletin revises the\nmaximum vent run … does not affect the DR-210\nor either dishwasher model.\"",
+      "m": "1 finding · 15 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The supervisor hands off a third time (hop 3 of 4)",
+      "d": "→ 'research'",
+      "m": "191 in · 3 out · 0.3 s"
+    },
+    {
+      "e": "e3",
+      "h": "The third finding has the revised number",
+      "d": "service-bulletin#2: \"the maximum vent run … is now\n25 feet, with up to 3 elbows … supersedes the\n35-foot, 4-elbow figure.\"",
+      "m": "1 finding · 16 ms"
+    },
+    {
+      "e": "e4",
+      "h": "The supervisor now hands off to the write agent",
+      "d": "→ 'write'",
+      "m": "214 in · 3 out · 0.3 s"
+    },
+    {
+      "e": "e5",
+      "h": "The write agent drafts the final answer from all three findings",
+      "d": "\"The DR-520's vent run is limited to 25 feet with up\nto 3 elbows [service-bulletin#2], which supersedes\nthe manual's 35-foot, 4-elbow figure [dr520-manual#4].\"",
+      "m": "480 in · 44 out · 1.0 s"
+    }
+  ]
+}

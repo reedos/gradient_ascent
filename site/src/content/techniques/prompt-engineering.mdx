@@ -1,0 +1,218 @@
+---
+slug: prompt-engineering
+level: 1
+run: prompt-engineering
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Prompt engineering"
+    url: "https://developers.openai.com/api/docs/guides/prompt-engineering"
+    publisher: "OpenAI"
+    accessed: "2026-09-18"
+  - title: "Prompt engineering overview"
+    url: "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview"
+    publisher: "Anthropic"
+    accessed: "2026-09-18"
+  - title: "Prompt design strategies"
+    url: "https://ai.google.dev/gemini-api/docs/prompting-strategies"
+    publisher: "Google"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import promptEngineeringRun from '../../data/runs/prompt-engineering.json';
+
+Prompt engineering is writing the request itself well: instructions, examples, an assigned role, a
+required format, and sometimes an explicit ask to reason before answering. It does not change what
+level a technique sits at — this is still level 1, one call, decided entirely by code — it changes
+what happens inside that one call, by giving the model more to work with than the bare question
+alone.
+
+Every maker that publishes a model also publishes its own guidance for this, because the moves
+(structure, examples, a stated format) carry across models even though the details of how much
+each one helps do not<Cite n={1}/><Cite n={2}/><Cite n={3}/>. None of it is worth doing once and
+trusting forever: write down what a correct answer looks like before changing a prompt, then check
+the new version against the same cases the old one had to pass. This page's example makes that
+concrete — the same question and the same source text, asked two ways, checked by a regular
+expression rather than by reading the reply and deciding it looks better.
+
+This page is marked draft, not published: it has no recorded trace and no scored result file yet,
+so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={promptEngineeringRun} label="Level 1 · Prompt engineering" runKey="prompt-engineering" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Most people already do some of this; it is usually one clause added on the fly ("be concise",
+"answer as a table") rather than a deliberate practice. The makers' own guides describe it as a
+handful of moves that hold up across their different models.
+
+**Instructions.** Say exactly what you want, not what you do not want. "Answer in two sentences"
+gets followed more reliably than "don't be too long."
+
+**Examples.** Show, not just tell, especially for a format that is hard to describe in words.
+OpenAI's guide calls one well-chosen example "few-shot learning"<Cite n={1}/>, and Google's
+guide goes further, recommending that few-shot examples always be included rather than left
+out<Cite n={3}/>.
+
+**A role.** Telling the model who it is for this conversation ("you are a parts-desk assistant")
+narrows what a plausible answer looks like, the way a job title narrows what a person would say
+next.
+
+**A format.** Asking for the answer as a specific shape makes the reply something code can check
+automatically instead of something a person has to read and judge. Google's own guide gives this
+example directly: ask for a response "as a table, bulleted list, elevator pitch, keywords,
+sentence, or paragraph"<Cite n={3}/> and that is what comes back.
+
+**Asking for reasoning.** For a question with more than one step, asking the model to work
+through it before giving a final answer tends to help, at the cost of more tokens and more time;
+OpenAI's guide notes this matters less for a model built to reason on its own by default, which
+tends to do better on high-level guidance than on very precise, spelled-out steps<Cite n={1}/>.
+
+**Iterating against test cases.** Anthropic's guide frames this as the starting point, not an
+afterthought: it assumes you arrive with a clear definition of success and a way to test against
+it, and says to establish both first if you do not have them<Cite n={2}/>. Then check a new
+version against the same cases the old one had to pass. A prompt that "feels" better after one
+try is a different claim from a prompt that scores better across cases it was not tuned on.
+
+In a chat app, all of this still applies with no API in sight: a saved custom instruction, a
+pinned example message, or just typing "answer in a table" each session are the same moves,
+done by hand instead of programmed once.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example runs the exact contrast above: the same question, against the same source passage,
+sent to the model two ways. The structured prompt adds a role, an explicit two-field output
+format, and one worked example — the moves OpenAI's and Anthropic's guides both
+describe<Cite n={1}/><Cite n={2}/>. The bare prompt is the question and the passage with nothing
+else added.
+
+<CodeFile file="examples/prompt_engineering/run.py" func="run" />
+
+The check at the end is what turns "did structure help" into something answerable rather than a
+matter of taste: `FIELD_RE` looks for exactly `PART: <something> PRICE: <something>` in the reply.
+Against this site's `StubModel`, the two replies are scripted by hand for the test that exercises
+this example — a well-formatted two-line answer for the structured run, and a hedging sentence
+that never states a part number in that shape for the bare one. That is an honest limit on what a
+stub run can show: it demonstrates the check a real prompt-tuning loop is built from, not a
+finding about how any real model responds to more or less structure. The citations above are the
+actual claims about real models; this example is the machinery for testing your own.
+
+Run it yourself:
+
+<CodeFile file="examples/prompt_engineering/README.md" start={14} end={15} lang="text" expect="python -m examples.prompt_engineering" />
+
+Every step is `decided_by: "code"`, the same as chat: the code always builds whichever prompt
+style it was asked for and asks the model exactly once. What changes between the two runs is
+entirely inside the prompt, not in the control flow around it — which is the technique in one
+sentence: something you do to the request, not a different level.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Skip adding structure if the bare question already gets the right answer every time you try it —
+structure has its own cost: more tokens on every call, and a format instruction that itself needs
+testing. And if the format absolutely must be valid on every single call rather than usually
+valid, use <Link href="/techniques/structured-output/">structured output</Link> instead of an
+instruction alone: a schema is enforced by the API, a format instruction is only a strong
+suggestion the model can still miss.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'The format holds on easy questions and slips on hard ones',
+    notice: 'Short, simple questions come back in the requested format every time, but a longer or more unusual question makes the model drop it.',
+    test: "Run the same prompt over the site's harder eval questions (multi-hop, conflicting sources) and score format compliance separately from correctness.",
+  },
+  {
+    name: 'Instructions that quietly conflict',
+    notice: 'Two rules in the same prompt pull in different directions, and the model resolves the conflict by picking one without telling you it had to choose.',
+    test: 'Read the prompt as a checklist and try to follow it yourself, line by line, as if you were the model given exactly that text and nothing else.',
+  },
+  {
+    name: 'One example teaches the wrong lesson',
+    notice: "The model copies an incidental detail of the worked example (its exact wording, its specific numbers) instead of the pattern the example was meant to show.",
+    test: "Change the specific values in the worked example and ask a new question; check whether the answer stays correct or drifts toward the example's own numbers.",
+  },
+  {
+    name: 'Tuned on too few cases',
+    notice: 'The prompt looks great on the handful of questions used to write it and gets measurably worse on questions it never saw while being tuned.',
+    test: 'Hold out part of the test set while writing the prompt, then score the finished prompt on the held-out part before it ships.',
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, one question', value: '1' },
+    { label: 'Tokens in, bare prompt', value: '~25' },
+    { label: 'Tokens in, structured prompt', value: '~140' },
+    { label: 'Wall time', value: '~0.4s' },
+  ]}
+  comparedTo={{
+    label: 'structured output (level 1)',
+    note: 'Structured output enforces a schema at the API level instead of asking for a format in words, for a similar token cost — the difference is whether an invalid reply is even possible, not how much it costs to ask.',
+  }}
+  level={1}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+Prompt engineering is not its own row in the site's eval; it is a way of improving the score at
+whichever level you are already using, by holding the retrieval, the tools and the level fixed and
+comparing prompt versions against the same 60-question set (`docs/EVALS.md`). The right test is
+A/B, not before/after: run the old prompt and the new prompt over the same questions and compare
+scores, since a single "it reads better now" impression on a handful of examples is exactly the
+failure the iterating-against-test-cases move above exists to catch.
+
+`scripts/eval_run.py` will not score this example against that set: it sends one fixed passage
+to the model two ways and never reads the documents the questions are about, so asking the
+runner for a score prints that reason and stops (`docs/EVALS.md`). What to measure for a prompt
+change is the pair, old prompt against new, on the same inputs: format adherence, the share of
+replies that come back in the shape you asked for, and accuracy of what is in them.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="How often the reply matches the required format, tracked separately from whether the content is correct. A reply can be well-formatted and wrong, or correct and unusable because it broke the format a downstream parser expects."
+  costAtVolume="A longer, more structured prompt costs more input tokens on every call, paid on every request regardless of whether that question needed the structure. A structure that only helps on hard questions is often worth adding conditionally rather than to every prompt."
+  failsInProduction={"A prompt tuned against a handful of examples during development meets a wider range of real questions in production, and the format-compliance rate drops because the tuning set didn't cover the phrasing that actually shows up."}
+  whatToLog="The full rendered prompt, not just the template; the raw reply; and whether it matched the expected format, so a format failure in production can be replayed against prompt changes before they ship."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Take a chat app request you make often and add one instruction, one example of the output you want, and a specific format. Compare the reply against what the plain version gave you.' },
+  { lane: 'build', body: 'Run both commands from examples/prompt_engineering/README.md with --model stub, then edit STRUCTURED_SYSTEM in run.py to remove the worked example and see whether the test file still passes.' },
+  { lane: 'either', body: 'Before you try it, write down exactly what a correct answer to your own question would contain. That written-down version is the test case the iterating-against-test-cases move above depends on.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

@@ -1,0 +1,48 @@
+{
+  "illustrative": true,
+  "h": 626,
+  "title": "Computer use",
+  "sub": "The model picks one action on a screen; code checks it against an allowlist, then runs it or refuses it.",
+  "pill": "Level 4 · Tools",
+  "nodes": [
+    { "id": "screen", "x": 170, "y": 34, "l": "Screen", "k": "io" },
+    { "id": "decide", "x": 170, "y": 174, "l": "picks one action", "k": "model" },
+    { "id": "allow", "x": 170, "y": 314, "l": "checks the allowlist", "k": "code" },
+    { "id": "act", "x": 170, "y": 454, "l": "runs the action", "k": "tool" },
+    { "id": "result", "x": 170, "y": 594, "l": "Result", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "screen", "t": "decide", "by": "code" },
+    { "id": "e2", "f": "decide", "t": "allow", "by": "model" },
+    { "id": "e3", "f": "allow", "t": "act", "by": "code" },
+    { "id": "e4", "f": "act", "t": "result", "by": "code" },
+    { "id": "e5", "f": "allow", "t": "result", "by": "code", "b": 140 },
+    { "id": "e6", "f": "decide", "t": "result", "by": "model", "b": -140 }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The screen renders as text",
+      "d": "[search-box] field \"Search\" value=\"\"\n[search-button] button \"Search\"\n[cookie-accept] button \"Accept all cookies\"\n[delete-account] link \"Delete my account\"",
+      "m": "4 elements · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The model picks an action",
+      "d": "→ click(id=\"search-button\")\n(cookie-accept and delete-account were also on screen)",
+      "m": "~140 tokens in · 10 tokens out · 0.5 s"
+    },
+    {
+      "e": "e3",
+      "h": "Your code checks the id against the allowlist",
+      "d": "\"search-button\" is in {search-box, search-button}\n→ allowed",
+      "m": "0 ms"
+    },
+    {
+      "e": "e4",
+      "h": "Your code runs the click",
+      "d": "\"Clicked search-button.\"",
+      "m": "done"
+    }
+  ]
+}

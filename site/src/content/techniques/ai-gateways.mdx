@@ -1,0 +1,256 @@
+---
+slug: ai-gateways
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "OpenRouter"
+    url: "https://openrouter.ai/"
+    publisher: "OpenRouter"
+    accessed: "2026-09-18"
+  - title: "LiteLLM documentation"
+    url: "https://docs.litellm.ai/docs/"
+    publisher: "BerriAI"
+    accessed: "2026-09-18"
+  - title: "AI Gateway"
+    url: "https://developers.cloudflare.com/ai-gateway/"
+    publisher: "Cloudflare"
+    accessed: "2026-09-18"
+---
+
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+
+An AI gateway is one entry point that every call to a model provider goes through instead of
+calling each provider directly. It centralizes provider keys, routing and fallback between
+providers, rate limits and budgets per caller, caching, a log of every call, and policy checks on
+the way out and back. LiteLLM's own documentation describes its proxy mode as a "Self-hosted LLM
+Gateway (Proxy) with virtual keys, cost tracking, and an admin UI," offering "Virtual keys with
+per-key/team/user budgets" and "Centralized logging, guardrails, and caching"<Cite n={2}/>.
+
+A gateway is not an agent framework: it decides nothing about what a model should do next, and
+holds no task state. It overlaps with an API aggregator without being the same thing — LiteLLM's
+own docs describe a library that "gives you a single, unified interface to call 100+ LLMs" and a
+separately named "Gateway (Proxy)" run on top of it, adding keys, budgets and policy<Cite n={2}/>.
+
+Two things come with the entry point: everything now depends on one component that can itself be
+down, and a hosted gateway is one more party that sees your traffic. Neither is a reason not to
+use one; both are decisions to make on purpose.
+
+This topic is not a level on the ladder; it applies at every level, the way
+<Link href="/techniques/ops/">ops</Link> does. This page is marked draft, not published: no
+result file or production trace exists for this site, so nothing below reports a measured
+number.
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Most people who benefit from a gateway never call one directly; a company's own product calls it
+on their behalf. The sign one is in front of you is usually indirect: a product that keeps
+working when a provider has an outage, that seems to answer easy questions from a different,
+faster model than hard ones, or whose account has one bill covering several providers' usage.
+OpenRouter, a hosted service, puts its own pitch in two lines on its front page: "Call many
+models or providers through one API key, one bill, and one SDK," and "Route around provider
+outages and rate limits with automatic fallbacks"<Cite n={1}/>. Those are the maker's words for
+what its product is for, not a result this site has checked.
+
+What a gateway costs is a new component between you and the model, and a new question about who
+sees your traffic. A hosted gateway — OpenRouter is one, and Cloudflare AI Gateway another, whose
+documented features include caching, rate limiting, logging and "model fallbacks in case of
+an error"<Cite n={3}/> — is a third party that a request passes through before
+it reaches the model provider at all, on top of whatever the model provider itself sees. That is
+a question to answer, not a warning: what does this company say it retains, for how long, and is
+that acceptable for the traffic you are about to send through it. A self-hosted gateway, the mode
+LiteLLM's own proxy is built to run as, keeps that hop inside infrastructure you already control,
+at the cost of running and patching one more service yourself. Neither is strictly better: it is
+the same shape of trade-off <Link href="/techniques/local-inference/">running a model
+locally</Link> makes against calling an API, one layer up the stack.
+
+If a product you use suddenly starts failing every request instead of degrading gracefully, a
+gateway outage is worth considering before assuming every provider behind it is down at once.
+That is the trade the entry point makes: one component in front of five providers replaces five
+integrations, and it also becomes the one thing whose going down takes all five with it.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example is a small in-process gateway: one call per key routes to that key's primary
+provider, falls back to its secondary on any error, and is refused outright once the key's token
+budget is spent. Both "providers" are `Model`s from `examples.common.model` — here two
+`StubModel`s standing in for what would really be an Ollama tag and a Claude model id behind the
+same interface, so the gateway's own code never has to know which one actually answered:
+
+<CodeFile file="examples/ai_gateways/run.py" cls="Gateway" />
+
+Budget is checked before the call and reconciled after it against the tokens the provider
+actually reported, which is the right order: a key with nothing left is refused without a
+provider ever being contacted. Be precise about what that buys, though, because it is easy to
+oversell. The check asks whether anything is left, not whether enough is left, so one call of any
+size may still start and finish below zero; the overshoot is bounded by one call, and the tests
+pin it. And check, call, subtract is three steps, so two calls racing each other can both read
+the same remaining budget and both go through — a real gateway reserves against the budget under
+a lock or in a shared store, and this one runs in a single thread and says so.
+
+Fallback is the mechanism that needs a warning rather than a caveat. `complete` falls back on any
+exception from the primary, and an exception does not tell you whether the provider did the work
+before it failed. For a plain completion that is harmless. For anything with a side effect — a
+call that charges something, files something, or sends something — retrying on a different
+provider can do it twice, so falling back on everything that raises is a choice to make per
+route, not a default to leave on.
+
+Redaction is a constructor flag, not an afterthought. `Gateway.redact` defaults to `True`, so a
+call's prompt text never reaches `LogEntry.prompt`; a caller has to turn it off deliberately to
+see it, the same shape of default OpenTelemetry uses for anything that might carry
+<Link href="/techniques/observability/">sensitive content</Link>. The flag covers the gateway's
+own log and nothing else. If both providers fail, the second one's exception propagates
+unchanged, and a real provider client often quotes part of the request in that string — a second
+way prompt text leaves a system whose logs are careful.
+
+<CodeFile file="examples/ai_gateways/README.md" start={12} end={12} lang="text" expect="python -m examples.ai_gateways" />
+
+`tests/test_example_ai_gateways.py` checks all three mechanisms and then attacks them: a failing
+primary falls back and the log records `fell_back=True`; a key with an exhausted budget raises on
+its next call while a different key's budget is untouched; a planted secret never appears in the
+log's `repr` with redaction on, only when it is explicitly turned off; and three more tests pin
+the limits above — the single-call overshoot, the two calls that both read the budget before
+either subtracts, and the refused call that reaches no provider and names no prompt in its error.
+
+What the example leaves out matters as much as what it includes. It has no policy check — a real
+gateway's "guardrails" step, the same idea <Link href="/techniques/guardrails/">guardrails</Link>
+covers, would run here, on the request before it is sent or the answer before it is returned. It
+also has no cache: a real gateway's cache is keyed on more than the prompt text alone, because
+two different keys asking the identical question are not necessarily allowed to share an answer,
+and a cache that ignores which key asked is a way for one tenant's data to reach another's
+response.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Skip a gateway while a project calls one provider directly with one key and has no budget,
+routing or fallback need of its own — a gateway adds a component that itself has to stay running,
+and a single call to a single provider has nothing for a gateway to route between.
+
+Move up once more than one provider is in play, once separate callers need separate budgets or
+keys tracked centrally, or once the same policy or logging check needs to apply no matter which
+provider actually answers. A gateway is also where the levers on
+<Link href="/techniques/cost-optimization/">cost optimization</Link> get enforced once for
+everything rather than reimplemented in each application that calls a model.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'The gateway becomes the single point of failure',
+    notice: 'Every provider behind the gateway is healthy, but every request still fails, because the one thing in front of all of them is down.',
+    test: 'Take the gateway itself offline in a test environment and confirm the failure is visible and distinguishable from a provider outage in whatever you monitor, not lumped in with "the model is down."',
+  },
+  {
+    name: 'Fallback hides a real outage instead of surfacing it',
+    notice: "A primary provider is failing every request, but because the fallback quietly answers every time, nothing downstream notices until someone asks why costs or latency changed.",
+    test: 'Check whether a fallback event is logged and counted on its own, the way this example\'s LogEntry.fell_back is, not merged into a single "request succeeded" metric that looks identical either way.',
+  },
+  {
+    name: "A cache serves one caller's answer to a different caller",
+    notice: 'Two different keys ask a similar or identical question, and a cache keyed only on the prompt text returns one caller\'s cached answer to the other, which can leak content across tenants.',
+    test: "Send the same prompt under two different keys and confirm the cache key includes which key asked, not the prompt text alone.",
+  },
+  {
+    name: 'A budget check runs after the call instead of before it',
+    notice: 'A key goes over budget because the check that should have refused the call ran only after the provider had already answered and been billed.',
+    test: 'Confirm a key with zero budget remaining is refused before any provider is called, the way this example\'s Gateway.complete checks first — not billed once more and then flagged.',
+  },
+  {
+    name: 'Fallback retries a request that should not run twice',
+    notice: "A primary provider fails after doing the work rather than before, the gateway cannot tell the two apart, and the retry on the secondary repeats a side effect — something charged, filed or sent twice for one request.",
+    test: 'List what each route can actually cause to happen, and confirm fallback is enabled only on the routes where repeating the request is harmless; for the rest, the gateway should surface the error rather than retry it somewhere else.',
+  },
+  {
+    name: 'A budget is a floor, not a cap, and one call goes under it',
+    notice: "A key with a little budget left starts a very large call, because the check asked whether anything remained rather than whether enough remained, and the key finishes the call below zero.",
+    test: "Send one deliberately oversized request against a nearly-spent key and read the remaining budget afterwards. If it is negative, the overshoot is real and worth bounding by request size, not only by what is left.",
+  },
+  {
+    name: "The log redacts nothing, or redacts what a reader actually needed",
+    notice: "A log built for debugging keeps full prompt and answer text by default, which is useful right up until the log itself becomes the thing someone has to secure and explain in an audit — or the opposite: redaction is on for everything, including the one field a real incident needed to see.",
+    test: "Check what a log actually contains after a real request, not what a redaction flag is named; this example's own tests assert the secret string is absent with redact=True and present with it off, which is the same check to run against a real deployment.",
+  },
+]} />
+
+## At each level
+
+- <Link href="/levels/1/">One call</Link>: a gateway is one extra hop in front of the single
+  call <Link href="/techniques/chat/">chat</Link> makes; whether it earns its place here depends
+  entirely on whether more than one provider or key is already in the picture.
+- <Link href="/levels/3/">Workflows</Link>: your own code already decided which step calls which
+  model, so the gateway's routing is redundant with that decision — what it adds here is one
+  budget and one log across every step, not new fallback logic your code didn't already have.
+- <Link href="/levels/4/">Tools</Link>: a tool definition passes through the gateway unchanged
+  in either direction, so nothing about <Link href="/techniques/function-calling/">function
+  calling</Link> is this layer's concern — only the token accounting around the call is.
+- <Link href="/levels/5/">Agents</Link>: the number of calls a run makes is not fixed in advance,
+  so a gateway's per-key budget is a real backstop here, not just bookkeeping — the same ceiling
+  <Link href="/techniques/single-agent/">a single agent</Link>'s own `max_tokens` cap is meant to
+  provide, enforced one layer further out in case the cap inside the loop fails to hold.
+- <Link href="/levels/6/">Teams of agents</Link>: several agents can share one gateway key or
+  each hold their own, which is exactly the choice that decides whether
+  <Link href="/techniques/orchestrator-workers/">a lead and its workers</Link> show up as one
+  line in a cost report or several.
+- <Link href="/levels/7/">Always-on agents</Link>: traffic is continuous rather than one burst
+  per question, so a per-key budget stops being an occasional backstop and becomes the thing that
+  decides how much a runaway loop can spend before anyone is awake to notice.
+
+## Practices
+
+- Check a key's budget before calling a provider, not after, and reserve against it rather than
+  subtracting afterwards, so two simultaneous calls cannot both spend the last of it.
+- Turn fallback on per route, not globally. A request that can be repeated safely is a different
+  thing from one that charges, files or sends, and only the first is a fallback candidate.
+- Key a cache on more than the prompt text — who asked matters as much as what was asked, or one
+  caller's cached answer can reach another's request.
+- Log every fallback as its own event, not folded into a plain success count, so a primary
+  provider quietly failing every request is visible before someone asks why costs changed.
+- Redact prompt and answer content in logs by default, and then check the paths the flag does not
+  cover: a provider's raw error string is the usual one, and
+  <Link href="/techniques/observability/">observability</Link> lists the rest.
+- Decide up front whether the gateway itself is allowed to be a single point of failure for your
+  system, and if not, plan for what happens when it, not a provider behind it, is the thing that
+  is down.
+
+## Run it
+
+<RunIt
+  monitor="Fallback rate per key, separately from plain error rate; budget remaining per key;
+  and cache hit rate if caching is on, the same figures the ops track already asks for but split
+  out per key instead of aggregated."
+  costAtVolume="A gateway centralizes routing and budget decisions that would otherwise be
+  duplicated in every calling application; what it costs instead is running and securing one more
+  service that everything else now depends on."
+  failsInProduction="A fallback masks a primary provider's outage until someone asks why answers
+  changed, or a cache keyed only on the prompt text returns one caller's answer to a different
+  caller."
+  whatToLog="Which key called, which provider actually answered, whether it fell back, tokens in
+  and out, and whether a policy check ran and what it decided — with prompt and answer content
+  redacted unless explicitly captured."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: "Find a product you use that calls more than one AI provider (check its status page or documentation for the providers it names). Look for signs of a gateway in front of them: one combined status indicator, or a single outage that took down access to every provider at once." },
+  { lane: 'build', body: "Run python -m examples.ai_gateways --demo from the repo root and read the printed log. Then change team-a's budget in _demo_gateway (examples/ai_gateways/__main__.py) from 10 to 10000 and run it again -- does the second call for team-a still get refused?" },
+  { lane: 'either', body: "Pick one of the failure modes above and write down, for a real system you use or built, which of its two mitigations -- the check itself, or the log that would reveal the check failed -- you actually have today." },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

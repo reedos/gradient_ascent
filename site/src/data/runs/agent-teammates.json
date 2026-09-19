@@ -1,0 +1,66 @@
+{
+  "illustrative": true,
+  "h": 1080,
+  "title": "Always-on assistants",
+  "sub": "One scheduled tick: the model proposes actions, code sorts them into three classes.",
+  "pill": "Level 7 · Always-on agents",
+  "nodes": [
+    { "id": "tick", "x": 170, "y": 30, "l": "Scheduler tick", "k": "io" },
+    { "id": "events", "x": 170, "y": 170, "l": "Digest since last tick", "k": "code" },
+    { "id": "act", "x": 170, "y": 310, "l": "proposes actions", "k": "model" },
+    { "id": "policy", "x": 170, "y": 450, "l": "POLICY table", "k": "code" },
+    { "id": "auto", "x": 82, "y": 590, "l": "Run unattended", "k": "code" },
+    { "id": "forbidden", "x": 258, "y": 590, "l": "Refuse: forbidden", "k": "code" },
+    { "id": "approval", "x": 170, "y": 730, "l": "Queue for approval", "k": "code" },
+    { "id": "human", "x": 170, "y": 870, "l": "Person decides", "k": "human" },
+    { "id": "done", "x": 170, "y": 1010, "l": "Approved action runs", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "tick", "t": "events", "by": "code" },
+    { "id": "e2", "f": "events", "t": "act", "by": "code" },
+    { "id": "e3", "f": "act", "t": "policy", "by": "model" },
+    { "id": "eauto", "f": "policy", "t": "auto", "by": "code", "b": -30 },
+    { "id": "eforbidden", "f": "policy", "t": "forbidden", "by": "code", "b": 30 },
+    { "id": "eapproval", "f": "policy", "t": "approval", "by": "code" },
+    { "id": "e5", "f": "approval", "t": "human", "by": "code" },
+    { "id": "e6", "f": "human", "t": "done", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "A scheduled tick wakes the agent",
+      "d": "cron calls run_tick() on a timer\nno person opened this run",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code builds a digest of what changed since the last tick",
+      "d": "3 new emails: a newsletter, a meeting request from\na client, and an invoice asking to be paid",
+      "m": "3 events · 4 ms"
+    },
+    {
+      "e": "e3",
+      "h": "The model decides what needs doing and proposes three actions in one call",
+      "d": "→ archive_email(\"newsletter\")\n→ send_email(\"confirm the meeting\")\n→ make_payment(\"pay the invoice, $4,200\")\n(the model chose the actions; it does not choose what\nhappens to them next)",
+      "m": "310 in · 41 out · 0.7 s"
+    },
+    {
+      "e": "eapproval",
+      "h": "Your code looks each action up in POLICY, which the model cannot change",
+      "d": "auto → archive_email ran unattended, this same tick\napproval → send_email is queued below, unrun\nforbidden → make_payment is refused outright\nanything not in the table → forbidden, by default",
+      "m": "0 tokens · 3 classified"
+    },
+    {
+      "e": "e5",
+      "h": "The approval-class action sits in the queue; a person has not seen it yet",
+      "d": "send_email(\"confirm the meeting\") added to the queue\nnothing in the queue runs on its own, however long it\nwaits there",
+      "m": "0 tokens · queued"
+    },
+    {
+      "e": "e6",
+      "h": "A person reviews the queue and approves it",
+      "d": "approve(index=0, decision=\"approve\", approver=\"dana\")\n→ the email sends now, not when the model asked, and the\nlog records who released it",
+      "m": "decision: approved by a person"
+    }
+  ]
+}

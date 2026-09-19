@@ -1,0 +1,106 @@
+---
+slug: document-extraction
+reviewed: 2026-09-18
+sources: []
+---
+
+import Run from '../../components/page/Run.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import Link from '../../components/page/Link.astro';
+import extractionRun from '../../data/runs/recipe-document-extraction.json';
+
+A clinic's front desk photographs each new patient's paper intake form instead of re-typing it —
+name, date of birth, reason for visit, insurance ID — into the patient system by hand. The form is
+handwritten, sometimes hard to read, and the record it becomes matters enough that nobody wants a
+guessed date of birth saved silently.
+
+Document extraction is that job: read the image, fill a fixed set of fields, and have a person
+confirm the record — correcting whatever the read got wrong — before it's saved. Nothing here
+decides whether to save; that always happens once a person has looked.
+
+## The assembled diagram
+
+<Run data={extractionRun} label="Level 3 · Turn a form photo into a record" runKey="document-extraction" />
+
+## Why these techniques, and why not higher
+
+Three techniques compose this recipe. <Link href="/techniques/multimodal/">Multimodal</Link> reads
+the photographed form in the same one call a chat app makes when you upload an image and ask about
+it — still level 1, since sending a picture alongside text changes what's in the request, not the
+one-call shape. <Link href="/techniques/structured-output/">Structured output</Link> turns what it
+reads into the same four-field record every time, validated, with one retry if a field comes back
+malformed. <Link href="/techniques/human-in-the-loop/">Human approval</Link> is what actually
+raises this recipe to level 3: the run always pauses for a person before anything is saved, since
+a misread field here becomes a wrong record in the patient system, not a wrong answer on a screen.
+
+Nothing needs to climb past that. Saving is a fixed action your code always takes once a person
+has approved, not a choice the model makes — the boundary <Link
+href="/techniques/function-calling/">function calling</Link>'s own page draws between a tool your
+code always runs and one the model decides whether to reach for. There is no
+"whether" here. Multimodal has nothing to gain from an agent
+loop either — reading one form is one call whether or not every field is legible, and your code
+can decide in advance to re-ask on whichever field the first pass couldn't read.
+
+The gate is not optional here the way it can be elsewhere on this site. Human approval's own page
+says to skip a gate when being wrong is cheap and easy to notice after the fact; a patient record
+with the wrong birth date is neither, so this recipe pauses on every field the read could not
+reach, rather than setting a looser threshold and letting some of them through.
+
+## Walkthrough
+
+The three steps compose the runnable code already on the multimodal, structured output and human
+approval pages, each written against the site's own shared examples — a rating plate, a warranty
+record in text — rather than a literal intake form. Composing them here means keeping the same
+three functions and swapping in this job's own schema (name, date of birth, reason for visit,
+insurance ID, each allowed to come back `"unknown"`) and its own gate reason (`low_confidence`
+whenever a field reads `"unknown"`). Nothing in this repository ships that form; the diagram is
+those three examples with this job's schema in them.
+
+The run above shows a form with one field genuinely too faint to read. The first pass returns
+three clean fields and `"unknown"` for the date of birth; the code crops that corner of the image
+and asks again, the same one-retry contract structured output's own example uses, and the model
+still can't read it — an honest `"unknown"`, not a guessed date. Cropping works because the clinic
+uses one fixed form, so the code knows where each field sits; a desk handling several layouts has
+to re-ask on the whole image instead. The record validates either way, since `"unknown"` is a
+well-typed string, so the gate is what catches it: `low_confidence` trips, the run pauses, and a
+person reads the paper form, fills in the real date and approves. The corrected record is what
+gets saved.
+
+Say plainly where the data goes. A photographed intake form is patient data and it leaves the
+machine the moment the request is sent, so where the model runs is settled before how accurate it
+is. Log the extracted fields, the gate's reason and the correction a person made — and the
+attachment's size and type rather than the image itself.
+
+## What to measure
+
+<HowToEval>
+
+None of the three techniques here answers a question the site's shared 60-question set can grade;
+each has its own measurement instead, described on its own page. Build a labeled set for this job:
+a batch of photographed forms with the record a person would actually write down beside each one.
+Two numbers matter most. Field accuracy against those labels, character for character for a date
+or an ID — the same measure multimodal's own page describes for a serial number read off a plate —
+tells you whether a field that validated is also correct. And the gate's own numbers: the pause
+rate, and separately, a check of the answers that did *not* pause, to see whether an "unknown" ever
+slipped through as a confident-looking guess instead. No result file exists for multimodal,
+structured output or human approval yet (see `docs/EVALS.md`), so this recipe claims no score.
+
+</HowToEval>
+
+## Variations
+
+- Route by form type first — intake, insurance update, referral — with <Link
+  href="/techniques/routing/">routing</Link>, if the clinic uses more than one form, each needing
+  a different schema; the extraction and the gate stay the same underneath.
+- Loosen the gate on fields that are cheap to get wrong — a misspelled name a later step can fix —
+  while keeping it strict on a date of birth or an insurance ID, rather than one threshold for
+  every field.
+- Move to <Link href="/techniques/function-calling/">function calling</Link> only if saving stops
+  being one fixed action — for instance, if the model must first decide whether this patient
+  already has a record to update instead of a new one to create.
+- Preprocess before reading: cropping, deskewing or upscaling the photographed corner that failed,
+  the way the retry in the run above does, is <Link href="/techniques/order-zero/">order
+  zero</Link> applied to one field rather than the whole form.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}

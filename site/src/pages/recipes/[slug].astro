@@ -1,0 +1,107 @@
+---
+import { getEntry, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import Pill from '../../components/Pill.astro';
+import TechniqueRow from '../../components/TechniqueRow.astro';
+import Sources from '../../components/page/Sources.astro';
+import Reviewed from '../../components/page/Reviewed.astro';
+import { url } from '../../lib/url';
+import { recipes, techniquesForRecipe, recipeLevels } from '../../lib/content';
+
+export function getStaticPaths() {
+  return recipes.map((r) => ({ params: { slug: r.slug } }));
+}
+
+const { slug } = Astro.params;
+const recipe = recipes.find((r) => r.slug === slug)!;
+const techniques = techniquesForRecipe(recipe);
+const lv = recipeLevels(recipe);
+const highest = lv.length ? Math.max(...lv) : undefined;
+const color = highest !== undefined ? `var(--o${highest})` : 'var(--ot)';
+
+const entry = await getEntry('recipes', slug!);
+const rendered = entry ? await render(entry) : undefined;
+const Content = rendered?.Content;
+
+// Same rule as a technique page: sources and the reviewed date are rendered from frontmatter,
+// last, so the reviewed date closes the page and no MDX file keeps a second copy of its own
+// source list.
+const sources = entry?.data.sources ?? [];
+const reviewedISO = entry ? entry.data.reviewed.toISOString().slice(0, 10) : undefined;
+---
+<Base title={`${recipe.title} · Gradient Ascent`} description={recipe.summary}>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href={url('/')}>Home</a>
+    <span aria-hidden="true">/</span>
+    <a href={url('/recipes/')}>Recipes</a>
+    <span aria-hidden="true">/</span>
+    <span>{recipe.title}</span>
+  </nav>
+
+  <div class="page-hero leveled" style={`--c:${color}`}>
+    <Eyebrow label="Recipe" color={color} />
+    <h1>{recipe.title}</h1>
+    <p>{recipe.summary}</p>
+    <p>
+      {recipe.status && <Pill status={recipe.status} />}
+      {highest !== undefined && (
+        <span class="pill level" style={`--c:${color}`}>
+          Needs level {highest}
+        </span>
+      )}
+    </p>
+  </div>
+
+  {
+    Content ? (
+      <div class="prose">
+        <Content />
+      </div>
+    ) : (
+      <p class="status-note">
+        This recipe page is an outline. The assembled diagram, the walkthrough, what to measure and
+        the variations have not been written yet.
+      </p>
+    )
+  }
+
+  <section class="section">
+    <div class="section-top">
+      <div>
+        <div class="eyebrow muted">Composition</div>
+        <h2>Techniques this recipe uses</h2>
+      </div>
+      {highest !== undefined && <p>The highest level it needs is level {highest}.</p>}
+    </div>
+    <div class="panel reading">
+      {
+        techniques.map((t) => (
+          <TechniqueRow
+            slug={t.slug}
+            title={t.title}
+            summary={t.summary}
+            status={t.status}
+            color={t.level === 'tracks' ? 'var(--ot)' : `var(--o${t.level})`}
+          />
+        ))
+      }
+    </div>
+  </section>
+
+  {
+    sources.length > 0 && (
+      <section class="section">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow muted">Where this comes from</div>
+            <h2>Primary sources</h2>
+          </div>
+        </div>
+        <Sources sources={sources} />
+      </section>
+    )
+  }
+
+  {reviewedISO && <Reviewed date={reviewedISO} mdHref={url(`/recipes/${slug}.md`)} />}
+</Base>

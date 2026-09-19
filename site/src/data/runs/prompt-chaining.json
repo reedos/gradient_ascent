@@ -1,0 +1,54 @@
+{
+  "illustrative": true,
+  "h": 420,
+  "title": "Prompt chaining",
+  "sub": "Break the task into fixed steps. The model fills each one in; your code decides the order.",
+  "pill": "Level 3 · Workflows",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
+    { "id": "rewrite", "x": 170, "y": 104, "l": "Rewrite into queries", "k": "model" },
+    { "id": "retrieve", "x": 170, "y": 176, "l": "Retrieve per query", "k": "code" },
+    { "id": "draft", "x": 170, "y": 250, "l": "Draft an answer", "k": "model" },
+    { "id": "check", "x": 170, "y": 322, "l": "Check citations", "k": "code" },
+    { "id": "a", "x": 170, "y": 392, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "rewrite", "by": "code" },
+    { "id": "e2", "f": "rewrite", "t": "retrieve", "by": "code" },
+    { "id": "e3", "f": "retrieve", "t": "draft", "by": "code" },
+    { "id": "e4", "f": "draft", "t": "check", "by": "code" },
+    { "id": "e5", "f": "check", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"Is the DR-520 vent length still 35 feet?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code asks the model to split the question into search queries",
+      "d": "\"DR-520 vent length maximum\"\n\"DR-520 vent service bulletin\"",
+      "m": "18 tokens in · 14 tokens out · 340 ms"
+    },
+    {
+      "e": "e3",
+      "h": "Your code retrieves for each query and merges the results",
+      "d": "dr520-manual#4    Venting Requirements\nservice-bulletin#2  Revised Vent Specification",
+      "m": "2 queries · 2 sections · 9 ms"
+    },
+    {
+      "e": "e4",
+      "h": "Your code asks the model to draft from what came back",
+      "d": "\"No. The manual originally stated 35 feet [dr520-manual#4],\nbut a later service bulletin lowered the DR-520 limit to\n25 feet [service-bulletin#2].\"",
+      "m": "410 tokens in · 52 tokens out · 1.6 s"
+    },
+    {
+      "e": "e5",
+      "h": "Your code checks the draft's citations against what was actually retrieved",
+      "d": "claimed: dr520-manual#4, service-bulletin#2\nretrieved: dr520-manual#4, service-bulletin#2\nkept: both (nothing ungrounded)",
+      "m": "2 citations kept · 0 dropped"
+    }
+  ]
+}

@@ -1,0 +1,215 @@
+---
+slug: chat
+level: 1
+run: chat
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Claude Sonnet 5"
+    url: "https://platform.claude.com/docs/en/models/sonnet-5/overview"
+    publisher: "Anthropic"
+    date: "2026-06-30"
+    accessed: "2026-09-18"
+  - title: "Claude"
+    url: "https://claude.com/product/overview"
+    publisher: "Anthropic"
+    accessed: "2026-09-18"
+  - title: "OpenAI API documentation"
+    url: "https://developers.openai.com/api/docs/overview"
+    publisher: "OpenAI"
+    accessed: "2026-09-18"
+  - title: "Ollama"
+    url: "https://ollama.com/"
+    publisher: "Ollama"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import chatRun from '../../data/runs/chat.json';
+
+Chat is level 1: one request, one response, and nothing in between decides anything. You, or the
+product you are using, send a question in a message, and the model returns an answer once. There
+is no search step, no tool call, and no second look at its own answer — whatever comes back on
+the first attempt is what you get. This is also what most people mean by "using AI": typing into
+a chat app and reading back a reply.
+
+Because there is only one step, the whole outcome depends on what happens inside that one call:
+how the model was trained, and what you put in the request. Later levels add retrieval, tools and
+loops around the model to make up for what one call alone gets wrong. Before any of that, it
+helps to be precise about what "the model" even refers to, because a chat app, the company behind
+it, and the model actually answering you are three different things often sharing one name.
+
+This page is marked draft, not published: chat has no recorded trace and no scored result file
+yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={chatRun} label="Level 1 · Chat" runKey="chat" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Four kinds of name get used almost interchangeably in conversation, and keeping them apart is the
+fastest way to make sense of anything on this site, or in the news about AI.
+
+A **developer** trains models. Anthropic and OpenAI are developers. A developer's name rarely
+appears on your screen by itself; it appears on everything else.
+
+A **model** is a trained system with a specific, versioned name. Claude Sonnet 5 is a model
+Anthropic trains; Anthropic's own documentation states it as released June 30, 2026, with the
+model id `claude-sonnet-5`<Cite n={1}/>. The version matters because a model is frozen once
+trained — Claude Sonnet 5 does not quietly get smarter next month; a new model with a new name
+replaces it instead.
+
+A **product** is something a person uses — a chat app, here. Claude, Anthropic's own product, is
+described as "a helpful, intuitive, and powerful collaborator you can put to work on real
+tasks"<Cite n={2}/>; behind that description, it calls one of Anthropic's models to generate each
+reply. ChatGPT is OpenAI's equivalent product. A product's name and a model's name are not
+interchangeable: "Claude" is not itself a model, and asking "which Claude" is really asking which
+model answered you, which the product usually shows in a menu.
+
+A **tool** is something a developer builds with, not something a person chats in directly. The
+OpenAI API ships "guides and conceptual documentation for building with the OpenAI API"<Cite n={3}/>
+— code calls it; a person does not type into it directly. Ollama is a different kind of tool: it
+runs a model on your own machine instead of over the network, so that "nothing you run locally
+ever leaves your machine"<Cite n={4}/>. Neither is a product on its own; each is what someone
+else's product, or your own code, gets built on top of.
+
+Once these four are apart, a lot of confusion resolves itself. "Is Claude as good as GPT-6 Astra"
+compares a product to a model, which is not quite the right question, since a product can run
+more than one model and a menu decides which. "I built this with the OpenAI API" is a tool
+credit, not a product endorsement. Reading a name anywhere on this site, ask which of the four it
+is; the "Out there" list at the bottom of every page groups its names the same way.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The Build it example is level 1's entire trick: send the question, change nothing else, and see
+what the model does with no documents and no tools available to it. `examples/one_call` asks
+about Halvorsen, a fictional appliance maker invented for this site's synthetic documents,
+specifically so a model has never legitimately seen its manuals. A correct run at this level
+mostly means declining questions it cannot know the answer to, rather than inventing a
+plausible-sounding number — which is exactly the failure this level exists to measure, and
+exactly what <Link href="/techniques/rag/">RAG</Link> exists to fix.
+
+The system prompt is the only lever available here, and it says so directly: answer plainly, and
+say so plainly when a specific fact is not known instead of guessing at it. There is no chunking,
+no search and no schema — one system message, one user message, one call.
+
+<CodeFile file="examples/one_call/run.py" func="run" />
+
+Two things are worth noticing in the trace. First, calling the model is not itself a model
+decision: the code decided to make this call, in this order, before the model said anything — the
+`"model"` kind on that step and the `"code"` `decided_by` on the same step answer two different
+questions (see `docs/EVALS.md`). Second, there is nothing left to decide once the call returns;
+the code does not parse the answer, check it against anything, or call the model again. It hands
+back exactly what came back. Run it yourself:
+
+<CodeFile file="examples/one_call/README.md" start={15} end={15} lang="text" expect="python -m examples.one_call" />
+
+A newcomer building their first real thing on top of a model almost always starts here, whether or
+not they call it "level 1": one prompt, sent through whichever tool wraps the developer's model —
+usually that developer's own API, or a tool like Ollama that can swap which model answers without
+changing the calling code.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try <Link href="/techniques/order-zero/">level 0, no model at all</Link> first if the question has a fixed
+vocabulary and repeats often enough that a keyword search or a rule can answer it with no model at
+all. Level 0 is fast, free and completely predictable — three things a chat reply cannot
+promise.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'Confident answers outside what the model actually knows',
+    notice: "The reply is fluent and specific about something the model was never trained on (a fictional product, your own private data, an internal document), instead of saying it does not know.",
+    test: "Ask about something invented for this site's synthetic corpus, like a Halvorsen part number, with no documents attached, and check whether the model declines or guesses.",
+  },
+  {
+    name: 'No memory beyond what is sent',
+    notice: 'A follow-up question gets answered as if the earlier part of the conversation never happened, because a single call only sees what is in that one request.',
+    test: 'Call the model with only the latest question, no prior turns included, and check whether it can still answer something that depended on earlier context.',
+  },
+  {
+    name: 'Knowledge cutoff',
+    notice: 'The model answers confidently about something that changed after its training data ends, using the old fact as if it were current.',
+    test: "Ask about a recent event or a fact you know changed recently, and compare the answer against the model's stated knowledge cutoff.",
+  },
+  {
+    name: 'No way to check its own answer',
+    notice: 'Asking "are you sure" is still just another single call; the model may double down or flip its answer with equal confidence either way, since nothing verifies either reply against a source.',
+    test: 'Ask the same factual question twice in separate calls, phrased differently, and check whether the two answers actually agree.',
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, one question', value: '1' },
+    { label: 'Tokens in', value: '~40' },
+    { label: 'Tokens out', value: '~55' },
+    { label: 'Wall time', value: '~0.6s' },
+  ]}
+  comparedTo={{
+    label: 'RAG (level 2)',
+    note: 'RAG adds one retrieval step and roughly forty times the input tokens for the same question, in exchange for grounding the answer in real documents instead of whatever the model remembers from training.',
+  }}
+  level={1}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+Chat is scored on the same 60-question set as every other level (`docs/EVALS.md`). With no
+documents attached, its lookup and numeric scores should sit close to level 0's floor: whatever
+it gets right, it gets right from training data alone, which for a fictional appliance maker like
+Halvorsen should be close to nothing. The one place a single call can beat a keyword score is
+unanswerable questions, if the system prompt's instruction to decline rather than guess actually
+holds — it can say "I don't know" in its own words instead of returning an irrelevant passage.
+
+No result file exists yet for any level (see `docs/EVALS.md`). Run
+`python scripts/eval_run.py --example one_call --model stub --dry` to project the token cost of a
+run before spending anything on a real one.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="The rate of confidently wrong answers on anything outside common knowledge, since a single call has no way to flag its own uncertainty beyond what the prompt asks it to say."
+  costAtVolume="Tokens in track what you send (the question plus any instructions); tokens out track how long the replies run. Both scale linearly with traffic, and there is no retrieval or tool infrastructure running alongside it to add to the bill."
+  failsInProduction={"A user asks about something the model was never trained on, or something that changed after its training cutoff, and gets a fluent, wrong answer instead of a refusal. Or an app update quietly drops the instruction to say \"I don't know\", and nobody notices until a wrong answer causes a real problem."}
+  whatToLog="The full prompt sent (system and user messages), the model id and version, and the raw reply, so a bad answer traces back to what the model was actually asked rather than being guessed at afterward."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Open a chat app and check which model answered your last message, usually shown in a menu or settings panel. Ask it its own knowledge cutoff date and compare that against what the product\'s own documentation says.' },
+  { lane: 'build', body: 'Run python -m examples.one_call --model stub --question "What voltage does a DR-210 need?" from the repo root, then ask it something real and common instead, like the boiling point of water, and compare how the two replies differ.' },
+  { lane: 'either', body: 'Pick a name from the "Out there" list at the bottom of this page and say which of the four kinds it is: developer, model, product, or tool.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

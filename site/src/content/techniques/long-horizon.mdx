@@ -1,0 +1,273 @@
+---
+slug: long-horizon
+level: 7
+run: long-horizon
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Effective context engineering for AI agents"
+    url: "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
+    publisher: "Anthropic (Engineering blog)"
+    accessed: "2026-09-18"
+  - title: "Your First Session"
+    url: "https://docs.devin.ai/get-started/first-run"
+    publisher: "Cognition (Devin documentation)"
+    accessed: "2026-09-18"
+  - title: "Session Insights"
+    url: "https://docs.devin.ai/product-guides/session-insights"
+    publisher: "Cognition (Devin documentation)"
+    accessed: "2026-09-18"
+  - title: "Understanding Temporal"
+    url: "https://docs.temporal.io/evaluate/understanding-temporal"
+    publisher: "Temporal (documentation)"
+    accessed: "2026-09-18"
+  - title: "How Functions Are Executed"
+    url: "https://www.inngest.com/docs/learn/how-functions-are-executed"
+    publisher: "Inngest (documentation)"
+    accessed: "2026-09-18"
+  - title: "Archival memory"
+    url: "https://docs.letta.com/guides/core-concepts/memory/archival-memory"
+    publisher: "Letta (documentation)"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import longHorizonRun from '../../data/runs/long-horizon.json';
+
+A long-running task keeps going after everyone has stopped watching it. It starts on a schedule
+or an event, not a typed message, and runs across many separate sessions — separate processes,
+separate context windows — until its queue or goal is finished, or a person steps in.
+
+No session sees the one before it directly: whatever an earlier session learned has to be
+written somewhere a fresh one can read back. Anthropic's own writing on long-running agents
+describes "structured note-taking" as a technique "where the agent regularly writes notes
+persisted to memory outside of the context window"<Cite n={1}/> — that written record, not a
+saved transcript, is what a new session starts from. And because a session can stop without
+anyone deciding to stop it — the process killed, the machine rebooted — what runs next has to
+pick up from the last checkpoint, not the beginning and not nothing.
+
+Long-running tasks sit at level 7, always-on agents. The trigger that starts a session is
+ordinary code — a timer, a new item on a queue. What a person hands over here is what happens
+once that trigger fires: whether the session finds anything worth doing, and what to do about
+it.
+
+This page is marked draft, not published: it has no recorded trace and no scored result file
+yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={longHorizonRun} label="Level 7 · Long-running tasks" runKey="long-horizon" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+You have probably used a product built this way if you have ever handed a coding agent a ticket
+and closed the tab. Cognition's documentation for Devin gives a size for what fits one session:
+"As a rule of thumb: if a task would take you three hours or less, Devin can most likely do it.
+For larger projects, break them into focused sessions and run them in parallel with managed
+Devins"<Cite n={2}/>. The second sentence is this level's problem in miniature: past a certain
+size the work stops being one run and becomes several, and something has to carry what each one
+learned to the next. That page does not say the work runs unattended, so this one does not say
+Cognition claims it does.
+
+What is worth checking, in any product like this, is how you find out what happened while you
+were away. Devin's own documentation describes a timeline view in its session insights that
+"provides a chronological, color-coded view of key events during the session"<Cite n={3}/> — a
+record built for someone catching up after the fact, not for someone watching live. That is the
+audit trail this whole level depends on: if a long-running agent cannot show what it did and
+when, in a form meant for someone who was not there, there is no way to check it did the right
+thing.
+
+The other habit worth building is telling apart "still working" from "stuck." A coding agent that
+quietly reruns the same failing check for an hour looks, from the outside, exactly like one
+making steady progress, unless the product actually distinguishes the two. Look for a status that
+says which is happening, not just a spinner — and for a way to stop the run yourself, since
+something started without you should also be something you can end without waiting for it to
+decide it is done.
+
+Products in this category differ in what they actually persist and for how long, and a maker's
+page is the only way to know which: some keep a session alive for one ticket and discard its
+state once a pull request lands, others are built to run indefinitely against a standing queue.
+Nothing about "it ran for three hours last time" tells you which one you are using; the product's
+own documentation on sessions, history and limits does.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example works through a queue of questions across separate calls to `run_session`, each one
+standing in for a separate process. A session never receives the previous session's messages —
+only `QueueState.notes`, a short list of one-line summaries the earlier sessions wrote, the
+mechanism Anthropic's writing calls structured note-taking<Cite n={1}/>. `MAX_NOTES` caps that
+list at six, so notes are a compaction, not a growing log: the oldest one is dropped, the same way
+Anthropic describes compaction as reinitiating a window from a summary once the old one nears its
+limit — this example does it by count instead of by token limit, to keep the code small.
+
+Everything the queue needs to resume lives in one JSON file, `QueueState`, written by replacing a
+temp file rather than overwriting in place, so a session killed mid-write can never hand the next
+one a half-written checkpoint. Two real systems do the same job differently. Temporal keeps "a
+complete, ordered record of everything that happened in a Workflow Execution", and a new process
+"rebuilds the state of the execution and resumes at the point where it stopped, with local
+variables and progress intact"<Cite n={4}/>. Inngest persists each step's own result instead:
+"The steps that successfully executed are memoized," and a retry "is re-executed from the point
+of failure with the state of all previous step executions"<Cite n={5}/>. `QueueState` is closer
+to Inngest's shape — one record of what is done — without a workflow engine underneath it.
+Letta's archival memory goes past a flat notes list: "a semantically searchable database where
+agents can store facts, knowledge, and information for long-term retrieval", whose fragments
+"must be queried on-demand via tools"<Cite n={6}/>. Six notes never need a search index;
+thousands would.
+
+The one model-decided step in a session is a single choice between two tools, `answer` and
+`flag_for_review` — the same kind of decision <Link href="/techniques/function-calling/">function
+calling</Link> makes once, not a loop like <Link href="/techniques/single-agent/">single
+agent</Link>'s. What makes this level 7 and not level 4 is everything around that one call: the
+trigger that started the session, the checkpoint the session leaves behind, and the fact that
+nobody has to be there for either.
+
+<CodeFile file="examples/long_horizon/run.py" func="run_session" />
+
+Be precise about what that buys. An interrupted session writes nothing, so every finished answer
+survives and is recorded once; the question it was working on returns to the queue and is asked
+again, so the model call can happen twice. The work is at-least-once, the record is once. That is
+safe only because a session's one effect outside its own memory is the checkpoint — a session
+that also sent an email would need the send to be idempotent.
+
+Write-then-replace does not cover two other failures. A checkpoint damaged by anything else —
+truncated, hand-edited, the wrong shape — raises a `CheckpointError` naming the file rather than
+starting fresh, because starting over silently would drop the queue, re-answer everything, and
+still report success on every tick after. And two overlapping sessions would both load the same
+checkpoint, the second erasing the first, so `save` refuses unless the counter on disk is still
+the one the session read. That is a check before a write, not a lock: it catches the overlap, it
+does not make concurrent sessions safe.
+
+`tests/test_example_long_horizon.py` proves each of these: a crash mid-session with the checkpoint
+compared byte for byte afterward, a retry that answers the interrupted question once, seven kinds
+of damaged checkpoint, and two overlapping sessions where the loser is refused. Run it yourself:
+
+<CodeFile file="examples/long_horizon/README.md" start={19} end={19} lang="text" expect="python -m examples.long_horizon" />
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try <Link href="/techniques/single-agent/">a single agent</Link> first if the whole task finishes
+inside one sitting — one process, one context window, done before anyone would think to check on
+it. Long-running tasks earn their extra machinery only once a task genuinely cannot finish in one.
+
+Try a plain scheduled job — <Link href="/techniques/order-zero/">level 0, no model at all</Link>, or a fixed
+<Link href="/techniques/workflow-graphs/">workflow</Link> triggered on a timer — if what runs and
+when is fully known in advance. That still starts on its own, but nothing needs to decide whether
+there is work to do or what to do about it; a model is not required to make a decision that is
+already written down.
+
+Move up to a long-running task once the work can neither finish in one sitting nor be scripted in
+advance: a queue that grows on its own schedule, work whose next step depends on what an earlier,
+separate session found. If what you want is not a queue to drain but a standing assistant that
+decides for itself whether anything needs doing on each tick, that is
+<Link href="/techniques/agent-teammates/">always-on assistants</Link>, and it needs the policy
+layer that page describes as well as the checkpoint this one does.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'Notes drift from what they summarized',
+    notice: 'A session acts confidently on a note that was accurate when it was written but has since gone stale, or that compressed away a caveat the original source stated plainly.',
+    test: "Pick a note several sessions old and compare it against the source section it was written from. A note that no longer matches, or that dropped a qualifier the source still states, is drift, not a bug in one session's answer.",
+  },
+  {
+    name: 'A crash loses or repeats completed work',
+    notice: 'After a restart, the queue is missing an answer that was already produced, or the same question gets answered a second time with a different result.',
+    test: "Kill the process between a model call finishing and the checkpoint being written, then check the state file: a completed answer must survive, and an interrupted question must still be in the queue, not marked done and not duplicated.",
+  },
+  {
+    name: 'A flagged item never gets resolved',
+    notice: 'Sessions keep running and the queue keeps shrinking, but a pile of flagged questions sits untouched because nothing paged anyone to look at them.',
+    test: 'Check the age of the oldest pending item. A long-running system with no alert on pending age can go weeks with a growing backlog nobody notices, since every scheduled session still reports success.',
+  },
+  {
+    name: 'The trigger fires and nothing needed doing, but a session runs anyway',
+    notice: 'Every scheduled tick costs a model call and takes wall-clock time even when the queue was already empty, instead of the code recognizing there was nothing to do before spending anything.',
+    test: 'Trigger a session against an empty queue and confirm no model call happens. If one does, the code is asking the model a question the code already had the answer to.',
+  },
+  {
+    name: 'A half-written checkpoint corrupts the next session',
+    notice: "The process is killed mid-write to the state file, and the next session either crashes trying to parse a truncated file or silently starts over with an empty queue.",
+    test: 'Kill the process while it is writing the checkpoint, not while it is working, and confirm the file the next session reads is either the old, complete checkpoint or the new, complete one — never a partial write of either. Then hand the loader a damaged file on purpose: starting the queue over is the worse of the two outcomes, because every scheduled tick after it still reports success.',
+  },
+  {
+    name: 'Two sessions run at the same time',
+    notice: 'A session takes longer than the gap between scheduled ticks, so two are live at once. Both load the same checkpoint, both work the same question, and the second to finish overwrites what the first wrote.',
+    test: "Load the checkpoint twice, write from both, and check whether the second write is refused or silently accepted. A write that does not verify the checkpoint is still the one the session read will lose work with no error anywhere. A check before the write catches the ordinary overlap; only a lock or a database makes genuinely concurrent sessions safe.",
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, one session', value: '1' },
+    { label: 'Sessions to drain a 3-question queue, no flags', value: '3' },
+    { label: 'Tokens in, one session', value: '~420' },
+    { label: 'Wall time, one session', value: '~0.6s' },
+  ]}
+  comparedTo={{
+    label: 'a single agent (level 5) answering the same 3 questions in one sitting',
+    note: 'Close to the same total tokens for the model calls themselves in the illustrated run, since each session asks once. What a single sitting does not pay for is the checkpoint write after every question and the notes carried into the next one — the cost this level adds is that bookkeeping, not extra model calls.',
+  }}
+  level={7}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+The site's shared 60-question set is asked in one sitting over one document set, so it does not
+test what this level is actually for: work that spans separate sessions and survives one of them
+being interrupted. A question this example flags for a person also has no single right answer in
+the set's grading contract, the same reason
+<Link href="/techniques/human-in-the-loop/">human approval</Link>'s example is not scored against
+it either.
+
+So `scripts/eval_run.py` does not score this example. What would mean something here: the share
+of a queue finished correctly across sessions with no session ever seeing another's transcript,
+the citation hit rate on the answers that were not flagged, and — the property this page is
+built around — whether a crash-and-resume run ever loses a completed answer or repeats one.
+`tests/test_example_long_horizon.py` checks that last one directly, on the stub, every time the
+test suite runs.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="Queue depth over time, the age of the oldest pending (flagged) item, and how many sessions in a row end with the forced retry of the same question — a sign something is crashing before it can checkpoint, not just slow."
+  costAtVolume="Cost tracks the number of sessions the queue actually needs, not a fixed schedule: an empty queue should cost nothing per tick, and a queue that keeps growing costs more sessions, not slower ones, provided the trigger interval stays fixed."
+  failsInProduction="Notes drift from the sources they summarized over enough sessions that nobody re-reads them against the original, or a checkpoint write is interrupted by exactly the kind of crash it was meant to survive, and the file it leaves behind cannot be parsed."
+  whatToLog="Every session's starting checkpoint and ending checkpoint, the one model-decided step and what it chose, and — for anything flagged — who resolved it, when, and what they decided, so a person catching up later never has to ask the system what happened while they were away."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: "If you use a coding agent or a research tool that runs for a while unattended, find its progress or timeline view and read it after a run finishes. Can you tell, from that record alone, what it tried before it got to the final result, without asking it again?" },
+  { lane: 'build', body: 'From the repo root, run python -m examples.long_horizon --model stub --state lh-demo.json --question "What does HLV-2205 cost?" twice in a row. What does the second run do differently because the first one already checkpointed, and what is in lh-demo.json that told it so? Delete the file when you are done.' },
+  { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose: for the crash failure, open tests/test_example_long_horizon.py and read the test that makes the model raise mid-session, then change what it asserts about the checkpoint file and watch it fail.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

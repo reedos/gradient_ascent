@@ -1,0 +1,253 @@
+---
+slug: organizations-swarms
+level: 7
+run: organizations-swarms
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Generative Agents: Interactive Simulacra of Human Behavior"
+    url: "https://arxiv.org/abs/2304.03442"
+    publisher: "arXiv (Stanford University, Google Research)"
+    date: "2023-04-07"
+    accessed: "2026-09-18"
+  - title: "MetaGPT: Meta Programming for a Multi-Agent Collaborative Framework"
+    url: "https://arxiv.org/abs/2308.00352"
+    publisher: "arXiv"
+    date: "2023-08-01"
+    accessed: "2026-09-18"
+  - title: "FoundationAgents/MetaGPT"
+    url: "https://github.com/FoundationAgents/MetaGPT"
+    publisher: "MetaGPT (GitHub README)"
+    accessed: "2026-09-18"
+  - title: "Hallucination Cascade: Analyzing Error Propagation in Multi-Agent LLM Systems"
+    url: "https://arxiv.org/abs/2606.07937"
+    publisher: "arXiv"
+    date: "2026-06-06"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import orgSwarmsRun from '../../data/runs/organizations-swarms.json';
+
+An organization of agents is several standing agents with distinct roles and a shared goal, not
+one agent calling another for one task and getting an answer back. This page sits at level 7,
+not level 6, because the roster itself — who exists, what they are working on, when a new round
+of work starts — keeps running and gets decided along the way, rather than being fixed by a
+person for one job and torn down after.
+
+This is mostly frontier. What ships today is closer to <Link
+href="/techniques/orchestrator-workers/">orchestrator-workers</Link> and
+<Link href="/techniques/agent-graphs/">agent graphs</Link> wearing a bigger name than the standing,
+many-role organizations described below and in the research this page cites. Keep that
+distinction in mind reading it: a documented, shipping framework assigns roles and runs them
+through fixed procedures; a research paper reports what a simulation of many agents actually did
+under study conditions; anything past those two is this page's own reasoning about where the
+approach runs into trouble, and it says so.
+
+This page is marked draft, not published: it has no recorded trace and no scored result file
+yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={orgSwarmsRun} label="Level 7 · Organizations of agents" runKey="organizations-swarms" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Almost nothing you can subscribe to today is a genuine standing organization of agents; what
+exists and ships is a framework a developer assembles, not a product you turn on. MetaGPT is the
+one this page can name with a source: its own documentation states the idea outright —
+"assign different roles to GPTs to form a collaborative entity for complex tasks" — and lists
+"product managers / architects / project managers / engineers" as the roles it
+includes<Cite n={3}/>. That is a fixed roster running a fixed procedure on one task, closer to a
+simulated org chart than to agents that keep existing and deciding what to work on next.
+
+One thing about output from anything built this way is measured, and worth stating exactly as its
+authors do. A 2026 paper ran 500 cascades across 10 knowledge domains on three models, 1,250
+responses in all, passing each answer along a chain of agents that revise it. In three-agent
+chains the hallucination score fell — from 0.422 at the first agent to 0.272 at the last — and
+factual accuracy fell with it, "from 0.789 to 0.769", which the authors call "a trade-off between
+hallucination suppression and factual preservation"<Cite n={4}/>. The chain does suppress
+hallucinations; it also shaves off correct material on the way. Both movements are small, over
+one benchmark, at one chain length, so read it as a direction rather than a rate.
+
+The rest of this section is the site's reasoning, not a finding. Four things have to be written
+down before a roster runs without a person in the room, and none come from the model: what
+persists between rounds (the board, the claims, each role's memory), what a role may do
+unattended, what stops for approval, and how the whole organization is halted at once — one
+switch that drains the board and refuses new claims, not a role-by-role hunt while the rest keep
+working.
+
+Accountability is the fifth and the one this page cannot settle. When a mistake reaches a person
+by way of two or three roles that each added something, who is responsible — the role that made
+the error, the one that passed it on, or whoever set the roster up? No maker's page or paper this
+site has read answers that. Decide it on purpose, in writing, before relying on a system like
+this for anything that matters.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example is deliberately small: three roles — researcher, writer, reviewer — share one task
+board, and a coordinator model decides which open task goes to which role. What each role would
+actually do with an assigned task is out of scope; a role agent would use whatever pattern
+elsewhere in this manual fits its own job. What this example isolates is only the part specific
+to an organization: the shared board, and an assignment step the model does not fully control.
+
+<CodeFile file="examples/organizations_swarms/run.py" func="coordinate" />
+
+One coordinator call runs per round, and that single call is the round's only
+`decided_by: "model"` step however many assignments it proposes; the diagram above draws each
+proposal as its own dashed edge and says so under its tally.
+
+`BUDGET_PER_ROLE` is a fixed cap the coordinator cannot raise by asking; a role that has already
+been assigned two tasks this round gets no more, whatever the coordinator's output requests next.
+Claiming is checked against the board itself, not against what the coordinator believes is true:
+`task.status != "open"` refuses an assignment outright, so if the coordinator's own single call
+proposes the same task to two different roles — which its output can do, since nothing stops a
+model from repeating itself — only the first proposal is ever honored. The second reads the board
+fresh, sees the task is no longer open, and is refused, not silently overwritten and not queued
+to run later. That check is what the shared board is actually for: a coordinator's plan is a
+proposal against it, not an instruction the board has to accept.
+
+MetaGPT's own paper describes a fuller version of the same idea, fixed procedure rather than a
+per-round budget: it "utilizes an assembly line paradigm to assign diverse roles to various
+agents, efficiently breaking down complex tasks into subtasks involving many agents working
+together" and encodes "Standardized Operating Procedures (SOPs) into prompt sequences for more
+streamlined workflows"<Cite n={2}/>. The paper's claim for that design is scoped: "On
+collaborative software engineering benchmarks, MetaGPT generates more coherent solutions than
+previous chat-based multi-agent systems"<Cite n={2}/>. That is the authors' result on those
+benchmarks, against the systems they chose to compare with, and not a result this site has
+measured.
+
+A different line of research reaches for coordination without any fixed roster at all. Park et
+al.'s Generative Agents paper populated a sandbox environment — twenty-five agents in a small
+town, no shared board and no fixed roles, just memory, planning and reflection — and reports
+that "starting with only a single user-specified notion that one agent wants to throw a
+Valentine's Day party, the agents autonomously spread invitations to the party over the next two
+days, make new acquaintances, ask each other out on dates to the party, and coordinate to show up
+for the party together at the right time"<Cite n={1}/>. The paper's subject is believable human
+behavior in a simulation, not work getting done: read it for the mechanism, which is that
+coordination can emerge without a coordinator role, and not as evidence that a roster of agents
+will organize itself around a real task.
+
+The two rules look alike and behave differently, which is worth testing separately: the budget is
+spent per round and refills at the start of the next one, while a claim is permanent until the
+task is done. `tests/test_example_organizations_swarms.py` scripts a coordinator that over-assigns
+one role, one that proposes the same task twice in a single call, and one that tries to re-claim
+a task in a later round — that last test keeps a second task open on purpose, because a round with
+nothing open returns before the model is ever called and would otherwise pass without checking
+anything. Run it yourself:
+
+<CodeFile file="examples/organizations_swarms/README.md" start={12} end={12} lang="text" expect="python -m examples.organizations_swarms" />
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try <Link href="/techniques/orchestrator-workers/">orchestrator-workers</Link> or
+<Link href="/techniques/agent-graphs/">agent graphs</Link> first for almost anything you are
+actually building today. A fixed roster assembled for one job, run once, and torn down
+afterward is level 6, cheaper to reason about, and is what the one shipping framework this page
+names actually does.
+
+Move up to a standing organization only once the roster itself needs to persist and change
+between tasks — new roles added, old ones retired, work assigned across many separate requests
+rather than one — and once you have an answer, in writing, for who is accountable when it acts.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'A task is claimed by two roles at once',
+    notice: 'Two roles both believe they own the same task and either duplicate the work or step on each other\'s output.',
+    test: 'Script a coordinator that proposes the same task to two roles in one call (this page\'s own test suite does exactly this) and confirm only the first proposal is honored — not that both fail, not that both succeed.',
+  },
+  {
+    name: 'A role quietly exceeds its budget',
+    notice: 'One role ends up doing most of the work for a round because nothing capped how much it could take on, defeating the point of having separate roles at all.',
+    test: 'Script a coordinator that tries to assign every open task to the same role and confirm the count assigned never exceeds the fixed budget, regardless of how many the coordinator asked for.',
+  },
+  {
+    name: 'An error compounds instead of getting caught',
+    notice: "A mistake made by one role passes through a second and third role that were supposed to check it, and comes out the other end looking more confident than it started, not less.",
+    test: "Trace one output back through every role that touched it and check whether each one actually verified something or just passed the previous role's claim along unchanged.",
+  },
+  {
+    name: 'Nobody can say which role is responsible for a bad result',
+    notice: "A wrong or harmful output reaches a person and the postmortem cannot identify which role introduced the error, because the board and the logs record what was assigned, not what each role actually checked before acting.",
+    test: 'Pick a finished task and try to reconstruct, from the logs alone, which role\'s decision the final output actually depended on. If you cannot, the logging is not enough for this level, whatever it is enough for at level 6.',
+  },
+  {
+    name: 'The roster grows because adding a role feels free',
+    notice: 'Each new role seems to add a capability, but the system as a whole gets slower and harder to predict, and nobody can say what the fourth or fifth role actually improved.',
+    test: 'Remove one role and rerun the same tasks. If the outcome does not measurably change, that role was not paying for its share of the coordination cost.',
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, one coordination round', value: '1' },
+    { label: 'Roles sharing the board', value: '3' },
+    { label: 'Tokens in, one round', value: '~180' },
+    { label: 'Wall time, one round', value: '~0.5s' },
+  ]}
+  comparedTo={{
+    label: 'a single agent (level 5) doing all three roles’ work itself',
+    note: 'The coordination call itself is cheap: one small model call per round. What this strip does not show, and what a real system pays for, is each role’s own work once assigned — three separate agents’ worth of calls this example does not run, on top of the coordination shown here.',
+  }}
+  level={7}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={0} kinds={[]}>
+
+This example coordinates a task board; it does not answer questions about the document corpus, so
+the site's shared 60-question set does not apply, the same reason it does not apply to
+<Link href="/techniques/agent-teammates/">always-on assistants</Link>' policy example. What would
+be measured here: the share of coordination rounds that violate the budget or double-claim a task
+under adversarial scripting (this should be exactly zero, and
+`tests/test_example_organizations_swarms.py` checks it on the stub every run), how evenly work
+actually spreads across roles against how evenly the coordinator intended it to, and — the harder
+measurement research has not settled — whether a final output's accuracy degrades as it passes
+through more roles, the way the hallucination-cascade paper measures for its own three-agent
+chain<Cite n={4}/>.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="Assignments refused for budget or for a task no longer being open — both should be rare relative to the volume of tasks, and a rising rate of either is worth reading as a sign the roster or the budgets no longer match the workload, not just logging and moving on."
+  costAtVolume="One coordination call per round regardless of roster size, plus each role's own work once assigned; coordination cost itself stays close to flat as the roster grows, but the total system cost does not, since every added role is added work somewhere downstream of this example."
+  failsInProduction="A role silently falls behind its budget every round because the coordinator keeps proposing more than it can take, and nobody notices until a backlog of unclaimed tasks is large enough to see on a dashboard nobody was watching."
+  whatToLog="Every proposed assignment, whether the board accepted or refused it and why, which role actually touched a task before it was marked done, and the full chain of roles a given output passed through, so an accountability question has an answer that does not require asking any of the agents."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: "Read MetaGPT's own documentation for the roles it assigns to a task. For one of those roles, write down what you would need to see in a log to trust that role's output without re-doing its work yourself." },
+  { lane: 'build', body: 'Run python -m examples.organizations_swarms --model stub --question "..." with a task of your own, then open tests/test_example_organizations_swarms.py and read test_a_task_cannot_be_claimed_twice_in_one_round to see a coordinator that actually tries to double-claim a task.' },
+  { lane: 'either', body: "Pick one of the failure modes above and try to cause it on purpose: for the over-budget failure, lower BUDGET_PER_ROLE in examples/organizations_swarms/run.py to 1 and rerun the tests to see which ones still pass." },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

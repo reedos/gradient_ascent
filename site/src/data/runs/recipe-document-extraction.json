@@ -1,0 +1,79 @@
+{
+  "illustrative": true,
+  "h": 560,
+  "title": "Turn a form photo into a record, assembled",
+  "sub": "Read the image into a fixed schema, retry once on a low-confidence field, and confirm with a person before saving.",
+  "pill": "Level 3 · Workflows",
+  "nodes": [
+    { "id": "photo", "x": 170, "y": 34, "l": "Form photographed", "k": "io" },
+    { "id": "read", "x": 170, "y": 104, "l": "Read the form image", "k": "model" },
+    { "id": "val1", "x": 170, "y": 174, "l": "One field unreadable", "k": "code" },
+    { "id": "reread", "x": 170, "y": 244, "l": "Ask again for that field", "k": "model" },
+    { "id": "val2", "x": 170, "y": 314, "l": "Validate: shape passes", "k": "code" },
+    { "id": "check", "x": 170, "y": 384, "l": "Check the gate", "k": "code" },
+    { "id": "reviewer", "x": 310, "y": 454, "l": "Person confirms", "k": "human" },
+    { "id": "resume", "x": 170, "y": 454, "l": "Resume", "k": "code" },
+    { "id": "saved", "x": 170, "y": 524, "l": "Record saved", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "photo", "t": "read", "by": "code" },
+    { "id": "e2", "f": "read", "t": "val1", "by": "code" },
+    { "id": "e3", "f": "val1", "t": "reread", "by": "code" },
+    { "id": "e4", "f": "reread", "t": "val2", "by": "code" },
+    { "id": "e5", "f": "val2", "t": "check", "by": "code" },
+    { "id": "e6pass", "f": "check", "t": "saved", "by": "code", "b": 140 },
+    { "id": "e6pause", "f": "check", "t": "resume", "by": "code" },
+    { "id": "e7", "f": "reviewer", "t": "resume", "by": "code" },
+    { "id": "e8", "f": "resume", "t": "saved", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "A photo of the intake form arrives",
+      "d": "one image + \"Extract name, date of birth, reason for\nvisit and insurance ID as JSON. Use \\\"unknown\\\" for\nanything you cannot read.\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The model reads the image and returns JSON",
+      "d": "{\"name\": \"J. Alvarez\", \"date_of_birth\": \"unknown\",\n \"reason\": \"annual checkup\", \"insurance_id\": \"HL-88213\"}",
+      "m": "~1,400 tokens in (image) · 38 out · 1.1 s"
+    },
+    {
+      "e": "e3",
+      "h": "Your code checks the reply — one field is unreadable",
+      "d": "date_of_birth = \"unknown\" -> code crops the top-left\ncorner of the image and asks again, just for that field",
+      "m": "1 field flagged"
+    },
+    {
+      "e": "e4",
+      "h": "The model tries again on the cropped detail",
+      "d": "{\"date_of_birth\": \"unknown\"}\n(the handwriting genuinely isn't legible in the photo)",
+      "m": "~600 tokens in (crop) · 8 out · 0.5 s"
+    },
+    {
+      "e": "e5",
+      "h": "Your code validates the shape — every field present",
+      "d": "all four fields present and typed correctly\n(one is the literal value \"unknown\", which still validates)",
+      "m": "0 shape problems"
+    },
+    {
+      "e": "e6pause",
+      "h": "Your code checks the gate and pauses the run",
+      "d": "reason=low_confidence (date_of_birth could not be read)\nthe run returns a checkpoint here; nothing is saved until\na person decides\n(the direct pass-through to Record saved, below, was not\ntaken this run)",
+      "m": "0 tokens · paused"
+    },
+    {
+      "e": "e7",
+      "h": "A person reviews the paused record against the photo",
+      "d": "sees: the photo, the extracted record, reason: low_confidence\nreads the date of birth off the physical form and edits it in\ndecides: edit, then approve",
+      "m": "decision: edit"
+    },
+    {
+      "e": "e8",
+      "h": "Your code resumes and saves the corrected record",
+      "d": "{\"name\": \"J. Alvarez\", \"date_of_birth\": \"1988-04-02\",\n \"reason\": \"annual checkup\", \"insurance_id\": \"HL-88213\"}",
+      "m": "0 tokens · 0 ms"
+    }
+  ]
+}

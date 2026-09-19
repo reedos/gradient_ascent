@@ -1,0 +1,46 @@
+{
+  "illustrative": true,
+  "h": 400,
+  "title": "Multimodal: an image and a question, one call",
+  "sub": "Attach an image as its own content block next to the text, ask once, check the reply.",
+  "pill": "Level 1 · One call",
+  "nodes": [
+    { "id": "in", "x": 170, "y": 26, "l": "Photo + question", "k": "io" },
+    { "id": "attach", "x": 170, "y": 110, "l": "Attach the image, before the text", "k": "code" },
+    { "id": "llm", "x": 170, "y": 194, "l": "reads image + text together", "k": "model" },
+    { "id": "check", "x": 170, "y": 278, "l": "Check the two fields", "k": "code" },
+    { "id": "a", "x": 170, "y": 362, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "in", "t": "attach", "by": "code" },
+    { "id": "e2", "f": "attach", "t": "llm", "by": "code" },
+    { "id": "e3", "f": "llm", "t": "check", "by": "code" },
+    { "id": "e4", "f": "check", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The photo and the question arrive",
+      "d": "[rating-plate.jpg] + \"Read the model number and the\nserial number off this rating plate.\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code attaches the image as its own part, before the text",
+      "d": "[image image/jpeg, 1200×900px] + [text: \"Read the model\nnumber and the serial number off this rating plate.\"]",
+      "m": "~1,300 tokens in (image) + ~15 (text)"
+    },
+    {
+      "e": "e3",
+      "h": "The model reads the attachment and the text together",
+      "d": "\"MODEL: DW-480\nSERIAL: UNREADABLE\"",
+      "m": "1,315 in · 12 out · 1.1s"
+    },
+    {
+      "e": "e4",
+      "h": "Your code checks the reply against the two fields it asked for",
+      "d": "the format matched, but the serial came back UNREADABLE:\nthe plate is reported unread rather than filled in",
+      "m": "0 tokens · 0 ms"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+---
+import type { Status } from '../lib/content';
+
+const STATUS_LABEL: Record<Status, string> = {
+  published: 'Published',
+  draft: 'Draft',
+  stub: 'Outline',
+  planned: 'Planned',
+};
+
+interface Props {
+  status?: Status;
+  label?: string;
+  model?: boolean;
+}
+const { status, label, model = false } = Astro.props;
+const text = label ?? (status ? STATUS_LABEL[status] : '');
+---
+<span class:list={['pill', status, { model }]}>{text}</span>

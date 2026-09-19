@@ -1,0 +1,104 @@
+---
+// The use-case x pattern matrix from the project plan's Content model: recipes down the side, techniques
+// across, grouped and coloured by level, a filled cell where the recipe uses the technique. The
+// shaping is in lib/matrix.ts (unit-tested in site/tests/matrix.test.ts); this file only draws it.
+//
+// Two renderings, swapped by the media query in styles/matrix.css: the grid, inside its own
+// horizontally scrolling box with a sticky first column, and below 700px a list of recipes with
+// their techniques as level-coloured pills. Both are plain HTML built at compile time -- no client
+// JavaScript, and the page itself never scrolls sideways.
+import { url } from '../lib/url';
+import '../styles/matrix.css';
+import { buildMatrix, levelColor, type MatrixRecipe, type MatrixTechnique } from '../lib/matrix';
+
+interface Props {
+  recipes: MatrixRecipe[];
+  techniques: MatrixTechnique[];
+}
+const { recipes, techniques } = Astro.props;
+const matrix = buildMatrix(recipes, techniques);
+---
+
+<div class="mx-wide">
+  <div class="mx-scroll">
+    <table class="mx-table">
+      <caption class="mx-sr">
+        Recipes down the side, techniques across, grouped by level. A filled cell means that recipe
+        uses that technique.
+      </caption>
+      <thead>
+        <tr>
+          <th class="mx-corner" rowspan={2} scope="col">Recipe</th>
+          {
+            matrix.groups.map((g) => (
+              <th class="mx-group" colspan={g.techniques.length} scope="colgroup" style={`--c:${g.color}`}>
+                {g.label}
+              </th>
+            ))
+          }
+        </tr>
+        <tr>
+          {
+            matrix.columns.map((c) => (
+              <th class="mx-head" scope="col">
+                <span>
+                  <a href={url(`/techniques/${c.slug}/`)}>{c.title}</a>
+                </span>
+              </th>
+            ))
+          }
+        </tr>
+      </thead>
+      <tbody>
+        {
+          matrix.rows.map((row) => (
+            <tr>
+              <th class="mx-side" scope="row">
+                <a href={url(`/recipes/${row.slug}/`)}>{row.title}</a>
+              </th>
+              {row.cells.map((on, i) =>
+                on ? (
+                  <td class="is-on" style={`--c:${levelColor(matrix.columns[i].level)}`}>
+                    <i />
+                    <span class="mx-sr">uses {matrix.columns[i].title}</span>
+                  </td>
+                ) : (
+                  <td />
+                ),
+              )}
+            </tr>
+          ))
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <td class="mx-count-side">Recipes using it</td>
+          {matrix.columnCounts.map((n) => <td class="mx-count">{n}</td>)}
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<ul class="mx-narrow mx-list">
+  {
+    matrix.rows.map((row) => (
+      <li>
+        <h3>
+          <a href={url(`/recipes/${row.slug}/`)}>{row.title}</a>
+        </h3>
+        <div class="mx-list-meta">
+          {row.used.length} technique{row.used.length === 1 ? '' : 's'}
+          {row.highest !== undefined && ` · needs level ${row.highest}`}
+        </div>
+        <div class="mx-pills">
+          {row.used.map((t) => (
+            <a class="mx-pill" href={url(`/techniques/${t.slug}/`)} style={`--c:${levelColor(t.level)}`}>
+              {t.title}
+            </a>
+          ))}
+        </div>
+      </li>
+    ))
+  }
+</ul>

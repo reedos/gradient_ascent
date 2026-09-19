@@ -1,0 +1,65 @@
+{
+  "illustrative": true,
+  "h": 630,
+  "title": "Data analysis by conversation, assembled",
+  "sub": "The model writes a plan, then writes and runs code against the dataset, deciding after each result whether it needs another pass.",
+  "pill": "Level 5 · Agents",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 30, "l": "Question about the dataset", "k": "io" },
+    { "id": "plan", "x": 170, "y": 170, "l": "writes a short plan", "k": "model" },
+    { "id": "act", "x": 170, "y": 310, "l": "picks the next step", "k": "model" },
+    { "id": "sandbox", "x": 170, "y": 450, "l": "run_python(snippet)", "k": "tool" },
+    { "id": "a", "x": 170, "y": 590, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "plan", "by": "code" },
+    { "id": "e2", "f": "plan", "t": "act", "by": "code" },
+    { "id": "e3", "f": "act", "t": "sandbox", "by": "model", "b": 22 },
+    { "id": "e4", "f": "sandbox", "t": "act", "by": "code", "b": 22 },
+    { "id": "e5", "f": "act", "t": "a", "by": "model", "b": -200 }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"Which product category has the highest return\nrate this quarter, and how does that compare\nto last quarter?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The model writes a plan; your code moves on regardless of what it says",
+      "d": "\"1. Compute return rate by category for this quarter.\n2. Compute the same for last quarter.\n3. Compare them.\"",
+      "m": "260 in · 40 out · 0.7 s"
+    },
+    {
+      "e": "e3",
+      "h": "The model writes code for the first step",
+      "d": "→ run_python(\"df[df.quarter=='Q3'].groupby('category')\n['returned'].mean()\")",
+      "m": "420 in · 34 out · 0.8 s"
+    },
+    {
+      "e": "e4",
+      "h": "Your sandbox runs it and returns the result",
+      "d": "Outdoor      0.18\nKitchen      0.06\nElectronics  0.09\nHome         0.05",
+      "m": "1 result · 140 ms"
+    },
+    {
+      "e": "e3",
+      "h": "The model runs the same query for last quarter",
+      "d": "→ run_python(\"df[df.quarter=='Q2'].groupby('category')\n['returned'].mean()\")",
+      "m": "610 in · 34 out · 0.8 s"
+    },
+    {
+      "e": "e4",
+      "h": "Your sandbox returns the second result",
+      "d": "Outdoor      0.11\nKitchen      0.07\nElectronics  0.08\nHome         0.05",
+      "m": "1 result · 130 ms"
+    },
+    {
+      "e": "e5",
+      "h": "The model decides it has enough and stops",
+      "d": "\"Outdoor has the highest return rate this quarter\nat 18%, up from 11% last quarter. Every other\ncategory moved less than two points.\"",
+      "m": "890 in · 46 out · 1.0 s"
+    }
+  ]
+}

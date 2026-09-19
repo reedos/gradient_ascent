@@ -1,0 +1,66 @@
+{
+  "illustrative": true,
+  "h": 770,
+  "title": "Voice notes into structured entries",
+  "sub": "One fixed transcription call, then a fixed split-and-fill sequence. No step chooses what happens next.",
+  "pill": "Level 3 · Workflows",
+  "nodes": [
+    { "id": "voice", "x": 170, "y": 34, "l": "Voice note", "k": "io" },
+    { "id": "transcribe", "x": 170, "y": 174, "l": "Transcribe once", "k": "model" },
+    { "id": "split", "x": 170, "y": 314, "l": "Split into findings, fixed order", "k": "code" },
+    { "id": "structure", "x": 170, "y": 454, "l": "Fill the record schema", "k": "model" },
+    { "id": "check", "x": 170, "y": 594, "l": "Check required fields", "k": "code" },
+    { "id": "records", "x": 170, "y": 734, "l": "Structured records", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "voice", "t": "transcribe", "by": "code" },
+    { "id": "e2", "f": "transcribe", "t": "split", "by": "code" },
+    { "id": "e3", "f": "split", "t": "structure", "by": "code" },
+    { "id": "e4", "f": "structure", "t": "check", "by": "code" },
+    { "id": "e5", "f": "check", "t": "records", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The note arrives",
+      "d": "audio, 41 seconds. Code calls the transcription\nmodel once; this call was never in question.",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The model returns a transcript; code splits it",
+      "d": "\"...belt's worn and needs replacing before next\nvisit, also the condensate line has a slow drip\nnear the drain pan.\" → 2 candidate findings",
+      "m": "41 s of audio · 38 out · 1.4 s"
+    },
+    {
+      "e": "e3",
+      "h": "Code sends finding 1 to the model with the fixed schema",
+      "d": "location: rooftop unit · component: drive belt\ncondition: worn · action: ?",
+      "m": "180 in · 46 out · 0.5 s"
+    },
+    {
+      "e": "e4",
+      "h": "Code checks finding 1's required fields",
+      "d": "action: \"replace before next visit\" · confidence: high\nall required fields present.",
+      "m": "4 fields · 2 ms"
+    },
+    {
+      "e": "e3",
+      "h": "Code sends finding 2 to the model",
+      "d": "location: rooftop unit · component: condensate line\ncondition: slow drip near drain pan · action: ?",
+      "m": "170 in · 41 out · 0.5 s"
+    },
+    {
+      "e": "e4",
+      "h": "Code checks finding 2's required fields",
+      "d": "location, component and condition present.\naction: not stated · confidence: low, flagged for review\nrather than filed as routine.",
+      "m": "4 fields · 2 ms"
+    },
+    {
+      "e": "e5",
+      "h": "Code writes both records to the queue",
+      "d": "2 records filed. 1 flagged for a person to add\nthe missing action before it is scheduled.",
+      "m": "2 records · 3 ms"
+    }
+  ]
+}

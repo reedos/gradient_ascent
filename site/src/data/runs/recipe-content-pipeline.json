@@ -1,0 +1,69 @@
+{
+  "illustrative": true,
+  "h": 510,
+  "title": "Drafting with a reviewer, assembled",
+  "sub": "A fixed chain turns bullet points into an outline and checks it covers every one, then a separate checker loops on the draft until it passes a style rubric.",
+  "pill": "Level 3 · Workflows",
+  "nodes": [
+    { "id": "bullets", "x": 170, "y": 30, "l": "Bullet points", "k": "io" },
+    { "id": "outline", "x": 170, "y": 100, "l": "Rewrite into an outline", "k": "model" },
+    { "id": "gate", "x": 170, "y": 170, "l": "Check bullet coverage", "k": "code" },
+    { "id": "draft", "x": 170, "y": 240, "l": "Draft the email", "k": "model" },
+    { "id": "check", "x": 170, "y": 310, "l": "Check the style rubric", "k": "model" },
+    { "id": "revise", "x": 310, "y": 390, "l": "Revise", "k": "model" },
+    { "id": "a", "x": 170, "y": 470, "l": "Email ready to send", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "bullets", "t": "outline", "by": "code" },
+    { "id": "e2", "f": "outline", "t": "gate", "by": "code" },
+    { "id": "e3", "f": "gate", "t": "draft", "by": "code" },
+    { "id": "e4", "f": "draft", "t": "check", "by": "code" },
+    { "id": "e5", "f": "check", "t": "revise", "by": "code", "b": 22 },
+    { "id": "e6", "f": "revise", "t": "check", "by": "code", "b": 22 },
+    { "id": "e7", "f": "check", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The week's bullet points arrive",
+      "d": "\"- Shipped dark mode\n- Fixed the sync bug reported by several users\n- Raised the free-tier project limit from 3 to 5\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code asks the model to write an outline",
+      "d": "\"1. Dark mode\\n2. Sync fix\\n3. Free-tier limit raised to 5\"",
+      "m": "60 tokens in · 22 tokens out · 0.5 s"
+    },
+    {
+      "e": "e3",
+      "h": "Your code checks the outline against the bullets, in plain code",
+      "d": "dark mode: covered · sync fix: covered · free-tier limit: covered\n(3 of 3 -- no model call needed for this check)",
+      "m": "0 tokens · 4 ms"
+    },
+    {
+      "e": "e4",
+      "h": "Your code asks the model to draft the email from the outline",
+      "d": "\"This week we shipped an amazing new dark mode, squashed\nthe sync bug you told us about, and raised free-tier\nprojects from 3 to 5.\"",
+      "m": "140 in · 48 out · 0.8 s"
+    },
+    {
+      "e": "e5",
+      "h": "The checker finds a rubric violation",
+      "d": "\"FAIL: 'amazing' is an unapproved superlative;\nstyle guide requires plain, factual language\"",
+      "m": "220 in · 16 out · 0.6 s"
+    },
+    {
+      "e": "e6",
+      "h": "The model revises using the checker's own feedback",
+      "d": "\"This week we shipped dark mode, fixed the sync bug you\ntold us about, and raised free-tier projects from 3 to 5.\"",
+      "m": "260 in · 44 out · 0.9 s"
+    },
+    {
+      "e": "e7",
+      "h": "The checker confirms the draft now passes",
+      "d": "\"PASS\" -> loop stops, 1 of 2 revisions used",
+      "m": "230 in · 3 out · 0.5 s"
+    }
+  ]
+}

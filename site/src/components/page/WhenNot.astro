@@ -1,0 +1,16 @@
+---
+// "When you do not need this": what to try first, instead. A `.connection` block, the same
+// component the level pages use for "who decides the next step" and the trace player uses for
+// "what it cost" -- so this reads as part of the same system, not a new shape.
+import Connection from '../Connection.astro';
+
+interface Props {
+  title?: string;
+  color?: string;
+}
+const { title = 'When you do not need this', color } = Astro.props;
+---
+
+<Connection title={title} color={color}>
+  <slot />
+</Connection>

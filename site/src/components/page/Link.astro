@@ -1,0 +1,15 @@
+---
+// An internal link for use inside MDX prose. Markdown's `[text](/path/)` syntax writes a
+// literal href with no base-path prefix, which breaks under the GitHub Pages base
+// (`/gradient_ascent/`); this runs every href through the same `url()` helper the rest of the
+// site uses, and stays usable as an inline JSX tag inside a paragraph.
+import { url } from '../../lib/url';
+
+interface Props {
+  /** Site-relative path starting with "/", e.g. "/techniques/rag/". */
+  href: string;
+}
+const { href } = Astro.props;
+---
+
+<a href={url(href)}><slot /></a>

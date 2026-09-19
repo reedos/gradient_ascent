@@ -1,0 +1,185 @@
+---
+slug: reviewing
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Building Effective AI Agents"
+    url: "https://www.anthropic.com/engineering/building-effective-agents"
+    publisher: "Anthropic"
+    accessed: "2026-09-18"
+  - title: "Why Language Models Hallucinate"
+    url: "https://arxiv.org/abs/2509.04664"
+    publisher: "arXiv (Kalai, Nachum, Vempala and Zhang; OpenAI and Georgia Tech)"
+    date: "2025-09-04"
+    accessed: "2026-09-18"
+  - title: "Automation-Induced Complacency Potential: Development and Validation of a New Scale"
+    url: "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2019.00225/full"
+    publisher: "Frontiers in Psychology (Merritt et al.)"
+    date: "2019-02-19"
+    accessed: "2026-09-18"
+---
+
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+
+Reviewing is checking work you did not do yourself before it goes anywhere. It is a different
+skill from doing the work, and it gets harder rather than easier as a system does more on its
+own, because more of the work happened somewhere you were not watching.
+
+Two things decide whether a piece of work can be reviewed at all. There has to be something to
+check it against — a source, a record, a number you can recompute — and enough of the work has
+to be visible to check, not just its conclusion. When neither is true, "review" means reading
+something plausible and agreeing with it.
+
+How much review a result needs is not a fixed amount. It scales with what a wrong answer would
+cost and how long the mistake would sit there before anyone noticed. That is the same question
+<Link href="/techniques/delegating/">delegating</Link> asks before handing a task over at all,
+asked again about the thing that came back; <Link href="/techniques/trust/">calibrating
+trust</Link> is what the answers to it, kept over time, add up to. All four skills on the
+<Link href="/techniques/operator-craft/">operator craft</Link> topic start from what the request
+said, which is <Link href="/techniques/briefing/">briefing</Link>.
+
+This page is marked draft, not published: no result file exists for anything below, so nothing
+here reports a measured number.
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+**Reviewing one answer.** Three passes, in this order, because the first two need no expertise
+and the third needs all of yours:
+
+1. Pull out every specific claim — a figure, a date, a name, a citation, a quoted line — and
+   check each one against the thing it came from. Open the source; do not accept a summary of it.
+2. Check what is missing against what you asked for. If the brief asked for five clauses and
+   four came back, nothing in the answer will say so.
+3. Then read for judgment: is this the right answer to the right question, and would you have
+   made the same calls? This is the part only you can do, so spend the time there.
+
+For a code change, pass 3 means reading the diff, not a summary of it written by the same system
+that made the change — see <Link href="/techniques/coding-agents/">coding agents</Link>.
+
+**Reviewing a day of unattended work** is a different job: nothing can be stopped mid-run, so
+there is only a record. Read the list of actions taken before any summary of them, irreversible
+ones first — sent, deleted, paid, published, filed. Open two or three at random and confirm the
+work matches what the record claims. Then look at the shape of the day: how many items were
+handled, skipped, flagged. A run that flagged nothing and skipped nothing is a run to look at
+harder, not a clean one. Set the sample rate in advance — one item in ten — so it does not drift
+with how busy the week is.
+
+Fluency is not evidence. A fabricated answer reads exactly as well as a correct one, and a 2025
+paper by researchers at OpenAI and Georgia Tech argues this is structural rather than deceptive:
+models "hallucinate because the training and evaluation procedures reward guessing over
+acknowledging uncertainty," because "language models are optimized to be good test-takers, and
+guessing when uncertain improves test performance."<Cite n={2}/> That is an argument about
+training and grading, not a measurement of any product. The tone of an answer tells you nothing
+about the claims inside it.
+
+What erodes first is attention, not trust. In a 2019 survey of 475 online-panel participants
+whose automation experience was mostly low-stakes, the authors of a complacency scale put the core of
+it at "the degree of attention devoted to monitoring automated tasks (specifically, the lack
+thereof)"<Cite n={3}/>. See <Link href="/techniques/human-in-the-loop/">human approval</Link>
+for what a checkpoint is worth once nobody is reading it.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+A review surface is something a builder chooses to expose. A system that returns only a final
+answer leaves a reviewer nothing but plausibility to judge; one that shows its sources and the
+steps that produced them lets a reviewer check the parts that are actually checkable. Anthropic's
+own guidance for agent builders is blunt about where that effort should come from: even where
+automated tests already ran, "human review remains crucial for ensuring solutions align with
+broader system requirements."<Cite n={1}/> A test suite checks what it was written to check, not
+whether the change was the right one to make.
+
+`examples/reviewing` builds one small piece of a surface like that. Given a drafted answer and
+the citations it names, it reports which figures the answer states are carried by no section it
+cites, and which citations carry none of them. `figures_in` reads the answer's own numbers.
+Getting this loose is the whole difficulty: a checker that flags everything gets ignored exactly
+the way an approval step does, and one that matches too eagerly reports clean when it should not.
+
+<CodeFile file="examples/reviewing/run.py" func="figures_in" />
+
+`_figure`, the helper called on each token, is where the judgment sits. It compares figures as
+values rather than as text, so `$1,200` and `1200` are one figure and `52` is not a match for
+`1152` — which a substring search would have accepted, reporting a citation as support for a
+price it says nothing about. A token with a letter before its digits (`HLV-2205`, `DW300`,
+`v2.1`, `dw300-manual#3`) states no quantity, so nothing is claimed about it. A range states both
+of its ends; an ISO date is one figure rather than three.
+
+<CodeFile file="examples/reviewing/run.py" func="run" />
+
+This is a presence check, not a truth check. It says a number appears in the text the answer
+points at. It does not say the section supports the claim, that the right sources were chosen,
+or that the answer is complete, and two limits are pinned as tests rather than hidden: units are
+dropped, so a figure can match with the wrong unit, and a date written in prose will not match
+the same date written `2026-09-18`. No model is called anywhere in it, so every step is
+`decided_by: "code"`, and the 60-question set does not score it — it answers no question about
+the corpus, it checks an answer someone else produced. The number worth tracking is its own
+flag rate on real output, which is a claim about that system, not about models in general.
+
+</Lane>
+</Lanes>
+
+## At each level
+
+- <Link href="/levels/0/">No model</Link>: there is no output to review, only code to test.
+- <Link href="/levels/1/">One call</Link>: one reply, reviewed against what you already know or
+  can look up in the time you were willing to spend.
+- <Link href="/levels/2/">Context</Link>: the sources are on screen, so the cheap checks become
+  possible — and a citation that is present is not yet a citation that supports the sentence.
+- <Link href="/levels/3/">Workflows</Link>: the pipeline is fixed, so you can decide once, in
+  advance, which step is worth a person's eyes rather than deciding per result.
+- <Link href="/levels/4/">Tools</Link>: a proposed action can be reviewed before it runs, which
+  is a cheaper and more useful check than reading about it afterwards.
+- <Link href="/levels/5/">Agents</Link>: nobody reads the whole run, so review becomes a sample
+  plus the final result, and the sample rate is now a number someone has to choose.
+- <Link href="/levels/6/">Teams of agents</Link>: several outputs agree with each other, which
+  is not evidence — they can be wrong together, and often from the same starting assumption.
+- <Link href="/levels/7/">Always-on agents</Link>: review is entirely after the fact, so the
+  question becomes what would have to change to catch this before the next run, not this one.
+
+## Practices
+
+- Check the specific claims first — figures, dates, names, citations — then what is missing, then
+  the judgment. The order matters: the first two are fast and the third is where your expertise
+  actually earns its keep.
+- Open the source, not a summary of the source written by the system whose work you are checking.
+- Set the sample rate before the week starts, not while reading the output.
+- Read the record of what was done before any summary of what was done, and the irreversible
+  actions before the rest.
+- Count the flags and the skips. A run with none of either is a reason to look harder.
+
+## Run it
+
+<RunIt
+  monitor="The share of problems found by a reviewer versus found later by someone downstream —
+  a customer, an auditor, the person who received the output. That ratio moving the wrong way
+  says review is missing things, well before anyone complains about quality."
+  costAtVolume="Reviewing every result costs a fixed amount per result and does not survive
+  growth. What does survive is a machine check on the parts that are mechanical (a figure that
+  must appear in a cited source, a required field that must be filled) plus a sample of the rest,
+  which keeps a person's time on the judgment that no check can make."
+  failsInProduction="The review step is still in the process and nobody is doing it. Approvals
+  come back in seconds, flags stop appearing, and the record shows a hundred consecutive clean
+  results — which is what both a reliable system and an unread queue look like."
+  whatToLog="For every reviewed item: what was changed, rejected or flagged, and why. That log
+  is what tells the two cases above apart, and it is the raw material a trust record is built
+  from."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Take the last piece of model-generated work you accepted without much scrutiny. Pull out three specific claims — a figure, a date, a citation — and check each against its source. Note how long it took; that number is what a review costs you.' },
+  { lane: 'build', body: 'From the repo root run python -m examples.reviewing --scenario clean, then --scenario mismatch, then --scenario missing, and read the three reports. Then add a scenario of your own in examples/reviewing/__main__.py whose answer spells a corpus figure differently — "the drain pump costs 52 dollars" against a list price written $52.00 — and confirm it still reports clean. Then break it on purpose: change 52 to 5.2 and read the two flags that come back.' },
+  { lane: 'either', body: 'Write down the sample rate you actually use on work you are supposed to be reviewing — one in three, one in ten, whatever it honestly is. Then write down the rate you would defend to someone whose money or safety depends on it. If the two differ, one of them is wrong.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

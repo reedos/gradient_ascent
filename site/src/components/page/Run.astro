@@ -1,0 +1,23 @@
+---
+// Wraps the RunDiagram island for one run file. The "this trace is an illustration" notice is
+// already conditional on the run JSON's own `illustrative` flag inside RunDiagram, so this
+// component only has to hand it one run instead of the home page's two-run comparison set.
+//
+// `lanes={false}`: a technique page already wraps its body in <Lanes>, so the player's own
+// Use it / Build it panel would be a second switch a few pixels from the first, repeating the
+// Use it opening paragraph and the names that the generated "Out there" block already lists.
+import RunDiagram from '../islands/RunDiagram';
+import type { RunData, RunDef } from '../islands/RunDiagram';
+
+interface Props {
+  /** A run JSON imported from src/data/runs/*.json. */
+  data: RunData;
+  label: string;
+  runKey?: string;
+  accentPill?: boolean;
+}
+const { data, label, runKey = 'run', accentPill = false } = Astro.props;
+const runs: RunDef[] = [{ key: runKey, label, data: data as RunData, accentPill }];
+---
+
+<RunDiagram runs={runs} lanes={false} client:visible />

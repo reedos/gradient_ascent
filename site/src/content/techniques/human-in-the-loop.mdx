@@ -1,0 +1,219 @@
+---
+slug: human-in-the-loop
+level: 3
+run: human-in-the-loop
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Building effective agents"
+    url: "https://www.anthropic.com/engineering/building-effective-agents"
+    publisher: "Anthropic"
+    date: "2024-12-19"
+    accessed: "2026-09-18"
+  - title: "Power Automate"
+    url: "https://www.microsoft.com/en-us/power-platform/products/power-automate"
+    publisher: "Microsoft"
+    accessed: "2026-09-18"
+  - title: "Jules"
+    url: "https://jules.google/"
+    publisher: "Google"
+    accessed: "2026-09-18"
+  - title: "Cline"
+    url: "https://cline.bot/"
+    publisher: "Cline"
+    accessed: "2026-09-18"
+  - title: "Human-in-the-loop"
+    url: "https://docs.langchain.com/oss/python/langchain/human-in-the-loop"
+    publisher: "LangChain (documentation)"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import hitlRun from '../../data/runs/human-in-the-loop.json';
+
+Human approval pauses a run before something costly, irreversible, or too uncertain to ship, and
+hands that decision to a person. Anthropic frames the pause as a checkpoint inside an agent's own
+loop — "agents can then pause for human feedback at checkpoints or when encountering
+blockers"<Cite n={1}/> — but the version on this page stays at level 3: *your code* decides when
+to pause, against a fixed rule. The model is never asked whether a person should look, and the
+line to level 4 is exactly that — a design where the model can call for review itself.
+
+The rule that decides *when* to pause does the real work. Two common ones: confidence (the draft
+has nothing to point to, so it may be a guess) and cost (the draft names a price, or an action
+with a consequence if it is wrong). Get the threshold wrong either way and the gate stops doing
+its job. Too loose, and it waves through the answers that most needed a second look; too strict,
+and approving becomes a reflex rather than a check.
+
+This page is marked draft, not published: this technique has no recorded trace and no scored
+result file yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={hitlRun} label="Level 3 · Human approval" runKey="human-in-the-loop" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Approval steps in ordinary automation tools are the plainest version of this. Power Automate
+sells the feature directly: "Streamlined approval processes" that let you "create, manage, and
+share approval processes across your organization"<Cite n={2}/> — a flow runs up to a point, a
+person is asked to approve or reject, and only an approval lets it continue. Coding agents put
+the pause at a different kind of irreversible step: Jules works from a plan you confirm ("That
+looks good. Continue!"), and when the work is done, "Jules creates a PR of the changes. Approve
+the PR, merge it to your branch, and publish it on GitHub"<Cite n={3}/> — two gates, both of them
+yours, sitting either side of the part that is hard to undo rather than in front of every step.
+
+Tools at this level usually offer a second mode that skips the asking. Cline's own description of
+the choice: "Approve every step, or flip auto-approve for autopilot"<Cite n={4}/>. Which of those
+you want is a real decision, and it is worth making deliberately rather than by drift: a gate is
+only a control while somebody is reading what it shows them, and an approval that has become
+automatic — by the flip of a setting, or by habit — is a step in the run, not a check on it.
+
+So if a tool asks you to approve something, two questions are worth answering honestly: what
+would actually happen if you clicked through without reading, and how much of it are you
+reading. The answer to the second tends to fall over time. <Link
+href="/techniques/evaluator-optimizer/">Write and check</Link> is the move when the thing you
+were reading for turns out to be something a second prompt can test every time.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example checks a drafted answer against two fixed rules — no citation at all (`low_confidence`)
+or a dollar figure in the text (`high_cost`) — and if either trips, `run` returns a `PendingReview`
+instead of a final `Answer`. `PendingReview` is a plain dataclass: the question, the full draft
+text, its citations, and the reason. That is deliberately everything a reviewer needs to judge
+the answer on its own merits, not just a bare yes/no — a reviewer shown only "approve this
+answer?" with no sources to check it against is being asked to rubber-stamp, not review.
+
+`resume` is a second, separate function. It takes the checkpoint, a person's decision
+(`approve`, `edit` or `reject`), and — for an edit — their corrected text, and produces the final
+answer. Nothing about the pause or the resume is a model decision: `_needs_review` is a plain
+function of the draft's text and citations, and `resume` just branches on a string a person
+supplied. A real system would serialize `PendingReview` the same way, hand it to a queue or a
+ticket, and call `resume` whenever the decision comes back — hours or days later, in a different
+process entirely, with nothing about the code above needing to change.
+
+<CodeFile file="examples/human_in_the_loop/run.py" start={26} end={101} expect="LEVEL = 3" />
+
+Run it yourself:
+
+<CodeFile file="examples/human_in_the_loop/README.md" start={17} end={17} lang="text" expect="python -m examples.human_in_the_loop" />
+
+The example's own tests stand in for the person: a small scripted "reviewer" function takes a
+`PendingReview` and returns a decision, the same way a real reviewer's click would, so the pause
+and the resume can both be exercised on `StubModel` with no actual person or live model involved.
+
+If you would rather not write the checkpoint yourself, LangGraph has this built in. Its
+documentation describes middleware that pauses when a model proposes an action that might need
+review, waits for a decision, and saves the graph's state so the run can resume
+later<Cite n={5}/> — the same two halves as `run` and `resume` above, with the persistence
+supplied. The decisions it names are the three this example takes plus one more: approve, edit,
+reject, and answer the model directly.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try shipping without a gate first if a wrong answer costs little and is easy to notice and fix
+after the fact — a gate adds latency and a person's attention, and both are wasted on an answer
+nobody needed to check.
+
+Move up to a real approval gate once being wrong is expensive, hard to undo, or the kind of
+mistake nobody would notice until it was too late to matter — and pick the threshold from what
+actually made past answers wrong, not a guess.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'Approval fatigue',
+    notice: 'Reviewers start approving without reading, because too many of the things they are asked to check turn out to be fine, and the gate becomes a formality rather than a control.',
+    test: "Track the time between a review being shown and a decision being made. A gap that stays suspiciously short and constant, regardless of how long the draft is, is a sign the reviewer stopped actually reading.",
+  },
+  {
+    name: 'The threshold is tuned wrong',
+    notice: "Either almost everything pauses (a threshold too sensitive, breeding fatigue) or almost nothing does (a threshold too loose, so the cases that most needed a second look slip through with everything else).",
+    test: "Track what share of real traffic pauses over time, and separately, sample the answers that did NOT pause and check by hand whether any of them should have.",
+  },
+  {
+    name: 'The checkpoint does not show enough to judge',
+    notice: 'A reviewer is shown the draft but not what it was grounded in, so a citation that looks plausible cannot actually be checked against the source it claims to come from.',
+    test: "Show a reviewer only the draft text, without the sources, and a version with the sources attached, and compare how often each version gets approved. A gap between the two says the bare draft was not enough to judge on.",
+  },
+  {
+    name: 'The decision never reaches resume',
+    notice: 'A paused run sits in a queue nobody is watching, or the decision is recorded somewhere resume never reads it from, so a question a person genuinely answered never actually produces a final answer.',
+    test: 'Time how long a paused checkpoint sits before resume is called on it, end to end, not just how long it takes a person to click a button once they see it.',
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, no pause needed', value: '1' },
+    { label: 'Model calls, paused', value: '1' },
+    { label: 'Added latency when paused', value: 'minutes to days' },
+    { label: 'Wall time, no pause needed', value: '~0.6s' },
+  ]}
+  comparedTo={{
+    label: 'RAG (level 2), no gate',
+    note: 'The model cost is identical to a plain RAG call when nothing trips the threshold. The real cost of a pause is not tokens; it is the wall-clock time until a person actually looks, which can be orders of magnitude longer than the model call it is checking.',
+  }}
+  level={3}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+The site's shared 60-question set grades answers, and this technique's whole point is that some
+questions end without one: a run that trips `low_confidence` or `high_cost` hands back a
+checkpoint for a person instead. `scripts/eval_run.py` will not score it for that reason, and
+says so rather than scoring the questions that happen not to pause and calling that a number for
+this technique (see `docs/EVALS.md`).
+
+What would be measured here is the gate, in three parts. The pause rate: what share of questions
+trip each threshold. Whether the right ones pause — `unanswerable` questions should pause at a
+high rate, having no citation to point to, and a low pause rate on that kind means the threshold
+is missing exactly the case it exists to catch. And accuracy after `resume`, scored separately
+for approved and for edited answers, which is the only measurement that says whether the person
+in the loop is adding anything. None of these is a token cost, and none of them can tell you how
+long a real queue of paused checkpoints takes a person to clear.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="The pause rate over time, and separately, the approve/edit/reject split among decisions actually made. A pause rate that drifts with no change to the threshold code is a sign the traffic mix changed, not the rule."
+  costAtVolume="Model cost tracks question count the same as a single-call technique. The real cost that grows with volume is reviewer time: a fixed pause rate against rising traffic means a rising number of checkpoints waiting on the same number of people."
+  failsInProduction="The pause rate creeps up until approving becomes reflexive, or a queue of paused checkpoints backs up faster than anyone is clearing it, and answers that were correctly flagged for review sit unresolved rather than being wrong out loud."
+  whatToLog="Every pause with its reason, the full checkpoint shown to the reviewer, the decision made, who made it, and the time between the pause and the resume — an approval with no record of what was actually shown is not auditable after the fact."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Find a tool you use that asks you to approve something before it acts (a form, an agent, an automation). Time how long you actually spend reading before you click approve. Is that enough time to have caught a real mistake?' },
+  { lane: 'build', body: 'Run python -m examples.human_in_the_loop --model stub --question "What does HLV-2205 cost?" to see it pause, then add --decision reject to resume it as rejected instead. Then try a question with no good answer in the corpus and watch it pause for a different reason.' },
+  { lane: 'either', body: 'Take an approval step you own and write down the last three things it stopped. If you cannot name one, the threshold is either too loose to catch anything or too tight to be read.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

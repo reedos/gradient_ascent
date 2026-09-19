@@ -1,0 +1,106 @@
+---
+// A thread page: a cross-cutting idea that runs through several technique pages, generated from
+// content/taxonomy.json's `threads` (one today: graph engineering). Same layout family as
+// techniques/[slug].astro (outline fallback, sources and reviewed date rendered last from
+// frontmatter) and levels/[level].astro (a panel of TechniqueRow entries, colored by each page's
+// own level, since a thread has no single level of its own).
+import { getEntry, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import Connection from '../../components/Connection.astro';
+import TechniqueRow from '../../components/TechniqueRow.astro';
+import Sources from '../../components/page/Sources.astro';
+import Reviewed from '../../components/page/Reviewed.astro';
+import { url } from '../../lib/url';
+import { taxonomy, techniqueBySlug } from '../../lib/content';
+
+// getStaticPaths is bundled on its own for the static build, so it cannot close over a const
+// declared elsewhere in this module (that produced a "threads is not defined" build error) --
+// read taxonomy.threads inline here, and again below for the render body.
+export function getStaticPaths() {
+  return taxonomy.threads.map((t) => ({ params: { id: t.id } }));
+}
+
+const { id } = Astro.params;
+const thread = taxonomy.threads.find((t) => t.id === id)!;
+const pages = thread.pages.map((slug) => techniqueBySlug(slug)).filter((p) => p !== undefined);
+const colorOf = (level: number | 'tracks') => (level === 'tracks' ? 'var(--ot)' : `var(--o${level})`);
+
+const entry = await getEntry('threads', id!);
+const rendered = entry ? await render(entry) : undefined;
+const Content = rendered?.Content;
+
+// Sources and the reviewed date are page furniture, not prose: rendered here from the
+// frontmatter the schema validates, after the body, the same rule techniques/[slug].astro and
+// recipes/[slug].astro both follow.
+const sources = entry?.data.sources ?? [];
+const reviewedISO = entry ? entry.data.reviewed.toISOString().slice(0, 10) : undefined;
+---
+<Base title={`${thread.title} · Gradient Ascent`} description={thread.summary}>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href={url('/')}>Home</a>
+    <span aria-hidden="true">/</span>
+    <a href={url('/techniques/')}>Techniques</a>
+    <span aria-hidden="true">/</span>
+    <span>{thread.title}</span>
+  </nav>
+
+  <div class="page-hero leveled" style="--c:var(--ot)">
+    <Eyebrow label="Thread" color="var(--ot)" />
+    <h1>{thread.title}</h1>
+    <p>{thread.summary}</p>
+  </div>
+
+  <Connection title="The organizing sentence" color="var(--ot)">{thread.line}</Connection>
+
+  {
+    Content ? (
+      <div class="prose">
+        <Content />
+      </div>
+    ) : (
+      <p class="status-note">
+        This thread page is an outline. The side-by-side comparison and the sourced claims have
+        not been written yet.
+      </p>
+    )
+  }
+
+  <section class="section">
+    <div class="section-top">
+      <div>
+        <div class="eyebrow muted">This thread</div>
+        <h2>Pages that carry it</h2>
+      </div>
+    </div>
+    <div class="panel reading">
+      {
+        pages.map((p) => (
+          <TechniqueRow slug={p!.slug} title={p!.title} summary={p!.summary} status={p!.status} color={colorOf(p!.level)} />
+        ))
+      }
+    </div>
+  </section>
+
+  {
+    sources.length > 0 && (
+      <section class="section">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow muted">Where this comes from</div>
+            <h2>Primary sources</h2>
+          </div>
+        </div>
+        <Sources sources={sources} />
+      </section>
+    )
+  }
+
+  {
+    reviewedISO ? (
+      <Reviewed date={reviewedISO} />
+    ) : (
+      <p class="reviewed-note">This page is generated from the taxonomy.</p>
+    )
+  }
+</Base>

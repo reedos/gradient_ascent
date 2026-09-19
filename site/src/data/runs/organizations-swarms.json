@@ -1,0 +1,105 @@
+{
+  "illustrative": true,
+  "trace_note": "Both proposals come from one coordinator call per round, so the recorded trace counts one model-decided step per round where the diagram plays two: one model output selected both transitions.",
+  "h": 540,
+  "title": "Organizations of agents",
+  "sub": "A coordinator assigns a shared task board; code enforces the budget and stops a double claim.",
+  "pill": "Level 7 · Always-on agents",
+  "nodes": [
+    {
+      "id": "tasks",
+      "x": 170,
+      "y": 30,
+      "l": "Task board",
+      "k": "store"
+    },
+    {
+      "id": "coord",
+      "x": 170,
+      "y": 170,
+      "l": "proposes assignments",
+      "k": "model"
+    },
+    {
+      "id": "check",
+      "x": 170,
+      "y": 310,
+      "l": "checks board + budget",
+      "k": "code"
+    },
+    {
+      "id": "claimed",
+      "x": 82,
+      "y": 450,
+      "l": "Claimed",
+      "k": "code"
+    },
+    {
+      "id": "refused",
+      "x": 258,
+      "y": 450,
+      "l": "Refused: not open",
+      "k": "code"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "f": "tasks",
+      "t": "coord",
+      "by": "code"
+    },
+    {
+      "id": "e2",
+      "f": "coord",
+      "t": "check",
+      "by": "model"
+    },
+    {
+      "id": "e3",
+      "f": "check",
+      "t": "claimed",
+      "by": "code",
+      "b": -24
+    },
+    {
+      "id": "e4",
+      "f": "check",
+      "t": "refused",
+      "by": "code",
+      "b": 24
+    }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "Three tasks are open; the coordinator is asked to assign this round",
+      "d": "T1 look up a warranty term · T2 draft a bulletin summary\nT3 check the draft's citations\nbudget this round: researcher 2, writer 2, reviewer 2",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The coordinator proposes T1 for the researcher",
+      "d": "→ assign(T1, researcher)",
+      "m": "180 in · 12 out · 0.5 s"
+    },
+    {
+      "e": "e3",
+      "h": "Code checks the board: T1 is open, researcher has budget — claimed",
+      "d": "T1.status: open → claimed, assigned_to: researcher\nresearcher budget: 2 → 1 left",
+      "m": "claimed"
+    },
+    {
+      "e": "e2",
+      "h": "In the same call, the coordinator also proposes T1 for the writer",
+      "d": "→ assign(T1, writer)\n(the coordinator's own output asked for the same\ntask twice, for two different roles)",
+      "m": "180 in · 12 out · 0.5 s"
+    },
+    {
+      "e": "e4",
+      "h": "Code checks again: T1 is no longer open — refused, not reassigned",
+      "d": "T1.status: claimed (already assigned to researcher)\nwriter's budget is never touched by this proposal",
+      "m": "refused"
+    }
+  ]
+}

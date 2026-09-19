@@ -1,0 +1,258 @@
+---
+slug: inference-time-reasoning
+level: 1
+run: inference-time-reasoning
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Thinking"
+    url: "https://platform.claude.com/docs/en/build-with-claude/thinking"
+    publisher: "Anthropic"
+    accessed: "2026-09-18"
+  - title: "Thinking"
+    url: "https://ai.google.dev/gemini-api/docs/thinking"
+    publisher: "Google"
+    accessed: "2026-09-18"
+  - title: "Reasoning models"
+    url: "https://developers.openai.com/api/docs/guides/reasoning"
+    publisher: "OpenAI"
+    accessed: "2026-09-18"
+  - title: "Self-Consistency Improves Chain of Thought Reasoning in Language Models"
+    url: "https://arxiv.org/abs/2203.11171"
+    publisher: "arXiv (Google Research, UC Santa Barbara)"
+    date: "2022-03-21"
+    accessed: "2026-09-18"
+  - title: "Learning to Reason with LLMs (read through the Internet Archive's capture of 13 September 2024)"
+    url: "https://web.archive.org/web/20240913000639/https://openai.com/index/learning-to-reason-with-llms/"
+    publisher: "OpenAI"
+    date: "2024-09-12"
+    accessed: "2026-09-18"
+  - title: "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning"
+    url: "https://arxiv.org/abs/2501.12948"
+    publisher: "arXiv (DeepSeek-AI)"
+    date: "2025-01-22"
+    accessed: "2026-09-18"
+  - title: "Introducing Operator (read through the Internet Archive's capture of 23 January 2025)"
+    url: "https://web.archive.org/web/20250123210058/https://openai.com/index/introducing-operator/"
+    publisher: "OpenAI"
+    date: "2025-01-23"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import inferenceTimeReasoningRun from '../../data/runs/inference-time-reasoning.json';
+
+Inference-time reasoning is spending more computation after training to get a better answer,
+without changing the model itself. It comes in two shapes. The first scales one call: extended
+thinking or a reasoning-effort setting lets the model work through a problem in its own words
+before answering, and Anthropic says that reasoning is billed as output tokens even when the
+thinking text is not returned to you<Cite n={1}/>. The second scales the number of calls instead:
+ask the same question several times and combine the answers, the way self-consistency samples
+several reasoning paths and keeps whichever final answer most of them agree on<Cite n={4}/>.
+
+Every maker that offers the first kind says close to the same thing: more thinking helps on
+problems with real intermediate steps — math, debugging, planning — and mostly wastes tokens on
+ones that do not have any, like a lookup or a classification<Cite n={1}/><Cite n={2}/><Cite n={3}/>.
+This page's example uses the second kind, because it is the one a fixed `StubModel` can
+demonstrate honestly: sample the same question several times and take the answer most samples
+agree on.
+
+## What a reasoning model is, and what it added
+
+Until September 2024 the thinking was a prompt trick. You wrote "think step by step" and an
+ordinary model wrote out its working, because working looked like the text it had been trained on.
+A reasoning model is trained to do it. OpenAI introduced o1 as "a new large language model trained
+with reinforcement learning to perform complex reasoning", one that "can produce a long internal
+chain of thought before responding to the user"<Cite n={5}/>. What the training teaches is the
+part worth knowing: the model "learns to recognize and correct its mistakes", "to break down
+tricky steps into simpler ones" and "to try a different approach when the current one isn't
+working"<Cite n={5}/>. Four months later the DeepSeek-R1 paper reported that such reasoning "can
+be incentivized through pure reinforcement learning", with no human-written examples of reasoning
+to copy<Cite n={6}/>.
+
+It added two things. The first is test-time compute as a dial. OpenAI reported that o1 improves
+"with more time spent thinking (test-time compute)"<Cite n={5}/>, so a hard question can be given
+more effort instead of a bigger model. That dial is the thinking switch and the effort setting
+described below, and you pay for it in seconds and in output tokens<Cite n={1}/>.
+
+The second is what agents needed. Noticing a mistake, backing up and trying another way is what
+keeps a long task on course, and it is what a level 5 loop asks of a model at every step.
+OpenAI's post on Operator, its browser agent, credits "advanced reasoning through reinforcement
+learning" for the model that drives it<Cite n={7}/>. On <Link href="/timeline/#reasoning-models">this
+site's timeline</Link> reasoning models fall in the gap between tools (2023) and agents (2025).
+
+It is still level 1. A model that thinks for a minute inside one reply has not changed who decides
+the next step.
+
+This page is marked draft, not published: it has no recorded trace and no scored result file yet,
+so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={inferenceTimeReasoningRun} label="Level 1 · Self-consistency" runKey="inference-time-reasoning" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Most chat apps that offer a reasoning model give you a toggle or a slider for this, often called
+"thinking," "extended reasoning," or an effort level from low to high. Turning it up gets a model
+that visibly works through a problem — restating what is being asked, trying an approach, checking
+it, backtracking if it does not hold up — before giving a final answer<Cite n={1}/>. That is worth
+it for a hard multi-step problem: real math, a subtle bug, a plan with several dependent steps. It
+is usually not worth it for a fact you could look up, a short classification, or anything where
+the first plausible answer is also the right one — the makers' own guidance says as much directly:
+use minimal effort for fact retrieval and classification, and save the higher settings for coding,
+math, and multi-step planning<Cite n={2}/><Cite n={3}/>.
+
+The other shape — running the same question several times and combining the answers — is mostly
+invisible to a reader, since it happens inside a product rather than as a setting you control. A
+coding tool that generates several candidate fixes and keeps the one that actually passes the
+tests is doing a version of this: best-of-N with a checker, where the checker is something
+concrete (does the code run, does the test pass) rather than a vote. A product that shows a
+confidence figure next to an answer, or that quietly retries a step that looked shaky, is often
+running more than one attempt behind the scenes and combining them, even when the interface never
+uses the phrase "self-consistency."
+
+Both shapes trade money and time for a better chance at a right answer, and neither fixes a model
+that is confidently wrong the same way every time. More thinking applied to a bad approach still
+produces a bad answer, just a longer and more convincing-looking one; running the same flawed
+reasoning several times and voting only helps when the mistakes differ from run to run, not when
+they are systematic. If a product's answer is wrong, more reasoning effort is not automatically
+the fix to reach for first — whether the model had the information it needed in the first place is
+worth checking before spending more on reasoning about the wrong facts.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example runs self-consistency literally: the same numeric question goes to the model five
+times as five independent calls, each reply is asked to end with a line the code can parse
+(`Answer: <number>`), and the code returns whichever number the largest share of the five samples
+agree on.
+
+<CodeFile file="examples/inference_time_reasoning/run.py" func="run" />
+
+Extracting the final number from free-form reasoning text is its own small, fixed piece of code
+(`_extract`): read from the bottom for a line starting `Answer:` and pull the number out of it, so
+a sample that reasons at length still ends in something machine-checkable. Five samples from a
+scripted stub exercise the vote itself, not a claim about how often real models agree with
+themselves on a hard question — that claim (whether five samples on a real model land on the
+right number more often than one sample does) is exactly what this site's eval set is built to
+measure, once a real run exists (see `docs/EVALS.md`).
+
+Run it yourself:
+
+<CodeFile file="examples/inference_time_reasoning/README.md" start={14} end={14} lang="text" expect="python -m examples.inference_time_reasoning" />
+
+Every step is `decided_by: "code"`: the sample count is fixed, and the code always takes the
+majority regardless of what any individual sample said. A model choosing to think longer inside
+one call — the other shape of this technique — would still be `decided_by: "code"` by this site's
+definition too: the code decided to turn thinking on or set an effort level, and the model
+deciding what to think about is not the same as the model deciding what the control flow does
+next (see `docs/EVALS.md`).
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Skip the extra tokens if a single plain call already gets the answer right on repeat tries — test
+that before assuming more thinking or more samples will help. And if the model is wrong because it
+was never given a fact it needed, not because it reasoned badly, more reasoning effort does not
+fix that; <Link href="/techniques/rag/">RAG</Link> or a better prompt fixes a missing-information
+problem, not a reasoning one.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'A systematic error looks unanimous',
+    notice: 'All samples make the same mistake (a shared misreading of the question, an arithmetic slip everyone reproduces), so the majority vote reports high confidence in a wrong answer.',
+    test: 'Check a case where the correct answer is already known, and verify the votes are not unanimous for a wrong one.',
+  },
+  {
+    name: 'No answer to extract',
+    notice: "A sample reasons at length but never states its answer in the expected format, so it silently falls into \"no answer\" instead of being flagged as a parsing failure.",
+    test: "Check the \"no answer\" bucket's share of votes across a batch of runs, not just which answer won.",
+  },
+  {
+    name: 'Reasoning tokens with nothing to reason about',
+    notice: 'Turning on extended thinking or a high effort level for a simple lookup or classification burns tokens and adds latency with no change in the answer.',
+    test: 'Compare token count and wall time with thinking on versus off on the same simple question, holding the question fixed.',
+  },
+  {
+    name: 'A near-tie decided arbitrarily',
+    notice: 'The votes split close to evenly and the code picks whichever answer happened to be tallied first, presenting it with the same confidence as a clear majority.',
+    test: 'Log the full vote distribution, not just the winner, and treat a close vote differently from a landslide.',
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, one question', value: '5' },
+    { label: 'Tokens in (total)', value: '~260' },
+    { label: 'Tokens out (total)', value: '~450' },
+    { label: 'Wall time', value: '~2s' },
+  ]}
+  comparedTo={{
+    label: 'chat (level 1)',
+    note: 'Five independent samples cost roughly five times a single call in tokens, and roughly five times the wall time run one after another (or close to one call\'s wall time if run in parallel, at the same total token cost), for a better chance at a correct answer on questions with more than one path to it.',
+  }}
+  level={1}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+Self-consistency and extended thinking are graded like every technique here: scored against the
+same 60-question set (`docs/EVALS.md`), with the sample count or the effort level recorded as a
+setting on the run rather than a fixed part of the technique. The comparison that actually matters
+is one sample against five, or low effort against high, on the exact same questions, since the
+whole claim is "more inference-time computation raises the score for some class of model, on some
+kinds of question" — and the site's claim rule requires naming which model class and which kinds
+that holds for once a result file exists.
+
+This example samples one arithmetic question five times and returns the majority answer. It
+reads no documents and cites nothing, so `scripts/eval_run.py` will not score it against the
+60-question set and says so instead of returning a number measured on the wrong task
+(`docs/EVALS.md`). Measuring it needs questions with a checkable numeric answer, run at one
+sample, three and five: the score at each setting, the share of runs where the samples agreed,
+and the token cost of each, since five samples cost about five times one.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="Agreement rate across samples (unanimous versus split), tracked separately from raw accuracy. A model that agrees with itself confidently and is wrong needs a different fix than one that disagrees with itself but is right on the majority side."
+  costAtVolume="Cost multiplies by the sample count, or by the extra reasoning tokens for a single deeper call, on every question whether or not that question needed it. This is the one technique on the site where the multiplier is a number you choose directly."
+  failsInProduction={"A question type that used to have one dominant right answer starts splitting votes evenly after a data or prompt change, and the majority pick becomes close to a coin flip without the interface showing any less confidence than before."}
+  whatToLog="Every sample's raw text and extracted answer, the full vote tally, and which one won, so a bad final answer can be told apart from a bad extraction of an otherwise fine sample."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Find a "thinking" or "reasoning effort" toggle in a chat app you use. Ask it a simple factual question with it on and off and compare the wait and the answer, then do the same with a real multi-step problem.' },
+  { lane: 'build', body: 'Run python -m examples.inference_time_reasoning --model stub --question "..." from the repo root, then edit the scripted samples in tests/test_example_inference_time_reasoning.py so all five disagree. Does the code still return an answer, and how much should you trust it?' },
+  { lane: 'either', body: 'Pick a question a model recently got wrong. Would asking it to think longer have fixed it, or was the problem that it never had the right information in the first place?' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

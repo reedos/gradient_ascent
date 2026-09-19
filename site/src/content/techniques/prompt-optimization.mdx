@@ -1,0 +1,218 @@
+---
+slug: prompt-optimization
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines"
+    url: "https://arxiv.org/abs/2310.03714"
+    publisher: "arXiv (Khattab et al., Stanford)"
+    date: "2023-10-05"
+    accessed: "2026-09-18"
+  - title: "DSPy Optimizers (formerly Teleprompters)"
+    url: "https://github.com/stanfordnlp/dspy/blob/main/docs/docs/learn/optimization/optimizers.md"
+    publisher: "DSPy (Stanford NLP) — documentation source"
+    accessed: "2026-09-18"
+  - title: "Prompt improver"
+    url: "https://claude.com/blog/prompt-improver"
+    publisher: "Anthropic"
+    date: "2024-10-14"
+    accessed: "2026-09-18"
+---
+
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+
+A program searches for a better prompt against a measured score, instead of a person hand-editing
+the wording. That is prompt optimization, also called automated prompt optimization, and it is the
+one technique under <Link href="/techniques/adaptation/">changing the model</Link> that changes no
+weights at all: where <Link href="/techniques/fine-tuning/">fine-tuning</Link> trains the
+instruction in, this searches for a better one to send.
+
+DSPy is the program this page quotes throughout. Its paper describes designing "a compiler that
+will optimize any DSPy pipeline to maximize a given metric"<Cite n={1}/>, and its documentation is
+specific about what an optimizer takes: "your DSPy program," "your metric," and "a few training
+inputs"<Cite n={2}/>. Two of those three have to exist before there is anything to
+optimize, which is why this page assumes <Link href="/techniques/evals/">evals</Link>. An eval set
+is not a nice-to-have here. It is the thing being optimized against, and every weakness in it is
+inherited by whatever comes out.
+
+This page is marked draft, not published: no optimization run has happened for this site, so
+nothing below is measured.
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Most prompt-improvement tools a person meets directly are not the search DSPy runs. Anthropic's
+Prompt Improver rewrites a prompt in one pass using five named techniques — a chain-of-thought
+section, example standardization into XML, example enrichment, rewriting for clarity, and a
+prefilled assistant message — after which "you can provide feedback for Claude about what is and
+isn't working to further improve the prompt"<Cite n={3}/>. The rewrite itself compares no
+candidates and consults no score. Scoring is a separate step in the same product: Anthropic
+describes its prompt evaluator as letting you "test your prompts under various scenarios," with an
+"ideal output" column added so users can "grade model outputs on a 5-point scale"<Cite n={3}/> — a
+person grading, one prompt at a time, not a search choosing between prompts by number.
+
+The tools this page is about do the choosing. They run many candidate instructions, or many
+candidate few-shot examples, and keep whichever scores highest on a set of examples. That makes the
+question about any number one of them reports the same question
+<Link href="/techniques/evals/">evals</Link> asks about every score: was it measured on data the
+search never touched while it was choosing? A search allowed to see its own scoring set will always
+find something that scores well on it, which is a different claim from finding something that works
+elsewhere.
+
+None of this replaces writing a prompt by hand for a one-off task, and an optimized prompt is not
+a permanent asset: it is fitted to one development set, on one model. Change the model — a new
+version from the same maker counts — and the search has to be re-run, or at minimum the winner
+re-scored, because nothing about the old score carries over to a model that answers differently.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+`examples/prompt_optimization` is a minimal version of what a DSPy optimizer does, scoped down to
+one thing: search over a fixed list of whole system prompts, using
+<Link href="/techniques/distillation/">distillation's own</Link> `grade_exact` as the metric,
+against the site's 32 exact-graded questions. What DSPy's own optimizers actually search over is
+usually finer-grained — its documentation lists "synthesizing good few-shot examples for every
+module," "proposing and intelligently exploring better natural-language instructions for every
+prompt," and "building datasets for your modules and using them to finetune the LM weights" as
+three different things an optimizer can tune<Cite n={2}/> — this example only ever swaps the whole
+instruction, never touches an example or a weight.
+
+The split is the part worth reading closely:
+
+<CodeFile file="examples/prompt_optimization/run.py" func="run" />
+
+Every candidate is scored on the development split; the highest score is selected; only then is
+that one candidate scored on the held-out split. A development number answers "which candidate
+looked best while we were choosing." The held-out number answers "how good is the one we picked,"
+and those are different questions.
+
+The separation is worth attacking rather than believing, because a leak would change no number a
+reader could see. Four properties hold it up, and each is a test. The split is a deterministic
+partition for a given seed: the same seed gives the same two lists, every question lands in exactly
+one of them, and the held-out side is never empty even at a fraction that rounds to zero. Every
+held-out question is asked exactly once, after selection has finished and only under the winning
+instruction — the test asserts the ordering, not just the instruction, since a held-out question
+scored early and re-scored later would still have leaked. Every candidate is scored on the same
+development questions. And ties resolve to the first candidate in list order, which means a run
+where everything ties has selected nothing: `python -m examples.prompt_optimization --model stub`
+does exactly that, scoring every candidate 0/24 against the interactive stub, so the "winner" is
+list position. A `held_out_fraction` that would leave no development questions raises instead of
+returning, because selecting on nothing and then printing a held-out score reads precisely like a
+search that worked.
+
+Size is the honest limitation. DSPy's own guidance for a longer optimization run with its
+`MIPROv2` optimizer is to use it when you "have enough data (e.g. 200 examples or more to prevent
+overfitting)"<Cite n={2}/> — scoped to that one optimizer's longer search mode, not a rule for
+every method. This example splits 32 questions 24/8, enough to demonstrate the discipline and far
+short of enough to trust a winner.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+There is a prerequisite here that rules most cases out on its own: no eval set, no search. A
+program that picks a prompt by score cannot run without a metric and examples to run it against,
+so if you do not already have an eval set you trust, the work in front of you is
+<Link href="/techniques/evals/">building one</Link>, and that work usually improves the prompt by
+itself — writing down what a good answer looks like is most of saying what you want. Start where
+<Link href="/techniques/prompt-engineering/">prompt engineering</Link> starts: one prompt written
+by hand, checked against a handful of real cases.
+
+Search becomes worth its cost at the point where comparing candidates by hand is the slow part:
+the same prompt sent often, an eval set someone has already sampled and trusts, and more variants
+worth trying than a person will sit through. Short of that, a machine comparing dozens of prompts
+against a set nobody has checked will confidently hand you the one that best fits its flaws.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'The winning candidate never faces held-out data',
+    notice: 'A reported score is the same number the search used to choose the candidate in the first place, so it measures how well the search fit that one set, not how the candidate performs elsewhere.',
+    test: "Check whether the reported number came from the same examples the search compared candidates on. If so, it is a training-time number, not a held-out one, whatever it is called on the page.",
+  },
+  {
+    name: 'Too little data for the amount of search',
+    notice: "A search tries many candidates against a small example set, and the winner's score is really noise from that small set rather than a real difference between candidates.",
+    test: "Compare the number of candidates tried against the number of examples scored on; DSPy's own guidance scopes its 200-example recommendation to one optimizer's longer search mode, which is a useful reference point even for a different search.",
+  },
+  {
+    name: 'Metric mismatch between what is optimized and what is wanted',
+    notice: "The search maximizes exactly the metric it was given, and the metric turns out to reward something narrower than what the prompt was actually supposed to do well.",
+    test: "Read a sample of the highest-scoring candidate's actual outputs, not just its score, and check whether a person would call them good for the real task.",
+  },
+  {
+    name: 'A one-shot rewrite mistaken for a search',
+    notice: "A prompt-improvement tool rewrites a prompt once using fixed techniques, and the result is passed on as though something had compared it against alternatives and measured the difference.",
+    test: "Ask what scored it, and on what. A rewrite is a draft: it needs the same check by hand that any prompt you wrote yourself would need, and a grade a person gave one prompt is not a comparison between two.",
+  },
+  {
+    name: 'The model changed and the prompt did not',
+    notice: "An optimized prompt keeps running after the model behind it is upgraded or swapped, still carrying a held-out score that was measured on the old one. Instructions tuned around one model's habits can be neutral or harmful on the next.",
+    test: "Re-score the current prompt on the held-out split against the new model before the switch, and re-run the search if the number moved. Record the model id beside every score so this question can be asked at all.",
+  },
+  {
+    name: 'The eval set the search runs against is the problem',
+    notice: "The search finds a real, generalizable improvement against a flawed or unrepresentative eval set, and the improvement does not show up once the prompt meets real traffic.",
+    test: "Before trusting an optimization result, apply the same checks the evals page describes to the set itself: is it representative of real questions, and has anyone checked a sample by hand?",
+  },
+]} />
+
+## How to eval it
+
+<HowToEval>
+
+Running the site's eval runner over this example would be circular: the example already uses 32 of
+those 60 questions as the thing it searches and reports against (see `docs/EVALS.md`). Its own
+held-out score is the measurement, and it means something only because of where the number came
+from — data the choice never touched, which is the rule <Link href="/techniques/evals/">evals</Link>
+sets for every before/after on this site.
+
+Optimizing a real prompt against the full 60 works the same way: cut a slice off first, search on
+the rest, score the winner on the slice, and report the two numbers separately with the model id
+beside them. One number labelled "after optimization," with no statement of which questions
+produced it, is not a result.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="The gap between the development score and the held-out score over repeated
+  optimization runs; a gap that keeps growing usually means the eval set is too small, too
+  similar to what the search has already seen, or both."
+  costAtVolume="Cost scales with candidates tried times examples scored per candidate, on the
+  development split; the held-out check adds one more full pass, once, for whichever candidate
+  won. A wider search is a multiplier on the development side only."
+  failsInProduction="Two drifts, and the prompt notices neither. Real traffic moves away from the
+  shape of the questions the search ran on, and the model behind the prompt is upgraded to one
+  that reads the same instruction differently. In both cases a held-out score measured months ago
+  keeps being quoted as though it still described the system."
+  whatToLog="Every candidate tried and its development score, which one was selected and why, the
+  held-out score, and the eval set's own version, so a later question about why this prompt was
+  chosen can be answered by rereading a record instead of rerunning the search."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: "Find a claim that a prompt was 'optimized' or 'tuned' for a task, and try to answer two questions from the page alone: how many examples was it scored on, and were any of them kept back from the process that picked it? Most pages answer neither, and the second one is the one that decides what the number means." },
+  { lane: 'build', body: 'Run python -m examples.prompt_optimization --model stub from the repo root and read the three development scores. Then open examples/prompt_optimization/run.py and add a fourth instruction at the TOP of CANDIDATE_INSTRUCTIONS. Run it again: every score is still 0/24, the held-out score is still 0/8, and the selected candidate has changed. Selection by list position is what a tie actually is.' },
+  { lane: 'either', body: "Write two short system prompts for a task you know well, and by hand, run each against five questions you already know the right answer to. Keep two of those five aside before you look at either prompt's answers, then score only the remaining three to pick a winner, and check the winner's score on the two you kept aside. Did the held-out pair agree with your pick?" },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

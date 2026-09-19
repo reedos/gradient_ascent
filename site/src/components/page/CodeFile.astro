@@ -1,0 +1,96 @@
+---
+// Renders a region of a real file from examples/, read at build time, so the code shown on a
+// page is the tested code and can never drift from it silently -- a change to the example shows
+// up here the next time the site builds.
+//
+// examples/ has no marker comments (`# --8<-- [start:x]` and the like) yet, so this takes a
+// function name and computes the region itself: from `def <func>(` to the next top-level
+// statement (a line with no leading whitespace) or end of file. `cls` does the same for a
+// `class <Name>` block. Pass `start`/`end` (1-based, inclusive) directly to show an exact range
+// instead, once markers exist upstream.
+//
+// Prefer `func` or `cls` to `start`/`end` wherever one of them fits. A pinned range is a line
+// number written on a page about a file the page does not own: an edit anywhere above it slides
+// the window silently, the build still passes, and the page ends up describing code that is no
+// longer on screen. That happened once during wave 2, to evals.mdx's window into
+// scripts/eval_run.py, when the runner gained entries near the top of the file.
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+interface Props {
+  /** Path from the repo root, e.g. "examples/rag/run.py". */
+  file: string;
+  /** Function name to extract: shows from `def <func>(` to the next top-level line. */
+  func?: string;
+  /** Class name to extract: shows from `class <cls>` to the next top-level line. */
+  cls?: string;
+  /** Explicit 1-based line range; overrides `func` and `cls` when given. */
+  start?: number;
+  end?: number;
+  /**
+   * A short literal the extracted block must contain. Pair it with every `start`/`end` range:
+   * it is the only thing that turns a silently slid window into a loud failure, and a slid
+   * window has now shipped twice (evals.mdx, waves 2 and 3). `scripts/validate.py` checks it
+   * too, so the break is caught before a build is even attempted.
+   */
+  expect?: string;
+  lang?: string;
+}
+const { file, func, cls, start, end, expect, lang = 'python' } = Astro.props;
+
+const here = path.dirname(fileURLToPath(import.meta.url)); // site/src/components/page
+const repoRoot = path.resolve(here, '../../../../'); // -> gradient_ascent/
+const abs = path.join(repoRoot, file);
+const full = fs.readFileSync(abs, 'utf-8');
+const lines = full.replace(/\r\n/g, '\n').split('\n');
+
+let s = start;
+let e = end;
+if (!s && (func || cls)) {
+  // `class Name:`, `class Name(Base):` and `def name(` all open a top-level block that runs to
+  // the next line starting at column 0.
+  const openRe = func ? new RegExp(`^def ${func}\\(`) : new RegExp(`^class ${cls}[(:]`);
+  const what = func ? `function "${func}"` : `class "${cls}"`;
+  const idx = lines.findIndex((l: string) => openRe.test(l));
+  if (idx === -1) {
+    throw new Error(`CodeFile: ${what} not found in ${file}`);
+  }
+  s = idx + 1; // 1-based, include the opening line
+
+  // The signature can span several lines (one parameter per line), and a wrapped line such as
+  // ") -> Answer:" starts at column 0 without being the end of the function, so first walk past
+  // the parenthesized signature by tracking paren depth before looking for a top-level line.
+  let depth = 0;
+  let j = idx;
+  do {
+    for (const ch of lines[j]) {
+      if (ch === '(') depth++;
+      else if (ch === ')') depth--;
+    }
+    j++;
+  } while (depth > 0 && j < lines.length);
+
+  while (j < lines.length && !/^\S/.test(lines[j])) j++; // walk to the next top-level line
+  // trim trailing blank lines from the extracted body
+  while (j > idx + 1 && lines[j - 1].trim() === '') j--;
+  e = j; // 1-based inclusive end
+}
+
+const snippet = s && e ? lines.slice(s - 1, e).join('\n') : full.replace(/\s+$/, '');
+if (expect && !snippet.includes(expect)) {
+  throw new Error(
+    `CodeFile: ${file} lines ${s}–${e} no longer contain ${JSON.stringify(expect)}; ` +
+      `the range has slid and the prose now describes code that is not on screen.`,
+  );
+}
+const rangeLabel = s && e ? ` · lines ${s}–${e}` : '';
+---
+
+<div class="code-file">
+  <div class="code-file-path">
+    {file}
+    {rangeLabel}
+  </div>
+  <pre><code class={`language-${lang}`}>{snippet}</code></pre>
+</div>

@@ -1,0 +1,76 @@
+{
+  "illustrative": true,
+  "h": 790,
+  "title": "A team of personal assistants",
+  "sub": "A request or a routine's own tick reaches a supervising agent; a scope check decides what a partner has to see.",
+  "pill": "Level 7 · Always-on agents",
+  "nodes": [
+    { "id": "request", "x": 170, "y": 34, "l": "Request, or a routine's tick", "k": "io" },
+    { "id": "router", "x": 170, "y": 174, "l": "Chief-of-staff agent hands off", "k": "model" },
+    { "id": "sched", "x": 82, "y": 314, "l": "Scheduling assistant drafts", "k": "model" },
+    { "id": "invoice", "x": 258, "y": 314, "l": "Invoicing assistant drafts", "k": "model" },
+    { "id": "gate", "x": 170, "y": 454, "l": "Check shared memory and scope", "k": "code" },
+    { "id": "person", "x": 170, "y": 604, "l": "Partner decides", "k": "human" },
+    { "id": "out", "x": 170, "y": 744, "l": "Sent", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "request", "t": "router", "by": "code" },
+    { "id": "e2", "f": "router", "t": "sched", "by": "model", "b": -22 },
+    { "id": "e3", "f": "router", "t": "invoice", "by": "model", "b": 22 },
+    { "id": "e4", "f": "sched", "t": "gate", "by": "code", "b": -22 },
+    { "id": "e5", "f": "invoice", "t": "gate", "by": "code", "b": 22 },
+    { "id": "e6auto", "f": "gate", "t": "out", "by": "code", "b": 150 },
+    { "id": "e6hold", "f": "gate", "t": "person", "by": "code" },
+    { "id": "e7", "f": "person", "t": "out", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "A request arrives; a routine's tick is the other way in",
+      "d": "\"Reschedule Thursday's 2pm with Larsen and follow up\non the overdue invoice.\" The invoicing assistant's\nweekly pass reaches the same handoff with nobody asking.",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The chief-of-staff agent hands off the scheduling half",
+      "d": "→ scheduling assistant: reschedule Thursday 2pm, client Larsen",
+      "m": "260 in · 22 out · 0.6 s"
+    },
+    {
+      "e": "e3",
+      "h": "It hands off the invoicing half in the same turn",
+      "d": "→ invoicing assistant: follow up, invoice #214, client Larsen",
+      "m": "260 in · 19 out · 0.5 s"
+    },
+    {
+      "e": "e4",
+      "h": "The scheduling assistant checks memory and drafts",
+      "d": "memory: Larsen reschedules to Friday mornings when possible.\ndraft: propose Friday 10am.",
+      "m": "340 in · 44 out · 0.7 s"
+    },
+    {
+      "e": "e5",
+      "h": "The invoicing assistant checks memory and drafts",
+      "d": "memory: Larsen disputed a charge last quarter.\ndraft: polite follow-up, dispute flagged in the note.",
+      "m": "360 in · 51 out · 0.8 s"
+    },
+    {
+      "e": "e6auto",
+      "h": "The scope check clears the reschedule automatically",
+      "d": "reschedule, no dispute history on this thread: routine.\nSent without a pause.",
+      "m": "0 tokens · 3 ms"
+    },
+    {
+      "e": "e6hold",
+      "h": "The scope check holds the invoice follow-up",
+      "d": "touches billing on an account with an open dispute\nin memory: held for the partner, not sent automatically.",
+      "m": "0 tokens · 3 ms"
+    },
+    {
+      "e": "e7",
+      "h": "The partner reviews and sends it",
+      "d": "sees: the draft, the reason held, the dispute note.\nedits one line, approves.",
+      "m": "decision: approve with edit"
+    }
+  ]
+}

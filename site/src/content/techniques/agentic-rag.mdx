@@ -1,0 +1,224 @@
+---
+slug: agentic-rag
+level: 5
+run: agentic-rag
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Deep Research"
+    url: "https://gemini.google/overview/deep-research/"
+    publisher: "Google"
+    accessed: "2026-09-18"
+  - title: "How we built our multi-agent research system"
+    url: "https://www.anthropic.com/engineering/multi-agent-research-system"
+    publisher: "Anthropic"
+    accessed: "2026-09-18"
+  - title: "Deep research"
+    url: "https://developers.openai.com/api/docs/guides/deep-research"
+    publisher: "OpenAI (API documentation)"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import agenticRagRun from '../../data/runs/agentic-rag.json';
+
+Agentic RAG puts the search loop itself under the model's control. <Link
+href="/techniques/rag/">RAG</Link> always searches once and asks the model once. Agentic RAG
+instead offers the model a search tool it can call as many times as it decides it needs, lets it
+read what comes back, and lets it decide whether to search again, read more closely, or stop and
+answer — the <Link href="/techniques/single-agent/">single-agent</Link> loop aimed at retrieval.
+
+Google describes its own version this way: "at each step, the model has to ground itself on all
+information gathered so far, then identify missing information and discrepancies it wants to
+explore," continuing until "the model determines enough information has been gathered"<Cite
+n={1}/>. OpenAI's deep research models work the same way — "agentic" systems that "conduct
+multi-step research" and return a listing of every search made along the way<Cite n={3}/>. In both
+cases the model chooses the next query and when to stop; your code still runs every search and can
+cut the loop off with a hard cap regardless of what the model would have done next.
+
+This page is marked draft, not published: agentic RAG has no recorded trace and no scored result
+file yet, so nothing below is measured. It is illustrated. The home page's own comparison runs one
+question through both RAG and this technique side by side.
+
+## A run, step by step
+
+<Run data={agenticRagRun} label="Level 5 · Agentic RAG" runKey="agentic-rag" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+This is what a deep-research mode in a chat app is doing. ChatGPT, Claude, Gemini and Perplexity
+each ship one; SpaceXAI's Grok has DeepSearch. Ask a question, and instead of one search the
+product runs several, reads what each one turns up, and decides for itself whether it has enough
+or needs to look further before writing a report.
+
+Google's description of its own Deep Research is specific about the mechanism: the model
+"oversees the execution of" a research plan and "at each step the model reasons over information
+available to decide its next move," browsing "the web and your Gmail, Drive, and Chat if you
+choose so"<Cite n={1}/> — the same search-then-read-then-decide loop the run above steps through,
+aimed at a much larger set of sources. OpenAI's documentation for its deep research models
+describes the output the same way: it "will contain a listing of web search calls, code
+interpreter calls, and remote MCP calls made to get to the answer," so the searches themselves are
+visible, not just the final report<Cite n={3}/>.
+
+That visibility is worth using. A deep-research report that shows its sources or its search steps
+is showing you the trace this page's run diagram illustrates in miniature — check whether a claim
+in the report actually traces back to one of the searches shown, the same way you would check
+RAG's citations, and watch for a report that cites a source it never appears to have opened.
+
+The loop also has a cap you do not see. OpenAI's API lets a developer set `max_tool_calls` "to
+control the total number of tool calls... that the model will make before returning a
+result"<Cite n={3}/>; the products built on this pattern have some version of the same limit. A
+report that reads as thinner than the question deserved, especially on something with several
+parts to it, may be a run that hit its cap rather than one that ran out of things to find.
+
+Ask questions this is actually for: ones where the right next search depends on what the last one
+found, or where the answer draws on several documents that disagree. A question one search can
+already answer does not need this, and costs more here for no benefit — see when RAG alone is
+enough, below.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+`examples/agentic_rag/` is the site's running example for this page; nothing new was written for
+it here. It offers the model two tools, `search(query)`, which returns titles and citations but no
+text, and `read(cite)`, which returns one section's full text, and loops until the model stops
+calling tools or a cap is hit. Withholding the text from `search` is what makes the loop genuinely
+iterative rather than a slower RAG: the model has to decide, itself, which of the titles it saw are
+worth opening before it can cite anything with confidence.
+
+Every tool call and the decision to stop are `decided_by: "model"`: the model's own output picks
+the query, picks which section to read, and picks when it has enough. Running a tool and returning
+its result to the model are always `decided_by: "code"`, the same rule
+<Link href="/techniques/single-agent/">single agent</Link>'s example follows. `MAX_STEPS` (6) and
+`MAX_TOKENS` (4000) are the hard caps; when either is hit before the model stops on its own, the
+code forces one last no-tools call for a final answer, and that forced stop is `decided_by:
+"code"` — the model never chose to stop, so it is not credited with a decision it did not make.
+
+<CodeFile file="examples/agentic_rag/run.py" func="run" />
+
+Run it yourself:
+
+<CodeFile file="examples/agentic_rag/README.md" start={16} end={16} lang="text" expect="python -m examples.agentic_rag" />
+
+Anthropic's account of building a production research agent puts a number on what a loop like this
+costs, and the published sentence carries two figures, not one: "In our data, agents typically use
+about 4× more tokens than chat interactions, and multi-agent systems use about 15× more tokens
+than chats"<Cite n={2}/>. The 4× is the half that belongs on this page — one agent running its own
+searches. The 15× is for the system of several agents Anthropic was describing, which is level 6,
+not this one. Both are Anthropic's numbers, not anything measured here. Anthropic also lists what
+went wrong in early versions of that system — agents "continuing when they already had sufficient
+results, using overly verbose search queries, or selecting incorrect tools"<Cite n={2}/>, the same
+failures a step cap and a careful stop condition exist to catch here, at a much smaller scale.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try <Link href="/techniques/rag/">RAG</Link> first if one search, over one fixed set of documents,
+can actually answer the question — most lookups can, and RAG costs one model call every time
+instead of a number that varies with how hard the question turns out to be.
+
+Try a fixed multi-step <Link href="/techniques/workflow-graphs/">workflow</Link> instead of an
+agent if you already know how many searches a question needs and in what order — a two-step
+chain that always searches, then always searches again with a refined query, is cheaper and more
+predictable than a loop when the shape of the task never actually varies.
+
+Move up to agentic RAG once the next query genuinely depends on what the last one found, so the
+number of searches cannot be fixed in advance.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'The loop stops on a thin answer',
+    notice: "The model decides it has enough after one or two searches when the question actually needed a third, and answers confidently from an incomplete set of sources.",
+    test: "Ask a question you know needs sources from more than one document and check the trace: did the model search again after the first result, or answer from what the first search alone returned?",
+  },
+  {
+    name: 'The loop never stops on its own',
+    notice: 'Anthropic\'s own account of building a research agent describes early versions "continuing when they already had sufficient results, using overly verbose search queries, or selecting incorrect tools" — cost without any added accuracy.',
+    test: "Compare the number of searches a question actually needed against the number the trace shows. Extra searches that return the same information as an earlier one are this failure, not thoroughness.",
+  },
+  {
+    name: 'The cap cuts off a real search partway through',
+    notice: 'The step or token cap is reached before the model was actually done, and the forced final answer reads as complete even though a source it was about to check never got opened.',
+    test: "Force a low cap (examples/agentic_rag/run.py's max_steps argument) on a question that needs more searches than the cap allows, and confirm the trace records which cap stopped it rather than presenting the answer as a normal stop.",
+  },
+  {
+    name: 'A confident source beats a correct one',
+    notice: "The model settles on the first source that looks authoritative rather than the one that actually answers the question, especially when two sources disagree.",
+    test: "Use a conflicting-sources question from evals/corpus/ and check whether the answer notices the conflict or just reports whichever source its search happened to rank first.",
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, illustrated run', value: '4' },
+    { label: 'Tokens in, illustrated run', value: '~3,910' },
+    { label: 'Tokens out, illustrated run', value: '~88' },
+    { label: 'Wall time, illustrated run', value: '~2.6s' },
+  ]}
+  comparedTo={{
+    label: 'RAG (level 2), one call',
+    note: 'About four model calls instead of one, about four times the tokens, and about three times the wait, in the illustrated run compared on the home page. Anthropic separately reports that in its data agents typically use about 4x more tokens than chat interactions, and multi-agent systems about 15x more than chats; those are Anthropic\'s figures, not ones measured here.',
+  }}
+  level={5}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+`agentic_rag` is registered and scored on the same 60-question set as every other technique here:
+exact or rubric match, citation hit rate, and the count of model-decided steps the trace carries.
+Multi-hop and conflicting-source questions are where the extra cost is supposed to earn its
+keep — a multi-hop question needs two sections found and used together, which single-pass RAG
+often cannot do in one search, and a conflicting-source question needs the loop to notice two
+retrieved sections disagree rather than stopping after the first one that looks like an answer. A
+lookup question that RAG already answers in one call is the wrong place to look for agentic RAG's
+advantage; if the extra cost does not show up as a better score on multi-hop and conflicting
+questions specifically, it is not paying for itself.
+
+No result file exists for agentic RAG yet, so this page cannot say a number for any of it. Run
+`python scripts/eval_run.py --example agentic_rag --model <spec> --dry` to project the cost of a
+real run before spending anything on one.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="Searches per question and the cap-hit rate (the share of runs that end in a forced final answer). A rising average search count with no change to the questions arriving is worth investigating before it shows up as a cost spike."
+  costAtVolume="Cost per question varies with how many searches it actually takes, unlike RAG's fixed one call. Budget from the cap, not the average, and watch the tail: a handful of hard questions that each use the full cap can cost as much as the rest of a batch combined."
+  failsInProduction="The model keeps searching past the point of diminishing returns on an easy question, or stops one search short on a hard one, and both look identical from outside unless the trace is actually read."
+  whatToLog="Every query the model chose, every citation returned, every section it read in full, and which cap (if any) ended the run, so a thin or wrong answer traces back to a specific search decision instead of an unexplained gap."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Give a deep-research mode a question with two parts that live in different sources, and check its shown searches or sources: did it actually run more than one search, and does each part of the answer trace to one it ran?' },
+  { lane: 'build', body: 'Run python -m examples.agentic_rag --model stub with a question of your own from the repo root, then read tests/test_examples.py\'s agentic_rag tests to see a scripted model that actually searches, reads, and stops.' },
+  { lane: 'either', body: 'Compare this page\'s run to RAG\'s: RAG\'s five steps are all solid (code-decided); count how many of this run\'s eight are dashed instead. What does the difference buy, and what does it cost?' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

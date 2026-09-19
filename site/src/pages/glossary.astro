@@ -1,0 +1,93 @@
+---
+// Generated from content/glossary.json (finish-indexes). Every entry's `page` is a real
+// technique or topic slug, or a thread id for a term that names two techniques at once, checked
+// by scripts/validate.py; the definitions come from reading that page, not from an outside
+// source -- see content/glossary.json's own note. indexes.ts's glossaryTarget turns `page` into
+// the link and the label, so nothing here builds a URL of its own.
+import Base from '../layouts/Base.astro';
+import { glossaryTerms, glossaryColor, glossarySlug, glossaryTarget, type GlossaryEntry } from '../lib/indexes';
+import '../styles/indexes.css';
+
+const terms = [...glossaryTerms].sort((a, b) => a.term.localeCompare(b.term, undefined, { sensitivity: 'base' }));
+
+const byName = new Map<string, GlossaryEntry>();
+for (const t of terms) {
+  byName.set(t.term.toLowerCase(), t);
+  for (const a of t.aka ?? []) byName.set(a.toLowerCase(), t);
+}
+
+const letters = [...new Set(terms.map((t) => t.term[0].toUpperCase()))];
+
+interface LetterGroup {
+  letter: string;
+  entries: GlossaryEntry[];
+}
+const groups: LetterGroup[] = letters.map((letter) => ({
+  letter,
+  entries: terms.filter((t) => t.term[0].toUpperCase() === letter),
+}));
+---
+<Base
+  title="Glossary · Gradient Ascent"
+  description={`${terms.length} terms a newcomer meets on this site, each defined from the page that explains it.`}
+>
+  <div class="page-hero">
+    <div class="eyebrow muted"><span class="dot"></span>Glossary</div>
+    <h1>{terms.length} terms, defined from the pages that explain them</h1>
+    <p>
+      Every definition below is written from the technique or topic page named beside it, so the
+      glossary cannot say something that page does not. A definition is one or two plain
+      sentences a newcomer can read. Click a term's name to read the page it comes from.
+    </p>
+  </div>
+
+  <nav class="letter-index" aria-label="Jump to letter">
+    {letters.map((l) => <a href={`#letter-${l}`}>{l}</a>)}
+  </nav>
+
+  {
+    groups.map((g) => (
+      <section class="glossary-group" id={`letter-${g.letter}`}>
+        <h2 class="glossary-letter">{g.letter}</h2>
+        <dl class="glossary-list">
+          {g.entries.map((entry) => {
+            const color = glossaryColor(entry);
+            const target = glossaryTarget(entry);
+            const anchorId = glossarySlug(entry.term);
+            return (
+              <div class="glossary-entry" id={anchorId}>
+                <dt>
+                  <a href={target.href} style={`color:${color}`}>
+                    {entry.term}
+                  </a>
+                  {entry.aka && entry.aka.length > 0 && (
+                    <span class="glossary-aka">also called {entry.aka.join(', ')}</span>
+                  )}
+                  {target.label && <span class="glossary-page-label">{target.label}</span>}
+                </dt>
+                <dd>
+                  <p>{entry.definition}</p>
+                  {entry.see && entry.see.length > 0 && (
+                    <p class="glossary-see">
+                      See also:{' '}
+                      {entry.see.map((ref, i) => {
+                        const target = byName.get(ref.toLowerCase());
+                        if (!target) return null;
+                        return (
+                          <>
+                            {i > 0 && ', '}
+                            <a href={`#${glossarySlug(target.term)}`}>{target.term}</a>
+                          </>
+                        );
+                      })}
+                    </p>
+                  )}
+                </dd>
+              </div>
+            );
+          })}
+        </dl>
+      </section>
+    ))
+  }
+</Base>

@@ -1,0 +1,47 @@
+{
+  "illustrative": true,
+  "h": 626,
+  "title": "Function calling",
+  "sub": "The model picks one action and its arguments; your code runs it and asks once more.",
+  "pill": "Level 4 · Tools",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
+    { "id": "decide", "x": 170, "y": 174, "l": "picks a tool, or answers", "k": "model" },
+    { "id": "tool", "x": 82, "y": 314, "l": "lookup_part(num)", "k": "tool" },
+    { "id": "final", "x": 170, "y": 454, "l": "answers using the result", "k": "model" },
+    { "id": "a", "x": 170, "y": 594, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "decide", "by": "code" },
+    { "id": "e2", "f": "decide", "t": "tool", "by": "model" },
+    { "id": "e3", "f": "tool", "t": "final", "by": "code" },
+    { "id": "e4", "f": "final", "t": "a", "by": "code" },
+    { "id": "e5", "f": "decide", "t": "a", "by": "model", "b": -140 }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"What does part HLV-2205 cost?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The model decides to call a tool",
+      "d": "→ lookup_part(part_number=\"HLV-2205\")\n(it could have answered directly instead; nothing forced this choice)",
+      "m": "~190 tokens in · 14 tokens out · 0.6 s"
+    },
+    {
+      "e": "e3",
+      "h": "Your code runs the tool and returns the result",
+      "d": "\"HLV-2205, Drain Pump, $52.00\"\n[parts-list#2]",
+      "m": "1 result · 4 ms"
+    },
+    {
+      "e": "e4",
+      "h": "The model answers using the tool result",
+      "d": "\"Part HLV-2205 is a drain pump and costs $52.00\n[parts-list#2].\"",
+      "m": "~205 in · 20 out · 0.7 s"
+    }
+  ]
+}

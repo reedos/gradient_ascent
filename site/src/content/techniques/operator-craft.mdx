@@ -1,0 +1,240 @@
+---
+slug: operator-craft
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Claude prompting best practices"
+    url: "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"
+    publisher: "Anthropic (Claude Platform Docs)"
+    accessed: "2026-09-18"
+  - title: "Prompt engineering"
+    url: "https://developers.openai.com/api/docs/guides/prompt-engineering"
+    publisher: "OpenAI (API documentation)"
+    accessed: "2026-09-18"
+  - title: "Building Effective AI Agents"
+    url: "https://www.anthropic.com/engineering/building-effective-agents"
+    publisher: "Anthropic"
+    accessed: "2026-09-18"
+  - title: "Automation-Induced Complacency Potential: Development and Validation of a New Scale"
+    url: "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2019.00225/full"
+    publisher: "Frontiers in Psychology"
+    date: "2019-02-19"
+    accessed: "2026-09-18"
+---
+
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+
+Operator craft is the human half of the manual: the skill of working well with a model, which
+grows more demanding, not less, as a system climbs the ladder. At level 1 it is mostly one skill,
+saying clearly what you want. By level 7 it is several: judging work you did not do yourself,
+deciding what to hand over and what to keep, and knowing, from evidence rather than a good first
+impression, how much to trust a system that acts without asking each time. This page is the
+overview; four pages carry the depth — <Link href="/techniques/briefing/">briefing</Link>,
+<Link href="/techniques/reviewing/">reviewing</Link>, <Link
+href="/techniques/delegating/">delegating</Link>, and <Link
+href="/techniques/trust/">calibrating trust</Link>.
+
+None of this is specific to a coder. A domain professional who has never written a line of code
+briefs, reviews, delegates and trusts a model exactly the way a builder does, on the same four
+skills, just without the code.
+
+This page is marked draft, not published: no result file exists for anything below, so nothing
+here reports a measured number.
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Briefing is the skill everything else rests on, and it is mostly the discipline of not assuming
+the model already knows what you mean. Anthropic's own prompting guidance frames this directly:
+think of the model "as a brilliant but new employee who lacks context on your norms and
+workflows," and test a request against what it labels the golden rule: "Show your prompt to a
+colleague with minimal context on the task and ask them to follow it. If they'd be confused,
+Claude will be too."<Cite n={1}/> What you want, the constraints it has to respect, and what
+"done" looks like are three separate things. Writing them on three lines, not in one paragraph,
+is the whole discipline: a missing constraint is invisible in prose and obvious in a list.
+
+How much to spell out depends on which model you are briefing, and OpenAI's own guidance sorts
+its models into two kinds for exactly that reason<Cite n={2}/>. The <Link
+href="/techniques/briefing/">briefing</Link> page quotes that passage and works an example
+through it; the overview's job is only to say that the newcomer's mistake runs in both
+directions — over-specifying a model that could have worked out the details, or under-specifying
+one that needed them spelled out.
+
+Reviewing work you did not do is a different skill from doing the work yourself, and it gets
+harder, not easier, as a system does more without you. Anthropic's own guidance for agents says
+plainly that "human review remains crucial for ensuring solutions align with broader system
+requirements" even where automated checks already ran, and describes agents pausing "for human
+feedback at checkpoints or when encountering blockers" as a normal part of the design, not a
+fallback<Cite n={3}/>. The practical version: check what you can verify independently — a
+citation that resolves, a number you can recompute — before trusting the parts you cannot. The
+failure mode that follows has a name and a literature: a scale-development paper in Frontiers in
+Psychology summarizes the agreed definition of complacency as a human operator monitoring an
+automated system, at a frequency that is "suboptimal or below a normative rate," where that
+suboptimal monitoring "leads to performance failures"<Cite n={4}/>. The trust was real; it just
+stopped being checked against evidence.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+A builder shapes operator craft through the interface, whether or not any of this is written
+down as a rule. A free-text chat box makes the brief and the request the same blob of prose, so
+nothing stops the constraint or the definition of done from getting silently dropped on a rewrite.
+A task input with separate fields — what to do, what not to do, what finished looks like — costs
+a little more to build and makes the brief a thing the reader can check against later, not just a
+paragraph they typed and moved past.
+
+Reviewing needs something to review. A system that shows only a final answer gives a reviewer
+nothing to check but the answer's surface plausibility; one that shows its sources, and ideally
+the steps that produced the answer, lets a reviewer check the parts that can be verified
+independently, the way this site's own trace player exposes each step of a run instead of only
+its last one. Anthropic's guidance for agent builders treats the interface between a model and
+its tools as real design work rather than plumbing: one rule of thumb it gives is to think about
+how much effort goes into human-computer interfaces and "plan to invest just as much effort in
+creating good agent-computer interfaces"<Cite n={3}/>. The surface a reviewer reads deserves the
+same budget.
+
+Approval points are where operator craft becomes a piece of code, not just a habit. An interface
+that lets a person approve or reject one specific action before it runs — rather than trusting an
+instruction in a system prompt to hold — is the same shape as the permission check on the <Link
+href="/techniques/safety/">safety, privacy and governance</Link> page: a check outside the model,
+that runs whether or not the model would have gotten it right on its own. A builder designing for
+delegation decides, ahead of time and in code, which actions get that checkpoint and which do
+not; leaving that decision to be made informally, in the moment, is how it stops getting made at
+all once volume goes up.
+
+No runnable example accompanies this page. A task-input form, a review surface, and an approval
+checkpoint are interface and process decisions, not an algorithm with a fixed answer to test
+against — the honest Build it lane here is what to design for, not code to run.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Skip building any of this out formally — a task-input form with separate fields, a visible review
+surface, a coded approval checkpoint — for a single, low-stakes request you would not mind redoing
+by hand. Writing the constraint and the "done" condition on their own line, the way the Practices
+below ask, is already most of the value, and it costs nothing to try before building anything
+around it.
+
+There is nothing to brief, review, delegate or trust before a model is actually in the loop;
+<Link href="/techniques/order-zero/">level 0, no model at all</Link> does not raise any of these
+questions.
+
+Build the formal version once a wrong answer costs enough, or gets reviewed by someone other than
+the person who asked, that "I would have caught it" stops being a good enough plan.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'A missing constraint is invisible until it is violated',
+    notice: 'A request typed as one paragraph drops a constraint on a rewrite with nothing showing it went missing, and the answer that comes back looks fine until the dropped constraint turns out to matter.',
+    test: "Compare a request's current wording against its original list of what, what not, and what done looks like; a constraint no longer present anywhere is this failure, not a model that ignored it.",
+  },
+  {
+    name: 'Automation complacency',
+    notice: 'After a run of correct answers, checking starts to feel like wasted effort, and the one wrong answer that actually matters goes through with less scrutiny than the ones before it, not more.',
+    test: 'Track how often a problem is caught after the fact instead of during review, over time; a rising after-the-fact rate with no change in review effort is this failure, already underway.',
+  },
+  {
+    name: 'Over-specifying a model that could have worked it out',
+    notice: 'A brief spells out steps the model would have chosen correctly on its own, and the extra constraints leave it less room to handle a case the brief\'s author did not think to cover.',
+    test: "Compare the outcome of a detailed, step-by-step brief against a shorter one stating only the goal and the constraints, on a task the model has handled well before.",
+  },
+  {
+    name: 'Under-specifying a model that needed the detail spelled out',
+    notice: 'A brief states only the goal, and the model fills the gap with a plausible-sounding assumption instead of asking, on a task that actually needed a constraint spelled out.',
+    test: 'Read the output for an assumption nowhere in the brief; a model that filled a real gap silently, rather than flagging it, is this failure regardless of whether the assumption happened to be right.',
+  },
+  {
+    name: 'Nothing in the interface gives a reviewer something to check',
+    notice: 'A tool shows only a final answer, so a reviewer can judge no more than whether it sounds plausible, and a wrong answer that reads fluently passes review the same as a right one would.',
+    test: "Try to verify one specific claim in the output independently of the tool itself — a citation, a recomputed number. If the interface gives you nothing to check it against, that is the failure, not the reviewer's diligence.",
+  },
+]} />
+
+## At each level
+
+- <Link href="/levels/0/">No model</Link>: there is nothing to brief, review, delegate or trust
+  yet; this topic's skill only starts once
+  <Link href="/techniques/order-zero/">a model is actually in the loop</Link>.
+- <Link href="/levels/1/">One call</Link>: briefing is nearly the whole skill, since a single
+  <Link href="/techniques/prompt-engineering/">prompt</Link> is the entire interface between what
+  you want and what you get back.
+- <Link href="/levels/2/">Context</Link>: reviewing has to include what the model was given, not
+  only what it said — <Link href="/techniques/rag/">RAG</Link>'s own failure modes show a wrong
+  answer built from the right sources is a different problem than one built from missing ones,
+  and telling the two apart is its own skill.
+- <Link href="/levels/3/">Workflows</Link>: a fixed pipeline hands you a defined checkpoint, the
+  way <Link href="/techniques/human-in-the-loop/">human approval</Link>'s own pause-and-resume
+  shape does, so reviewing can happen at a point along the way instead of only at the end.
+- <Link href="/levels/4/">Tools</Link>: delegating a specific action, not just an answer, becomes
+  a real decision — <Link href="/techniques/function-calling/">function calling</Link> is exactly
+  that decision in code — trusting a model to describe what it would do is not the same judgment
+  as trusting it to actually do it.
+- <Link href="/levels/5/">Agents</Link>: the model chooses its own steps, so calibrating trust —
+  how much to check, and how often, instead of checking every single step
+  <Link href="/techniques/single-agent/">a single agent</Link> takes — replaces reviewing each one
+  by hand.
+- <Link href="/levels/6/">Teams of agents</Link>: reviewing shifts toward reviewing a division of
+  labor, not one output — whether <Link href="/techniques/orchestrator-workers/">a lead's
+  split</Link> of the task was sensible is a separate question from whether each part came back
+  right.
+- <Link href="/levels/7/">Always-on agents</Link>: delegating reaches its hardest form — deciding
+  in advance what an agent may do without asking and what it must always ask about, the three-way
+  policy <Link href="/techniques/agent-teammates/">always-on assistants</Link>' own example
+  builds, since there is no longer a moment where a person is watching in real time to decide.
+
+## Practices
+
+- Write the constraint and the "done" condition down separately from the request itself, not
+  folded into one paragraph that's easy to reread without noticing a piece went missing.
+- When reviewing work you didn't do, check what you can verify independently first — a citation
+  that resolves, a number that recomputes — before trusting the parts you can't check that way.
+- Decide what to hand over by what a wrong answer costs and how fast you'd notice it: the same
+  question <Link href="/techniques/order-zero/">level 0, no model at all</Link> asks about choosing a level at
+  all, applied here to one task instead.
+- Calibrate trust from a running record of corrections over time, not from how confident the most
+  recent answer sounded.
+- Treat a string of correct answers as a reason to keep sample-checking, not a reason to stop —
+  that is exactly where the research on automation complacency says monitoring erodes.
+
+## Run it
+
+<RunIt
+  monitor="How often you catch a problem after the fact instead of before, on work you were
+  supposed to be reviewing as it happened. A rising after-the-fact rate is the signal to review
+  more closely, not a sign that less review is now safe."
+  costAtVolume="Review time should not fall to zero as trust grows; it should shift from checking
+  everything to checking a sample plus anything that crosses a fixed bar — an irreversible
+  action, a number that gets repeated elsewhere — the same shape a human-in-the-loop checkpoint
+  uses."
+  failsInProduction="Automation complacency: after enough correct answers in a row, checking
+  starts to feel like wasted effort, and the one wrong answer that actually mattered goes through
+  unchecked."
+  whatToLog="What you changed or rejected in anything you reviewed, and why. A record of your own
+  corrections, not a memory of how confident things felt, is what calibrated trust is actually
+  built from."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: "Before your next real request to a model, write the constraint and the \"done\" condition on their own line, separate from the request. Did writing them down change what you actually asked for?" },
+  { lane: 'build', body: 'Look at a tool you use or have built that shows a model\'s reasoning or sources before its final answer. Find one place in it where a wrong intermediate step would be invisible to a reviewer, and write down what would have to change to surface it.' },
+  { lane: 'either', body: "Pick one thing you routinely accept from a model without checking. Write down what checking it would actually cost you in time, and what a wrong one slipping through would cost. Decide, on paper, whether that's the trade you actually want." },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

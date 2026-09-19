@@ -1,0 +1,144 @@
+---
+// One teardown: a kind of product the reader has used, decoded into the techniques underneath it.
+// Built the same way a recipe page is -- the taxonomy owns the list and the technique links, the
+// MDX file owns the writing -- with two additions the recipe page does not need: the registry
+// entries the teardown names (a teardown is about products, so the names are page furniture, not
+// prose), and the expiry date the project plan gives every teardown.
+import { getEntry, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import TechniqueRow from '../../components/TechniqueRow.astro';
+import Sources from '../../components/page/Sources.astro';
+import Reviewed from '../../components/page/Reviewed.astro';
+import { url } from '../../lib/url';
+import {
+  teardowns,
+  techniquesForTeardown,
+  teardownExpiry,
+  teardownIsStale,
+  named,
+  asOf,
+} from '../../lib/content';
+
+export function getStaticPaths() {
+  return teardowns.map((t) => ({ params: { slug: t.slug } }));
+}
+
+const { slug } = Astro.params;
+const teardown = teardowns.find((t) => t.slug === slug)!;
+const techniques = techniquesForTeardown(teardown);
+const levelsUsed = techniques
+  .map((t) => t.level)
+  .filter((l): l is number => typeof l === 'number')
+  .sort((a, b) => a - b);
+const highest = levelsUsed.length ? levelsUsed[levelsUsed.length - 1] : undefined;
+const color = highest !== undefined ? `var(--o${highest})` : 'var(--ot)';
+
+const entry = await getEntry('teardowns', slug!);
+const rendered = entry ? await render(entry) : undefined;
+const Content = rendered?.Content;
+
+// The products this teardown decodes, resolved through the registry so a renamed or retired
+// product says so here without this page being touched.
+const productIds = entry?.data.products ?? [];
+const products = productIds
+  .map((id: string) => named.find((n) => n.id === id))
+  .filter((n): n is (typeof named)[number] => Boolean(n));
+
+const sources = entry?.data.sources ?? [];
+const reviewedISO = entry ? entry.data.reviewed.toISOString().slice(0, 10) : undefined;
+const expires = reviewedISO ? teardownExpiry(reviewedISO) : undefined;
+const stale = reviewedISO ? teardownIsStale(reviewedISO) : false;
+---
+<Base
+  title={`${teardown.title} · Gradient Ascent`}
+  description={`${teardown.title}: what you see, what runs underneath it, and which technique page explains each part.`}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href={url('/')}>Home</a>
+    <span aria-hidden="true">/</span>
+    <a href={url('/teardowns/')}>Teardowns</a>
+    <span aria-hidden="true">/</span>
+    <span>{teardown.title}</span>
+  </nav>
+
+  <div class="page-hero leveled" style={`--c:${color}`}>
+    <Eyebrow label="Teardown" color={color} />
+    <h1>{teardown.title}</h1>
+    <p>
+      One kind of product, taken apart into the techniques it is built from. Every claim about a
+      product here is what its maker documents, quoted and linked.
+    </p>
+    <p>
+      {highest !== undefined && (
+        <span class="pill level" style={`--c:${color}`}>
+          Reaches level {highest}
+        </span>
+      )}
+      {stale && <span class="pill">Stale · past its expiry</span>}
+    </p>
+  </div>
+
+  {
+    products.length > 0 && (
+      <p class="footnote reading">
+        Decoded from {products.map((p) => `${p.name} (${p.maker})`).join(', ')}. Names and makers as
+        registered on {asOf}; the <a href={url('/names/')} style="color:var(--accent)">names index</a>{' '}
+        carries each entry's own source.
+      </p>
+    )
+  }
+
+  {
+    Content ? (
+      <div class="prose">
+        <Content />
+      </div>
+    ) : (
+      <p class="status-note">
+        This teardown has not been written yet. The list below is generated from the taxonomy: it
+        names the techniques this kind of product is built from, each with the page that explains
+        it on its own.
+      </p>
+    )
+  }
+
+  <section class="section">
+    <div class="section-top">
+      <div>
+        <div class="eyebrow muted">What it decodes into</div>
+        <h2>{techniques.length} techniques explain this product</h2>
+      </div>
+      {highest !== undefined && <p>The highest level it reaches is level {highest}.</p>}
+    </div>
+    <div class="panel reading">
+      {
+        techniques.map((t) => (
+          <TechniqueRow
+            slug={t.slug}
+            title={t.title}
+            summary={t.summary}
+            status={t.status}
+            color={t.level === 'tracks' ? 'var(--ot)' : `var(--o${t.level})`}
+          />
+        ))
+      }
+    </div>
+  </section>
+
+  {
+    sources.length > 0 && (
+      <section class="section">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow muted">Where this comes from</div>
+            <h2>Primary sources</h2>
+          </div>
+        </div>
+        <Sources sources={sources} />
+      </section>
+    )
+  }
+
+  {reviewedISO && <Reviewed date={reviewedISO} expires={expires} mdHref={url(`/teardowns/${slug}.md`)} />}
+</Base>

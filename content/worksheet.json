@@ -1,0 +1,275 @@
+{
+  "version": 1,
+  "note": "Data for the worksheet page (site/src/pages/worksheet.astro, site/src/lib/worksheet.ts). Seven core questions walk a decision tree from level 0 to level 7, settling at the first level whose test passes; four cross-cutting questions always run after and change the advice, not the level. Every answer that raises the level either carries a `relation` (resolved against content/taxonomy.json's upgrades_to relations at read time, so the quoted sentence can never drift from the page it names) or an authored `reason` grounded in the matching tier's own who/description text. tests/test_worksheet.py checks this file against content/taxonomy.json independently of the TypeScript.",
+  "intro": {
+    "eyebrow": "Worksheet",
+    "heading": "Find the lowest level that does the job",
+    "aside": "About two minutes. Nothing you type here is sent anywhere; the whole thing runs in your browser."
+  },
+  "first_question": "rule",
+  "core_questions": [
+    {
+      "id": "rule",
+      "level_tested": 0,
+      "prompt": "Can the job be done by a fixed rule, a search, or a plain form — with no model involved at all?",
+      "help": "If you could write the logic as an if/then rule, a lookup table, or a form with fixed fields, start there.",
+      "answers": [
+        {
+          "id": "yes",
+          "label": "Yes. A rule, a lookup table, a search, or a plain form covers every case.",
+          "action": "settle",
+          "level": 0,
+          "reason": "A fixed rule, a search, or a form does the job on its own. No model is involved, so there is nothing extra to build, test, or pay for."
+        },
+        {
+          "id": "no",
+          "label": "No. It needs to understand or produce language, or use judgement a rule cannot capture.",
+          "action": "next",
+          "next": "one-call",
+          "relation": { "from": "order-zero", "to": "chat" }
+        }
+      ]
+    },
+    {
+      "id": "one-call",
+      "level_tested": 1,
+      "prompt": "Does one request, written well, with everything the model needs already in it, reliably get a good answer?",
+      "help": "This covers rewriting, drafting, or answering a question when all the facts are already in your message.",
+      "answers": [
+        {
+          "id": "yes",
+          "label": "Yes. One clear message, sent once, does it.",
+          "action": "settle",
+          "level": 1,
+          "reason": "One well-written request, sent once, reliably gets a good answer. There is no second step, and no outside information to gather first."
+        },
+        {
+          "id": "no",
+          "label": "No. It needs information the model was not given — documents, current data, or something specific to us.",
+          "action": "next",
+          "next": "context",
+          "reason": "The right document or the right current fact has to be found and handed to the model before it can answer — nobody can write it all into a single request ahead of time."
+        }
+      ]
+    },
+    {
+      "id": "context",
+      "level_tested": 2,
+      "prompt": "Does finding the right information and putting it in front of the model answer this — one search, or one set of documents, is enough?",
+      "help": "This covers answering from a manual, a knowledge base, or a set of notes, where a single lookup finds what is needed.",
+      "answers": [
+        {
+          "id": "yes",
+          "label": "Yes. Hand it the right document or search result and it answers well.",
+          "action": "settle",
+          "level": 2,
+          "reason": "Finding the right information and giving it to the model answers this. One search or one set of documents is enough; nothing has to happen in a fixed sequence of steps."
+        },
+        {
+          "id": "no",
+          "label": "No. It takes more than one step, or the steps have to happen in a set order.",
+          "action": "next",
+          "next": "workflow",
+          "reason": "More than one retrieval is involved, or the steps have to happen in a fixed order, so something has to hold that order instead of leaving it to a single prompt."
+        }
+      ]
+    },
+    {
+      "id": "workflow",
+      "level_tested": 3,
+      "prompt": "Can every step be written down in advance, so your code decides what happens next and only asks the model to fill in each step?",
+      "help": "This covers sorting things into fixed categories, chaining a few prompts, or checking one draft against another — as long as the model never chooses which step comes next.",
+      "answers": [
+        {
+          "id": "yes",
+          "label": "Yes. The steps are known ahead of time; code decides what happens next, never the model.",
+          "action": "settle",
+          "level": 3,
+          "reason": "Every step can be written down ahead of time. Code decides the order and calls the model to fill in each step; the model never chooses which step comes next."
+        },
+        {
+          "id": "no",
+          "label": "No. It has to act on the world while it works — look something up live, run code, or operate something.",
+          "action": "next",
+          "next": "tools",
+          "reason": "Writing the steps down in advance is not enough once the task has to reach outside itself while it runs — something has to be looked up live, run, or operated, not just described."
+        }
+      ]
+    },
+    {
+      "id": "tools",
+      "level_tested": 4,
+      "prompt": "Can the model do this by picking one bounded action — calling a function, running a lookup, clicking one thing — with your code carrying out that action and stopping there?",
+      "help": "The model chooses which action to take and with what details, but only one action, and your code performs it and hands back the result.",
+      "answers": [
+        {
+          "id": "yes",
+          "label": "Yes. One action; your code runs it and the task is done.",
+          "action": "settle",
+          "level": 4,
+          "reason": "The model can do this by picking one bounded action — a lookup, a function call, a click. Your code carries out that action and returns the result; the model does not chain actions together on its own."
+        },
+        {
+          "id": "no",
+          "label": "No. What happens next depends on what the last action returned, and the model has to decide that for itself, more than once.",
+          "action": "next",
+          "next": "agent",
+          "relation": { "from": "function-calling", "to": "single-agent" }
+        }
+      ]
+    },
+    {
+      "id": "agent",
+      "level_tested": 5,
+      "prompt": "Can the steps NOT be known in advance, so the model has to plan, act, look at the result, and decide for itself what to do next and when it is finished?",
+      "help": "This is the difference between following a plan you wrote and working one out as it goes, the way debugging or open-ended research does.",
+      "answers": [
+        {
+          "id": "yes",
+          "label": "Yes. It plans, acts, checks its own result, and decides for itself when it is done.",
+          "action": "settle",
+          "level": 5,
+          "reason": "The steps cannot be known in advance. The model has to plan, act, look at what happened, and decide for itself what to do next and when it is finished."
+        },
+        {
+          "id": "no",
+          "label": "No. Even one model working alone in a loop is not enough for this.",
+          "action": "next",
+          "next": "team",
+          "reason": "A single model, even one working alone in a loop, cannot cover this — the work needs a second, independent perspective, more than one agent's worth of room, or longer than one sitting."
+        }
+      ]
+    },
+    {
+      "id": "team",
+      "level_tested": 6,
+      "prompt": "Does the work need to be split across more than one agent or checked independently — or does it have to start on its own, or keep running for a long time?",
+      "help": "Pick the closest answer. \"Independent\" means an agent with its own access, not a second pass by the same one.",
+      "answers": [
+        {
+          "id": "split",
+          "label": "It is too big for one agent to hold, or the subtasks cannot be known until the work is split among several agents.",
+          "action": "settle",
+          "level": 6,
+          "relation": { "from": "parallelization", "to": "orchestrator-workers" }
+        },
+        {
+          "id": "review",
+          "label": "It needs a second, independent agent to check the work, with its own access — one agent checking itself shares its own blind spots.",
+          "action": "settle",
+          "level": 6,
+          "relation": { "from": "evaluator-optimizer", "to": "debate-review" }
+        },
+        {
+          "id": "long",
+          "label": "It has to start without being asked, run on its own schedule, or keep going for days or longer.",
+          "action": "settle",
+          "level": 7,
+          "relation": { "from": "single-agent", "to": "long-horizon" }
+        }
+      ]
+    }
+  ],
+  "cross_questions": [
+    {
+      "id": "cost",
+      "prompt": "If the model gets this wrong, what does that cost?",
+      "answers": [
+        {
+          "id": "cheap",
+          "label": "Not much. Someone notices quickly and it is easy to fix.",
+          "caution": null
+        },
+        {
+          "id": "moderate",
+          "label": "Real rework, a bad customer moment, or a delay before someone catches it.",
+          "caution": {
+            "text": "A wrong answer here costs real time or trust. Check the work before it goes out, and keep a record of what was decided and why.",
+            "relates_to": ["reviewing", "ops"]
+          }
+        },
+        {
+          "id": "high",
+          "label": "Money, legal exposure, safety, or something that cannot be undone.",
+          "caution": {
+            "text": "A wrong answer here is expensive or dangerous. Keep a person in the loop before anything ships, and be able to say why the model was trusted with it.",
+            "relates_to": ["human-in-the-loop", "safety"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "checkable",
+      "prompt": "How easily can someone check the result before it is used?",
+      "answers": [
+        {
+          "id": "easy",
+          "label": "Easily and fast — a glance, or a simple test, confirms it.",
+          "caution": null
+        },
+        {
+          "id": "effort",
+          "label": "It takes real effort — reading closely, or running it, to know if it is right.",
+          "caution": {
+            "text": "Build the check into the process instead of relying on a read-through. A standing eval set catches drift a one-off spot check misses.",
+            "relates_to": ["evals"]
+          }
+        },
+        {
+          "id": "hard",
+          "label": "It is hard or impossible to check — there is no ground truth, or checking takes as long as doing the job.",
+          "caution": {
+            "text": "When nobody can easily confirm the result, treat it as unverified until proven otherwise, and keep a person responsible for what happens with it.",
+            "relates_to": ["reviewing", "human-in-the-loop"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "reversible",
+      "prompt": "If the action turns out to be wrong, can it be undone?",
+      "answers": [
+        {
+          "id": "yes",
+          "label": "Yes, easily — nothing has shipped, been spent, or changed yet.",
+          "caution": null
+        },
+        {
+          "id": "some",
+          "label": "With some effort — it can be corrected, but it takes real work.",
+          "caution": {
+            "text": "Log every action taken so a wrong one can be traced and reversed without guessing what happened.",
+            "relates_to": ["ops"]
+          }
+        },
+        {
+          "id": "no",
+          "label": "No — money moved, a message went out, or something was deleted.",
+          "caution": {
+            "text": "An action that cannot be undone needs approval before it happens, not review after the fact.",
+            "relates_to": ["human-in-the-loop", "safety"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "data",
+      "prompt": "Does private or sensitive data leave your own machine to do this?",
+      "answers": [
+        {
+          "id": "no",
+          "label": "No — everything runs on infrastructure you control.",
+          "caution": null
+        },
+        {
+          "id": "yes",
+          "label": "Yes — a cloud model or a third-party service sees it.",
+          "caution": {
+            "text": "Know what leaves the machine and who can see it. Check the provider's data-handling terms before sending anything sensitive.",
+            "relates_to": ["safety"]
+          }
+        }
+      ]
+    }
+  ]
+}

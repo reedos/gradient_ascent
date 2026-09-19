@@ -1,0 +1,2480 @@
+{
+  "version": 1,
+  "as_of": "2026-09-18",
+  "criteria": {
+    "described": "The earliest publication the site could verify that describes the level's defining idea itself, in a form recognisable today: a paper, or a maker's own technical post. A paper about an enabling architecture does not count; the page has to describe what the level does. For papers the date is the arXiv v1 submission date, not the date of later revision or conference publication.",
+    "buildable": "The earliest release the site could verify of a widely used open framework, library or API that a developer could build the level with instead of writing it from scratch. A developer still has to build something; this is not a product an ordinary customer can use.",
+    "available": "The day the level reached the public: the launch of the widely known product that first put it in front of ordinary people, as its maker's own page dates it. This is an editorial choice and the site says so. Earlier, little-known products often exist (a text game before ChatGPT, a looping web demo before any agent product); each level's `candidates` list names them, with dates and sources, and says why the mark is the product people know. The marked date is the launch date. Where the launch was a waitlist, a preview or an announcement, the milestone says so in `availability`, and `opened` records the day an ordinary customer could actually get in. What the product did is quoted from the maker's page of that date, not from what it became later. Where a maker's page will not open from here, the site reads the Internet Archive's capture of that same page and records it in `source.archive_url`. See docs/TIMELINE-METHOD.md."
+  },
+  "levels": [
+    {
+      "level": 0,
+      "described": "eliza-1966",
+      "buildable": "scikit-learn-first-release",
+      "available": null,
+      "note": "Level 0 has no model, so it has no maker announcing general availability the way the other levels do. Products built from rules, search and forms — spreadsheets, form validators, search boxes, spam filters — have been sold to ordinary customers for decades, by many makers, none of whom announced “level 0”, so there is no single date to mark and the site does not invent one. 'buildable' is the earliest general-purpose library the site could verify that let a developer use a level-0 technique (classical machine learning) without writing the algorithm themselves. Rule-based keyword matching (ELIZA, 1966) is decades older than any such packaged library; that gap is real, not a gap in sourcing.",
+      "candidates": [
+        {
+          "mark": "described",
+          "id": "eliza-1966",
+          "chosen": true,
+          "why": "The earliest paper this site could open describing code that picks the reply from keyword rules."
+        },
+        {
+          "mark": "buildable",
+          "id": "scikit-learn-first-release",
+          "chosen": true,
+          "why": "First public release, 1 February 2010, of a general-purpose library for the level's technique."
+        },
+        {
+          "mark": "buildable",
+          "id": "elasticsearch-first-release",
+          "chosen": false,
+          "why": "Same month (February 2010) and no earlier; scikit-learn's own page gives a day, Elastic's gives only the month."
+        },
+        {
+          "mark": "buildable",
+          "id": "xgboost-paper",
+          "chosen": false,
+          "why": "2016, six years later."
+        }
+      ]
+    },
+    {
+      "level": 1,
+      "described": "gpt-2-post-2019",
+      "buildable": "transformers-library-2018",
+      "available": "chatgpt-launch",
+      "note": "ChatGPT's launch page will not open from here — openai.com returns 403 — so the date is verified against the Internet Archive's capture of that same page, taken six days later. OpenAI called it a research preview and it was free, but nobody needed an invitation, which is why the site marks it rather than a later date.",
+      "candidates": [
+        {
+          "mark": "described",
+          "id": "attention-is-all-you-need",
+          "chosen": false,
+          "why": "12 June 2017, but it describes a translation architecture and never mentions prompting. It made level 1 possible; it does not describe it."
+        },
+        {
+          "mark": "described",
+          "id": "gpt-3-few-shot",
+          "chosen": false,
+          "why": "28 May 2020: says it more fully, fifteen months later."
+        },
+        {
+          "mark": "buildable",
+          "id": "transformers-library-2018",
+          "chosen": true,
+          "why": "29 October 2018: the earliest open library this site could date that loads a pretrained language model."
+        },
+        {
+          "mark": "buildable",
+          "id": "gpt-3-api-2020",
+          "chosen": false,
+          "why": "11 June 2020, and OpenAI's own page calls it “a private beta rather than general availability” with a waitlist."
+        },
+        {
+          "mark": "available",
+          "id": "chatgpt-launch",
+          "chosen": true,
+          "why": "30 November 2022: free, open to anyone, and the product through which the public met language models."
+        },
+        {
+          "mark": "described",
+          "id": "gpt-2-post-2019",
+          "chosen": true,
+          "why": "14 February 2019: the earliest page found that states the idea itself, tasks done \"simply by prompting the trained model in the right way\"."
+        },
+        {
+          "mark": "available",
+          "id": "ai-dungeon-2-2019",
+          "chosen": false,
+          "why": "5 December 2019: three years earlier and open to anyone, but a text game few people outside the field ever saw."
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "described": "rag-paper-2020",
+      "buildable": "llamaindex-2022",
+      "available": "bing-ai-search-2023",
+      "note": "'buildable' is now the first open library built for this level's job rather than the oldest library involved in it. FAISS (2017) is vector similarity search, published three years before anyone retrieved with it for a language model, and OpenAI's embeddings endpoint (January 2022) returns vectors but retrieves nothing; both are kept as milestones. Perplexity, live from December 2022, would be an earlier 'available' if it could be dated: no Perplexity-owned page states a launch date.",
+      "candidates": [
+        {
+          "mark": "described",
+          "id": "rag-paper-2020",
+          "chosen": true,
+          "why": "arXiv v1 22 May 2020, the paper that named retrieval-augmented generation."
+        },
+        {
+          "mark": "buildable",
+          "id": "llamaindex-2022",
+          "chosen": true,
+          "why": "2 November 2022: the first widely used open library whose whole purpose is retrieving for a model."
+        },
+        {
+          "mark": "buildable",
+          "id": "faiss-first-release-2017",
+          "chosen": false,
+          "why": "2017 vector search, five years before any model was given its results; marking it made 'buildable' predate 'described'."
+        },
+        {
+          "mark": "buildable",
+          "id": "openai-embeddings-2022",
+          "chosen": false,
+          "why": "25 January 2022, and it produces vectors only — the developer still writes the retrieval and the prompt."
+        },
+        {
+          "mark": "available",
+          "id": "bing-open-preview-2023",
+          "chosen": false,
+          "why": "4 May 2023: the day the waitlist ended. Recorded as the launch's `opened` date."
+        },
+        {
+          "mark": "available",
+          "id": "bing-ai-search-2023",
+          "chosen": true,
+          "why": "7 February 2023: the launch that put answers built from search results in front of the public. Waitlisted at first; open to everyone on 4 May 2023."
+        },
+        {
+          "mark": "available",
+          "id": "gemini-notebook-rename-2026",
+          "chosen": false,
+          "why": "2026; the clearest consumer example of the level today, not the earliest."
+        },
+        {
+          "mark": "available",
+          "id": "neeva-ai-2023",
+          "chosen": false,
+          "why": "6 January 2023: a month earlier and open at once, from a search engine few people used and that closed the same year."
+        }
+      ]
+    },
+    {
+      "level": 3,
+      "described": "ai-chains-paper-2021",
+      "buildable": "langchain-release-2022",
+      "available": "m365-copilot-2023",
+      "note": "The 'available' date is the earliest capture this site could read of Zapier's own OpenAI page, not a date Zapier announces: the feature was live by 9 December 2022 and may have shipped earlier. It replaces a Microsoft general-availability announcement a year later, which was the earliest date this site had previously looked for rather than the earliest it could show. The marked product, Microsoft 365 Copilot, was unveiled on 16 March 2023 and could not be bought until 1 November 2023; the mark is the unveiling because that is when the public met the idea. Zapier's OpenAI step was usable by 9 December 2022 and is the earlier, lesser-known product.",
+      "candidates": [
+        {
+          "mark": "described",
+          "id": "ai-chains-paper-2021",
+          "chosen": true,
+          "why": "arXiv v1 4 October 2021: chaining model calls so a person can see and steer each step."
+        },
+        {
+          "mark": "buildable",
+          "id": "langchain-release-2022",
+          "chosen": true,
+          "why": "0.0.1 on PyPI, 25 October 2022 — the chaining plumbing a developer stopped writing."
+        },
+        {
+          "mark": "buildable",
+          "id": "langgraph-launch-2024",
+          "chosen": false,
+          "why": "January 2024, fifteen months later."
+        },
+        {
+          "mark": "available",
+          "id": "zapier-openai-2022",
+          "chosen": false,
+          "why": "Live by 9 December 2022 and usable by any Zapier customer, so it is the earlier product. But it is a thin connector: it passes text to OpenAI's model inside Zapier's ordinary automation, and few people know it."
+        },
+        {
+          "mark": "available",
+          "id": "power-automate-gpt-prompts-2023",
+          "chosen": false,
+          "why": "Generally available 19 December 2023, a year later, though with a dated announcement of its own."
+        },
+        {
+          "mark": "available",
+          "id": "m365-copilot-2023",
+          "chosen": true,
+          "why": "16 March 2023: the product through which most people first met a model working inside fixed, software-run steps. Unveiled that day; on sale 1 November 2023."
+        },
+        {
+          "mark": "available",
+          "id": "m365-copilot-ga-2023",
+          "chosen": false,
+          "why": "1 November 2023: the day it went on sale. Recorded as the launch's `opened` date."
+        }
+      ]
+    },
+    {
+      "level": 4,
+      "described": "mrkl-paper-2022",
+      "buildable": "openai-function-calling-2023",
+      "available": "chatgpt-plugins-2023",
+      "note": "Both marks here were previously set by which page would open rather than what happened first: the Model Context Protocol (November 2024) stood as 'buildable' and Bard Extensions (September 2023) as 'available'. Both are seventeen and four months later than the OpenAI milestones now marked, each verified through the Internet Archive's capture of OpenAI's own page. 'available' sits a month before 'buildable' because the product shipped before the API did.",
+      "candidates": [
+        {
+          "mark": "described",
+          "id": "toolformer-paper-2023",
+          "chosen": false,
+          "why": "9 February 2023: a clean statement of the idea, but nine months after MRKL and more than a year after WebGPT and LaMDA."
+        },
+        {
+          "mark": "buildable",
+          "id": "openai-function-calling-2023",
+          "chosen": true,
+          "why": "13 June 2023, the first tool-calling API a developer could describe functions to."
+        },
+        {
+          "mark": "buildable",
+          "id": "mcp-launch-2024",
+          "chosen": false,
+          "why": "25 November 2024: an open standard for connecting tools, seventeen months later."
+        },
+        {
+          "mark": "available",
+          "id": "chatgpt-plugins-beta-2023",
+          "chosen": false,
+          "why": "12 May 2023: the day the rollout to paying subscribers began. Recorded as the launch's `opened` date."
+        },
+        {
+          "mark": "available",
+          "id": "chatgpt-plugins-2023",
+          "chosen": true,
+          "why": "23 March 2023: the launch. ChatGPT chose a plugin, called its service and used the reply. Waitlisted at first; the rollout to Plus subscribers began on 12 May 2023."
+        },
+        {
+          "mark": "available",
+          "id": "bard-extensions-2023",
+          "chosen": false,
+          "why": "19 September 2023, four months later; it was free rather than on a paid plan."
+        },
+        {
+          "mark": "available",
+          "id": "claude-analysis-tool-2024",
+          "chosen": false,
+          "why": "October 2024."
+        },
+        {
+          "mark": "described",
+          "id": "mrkl-paper-2022",
+          "chosen": true,
+          "why": "1 May 2022: the earliest paper that is about this idea and nothing else, a model choosing which tool to call."
+        }
+      ]
+    },
+    {
+      "level": 5,
+      "described": "react-paper-2022",
+      "buildable": "autogpt-2023",
+      "available": "operator-2025",
+      "note": "ChatGPT's code interpreter is not counted here: running code the model wrote is a tool call, which is level 4, though it is a close call, since it reads its own errors and retries inside one reply. What separates an agent from a chatbot that writes code is who runs the loop. A chatbot hands you the code and you run it, read the error and paste it back. An agent runs it, reads the error and fixes it, and goes on until it decides the job is done. Operator is marked because it is the agent the public could picture: it drove a browser by sight until the task was finished, and asked the person to take over for logins and payments. Replit Agent (5 September 2024) and Gemini Deep Research (11 December 2024) are earlier and are listed.",
+      "candidates": [
+        {
+          "mark": "described",
+          "id": "react-paper-2022",
+          "chosen": true,
+          "why": "6 October 2022: the first paper to state the loop of reasoning and acting as a general method across different kinds of task. WebGPT (17 December 2021) has a model choosing each browsing command and deciding when to stop, for one task only."
+        },
+        {
+          "mark": "buildable",
+          "id": "autogpt-2023",
+          "chosen": true,
+          "why": "Repository created 16 March 2023: an open goal-seeking loop a developer could run."
+        },
+        {
+          "mark": "buildable",
+          "id": "computer-use-2024",
+          "chosen": false,
+          "why": "October 2024, and Anthropic calls it “still experimental—at times cumbersome and error-prone”."
+        },
+        {
+          "mark": "available",
+          "id": "replit-agent-2024",
+          "chosen": false,
+          "why": "5 September 2024: earlier, and it delivered finished apps, but it is a coding product known to programmers and not to the public."
+        },
+        {
+          "mark": "available",
+          "id": "devin-2024",
+          "chosen": false,
+          "why": "12 March 2024 but “in early access as we ramp up capacity” — an invitation."
+        },
+        {
+          "mark": "available",
+          "id": "devin-ga-2024",
+          "chosen": false,
+          "why": "Generally available 10 December 2024, three months after Replit's agent."
+        },
+        {
+          "mark": "available",
+          "id": "gemini-deep-research-2024",
+          "chosen": false,
+          "why": "11 December 2024: six weeks earlier than Operator and open to every Gemini Advanced subscriber. The closest alternative."
+        },
+        {
+          "mark": "available",
+          "id": "chatgpt-deep-research-2025",
+          "chosen": false,
+          "why": "2 February 2025."
+        },
+        {
+          "mark": "available",
+          "id": "claude-code-2025",
+          "chosen": false,
+          "why": "24 February 2025, and released “as a limited research preview”."
+        },
+        {
+          "mark": "available",
+          "id": "chatgpt-agent-2025",
+          "chosen": false,
+          "why": "17 July 2025."
+        },
+        {
+          "mark": "available",
+          "id": "operator-2025",
+          "chosen": true,
+          "why": "23 January 2025: an agent ordinary people could picture and watch, driving a browser until the job was done. The editor's pick among the widely known candidates."
+        },
+        {
+          "mark": "available",
+          "id": "agentgpt-2023",
+          "chosen": false,
+          "why": "Live by 9 April 2023: the earliest looping agent anyone could use, part of the AutoGPT wave. Widely reported to stall before finishing, and little remembered."
+        }
+      ]
+    },
+    {
+      "level": 6,
+      "described": "camel-paper-2023",
+      "buildable": "autogen-release-2023",
+      "available": "claude-research-launch-2025",
+      "note": "The level has two forms, and they arrived at different times. Subagents: one agent spawns temporary copies of itself for parts of a job, they report back and they are gone. That is what Anthropic's June 2025 post describes for Claude Research, and it arrived first. Teams: standing agents with their own roles that persist and check one another; Muse's separate Sentinel agent (September 2026) is an example. Claude Research is marked at its launch, 15 April 2025. The launch page itself describes one Claude searching repeatedly; the page that says a lead agent delegates to subagents is dated 13 June 2025, and neither says whether the design changed in between.",
+      "candidates": [
+        {
+          "mark": "described",
+          "id": "multiagent-debate-paper-2023",
+          "chosen": false,
+          "why": "23 May 2023: several model instances checking each other. A distinct form of the level, but not the earliest."
+        },
+        {
+          "mark": "buildable",
+          "id": "autogen-release-2023",
+          "chosen": true,
+          "why": "Repository created 18 August 2023: the first open multi-agent framework this site could date."
+        },
+        {
+          "mark": "buildable",
+          "id": "a2a-protocol-2025",
+          "chosen": false,
+          "why": "April 2025, and a protocol between agents rather than a framework to build them with."
+        },
+        {
+          "mark": "available",
+          "id": "claude-research-launch-2025",
+          "chosen": true,
+          "why": "15 April 2025: the launch of the widely known product. Anthropic's launch page describes one Claude searching repeatedly; its engineering post of 13 June 2025 is the page that says a lead agent delegates to subagents."
+        },
+        {
+          "mark": "available",
+          "id": "anthropic-multiagent-research-2025",
+          "chosen": false,
+          "why": "13 June 2025: the page that proves the architecture, published two months after the product went on sale."
+        },
+        {
+          "mark": "available",
+          "id": "grok-4-heavy-2025",
+          "chosen": false,
+          "why": "9 July 2025, after the marked date. xAI's page shows \"Agent 1\", \"Agent 2\", \"Agent 3\" in its demo but does not say how they share the work."
+        },
+        {
+          "mark": "described",
+          "id": "camel-paper-2023",
+          "chosen": true,
+          "why": "31 March 2023: two model agents working one task between them, in the abstract's words \"multi-agent settings\". Eight weeks before the debate paper."
+        },
+        {
+          "mark": "available",
+          "id": "genspark-2024",
+          "chosen": false,
+          "why": "18 June 2024: the earliest product whose own launch page says several agents share a job. It gives no mechanism, and few people know the product."
+        }
+      ]
+    },
+    {
+      "level": 7,
+      "described": "generative-agents-paper-2023",
+      "buildable": "hermes-agent-2025",
+      "available": "grok-bot-2026",
+      "note": "'buildable' is no longer empty: two self-hostable always-on agents can now be dated from GitHub's metadata, and the earlier is Hermes Agent (22 July 2025, MIT). ChatGPT's scheduled tasks (January 2025) were considered and rejected: the person sets the time, so nothing in the product decides when to start. ChatGPT agent (July 2025) works on its own computer but waits to be asked, and is kept at level 5. Claude Cowork's January 2026 release is kept at level 5 for the same reason: Anthropic's release note describes a desktop agent that runs on the person's own computer, and the person starts every task. Cowork became always-on on 7 July 2026, when the same notes say sessions run remotely and scheduled tasks run with no device online. Manus cannot be dated from any page of its own. The level's customer-facing arrival is therefore the summer of 2026: Gemini Spark by 30 June, Cowork's remote sessions on 7 July, Grok Bot on 11 August and Muse on 8 September.",
+      "candidates": [
+        {
+          "mark": "described",
+          "id": "generative-agents-paper-2023",
+          "chosen": true,
+          "why": "arXiv v1 7 April 2023: agents that decide when to act, not only what to answer."
+        },
+        {
+          "mark": "buildable",
+          "id": "hermes-agent-2025",
+          "chosen": true,
+          "why": "Repository created 22 July 2025, MIT, self-hosted, with standing tasks that run while it runs."
+        },
+        {
+          "mark": "buildable",
+          "id": "openclaw-2025",
+          "chosen": false,
+          "why": "Repository created 24 November 2025, four months later."
+        },
+        {
+          "mark": "available",
+          "id": "claude-cowork-2026",
+          "chosen": false,
+          "why": "12 January 2026, but a level-5 product on that date: it ran on the person's own computer and the person started every task."
+        },
+        {
+          "mark": "available",
+          "id": "gemini-spark-subscribers-2026",
+          "chosen": false,
+          "why": "By 30 June 2026 and six weeks earlier, but a beta for United States subscribers to Google's most expensive plan. Few people could use it."
+        },
+        {
+          "mark": "available",
+          "id": "claude-cowork-remote-2026",
+          "chosen": false,
+          "why": "7 July 2026, one week later: the day Cowork's sessions moved off the person's computer."
+        },
+        {
+          "mark": "available",
+          "id": "manus-2025",
+          "chosen": false,
+          "why": "No Manus-owned page states a launch date, so 6 March 2025 could not be verified."
+        },
+        {
+          "mark": "available",
+          "id": "chatgpt-agent-2025",
+          "chosen": false,
+          "why": "A level-5 product: it runs on its own computer, but the person starts every task."
+        },
+        {
+          "mark": "available",
+          "id": "gemini-spark-2026",
+          "chosen": false,
+          "why": "19 May 2026 is the announcement. Only trusted testers had it that week, and subscribers were promised it in the coming weeks."
+        },
+        {
+          "mark": "available",
+          "id": "chatgpt-work-2026",
+          "chosen": false,
+          "why": "openai.com will not open and the archived capture carries no date, so 2026-07-09 is unverified."
+        },
+        {
+          "mark": "available",
+          "id": "grok-bot-2026",
+          "chosen": true,
+          "why": "11 August 2026: \"your team of always-on agents\", \"available today\" to paying subscribers. The first always-on product most people heard of."
+        },
+        {
+          "mark": "available",
+          "id": "muse-2026",
+          "chosen": false,
+          "why": "8 September 2026."
+        },
+        {
+          "mark": "available",
+          "id": "claude-cowork-merge-2026",
+          "chosen": false,
+          "why": "16 September 2026: the end of the separate product, not its arrival."
+        }
+      ]
+    }
+  ],
+  "milestones": [
+    {
+      "id": "eliza-1966",
+      "date": "1966-01",
+      "precision": "month",
+      "level": 0,
+      "kind": "research",
+      "title": "ELIZA",
+      "maker": "Joseph Weizenbaum, MIT",
+      "what": "Weizenbaum's paper describes ELIZA, a program that scans input for keywords and applies decomposition and reassembly rules attached to them; the paper says \"Keywords and their associated transformation rules constitute the SCRIPT for a particular class of conversation.\" Code picks the reply, with no model involved.",
+      "technique": "order-zero",
+      "source": {
+        "title": "ELIZA — a computer program for the study of natural language communication between man and machine",
+        "url": "https://courses.cs.umbc.edu/331/papers/eliza.html",
+        "publisher": "Communications of the ACM, vol. 9 no. 1, January 1966 (mirror; the ACM Digital Library and cacm.acm.org copies both return 403 to this site's fetcher)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "elasticsearch-first-release",
+      "date": "2010-02",
+      "precision": "month",
+      "level": 0,
+      "kind": "tool",
+      "title": "Elasticsearch",
+      "maker": "Shay Banon",
+      "what": "Elastic's own history post places Elasticsearch's first release, which it says \"happened to be 0.4.0\", in February 2010: keyword search an ordinary developer could run without writing a search engine.",
+      "technique": "order-zero",
+      "registry_id": "elasticsearch",
+      "source": {
+        "title": "Elasticsearch history: Overview of 15 years of searching",
+        "url": "https://www.elastic.co/search-labs/blog/elasticsearch-history-15-years",
+        "publisher": "Elastic"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "scikit-learn-first-release",
+      "date": "2010-02-01",
+      "precision": "day",
+      "level": 0,
+      "kind": "tool",
+      "title": "scikit-learn",
+      "maker": "Fabian Pedregosa, Gaël Varoquaux, Alexandre Gramfort and Vincent Michel, INRIA",
+      "what": "scikit-learn's own About page says these four \"took leadership of the project and made the first public release, February the 1st 2010\", packaging classical machine learning algorithms a developer could call without implementing them.",
+      "technique": "order-zero",
+      "registry_id": "scikit-learn",
+      "source": {
+        "title": "About us",
+        "url": "https://scikit-learn.org/stable/about.html",
+        "publisher": "scikit-learn"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "xgboost-paper",
+      "date": "2016-03-09",
+      "precision": "day",
+      "level": 0,
+      "kind": "research",
+      "title": "XGBoost: A Scalable Tree Boosting System",
+      "maker": "Tianqi Chen and Carlos Guestrin",
+      "what": "The paper describes a scalable tree boosting system \"used widely by data scientists to achieve state-of-the-art results\" — classical machine learning, no language model anywhere in it, still advancing in the middle of the deep-learning decade.",
+      "technique": "order-zero",
+      "registry_id": "xgboost",
+      "source": {
+        "title": "XGBoost: A Scalable Tree Boosting System",
+        "url": "https://arxiv.org/abs/1603.02754",
+        "publisher": "arXiv (v1, 9 March 2016)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "attention-is-all-you-need",
+      "date": "2017-06-12",
+      "precision": "day",
+      "level": 1,
+      "kind": "research",
+      "title": "Attention Is All You Need",
+      "maker": "Vaswani et al., Google",
+      "what": "Google researchers introduced the Transformer, an architecture built on attention alone, dispensing with the recurrence and convolutions earlier sequence models relied on. It is the architecture under the one-call language models the rest of this level names.",
+      "technique": "chat",
+      "source": {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "publisher": "arXiv (v1, 12 June 2017)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "transformers-library-2018",
+      "date": "2018-10-29",
+      "precision": "day",
+      "level": 1,
+      "kind": "tool",
+      "title": "Transformers",
+      "maker": "Hugging Face",
+      "what": "GitHub's record of huggingface/transformers gives a creation date of 29 October 2018. The repository describes itself as \"the model-definition framework for state-of-the-art machine learning models in text, vision, audio, and multimodal models, for both inference and training\": the open library a developer could load a pretrained language model with, years before anyone could buy a chat product.",
+      "technique": "chat",
+      "registry_id": "transformers",
+      "source": {
+        "title": "huggingface/transformers (repository metadata)",
+        "url": "https://api.github.com/repos/huggingface/transformers",
+        "publisher": "GitHub"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "gpt-2-post-2019",
+      "short": "GPT-2",
+      "date": "2019-02-14",
+      "precision": "day",
+      "level": 1,
+      "kind": "research",
+      "title": "Better Language Models and Their Implications (GPT-2)",
+      "maker": "OpenAI",
+      "what": "OpenAI's post on GPT-2 reports the model doing reading comprehension, translation and summarisation \"without any fine-tuning of our models, simply by prompting the trained model in the right way\". That is level 1 stated plainly: write the request, read the response, no training step in between.",
+      "technique": "prompt-engineering",
+      "source": {
+        "title": "Better Language Models and Their Implications",
+        "url": "https://openai.com/blog/better-language-models/",
+        "archive_url": "https://web.archive.org/web/20190311202940id_/https://openai.com/blog/better-language-models/",
+        "publisher": "OpenAI"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "openai.com returns 403 to this site's fetcher; the Internet Archive's capture of 11 March 2019 carries the byline \"February 14, 2019\" and the sentence quoted."
+    },
+    {
+      "id": "ai-dungeon-2-2019",
+      "date": "2019-12-05",
+      "precision": "day",
+      "level": 1,
+      "kind": "product",
+      "title": "AI Dungeon 2",
+      "maker": "Nick Walton (later Latitude)",
+      "what": "A text adventure built on GPT-2: the player types any action in plain English and the model writes what happens next. Its maker's own post is dated Thursday, December 5, 2019. One request, one response, open to anyone, three years before ChatGPT. At first it ran from a shared Google notebook, not an app.",
+      "technique": "chat",
+      "source": {
+        "title": "AI Dungeon 2 is released",
+        "url": "https://aidungeon2.blogspot.com/2019/12/ai-dungeon-2-is-released-play-ai.html",
+        "publisher": "Nick Walton"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "general"
+    },
+    {
+      "id": "gpt-3-few-shot",
+      "date": "2020-05-28",
+      "precision": "day",
+      "level": 1,
+      "kind": "research",
+      "title": "GPT-3: Language Models are Few-Shot Learners",
+      "maker": "OpenAI",
+      "what": "OpenAI's paper describes \"an autoregressive language model with 175 billion parameters\" applied \"without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction\" — the one-call pattern that prompt engineering works within.",
+      "technique": "prompt-engineering",
+      "source": {
+        "title": "Language Models are Few-Shot Learners",
+        "url": "https://arxiv.org/abs/2005.14165",
+        "publisher": "arXiv (v1, 28 May 2020)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "gpt-3-api-2020",
+      "date": "2020-06-11",
+      "precision": "day",
+      "level": 1,
+      "kind": "tool",
+      "title": "The OpenAI API",
+      "maker": "OpenAI",
+      "what": "OpenAI's announcement of 11 June 2020 says “We’re releasing an API for accessing new AI models developed by OpenAI”, providing “a general-purpose ‘text in, text out’ interface”, and that “Today the API runs models with weights from the GPT-3 family”. Access was not open: “we are launching today in a private beta rather than general availability”, with a waitlist.",
+      "technique": "chat",
+      "registry_id": "openai-api",
+      "source": {
+        "title": "OpenAI API",
+        "url": "https://openai.com/blog/openai-api",
+        "archive_url": "https://web.archive.org/web/20200615205727id_/https://openai.com/blog/openai-api/",
+        "publisher": "OpenAI"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "waitlist",
+      "note": "openai.com returns 403 here; read through the Internet Archive's capture of 15 June 2020."
+    },
+    {
+      "id": "chain-of-thought-prompting",
+      "date": "2022-01-28",
+      "precision": "day",
+      "level": 1,
+      "kind": "research",
+      "title": "Chain-of-Thought Prompting",
+      "maker": "Wei et al., Google",
+      "what": "The paper reports that \"generating a chain of thought -- a series of intermediate reasoning steps -- significantly improves the ability of large language models to perform complex reasoning\", and that it \"improves performance on a range of arithmetic, commonsense, and symbolic reasoning tasks\". Nothing about the model changes; only the prompt does.",
+      "technique": "prompt-engineering",
+      "source": {
+        "title": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
+        "url": "https://arxiv.org/abs/2201.11903",
+        "publisher": "arXiv (v1, 28 January 2022)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "instructgpt-rlhf",
+      "date": "2022-03-04",
+      "precision": "day",
+      "level": 1,
+      "kind": "research",
+      "title": "InstructGPT",
+      "maker": "OpenAI",
+      "what": "OpenAI fine-tuned GPT-3 on human demonstrations and human rankings of its outputs. The paper reports that \"outputs from the 1.3B parameter InstructGPT model are preferred to outputs from the 175B GPT-3, despite having 100x fewer parameters\", in human evaluations on OpenAI's own prompt distribution.",
+      "technique": "chat",
+      "source": {
+        "title": "Training language models to follow instructions with human feedback",
+        "url": "https://arxiv.org/abs/2203.02155",
+        "publisher": "arXiv (v1, 4 March 2022)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "chatgpt-launch",
+      "short": "ChatGPT",
+      "date": "2022-11-30",
+      "precision": "day",
+      "level": 1,
+      "kind": "product",
+      "title": "ChatGPT",
+      "maker": "OpenAI",
+      "what": "OpenAI's announcement, dated November 30, 2022, says “We’ve trained a model called ChatGPT which interacts in a conversational way” and “During the research preview, usage of ChatGPT is free. Try it now at chat.openai.com.” A chat product anyone could open in a browser, with no API key, no code and no invitation.",
+      "technique": "chat",
+      "registry_id": "chatgpt",
+      "source": {
+        "title": "ChatGPT",
+        "url": "https://openai.com/blog/chatgpt/",
+        "publisher": "OpenAI",
+        "archive_url": "https://web.archive.org/web/20221206000504id_/https://openai.com/blog/chatgpt/"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "openai.com returns 403 to this site's fetcher, confirmed again on 2026-09-18. The Internet Archive's capture of OpenAI's own post, taken 6 December 2022, opens and shows both the date and the wording quoted here; that capture is recorded in source.archive_url.",
+      "availability": "preview"
+    },
+    {
+      "id": "gpt-4-launch",
+      "date": "2023-03-15",
+      "precision": "day",
+      "level": 1,
+      "kind": "research",
+      "title": "GPT-4 Technical Report",
+      "maker": "OpenAI",
+      "what": "OpenAI's technical report describes \"a large-scale, multimodal model which can accept image and text inputs and produce text outputs\", and reports that it \"exhibits human-level performance on various professional and academic benchmarks\" — OpenAI's own evaluation of its own model.",
+      "technique": "multimodal",
+      "source": {
+        "title": "GPT-4 Technical Report",
+        "url": "https://arxiv.org/abs/2303.08774",
+        "publisher": "arXiv (v1, 15 March 2023)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "gpt-4o-launch",
+      "date": "2024-05-13",
+      "precision": "day",
+      "level": 1,
+      "kind": "model",
+      "title": "GPT-4o",
+      "maker": "OpenAI",
+      "what": "OpenAI's API changelog entry for 13 May 2024 reads: \"Released GPT-4o in the API. GPT-4o is our fastest and most affordable flagship model.\" The changelog does not describe how its modalities are combined; this site cites it only for the release date and OpenAI's own description.",
+      "technique": "multimodal",
+      "source": {
+        "title": "Changelog",
+        "url": "https://developers.openai.com/api/docs/changelog",
+        "publisher": "OpenAI (API documentation)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "structured-outputs-api",
+      "date": "2024-08-06",
+      "precision": "day",
+      "level": 1,
+      "kind": "tool",
+      "title": "Structured Outputs",
+      "maker": "OpenAI",
+      "what": "OpenAI's API changelog entry for 6 August 2024 reads: \"Launched Structured Outputs—model outputs now reliably adhere to developer supplied JSON Schemas.\"",
+      "technique": "structured-output",
+      "registry_id": "openai-api",
+      "source": {
+        "title": "Changelog",
+        "url": "https://developers.openai.com/api/docs/changelog",
+        "publisher": "OpenAI (API documentation)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "o1-reasoning-models",
+      "date": "2024-09-12",
+      "precision": "day",
+      "level": 1,
+      "kind": "model",
+      "title": "OpenAI o1, the first reasoning model",
+      "maker": "OpenAI",
+      "what": "OpenAI's post of September 12, 2024 opens: \"We are introducing OpenAI o1, a new large language model trained with reinforcement learning to perform complex reasoning. o1 thinks before it answers—it can produce a long internal chain of thought before responding to the user.\" It adds that the model \"learns to recognize and correct its mistakes\" and that its performance improves \"with more time spent thinking (test-time compute)\". The extra work happens inside one request and response, which is why this sits at level 1 and not higher. OpenAI's API changelog for the same day records the release of o1-preview and o1-mini.",
+      "technique": "inference-time-reasoning",
+      "source": {
+        "title": "Learning to Reason with LLMs",
+        "url": "https://openai.com/index/learning-to-reason-with-llms/",
+        "archive_url": "https://web.archive.org/web/20240913000639id_/https://openai.com/index/learning-to-reason-with-llms/",
+        "publisher": "OpenAI"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "openai.com returns 403 to this site's fetcher; the Internet Archive captured the post the day after it was published. The changelog is at https://developers.openai.com/api/docs/changelog."
+    },
+    {
+      "id": "deepseek-r1-2025",
+      "date": "2025-01-22",
+      "precision": "day",
+      "level": 1,
+      "kind": "research",
+      "title": "DeepSeek-R1",
+      "maker": "DeepSeek-AI",
+      "what": "The paper reports that \"the reasoning abilities of LLMs can be incentivized through pure reinforcement learning (RL), obviating the need for human-labeled reasoning trajectories\", and that the training brings out \"advanced reasoning patterns, such as self-reflection, verification, and dynamic strategy adaptation.\" A second lab, in the open, reaching what o1 had shown four months earlier.",
+      "technique": "inference-time-reasoning",
+      "source": {
+        "title": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+        "url": "https://arxiv.org/abs/2501.12948",
+        "publisher": "arXiv (v1, 22 January 2025)"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "The abstract quoted is the current one on arXiv, which was revised after v1; the date is the v1 submission date."
+    },
+    {
+      "id": "gemini-31-pro-2026",
+      "date": "2026-02-19",
+      "precision": "day",
+      "level": 1,
+      "kind": "model",
+      "title": "Gemini 3.1 Pro",
+      "maker": "Google",
+      "what": "Google's Gemini API changelog entry for 19 February 2026 reads: \"Released Gemini 3.1 Pro Preview, our latest iteration in the new Gemini 3 series family.\"",
+      "technique": "inference-time-reasoning",
+      "registry_id": "gemini-3.1-pro",
+      "source": {
+        "title": "Gemini API changelog",
+        "url": "https://ai.google.dev/gemini-api/docs/changelog",
+        "publisher": "Google (Gemini API documentation)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "gpt-6-astra",
+      "date": "2026-09-03",
+      "precision": "day",
+      "level": 1,
+      "kind": "model",
+      "title": "GPT-6 Astra",
+      "maker": "OpenAI",
+      "what": "OpenAI's API changelog entry for 3 September 2026 reads: \"Released GPT-6 Astra, our most capable model, built for the hardest end-to-end work.\" That is OpenAI's own description of its own model.",
+      "technique": "inference-time-reasoning",
+      "registry_id": "gpt-6-astra",
+      "source": {
+        "title": "Changelog",
+        "url": "https://developers.openai.com/api/docs/changelog",
+        "publisher": "OpenAI (API documentation)"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "content/landscape.json cites openai.com/index/gpt-6-astra/ for this release; that page returns 403 to this site's fetcher, so the API changelog, which opens and covers the same release, is cited here instead."
+    },
+    {
+      "id": "deepseek-v41-flash-2026",
+      "date": "2026-09-10",
+      "precision": "day",
+      "level": 1,
+      "kind": "model",
+      "title": "DeepSeek-V4.1-Flash",
+      "maker": "DeepSeek",
+      "what": "DeepSeek's release note of 10 September 2026 says \"V4.1-Flash is now live on the DeepSeek API with native multimodal support\", describing a mixture-of-experts model with 552B parameters and 8B active for input, 16B for output — a frontier-class open-weight release, one call at a time.",
+      "technique": "chat",
+      "registry_id": "deepseek-v4.1-flash",
+      "source": {
+        "title": "DeepSeek-V4.1-Flash release note",
+        "url": "https://api-docs.deepseek.com/news/news260910/",
+        "publisher": "DeepSeek (API documentation)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "jev-2026",
+      "date": "2026-09-15",
+      "precision": "day",
+      "level": 1,
+      "kind": "model",
+      "title": "Jev, a System One model",
+      "maker": "TypeSafe AI",
+      "what": "TypeSafe's founder, Diogo Almeida, announces \"a new class of frontier models built to make fast, structured decisions that software can use directly\": \"unstructured state in, typed probabilistic decisions out.\" Jev writes no text. Its possible outputs are defined in advance, every answer carries a probability, and all of it comes back in one parallel pass, not word by word. TypeSafe quotes \"70ms-500ms\" a call and \"$0.042 / MTok\" of input. Its own list of uses is this site's level 3: \"classify, route, score, extract, or branch where hand-written logic is too brittle.\"",
+      "technique": "structured-output",
+      "registry_id": "jev",
+      "source": {
+        "title": "Introducing System One Models & Jev",
+        "url": "https://typesafe.ai/blog/introducing-system-one-models-and-jev",
+        "publisher": "TypeSafe AI"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "waitlist",
+      "note": "\"available today in early access\", with a waitlist on the same page. Every figure here is TypeSafe's own claim, including that the model \"can't hallucinate\"; this site has measured none of them. Of his background Almeida writes: \"At OpenAI, I helped build the methods that made language models useful at following instructions and talking with people. That work ended up as the research behind ChatGPT.\""
+    },
+    {
+      "id": "faiss-first-release-2017",
+      "date": "2017-02-07",
+      "precision": "day",
+      "level": 2,
+      "kind": "tool",
+      "title": "FAISS",
+      "maker": "Facebook AI Research",
+      "what": "GitHub's record of facebookresearch/faiss gives a creation date of 7 February 2017 and describes it as \"A library for efficient similarity search and clustering of dense vectors\" — the open library a developer could build vector search over their own documents with, and still the substrate under most retrieval code.",
+      "technique": "embeddings-search",
+      "registry_id": "faiss",
+      "source": {
+        "title": "facebookresearch/faiss (repository metadata)",
+        "url": "https://api.github.com/repos/facebookresearch/faiss",
+        "publisher": "GitHub"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "rag-paper-2020",
+      "date": "2020-05-22",
+      "precision": "day",
+      "level": 2,
+      "kind": "research",
+      "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+      "maker": "Lewis et al., Meta AI (FAIR), UCL, NYU",
+      "what": "The paper introduces RAG, in which \"the parametric memory is a pre-trained seq2seq model and the non-parametric memory is a dense vector index of Wikipedia\", \"accessed with a pre-trained neural retriever\": the model answers from passages retrieved for the question rather than only from its own weights.",
+      "technique": "rag",
+      "source": {
+        "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+        "url": "https://arxiv.org/abs/2005.11401",
+        "publisher": "arXiv (v1, 22 May 2020)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "openai-embeddings-2022",
+      "date": "2022-01-25",
+      "precision": "day",
+      "level": 2,
+      "kind": "tool",
+      "title": "Embeddings in the OpenAI API",
+      "maker": "OpenAI",
+      "what": "OpenAI's post of 25 January 2022 says “We are introducing embeddings, a new endpoint in the OpenAI API that makes it easy to perform natural language and code tasks like semantic search, clustering, topic modeling, and classification”, and that “Embeddings that are numerically similar are also semantically similar.” Vectors as a service: a developer no longer had to train or host an embedding model.",
+      "technique": "embeddings-search",
+      "registry_id": "openai-api",
+      "source": {
+        "title": "Introducing Text and Code Embeddings in the OpenAI API",
+        "url": "https://openai.com/blog/introducing-text-and-code-embeddings",
+        "archive_url": "https://web.archive.org/web/20220201184422id_/https://openai.com/blog/introducing-text-and-code-embeddings/",
+        "publisher": "OpenAI"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "openai.com returns 403 here; read through the Internet Archive's capture of 1 February 2022."
+    },
+    {
+      "id": "llamaindex-2022",
+      "date": "2022-11-02",
+      "precision": "day",
+      "level": 2,
+      "kind": "tool",
+      "title": "LlamaIndex",
+      "maker": "Jerry Liu",
+      "what": "GitHub's record of the repository now published as run-llama/llama_index gives a creation date of 2 November 2022, and the first release of its package on PyPI, then named gpt-index, is dated 22 November 2022 with the summary “Building an index of GPT summaries.” The first widely used open library built for this level's job: index a set of documents, retrieve from it, and hand what comes back to a language model.",
+      "technique": "rag",
+      "registry_id": "llamaindex",
+      "source": {
+        "title": "run-llama/llama_index (repository metadata)",
+        "url": "https://api.github.com/repos/run-llama/llama_index",
+        "publisher": "GitHub"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "The repository's web page shows no creation date; GitHub's metadata endpoint, opened on 2026-09-18, gives created_at 2022-11-02T04:24:54Z. It was created as jerryjliu/gpt_index and renamed; the PyPI date comes from pypi.org/pypi/gpt-index/json."
+    },
+    {
+      "id": "neeva-ai-2023",
+      "date": "2023-01-06",
+      "precision": "day",
+      "level": 2,
+      "kind": "product",
+      "title": "NeevaAI",
+      "maker": "Neeva",
+      "what": "Neeva's post, bylined \"The Neeva Team on 01/06/23\", introduces a written answer at the top of its search results with citations embedded in the text, open at once to account holders in the United States. A month before the new Bing. Neeva closed its search engine later in 2023.",
+      "technique": "rag",
+      "source": {
+        "title": "Introducing NeevaAI",
+        "url": "https://neeva.com/blog/introducing-neevaai",
+        "archive_url": "https://web.archive.org/web/20230106113818id_/https://neeva.com/blog/introducing-neevaai",
+        "publisher": "Neeva"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "general",
+      "note": "neeva.com no longer serves the post; the Internet Archive captured it on the day it was published. Perplexity and You.com's YouChat were answering from search results in December 2022, but neither maker has a dated page for it that this site could open."
+    },
+    {
+      "id": "bing-ai-search-2023",
+      "date": "2023-02-07",
+      "precision": "day",
+      "level": 2,
+      "kind": "product",
+      "title": "Bing Chat launches (the new Bing)",
+      "maker": "Microsoft",
+      "what": "Microsoft's announcement says \"Bing reviews results from across the web to find and summarize the answer you're looking for\" and that \"The new Bing also cites all its sources\". On this date it was a limited preview on desktop with a waitlist, so it is not the level's availability date.",
+      "technique": "rag",
+      "source": {
+        "title": "Reinventing search with a new AI-powered Microsoft Bing and Edge, your copilot for the web",
+        "url": "https://blogs.microsoft.com/blog/2023/02/07/reinventing-search-with-a-new-ai-powered-microsoft-bing-and-edge-your-copilot-for-the-web/",
+        "publisher": "Microsoft"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "waitlist",
+      "short": "Bing Chat",
+      "opened": {
+        "date": "2023-05-04",
+        "precision": "day",
+        "text": "open to everyone, no waitlist",
+        "milestone": "bing-open-preview-2023"
+      }
+    },
+    {
+      "id": "bing-open-preview-2023",
+      "date": "2023-05-04",
+      "precision": "day",
+      "level": 2,
+      "kind": "product",
+      "title": "the new Bing, open to everyone",
+      "maker": "Microsoft",
+      "what": "Microsoft's announcement says \"the new Bing is now in Open Preview and no longer has a waitlist\": anyone with a Microsoft account could now ask a question and get an answer written from pages retrieved for it, with links to those pages.",
+      "technique": "rag",
+      "source": {
+        "title": "Announcing the next wave of AI innovation with Microsoft Bing and Edge",
+        "url": "https://blogs.microsoft.com/blog/2023/05/04/announcing-the-next-wave-of-ai-innovation-with-microsoft-bing-and-edge/",
+        "publisher": "Microsoft"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "general"
+    },
+    {
+      "id": "claude-100k-context-2023",
+      "date": "2023-05-11",
+      "precision": "day",
+      "level": 2,
+      "kind": "product",
+      "title": "100K context windows",
+      "maker": "Anthropic",
+      "what": "Anthropic's announcement says: \"We've expanded Claude's context window from 9K to 100K tokens, corresponding to around 75,000 words!\" Enough room to paste the material in rather than retrieve from it.",
+      "technique": "context-engineering",
+      "source": {
+        "title": "Introducing 100K context windows",
+        "url": "https://www.anthropic.com/news/100k-context-windows",
+        "publisher": "Anthropic"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "embeddings-v3-2024",
+      "date": "2024-01-25",
+      "precision": "day",
+      "level": 2,
+      "kind": "tool",
+      "title": "text-embedding-3",
+      "maker": "OpenAI",
+      "what": "OpenAI's API changelog entry for 25 January 2024 reads: \"Released embedding V3 models and an updated GPT-4 Turbo preview\". The changelog entry itself says nothing further about the models; this site cites it for the date only.",
+      "technique": "embeddings-search",
+      "registry_id": "text-embedding-3",
+      "source": {
+        "title": "Changelog",
+        "url": "https://developers.openai.com/api/docs/changelog",
+        "publisher": "OpenAI (API documentation)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "graphrag-2024",
+      "date": "2024-02-13",
+      "precision": "day",
+      "level": 2,
+      "kind": "research",
+      "title": "GraphRAG",
+      "maker": "Microsoft Research",
+      "what": "Microsoft Research's post describes an approach in which \"The LLM processes the entire private dataset, creating references to all entities and relationships within the source data, which are then used to create an LLM-generated knowledge graph\", which is then clustered and pre-summarised so questions can be answered across many documents rather than from the nearest few passages.",
+      "technique": "knowledge-graphs",
+      "registry_id": "graphrag",
+      "source": {
+        "title": "GraphRAG: Unlocking LLM discovery on narrative private data",
+        "url": "https://www.microsoft.com/en-us/research/blog/graphrag-unlocking-llm-discovery-on-narrative-private-data/",
+        "publisher": "Microsoft Research"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "chatgpt-memory-2024",
+      "date": "2024-02-13",
+      "precision": "day",
+      "level": 2,
+      "kind": "product",
+      "title": "ChatGPT memory",
+      "maker": "OpenAI",
+      "what": "OpenAI's post of 13 February 2024 says “We’re testing the ability for ChatGPT to remember things you discuss to make future chats more helpful”, that a user “can explicitly tell it to remember something, ask it what it remembers, and tell it to forget conversationally or through settings”, and that memory can be turned off entirely.",
+      "technique": "memory",
+      "registry_id": "chatgpt-memory",
+      "source": {
+        "title": "Memory and new controls for ChatGPT",
+        "url": "https://openai.com/index/memory-and-new-controls-for-chatgpt/",
+        "publisher": "OpenAI",
+        "archive_url": "https://web.archive.org/web/20240502120859id_/https://openai.com/index/memory-and-new-controls-for-chatgpt"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "openai.com returns 403 to this site's fetcher; the Internet Archive's capture of OpenAI's own page shows the date and the wording quoted here.",
+      "availability": "preview"
+    },
+    {
+      "id": "gemini-15-million-context-2024",
+      "date": "2024-02-15",
+      "precision": "day",
+      "level": 2,
+      "kind": "model",
+      "title": "Gemini 1.5 Pro",
+      "maker": "Google",
+      "what": "Google's announcement says \"We can now run up to 1 million tokens in production\", and that at this date \"a limited group of developers and enterprise customers can try it with a context window of up to 1 million tokens\". A private preview, not a general release, and the standard window was 128,000 tokens.",
+      "technique": "context-engineering",
+      "source": {
+        "title": "Introducing Gemini 1.5, Google's next-generation AI model",
+        "url": "https://blog.google/innovation-and-ai/products/google-gemini-next-generation-model-february-2024/",
+        "publisher": "Google"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "prompt-caching-2024",
+      "date": "2024-10-01",
+      "precision": "day",
+      "level": 2,
+      "kind": "tool",
+      "title": "Prompt caching",
+      "maker": "OpenAI",
+      "what": "OpenAI's API changelog entry for 1 October 2024 reads: \"Prompt caching: Discounts and faster processing times on recently seen input tokens.\" Anthropic's own API release notes record prompt caching leaving beta on the Claude API on 17 December 2024. Reusing a long shared prefix is what makes a large fixed context affordable to send on every request.",
+      "technique": "context-engineering",
+      "registry_id": "openai-api",
+      "source": {
+        "title": "Changelog",
+        "url": "https://developers.openai.com/api/docs/changelog",
+        "publisher": "OpenAI (API documentation)"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "OpenAI's prompt caching guide carries no date and the maker's feature page elsewhere shows a later byline; the dated API changelog entry is used instead. The Anthropic date in `what` comes from platform.claude.com/docs/en/release-notes/api, opened on 2026-09-18."
+    },
+    {
+      "id": "gemini-notebook-rename-2026",
+      "date": "2026-07-16",
+      "precision": "day",
+      "level": 2,
+      "kind": "product",
+      "title": "NotebookLM becomes Gemini Notebook",
+      "maker": "Google",
+      "what": "Google's announcement says: \"We're renaming NotebookLM to Gemini Notebook. It's the same standalone product, now doing more across the Google ecosystem and updated with a secure cloud computer.\" The product whose whole premise is answering only from the documents you gave it is still the plainest consumer example of level 2.",
+      "technique": "rag",
+      "registry_id": "gemini-notebook",
+      "source": {
+        "title": "NotebookLM is now Gemini Notebook",
+        "url": "https://blog.google/innovation-and-ai/products/gemini-notebook/notebooklm-gemini-notebook/",
+        "publisher": "Google"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "ai-chains-paper-2021",
+      "date": "2021-10-04",
+      "precision": "day",
+      "level": 3,
+      "kind": "research",
+      "title": "AI Chains",
+      "maker": "Wu, Terry and Cai",
+      "what": "The paper proposes \"Chaining LLM steps together, where the output of one step becomes the input for the next, thus aggregating the gains per step\", and is titled for what that buys: transparent and controllable human-AI interaction, because the intermediate results exist as steps a person can see.",
+      "technique": "prompt-chaining",
+      "source": {
+        "title": "AI Chains: Transparent and Controllable Human-AI Interaction by Chaining Large Language Model Prompts",
+        "url": "https://arxiv.org/abs/2110.01691",
+        "publisher": "arXiv (v1, 4 October 2021)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "langchain-release-2022",
+      "date": "2022-10-25",
+      "precision": "day",
+      "level": 3,
+      "kind": "tool",
+      "title": "LangChain",
+      "maker": "Harrison Chase",
+      "what": "PyPI's release history for the langchain package shows version 0.0.1 uploaded on 25 October 2022, with 0.0.2 the next day: the library a developer could install instead of writing chaining and model-swapping plumbing themselves.",
+      "technique": "prompt-chaining",
+      "registry_id": "langchain",
+      "source": {
+        "title": "langchain release history",
+        "url": "https://pypi.org/project/langchain/#history",
+        "publisher": "Python Package Index"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "zapier-openai-2022",
+      "date": "2022-12-09",
+      "precision": "day",
+      "level": 3,
+      "kind": "product",
+      "title": "OpenAI steps in Zapier",
+      "maker": "Zapier",
+      "what": "Zapier's own OpenAI integration page offers an action that “Sends a prompt to OpenAI and generate a response” inside a multi-step Zap, and says “Zapier lets you connect OpenAI with thousands of the most popular apps, so you can automate your work and have more time for what matters most—no code required.” The flow decides what runs next; one of its steps calls a model. The page carries no launch date, so the date marked here is the earliest capture of it this site could read — the feature was live by then, and may well have shipped earlier.",
+      "technique": "prompt-chaining",
+      "registry_id": "zapier",
+      "source": {
+        "title": "OpenAI Integrations",
+        "url": "https://zapier.com/apps/openai/integrations",
+        "archive_url": "https://web.archive.org/web/20221209043525id_/https://zapier.com/apps/openai/integrations",
+        "publisher": "Zapier"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "general",
+      "note": "9 December 2022 is the date of the earliest Internet Archive capture of this page, not a date Zapier states. The page describes the app as “OpenAI integration for GPT-3 or DALL-E”. Zapier's earlier AI by Zapier beta (announced 5 January 2021) was invite-only, so it is not used here."
+    },
+    {
+      "id": "m365-copilot-2023",
+      "short": "Microsoft 365 Copilot",
+      "date": "2023-03-16",
+      "precision": "day",
+      "level": 3,
+      "kind": "product",
+      "title": "Microsoft 365 Copilot unveiled",
+      "maker": "Microsoft",
+      "what": "Microsoft's announcement says Copilot \"is more than OpenAI’s ChatGPT embedded into Microsoft 365. It’s a sophisticated processing and orchestration engine working behind the scenes to combine the power of LLMs, including GPT-4, with the Microsoft 365 apps and your business data in the Microsoft Graph\". Software runs the steps (fetch the person's files and mail, build the prompt, call the model, check the result, write into Word or Outlook) and the model fills them in. Shown that day: a first draft in Word from your own files, a deck in PowerPoint from a document, trend analysis in Excel, thread summaries and draft replies in Outlook, and live meeting summaries in Teams.",
+      "technique": "prompt-chaining",
+      "registry_id": "m365-copilot",
+      "source": {
+        "title": "Introducing Microsoft 365 Copilot – your copilot for work",
+        "url": "https://blogs.microsoft.com/blog/2023/03/16/introducing-microsoft-365-copilot-your-copilot-for-work/",
+        "publisher": "Microsoft"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "preview",
+      "opened": {
+        "date": "2023-11-01",
+        "precision": "day",
+        "text": "on sale to enterprise customers",
+        "milestone": "m365-copilot-ga-2023"
+      },
+      "note": "An unveiling, not a release. Microsoft's companion post of the same day says \"We are currently testing Copilot for Microsoft 365 with 20 customers, including 8 in Fortune 500 enterprises.\" Nobody could buy it for another seven and a half months. It is marked because it is the product through which most people first met a model working inside fixed, software-run steps; Zapier's OpenAI step (live by 9 December 2022) was usable earlier and is listed as a candidate."
+    },
+    {
+      "id": "m365-copilot-ga-2023",
+      "date": "2023-11-01",
+      "precision": "day",
+      "level": 3,
+      "kind": "product",
+      "title": "Microsoft 365 Copilot on sale",
+      "maker": "Microsoft",
+      "what": "Microsoft's post of 1 November 2023 opens: \"Starting today, Microsoft 365 Copilot is generally available for enterprise customers worldwide.\"",
+      "technique": "prompt-chaining",
+      "registry_id": "m365-copilot",
+      "source": {
+        "title": "Microsoft 365 Copilot is generally available",
+        "url": "https://techcommunity.microsoft.com/blog/microsoft365copilotblog/microsoft-365-copilot-is-generally-available/3969331",
+        "publisher": "Microsoft"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "paid plans"
+    },
+    {
+      "id": "semantic-router-2023",
+      "date": "2023-11-09",
+      "precision": "day",
+      "level": 3,
+      "kind": "tool",
+      "title": "Semantic Router",
+      "maker": "Aurelio Labs",
+      "what": "PyPI shows version 0.0.1 of semantic-router uploaded on 9 November 2023. Its project page calls it \"a superfast decision-making layer for your LLMs and agents\" that routes requests \"using semantic meaning\" rather than waiting on a model's generation: code picks the branch.",
+      "technique": "routing",
+      "registry_id": "semantic-router",
+      "source": {
+        "title": "semantic-router release history",
+        "url": "https://pypi.org/project/semantic-router/#history",
+        "publisher": "Python Package Index"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "power-automate-gpt-prompts-2023",
+      "date": "2023-12-19",
+      "precision": "day",
+      "level": 3,
+      "kind": "product",
+      "title": "AI Builder GPT Prompts in Power Automate",
+      "maker": "Microsoft",
+      "what": "Microsoft's Power Platform blog says \"GPT Prompts with Prompt Builder, a new feature of AI Builder, is now generally available!\" and that it lets a person \"add content processing and content generation capabilities to Power Automate\". An ordinary customer drops a model call into a flow whose next step is still chosen by the flow, not the model.",
+      "technique": "prompt-chaining",
+      "registry_id": "power-automate",
+      "source": {
+        "title": "AI Builder GPT Prompts are generally available",
+        "url": "https://www.microsoft.com/en-us/power-platform/blog/power-automate/ai-builder-gpt-prompts-are-generally-available/",
+        "publisher": "Microsoft"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "general"
+    },
+    {
+      "id": "langgraph-launch-2024",
+      "date": "2024-01-17",
+      "precision": "day",
+      "level": 3,
+      "kind": "tool",
+      "title": "LangGraph",
+      "maker": "LangChain",
+      "what": "LangChain's launch post says \"LangGraph is module built on top of LangChain to better enable creation of cyclical graphs, often needed for agent runtimes\", and that until then \"we've lacked a method for easily introducing cycles into these chains.\" A developer describes the application as a state machine of nodes and edges.",
+      "technique": "workflow-graphs",
+      "registry_id": "langgraph",
+      "source": {
+        "title": "LangGraph",
+        "url": "https://www.langchain.com/blog/langgraph",
+        "publisher": "LangChain"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "openai-batch-api-2024",
+      "date": "2024-04-15",
+      "precision": "day",
+      "level": 3,
+      "kind": "tool",
+      "title": "Batch API",
+      "maker": "OpenAI",
+      "what": "OpenAI's API changelog records the Batch API's release on 15 April 2024. Sending a set of independent requests together, and collecting them when they finish, is the parallel-calls pattern offered as a product feature rather than assembled by hand.",
+      "technique": "parallelization",
+      "registry_id": "openai-batch-api",
+      "source": {
+        "title": "Changelog",
+        "url": "https://developers.openai.com/api/docs/changelog",
+        "publisher": "OpenAI (API documentation)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "langgraph-interrupt-2024",
+      "date": "2024-12-14",
+      "precision": "day",
+      "level": 3,
+      "kind": "tool",
+      "title": "interrupt: human approval in LangGraph",
+      "maker": "LangChain",
+      "what": "LangChain's post introduces interrupt, which will \"pause execution of the graph, mark the thread you are running as interrupted, and put whatever you passed as an input to interrupt into the persistence layer.\" The pattern it names first: \"Pause the graph before a critical step, such as an API call, to review and approve the action. If the action is rejected, you can prevent the graph from executing the step\".",
+      "technique": "human-in-the-loop",
+      "registry_id": "langgraph",
+      "source": {
+        "title": "Making it easier to build human-in-the-loop agents with interrupt",
+        "url": "https://www.langchain.com/blog/making-it-easier-to-build-human-in-the-loop-agents-with-interrupt",
+        "publisher": "LangChain"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "building-effective-agents-2024",
+      "date": "2024-12-19",
+      "precision": "day",
+      "level": 3,
+      "kind": "research",
+      "title": "Building Effective Agents",
+      "maker": "Anthropic",
+      "what": "Anthropic's engineering post names and diagrams five workflow patterns — prompt chaining, routing, parallelization, orchestrator-workers and evaluator-optimizer — and advises: \"Start with simple prompts, optimize them with comprehensive evaluation, and add multi-step agentic systems only when simpler solutions fall short.\"",
+      "technique": "evaluator-optimizer",
+      "source": {
+        "title": "Building Effective AI Agents",
+        "url": "https://www.anthropic.com/engineering/building-effective-agents",
+        "publisher": "Anthropic"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "flowise-sunset-2026",
+      "date": "2026-08-10",
+      "precision": "day",
+      "level": 3,
+      "kind": "tool",
+      "title": "Flowise sunset",
+      "maker": "Flowise",
+      "what": "Flowise's sunset notice says \"we've decided to wind down our operations for Flowise\", with a feature freeze on 29 July 2026 and the repository archived on 10 August 2026, adding that \"Flowise source code will still remain on Github and the Apache 2.0 licensed code is yours to keep building on.\" A visual workflow builder closing while the pattern it built stayed in use.",
+      "technique": "workflow-graphs",
+      "registry_id": "flowise",
+      "source": {
+        "title": "Flowise sunset",
+        "url": "https://flowiseai.com/sunset",
+        "publisher": "Flowise"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "mrkl-paper-2022",
+      "date": "2022-05-01",
+      "precision": "day",
+      "level": 4,
+      "kind": "research",
+      "title": "MRKL Systems",
+      "maker": "Karpas et al., AI21 Labs",
+      "what": "The paper describes a language model surrounded by tools (a calculator, a currency converter, a database call) and \"a router that routes every incoming natural language input to a module that can best respond to the input\". The router is itself a small neural network. A model chooses the tool and code runs it: the whole paper is about that one idea, nine months before Toolformer.",
+      "technique": "function-calling",
+      "source": {
+        "title": "MRKL Systems: A modular, neuro-symbolic architecture that combines large language models, external knowledge sources and discrete reasoning",
+        "url": "https://arxiv.org/abs/2205.00445",
+        "publisher": "arXiv (v1, 1 May 2022)"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "Earlier papers contain the idea without being about it. WebGPT (arXiv v1, 17 December 2021) has a model issuing search and click commands, but in a loop it ends itself, which is level 5. LaMDA (arXiv v1, 20 January 2022) routes some outputs to a calculator, a translator and a search system as one section of a dialogue paper."
+    },
+    {
+      "id": "toolformer-paper-2023",
+      "date": "2023-02-09",
+      "precision": "day",
+      "level": 4,
+      "kind": "research",
+      "title": "Toolformer",
+      "maker": "Schick et al., Meta AI",
+      "what": "The paper describes a model trained in a self-supervised way, from a handful of examples per API, to \"decide which APIs to call, when to call them, what arguments to pass, and how to best incorporate the results into future token prediction\" — the model choosing the action, not code choosing it for the model.",
+      "technique": "function-calling",
+      "source": {
+        "title": "Toolformer: Language Models Can Teach Themselves to Use Tools",
+        "url": "https://arxiv.org/abs/2302.04761",
+        "publisher": "arXiv (v1, 9 February 2023)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "chatgpt-plugins-2023",
+      "date": "2023-03-23",
+      "precision": "day",
+      "level": 4,
+      "kind": "product",
+      "title": "ChatGPT plugins",
+      "maker": "OpenAI",
+      "what": "OpenAI's post of March 23, 2023 says “We’ve implemented initial support for plugins in ChatGPT”, tools that “help ChatGPT access up-to-date information, run computations, or use third-party services”, and that “we're also hosting two plugins ourselves, a web browser and code interpreter”. The model picks which plugin to call mid-conversation. This was an invitation: “Today, we will begin extending plugin alpha access to users and developers from our waitlist.”",
+      "technique": "code-execution",
+      "source": {
+        "title": "ChatGPT plugins",
+        "url": "https://openai.com/blog/chatgpt-plugins",
+        "publisher": "OpenAI",
+        "archive_url": "https://web.archive.org/web/20230401220923id_/https://openai.com/blog/chatgpt-plugins"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "openai.com returns 403 to this site's fetcher; the Internet Archive's capture of 1 April 2023 shows the date and the wording quoted here. Alpha access from a waitlist, so this is not the level's availability date; the beta that began rolling out to ChatGPT Plus subscribers seven weeks later is.",
+      "availability": "waitlist",
+      "short": "ChatGPT plugins",
+      "opened": {
+        "date": "2023-05-12",
+        "precision": "day",
+        "text": "rollout to Plus subscribers begins",
+        "milestone": "chatgpt-plugins-beta-2023"
+      }
+    },
+    {
+      "id": "chatgpt-plugins-beta-2023",
+      "date": "2023-05-12",
+      "precision": "day",
+      "level": 4,
+      "kind": "product",
+      "title": "ChatGPT plugins open to Plus subscribers",
+      "maker": "OpenAI",
+      "what": "OpenAI's ChatGPT release notes carry an entry headed “Web browsing and Plugins are now rolling out in beta (May 12)”, which says “If you are a ChatGPT Plus user, enjoy early access to experimental new features” through a beta panel “which is rolling out to all Plus users over the course of the next week”, and describes plugins as “a new version of ChatGPT that knows when and how to use third-party plugins that you enable”. No waitlist and no invitation: a subscription was enough.",
+      "technique": "function-calling",
+      "registry_id": "chatgpt",
+      "source": {
+        "title": "ChatGPT — Release Notes",
+        "url": "https://help.openai.com/en/articles/6825453-chatgpt-release-notes",
+        "archive_url": "https://web.archive.org/web/20230615205435id_/https://help.openai.com/en/articles/6825453-chatgpt-release-notes",
+        "publisher": "OpenAI (help centre)"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "paid plans",
+      "note": "help.openai.com returns 403 to this site's fetcher; the Internet Archive's capture of 15 June 2023 shows the dated entry quoted here. The date is OpenAI's own “May 12” heading; the rollout to all Plus users took the following week, so not every subscriber had it on the 12th. The same entry shipped web browsing, which OpenAI's March 2023 post shows searching, clicking and reading in a loop until it prints “Finished browsing”: that half behaves like level 5. The plugins half, one model-chosen call that code runs, is what this level marks."
+    },
+    {
+      "id": "openai-function-calling-2023",
+      "date": "2023-06-13",
+      "precision": "day",
+      "level": 4,
+      "kind": "tool",
+      "title": "Function calling",
+      "maker": "OpenAI",
+      "what": "OpenAI's post of June 13, 2023 says “Developers can now describe functions to gpt-4-0613 and gpt-3.5-turbo-0613, and have the model intelligently choose to output a JSON object containing arguments to call those functions”, through “new API parameters in our /v1/chat/completions endpoint, functions and function_call”. The model chooses the call; the developer's code makes it.",
+      "technique": "function-calling",
+      "registry_id": "openai-api",
+      "source": {
+        "title": "Function calling and other API updates",
+        "url": "https://openai.com/blog/function-calling-and-other-api-updates",
+        "publisher": "OpenAI",
+        "archive_url": "https://web.archive.org/web/20230621010946id_/https://openai.com/blog/function-calling-and-other-api-updates"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "openai.com returns 403 to this site's fetcher and OpenAI's public API changelog does not go back before 2024; the Internet Archive's capture of 21 June 2023 shows the date and the wording quoted here."
+    },
+    {
+      "id": "bard-extensions-2023",
+      "date": "2023-09-19",
+      "precision": "day",
+      "level": 4,
+      "kind": "product",
+      "title": "Bard Extensions",
+      "maker": "Google",
+      "what": "Google's announcement says Extensions let Bard \"find and show you relevant information from the Google tools you use every day — like Gmail, Docs, Drive, Google Maps, YouTube, and Google Flights and hotels — even when the information you need is across multiple apps and services.\" The model decides which of those to reach for mid-conversation; Google's code makes the call. The product is now Gemini's connected apps.",
+      "technique": "function-calling",
+      "registry_id": "gemini-apps",
+      "source": {
+        "title": "Google Bard September update: App extensions and new features",
+        "url": "https://blog.google/products-and-platforms/products/gemini/google-bard-new-features-update-sept-2023/",
+        "publisher": "Google"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "general"
+    },
+    {
+      "id": "computer-use-2024",
+      "date": "2024-10-22",
+      "precision": "day",
+      "level": 4,
+      "kind": "tool",
+      "title": "Computer use",
+      "maker": "Anthropic",
+      "what": "Anthropic's announcement describes Claude working a computer \"by looking at a screen, moving a cursor, clicking buttons, and typing text\", and says of the capability: \"At this stage, it is still experimental—at times cumbersome and error-prone.\" It adds that \"we encourage developers to begin exploration with low-risk tasks.\"",
+      "technique": "computer-use",
+      "registry_id": "claude-computer-use",
+      "source": {
+        "title": "Introducing computer use, a new Claude 3.5 Sonnet, and Claude 3.5 Haiku",
+        "url": "https://www.anthropic.com/news/3-5-models-and-computer-use",
+        "publisher": "Anthropic"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "claude-analysis-tool-2024",
+      "date": "2024-10-24",
+      "precision": "day",
+      "level": 4,
+      "kind": "product",
+      "title": "Claude analysis tool",
+      "maker": "Anthropic",
+      "what": "Anthropic's announcement describes a tool that lets Claude \"write and run JavaScript code directly in Claude.ai\" to \"process data, conduct analysis, and produce real-time insights\", available to \"all Claude.ai users in feature preview\" — code execution reaching people who write none.",
+      "technique": "code-execution",
+      "registry_id": "claude-app",
+      "source": {
+        "title": "Introducing the analysis tool in Claude.ai",
+        "url": "https://claude.com/blog/analysis-tool",
+        "publisher": "Anthropic"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "mcp-launch-2024",
+      "date": "2024-11-25",
+      "precision": "day",
+      "level": 4,
+      "kind": "standard",
+      "title": "Model Context Protocol",
+      "maker": "Anthropic",
+      "what": "Anthropic's announcement says \"The Model Context Protocol is an open standard that enables developers to build secure, two-way connections between their data sources and AI-powered tools\", and that it provides \"a universal, open standard for connecting AI systems with data sources, replacing fragmented integrations with a single protocol.\"",
+      "technique": "mcp",
+      "registry_id": "mcp-protocol",
+      "source": {
+        "title": "Introducing the Model Context Protocol",
+        "url": "https://www.anthropic.com/news/model-context-protocol",
+        "publisher": "Anthropic"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "openai-responses-api-2025",
+      "date": "2025-03-11",
+      "precision": "day",
+      "level": 4,
+      "kind": "tool",
+      "title": "Responses API",
+      "maker": "OpenAI",
+      "what": "OpenAI's API changelog for 11 March 2025 records \"the Responses API, a new API for creating and using agents and tools\" and, the same day, \"a set of built-in tools\" for it: web search, file search and computer use. Remote MCP servers and a code interpreter were added on 20 May 2025.",
+      "technique": "computer-use",
+      "registry_id": "openai-api",
+      "source": {
+        "title": "Changelog",
+        "url": "https://developers.openai.com/api/docs/changelog",
+        "publisher": "OpenAI (API documentation)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "react-paper-2022",
+      "date": "2022-10-06",
+      "precision": "day",
+      "level": 5,
+      "kind": "research",
+      "title": "ReAct",
+      "maker": "Yao et al., Princeton University and Google Research",
+      "what": "The paper interleaves reasoning traces with actions, so that \"reasoning traces help the model induce, track, and update action plans as well as handle exceptions, while actions allow it to interface with external sources, such as knowledge bases or environments, to gather additional information.\" The model reads each result and picks the next move, which is what makes the loop the model's rather than the code's.",
+      "technique": "single-agent",
+      "source": {
+        "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+        "url": "https://arxiv.org/abs/2210.03629",
+        "publisher": "arXiv (v1, 6 October 2022)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "autogpt-2023",
+      "date": "2023-03-16",
+      "precision": "day",
+      "level": 5,
+      "kind": "tool",
+      "title": "AutoGPT",
+      "maker": "Significant Gravitas",
+      "what": "GitHub's record of the Significant-Gravitas/AutoGPT repository gives a creation date of 16 March 2023. The project describes itself as \"The open-source platform for AI agents\" and says it \"lets you build, deploy, and run AI agents that carry out complete workflows\": a goal-seeking loop a developer could run instead of writing one.",
+      "technique": "single-agent",
+      "source": {
+        "title": "Significant-Gravitas/AutoGPT (repository metadata)",
+        "url": "https://api.github.com/repos/Significant-Gravitas/AutoGPT",
+        "publisher": "GitHub"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "The repository's web page does not show a creation date; GitHub's repository metadata endpoint, opened on 2026-09-18, gives created_at 2023-03-16T09:21:07Z. The README quoted here is today's, not the one published in 2023."
+    },
+    {
+      "id": "agentgpt-2023",
+      "date": "2023-04-09",
+      "precision": "day",
+      "level": 5,
+      "kind": "product",
+      "title": "AgentGPT",
+      "maker": "Reworkd",
+      "what": "A free web page, live by 9 April 2023: \"Assemble, configure, and deploy autonomous AI Agents in your browser. Create an agent by adding a name / goal, and hitting deploy!\" It wrote itself a task list, worked through it and added tasks from the results. Part of the AutoGPT wave of spring 2023, which put a looping agent in front of anyone with a browser, and which few people remember as a product.",
+      "technique": "single-agent",
+      "source": {
+        "title": "AgentGPT",
+        "url": "https://agentgpt.reworkd.ai/",
+        "archive_url": "https://web.archive.org/web/20230409020456id_/https://agentgpt.reworkd.ai/",
+        "publisher": "Reworkd"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "general",
+      "note": "A live-by date: 9 April 2023 is the Internet Archive's first capture of the page, and the project's repository was created two days earlier. By the capture of 14 April the page asked for the visitor's own OpenAI key."
+    },
+    {
+      "id": "devin-2024",
+      "date": "2024-03-12",
+      "precision": "day",
+      "level": 5,
+      "kind": "product",
+      "title": "Devin",
+      "maker": "Cognition",
+      "what": "Cognition's announcement, headed \"Introducing Devin, the first AI software engineer\", says it equipped Devin \"with common developer tools including the shell, code editor, and browser within a sandboxed compute environment—everything a human would need to do their work.\" On this date it was not something a customer could buy: \"Devin is currently in early access as we ramp up capacity.\"",
+      "technique": "coding-agents",
+      "registry_id": "devin",
+      "source": {
+        "title": "Introducing Devin, the first AI software engineer",
+        "url": "https://cognition.com/blog/introducing-devin",
+        "publisher": "Cognition"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "waitlist"
+    },
+    {
+      "id": "replit-agent-2024",
+      "date": "2024-09-05",
+      "precision": "day",
+      "level": 5,
+      "kind": "product",
+      "title": "Replit Agent",
+      "maker": "Replit",
+      "what": "Replit's post says “Last week, we launched Replit Agent, our AI system that can create and deploy applications”, and that “It configures your development environment, installs dependencies, and executes code” — the model choosing each next step and stopping when the app runs. Replit adds: “The agent is available today in early access to all Replit Core subscribers” and “it should be treated as ‘alpha’ software.” A subscription, not an invitation.",
+      "technique": "coding-agents",
+      "registry_id": "replit-agent",
+      "source": {
+        "title": "Introducing Replit Agent",
+        "url": "https://blog.replit.com/introducing-replit-agent",
+        "archive_url": "https://web.archive.org/web/20240917121035id_/https://blog.replit.com/introducing-replit-agent",
+        "publisher": "Replit"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "paid plans",
+      "note": "Replit's post is dated Mon, Sep 16, 2024 and says the launch was “last week”, so 16 September is not the launch date. The date marked is 5 September 2024: that day Replit's chief executive posted “Announcing Replit Agent in early access—available today for subscribers”, and the Internet Archive stored the post's own data, with created_at 2024-09-05T16:27:35Z, eight minutes later (https://web.archive.org/web/20240905162735id_/https://twitter.com/amasad/status/1831730911685308857). The post is quoted for what the product did; the date comes from the launch-day statement. Earlier, rougher products at this level exist (AgentGPT, live by 9 April 2023) and are under review."
+    },
+    {
+      "id": "openai-realtime-api-2024",
+      "date": "2024-10-01",
+      "precision": "day",
+      "level": 5,
+      "kind": "tool",
+      "title": "Realtime API",
+      "maker": "OpenAI",
+      "what": "OpenAI's API changelog entry for 1 October 2024 reads: \"Realtime API: Build fast speech-to-speech experiences into your applications using a WebSockets interface.\" The same changelog records it becoming generally available on 28 August 2025.",
+      "technique": "voice-agents",
+      "registry_id": "openai-realtime",
+      "source": {
+        "title": "Changelog",
+        "url": "https://developers.openai.com/api/docs/changelog",
+        "publisher": "OpenAI (API documentation)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "devin-ga-2024",
+      "date": "2024-12-10",
+      "precision": "day",
+      "level": 5,
+      "kind": "product",
+      "title": "Devin, generally available",
+      "maker": "Cognition",
+      "what": "Cognition's post of December 10, 2024, headed “Devin is now generally available”, says “Today we’re making Devin generally available starting at $500 a month for engineering teams”. The nine months between this and Devin's announcement are the gap between a demonstration and something a customer could buy.",
+      "technique": "coding-agents",
+      "registry_id": "devin",
+      "source": {
+        "title": "Devin is now generally available",
+        "url": "https://www.cognition.ai/blog/devin-generally-available",
+        "archive_url": "https://web.archive.org/web/20241212002718id_/https://www.cognition.ai/blog/devin-generally-available",
+        "publisher": "Cognition"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "general"
+    },
+    {
+      "id": "gemini-deep-research-2024",
+      "date": "2024-12-11",
+      "precision": "day",
+      "level": 5,
+      "kind": "product",
+      "title": "Deep Research in Gemini",
+      "maker": "Google",
+      "what": "Google's announcement says Deep Research creates \"a multi-step research plan for you to either revise or approve\", then works \"browsing the web the way you do: searching, finding interesting pieces of information and then starting a new search based on what it's learned\", ending in \"a comprehensive report of the key findings\". It launched that day on desktop and mobile web for Gemini Advanced subscribers.",
+      "technique": "agentic-rag",
+      "registry_id": "gemini-deep-research",
+      "source": {
+        "title": "Try Deep Research and our new experimental model in Gemini, your AI assistant",
+        "url": "https://blog.google/products/gemini/google-gemini-deep-research/",
+        "publisher": "Google"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "paid plans"
+    },
+    {
+      "id": "operator-2025",
+      "short": "OpenAI Operator",
+      "date": "2025-01-23",
+      "precision": "day",
+      "level": 5,
+      "kind": "product",
+      "title": "Operator",
+      "maker": "OpenAI",
+      "what": "OpenAI's post introduces \"A research preview of an agent that can use its own browser to perform tasks for you.\" The person describes a task; the model looks at screenshots of a browser running in the cloud and clicks and types until the job is done. It hands back when it should: \"Operator is trained to proactively ask the user to take over for tasks that require login, payment details, or when solving CAPTCHAs.\" The post says \"Available to Pro users in the U.S.\"",
+      "technique": "computer-use",
+      "source": {
+        "title": "Introducing Operator",
+        "url": "https://openai.com/index/introducing-operator/",
+        "archive_url": "https://web.archive.org/web/20250123210058id_/https://openai.com/index/introducing-operator/",
+        "publisher": "OpenAI"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "paid plans",
+      "note": "openai.com returns 403 to this site's fetcher; the Internet Archive captured the post on the day it was published, dated January 23, 2025. A research preview on the $200-a-month Pro plan in the United States only: open to anyone who paid, no invitation."
+    },
+    {
+      "id": "chatgpt-deep-research-2025",
+      "date": "2025-02-02",
+      "precision": "day",
+      "level": 5,
+      "kind": "product",
+      "title": "ChatGPT deep research",
+      "maker": "OpenAI",
+      "what": "OpenAI's post of February 2, 2025 describes deep research as “An agent that uses reasoning to synthesize large amounts of online information and complete multi-step research tasks for you”, which “conducts multi-step research on the internet for complex tasks” and returns a report with citations. The same page says: “Available to Pro users today, Plus and Team next.”",
+      "technique": "agentic-rag",
+      "registry_id": "chatgpt-deep-research",
+      "source": {
+        "title": "Introducing deep research",
+        "url": "https://openai.com/index/introducing-deep-research/",
+        "publisher": "OpenAI",
+        "archive_url": "https://web.archive.org/web/20250203220621id_/https://openai.com/index/introducing-deep-research/"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "openai.com returns 403 to this site's fetcher; the Internet Archive's capture of 3 February 2025 shows the date and the wording quoted here.",
+      "availability": "paid plans"
+    },
+    {
+      "id": "claude-code-2025",
+      "date": "2025-02-24",
+      "precision": "day",
+      "level": 5,
+      "kind": "product",
+      "title": "Claude Code",
+      "maker": "Anthropic",
+      "what": "Anthropic's announcement says Claude Code, released \"as a limited research preview\" alongside Claude 3.7 Sonnet, \"enables developers to delegate substantial engineering tasks to Claude directly from their terminal\", describing it as \"an active collaborator that can search and read code, edit files, write and run tests, commit and push code to GitHub, and use command line tools\".",
+      "technique": "coding-agents",
+      "registry_id": "claude-code",
+      "source": {
+        "title": "Claude 3.7 Sonnet and Claude Code",
+        "url": "https://www.anthropic.com/news/claude-3-7-sonnet",
+        "publisher": "Anthropic"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "claude-research-2025",
+      "date": "2025-04-15",
+      "precision": "day",
+      "level": 5,
+      "kind": "product",
+      "title": "Claude Research",
+      "maker": "Anthropic",
+      "what": "Anthropic's announcement says Claude \"operates agentically, conducting multiple searches that build on each other while determining exactly what to investigate next\", across \"both your internal work context and the web\". It launched \"in early beta for Max, Team, and Enterprise plans in the United States, Japan, and Brazil.\"",
+      "technique": "agentic-rag",
+      "registry_id": "claude-research",
+      "source": {
+        "title": "Claude takes research to new places",
+        "url": "https://claude.com/blog/research",
+        "publisher": "Anthropic"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "preview"
+    },
+    {
+      "id": "chatgpt-agent-2025",
+      "date": "2025-07-17",
+      "precision": "day",
+      "level": 5,
+      "kind": "product",
+      "title": "ChatGPT agent",
+      "maker": "OpenAI",
+      "what": "OpenAI's post of July 17, 2025 says “ChatGPT can now do work for you using its own computer, handling complex tasks from start to finish”, with “a visual browser that interacts with the web through a graphical-user interface, a text-based browser for simpler reasoning-based web queries, a terminal, and direct API access”, and that “Starting today, Pro, Plus, and Team users can activate ChatGPT’s new agentic capabilities”. The person still starts every task, which is what keeps this at level 5 rather than level 7.",
+      "technique": "computer-use",
+      "registry_id": "chatgpt",
+      "source": {
+        "title": "Introducing ChatGPT agent: bridging research and action",
+        "url": "https://openai.com/index/introducing-chatgpt-agent/",
+        "archive_url": "https://web.archive.org/web/20250718155537id_/https://openai.com/index/introducing-chatgpt-agent/",
+        "publisher": "OpenAI"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "paid plans",
+      "note": "openai.com returns 403 to this site's fetcher; the Internet Archive's capture of 18 July 2025 shows the date and the wording quoted here."
+    },
+    {
+      "id": "agent-skills-2025",
+      "date": "2025-10-16",
+      "precision": "day",
+      "level": 5,
+      "kind": "standard",
+      "title": "Agent Skills",
+      "maker": "Anthropic",
+      "what": "Anthropic's announcement says \"Skills are folders that include instructions, scripts, and resources that Claude can load when needed\", and that \"Claude will only access a skill when it's relevant to the task at hand\" — the agent deciding which of its own instructions to read.",
+      "technique": "skills",
+      "registry_id": "agent-skills",
+      "source": {
+        "title": "Introducing Agent Skills",
+        "url": "https://claude.com/blog/skills",
+        "publisher": "Anthropic"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "antigravity-cli-2026",
+      "date": "2026-05-19",
+      "precision": "day",
+      "level": 5,
+      "kind": "product",
+      "title": "Gemini CLI becomes Antigravity CLI",
+      "maker": "Google",
+      "what": "Google's post says \"we're unifying our efforts into Google Antigravity, our premier agent-first development platform\", and that \"On June 18, 2026, Gemini CLI and Gemini Code Assist IDE extensions will stop serving requests for Google AI Pro and Ultra, as well as those using it free of charge using Gemini Code Assist for individuals.\" Enterprise licences keep Gemini CLI.",
+      "technique": "coding-agents",
+      "registry_id": "gemini-cli",
+      "source": {
+        "title": "An important update: transitioning Gemini CLI to Antigravity CLI",
+        "url": "https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/",
+        "publisher": "Google Developers Blog"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "camel-paper-2023",
+      "date": "2023-03-31",
+      "precision": "day",
+      "level": 6,
+      "kind": "research",
+      "title": "CAMEL",
+      "maker": "Li, Hammoud, Itani, Khizbullin and Ghanem",
+      "what": "Two model agents, one given the role of the person with a task and one the role of the assistant, work the task out between them with no human in the conversation. The abstract proposes \"a novel communicative agent framework named role-playing\" and reports \"comprehensive studies on instruction-following cooperation in multi-agent settings.\" Eight weeks before the multi-agent debate paper.",
+      "technique": "agent-graphs",
+      "source": {
+        "title": "CAMEL: Communicative Agents for \"Mind\" Exploration of Large Language Model Society",
+        "url": "https://arxiv.org/abs/2303.17760",
+        "publisher": "arXiv (v1, 31 March 2023)"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "HuggingGPT (arXiv v1, 30 March 2023) is a day earlier, but the models its controller calls are single-purpose ones used once each, which is tool use, not a team of agents."
+    },
+    {
+      "id": "multiagent-debate-paper-2023",
+      "date": "2023-05-23",
+      "precision": "day",
+      "level": 6,
+      "kind": "research",
+      "title": "Improving Factuality and Reasoning in Language Models through Multiagent Debate",
+      "maker": "Du et al., MIT and Google Brain",
+      "what": "The paper has \"multiple language model instances propose and debate their individual responses and reasoning processes over multiple rounds to arrive at a common final answer\", and reports that this \"improves the factual validity of generated content, reducing fallacious answers and hallucinations that contemporary models are prone to\".",
+      "technique": "debate-review",
+      "source": {
+        "title": "Improving Factuality and Reasoning in Language Models through Multiagent Debate",
+        "url": "https://arxiv.org/abs/2305.14325",
+        "publisher": "arXiv (v1, 23 May 2023)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "autogen-release-2023",
+      "date": "2023-08-18",
+      "precision": "day",
+      "level": 6,
+      "kind": "tool",
+      "title": "AutoGen",
+      "maker": "Microsoft",
+      "what": "GitHub's record of the microsoft/autogen repository gives a creation date of 18 August 2023; the first pyautogen release reached PyPI a week later, on 25 August 2023. The README calls it \"a framework for creating multi-agent AI applications that can act autonomously or work alongside humans\".",
+      "technique": "orchestrator-workers",
+      "registry_id": "autogen",
+      "source": {
+        "title": "microsoft/autogen (repository metadata)",
+        "url": "https://api.github.com/repos/microsoft/autogen",
+        "publisher": "GitHub"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "The repository's web page shows no creation date; GitHub's metadata endpoint, opened on 2026-09-18, gives created_at 2023-08-18T11:43:45Z. The PyPI date comes from pypi.org/project/pyautogen/#history. The README quoted is today's."
+    },
+    {
+      "id": "genspark-2024",
+      "date": "2024-06-18",
+      "precision": "day",
+      "level": 6,
+      "kind": "product",
+      "title": "Genspark",
+      "maker": "Genspark",
+      "what": "A search product that builds a page of results for each question. Its launch post, dated Jun 18, 2024, describes a \"multi-agent framework\" and a \"team of specialized AI agents\". It is the earliest product this site found whose own launch page says several agents share one job, ten months before Claude Research. The post never says how the agents divide the work.",
+      "technique": "orchestrator-workers",
+      "source": {
+        "title": "Introducing Genspark",
+        "url": "https://www.genspark.ai/blog/genspark-intro",
+        "publisher": "Genspark"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "a2a-protocol-2025",
+      "date": "2025-04-09",
+      "precision": "day",
+      "level": 6,
+      "kind": "standard",
+      "title": "Agent2Agent Protocol",
+      "maker": "Google",
+      "what": "Google's announcement says \"The A2A protocol will allow AI agents to communicate with each other, securely exchange information, and coordinate actions on top of various enterprise platforms or applications\", and says more than 50 technology partners contributed to it.",
+      "technique": "agent-graphs",
+      "registry_id": "a2a",
+      "source": {
+        "title": "Announcing the Agent2Agent Protocol (A2A)",
+        "url": "https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/",
+        "publisher": "Google Developers Blog"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "claude-research-launch-2025",
+      "short": "Claude Research",
+      "date": "2025-04-15",
+      "precision": "day",
+      "level": 6,
+      "kind": "product",
+      "title": "Claude Research reaches customers",
+      "maker": "Anthropic",
+      "what": "Anthropic's launch post of April 15, 2025 says Claude “operates agentically, conducting multiple searches that build on each other while determining exactly what to investigate next”, and that “Research is now available in early beta for Max, Team, and Enterprise plans in the United States, Japan, and Brazil.” Anthropic's engineering post two months later says of the same feature: “Our Research system uses a multi-agent architecture with an orchestrator-worker pattern, where a lead agent coordinates the process while delegating to specialized subagents that operate in parallel.” The launch post itself does not say several agents run on one request.",
+      "technique": "orchestrator-workers",
+      "registry_id": "claude-research",
+      "source": {
+        "title": "Claude takes research to new places",
+        "url": "https://claude.com/blog/research",
+        "publisher": "Anthropic"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "preview",
+      "note": "Marked as this level's available date because it is when customers could first use the product Anthropic later documented as multi-agent (anthropic-multiagent-research-2025, 13 June 2025). Reading the two posts together is this site's inference, not Anthropic's statement; a reader who wants only what a single page says should take 13 June 2025."
+    },
+    {
+      "id": "anthropic-multiagent-research-2025",
+      "date": "2025-06-13",
+      "precision": "day",
+      "level": 6,
+      "kind": "research",
+      "title": "How we built our multi-agent research system",
+      "maker": "Anthropic",
+      "what": "Anthropic's engineering post says of a feature customers were already using: \"Our Research system uses a multi-agent architecture with an orchestrator-worker pattern, where a lead agent coordinates the process while delegating to specialized subagents that operate in parallel.\" The subagents work \"with their own context windows\" before condensing what they found for the lead agent.",
+      "technique": "orchestrator-workers",
+      "registry_id": "claude-research",
+      "source": {
+        "title": "How we built our multi-agent research system",
+        "url": "https://www.anthropic.com/engineering/multi-agent-research-system",
+        "publisher": "Anthropic"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "Anthropic published this two months after the feature went on sale. It is the first page from a maker this site could open that says a product customers were already buying ran several agents on one request; the level marks the sale date instead, and says why."
+    },
+    {
+      "id": "grok-4-heavy-2025",
+      "date": "2025-07-09",
+      "precision": "day",
+      "level": 6,
+      "kind": "product",
+      "title": "Grok 4 Heavy",
+      "maker": "SpaceXAI",
+      "what": "xAI's announcement says: \"We have made further progress on parallel test-time compute, which allows Grok to consider multiple hypotheses at once. We call this model Grok 4 Heavy\", sold through \"a new SuperGrok Heavy tier\". Several runs on one question, bought as a tier.",
+      "technique": "debate-review",
+      "registry_id": "grok-heavy",
+      "source": {
+        "title": "Grok 4",
+        "url": "https://x.ai/news/grok-4",
+        "publisher": "SpaceXAI"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "xAI's prose describes parallel test-time compute over multiple hypotheses and does not call them agents. The product demo embedded in the same page does: it shows \"Grok 4 Heavy Processing\" with rows labelled \"Agent 1\", \"Agent 2\" and \"Agent 3\". The page gives no account of how the runs divide or combine the work, so this site lists it here without calling it the level's first.",
+      "availability": "paid plans"
+    },
+    {
+      "id": "generative-agents-paper-2023",
+      "date": "2023-04-07",
+      "precision": "day",
+      "level": 7,
+      "kind": "research",
+      "title": "Generative Agents",
+      "maker": "Park et al., Stanford University and Google Research",
+      "what": "The paper puts \"a small town of twenty five agents\" in a sandbox. Its architecture, in the paper's words, is one that agents use to \"store a complete record of the agent's experiences using natural language, synthesize those memories over time into higher-level reflections, and retrieve them dynamically to plan behavior\" — agents that decide when to act, not only what to answer.",
+      "technique": "long-horizon",
+      "source": {
+        "title": "Generative Agents: Interactive Simulacra of Human Behavior",
+        "url": "https://arxiv.org/abs/2304.03442",
+        "publisher": "arXiv (v1, 7 April 2023)"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "pi0-2024",
+      "date": "2024-10-31",
+      "precision": "day",
+      "level": 7,
+      "kind": "model",
+      "title": "π0",
+      "maker": "Physical Intelligence",
+      "what": "Physical Intelligence's post says \"We've developed a general-purpose robot foundation model that we call π0 (pi-zero)\" that \"spans images, text, and actions and acquires physical intelligence by training on embodied experience from robots, learning to directly output low-level motor commands\", trained on open-source data plus dexterous tasks collected \"across 8 distinct robots\".",
+      "technique": "embodied",
+      "registry_id": "pi0",
+      "source": {
+        "title": "Our First Generalist Policy",
+        "url": "https://www.pi.website/blog/pi0",
+        "publisher": "Physical Intelligence"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "manus-2025",
+      "date": "2025-03-06",
+      "precision": "day",
+      "level": 7,
+      "kind": "product",
+      "title": "Manus",
+      "maker": "Manus",
+      "what": "Manus describes itself, on its own site, as building \"general AI agents as the Action Engine for life\" and as \"building the hands for AI to do\" rather than the reasoning underneath — an agent a person points at a goal and lets run.",
+      "technique": "long-horizon",
+      "registry_id": "manus",
+      "source": {
+        "title": "About",
+        "url": "https://manus.im/about",
+        "publisher": "Manus",
+        "archive_url": "https://web.archive.org/web/20250311014213id_/https://manus.im/"
+      },
+      "checked": "2026-09-18",
+      "verified": false,
+      "note": "Manus states no launch date on any page of its own, confirmed again on 2026-09-18, and neither does the Internet Archive's earliest capture of manus.im (11 March 2025), which does show the product live and saying “Manus is a general AI agent that bridges minds and actions: it doesn’t just think, it delivers results.” 6 March 2025 is the date consistently reported at the time; this site could not confirm it, so the date stays unverified and Manus is not used as a marked date."
+    },
+    {
+      "id": "gemini-robotics-2025",
+      "date": "2025-03-12",
+      "precision": "day",
+      "level": 7,
+      "kind": "model",
+      "title": "Gemini Robotics",
+      "maker": "Google DeepMind",
+      "what": "Google DeepMind's announcement introduces \"Gemini Robotics, an advanced vision-language-action (VLA) model that was built on Gemini 2.0 with the addition of physical actions as a new output modality for the purpose of directly controlling robots\", alongside Gemini Robotics-ER for spatial reasoning. The registry's Gemini Robotics entry is the later Gemini Robotics 2.",
+      "technique": "embodied",
+      "source": {
+        "title": "Introducing Gemini Robotics and Gemini Robotics-ER, AI models designed for robots to understand, act and react to the physical world",
+        "url": "https://deepmind.google/blog/gemini-robotics-brings-ai-into-the-physical-world/",
+        "publisher": "Google DeepMind"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "hermes-agent-2025",
+      "date": "2025-07-22",
+      "precision": "day",
+      "level": 7,
+      "kind": "tool",
+      "title": "Hermes Agent",
+      "maker": "Nous Research",
+      "what": "GitHub's record of NousResearch/hermes-agent gives a creation date of 22 July 2025 and an MIT licence. The README calls it “The self-improving AI agent built by Nous Research” and says “Run it on a $5 VPS, a GPU cluster, or serverless infrastructure that costs nearly nothing when idle”; the project's own site (hermes-agent.nousresearch.com) says “Tasks that need an active agent will not run while it is stopped; hosted agents are managed separately in Nous Portal.” That is standing work that runs because the agent is running, on hardware the developer keeps up.",
+      "technique": "agent-teammates",
+      "registry_id": "hermes-agent",
+      "source": {
+        "title": "NousResearch/hermes-agent (repository metadata)",
+        "url": "https://api.github.com/repos/NousResearch/hermes-agent",
+        "publisher": "GitHub"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "The repository's web page shows no creation date; GitHub's metadata endpoint, opened on 2026-09-18, gives created_at 2025-07-22T22:22:28Z. The README and the documentation sentence quoted are today's, not July 2025's."
+    },
+    {
+      "id": "openclaw-2025",
+      "date": "2025-11-24",
+      "precision": "day",
+      "level": 7,
+      "kind": "tool",
+      "title": "OpenClaw",
+      "maker": "OpenClaw Foundation",
+      "what": "GitHub's record of openclaw/openclaw gives a creation date of 24 November 2025. Its README says “OpenClaw is an open-source AI assistant that runs on your own computer and meets you in the channels you already use”, with “One Gateway” running it “as a personal assistant on a laptop or as a shared team deployment”, and carries an MIT licence badge.",
+      "technique": "agent-teammates",
+      "registry_id": "openclaw",
+      "source": {
+        "title": "openclaw/openclaw (repository metadata)",
+        "url": "https://api.github.com/repos/openclaw/openclaw",
+        "publisher": "GitHub"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "openclaw.ai states no first-release date, which is why this site dates the project from GitHub's metadata endpoint, opened on 2026-09-18 (created_at 2025-11-24T10:16:47Z). The README quoted is today's."
+    },
+    {
+      "id": "claude-cowork-2026",
+      "date": "2026-01-12",
+      "precision": "day",
+      "level": 5,
+      "kind": "product",
+      "title": "Claude Cowork",
+      "maker": "Anthropic",
+      "what": "Anthropic's dated release notes record, on 12 January 2026, “Cowork research preview on Claude Desktop (macOS only) for Max plans”, and say Cowork “brings Claude Code’s agentic capabilities to the Claude desktop app for knowledge work beyond coding”. Pro plans followed on 16 January 2026 and the same notes record “Claude Cowork is now generally available on macOS and Windows through the Claude Desktop app” on 9 April 2026.",
+      "technique": "single-agent",
+      "registry_id": "claude-cowork",
+      "source": {
+        "title": "Release notes",
+        "url": "https://support.claude.com/en/articles/12138966-release-notes",
+        "publisher": "Anthropic (Claude help centre)"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "preview",
+      "note": "Placed at level 5, not level 7. On this date Cowork, in the release note's words, \"runs locally on your computer in an isolated VM\", and the person starts each task. The same notes add scheduled tasks on 25 February 2026, where the person sets the time, and on 7 July 2026 say Cowork \"runs your sessions remotely\" so that \"scheduled tasks run with no device online\"; that later entry is this site's level-7 date for Cowork. A research preview on the Max plan and macOS only, open to anyone who bought that plan; general availability came on 9 April 2026."
+    },
+    {
+      "id": "pi0-7-2026",
+      "date": "2026-04-16",
+      "precision": "day",
+      "level": 7,
+      "kind": "model",
+      "title": "π0.7",
+      "maker": "Physical Intelligence",
+      "what": "Physical Intelligence's post calls π0.7 \"a steerable generalist model that can perform dexterous tasks across robots, scenes, and skills\", and reports \"compositional generalization, recombining skills from various tasks to solve new problems\" — including a robot folding laundry with no laundry-folding data in its training.",
+      "technique": "embodied",
+      "registry_id": "pi0-7",
+      "source": {
+        "title": "π0.7",
+        "url": "https://www.pi.website/blog/pi07",
+        "publisher": "Physical Intelligence"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "gemini-spark-2026",
+      "date": "2026-05-19",
+      "precision": "day",
+      "level": 7,
+      "kind": "product",
+      "title": "Gemini Spark",
+      "maker": "Google",
+      "what": "Google's announcement introduces \"Gemini Spark, a 24/7 personal AI agent that helps you navigate your digital life\", \"deeply integrated with the Workspace tools you rely on daily, like Gmail, Docs, Slides and more\", and says that \"because it is a cloud-based agent, Spark keeps working in the background even when you close your laptop or lock your phone.\"",
+      "technique": "agent-teammates",
+      "registry_id": "gemini-spark",
+      "source": {
+        "title": "The next evolution of the Gemini app",
+        "url": "https://blog.google/innovation-and-ai/products/gemini-app/next-evolution-gemini-app/",
+        "publisher": "Google"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "note": "The rollout was staged: Google says Spark went to trusted testers in the week of the announcement and to US Google AI Ultra subscribers in beta the following week, with more through summer 2026. The announcement date is marked, not a date on which everyone could use it.",
+      "availability": "preview"
+    },
+    {
+      "id": "gemini-spark-subscribers-2026",
+      "date": "2026-06-30",
+      "precision": "day",
+      "level": 7,
+      "kind": "product",
+      "title": "Gemini Spark in subscribers' hands",
+      "maker": "Google",
+      "what": "Google's post of 30 June 2026 says \"Gemini Spark for macOS is available in Beta to Google AI Ultra subscribers aged 18 and over, starting in the US.\" The May announcement had described Spark as \"a 24/7 personal AI agent\" that takes \"recurring tasks or triggers\" and \"keeps working in the background even when you close your laptop or lock your phone.\"",
+      "technique": "agent-teammates",
+      "registry_id": "gemini-spark",
+      "source": {
+        "title": "Gemini Spark updates: macOS launch, connected apps and more",
+        "url": "https://blog.google/innovation-and-ai/products/gemini-app/gemini-spark-updates-june-2026/",
+        "publisher": "Google"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "paid plans",
+      "note": "A live-by date, not a launch date. Google's release notes for 19 May 2026 say Spark \"is rolling out today to trusted testers and in Beta to Google AI Ultra subscribers aged 18 and over in the United States in the coming weeks\", and no Google page this site found states the day the subscriber beta opened. This post is the earliest dated Google page that says subscribers have it, so the true date falls between 19 May and 30 June 2026."
+    },
+    {
+      "id": "claude-cowork-remote-2026",
+      "date": "2026-07-07",
+      "precision": "day",
+      "level": 7,
+      "kind": "product",
+      "title": "Claude Cowork runs without your computer",
+      "maker": "Anthropic",
+      "what": "Anthropic's dated release notes record, on 7 July 2026: \"Cowork runs your sessions remotely (in beta), so your sessions and files are saved to your Claude account and go where you go, on any device. Work continues when you close your laptop, and scheduled tasks run with no device online.\" This is the entry that makes Cowork an always-on product; the January release ran on the person's own machine.",
+      "technique": "agent-teammates",
+      "registry_id": "claude-cowork",
+      "source": {
+        "title": "Release notes",
+        "url": "https://support.claude.com/en/articles/12138966-release-notes",
+        "publisher": "Anthropic (Claude help centre)"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "preview",
+      "note": "A beta, and a staged one: the same entry says \"We are rolling this capability out over the next several weeks starting with the Max plan, with more plans to follow.\""
+    },
+    {
+      "id": "chatgpt-work-2026",
+      "date": "2026-07-09",
+      "precision": "day",
+      "level": 7,
+      "kind": "product",
+      "title": "ChatGPT Work",
+      "maker": "OpenAI",
+      "what": "OpenAI's product page says “Powered by GPT‑5.6, ChatGPT Work brings together context from your team’s tools to turn scattered notes, drafts, and ideas into finished work — and keeps projects moving while you stay in control”, and that it “gathers context, plans the approach, and takes action across your tools, files, and desktop apps”.",
+      "technique": "agent-teammates",
+      "registry_id": "chatgpt-work",
+      "source": {
+        "title": "ChatGPT Work",
+        "url": "https://openai.com/chatgpt-work/",
+        "publisher": "OpenAI",
+        "archive_url": "https://web.archive.org/web/20260714033612id_/https://openai.com/chatgpt-work/"
+      },
+      "checked": "2026-09-18",
+      "verified": false,
+      "note": "openai.com/chatgpt-work/ returns 403 to this site's fetcher, matching content/landscape.json's own note. The Internet Archive's capture of 14 July 2026 opens and shows the wording quoted here, but the page carries no date, so 2026-07-09 is still unverified and this milestone is not used as a marked date."
+    },
+    {
+      "id": "grok-bot-2026",
+      "date": "2026-08-11",
+      "precision": "day",
+      "level": 7,
+      "kind": "product",
+      "title": "Grok Bot",
+      "maker": "SpaceXAI",
+      "what": "xAI's announcement says \"Grok Bot is your team of always-on agents\" and, of those agents, \"They have their own computer, work inside tools and apps like you do, and keep working 24/7.\" It says Grok Bot \"is in beta and available today\" to named SuperGrok and Cursor subscriber tiers on desktop and iOS.",
+      "technique": "agent-teammates",
+      "registry_id": "grok-bot",
+      "source": {
+        "title": "Introducing Grok Bot",
+        "url": "https://x.ai/news/introducing-grok-bot",
+        "publisher": "SpaceXAI"
+      },
+      "checked": "2026-09-18",
+      "verified": true,
+      "availability": "paid plans",
+      "short": "Grok Bot"
+    },
+    {
+      "id": "muse-2026",
+      "date": "2026-09-08",
+      "precision": "day",
+      "level": 7,
+      "kind": "product",
+      "title": "Muse",
+      "maker": "Meta",
+      "what": "Meta's announcement says \"Muse is a personal AI agent. It doesn't just answer questions, it actually does the work\", and that \"A separate Sentinel agent runs on that same machine, kept apart from Muse at the system level. Nothing Muse does reaches the internet unless the Sentinel approves it, and it asks the person for permission when needed.\" A checking agent shipped inside a consumer product, not only proposed in a paper.",
+      "technique": "agent-teammates",
+      "registry_id": "muse",
+      "source": {
+        "title": "Introducing Muse, a personal AI agent",
+        "url": "https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/",
+        "publisher": "Meta"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    },
+    {
+      "id": "claude-cowork-merge-2026",
+      "date": "2026-09-16",
+      "precision": "day",
+      "level": 7,
+      "kind": "product",
+      "title": "Cowork merges into Claude",
+      "maker": "Anthropic",
+      "what": "Anthropic's announcement folds a separate always-on product back into the chat app: \"hand over a report due at noon, and Claude takes it from there, even after you've closed your laptop\", and \"You can check progress from your phone on the way to the office.\" Cowork's capabilities are now \"available from any conversation, with the context, skills, and connectors you already have.\"",
+      "technique": "agent-teammates",
+      "registry_id": "claude-cowork",
+      "source": {
+        "title": "Cowork is now Claude",
+        "url": "https://claude.com/blog/cowork-is-now-claude",
+        "publisher": "Anthropic"
+      },
+      "checked": "2026-09-18",
+      "verified": true
+    }
+  ],
+  "measures": [
+    {
+      "id": "metr-time-horizon-original",
+      "quote": "Our original time horizon dataset, released in March 2025, showed a smooth trend with the frontier time-horizon doubling around every 7 months over the period 2019 to 2025.",
+      "what_it_measures": "The 50%-reliability time horizon. METR's March 2025 post states the finding this way: \"The length of tasks (measured by how long they take human professionals) that generalist frontier model agents can complete autonomously with 50% reliability has been doubling approximately every 7 months for the last 6 years.\" The length is a human time, not the model's; the tasks are METR's own suite of software and research tasks, not work in general.",
+      "scope": "METR's original (TH1) dataset: frontier models released 2019 to 2025, scored on METR's own task suite. The quotation is METR's January 2026 restatement of that earlier finding. METR's March 2025 post now carries this banner: \"⚠️ Some of the text and figures in this post are out of date. The interactive chart below is kept up to date, but the static figures and some claims in the text (e.g. the doubling time) reflect the state of the data at the time of original publication.\" A doubling time measured over a past period is a description of that period. It is not a forecast, and this site does not extend it forward.",
+      "source": {
+        "title": "Time Horizon 1.1",
+        "url": "https://metr.org/blog/2026-1-29-time-horizon-1-1/",
+        "publisher": "METR"
+      },
+      "date": "2026-01-29",
+      "checked": "2026-09-18"
+    },
+    {
+      "id": "metr-time-horizon-1-1-post-2023",
+      "quote": "The post-2023 doubling-time is 131 days under TH1.1, compared to 165 days under TH1, meaning progress is estimated to be 20% more rapid under TH1.1.",
+      "what_it_measures": "The same 50%-reliability time horizon, re-estimated under METR's revised TH1.1 methodology and restricted to the period since 2023. METR says of the suite: \"We increased our suite from 170 to 228 tasks.\" Evaluation also moved to Inspect, which METR describes as \"a widely-adopted open-source framework for AI evaluations developed by the UK AI Security Institute\".",
+      "scope": "Models released since 2023 only. METR says \"We have re-estimated the effective time horizons for 14 models\", of the 33 that had estimates under TH1, excluding the rest for \"the model no longer being publicly available, (ii) the model requiring significant changes to the tool-calling scaffold (e.g. for GPT-2, GPT-3, and GPT-3.5), or (iii) because the model was far from the capability frontier at the time of release, so unlikely to change the estimated trend.\" METR also reports that two models scored significantly higher under its previous harness than under Inspect, so the numbers are sensitive to the scaffold. This is a measurement of METR's task suite, not of real-world software work, and not a prediction of anything.",
+      "source": {
+        "title": "Time Horizon 1.1",
+        "url": "https://metr.org/blog/2026-1-29-time-horizon-1-1/",
+        "publisher": "METR"
+      },
+      "date": "2026-01-29",
+      "checked": "2026-09-18"
+    }
+  ],
+  "shifts": [
+    {
+      "id": "reasoning-models",
+      "title": "Reasoning models",
+      "milestone": "o1-reasoning-models",
+      "strip": true,
+      "technique": "inference-time-reasoning",
+      "also": [
+        "chain-of-thought-prompting",
+        "deepseek-r1-2025",
+        "operator-2025"
+      ],
+      "summary": "Models trained to think before they answer. Not a new level: a better engine for every level, and the one OpenAI credits for its first agent.",
+      "body": [
+        "Before September 2024 a model answered as it went, one word after the next. \"Think step by step\" was something you typed into the prompt, and the 2022 chain-of-thought paper showed it helped. OpenAI's o1 was trained to do it. OpenAI introduced it as \"a new large language model trained with reinforcement learning to perform complex reasoning\", one that \"can produce a long internal chain of thought before responding to the user.\" Through that training, OpenAI wrote, the model \"learns to recognize and correct its mistakes\", \"to break down tricky steps into simpler ones\" and \"to try a different approach when the current one isn't working.\" Four months later the DeepSeek-R1 paper reported that such reasoning \"can be incentivized through pure reinforcement learning\", with no human-written examples of reasoning to copy.",
+        "It added two things. The first is a second dial. OpenAI reported that o1 improves \"with more time spent thinking (test-time compute)\", so a hard question can be given more effort instead of a bigger model. You use it as a setting, a thinking switch or an effort level, and you pay for it in seconds and in output tokens. Makers advise turning it up for maths, debugging and planning and down for lookups and classification.",
+        "The second is the set of habits an agent needs. Noticing a mistake, backing up and trying another way is what keeps a long task on course. The agent products followed within months, and OpenAI's Operator post credits \"advanced reasoning through reinforcement learning\" for the model that drives it. That is why the gap between level 4 and level 5 on this timeline is not empty: reasoning models arrived in it.",
+        "It is not a level. Who decides the next step does not change when a model thinks longer inside one reply."
+      ]
+    },
+    {
+      "id": "system-one-models",
+      "title": "System One models",
+      "milestone": "jev-2026",
+      "strip": false,
+      "technique": "structured-output",
+      "also": [],
+      "summary": "The opposite direction: a model that writes no text and returns a typed decision with a probability, fast enough to sit inside ordinary code.",
+      "body": [
+        "The names come from psychology: System 1 is fast and automatic, System 2 slow and deliberate. Reasoning models are the slow kind. Jev, released in early access by TypeSafe AI on 15 September 2026, is built to be the fast kind. TypeSafe describes \"a new class of frontier models built to make fast, structured decisions that software can use directly\": \"unstructured state in, typed probabilistic decisions out.\"",
+        "It gives up writing. The possible answers are defined in advance, every answer comes with a probability, and the whole result comes back in one parallel pass, not word by word. TypeSafe quotes \"70ms-500ms\" a call. What that is for is this site's level 3, in TypeSafe's words: \"classify, route, score, extract, or branch where hand-written logic is too brittle.\" A workflow's routing step, an eval's judge and a guardrail's check are all decisions of that shape, and today they are usually made by a chat model asked to reply in a fixed format.",
+        "These are the maker's claims, a few days old. This site has measured none of them."
+      ],
+      "applications_intro": "What it is for, in TypeSafe's own words, and where each sits on this site:",
+      "applications": [
+        {
+          "title": "Decisions inside a workflow",
+          "technique": "routing",
+          "text": "\"AI-Powered Workflows / smart if-statements\": \"classify, route, score, extract, or branch where hand-written logic is too brittle.\" This is the routing step of a level 3 workflow: which queue a ticket goes to, whether a claim needs a person, which prompt handles a request."
+        },
+        {
+          "title": "Checking other models",
+          "technique": "guardrails",
+          "text": "\"Verify everything. Score, judge, verify, guardrail, and detect jailbreaks of LLM prompts, reasoning traces, and/or outputs.\" A guardrail or a judge is a yes-or-no decision made on every request, so speed, price and an honest probability matter more there than prose."
+        },
+        {
+          "title": "Reading large piles of data",
+          "technique": "parallelization",
+          "text": "\"Map-reducing over big data. Turn petabytes of data into features and insights.\" The same question asked of millions of records, which is affordable only when a call costs almost nothing."
+        },
+        {
+          "title": "Anything a person is waiting on",
+          "technique": "cost-optimization",
+          "text": "\"Real-time applications. 100ms speeds means you can use AI in your applications where UX is critical.\" TypeSafe's demos are of this kind: a bot playing Doom from a text description of the game state at \"10 queries a second (which ends up costing ~$7/hour)\", and a Wikipedia race where each \"step can mean choosing between hundreds to thousands of links\"."
+        }
+      ],
+      "limits": "What it cannot do is write: no summaries, no replies, no code. The Doom demo runs on \"structured state as a data structure with text, not on images\", and TypeSafe adds that \"a non-AI doom bot could play better\". A choice can have at most 255 options (\"Jev supports a cardinality up to 255\")."
+    }
+  ]
+}

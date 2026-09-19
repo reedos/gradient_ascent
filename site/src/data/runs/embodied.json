@@ -1,0 +1,60 @@
+{
+  "illustrative": true,
+  "h": 730,
+  "title": "Robots and machines",
+  "sub": "The model proposes a move; a safety envelope that does not read its reasoning decides what actually moves.",
+  "pill": "Level 7 · Always-on agents",
+  "nodes": [
+    { "id": "scene", "x": 170, "y": 30, "l": "Scene", "k": "io" },
+    { "id": "propose", "x": 170, "y": 170, "l": "proposes a move", "k": "model" },
+    { "id": "envelope", "x": 170, "y": 310, "l": "checks bounds + zones", "k": "code" },
+    { "id": "refused", "x": 258, "y": 450, "l": "Refuse: forbidden zone", "k": "code" },
+    { "id": "clamped", "x": 82, "y": 450, "l": "Clamp to bounds", "k": "code" },
+    { "id": "actuator", "x": 170, "y": 590, "l": "Actuator log", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "scene", "t": "propose", "by": "code" },
+    { "id": "e2", "f": "propose", "t": "envelope", "by": "model" },
+    { "id": "e3refused", "f": "envelope", "t": "refused", "by": "code", "b": 24 },
+    { "id": "e3clamped", "f": "envelope", "t": "clamped", "by": "code", "b": -24 },
+    { "id": "e4", "f": "clamped", "t": "actuator", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The scene arrives",
+      "d": "\"A part sits at (200, -200, 100)mm from home,\ninside the operator station.\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The model proposes a move toward the part",
+      "d": "→ move(x=200, y=-200, z=100, speed=180)",
+      "m": "60 in · 14 out · 0.2 s"
+    },
+    {
+      "e": "e3refused",
+      "h": "The envelope refuses: the target is inside a forbidden zone",
+      "d": "target is inside forbidden zone: operator station\nnothing was sent toward the actuator this step",
+      "m": "refused · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The model proposes a different move, further than the workspace reaches",
+      "d": "→ move(x=520, y=0, z=50, speed=180)",
+      "m": "58 in · 14 out · 0.2 s"
+    },
+    {
+      "e": "e3clamped",
+      "h": "The envelope clamps: the target is outside the workspace bounds",
+      "d": "x: 520 → 300 (workspace bound)\nspeed 180 is under the 250mm/s cap, unchanged",
+      "m": "clamped · 0 ms"
+    },
+    {
+      "e": "e4",
+      "h": "The clamped move reaches the actuator log",
+      "d": "move(x=300, y=0, z=50, speed=180)\nnot the target the model asked for, but a safe one",
+      "m": "1 move actuated"
+    }
+  ]
+}

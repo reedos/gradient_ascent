@@ -1,0 +1,244 @@
+---
+slug: coding-agents
+level: 5
+run: coding-agents
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "AGENTS.md"
+    url: "https://agents.md/"
+    publisher: "agents.md (stewarded by the Agentic AI Foundation, Linux Foundation)"
+    accessed: "2026-09-18"
+  - title: "How the agent loop works"
+    url: "https://code.claude.com/docs/en/agent-sdk/agent-loop"
+    publisher: "Anthropic (Claude Agent SDK documentation)"
+    accessed: "2026-09-18"
+  - title: "Sandboxing"
+    url: "https://learn.chatgpt.com/codex/sandboxing"
+    publisher: "OpenAI (Codex documentation)"
+    accessed: "2026-09-18"
+  - title: "Agent approvals & security"
+    url: "https://learn.chatgpt.com/codex/agent-approvals-security"
+    publisher: "OpenAI (Codex documentation)"
+    accessed: "2026-09-18"
+  - title: "Checkpointing"
+    url: "https://code.claude.com/docs/en/checkpointing"
+    publisher: "Anthropic (Claude Code documentation)"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import codingAgentsRun from '../../data/runs/coding-agents.json';
+
+A coding agent is a <Link href="/techniques/single-agent/">single agent</Link> whose tools read
+files, edit them, run commands and run tests, instead of searching documents. Code is a domain
+this pattern fits unusually well, because a test is a checker a computer can run: a change either
+passes its tests or it does not, so the loop has a real signal to act on instead of the model's own
+sense of whether it is finished. AGENTS.md, an open format several coding agents read, puts it
+directly: list your test commands and "the agent will attempt to execute relevant programmatic
+checks and fix failures before finishing the task"<Cite n={1}/>.
+
+Level 5 still means the model decides the action and the stop; your code still runs everything the
+model proposes and enforces the caps. For a coding agent specifically, the caps that matter most
+are the ones that limit how much damage a wrong step can do before a person sees it: which files
+it can touch, whether it can reach the network, and how many turns it gets before it has to stop
+and report.
+
+This page is marked draft, not published: coding agents has no recorded trace and no scored result
+file yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={codingAgentsRun} label="Level 5 · Coding agents" runKey="coding-agents" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Claude Code, Codex, Cursor, GitHub Copilot, Jules, Antigravity CLI, Grok Build, Devin, Devin
+Desktop, Replit Agent, Cline, Aider and Zed are all coding agents in this sense, each with its own
+take on permissions and sandboxing.
+
+Briefing one well means writing down, once, what a person would otherwise repeat every session:
+build commands, test commands, and conventions. AGENTS.md exists for exactly this — "a README for
+agents": a place for "the extra, sometimes detailed context coding agents need: build steps,
+tests, and conventions that might clutter a README or aren't relevant to human
+contributors"<Cite n={1}/>. A vague brief gets a vague plan; a brief that names the test command
+gets an agent that can tell for itself whether it succeeded.
+
+Keeping one from doing damage is mostly a matter of permissions. Anthropic's Agent SDK documents a
+`"plan"` mode where "Claude explores and plans without editing your source files; file edits are
+never auto-approved," useful for proposing a change before anything actually runs<Cite n={2}/>.
+OpenAI documents the same boundary for Codex from the other direction: under its Auto preset Codex
+"can read files, make edits, and run commands in the working directory automatically" and "asks
+for approval to edit files outside the workspace or to run commands that require network access",
+and by default "the agent runs with network access turned off"<Cite n={4}/>. Cross that boundary
+and, in OpenAI's words, "the approval flow takes over"<Cite n={3}/>. Neither maker leaves the
+boundary implicit; both make it a setting you pick.
+
+Reviewing a diff is still your job. Read it the way you would a colleague's: does it change only
+what the brief asked for, and did the tests referenced in the trace actually run, or does the
+agent's own account just say they should pass? Claude Code's checkpointing captures the state of
+your code "before each prompt you send that starts a turn," so a change that turns out wrong can
+be reverted with `/rewind` rather than untangled by hand. Read the limitation printed beside it
+before relying on it: checkpointing "does not track files modified by Bash commands", only edits
+made through Claude's own file editing tools, and Anthropic says plainly that it is not a
+replacement for version control<Cite n={5}/>. See
+<Link href="/techniques/operator-craft/">operator craft</Link> for the review habit itself.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example is a propose-edit-run-test loop over one small function held in memory as a string,
+not a real file: `sum_evens` sums the odd numbers instead of the even ones. The model calls
+`propose_edit` with a full replacement; your code reads that source, decides whether it may run
+at all, and only then runs it against four fixed test cases. The test result, pass or fail with a
+reason, goes back to the model as the tool result, and the model decides whether to try again or
+stop.
+
+The deciding is `check_source`, and it is the part worth copying. An earlier version of this
+example ran the proposed source through `exec` with an empty `__builtins__` and called that a
+sandbox. It is not one: an empty builtins dict does nothing about attribute access, and attribute
+access alone reaches every loaded class and, through any of their `__globals__`, a real
+`__builtins__` — an escape that uses no builtin name, so no list of forbidden names would catch
+it. A review of this repository wrote that escape and it worked. What replaced it is a whitelist
+of the AST node types the task actually needs, the same discipline
+<Link href="/techniques/code-execution/">code execution</Link>'s arithmetic evaluator uses:
+anything outside the list is refused by construction rather than by spelling.
+
+Even that is a check inside the same interpreter, which is not what a real coding agent needs. A
+real one restricts a whole filesystem and process — OpenAI documents Codex using "an OS-enforced
+sandbox that limits what it can touch (typically to the current workspace), plus an approval
+policy that controls when it must stop and ask you before acting"<Cite n={4}/>. What carries over
+from this example is the shape, not the boundary: the model never runs its own code directly,
+your code always does, and the result the model sees is only ever what your code decided to
+report back.
+
+Every `propose_edit` call and the decision to stop are `decided_by: "model"`; the tests that run
+in between are always `decided_by: "code"`, the same split
+<Link href="/techniques/single-agent/">single agent</Link>'s example makes. `max_steps` (3) and
+`max_tokens` (2000) are the hard caps; hitting either forces a final answer that is `decided_by:
+"code"`, and the returned citations are empty when the function was never actually fixed, so a
+capped-out run cannot look like a real success by accident.
+
+<CodeFile file="examples/coding_agents/run.py" func="check_source" />
+
+Everything above is what happens before a single test runs. The loop itself is ordinary: ask,
+check, run, report, repeat until the model stops or a cap ends it.
+
+<CodeFile file="examples/coding_agents/run.py" func="run" />
+
+Run it yourself:
+
+<CodeFile file="examples/coding_agents/README.md" start={18} end={18} lang="text" expect="python -m examples.coding_agents" />
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try a fixed <Link href="/techniques/workflow-graphs/">workflow</Link> — lint, autoformat, or a
+single scripted patch — first if the fix is already known and the same every time; a workflow like
+that is cheaper and never proposes something unexpected.
+
+Try <Link href="/techniques/function-calling/">function calling</Link> instead if one tool call
+settles it, such as running a single existing test suite once and reporting the result with no
+editing involved.
+
+Move up to a coding agent once the number and shape of edits needed cannot be known before the
+model reads the failing test — when fixing it might take one change or several, depending on what
+the first attempt reveals.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'A fix that passes the shown tests but breaks something else',
+    notice: 'The edit makes the targeted test pass, but a test outside what the agent was told to run now fails, and nothing in the trace says so.',
+    test: 'Run the full test suite after the agent reports success, not just the test it was pointed at. AGENTS.md\'s own model is to run "relevant programmatic checks" before finishing; a check that was never listed is a check that never ran.',
+  },
+  {
+    name: 'Damage outside the intended boundary',
+    notice: 'An overly permissive approval setting lets the agent edit or run something outside what the task needed, discovered after the fact rather than blocked at the time.',
+    test: "Check which permission or approval mode the session actually ran under, not which one you meant to set, and confirm the boundary it enforced matches the task, not just the tool's default.",
+  },
+  {
+    name: 'Looping without progress',
+    notice: 'The model proposes edits that address the same symptom in slightly different ways without ever reading why the previous attempt actually failed, until the step cap ends the run.',
+    test: 'Read the test-failure detail at each step in order: real progress narrows toward the actual bug; a loop repeats the same wrong theory.',
+  },
+  {
+    name: 'A diff that looks reasonable but was not actually re-checked',
+    notice: "A person reviews the code change, it reads as plausible, and it ships without the tests actually being re-run against it.",
+    test: "Confirm the trace shows a test run after the final edit, not just after an earlier one. A plausible diff and a passing test are two different facts.",
+  },
+  {
+    name: 'The cap ships a still-broken fix',
+    notice: 'The step or token cap is reached before the tests actually passed, and the run ends with an answer that reads like a normal report unless the forced-stop step is checked.',
+    test: "Force a low cap on a task that needs more attempts than the cap allows (this page's own test suite does exactly this) and confirm the answer's citations are empty rather than claiming success.",
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, best case (one fix, then stop)', value: '2' },
+    { label: 'Model calls, worst case (step cap reached)', value: '4' },
+    { label: 'Tokens in, one attempt', value: '~260–470' },
+    { label: 'Wall time, one attempt', value: '~0.7s' },
+  ]}
+  comparedTo={{
+    label: 'a fixed autofix workflow (level 3)',
+    note: 'A one-line fix costs close to what a single scripted patch-and-test step would; a fix that takes several attempts costs that many times over, for a problem a fixed workflow could not have known the shape of in advance.',
+  }}
+  level={5}
+/>
+
+## How to eval it
+
+<HowToEval>
+
+`coding_agents` does not do the site's own question-answering task — there is no document, no
+question and no citation to grade — so it is not part of the shared 60-question set, the same way
+`embeddings_search` and `memory` are not (see `docs/EVALS.md`). What would actually be measured is
+specific to this task: the share of attempts that reach a passing state at all, the number of
+attempts it takes, whether a fix that passes its own test also passes every other test in the
+suite it was not shown, and how closely the size of the diff matches the size of the actual bug.
+`scripts/eval_run.py` knows `coding_agents` and refuses to score it, printing that reason; no
+runner for the measures above exists yet.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="The share of runs that reach a passing state, the average number of attempts per task, and how often a change that passed its own test later broke something outside it."
+  costAtVolume="Cost per task varies with how many attempts a fix actually takes, the same as any agent loop; budget from the cap, and watch whether harder tasks are quietly consuming a disproportionate share of it."
+  failsInProduction="A permission or sandbox setting is looser than the task needed, so a change that should have stayed inside one file reaches further than intended before anyone reviews it."
+  whatToLog="Every proposed edit, every test result it produced, and which cap (if any) forced the final answer, so a bad merge traces back to the specific attempt that introduced it rather than to 'the agent did it.'"
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Find a project\'s AGENTS.md, CLAUDE.md, or similar instructions file, if it has one. Does it name a test command a coding agent could actually run, or only prose a human would read?' },
+  { lane: 'build', body: 'Run python -m examples.coding_agents --model stub with a question of your own from the repo root, then read tests/test_example_coding_agents.py to see a scripted model that proposes a wrong fix before a right one, and one that never fixes it at all.' },
+  { lane: 'either', body: 'Open examples/coding_agents/run.py and change TEST_CASES to add a case the current BUGGY_SOURCE and the fix in the tests both need to handle differently. Does the existing scripted fix in the tests still pass?' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

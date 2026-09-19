@@ -1,0 +1,50 @@
+---
+// Last reviewed date, the 90-day freshness rule (Method: "Stay current and say how current"),
+// and the link to this page's clean Markdown twin. Staleness is computed at build time against
+// the date the site is built, so a page that goes stale shows it on the next build without
+// anyone editing the page.
+//
+// One component for all three page kinds, so the foot of a technique, recipe and level page is
+// the same block rather than three near-identical ones. A level page has no `reviewed` field of
+// its own in taxonomy.json, so it passes the oldest reviewed date among its own pages and sets
+// `scope` to say so; that keeps the sentence honest instead of inventing a date for a page that
+// is generated.
+//
+// A teardown passes `expires` as well: it is about named products, which change faster than
+// anything else on the site, so the project plan gives it a hard expiry date rather than the 90-day review
+// flag. That sentence replaces the 90-day one when it is present.
+interface Props {
+  /** ISO date, e.g. "2026-09-18". Matches the `reviewed` frontmatter field. */
+  date: string;
+  /** 'page' (a written page's own date) or 'level' (the oldest date among its pages). */
+  scope?: 'page' | 'level';
+  /** Href of this page's `.md` twin, already passed through url(). Omitted, no link renders. */
+  mdHref?: string;
+  /** ISO date this page stops being live (teardowns only). Replaces the 90-day sentence. */
+  expires?: string;
+}
+const { date, scope = 'page', mdHref, expires } = Astro.props;
+const reviewedAt = new Date(`${date}T00:00:00Z`);
+const ageDays = Math.floor((Date.now() - reviewedAt.getTime()) / 86_400_000);
+const stale = ageDays > 90;
+const expired = Boolean(expires) && new Date().toISOString().slice(0, 10) > expires!;
+const lead = scope === 'level' ? 'Pages at this level last reviewed' : 'Last reviewed';
+---
+
+<p class="reviewed-note">
+  {lead} {date}.
+  {
+    expires
+      ? expired
+        ? ` This teardown expired on ${expires} and is waiting for a re-review; what a product does may have changed since it was written.`
+        : ` Products change faster than techniques do, so this teardown expires on ${expires} and is re-reviewed or retired then.`
+      : stale
+        ? ' This page has not been reviewed in over 90 days and is flagged for a pass.'
+        : ' Pages unreviewed for 90 days are flagged for another pass.'
+  }
+  {mdHref && (
+    <>
+      {' '}<a class="md-link" href={mdHref}>Markdown version of this page</a>
+    </>
+  )}
+</p>

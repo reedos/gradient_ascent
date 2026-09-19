@@ -1,0 +1,26 @@
+---
+// How to eval it: ties a technique to the site's own running eval set. `kinds` and
+// `questionCount` render as pills above the prose so the numbers are easy to scan before
+// reading the paragraph that explains them.
+interface Props {
+  questionCount?: number;
+  kinds?: string[];
+}
+// A page whose technique the shared question set cannot grade passes `questionCount={0}`, which
+// has to mean "no pills", not "a pill saying 0". Both tests below are explicit booleans for that
+// reason: `{questionCount && …}` renders the number 0 into the page when the count is 0, which
+// is how a bare "0" appeared above the computer-use page's eval prose.
+const { questionCount, kinds } = Astro.props;
+const showCount = typeof questionCount === 'number' && questionCount > 0;
+const kindList = kinds ?? [];
+---
+
+{
+  (showCount || kindList.length > 0) && (
+    <div class="eval-meta">
+      {showCount && <span class="pill">{questionCount} questions</span>}
+      {kindList.map((k) => <span class="pill">{k}</span>)}
+    </div>
+  )
+}
+<slot />

@@ -1,0 +1,175 @@
+---
+slug: delegating
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Claude prompting best practices"
+    url: "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"
+    publisher: "Anthropic (Claude Platform Docs)"
+    accessed: "2026-09-18"
+  - title: "LLM01:2025 Prompt Injection"
+    url: "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+    publisher: "OWASP Gen AI Security Project"
+    accessed: "2026-09-18"
+  - title: "Building Effective AI Agents"
+    url: "https://www.anthropic.com/engineering/building-effective-agents"
+    publisher: "Anthropic"
+    accessed: "2026-09-18"
+---
+
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+
+Delegating is deciding which parts of a task to hand to a model and which to keep. It comes
+before <Link href="/techniques/briefing/">briefing</Link>, which assumes the handoff has already
+been settled, and it is a decision about the task rather than about the model: a system fully
+capable of drafting a refund email can still be the wrong thing to let send one unattended, if a
+wrong send is expensive and hard to undo.
+
+Four questions do most of the work. What would a wrong answer cost? How easily could you check
+the result? How reversible is the action once taken? Does the task need context only you have?
+None of the four asks how good the model is.
+
+Anthropic's prompting guide draws the same line. For teams who want a model to confirm before
+risky actions it publishes a sample prompt — text you add to your own, not a description of
+default behaviour: "Consider the reversibility and potential impact of your actions. You are
+encouraged to take local, reversible actions like editing files or running tests, but for actions
+that are hard to reverse, affect shared systems, or could be destructive, ask the user before
+proceeding."<Cite n={1}/>
+
+This page is marked draft, not published: no result file exists for anything below, so nothing
+here reports a measured number.
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Score the task, not the model. Each row is a question about the work in front of you.
+
+| Question | Hand it over | Keep it, or check before it acts |
+|---|---|---|
+| What does a wrong answer cost? | A rough draft, a first pass, something you were going to redo anyway | Money moves, a claim goes out, a diagnosis or an order is recorded |
+| How checkable is the result? | You can verify it in less time than doing it took: a date, a total, a citation | A judgment call, or a summary of more material than you will reread |
+| How reversible is the action? | A draft, a file, a search, a suggestion | A payment, a deletion, a message already sent, a filing already made |
+| Whose context does it need? | Everything relevant is in the material you can give it | It turns on a relationship, an unwritten exception, or something said in a room |
+
+Read the row that scores worst, not the average. A task on the right of even one row wants a
+person between the model and the action — not more trust, a checkpoint. A task on the left of all
+four is a reasonable thing to hand over unattended.
+
+Three things this site recommends never running unattended, each because it fails the same two
+rows — irreversible and unverifiable after the fact:
+
+1. Anything that moves money or creates a legal obligation on your behalf.
+2. Anything that communicates in your name to someone outside your own team.
+3. Anything that deletes or overwrites the only copy of something.
+
+These are not warnings about what a model is likely to do. They are consequences of the table:
+you cannot check the result after the fact, because after the fact is too late. Everything else
+is a judgment for you to make, and most work is everything else.
+
+Then widen deliberately. Hand over the cheapest, most reversible slice first, watch what actually
+goes wrong for a few weeks, and widen only past what held up — which takes a record, so
+<Link href="/techniques/reviewing/">reviewing</Link> and <Link href="/techniques/trust/">calibrating
+trust</Link> are the next two pages, and <Link href="/techniques/human-in-the-loop/">human
+approval</Link> is the checkpoint the middle rows ask for. All four sit on the <Link
+href="/techniques/operator-craft/">operator craft</Link> topic.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+A builder makes the decision durable by encoding it as a permission rather than a habit: a tool
+the model may call freely, a tool that needs a person's approval first, and a tool the system
+never offers at all because nothing in the task needs it. The third category is the one usually
+skipped. OWASP's guidance for prompt injection puts both halves plainly: "Implement
+human-in-the-loop controls for privileged operations to prevent unauthorized actions," and
+"Restrict the model's access privileges to the minimum necessary for its intended
+operations."<Cite n={2}/> An action the system was never given is one no instruction can talk it
+into.
+
+The check belongs in code, running whether or not the model would have drawn the boundary
+correctly by itself. The <Link href="/techniques/safety/">safety</Link> page's example is one
+version: a permission check that refuses a refund call unless the customer's own message
+independently names the same amount, no matter what a retrieved note tried to talk the model
+into. The model may propose; only a call the person's own words support runs.
+
+Start narrow by default. Anthropic's own advice to agent builders is "finding the simplest
+solution possible, and only increasing complexity when needed"<Cite n={3}/> — the Use it lane's
+"widen deliberately," stated as a design default rather than a habit somebody has to remember.
+
+Delegating to another agent is still delegating, and the four questions apply to the split as
+well as to the original task. Anthropic documents over-delegation as a behaviour to prompt
+against rather than a hypothetical: under the heading "Watch for overuse", its prompting guide
+says "Claude Opus 5 also delegates to subagents more readily than prior models", and points to
+its own sample prompt for damping that down<Cite n={1}/>. That is Anthropic describing its own
+model, and it is worth knowing before reading a run: a split you did not choose is still a
+delegation, and <Link href="/techniques/orchestrator-workers/">lead agent and workers</Link>
+is where it gets designed on purpose.
+
+</Lane>
+</Lanes>
+
+## At each level
+
+- <Link href="/levels/0/">No model</Link>: nothing is delegated; the code does the whole task by
+  a fixed rule you wrote.
+- <Link href="/levels/1/">One call</Link>: you delegate the drafting and keep every decision,
+  because nothing happens until you act on the reply.
+- <Link href="/levels/2/">Context</Link>: you also delegate the search, so "how checkable" now
+  depends on whether you can see what was retrieved.
+- <Link href="/levels/3/">Workflows</Link>: the chain is fixed, so you can delegate most of it
+  and keep a checkpoint at exactly the step that scores worst on the table.
+- <Link href="/levels/4/">Tools</Link>: the reversibility row stops being hypothetical, because
+  now something outside the conversation actually changes.
+- <Link href="/levels/5/">Agents</Link>: you delegate a sequence you will not see, so score the
+  table against everything the loop *might* do, not against the task you had in mind.
+- <Link href="/levels/6/">Teams of agents</Link>: the split itself is delegated — a lead agent
+  decides who does what, and that decision is now also made without you.
+- <Link href="/levels/7/">Always-on agents</Link>: the decision moves entirely into advance, as a
+  standing policy, because there is no moment of handover left to think at. See <Link
+  href="/techniques/agent-teammates/">always-on assistants</Link>.
+
+## Practices
+
+- Score the task on the four questions before handing it over, and score the row that comes out
+  worst rather than the average of the four.
+- Encode the boundary as a permission set in advance, not as a judgment the model makes about
+  itself in the moment.
+- Give a system only the access its task needs. An action it cannot take is one nobody has to
+  supervise.
+- Widen from the cheapest reversible slice, on evidence from real use, not from a plan made
+  before anything ran.
+- Re-score the table when the use changes. Boundaries are usually drawn once, for the first
+  narrow task, and then quietly inherited by riskier ones.
+
+## Run it
+
+<RunIt
+  monitor="The distance between what a system is permitted to do and what it actually does.
+  Permissions granted and never exercised are the ones to remove; actions attempted and refused
+  are the ones to read, since each is either a boundary working or a boundary in the wrong place."
+  costAtVolume="A permission boundary costs the same whatever the volume: a disallowed action is
+  disallowed whether attempted once or ten thousand times. What grows with volume is the cost of
+  one drawn too loosely, because the mistake now repeats at the rate of the traffic."
+  failsInProduction="The boundary was drawn for a system's first, narrow job and never re-scored
+  as the job widened. Nothing changed in the permissions; what changed is that the actions behind
+  them stopped being cheap and reversible."
+  whatToLog="Every action taken without asking, the permission that allowed it, and who set that
+  permission and when. The last part is what makes the boundary reviewable by someone other than
+  the person who drew it."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Take a task you already hand to a model and score it on the four questions: cost of a wrong answer, checkability, reversibility, context only you have. Does how closely you actually watch it match the row that scored worst?' },
+  { lane: 'build', body: 'Find a tool or agent you use that has an auto-approve or autopilot setting. Turn it off for one session and write down every action it would otherwise have taken without asking. Score each on the four questions; the ones that fail a row are the ones to keep asking about.' },
+  { lane: 'either', body: 'Pick one task you have never delegated at all. Score it on the four questions and see whether not delegating is the answer the table gives, or just the default you never revisited.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

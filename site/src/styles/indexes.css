@@ -1,0 +1,164 @@
+/* Styles for the two generated index pages, /glossary/ and /failures/ (finish-indexes). Built
+   from the same tokens, hairlines and panel/pill shapes as global.css -- no new colour, font,
+   radius or shadow. Imported directly by glossary.astro and failures.astro, not from the layout,
+   so it never touches a page outside this territory. */
+
+/* ---------------------------------------------------------------------------------------------
+   Glossary
+   --------------------------------------------------------------------------------------------- */
+.letter-index {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0 0 36px;
+  position: sticky;
+  top: 100px;
+  z-index: 5;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  padding: 10px 0;
+}
+.letter-index a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 6px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font: 600 11px var(--font);
+  color: var(--muted);
+  background: var(--panel);
+}
+.letter-index a:hover {
+  border-color: var(--muted);
+  color: var(--text);
+}
+
+.glossary-group {
+  padding: 30px 0;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 150px;
+}
+.glossary-group:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+.glossary-letter {
+  font: 550 13px var(--display);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 16px;
+}
+.glossary-list {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  max-width: 780px;
+}
+.glossary-entry {
+  scroll-margin-top: 150px;
+}
+.glossary-entry dt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.glossary-entry dt > a {
+  font: 550 16px var(--display);
+  letter-spacing: -0.3px;
+}
+.glossary-entry dt > a:hover {
+  text-decoration: underline;
+}
+.glossary-aka {
+  font-size: 11px;
+  color: var(--muted);
+}
+.glossary-page-label {
+  font-size: 9px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 3px 7px;
+  margin-left: auto;
+}
+.glossary-entry dd {
+  margin: 0;
+}
+.glossary-entry dd > p {
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.8;
+  max-width: 62ch;
+}
+.glossary-see {
+  margin-top: 6px !important;
+  font-size: 11.5px !important;
+}
+.glossary-see a {
+  color: var(--accent);
+}
+.glossary-see a:hover {
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Failure gallery
+   --------------------------------------------------------------------------------------------- */
+.failure-filters {
+  margin-bottom: 34px;
+}
+.failure-filters a.filter {
+  color: var(--c, var(--muted));
+  text-decoration: none;
+}
+.failure-filters a.filter:hover {
+  border-color: var(--c, var(--muted));
+}
+
+.fail-groups .fail-group {
+  scroll-margin-top: 110px;
+}
+
+/* :target-based filtering, no client script: navigating to #level-N shows only that group. The
+   nine rules cover level 0-7 plus the tracks group; :has() is required, which every browser this
+   site tests in (recent Chromium/Edge, Safari 15.4+, Firefox 121+) supports. */
+.fail-groups:has(#level-0:target) .fail-group:not(#level-0),
+.fail-groups:has(#level-1:target) .fail-group:not(#level-1),
+.fail-groups:has(#level-2:target) .fail-group:not(#level-2),
+.fail-groups:has(#level-3:target) .fail-group:not(#level-3),
+.fail-groups:has(#level-4:target) .fail-group:not(#level-4),
+.fail-groups:has(#level-5:target) .fail-group:not(#level-5),
+.fail-groups:has(#level-6:target) .fail-group:not(#level-6),
+.fail-groups:has(#level-7:target) .fail-group:not(#level-7),
+.fail-groups:has(#level-tracks:target) .fail-group:not(#level-tracks) {
+  display: none;
+}
+
+.failure-mode {
+  position: relative;
+}
+.fail-source-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--c, var(--accent));
+}
+.fail-source-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .letter-index {
+    top: 0;
+  }
+}

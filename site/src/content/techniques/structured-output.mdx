@@ -1,0 +1,236 @@
+---
+slug: structured-output
+level: 1
+run: structured-output
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Structured Outputs"
+    url: "https://developers.openai.com/api/docs/guides/structured-outputs"
+    publisher: "OpenAI"
+    accessed: "2026-09-18"
+  - title: "Structured output"
+    url: "https://ai.google.dev/gemini-api/docs/structured-output"
+    publisher: "Google"
+    accessed: "2026-09-18"
+  - title: "Tool use with Claude"
+    url: "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview"
+    publisher: "Anthropic"
+    accessed: "2026-09-18"
+  - title: "Pydantic: get started"
+    url: "https://pydantic.dev/docs/validation/latest/get-started/"
+    publisher: "Pydantic"
+    accessed: "2026-09-18"
+  - title: "Introducing System One Models & Jev"
+    url: "https://typesafe.ai/blog/introducing-system-one-models-and-jev"
+    publisher: "TypeSafe AI"
+    date: "2026-09-15"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import structuredOutputRun from '../../data/runs/structured-output.json';
+
+Structured output means the reply comes back in a fixed shape — a JSON object with named fields —
+instead of a paragraph your code has to parse by guessing. Makers reach it two ways. A
+JSON-Schema response format constrains which tokens the model may produce next, so
+the output matches the schema: OpenAI says a model given one "will always generate responses that
+adhere to" it, and that there is then "no need to validate or retry incorrectly formatted
+responses"<Cite n={1}/>; Gemini takes the same approach through a schema in
+`response_format`<Cite n={2}/>. Anthropic gets there differently: define a tool with an input
+schema and have the model call it, adding `strict: true` to make the call match
+exactly<Cite n={3}/>.
+
+Read the rest of that page, though: OpenAI lists cases where a reply still may not match — a
+refusal, or a response cut short by the token limit<Cite n={1}/>. And no schema check speaks to
+whether the values are right; a validly typed number can still be the wrong one. Validating your
+own side and retrying once, the way Pydantic raises "an error with a breakdown of what was
+wrong"<Cite n={4}/>, is still worth doing.
+
+A model released in September 2026 takes the idea to its end. Jev, from TypeSafe AI, generates no
+text at all. TypeSafe calls it a System One model, after psychology's fast, automatic System 1:
+"a new class of frontier models built to make fast, structured decisions that software can use
+directly", or "unstructured state in, typed probabilistic decisions out"<Cite n={5}/>. The
+possible outputs are defined in advance, every answer carries a probability, and the result comes
+back in one parallel pass instead of word by word; TypeSafe quotes "70ms-500ms" a call<Cite n={5}/>.
+The uses it lists are the fixed steps of a level 3 workflow: "classify, route, score, extract, or
+branch where hand-written logic is too brittle"<Cite n={5}/>. TypeSafe names three more. Checking
+other models: "Score, judge, verify, guardrail, and detect jailbreaks of LLM prompts, reasoning
+traces, and/or outputs"<Cite n={5}/>. Reading large piles of data: "Map-reducing over big data"
+<Cite n={5}/>. And anything a person is waiting on, where "100ms speeds means you can use AI in
+your applications where UX is critical"<Cite n={5}/>; its demo is a bot playing Doom from a text
+description of the game at "10 queries a second"<Cite n={5}/>. What it cannot do is write a
+sentence, so it replaces the deciding steps in a system and none of the writing ones. It is in early access behind a
+waitlist, and the speed, price and accuracy figures are TypeSafe's own. This site has measured
+none of them. See <Link href="/timeline/#system-one-models">the timeline</Link> for how it sits
+against reasoning models, which went the other way.
+
+This page is marked draft, not published: structured output has no recorded trace and no scored
+result file yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={structuredOutputRun} label="Level 1 · Structured output" runKey="structured-output" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+You have used structured output any time a product turned something you typed or said into a
+form, a calendar event, or a spreadsheet row, rather than just a reply in a chat window. "Add
+lunch with Sam Thursday at noon" becoming an actual calendar entry with a title, a date and a
+time is a model extracting three fields into a schema, not free text. These features feel
+different from chat for exactly this reason: the product asked for a fixed shape, not a sentence.
+
+What separates a good version of this from a bad one is what happens when the extraction is
+wrong, not whether it usually works. A well-built feature validates the result before doing
+anything with it — a date has to actually be a valid date, a required field has to actually be
+present — and either retries automatically or hands the draft back for you to confirm, the way a
+calendar app shows a proposed event before saving it. A poorly built one accepts whatever
+JSON-shaped thing came back and acts on it immediately, which is how a voice assistant ends up
+creating an event on the wrong date with no chance to catch it.
+
+The distinction between "the API guarantees this is valid JSON" and "the values are actually
+correct" matters here. A schema-constrained reply is guaranteed to be well-formed: every required
+field present, every type right. Nothing about that guarantee checks that the date it extracted is
+the date you meant, or that a warranty length pulled from a document matches what the document
+actually says. Those checks are still yours, or a person's, to make; the schema guarantee is about
+shape, not truth.
+
+When a product fills a form or a record for you, look for a review step before it commits to
+anything, especially anything costly to get wrong — a payment amount, a shipping address, a date
+on a legal document. Its absence is invisible in a demo; it only shows up the first time the
+extraction is wrong.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example extracts a warranty record for one appliance from
+`evals/corpus/warranty-policy.md`: years of full coverage, the years and scope of the limited
+warranty that follows it, and how many days of coverage apply to commercial or rental use. The
+schema is five fields, all required.
+
+<CodeFile file="examples/structured_output/run.py" func="run" />
+
+The retry is deliberately capped at one. `_validate` checks the reply for every required field,
+checks that the appliance named in the reply matches the one that was actually asked about (a
+model can return well-typed JSON about the wrong appliance), and checks that the numeric fields
+are really integers rather than, say, the string `"90 days"` — a mistake a schema does not always
+catch, depending on how strictly the backend enforces it. If the first reply fails validation, the
+code appends the specific problem to the conversation and asks once more; a schema-constrained
+backend makes the second reply far more likely to be correctly typed, but this example's own
+check does not assume that and validates the second reply again regardless. If it is still
+invalid, the run reports that plainly instead of returning something that never actually passed.
+
+Run it yourself:
+
+<CodeFile file="examples/structured_output/README.md" start={15} end={15} lang="text" expect="python -m examples.structured_output" />
+
+Every step is `decided_by: "code"`: the schema is fixed, the retry count is fixed, and the model
+only ever chooses the field values inside whatever shape it was given. Compare this with
+<Link href="/techniques/function-calling/">function calling</Link> at level 4, where the model
+additionally decides whether to use a schema-shaped tool at all — the schema there is the same
+idea, but the decision of when to reach for it moves from your code to the model.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Skip the schema, and just read the reply as text, if nothing downstream actually parses it — a
+chat app showing an answer to a person does not need JSON. And if the field you need is already
+typed in a fixed, unambiguous format (a form field a person filled in directly, a part number a
+barcode scanner read), <Link href="/techniques/order-zero/">level 0, no model at all</Link> reads it directly,
+with no model and nothing to validate.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'Schema-valid, still wrong',
+    notice: "Every field is the right type and none are missing, but a value is factually incorrect: the model extracted a real-looking number that is not the one the source actually states.",
+    test: "Compare the extracted values against the source passage by hand on a sample of real runs, not just by checking that the JSON parses.",
+  },
+  {
+    name: 'A model that ignores the schema anyway',
+    notice: "Without an API-level guarantee (JSON mode, a forced tool call), the model sometimes wraps the JSON in prose or markdown fences, and a plain parser throws before validation even runs.",
+    test: "Feed the exact raw reply through the same parser production code uses, not a version you cleaned up by hand while debugging.",
+  },
+  {
+    name: 'Retrying on the same mistake',
+    notice: 'A validation error is sent back and the model makes the same mistake again, because the error message did not actually explain what to change.',
+    test: 'Check whether the second reply differs at all from the first; if retries look identical, the retry prompt is not doing its job.',
+  },
+  {
+    name: 'A schema stricter than the task',
+    notice: 'A field marked required fails validation on a legitimate case where that value genuinely is not knowable (a warranty exclusion with no stated time limit), forcing the model to invent something rather than say so.',
+    test: 'Look for retries or failures clustering on one specific kind of input rather than spread evenly across questions.',
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, one question', value: '1–2' },
+    { label: 'Tokens in, first attempt', value: '~180' },
+    { label: 'Tokens out', value: '~40' },
+    { label: 'Wall time', value: '~0.5–0.9s' },
+  ]}
+  comparedTo={{
+    label: 'chat (level 1)',
+    note: 'A schema and the fields it requires add a modest number of input tokens over an unstructured reply; the real cost is the retry path, which roughly doubles the call whenever the first reply fails validation.',
+  }}
+  level={1}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+Structured output adds a check no plain-text reply can be given: whether the reply is valid
+against its schema at all, tracked separately from whether the values in it are right. A run can
+score well on validity and badly on the values, or the reverse, and the two numbers together say
+more than either alone. Count the retries as a third number. A schema that needs a second
+attempt on a third of its inputs is a schema to rewrite, not a model to replace.
+
+This example extracts a fixed warranty record rather than answering the question it is handed,
+so `scripts/eval_run.py` will not score it against the site's 60-question set; asking prints
+that reason and stops (`docs/EVALS.md`). The set that would measure it is a different one: a
+list of passages, each with the record it should produce. Score valid-JSON rate, accuracy field
+by field against those records, and how often the retry was needed.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="Schema-validity rate and semantic-correctness rate, tracked as two separate numbers. A drop in either one means something different and gets fixed differently."
+  costAtVolume="Roughly one call per extraction, plus a second call for whatever share of replies fail validation the first time. That retry rate is the number to watch, since it is the part of the cost that is not fixed."
+  failsInProduction={"The source text changes shape slightly (a new document template, a field that used to always be present is now sometimes blank) and the extraction starts failing validation at a rate nobody notices until something downstream breaks on missing data."}
+  whatToLog="The source passage, the full prompt including the schema, every attempt's raw reply, and the validation result for each attempt, so a bad record traces back to which attempt produced it and why."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Find a feature in an app you use that turns text into a form or a calendar event, and deliberately give it an ambiguous input. Does it ask you to confirm, or does it commit to a guess?' },
+  { lane: 'build', body: 'Run python -m examples.structured_output --model stub --question "What is the DR-210\'s warranty?" from the repo root, then open run.py and change one field name in SCHEMA to see which test in tests/test_example_structured_output.py catches it.' },
+  { lane: 'either', body: 'Write down the schema you would want for a task in your own life (a recipe, a receipt, a contact) before trying to get a model to fill it. Which fields are actually required, and which would you rather leave blank than have the model guess?' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

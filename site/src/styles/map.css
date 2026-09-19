@@ -1,0 +1,350 @@
+/* /map/: the technique graph. Reuses the site's tokens (--bg, --panel, --line, --muted, --text,
+   --accent, --o0..--o7, --ot) and existing classes (.panel, .footnote, .row-dot) from
+   global.css -- nothing here redefines them, only the shapes specific to this one page: the
+   filter row, the two-column band-labels-plus-scrolling-drawing layout, the node and edge marks,
+   the legend and the plain-text edge list. */
+
+.map-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* -- Filters: a row of checkboxes that gate combines-with and alternative-to with plain CSS
+   (:has(), below), so no script is needed for the filter itself. -- */
+.map-filters-label {
+  font: 600 10px var(--font);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.map-filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+}
+.filter-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+}
+.filter-check input {
+  accent-color: var(--accent);
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+.map-filter-count {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.map-filters > .footnote {
+  margin-top: 14px;
+}
+
+/* Line-style swatches, shared between the filter row and the legend below the drawing. */
+.map-swatch {
+  display: inline-block;
+  width: 22px;
+  height: 0;
+  vertical-align: middle;
+  border-top: 2px solid var(--line);
+}
+.map-swatch[data-type='requires'] {
+  border-top-color: var(--muted);
+}
+.map-swatch[data-type='upgrades_to'] {
+  border-top-color: var(--accent);
+  border-top-width: 2.5px;
+}
+.map-swatch[data-type='combines_with'] {
+  border-top-color: var(--muted);
+  border-top-style: dotted;
+  border-top-width: 3px;
+}
+.map-swatch[data-type='alternative_to'] {
+  border-top-color: var(--o5);
+  border-top-style: dashed;
+  border-top-width: 2px;
+}
+
+/* -- The drawing: a fixed label sidebar beside a horizontally-scrolling SVG at its natural pixel
+   size. The label column is a plain sibling of the scroll box, not part of it, so it never
+   scrolls out of view; only .map-scroll gets overflow-x, per the brief ("the drawing may scroll
+   sideways inside its own overflow-x:auto box, the page body must not"). -- */
+.map-row {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  overflow: hidden;
+}
+.map-labels {
+  position: relative;
+  flex: 0 0 132px;
+  background: var(--panel2);
+  border-right: 1px solid var(--line);
+}
+.map-band-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 0 12px;
+  border-top: 1px solid var(--line);
+}
+.map-band-label:first-child {
+  border-top: none;
+}
+.map-band-label[data-kind='topics'] {
+  border-top-style: dashed;
+}
+.map-band-num {
+  font: 700 10px var(--font);
+  color: var(--c);
+  letter-spacing: 0.5px;
+}
+.map-band-title {
+  font-size: 10.5px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.map-scroll {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: var(--bg);
+}
+.map-svg {
+  display: block;
+}
+.map-row-rule {
+  stroke: var(--line);
+  stroke-width: 1;
+  opacity: 0.6;
+}
+.map-row-rule[data-kind='topics'] {
+  stroke-dasharray: 3 4;
+}
+
+.map-edge {
+  fill: none;
+}
+.map-edge-requires {
+  stroke: var(--muted);
+  stroke-width: 1.3;
+  opacity: 0.75;
+}
+.map-edge-upgrades-to {
+  stroke: var(--accent);
+  stroke-width: 1.7;
+  opacity: 0.9;
+}
+/* Hidden by default: turned on by the filter checkboxes (:has(), immediately below) or by
+   hovering/focusing one endpoint (the .hl class, toggled by the small script at the foot of
+   TechniqueMap.astro). Kept in the document either way, so the checkboxes and the plain-text
+   list under the drawing never depend on script having run. */
+.map-edge-combines-with,
+.map-edge-alternative-to {
+  opacity: 0;
+  pointer-events: none;
+}
+.map-edge-combines-with {
+  stroke: var(--muted);
+  stroke-width: 1.1;
+  stroke-dasharray: 1.5 3.5;
+}
+.map-edge-alternative-to {
+  stroke: var(--o5);
+  stroke-width: 1.4;
+  stroke-dasharray: 6 3;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .map-edge-combines-with,
+  .map-edge-alternative-to {
+    transition: opacity 0.15s ease;
+  }
+}
+.map-wrap:has(#map-f-requires:checked) .map-edge-requires {
+  opacity: 0.75;
+}
+.map-wrap:has(#map-f-requires:not(:checked)) .map-edge-requires {
+  opacity: 0;
+}
+.map-wrap:has(#map-f-upgrades:checked) .map-edge-upgrades-to {
+  opacity: 0.9;
+}
+.map-wrap:has(#map-f-upgrades:not(:checked)) .map-edge-upgrades-to {
+  opacity: 0;
+}
+.map-wrap:has(#map-f-combines:checked) .map-edge-combines-with {
+  opacity: 0.8;
+}
+.map-wrap:has(#map-f-alt:checked) .map-edge-alternative-to {
+  opacity: 0.85;
+}
+.map-edge-combines-with.hl,
+.map-edge-alternative-to.hl {
+  opacity: 1;
+}
+
+.map-node {
+  cursor: pointer;
+}
+.map-node-body {
+  fill: var(--panel2);
+  stroke: color-mix(in srgb, var(--c) 55%, var(--line));
+  stroke-width: 1;
+}
+/* The level-hue bar along each node's top edge -- see the comment beside it in
+   TechniqueMap.astro. Solid, not mixed with --line, so the colour reads clearly even for the
+   grey --ot topics hue, which is close in value to --line and would nearly vanish if mixed. */
+.map-node-accent {
+  fill: var(--c);
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .map-node-body {
+    transition: stroke 0.15s ease, filter 0.15s ease;
+  }
+}
+.map-node text {
+  font: 600 10px var(--font);
+  fill: var(--text);
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+.map-node:hover .map-node-body,
+.map-node:focus-visible .map-node-body {
+  stroke: var(--c);
+  stroke-width: 1.6;
+  filter: brightness(1.2);
+}
+.map-node:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.map-node:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* -- Legend: under the drawing, plain text, four relation kinds. -- */
+.map-legend-heading {
+  font: 600 10px var(--font);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 14px;
+}
+.map-legend-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px 24px;
+  margin: 0;
+}
+.map-legend-row dt {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font: 600 12.5px var(--font);
+  color: var(--text);
+  margin: 0 0 5px;
+}
+.map-legend-row dd {
+  margin: 0;
+  padding-left: 31px;
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+/* -- The full graph as text, grouped by level: the phone experience and the screen-reader
+   fallback both live here, not only in the drawing above. -- */
+.map-edge-list {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.map-band-group h3 {
+  display: flex;
+  align-items: center;
+  font: 600 11px var(--font);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text);
+  margin: 0 0 9px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.map-band-pages {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.85;
+  margin: 0 0 12px;
+}
+.map-band-pages a {
+  color: var(--text);
+}
+.map-band-pages a:hover {
+  color: var(--accent);
+}
+.map-edge-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.map-edge-items li {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.7;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--line);
+}
+.map-edge-items li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.map-edge-items a {
+  color: var(--accent);
+}
+.map-rel-label {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.map-edge-items small {
+  display: block;
+  color: var(--muted);
+  font-size: 11.5px;
+  margin-top: 3px;
+}
+
+@media (max-width: 600px) {
+  .map-labels {
+    flex-basis: 92px;
+  }
+  .map-band-title {
+    font-size: 9.5px;
+  }
+  .map-legend-list {
+    grid-template-columns: 1fr;
+  }
+}

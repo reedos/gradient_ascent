@@ -1,0 +1,255 @@
+---
+slug: guardrails
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "LLM01:2025 Prompt Injection"
+    url: "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+    publisher: "OWASP Gen AI Security Project"
+    accessed: "2026-09-18"
+  - title: "NeMo Guardrails"
+    url: "https://github.com/NVIDIA-NeMo/Guardrails"
+    publisher: "NVIDIA"
+    accessed: "2026-09-18"
+  - title: "Guardrails AI"
+    url: "https://github.com/guardrails-ai/guardrails"
+    publisher: "Guardrails AI"
+    accessed: "2026-09-18"
+  - title: "AI Guardrails quickstart"
+    url: "https://docs.lakera.ai/docs/quickstart"
+    publisher: "Check Point"
+    accessed: "2026-09-18"
+  - title: "Llama Guard 4"
+    url: "https://developer.meta.com/ai/docs/model-cards-and-prompt-formats/llama-guard-4/"
+    publisher: "Meta"
+    accessed: "2026-09-18"
+  - title: "Introducing System One Models & Jev"
+    url: "https://typesafe.ai/blog/introducing-system-one-models-and-jev"
+    publisher: "TypeSafe AI"
+    date: "2026-09-15"
+    accessed: "2026-09-18"
+---
+
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+
+Guardrails are checks on what goes into a model and what comes out: an input filter over the
+user's own message or retrieved content, an output validator over what the model produced, a
+separate classifier model trained to say whether something is safe, a schema check that an
+answer is well-formed, and an allowlist of which actions are even reachable. OWASP's own
+mitigation list for prompt injection names one form of this directly: "apply semantic filters and
+use string-checking to scan for non-allowed content"<Cite n={1}/>.
+
+Be precise about what that is and is not. A guardrail is a probabilistic check: it decides that
+something *looks* disallowed, usually with a model of its own, and it can be wrong in both
+directions. It is not the control that holds. The control that holds is a check in code that
+tests a specific fact and refuses the action when the fact is false, whatever anything upstream
+concluded — <Link href="/techniques/safety/">safety</Link>'s own example is exactly that check. A
+guardrail lowers how often that check gets tested. It never stands in for it.
+
+This topic is not a level on the ladder; it applies at every level, the way
+<Link href="/techniques/safety/">safety</Link> does.
+
+A guardrail is a decision made on every request, so its cost and its delay are paid every time.
+That is the case TypeSafe AI makes for Jev, a model released in September 2026 that returns typed
+decisions with probabilities and no text: "Score, judge, verify, guardrail, and detect jailbreaks
+of LLM prompts, reasoning traces, and/or outputs"<Cite n={6}/>. It is in early access and the
+claims are the maker's own; nothing here has tested it as a guardrail.
+
+This page is marked draft, not published: no result file or production trace exists for this
+site, so nothing below reports a measured number.
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+A guardrail is usually invisible until it fires: a product that refuses to answer a question, or
+that returns a generic "I can't help with that" instead of the thing you asked for, has very
+likely run an input or output check that decided the request or the answer matched something it
+was built to catch. That refusal is a guess, not a certainty — the check is probabilistic, so it
+can be wrong in either direction: a legitimate request that happens to resemble a disallowed
+pattern gets refused (a false positive), or a disallowed one worded just differently enough gets
+through.
+
+A false positive is not just an annoyance, and its cost is worth naming concretely. A nurse asking
+about a drug interaction, a fraud analyst describing the scam they are investigating, a translator
+working on a court transcript: each has a legitimate request that reads, to a filter, like the
+thing the filter was built to catch. What happens next is the real cost. Some of those people go
+somewhere else and the product loses the use case. Some keep rewording until something gets
+through, which trains them to write around the check rather than to trust it. And because a
+refusal usually says nothing about why, none of them can tell a policy from a misfire. How
+tightly a product tunes this is a decision made on your behalf, and it is rarely visible from
+outside which way it leans.
+
+Where a check sits in the flow decides what it can see. NVIDIA's own NeMo Guardrails distinguishes
+five places a rail can run: on "the input from the user," on retrieved chunks "in the case of a
+RAG... scenario," on how the model is prompted (its dialog rails, which "influence how the LLM is
+prompted"), on "input/output of the custom actions (a.k.a. tools)" the model calls, and on "the
+output generated by the LLM"<Cite n={2}/>. Each catches a different kind of problem, and none of
+them is a substitute for another.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The control that actually holds is not a guardrail model at all: it is a permission check written
+in code, run no matter what anything upstream decided.
+<Link href="/techniques/safety/">Safety</Link>'s own example is that check — `_permitted`,
+walked through on that page — refusing a refund unless the customer's own message names the same
+amount the tool call asks for, at the order this conversation is already about. Nothing here
+repeats that walkthrough; read it there.
+
+What this page shows instead is the piece that runs before the model ever sees untrusted content
+— delimiting it, so a retrieved note cannot pass as the system's own instructions:
+
+<CodeFile file="examples/safety/run.py" func="_delimited" />
+
+This is an input-side guardrail in the plainest sense, and it is a hint, not a guarantee — a
+model can still be talked into following text it was told is data. That is exactly why the code
+check after it exists at all: a guardrail lowers the odds an attack works; it does not remove the
+need for a control that holds even when the guardrail does not.
+
+Classifier-model guardrails are a different mechanism from a code-side permission check, and a
+different one from delimiting: a separate model, trained specifically to say whether content is
+safe. Meta documents Llama Guard 4 as a distinct safeguard model, not the one it is checking,
+whose guardrails apply "on the input and output of the model" it is placed in front of<Cite
+n={5}/> — a second opinion from a second model, which can itself be wrong, rather than a
+deterministic check on a specific fact the way `_permitted` is.
+
+Schema and structured-output checks are the guardrail form aimed at a different failure: not
+"is this unsafe" but "is this well-formed." Guardrails AI's own README describes its two
+functions as running "Input/Output Guards" that "detect, quantify and mitigate the presence of
+specific types of risks," and separately helping "generate structured data from LLMs"<Cite
+n={3}/> — a schema check catches a malformed answer a safety classifier would never flag, because
+nothing about a badly-shaped JSON object is unsafe, only wrong.
+
+A product aimed at the whole request and response pair, rather than one side of it, is AI
+Guardrails (Lakera Guard). Its documentation says it "screens user and external content going
+into LLMs and the resulting output, detecting any threats," and that it "blocks the interaction
+and shows the user a crafted response when threats are detected"<Cite n={4}/>. Two names are in
+play because the product changed hands: it was Lakera Guard, and the documentation is published
+by Check Point as AI Guardrails today. Worth knowing when you search for it, and worth checking
+in your own code and runbooks, where a former name outlives an acquisition for years.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Skip a separate guardrail layer for a single-user tool with no retrieved content and nothing it
+can act on — <Link href="/techniques/safety/">safety</Link>'s own guidance is the same here:
+direct prompt injection is the whole risk, and the worst it can do is a bad answer to your own
+question.
+
+Never treat a guardrail — classifier, filter, or schema check — as the control that makes an
+action safe to run unattended. Add a code-side permission check, the way
+<Link href="/techniques/safety/">safety</Link>'s own example does, as soon as a model can call a
+tool that does something; a guardrail can lower how often that check gets tested, but it cannot
+replace it.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'A false positive is treated as free',
+    notice: 'A guardrail tuned tightly to catch every real problem also refuses a real share of legitimate requests, and nothing measures how many, so the cost of being over-cautious never shows up next to the cost of being under-cautious.',
+    test: 'Run a labeled set of legitimate requests through the check and measure the refusal rate on them directly, not just the catch rate on a set of attacks.',
+  },
+  {
+    name: 'A guardrail model is trusted the same as the check it backstops',
+    notice: "An input or output classifier returns a wrong verdict and nothing else catches it, because the code-level check was skipped on the assumption the classifier would cover it.",
+    test: "Turn the classifier off for one test run and confirm a code-level permission check, where one exists, still refuses the same attack on its own -- a system where only the classifier catches it has one layer, not two.",
+  },
+  {
+    name: 'A check runs at the wrong point in the flow',
+    notice: "An output check catches a bad answer after the model already read and was influenced by untrusted input earlier in the same turn, when an input-side check placed before the model would have stopped the same problem earlier and cheaper.",
+    test: "For a given failure, trace which of the five points a rail can run at (input, dialog, retrieval, execution, output) would have caught it, and confirm a check actually exists there -- not just somewhere in the pipeline.",
+  },
+  {
+    name: 'Structured-output validity is mistaken for safety',
+    notice: 'A schema check confirms an answer is well-formed JSON and that passes as "the guardrails ran," even though nothing about schema validity says the content inside the fields is safe, accurate, or authorized.',
+    test: "Feed the schema check a well-formed answer that is nonetheless unsafe or wrong, and confirm something else -- not the schema check -- is what catches it.",
+  },
+  {
+    name: 'A renamed or re-owned tool is referenced by its old name',
+    notice: "Documentation, code comments, or internal references still name a guardrail product by a former name or owner, so a search for current information turns up nothing, or turns up policy that no longer applies under the new owner.",
+    test: "Check whether anything in your own system still names a guardrail tool by a name its own current documentation no longer uses, the way this page's own registry note does for the product formerly called Lakera Guard.",
+  },
+]} />
+
+## At each level
+
+- <Link href="/levels/1/">One call</Link>: an input filter on the user's message and an output
+  check on the answer are the only two points that exist yet — the same two halves
+  <Link href="/techniques/chat/">chat</Link>'s single call has.
+- <Link href="/levels/2/">Context</Link>: a retrieval rail becomes relevant for the first time,
+  since retrieved content is now something a check can inspect before it reaches the model —
+  exactly the failure mode <Link href="/techniques/rag/">RAG</Link> names for prompt injection
+  through retrieved text.
+- <Link href="/levels/4/">Tools</Link>: an execution rail — a check on what a tool call is about
+  to do, before it runs — is where the code-side permission check
+  <Link href="/techniques/safety/">safety</Link>'s own example builds actually lives; this is the
+  level where a guardrail stops being advisory and starts standing in front of a real action.
+- <Link href="/levels/5/">Agents</Link>: checks that ran once per exchange at lower levels now
+  need to run on every step of a loop with no fixed length, the same shift
+  <Link href="/techniques/single-agent/">a single agent</Link>'s own step cap responds to for
+  cost — a guardrail evaluated only at the start of a run cannot catch what the run drifts into
+  by its twentieth step.
+- <Link href="/levels/6/">Teams of agents</Link>: one agent's output becomes another agent's
+  input, so a check placed only at the system's outer boundary misses content moving between
+  agents entirely — the reason <Link href="/techniques/agent-graphs/">agent graphs</Link> checks
+  a handoff against an allowlist before acting on it.
+- <Link href="/levels/7/">Always-on agents</Link>: nobody is reading each decision as it happens,
+  so the signal is the refusal rate over time rather than any single refusal — a rate that moves
+  means either the traffic changed or the check did, and both are worth knowing about.
+
+## Practices
+
+- Say out loud, for each check, whether it is a guardrail or a control. If the sentence that
+  justifies running an action unattended names a classifier, the system has no control yet.
+- Measure both rates. A catch rate on attacks without a refusal rate on legitimate requests is
+  half a number, and it is the half that always looks good.
+- Put each check where it can see what it is judging: retrieved text before the model reads it,
+  a tool call before it runs, an answer before it is returned.
+- Log the decision and the reason, not just the outcome, so a refusal rate can later be split
+  into correct and incorrect rather than only counted.
+- Attack your own checks on a schedule rather than when something goes wrong —
+  <Link href="/techniques/red-teaming/">red teaming</Link> is how a guardrail's real precision
+  gets found before a user finds it.
+
+## Run it
+
+<RunIt
+  monitor="Refusal rate on a labeled set of legitimate requests, separately from catch rate on a
+  labeled set of attacks -- a guardrail tuned to look good on one number alone is untuned on the
+  other."
+  costAtVolume="A code-side check like safety's own permission check is a few lines run on every
+  call, negligible next to the model call it guards. A classifier-model guardrail such as Llama
+  Guard is a separate model call: one more per request to screen input, two if output is screened
+  too."
+  failsInProduction="A false positive rate nobody measured turns out to be high enough that
+  people route around the product entirely, or a guardrail model's own wrong verdict goes
+  uncaught because nothing else was checking the same thing."
+  whatToLog="Which check ran, what it decided, and why -- refused, altered, or passed -- on both
+  legitimate and disallowed content, so a refusal rate can be broken out by whether it was
+  correct, not just counted."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: "Think of a legitimate request a product has refused you. Write down which of the five points a check could have run at -- input, dialog, retrieval, execution, output -- the refusal most likely came from, and what the refusal message did and did not tell you about why. A refusal that explains nothing costs the same as a wrong one." },
+  { lane: 'build', body: "Open examples/safety/run.py and read _delimited alongside _permitted. Write down, for each, which of the five rail types NeMo Guardrails names (input, dialog, retrieval, execution, output) it corresponds to, and which of the two still holds if the model ignores everything it was told." },
+  { lane: 'either', body: "Pick one guardrail tool named on this page. Read its own documentation for one thing it explicitly says it does NOT do or does not guarantee, and write down what would have to catch that gap instead." },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

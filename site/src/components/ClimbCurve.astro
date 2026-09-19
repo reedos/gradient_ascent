@@ -1,0 +1,505 @@
+---
+// The home page's own version of the "AI maturity curve" slide: one smooth curve, drawn in the
+// level gradient, with the site's eight levels on it and five stage cards grouping them into the
+// four ways of working with a model (plus order zero). No client JavaScript: hover and focus
+// states are CSS only, and the two layouts (wide chart, narrow strip) are both rendered at build
+// time and swapped with a media query.
+//
+// The curve is the exact shape Logo.astro draws -- the same four control points per segment,
+// scaled into this chart's canvas instead of the logo's 40x40 box -- so the two read as the same
+// mark at two sizes. The eight level points are not eyeballed: they are found by sampling the
+// curve and walking it to eight equal arc-length steps.
+import { levels, stages } from '../lib/content';
+import { url } from '../lib/url';
+
+type Pt = [number, number];
+type Seg = [Pt, Pt, Pt, Pt];
+
+// Logo.astro: `M5 33.5C17.2 32.7 27.6 25.1 34 7.2` in a 40x40 box: one convex cubic that starts
+// flat and keeps steepening to the top, the shape of an exponential. (An earlier S-curve eased
+// off at the top and read as levelling out, which is the opposite of what the chart says.) The
+// cubic is split at t = 0.5 by de Casteljau into two segments so the sampling code below can
+// treat the path as two pieces; together they are exactly the logo's single curve.
+const SEG1: Seg = [
+  [5, 33.5],
+  [11.1, 33.1],
+  [16.75, 31.0],
+  [21.675, 26.7625],
+];
+const SEG2: Seg = [
+  [21.675, 26.7625],
+  [26.6, 22.525],
+  [30.8, 16.15],
+  [34, 7.2],
+];
+// y0 is the top of the logo's box (the dot); y1 is the bottom (the origin).
+const BOX = { x0: 5, x1: 34, y0: 7.2, y1: 33.5 };
+
+function cubic(seg: Seg, t: number): Pt {
+  const [p0, p1, p2, p3] = seg;
+  const mt = 1 - t;
+  const a = mt * mt * mt,
+    b = 3 * mt * mt * t,
+    c = 3 * mt * t * t,
+    d = t * t * t;
+  return [a * p0[0] + b * p1[0] + c * p2[0] + d * p3[0], a * p0[1] + b * p1[1] + c * p2[1] + d * p3[1]];
+}
+
+/** Combined-path parameter s in [0, 2]: [0,1] is segment 1, [1,2] is segment 2. */
+function atS(s1: Seg, s2: Seg, s: number): Pt {
+  return s <= 1 ? cubic(s1, s) : cubic(s2, s - 1);
+}
+
+function normalize([x, y]: Pt): Pt {
+  return [(x - BOX.x0) / (BOX.x1 - BOX.x0), (y - BOX.y0) / (BOX.y1 - BOX.y0)];
+}
+
+interface Canvas {
+  w: number;
+  h: number;
+  padL: number;
+  padR: number;
+  padT: number;
+  padB: number;
+}
+
+function toPx([nx, ny]: Pt, c: Canvas): Pt {
+  return [c.padL + nx * (c.w - c.padL - c.padR), c.padT + ny * (c.h - c.padT - c.padB)];
+}
+
+interface CurvePoint {
+  level: number;
+  x: number;
+  y: number;
+}
+
+interface CurveGeometry {
+  pathD: string;
+  fillD: string;
+  points: CurvePoint[];
+  baselineY: number;
+}
+
+/**
+ * Builds the curve path and the eight level points for one canvas size, by scaling the logo's
+ * own control points into it and sampling arc length. Both layouts below call this with their
+ * own canvas so they draw from the same geometry.
+ */
+function buildCurve(c: Canvas, samples = 400): CurveGeometry {
+  const s1px = SEG1.map((p) => toPx(normalize(p), c)) as Seg;
+  const s2px = SEG2.map((p) => toPx(normalize(p), c)) as Seg;
+
+  const ss: number[] = [];
+  const pts: Pt[] = [];
+  for (let i = 0; i <= samples; i++) {
+    const s = (i / samples) * 2;
+    ss.push(s);
+    pts.push(atS(s1px, s2px, s));
+  }
+  // The levels are spaced evenly ALONG THE X-AXIS, so each step to the right is one level and
+  // the height gained per level grows, as on an exponential. (Equal arc-length steps would bunch
+  // the top levels together on the steep part and squeeze their cards.) x is monotonic along
+  // this curve, so walking the samples finds each target.
+  const xStart = pts[0][0];
+  const xEnd = pts[pts.length - 1][0];
+  const points: CurvePoint[] = levels.map((tier, i) => {
+    const target = xStart + ((xEnd - xStart) * i) / (levels.length - 1);
+    let j = 0;
+    while (j < pts.length - 2 && pts[j + 1][0] < target) j++;
+    const span = pts[j + 1][0] - pts[j][0];
+    const frac = span > 0 ? (target - pts[j][0]) / span : 0;
+    const s = ss[j] + (ss[j + 1] - ss[j]) * frac;
+    const [x, y] = atS(s1px, s2px, s);
+    return { level: tier.order, x, y };
+  });
+
+  const [p0, p1, p2, p3] = s1px;
+  const [, p4, p5, p6] = s2px;
+  const f = (n: number) => n.toFixed(1);
+  const pathD =
+    `M${f(p0[0])},${f(p0[1])} C${f(p1[0])},${f(p1[1])} ${f(p2[0])},${f(p2[1])} ${f(p3[0])},${f(p3[1])}` +
+    ` C${f(p4[0])},${f(p4[1])} ${f(p5[0])},${f(p5[1])} ${f(p6[0])},${f(p6[1])}`;
+  const baselineY = c.h - c.padB;
+  const fillD = `${pathD} L${f(p6[0])},${f(baselineY)} L${f(p0[0])},${f(baselineY)} Z`;
+
+  return { pathD, fillD, points, baselineY };
+}
+
+const WIDE: Canvas = { w: 1000, h: 435, padL: 26, padR: 26, padT: 40, padB: 34 };
+// padB leaves room below the baseline for the stage-marker ticks and numbers (see the
+// climb-marker-* elements below); without it their text sat past the viewBox and was clipped.
+const STRIP: Canvas = { w: 340, h: 180, padL: 14, padR: 14, padT: 20, padB: 34 };
+
+const wide = buildCurve(WIDE);
+const strip = buildCurve(STRIP);
+
+const tierTitle = (order: number) => levels.find((t) => t.order === order)!.title;
+const pointAt = (geom: CurveGeometry, level: number) => geom.points.find((p) => p.level === level)!;
+
+/** A stage's position along the x-axis, as the mean of its levels' points -- used only to size
+ *  the wide layout's grid columns, so a stage's card sits above the stretch of curve its levels
+ *  actually occupy rather than at an eyeballed fraction. */
+function anchorXPct(geom: CurveGeometry, canvas: Canvas, stageLevels: number[]): number {
+  const xs = stageLevels.map((lv) => pointAt(geom, lv).x);
+  const mean = xs.reduce((s, x) => s + x, 0) / xs.length;
+  return (mean / canvas.w) * 100;
+}
+
+const anchors = stages.map((s) => anchorXPct(wide, WIDE, s.levels));
+// Partition the width at the midpoints between neighbouring stages' anchors, so every stage owns
+// a column proportional to where its levels actually sit on the curve, and the columns tile the
+// full width with no gap.
+const bounds = [0, ...anchors.slice(0, -1).map((a, i) => (a + anchors[i + 1]) / 2), 100];
+const colWidths = anchors.map((_, i) => bounds[i + 1] - bounds[i]);
+// `fr`, not `%`: the cards row has a `column-gap` between cards, and a percentage track does
+// not account for that -- five columns summing to 100% plus four 14px gaps overflowed the
+// container by 56px, which clipped the rightmost card's text at 1000px width. `fr` divides the
+// space left over *after* gaps, so the same ratios add up to the container's actual width.
+// minmax, not a bare `fr`: level 0 owns the flattest, narrowest stretch of the curve, and a
+// column sized purely by that broke the "Skip the model" card's sentences into three-word lines
+// beside four comfortable siblings. --col-min is 0 by default and only becomes a real floor
+// above 1100px (see the stylesheet below), where five 170px columns plus four 14px gaps still
+// leave room to spare; between 850 and 1100px the proportional widths stand, because a floor
+// there could push the row wider than its container.
+const gridColumns = colWidths.map((w) => `minmax(var(--col-min, 0px), ${w.toFixed(3)}fr)`).join(' ');
+
+const gradientStops = levels.map((t, i) => ({
+  offset: `${((i / (levels.length - 1)) * 100).toFixed(2)}%`,
+  color: `var(--o${t.order})`,
+}));
+
+const stageEnds = (levelsArr: number[]) => [levelsArr[0], levelsArr[levelsArr.length - 1]];
+
+// The narrow layout ties each card to its tick on the curve. Letters, not numbers: the same
+// strip already prints the level numbers 0-7 above the curve, and a second row of digits below
+// it read as more levels.
+const STAGE_MARKS = ['A', 'B', 'C', 'D', 'E'];
+
+const altText =
+  `This chart maps the site's eight levels onto five stages, in order: ` +
+  stages
+    .map((s) => {
+      const lv = s.levels.length > 1 ? `levels ${s.levels[0]} to ${s.levels[s.levels.length - 1]}` : `level ${s.levels[0]}`;
+      return `${s.title} (${lv})`;
+    })
+    .join('; ') +
+  '.';
+---
+
+<figure class="climb" id="climb-curve">
+  <p class="sr-only">{altText}</p>
+
+  <div class="climb-wide">
+    <svg
+      class="climb-svg"
+      viewBox={`0 0 ${WIDE.w} ${WIDE.h}`}
+      preserveAspectRatio="xMidYMid meet"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id="climb-stroke-wide" gradientUnits="userSpaceOnUse" x1={WIDE.padL} y1="0" x2={WIDE.w - WIDE.padR} y2="0">
+          {gradientStops.map((s) => <stop offset={s.offset} style={`stop-color:${s.color}`} />)}
+        </linearGradient>
+        <linearGradient id="climb-fill-wide" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" style="stop-color:var(--accent);stop-opacity:.12" />
+          <stop offset="1" style="stop-color:var(--accent);stop-opacity:0" />
+        </linearGradient>
+      </defs>
+      {[0.28, 0.56].map((f) => {
+        const y = WIDE.padT + f * (WIDE.h - WIDE.padT - WIDE.padB);
+        return <line x1={WIDE.padL} x2={WIDE.w - WIDE.padR} y1={y} y2={y} class="climb-grid" />;
+      })}
+      <line x1={WIDE.padL} x2={WIDE.w - WIDE.padR} y1={wide.baselineY} y2={wide.baselineY} class="climb-baseline" />
+      <path d={wide.fillD} fill="url(#climb-fill-wide)" stroke="none" />
+      <path d={wide.pathD} fill="none" stroke="url(#climb-stroke-wide)" stroke-width="3" stroke-linecap="round" />
+      {wide.points.map((p) => (
+        <a href={url(`/levels/${p.level}/`)} class="climb-point" aria-label={`Level ${p.level}: ${tierTitle(p.level)}`}>
+          <circle cx={p.x} cy={p.y} r={p.level === 7 ? 8 : 5.5} fill={`var(--o${p.level})`} stroke="var(--bg)" stroke-width="3" />
+          <text x={p.x} y={p.y - 13} class="climb-point-num">{p.level}</text>
+        </a>
+      ))}
+    </svg>
+
+    <div class="climb-connectors" style={`grid-template-columns:${gridColumns}`} aria-hidden="true">
+      {stages.map((s) => {
+        const [first, last] = stageEnds(s.levels);
+        return (
+          <div class="climb-connector">
+            <span style={`background:linear-gradient(var(--o${first}),var(--o${last}))`}></span>
+          </div>
+        );
+      })}
+    </div>
+
+    <div class="climb-cards-wide" style={`grid-template-columns:${gridColumns}`}>
+      {stages.map((s) => {
+        const [first, last] = stageEnds(s.levels);
+        return (
+          <div class:list={['climb-card', { quiet: s.id === 'skip' }]} style={`--rule-start:var(--o${first});--rule-end:var(--o${last})`}>
+            <h3>{s.title}</h3>
+            <p class="climb-kinds">{s.kinds}</p>
+            <p class="climb-line">{s.line}</p>
+            <div class="climb-levels">
+              {s.levels.map((lv) => (
+                <a href={url(`/levels/${lv}/`)}>
+                  <span class="row-dot" style={`--c:var(--o${lv})`}></span>Level {lv} &middot; {tierTitle(lv)}
+                </a>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+
+  <div class="climb-narrow">
+    <svg class="climb-svg-strip" viewBox={`0 0 ${STRIP.w} ${STRIP.h}`} aria-hidden="true">
+      <defs>
+        <linearGradient id="climb-stroke-strip" gradientUnits="userSpaceOnUse" x1={STRIP.padL} y1="0" x2={STRIP.w - STRIP.padR} y2="0">
+          {gradientStops.map((s) => <stop offset={s.offset} style={`stop-color:${s.color}`} />)}
+        </linearGradient>
+      </defs>
+      <line x1={STRIP.padL} x2={STRIP.w - STRIP.padR} y1={strip.baselineY} y2={strip.baselineY} class="climb-baseline" />
+      <path d={strip.pathD} fill="none" stroke="url(#climb-stroke-strip)" stroke-width="2.5" stroke-linecap="round" />
+      {strip.points.map((p) => (
+        <a href={url(`/levels/${p.level}/`)} class="climb-point" aria-label={`Level ${p.level}: ${tierTitle(p.level)}`}>
+          <circle cx={p.x} cy={p.y} r={p.level === 7 ? 6.5 : 4.5} fill={`var(--o${p.level})`} stroke="var(--bg)" stroke-width="2.5" />
+          <text x={p.x} y={p.y - 9} class="climb-point-num-strip">{p.level}</text>
+        </a>
+      ))}
+      {stages.map((s, i) => {
+        const startPoint = pointAt(strip, s.levels[0]);
+        return (
+          <g class="climb-marker-g">
+            <line x1={startPoint.x} x2={startPoint.x} y1={strip.baselineY + 4} y2={strip.baselineY + 12} class="climb-marker-tick" />
+            <text x={startPoint.x} y={strip.baselineY + 24} class="climb-marker-num">{STAGE_MARKS[i]}</text>
+          </g>
+        );
+      })}
+    </svg>
+
+    <div class="climb-cards-narrow">
+      {stages.map((s, i) => {
+        const [first, last] = stageEnds(s.levels);
+        return (
+          <div class:list={['climb-card', { quiet: s.id === 'skip' }]} style={`--rule-start:var(--o${first});--rule-end:var(--o${last})`}>
+            <div class="climb-marker-badge">{STAGE_MARKS[i]}</div>
+            <h3>{s.title}</h3>
+            <p class="climb-kinds">{s.kinds}</p>
+            <p class="climb-line">{s.line}</p>
+            <div class="climb-levels">
+              {s.levels.map((lv) => (
+                <a href={url(`/levels/${lv}/`)}>
+                  <span class="row-dot" style={`--c:var(--o${lv})`}></span>Level {lv} &middot; {tierTitle(lv)}
+                </a>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+
+  <figcaption class="footnote climb-caption">
+    The curve is a map, not a measurement. It shows the order of the levels, not how much each
+    one adds. Most work belongs near the bottom.
+  </figcaption>
+</figure>
+
+<style>
+  .climb {
+    margin: 0;
+  }
+  .climb-wide {
+    display: block;
+  }
+  .climb-narrow {
+    display: none;
+  }
+
+  /* -- Wide layout (>= 850px): curve on top, a thin connector row, then a row of cards, all in
+     one grid so the columns line up and the curve can never be covered. -- */
+  .climb-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .climb-grid {
+    stroke: var(--line);
+    stroke-opacity: 0.6;
+    stroke-width: 1;
+  }
+  .climb-baseline {
+    stroke: var(--line);
+    stroke-width: 1;
+  }
+  .climb-point circle {
+    transition: r 0.15s, filter 0.15s;
+  }
+  .climb-point:hover circle,
+  .climb-point:focus-visible circle {
+    filter: brightness(1.25);
+  }
+  .climb-point:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 100%;
+  }
+  .climb-point:focus:not(:focus-visible) {
+    outline: none;
+  }
+  .climb-point-num {
+    font: 600 13px var(--font);
+    fill: var(--muted);
+    text-anchor: middle;
+  }
+
+  .climb-connectors {
+    display: grid;
+    height: 16px;
+    /* Same column-gap as .climb-cards-wide: with `fr` tracks the gap changes where each column
+       boundary actually falls, so the two grids must share it to stay aligned. */
+    column-gap: 14px;
+  }
+  .climb-connector {
+    display: flex;
+    justify-content: center;
+  }
+  .climb-connector span {
+    display: block;
+    width: 2px;
+    height: 100%;
+    opacity: 0.55;
+  }
+
+  .climb-cards-wide {
+    display: grid;
+    column-gap: 14px;
+    align-items: start;
+  }
+  @media (min-width: 1100px) {
+    .climb-cards-wide,
+    .climb-connectors {
+      --col-min: 170px;
+    }
+  }
+
+  .climb-card {
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: var(--panel);
+    padding: 15px 16px 14px;
+    min-width: 0;
+    position: relative;
+  }
+  .climb-card::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    height: 2px;
+    border-radius: 9px 9px 0 0;
+    background: linear-gradient(90deg, var(--rule-start), var(--rule-end));
+  }
+  .climb-card.quiet {
+    border-style: dashed;
+    background: transparent;
+  }
+  .climb-card.quiet::before {
+    display: none;
+  }
+  .climb-card h3 {
+    font: 600 15px var(--display);
+    letter-spacing: -0.2px;
+    margin: 0 0 5px;
+  }
+  .climb-kinds {
+    font-size: 11px;
+    color: var(--muted);
+    margin: 0 0 7px;
+    line-height: 1.5;
+  }
+  .climb-line {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.65;
+    margin: 0 0 10px;
+  }
+  .climb-levels {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .climb-levels a {
+    font-size: 10.5px;
+    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+  }
+  .climb-levels a:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
+
+  .climb-caption {
+    max-width: 62ch;
+    margin-top: 18px;
+  }
+
+  /* -- Narrow layout (< 850px): a compact strip, then the cards stacked in one column. -- */
+  .climb-svg-strip {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .climb-point-num-strip {
+    font: 600 8.5px var(--font);
+    fill: var(--muted);
+    text-anchor: middle;
+  }
+  .climb-marker-tick {
+    stroke: var(--muted);
+    stroke-opacity: 0.55;
+    stroke-width: 1.4;
+  }
+  .climb-marker-num {
+    font: 700 9px var(--font);
+    fill: var(--muted);
+    text-anchor: middle;
+  }
+  .climb-cards-narrow {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .climb-marker-badge {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    width: 20px;
+    height: 20px;
+    border-radius: 100%;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font: 700 10px var(--font);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .climb-cards-narrow .climb-card {
+    padding-right: 42px;
+  }
+
+  @media (max-width: 849.98px) {
+    .climb-wide {
+      display: none;
+    }
+    .climb-narrow {
+      display: block;
+    }
+  }
+</style>

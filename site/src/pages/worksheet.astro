@@ -1,0 +1,203 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionTop from '../components/SectionTop.astro';
+import Worksheet from '../components/islands/Worksheet';
+import { url } from '../lib/url';
+import { resolveWorksheet, allLevelInfo } from '../lib/worksheet';
+import '../styles/worksheet.css';
+
+// Everything the island needs, fully resolved server-side: no taxonomy or registry import ships
+// to the client, only the plain strings built here (see site/src/lib/worksheet.ts's own note).
+const data = resolveWorksheet();
+const levelInfo = allLevelInfo();
+
+const STATUS_LABEL: Record<string, string> = {
+  published: 'Published',
+  draft: 'Draft',
+  stub: 'Outline',
+  planned: 'Planned',
+};
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+<Base
+  title="Worksheet · Gradient Ascent"
+  description="A short set of questions that settles the lowest level that does the job, from a fixed rule to an always-on agent, and what to watch for once you build it."
+>
+  <div class="page-hero">
+    <div class="eyebrow"><span class="dot"></span>Worksheet</div>
+    <h1>Find the lowest level that does the job</h1>
+    <p>
+      About two minutes. Nothing you type here is sent anywhere; the whole thing runs in your
+      browser. Answer honestly about the task in front of you, not the one you would like it to
+      be.
+    </p>
+  </div>
+
+  <section class="section">
+    <SectionTop
+      eyebrow="Two minutes, no code"
+      title="Answer a few questions about the task"
+      aside="Each question either settles the level or moves to the next. Four short questions after that change the advice, not the level."
+    />
+
+    <div class="ws-js-only">
+      <Worksheet client:load data={data} levelInfo={levelInfo} />
+    </div>
+
+    <div class="ws-noscript-only">
+      <p class="footnote reading" style="margin-bottom:22px">
+        JavaScript is off (or still loading), so here is the whole worksheet at once: every
+        question, what each answer points to, and all eight possible results below it. With
+        JavaScript on, this becomes one question at a time with a result built from your actual
+        answers.
+      </p>
+
+      <ol class="ws-static-list">
+        {
+          data.core_questions.map((q) => (
+            <li class="ws-static-q" id={`q-${q.id}`}>
+              <span class="ws-static-num" aria-hidden="true" />
+              <h3>{q.prompt}</h3>
+              {q.help && <p class="footnote" style="margin:-6px 0 12px">{q.help}</p>}
+              <ul class="ws-static-answers">
+                {q.answers.map((a) => (
+                  <li>
+                    {a.label}{' '}
+                    {a.action === 'settle' ? (
+                      <span class="ws-static-outcome">
+                        &mdash; settles at{' '}
+                        <a href={`#level-${a.level}`}>
+                          Level {pad(a.level ?? 0)} &middot; {levelInfo[a.level ?? 0].title}
+                        </a>
+                        .
+                      </span>
+                    ) : (
+                      <span class="ws-static-outcome">
+                        &mdash; not enough on its own: continue to{' '}
+                        <a href={`#q-${a.next}`}>
+                          {data.core_questions.find((n) => n.id === a.next)?.prompt}
+                        </a>
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+        {
+          data.cross_questions.map((q) => (
+            <li class="ws-static-q" id={`q-${q.id}`}>
+              <span class="ws-static-num" aria-hidden="true" />
+              <h3>{q.prompt}</h3>
+              <p class="footnote" style="margin:-6px 0 12px">
+                Does not change the level. Answered after the level is settled, and only changes
+                the cautions shown with the result.
+              </p>
+              <ul class="ws-static-answers">
+                {q.answers.map((a) => (
+                  <li>
+                    {a.label}
+                    {a.caution && <span class="ws-static-outcome"> &mdash; {a.caution.text}</span>}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="subhead" style="margin-top:8px">
+        The eight results
+        <span>one per level</span>
+      </div>
+      {
+        levelInfo.map((info) => (
+          <section class="ws-level-section" id={`level-${info.order}`}>
+            <div class="page-hero leveled" style={`--c:${info.color};padding:20px 0 0`}>
+              <div class="eyebrow" style={`--c:${info.color};color:${info.color}`}>
+                <span class="dot" />
+                Level {pad(info.order)}
+              </div>
+              <h2>{info.title}</h2>
+              <p>{info.description}</p>
+              <div class="connection" style={`--c:${info.color}`}>
+                <strong>Who decides the next step</strong>
+                {info.who}
+              </div>
+            </div>
+
+            {info.next && (
+              <div class="ws-next-up" style="margin-top:18px">
+                <strong>
+                  Why not level {pad(info.next.order)}, {info.next.title}?
+                </strong>
+                {info.next.description} It would take more to build, more to test and more ways
+                to fail quietly &mdash; worth it only once level {pad(info.order)} has actually
+                fallen short, not because it might. A proposal that skips several levels has to
+                clear that same test at every level in between.
+              </div>
+            )}
+
+            <div class="subhead" style="margin-top:24px">
+              Techniques at this level
+              <span>{info.techniques.length}</span>
+            </div>
+            <div class="panel reading">
+              {info.techniques.map((t) => (
+                <div class="pattern-row">
+                  <h3>
+                    <i class="row-dot" style={`--c:${info.color}`} />
+                    <a href={url(`/techniques/${t.slug}/`)}>{t.title}</a>
+                  </h3>
+                  <span class={`pill ${t.status}`}>{STATUS_LABEL[t.status]}</span>
+                  <p>{t.summary}</p>
+                </div>
+              ))}
+            </div>
+
+            {info.recipes.length > 0 && (
+              <>
+                <div class="subhead" style="margin-top:24px">
+                  Recipes that top out here
+                  <span>{info.recipes.length}</span>
+                </div>
+                <div class="signal-list">
+                  {info.recipes.map((r) => (
+                    <div class="signal-row">
+                      <div class="signal-layer">
+                        {r.levels.map((l) => (
+                          <i style={`--c:var(--o${l})`} />
+                        ))}
+                        <span>{r.levels.map((l) => `Level ${l}`).join(' + ')}</span>
+                      </div>
+                      <div class="signal-body">
+                        <h3>
+                          <a href={url(`/recipes/${r.slug}/`)}>{r.title}</a>
+                        </h3>
+                        <p>{r.summary}</p>
+                      </div>
+                      <div class="signal-meta">Needs level {Math.max(...r.levels)}</div>
+                      <a href={url(`/recipes/${r.slug}/`)} aria-label={`Open ${r.title}`}>
+                        &#8599;
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            <div class="ws-result-links" style="margin-top:20px">
+              <a href={url(`/levels/${info.order}/`)}>See the full level {pad(info.order)} page &rarr;</a>
+              <a href={url('/#climb')}>See it on the curve &rarr;</a>
+            </div>
+          </section>
+        ))
+      }
+    </div>
+  </section>
+</Base>
+
+<script is:inline>
+  document.documentElement.classList.add('js');
+</script>

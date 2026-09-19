@@ -1,0 +1,22 @@
+---
+// One side of the Use it / Build it switch. Always rendered; Lanes.astro's script is what hides
+// the other one. Must be used inside <Lanes>.
+//
+// The title is a real <h2>, at the same level as "Failure modes" and "Cost and latency", so the
+// two largest blocks on the page are in the heading outline rather than being marked only by a
+// small eyebrow. `aria-labelledby` points the section at that heading instead of repeating the
+// same string in an aria-label.
+interface Props {
+  name: 'use' | 'build';
+  title: string;
+}
+const { name, title } = Astro.props;
+const headingId = `lane-${name}`;
+---
+
+<section class="lane-panel" data-lane={name} aria-labelledby={headingId}>
+  <h2 id={headingId}>{title}</h2>
+  <div class="lane-body">
+    <slot />
+  </div>
+</section>

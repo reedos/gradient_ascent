@@ -1,0 +1,221 @@
+---
+slug: knowledge-graphs
+level: 2
+run: knowledge-graphs
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Welcome - GraphRAG"
+    url: "https://microsoft.github.io/graphrag/"
+    publisher: "Microsoft (GraphRAG documentation)"
+    accessed: "2026-09-18"
+  - title: "Knowledge graph"
+    url: "https://neo4j.com/use-cases/knowledge-graph/"
+    publisher: "Neo4j"
+    accessed: "2026-09-18"
+  - title: "LazyGraphRAG: Setting a new standard for quality and cost"
+    url: "https://www.microsoft.com/en-us/research/blog/lazygraphrag-setting-a-new-standard-for-quality-and-cost/"
+    publisher: "Microsoft Research (blog)"
+    accessed: "2026-09-18"
+  - title: "Enterprise Graph"
+    url: "https://www.glean.com/product/knowledge-graph"
+    publisher: "Glean"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import knowledgeGraphsRun from '../../data/runs/knowledge-graphs.json';
+
+Knowledge graphs connect information. A graph holds facts as entities and the relationships
+between them: nodes, relationships and properties, in Neo4j's description of the pattern it
+sells<Cite n={2}/>. "Halvorsen makes the DR-520" becomes two entities joined by a "makes"
+relationship. Enough facts like that and you can follow a chain of them, hop by hop, from one
+document to another, instead of needing one passage to state the whole answer. Each hop is a
+separate, checkable edge; Neo4j calls that capturing evidence provenance<Cite n={2}/>.
+
+GraphRAG, as Microsoft documents it, builds one automatically: slice the corpus, have a model
+extract the entities, relationships and claims, cluster the result, summarize each
+cluster<Cite n={1}/>. Extraction is the cost. LazyGraphRAG is Microsoft Research's own lighter
+variant, which leaves that model work until a question is actually asked; Microsoft Research
+states that its data indexing costs are identical to vector RAG and 0.1% of the costs of full
+GraphRAG<Cite n={3}/>. Those are Microsoft's numbers; the arithmetic is
+this site's, and it puts full GraphRAG's indexing at roughly a thousand times plain retrieval's.
+
+This is one of three pages in the site's
+<Link href="/threads/graph-engineering/">graph engineering thread</Link>: knowledge graphs connect
+information, while <Link href="/techniques/workflow-graphs/">workflow graphs</Link> and
+<Link href="/techniques/agent-graphs/">agent graphs</Link> connect work. They sit at level 2 —
+your code decides to extract, and how to walk what comes back. Marked draft, not published: no
+recorded trace, no scored result file, nothing below measured.
+
+## A run, step by step
+
+<Run data={knowledgeGraphsRun} label="Level 2 · Knowledge graphs" runKey="knowledge-graphs" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+Knowledge graphs are usually invisible plumbing, the same way
+<Link href="/techniques/embeddings-search/">embeddings and search</Link> are. Occasionally one is
+named: Glean, a workplace search product, calls the layer under its answers the Enterprise Graph
+and describes it as a knowledge graph of the entities a company works around — projects, people,
+customers and products<Cite n={4}/>. More often nothing says so, and what you can notice instead
+is the shape of an answer. A tool built on retrieval alone tends to answer from one strong match. A tool that can
+join facts across documents — a part's compatible model and that model's coverage, in one answer,
+rather than only half of it — is doing something closer to what a graph gives you, whether or not
+it uses one internally. <Link href="/techniques/agentic-rag/">Deep-research modes</Link>, which
+run several searches and combine what they find, get some of the same multi-document reach
+without necessarily building a graph at all.
+
+The other place this shows up for a reader, not a builder, is provenance. A graph-backed answer
+can show its work as a chain — this fact, from this source, connected to that fact, from that
+source — rather than one citation at the end covering the whole answer. When a tool gives you a
+chain like that, each link is a specific, separately checkable claim, which is a stronger
+guarantee than a citation that only says an answer is "based on" some set of sources somewhere in
+it.
+
+Ask before trusting one: how was the graph built, and how often is it rebuilt? A graph extracted
+once from a document set that keeps changing goes stale the same way a search index does, except
+a stale edge can join two facts that used to be true together and no longer are — a subtler
+failure than a stale passage, because neither fact on its own looks wrong.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The example below extracts triples from two of the synthetic corpus's documents — which part fits
+which model, and which model carries which warranty class — with one model call per document, the
+same shape as GraphRAG's own indexing step<Cite n={1}/>. It stores them in a plain dict keyed by
+subject, then answers a two-hop question by walking exactly two edges: a part number to the model
+it fits, then that model to its warranty class. Both edges' citations travel with the answer, so
+the path itself is the provenance, not a separate step bolted on afterward.
+
+This is a small, honest version of the idea, not a re-implementation of GraphRAG, and the graph
+itself is a plain Python dict rather than a graph database such as Neo4j, which is what a system
+built to be queried and to scale past a handful of documents would actually use. It also skips
+the clustering and community summarization Microsoft's system does over a large graph, and it
+looks up a fixed two-hop pattern rather than searching the graph for whatever path answers an
+arbitrary question. If a hop is missing — no edge extracted for a part that was never given a fitment, for
+example — the code reports no path found rather than guessing, and if a part fits more than one
+model, the walk follows whichever edge was extracted first, which is a real limitation worth
+noticing rather than a subtle bug this page pretends does not exist.
+
+<CodeFile file="examples/knowledge_graphs/run.py" func="run" />
+
+Every step is `decided_by: "code"`: the code always makes both extraction calls, in this order,
+and always walks the graph the same way afterward. The model fills in what a step says, not which
+step runs next. Run it yourself — `--model stub` replays a transcribed extraction rather than
+calling anything, so the walk runs offline; what you see is what the code does with triples, not
+what a model's reading of those documents looks like:
+
+<CodeFile file="examples/knowledge_graphs/README.md" start={15} end={15} lang="text" expect="python -m examples.knowledge_graphs" />
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try <Link href="/techniques/rag/">RAG</Link> first if a single search over your documents
+reliably answers the question, or the documents rarely need facts from more than one place joined
+together. Building and maintaining a graph costs real, ongoing extraction work<Cite n={3}/> that a
+single retrieval step does not.
+
+Move to a knowledge graph once questions regularly need facts joined across documents, or you
+need to show exactly where each part of an answer came from as a checkable chain rather than a
+single citation.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'Extraction misses or invents a relationship',
+    notice: 'A question the graph should answer comes back with no path found, or with a confident answer built on a relationship the source document never actually stated.',
+    test: 'Check a sample of extracted triples against the sentence they supposedly came from. A triple with no matching sentence is a hallucinated edge, not a hard-to-find one.',
+  },
+  {
+    name: 'The same entity exists twice under two names',
+    notice: 'A two-hop question fails even though both facts it needs are in the graph, because the first hop\'s object and the second hop\'s subject are spelled differently and never got merged into one node.',
+    test: 'Search the graph for every distinct spelling of a name you know refers to one real thing. More than one node for the same entity is an entity-resolution gap, not a missing fact.',
+  },
+  {
+    name: 'A missing edge gets guessed instead of reported as unknown',
+    notice: 'A question with no real path through the graph still gets a specific, confident-sounding answer.',
+    test: 'Ask a two-hop question about a part or an entity that genuinely has no recorded relationship for the second hop, and confirm the answer says so rather than filling the gap from general knowledge.',
+  },
+  {
+    name: 'An entity with more than one valid edge follows only one of them',
+    notice: 'A part or entity that legitimately connects to more than one thing gets an answer for only one of them, silently, with no sign that a choice was made.',
+    test: 'Ask about an entity you know has two valid outgoing edges for the same relationship and check whether the answer says which one it used, or names both.',
+  },
+  {
+    name: 'Stale graph',
+    notice: 'A source document changes and the graph keeps returning facts that were true when it was last built, not facts that are true now.',
+    test: 'Change a fact the graph depends on without rebuilding it, and ask a question that fact affects.',
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, building the graph', value: '2' },
+    { label: 'Model calls, answering a question', value: '0' },
+    { label: 'Tokens in, both extractions', value: '~390' },
+    { label: 'Tokens out, both extractions', value: '~100' },
+  ]}
+  comparedTo={{
+    label: 'RAG (level 2, same corpus)',
+    note: 'About twice the model calls of the illustrated RAG run, spent on building the graph rather than answering it. Unlike RAG, that cost is paid once per source document, not once per question: the graph above answers any number of two-hop questions over the same two documents with no further model calls at all.',
+  }}
+  level={2}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+Multi-hop questions are where a graph is supposed to earn its cost: the site's shared 60-question
+set includes twelve of them, each needing two sources joined together, which is exactly what a
+graph walk does directly instead of hoping a single retrieval happens to surface both passages at
+once. Citation hit rate on multi-hop questions specifically, compared against RAG's citation hit
+rate on the same twelve questions, is the number that would show whether the graph's cost bought
+anything here.
+
+No result file exists for this technique yet (see `docs/EVALS.md`), so this page cannot say a
+number for any of it. Run `python scripts/eval_run.py --example knowledge_graphs --model <spec>
+--dry` to project the cost of a real run before spending anything on one.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="Extraction coverage (the share of known facts that actually made it into the graph as edges) and time since the graph was last rebuilt versus time since the source documents last changed. A confident wrong answer is harder to catch than a missing one, so also sample answers against their cited path by hand."
+  costAtVolume="Extraction cost scales with how much source text gets re-processed, not with how many questions get asked afterward; a graph rebuilt on every document change costs roughly what indexing did the first time, repeated, while question-answering against an already-built graph costs nothing extra in model calls."
+  failsInProduction="A rebuild job fails silently and the graph quietly stops reflecting new documents. Or two names for the same real entity never get merged, so a path that should exist looks, from the outside, like a missing fact."
+  whatToLog="Every extracted triple with the document and section it came from, the full hop-by-hop path behind every answer (not just the final citations), and the graph's last rebuild time next to the source documents' last-modified time."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Ask a deep-research tool a question that needs two different topics joined together, and look at how it shows its sources. Does it show a connected chain of specific facts, or one flat list of links at the end?' },
+  { lane: 'build', body: 'Run python -m examples.knowledge_graphs --model stub --question "What warranty class covers the model that HLV-5520 fits?" and read the path it prints. Then ask the same question about HLV-7734, which the parts list itself gives no fitment for, and check that the answer reports no path rather than guessing one. Point --model at a real backend to see what changes when a model, not a transcription, does the extracting.' },
+  { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose: edit one of the two source sections in a copy of evals/corpus/ and see whether the graph the example builds still points at the changed fact or the old one.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

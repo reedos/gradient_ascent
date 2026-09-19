@@ -1,0 +1,71 @@
+---
+// Premise and the nine principles, copy from the project plan / the prototype, verbatim.
+import { url } from '../lib/url';
+
+interface Props {
+  linkHref?: string;
+}
+const { linkHref = url('/method/') } = Astro.props;
+
+const PRINCIPLES = [
+  {
+    title: 'Use the simplest approach that works',
+    body: 'Every page says when the technique is not needed and what to try first.',
+  },
+  {
+    title: 'Measure before claiming',
+    body: 'A page may say a level helps only when a committed result file shows it. No result file exists yet, so nothing here reports a measured number: every cost strip and every trace is an illustration, and says so.',
+  },
+  {
+    title: 'Name real things',
+    body: 'Every technique is tied to the models, products and tools that use it. Names come from a dated registry with sources.',
+  },
+  {
+    title: 'Show how it works',
+    body: 'Each technique has a diagram, a recorded run you can step through, and code you can run.',
+  },
+  {
+    title: 'State the costs and the failures',
+    body: 'Each page lists the cost in tokens and time, the common failure modes, and how to test for them.',
+  },
+  {
+    title: 'Stay current and say how current',
+    body: 'Every page and every name carries the date it was last checked. Anything not checked in 90 days is flagged.',
+  },
+  {
+    title: 'One site for beginners and experts',
+    body: 'Each page has a version with no code and a version with code. Both describe the same technique.',
+  },
+  {
+    title: 'Independent',
+    body: 'No rankings, no sponsorship, no affiliate links. Where several companies make something, the page names more than one.',
+  },
+  {
+    title: 'Open',
+    body: 'MIT licensed. The taxonomy, the registry and the result files are published as data. Corrections are welcome.',
+  },
+];
+---
+<p class="premise">
+  <strong>AI is a general-purpose technology.</strong> It is changing how work gets done in every
+  industry: the workflows people follow, the processes companies run, how productive a person or
+  a team can be, and how software and machines are operated. People who understand the full
+  range of techniques will make better decisions about where to use it. This site describes that
+  range, shows how each technique works, and will measure what each one costs.
+</p>
+<p class="footnote reading">
+  Every page on the site is a draft: written and sourced, but with no recorded run and no scored
+  result behind it. Every number in a cost strip or a trace is an illustration and is labelled
+  as one.
+</p>
+<div class="legend-grid">
+  {
+    PRINCIPLES.map((p) => (
+      <div>
+        <strong>{p.title}</strong>
+        <p>{p.body}</p>
+      </div>
+    ))
+  }
+</div>
+<a class="section-link" href={linkHref}>Read the full method &rarr;</a>

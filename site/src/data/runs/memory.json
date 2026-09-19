@@ -1,0 +1,54 @@
+{
+  "illustrative": true,
+  "h": 420,
+  "title": "Memory",
+  "sub": "Write facts across conversations, recall the relevant ones, forget on request.",
+  "pill": "Level 2 · Context",
+  "nodes": [
+    { "id": "facts", "x": 170, "y": 34, "l": "Facts from earlier turns", "k": "io" },
+    { "id": "write", "x": 170, "y": 104, "l": "Write to memory", "k": "code" },
+    { "id": "forget", "x": 170, "y": 176, "l": "Forget on request", "k": "code" },
+    { "id": "store", "x": 170, "y": 250, "l": "Memory store", "k": "store" },
+    { "id": "llm", "x": 170, "y": 322, "l": "answers once", "k": "model" },
+    { "id": "a", "x": 170, "y": 392, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "facts", "t": "write", "by": "code" },
+    { "id": "e2", "f": "write", "t": "forget", "by": "code" },
+    { "id": "e3", "f": "forget", "t": "store", "by": "code" },
+    { "id": "e4", "f": "store", "t": "llm", "by": "code" },
+    { "id": "e5", "f": "llm", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "Facts from earlier conversations arrive",
+      "d": "\"Owns a Halvorsen DW-300, purchased 2024-03-15.\"\n\"The DW-300 is in a rental property.\"\n\"Prefers email for service updates.\"\n\"Also owns a DR-520 dryer, purchased 2025-01-10.\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code writes every fact to memory",
+      "d": "4 entries: m0, m1, m2, m3",
+      "m": "4 entries written"
+    },
+    {
+      "e": "e3",
+      "h": "Your code forgets nothing this time (a later question forgets m1)",
+      "d": "forget_ids: none",
+      "m": "0 entries forgotten"
+    },
+    {
+      "e": "e4",
+      "h": "Your code recalls whichever memories are relevant to the new question",
+      "d": "\"Is my dishwasher still covered under warranty?\"\nm1 (rental property)   0.26\nm0 (DW-300 purchase)   0.25\nm3 (DR-520 purchase)   0.19",
+      "m": "3 of 4 memories recalled"
+    },
+    {
+      "e": "e5",
+      "h": "The model answers once, from the recalled memories",
+      "d": "\"Based on the rental-property use, coverage is\nlimited to 90 days from purchase, which has passed.\"",
+      "m": "recalled 3 · answered once"
+    }
+  ]
+}

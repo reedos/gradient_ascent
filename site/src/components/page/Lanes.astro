@@ -1,0 +1,64 @@
+---
+// The "Use it / Build it" switch. Both <Lane> children are always in the HTML; a small script
+// hides whichever one is not selected and remembers the choice in localStorage (wrapped in
+// try/catch, since a private window can throw). With JavaScript off, no `hidden` attribute is
+// ever applied, so both lanes render in full: the no-JS behaviour is "show both", not "show
+// neither". The choice is global (one key, `ga:lane`), so it persists from page to page.
+interface Props {
+  /** Defaults match the site's lane labels in content/taxonomy.json's `lanes` block. */
+  useLabel?: string;
+  buildLabel?: string;
+}
+const { useLabel = 'Use it', buildLabel = 'Build it' } = Astro.props;
+---
+
+<div class="lanes" data-ga-lanes>
+  <div class="filters" role="group" aria-label="Reading lane">
+    <button type="button" class="filter" data-lane-btn="use" aria-pressed="true">{useLabel}</button>
+    <button type="button" class="filter" data-lane-btn="build" aria-pressed="true">{buildLabel}</button>
+  </div>
+  <slot />
+</div>
+
+<script>
+  (function () {
+    const KEY = 'ga:lane';
+
+    function getStored(): string | null {
+      try {
+        return localStorage.getItem(KEY);
+      } catch {
+        return null;
+      }
+    }
+    function setStored(v: string) {
+      try {
+        localStorage.setItem(KEY, v);
+      } catch {
+        /* private window or storage disabled: the switch still works for this page load */
+      }
+    }
+    function apply(root: ParentNode, lane: string) {
+      root.querySelectorAll<HTMLElement>('[data-lane]').forEach((el) => {
+        el.hidden = el.dataset.lane !== lane;
+      });
+      root.querySelectorAll<HTMLElement>('[data-lane-btn]').forEach((btn) => {
+        btn.setAttribute('aria-pressed', String(btn.dataset.laneBtn === lane));
+      });
+    }
+
+    const roots = document.querySelectorAll<HTMLElement>('[data-ga-lanes]');
+    if (!roots.length) return;
+    const initial = getStored() || 'use';
+    roots.forEach((root) => {
+      apply(root, initial);
+      root.querySelectorAll<HTMLButtonElement>('[data-lane-btn]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const lane = btn.dataset.laneBtn!;
+          setStored(lane);
+          roots.forEach((r) => apply(r, lane));
+        });
+      });
+    });
+  })();
+</script>

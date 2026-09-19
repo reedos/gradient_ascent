@@ -1,0 +1,97 @@
+---
+slug: document-qa
+reviewed: 2026-09-18
+sources: []
+---
+
+import Run from '../../components/page/Run.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import Link from '../../components/page/Link.astro';
+import ragRun from '../../data/runs/rag.json';
+import agenticRun from '../../data/runs/agentic-rag.json';
+
+Someone has a small set of product manuals, spec sheets and policy documents and wants
+straight, sourced answers instead of reading all of them. That is document Q&A: given a
+question and a document set, retrieve what's relevant and answer from it, with citations a
+person can check.
+
+This is the site's running task. Every technique page that measures anything measures the same
+60 questions over the same documents, so a reader can compare levels on one task instead of
+twelve different ones.
+
+## The assembled diagram
+
+Document Q&A is level 2, RAG, exactly as that page describes it: chunk, embed, retrieve the top
+few, ask once.
+
+<Run data={ragRun} label="Level 2 · RAG, assembled for this recipe" runKey="rag" />
+
+## Why these techniques, and why not higher
+
+Three techniques compose this recipe: <Link href="/techniques/rag/">RAG</Link> does the
+retrieval and the one cited answer; <Link href="/techniques/structured-output/">structured
+output</Link> keeps that answer in a fixed shape (text plus a citation list) so calling code
+doesn't have to parse prose; and <Link href="/techniques/evals/">evals</Link> is the
+60-question set that says whether any of it is actually working, rather than just looking
+plausible.
+
+Level 2 is enough here because most of these questions are answerable from a single search: one
+question, one set of relevant passages, one answer. Climbing to <Link
+href="/techniques/agentic-rag/">agentic RAG</Link> (level 5) buys something real — in the
+illustrated run on the home page, the model runs a second, better-targeted search once the
+first one turns out to cover length but not exclusions, and finds a fact plain RAG missed. It
+also costs about four model calls instead of one, about four times the tokens, and about three
+times the wait, per that same run. For a document set this size, that trade only pays off once
+single-search RAG is provably missing answers a second search would find — which is what the
+eval set, cut by question kind, is for.
+
+<Run data={agenticRun} label="Level 5 · Agentic RAG, for comparison" runKey="agentic-rag" accentPill />
+
+## Walkthrough
+
+The document set is synthetic: twelve short Markdown files describing "Halvorsen," a fictional
+appliance brand, and its dishwashers (DW-300, DW-480) and dryers (DR-210, DR-520) — owner's
+manuals, a shared installation guide, a parts list, a warranty policy, a recall notice, a
+service bulletin, a care and cleaning guide, a troubleshooting guide and a specs comparison.
+Nothing in it is a real product or a real customer document; it exists so the site can publish
+traces and eval questions without touching anyone's private data.
+
+Each file is written as numbered sections (`## 3. Warranty`), so a citation is just
+`file#section` — `dw480-manual#9`, for instance. That numbering is also the chunk boundary: the
+example doesn't need a separate splitter, because the source documents already are the chunks.
+
+A question comes in, gets embedded, and is compared against every section's embedding by cosine
+similarity. The top four sections go into one prompt that tells the model to answer only from
+those sources and to name which ones it used. This is the exact code on the
+<Link href="/techniques/rag/">RAG page</Link> — `examples/rag/run.py` — run against
+`evals/corpus/`.
+
+## What to measure
+
+The same 60-question set every level is measured against: 12 questions each in five kinds —
+lookup, multi-hop, numeric, unanswerable, and conflicting sources — graded by exact match where
+possible and by a rubric otherwise.
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+For this recipe specifically, watch **citation hit rate** (did the answer cite every section the
+grading rule expects) more closely than raw correctness: a right-sounding answer with the wrong
+or missing citation is exactly the failure mode a reader can't catch by eye. No result file
+exists yet for either level shown above (see `docs/EVALS.md`), so this page describes the
+comparison without claiming a score for it.
+
+</HowToEval>
+
+## Variations
+
+- Swap the embedder. The example runs on a deterministic stub for tests and on a local Ollama
+  model for a real run, behind the same interface, so retrieval code never changes.
+- Add a reranking pass between retrieval and prompting, scoring a larger first cut of candidates
+  more precisely before keeping the top few. Cohere and Jina AI both sell a model for this step.
+- Move to <Link href="/techniques/knowledge-graphs/">knowledge graphs</Link> if questions start
+  needing facts joined across documents, or an explicit path showing where a fact came from.
+- Move to <Link href="/techniques/agentic-rag/">agentic RAG</Link> if one retrieval stops being
+  enough and the next search needs to depend on what the last one found.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}

@@ -1,0 +1,201 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import Connection from '../../components/Connection.astro';
+import TechniqueRow from '../../components/TechniqueRow.astro';
+import RecipeRow from '../../components/RecipeRow.astro';
+import NameList from '../../components/NameList.astro';
+import Reviewed from '../../components/page/Reviewed.astro';
+import { url } from '../../lib/url';
+import { levels, tracks, taxonomy, namesForLevel, relationsFor, asOf, namesChecked } from '../../lib/content';
+import { recipesForLevel } from '../../lib/worksheet';
+
+export function getStaticPaths() {
+  return [
+    ...levels.map((t) => ({ params: { level: String(t.order) }, props: { order: t.order } })),
+    { params: { level: 'tracks' }, props: { order: 'tracks' as const } },
+  ];
+}
+
+const { order } = Astro.props as { order: number | 'tracks' };
+const isTracks = order === 'tracks';
+const tier = isTracks ? undefined : levels.find((t) => t.order === order)!;
+
+const title = isTracks ? taxonomy.tracks_overview.title : tier!.title;
+const short = isTracks ? undefined : tier!.short;
+const who = isTracks ? taxonomy.tracks_overview.who : tier!.who;
+const description = isTracks ? taxonomy.tracks_overview.description : tier!.description;
+const color = isTracks ? 'var(--ot)' : `var(--o${order})`;
+const eyebrowLabel = isTracks ? 'Every level' : `Level ${String(order).padStart(2, '0')}`;
+
+const pages = isTracks
+  ? tracks.map((t) => ({ slug: t.id, title: t.title, summary: t.summary, status: t.status }))
+  : tier!.pages;
+
+const groupDefs: [string, string][] = [
+  ['product', order === 0 ? 'Products' : 'Products that work this way'],
+  ['tool', order === 0 ? 'What to use instead of a model' : 'Tools for building it'],
+  ['model', 'Models'],
+];
+const named = namesForLevel(order);
+const groups = groupDefs.map(([kind, label]) => ({
+  label,
+  entries: named[kind as 'product' | 'tool' | 'model'],
+}));
+
+// Upgrade conditions: every upgrades_to relation leaving a page in this level.
+const upgrades = pages.flatMap((p) => relationsFor(p.slug).upgradesTo.map((u) => ({ from: p, ...u })));
+
+const prev = !isTracks && order > 0 ? levels.find((t) => t.order === (order as number) - 1) : undefined;
+const next = !isTracks && (order as number) < levels.length - 1 ? levels.find((t) => t.order === (order as number) + 1) : undefined;
+
+// The recipes whose highest level is exactly this one, from the same helper the worksheet's
+// result view uses, so the two pages cannot disagree about which recipes top out where.
+const levelRecipes = isTracks ? [] : recipesForLevel(order as number);
+
+// A level page is generated from taxonomy.json, which carries no `reviewed` field for a tier
+// (see .local/page-requests/finish-indexes.md). Rather than invent one, print the OLDEST reviewed
+// date among the pages listed on this level: that is the date from which everything here has been
+// checked, and it goes stale exactly when the first of those pages does.
+const techniqueEntries = await getCollection('techniques');
+const reviewedBySlug = new Map(techniqueEntries.map((e) => [e.id, e.data.reviewed.toISOString().slice(0, 10)]));
+const pageDates = pages.map((p) => reviewedBySlug.get(p.slug)).filter((d): d is string => Boolean(d));
+const oldestReviewed = pageDates.length ? pageDates.sort()[0] : undefined;
+const mdHref = url(isTracks ? '/levels/tracks.md' : `/levels/${order}.md`);
+---
+<Base title={`${title} · Gradient Ascent`} description={description}>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href={url('/')}>Home</a>
+    <span aria-hidden="true">/</span>
+    <a href={url('/#levels')}>Levels</a>
+    <span aria-hidden="true">/</span>
+    <span>{title}</span>
+  </nav>
+
+  <div class="page-hero leveled" style={`--c:${color}`}>
+    <Eyebrow label={eyebrowLabel} color={color} />
+    <h1>{title}</h1>
+    <p>{description}</p>
+    <p><span class="pill level" style={`--c:${color}`}>{eyebrowLabel}</span></p>
+  </div>
+
+  <Connection title="Who decides the next step" color={color}>{who}</Connection>
+
+  <section class="section">
+    <div class="section-top">
+      <div>
+        <div class="eyebrow muted">{isTracks ? 'Topics' : 'Techniques'}</div>
+        <h2>{isTracks ? 'Five topics that apply at every level' : 'What is at this level'}</h2>
+      </div>
+      {!isTracks && <p>{short}</p>}
+    </div>
+    <div class="panel reading">
+      {
+        pages.map((p) => (
+          <>
+            <TechniqueRow slug={p.slug} title={p.title} summary={p.summary} status={p.status} color={color} />
+            {/* On /levels/tracks/ a topic's own sub-pages follow it, indented, so the overview
+                shows the whole topic rather than five roots with their depth hidden a click away. */}
+            {isTracks &&
+              (tracks.find((t) => t.id === p.slug)?.pages ?? []).map((sub) => (
+                <TechniqueRow
+                  slug={sub.slug}
+                  title={sub.title}
+                  summary={sub.summary}
+                  status={sub.status}
+                  color={color}
+                  as="h4"
+                  sub
+                />
+              ))}
+          </>
+        ))
+      }
+    </div>
+  </section>
+
+  {
+    upgrades.length > 0 && (
+      <section class="section">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow muted">Upgrade conditions</div>
+            <h2>When something here is not enough</h2>
+          </div>
+          <p>Each line names the failure that justifies moving to a higher level.</p>
+        </div>
+        <div class="relation-grid">
+          {upgrades.map((u) => (
+            <div class="relation-block">
+              <h3>
+                <a href={url(`/techniques/${u.from.slug}/`)}>{u.from.title}</a> &rarr;{' '}
+                <a href={url(`/techniques/${u.page.slug}/`)}>{u.page.title}</a>
+              </h3>
+              <p>{u.when}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    levelRecipes.length > 0 && (
+      <section class="section">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow muted">Recipes</div>
+            <h2>Jobs that top out here</h2>
+          </div>
+          <p>Each one needs this level and no higher, and says why.</p>
+        </div>
+        <div class="signal-list">
+          {levelRecipes.map((r) => (
+            <RecipeRow slug={r.slug} title={r.title} summary={r.summary} levels={r.levels} />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section">
+    <div class="section-top">
+      <div>
+        <div class="eyebrow muted">Out there</div>
+        <h2>Named products, tools and models</h2>
+      </div>
+      <p>Names listed {asOf}. {namesChecked.verified} of {namesChecked.total} registry entries have been checked against the maker's own page; the registry marks the rest as unchecked.</p>
+    </div>
+    <div class="panel">
+      <NameList groups={groups} emptyText="No names listed for this level yet." />
+    </div>
+  </section>
+
+  {
+    (prev || next) && (
+      <div class="level-pager">
+        {prev ? (
+          <a href={url(`/levels/${prev.order}/`)}>&larr; Level {String(prev.order).padStart(2, '0')} &middot; {prev.title}</a>
+        ) : (
+          <span />
+        )}
+        {next && (
+          <a class="next" href={url(`/levels/${next.order}/`)}>
+            Level {String(next.order).padStart(2, '0')} &middot; {next.title} &rarr;
+          </a>
+        )}
+      </div>
+    )
+  }
+
+  {
+    oldestReviewed ? (
+      <Reviewed date={oldestReviewed} scope="level" mdHref={mdHref} />
+    ) : (
+      <p class="reviewed-note">
+        This page is generated from the taxonomy. <a class="md-link" href={mdHref}>Markdown version of this page</a>
+      </p>
+    )
+  }
+</Base>

@@ -1,0 +1,128 @@
+---
+// The teardowns index. Teardowns are the one page kind with a shelf life: the project plan caps how many
+// may be live and expires each one after `expires_days`, so this page prints both numbers and
+// separates the live ones from any that have passed their date, rather than quietly listing a
+// teardown of a product that may have changed since it was decoded.
+import { getEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import SectionTop from '../../components/SectionTop.astro';
+import { url } from '../../lib/url';
+import {
+  teardowns,
+  teardownCap,
+  teardownExpiryDays,
+  techniquesForTeardown,
+  teardownExpiry,
+  teardownIsStale,
+} from '../../lib/content';
+
+const rows = await Promise.all(
+  teardowns.map(async (t) => {
+    const entry = await getEntry('teardowns', t.slug);
+    const reviewed = entry ? entry.data.reviewed.toISOString().slice(0, 10) : undefined;
+    const techniques = techniquesForTeardown(t);
+    const levels = [
+      ...new Set(techniques.map((x) => x.level).filter((l): l is number => typeof l === 'number')),
+    ].sort((a, b) => a - b);
+    return {
+      slug: t.slug,
+      title: t.title,
+      techniques,
+      levels,
+      reviewed,
+      expires: reviewed ? teardownExpiry(reviewed) : undefined,
+      stale: reviewed ? teardownIsStale(reviewed) : false,
+    };
+  }),
+);
+
+const live = rows.filter((r) => !r.stale);
+const expired = rows.filter((r) => r.stale);
+---
+<Base
+  title="Teardowns · Gradient Ascent"
+  description="A product you have used, taken apart into the techniques it is built from: what you see, what runs underneath, and which page explains each part."
+>
+  <div class="page-hero">
+    <div class="eyebrow muted"><span class="dot"></span>Teardowns</div>
+    <h1>Products you have used, taken apart</h1>
+    <p>
+      A teardown starts from something a reader has already used and works downward: what you see,
+      what is happening underneath level by level, which technique page explains each part, what
+      the maker says about how theirs works, and where it fails. Every claim about a product is
+      what its own maker documents.
+    </p>
+  </div>
+
+  <section class="section">
+    <SectionTop
+      eyebrow="Live teardowns"
+      title={`${live.length} of ${teardownCap} live`}
+      aside={`A teardown dates faster than a technique does, so each one expires ${teardownExpiryDays} days after it was last reviewed and is re-reviewed or retired then. At most ${teardownCap} are live at once.`}
+    />
+    <div class="signal-list">
+      {
+        live.map((r) => (
+          <div class="signal-row">
+            <div class="signal-layer">
+              {r.levels.map((l) => (
+                <i style={`--c:var(--o${l})`} />
+              ))}
+              <span>{r.levels.length ? r.levels.map((l) => `Level ${l}`).join(' + ') : 'Topics'}</span>
+            </div>
+            <div class="signal-body">
+              <h3>
+                <a href={url(`/teardowns/${r.slug}/`)}>{r.title}</a>
+              </h3>
+              <p>{r.techniques.map((t) => t.title).join(' · ')}</p>
+            </div>
+            <div class="signal-meta">
+              {r.reviewed ? `Reviewed ${r.reviewed}` : 'Not written yet'}
+              {r.expires && <><br />Expires {r.expires}</>}
+            </div>
+            <a href={url(`/teardowns/${r.slug}/`)} aria-label={`Open ${r.title}`}>
+              &#8599;
+            </a>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  {
+    expired.length > 0 && (
+      <section class="section">
+        <SectionTop
+          eyebrow="Past their date"
+          title={`${expired.length} waiting for a re-review`}
+          aside="These are still readable, but a product may have changed since. They do not count against the live cap and are not linked from technique pages until they are re-reviewed."
+        />
+        <div class="signal-list">
+          {expired.map((r) => (
+            <div class="signal-row">
+              <div class="signal-layer">
+                <span>Stale</span>
+              </div>
+              <div class="signal-body">
+                <h3>
+                  <a href={url(`/teardowns/${r.slug}/`)}>{r.title}</a>
+                </h3>
+                <p>{r.techniques.map((t) => t.title).join(' · ')}</p>
+              </div>
+              <div class="signal-meta">Expired {r.expires}</div>
+              <a href={url(`/teardowns/${r.slug}/`)} aria-label={`Open ${r.title}`}>
+                &#8599;
+              </a>
+            </div>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  <p class="footnote reading">
+    A teardown is one of the three layers in the project plan's content model, under the techniques
+    themselves and beside the <a href={url('/recipes/')} style="color:var(--accent)">recipes</a>.
+    How to write one is in <code>docs/WRITING-A-TEARDOWN.md</code>.
+  </p>
+</Base>

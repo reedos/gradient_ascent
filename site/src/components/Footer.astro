@@ -1,0 +1,68 @@
+---
+// The footer carries the whole site map, built from the same src/lib/nav.ts the header's menus
+// read. It is also where the phone's Menu link lands when JavaScript is off.
+import Logo from './Logo.astro';
+import { asOf, levels, tracks } from '../lib/content';
+import { url } from '../lib/url';
+import { buildNav, type NavLevel, type NavTrack } from '../lib/nav';
+import { REPO_URL } from '../lib/site';
+
+const navLevels: NavLevel[] = levels.map((l) => ({ order: l.order, title: l.title, short: l.short, slugs: l.pages.map((p) => p.slug) }));
+const navTracks: NavTrack[] = tracks.map((t) => ({ id: t.id, title: t.title, slugs: (t.pages ?? []).map((p) => p.slug) }));
+const groups = buildNav(navLevels, navTracks);
+---
+<footer class="site-footer">
+  <div class="footer-top">
+    <span class="brand">
+      <Logo id="footer" size={26} />
+      <span>gradient<span class="brand-light">ascent</span><span class="brand-dot">.</span></span>
+    </span>
+    <p>Every way to work with AI, from a question to a workforce.</p>
+  </div>
+
+  <nav class="footer-map" id="sitemap" aria-label="Site map">
+    {
+      groups.map((g) => (
+        <div class="footer-map-col">
+          <h2>{g.label}</h2>
+          <ul>
+            {g.sections.flatMap((s) => s.items).map((it) => (
+              <li>
+                <a href={url(it.path)} style={it.level !== undefined ? `--c:var(--o${it.level})` : undefined}>
+                  {it.level !== undefined && <span class="footer-map-n">{it.level}</span>}
+                  {it.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </nav>
+
+  <div class="footer-bottom">
+    <p>
+      <a href={`${REPO_URL}/issues/new?template=feedback.yml`} rel="noopener">Give feedback</a>
+      {' · '}
+      <a href={REPO_URL} rel="noopener">Source on GitHub</a>
+      {' · '}
+      <a href={url('/search/')}>Search</a>
+      {' · '}
+      <a href={url('/llms.txt')}>llms.txt</a>
+    </p>
+    MIT licensed. Levels, topics, recipes and the links between pages come from{' '}
+    <code>content/taxonomy.json</code>; named models, products and tools come from{' '}
+    <code>content/landscape.json</code>, listed as of {asOf}. Every page is a draft until a recorded run and a scored result stand behind it.
+  </div>
+</footer>
+
+<style>
+  .footer-map { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 32px; margin-top: 30px; padding-top: 26px; border-top: 1px solid var(--line) }
+  .footer-map h2 { font: 600 10px/1 var(--font); letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); margin: 0 0 12px }
+  .footer-map ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px }
+  .footer-map a { font-size: 12.5px; color: var(--muted); display: inline-flex; align-items: baseline; gap: 8px; transition: color .15s }
+  .footer-map a:hover { color: var(--text) }
+  .footer-map-n { font: 600 11px var(--display); color: var(--c); font-variant-numeric: tabular-nums; min-width: 8px }
+  .footer-bottom a { color: var(--accent) }
+  @media (max-width: 850px) { .footer-map { grid-template-columns: 1fr 1fr } }
+</style>

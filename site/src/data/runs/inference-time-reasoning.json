@@ -1,0 +1,70 @@
+{
+  "illustrative": true,
+  "h": 520,
+  "title": "Self-consistency: sample five times, vote",
+  "sub": "Ask the same numeric question five independent times and keep the answer most samples agree on.",
+  "pill": "Level 1 · One call, sampled 5×",
+  "nodes": [
+    { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
+    { "id": "build", "x": 170, "y": 140, "l": "Build one fixed prompt", "k": "code" },
+    { "id": "sample", "x": 170, "y": 246, "l": "5 independent samples", "k": "model" },
+    { "id": "vote", "x": 170, "y": 352, "l": "Tally votes, take the majority", "k": "code" },
+    { "id": "a", "x": 170, "y": 452, "l": "Answer", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "q", "t": "build", "by": "code" },
+    { "id": "e2", "f": "build", "t": "sample", "by": "code" },
+    { "id": "e3", "f": "sample", "t": "vote", "by": "code" },
+    { "id": "e4", "f": "vote", "t": "a", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The question arrives",
+      "d": "\"What is the total price to replace the heating elements\non both a DW-300 and a DW-480?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Sample 1 of 5",
+      "d": "\"...$38.50 + $41.00...\nAnswer: 79.50\"",
+      "m": "52 in · 88 out · 0.4s"
+    },
+    {
+      "e": "e2",
+      "h": "Sample 2 of 5",
+      "d": "\"...adding the two heating elements...\nAnswer: 79.50\"",
+      "m": "52 in · 91 out · 0.4s"
+    },
+    {
+      "e": "e2",
+      "h": "Sample 3 of 5",
+      "d": "\"...$38.50 + $41.00 = $79.00...\nAnswer: 79.00\"",
+      "m": "52 in · 85 out · 0.4s"
+    },
+    {
+      "e": "e2",
+      "h": "Sample 4 of 5",
+      "d": "\"...total comes to $79.50...\nAnswer: 79.50\"",
+      "m": "52 in · 90 out · 0.4s"
+    },
+    {
+      "e": "e2",
+      "h": "Sample 5 of 5",
+      "d": "\"...$38.50 + $41.00, carrying a digit...\nAnswer: 80.50\"",
+      "m": "52 in · 93 out · 0.4s"
+    },
+    {
+      "e": "e3",
+      "h": "Your code tallies the votes",
+      "d": "{'79.50': 3, '79.00': 1, '80.50': 1}",
+      "m": "5 samples tallied"
+    },
+    {
+      "e": "e4",
+      "h": "Your code returns the majority answer",
+      "d": "\"79.50 (3/5 samples agreed)\"",
+      "m": "3/5 agreement"
+    }
+  ]
+}

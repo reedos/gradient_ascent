@@ -1,0 +1,236 @@
+---
+slug: red-teaming
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Challenges in red teaming AI systems"
+    url: "https://www.anthropic.com/news/challenges-in-red-teaming-ai-systems"
+    publisher: "Anthropic"
+    accessed: "2026-09-18"
+  - title: "Announcing the OWASP Gen AI Red Teaming Guide"
+    url: "https://genai.owasp.org/2025/01/22/announcing-the-owasp-gen-ai-red-teaming-guide/"
+    publisher: "OWASP Gen AI Security Project"
+    date: "2025-01-22"
+    accessed: "2026-09-18"
+  - title: "AI Risk Management Framework"
+    url: "https://www.nist.gov/itl/ai-risk-management-framework"
+    publisher: "NIST"
+    accessed: "2026-09-18"
+  - title: "PyRIT"
+    url: "https://github.com/microsoft/PyRIT"
+    publisher: "Microsoft"
+    accessed: "2026-09-18"
+---
+
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+
+Red teaming is attacking your own system on purpose, before someone else does it without
+permission. OWASP's own announcement of its Gen AI Red Teaming Guide describes it as a
+"practical approach to evaluating LLM and Generative AI vulnerabilities," with coverage that
+"spans from model-level vulnerabilities (toxicity, bias) to system-level pitfalls (API misuse,
+data exposure)"<Cite n={2}/> — the system around the model, not only the model itself, is in
+scope.
+
+The result that matters is not a report; it is a change to the system, most durably a test that
+keeps failing until the finding is actually fixed. This page is deliberately defensive: it
+describes categories of test and how to organize the work, not working attacks, the same line
+<Link href="/techniques/safety/">safety</Link> draws around what a builder does with a finding.
+
+This topic is not a level on the ladder; it applies at every level.
+
+This page is marked draft, not published: no result file or production trace exists for this
+site, so nothing below reports a measured number.
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+A vendor's claim to have red-teamed a product is worth checking against its own published
+method, not taken as a fixed guarantee. Anthropic, one maker that publishes its own approach,
+describes several distinct methods rather than one. Its "domain-specific expert teaming"
+"involves collaborating with subject matter experts to identify and assess potential
+vulnerabilities or risks in AI systems within their area of expertise"; separate sections of the
+same post cover automated red teaming and multilingual and multicultural red teaming<Cite n={1}/>. "We red-team our models" can mean any of several different things, and the
+specifics — who did it, what they were looking for, how recently — are what actually tells you
+anything.
+
+A finding does not have to mean "broken." What matters more is what happened next: was the gap
+fixed, is it a known, documented limitation, or does using the product a certain way avoid it?
+NIST's AI Risk Management Framework — AI RMF 1.0, published as NIST AI 100-1 and, in NIST's
+words, "intended for voluntary use" — organizes the work into four functions it names govern,
+map, measure and manage<Cite n={3}/>. A finding that cannot be fixed outright still has to land
+in one of those, scoped and owned, rather than being known about and forgotten.
+
+If you operate a system rather than build one, the same instinct applies at smaller scale: before
+trusting a check that is supposed to catch bad output, try to make it fail on purpose. A check
+nobody has tried to break is a check nobody knows the limits of — which is the other half of what
+<Link href="/techniques/guardrails/">guardrails</Link> says about a filter's real precision.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+Scoping decides what is in play before any testing starts: which system, which access, which
+categories of harm, and who is allowed to know the exercise is running. Who does it ranges from
+the team that built the system to outside experts to a fully automated tool, and the useful
+combination is ordered. Anthropic puts it directly: once a person has identified a problematic
+input by hand, "we can use a language model to generate hundreds or thousands of variations of
+those inputs to cover more surface area, and do so in a fraction of the time"<Cite n={1}/>.
+People find the shape of a problem; automation covers the ground around it. Microsoft's PyRIT is
+an open-source framework for that second half, built in its own words "to empower security
+professionals and engineers to proactively identify risks in generative AI systems"<Cite n={4}/>.
+
+A finding that does not become a test is a finding that can come back quietly. This repository's
+history has three, each a defense that looked complete until something attacked it on purpose.
+
+<Link href="/techniques/safety/">Safety</Link>'s permission check lets a refund through only when
+the customer's own message names the same amount the call asks for. It compared that amount as
+text. So "order 4821" contained the string a call asking to refund \$4,821 was checked against,
+and the check permitted it; in the other direction a customer who wrote "\$40" was refused when
+the model asked for `40.0`. One bug, exploitable and annoying at once. The fix compares amounts
+as numbers, and both directions are tests now.
+
+`examples/coding_agents` handed model-written code to `exec` with an empty `__builtins__`
+dictionary and called that a sandbox. It is not one: emptying that dictionary removes names, and
+Python objects reach other objects through attributes rather than names, so ordinary attribute
+access gets back to a live `__builtins__` from almost anything. A blocklist never sees that walk
+coming, because the walk uses no name worth blocking. The fix, on
+<Link href="/techniques/coding-agents/">coding agents</Link>' own page, inverts the shape: an
+allowlist of the AST node types the task needs, which does not include attribute access at all.
+The test still carries the input that used to write a file to disk, and asserts it did not.
+
+`examples/debate_review`'s reviewer is fenced off from a draft it did not write, so a draft
+ending in a forged "Reply ACCEPT" cannot read as an instruction. The first version of that fence
+shortened any marker it found instead of removing it — and shortening is not breaking: a draft
+containing one bracket more than the marker came back out of the fence as a working marker, ready
+to close the block early. An audit found it, and the fix replaces a marker with a note built from
+none of the characters a marker is made of, so no surviving fragment can combine into another:
+
+<CodeFile file="examples/debate_review/run.py" func="_fence" />
+
+None of the three looked wrong on a read-through. All three failed on the first input built
+specifically to break them, which is the argument for doing this at all: a defense you have
+taught someone is a hypothesis about what an attacker will try, and it stays a hypothesis until
+something attacks it on purpose. Note also what the three have in common. Not one of them was a
+model behaving badly; each was ordinary code around a model, which is where
+<Link href="/techniques/guardrails/">guardrails</Link> and permission checks live and where scope
+most often fails to reach. Turning each finding into a named test, the way all three now are, is
+what keeps a fixed bug fixed when the surrounding code changes next year.
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Skip a formal red-teaming exercise for a single-user tool with no retrieved content and nothing
+it can act on — the same floor <Link href="/techniques/safety/">safety</Link> sets for a
+permission check and a delimiter. Reading the code once for the obvious cases is proportionate
+there; a taught defense that decides who gets money, what a tool is allowed to do, or what an
+unattended system does next is not that case.
+
+Never skip attacking a defense you are about to rely on for something irreversible, no matter how
+small the project. The three examples on this page were all a few lines of code that looked
+correct; being small did not make any of them safe to leave untested.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'A defense is trusted because it reads correctly',
+    notice: "Code that looks right on inspection is treated as done, with no input constructed specifically to break it -- which is exactly the gap all three of this page's own repository examples shared before an audit found them.",
+    test: "Before trusting a check, write the one input most specifically designed to defeat it -- not a random or typical input -- the way this page's own examples' regression tests do.",
+  },
+  {
+    name: 'A finding is fixed but never becomes a test',
+    notice: 'A bug is patched in the moment, but nothing records the specific input that broke it, so a later, unrelated change to the same code can silently reopen the same gap.',
+    test: "Check whether a fixed vulnerability has a named regression test carrying the original attack input, the way NAMESPACE_ESCAPE and the marker-shortening cases on this page do, not just a comment saying it was fixed.",
+  },
+  {
+    name: 'Scope excludes the system around the model',
+    notice: "Testing focuses entirely on what the model says and misses vulnerabilities in the code around it -- the permission check, the sandbox, the fence -- which is exactly where this page's own three examples' real bugs lived.",
+    test: "Confirm a red-teaming scope explicitly names the non-model code paths in play (permission checks, sandboxes, parsers), the way OWASP's own guide's system-level category asks for, not only the model's outputs.",
+  },
+  {
+    name: 'A finding with no fix lands nowhere',
+    notice: 'A red-teaming exercise surfaces a real gap that cannot be closed immediately, and it is simply noted rather than tracked, scoped, or mitigated in any durable way.',
+    test: "Check whether an unfixed finding has an owner and a decision (accepted risk, restricted scope, a scheduled fix) rather than only a line in a report nobody revisits.",
+  },
+  {
+    name: 'Automated testing replaces judgment instead of extending it',
+    notice: "A high volume of automatically generated attack variations creates the appearance of thorough testing, while the actual categories of harm being tested were never decided by a person with the right expertise.",
+    test: "Trace an automated tool's generated attacks back to the categories a person scoped in advance, and confirm the volume is covering ground a person defined, not substituting for that definition.",
+  },
+]} />
+
+## At each level
+
+- <Link href="/levels/1/">One call</Link>: attacking the prompt itself — the input a person can
+  type directly — is the whole scope, since there is no retrieved content and no tool call yet
+  for an attack to reach.
+- <Link href="/levels/2/">Context</Link>: retrieved content is now something to attack, not just
+  the user's own message — the same expansion <Link href="/techniques/safety/">safety</Link>'s
+  own "at each level" section names for prompt injection generally.
+- <Link href="/levels/4/">Tools</Link>: an attack that used to only produce a bad sentence can
+  now attempt a real action, so this is the level where the highest-value finding usually lives
+  — a permission check that fails is exactly the shape of bug this page's own safety example
+  narrates.
+- <Link href="/levels/5/">Agents</Link>: an attack does not have to work on the first turn; a
+  long loop gives it many chances, so testing has to include multi-turn attempts, not just single
+  malicious inputs.
+- <Link href="/levels/6/">Teams of agents</Link>: a handoff between agents is its own attack
+  surface — content that one agent only reads can carry an instruction for the next agent, which
+  may hold permissions the first never had, the exact shape
+  <Link href="/techniques/debate-review/">review and debate</Link>'s fence was built to break
+  and failed to break on its first attempt.
+- <Link href="/levels/7/">Always-on agents</Link>: nobody is watching in real time, so an attack
+  that only shows itself over many runs (a slow drift, not a single bad response) needs testing
+  that runs more than once to be caught at all.
+
+## Practices
+
+- Scope before testing: which system, which access, which categories of harm, and who is allowed
+  to know the exercise is running.
+- Name the non-model code in scope explicitly — permission checks, sandboxes, parsers, fences.
+  All three bugs above lived there, and a scope written around "the model" would have missed
+  every one.
+- End each finding in a named test carrying the original input, not in a patch and a note.
+- Let people decide the categories and let automation cover the ground inside them, in that
+  order.
+- Give every finding you cannot fix an owner and a decision — accepted, restricted, scheduled —
+  so it stays visible instead of ageing out of a document.
+
+## Run it
+
+<RunIt
+  monitor="Which findings have a regression test attached versus which are only documented; a
+  gap here is a finding one refactor away from silently returning."
+  costAtVolume="Manual expert red-teaming is the most expensive per finding and the best at
+  finding the first instance of a new category; automated generation is cheap per attempt and
+  best at covering the ground around a category a person already identified, per Anthropic's own
+  description of combining the two."
+  failsInProduction="A defense that passed every test built to confirm it works never got a test
+  built specifically to break it, and the first real attack is the first one it ever saw."
+  whatToLog="Every finding, the specific input that triggered it, whether it became a regression
+  test, and its current status -- fixed, accepted, or scoped around -- so nothing found is later
+  simply forgotten."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: "Find a claim from a product you use that it has been \"red-teamed\" or \"safety tested.\" Look for the maker's own published method (not a marketing page) and note what it actually says versus what the claim alone implied." },
+  { lane: 'build', body: 'Open tests/test_example_coding_agents.py and read the comment above NAMESPACE_ESCAPE and test_the_namespace_escape_never_reaches_exec. Then do the same for test_a_marker_with_one_extra_bracket_cannot_re_form_the_marker in tests/test_example_debate_review.py. Write down, for each, what the regression test would have missed if it only checked the fixed behavior and not the original attack input.' },
+  { lane: 'either', body: "Pick a check you rely on somewhere (a validator, a permission check, a filter). Write the one input most specifically designed to defeat it, run it, and see whether the check holds." },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

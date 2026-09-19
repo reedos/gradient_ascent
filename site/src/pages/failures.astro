@@ -1,0 +1,79 @@
+---
+// Every failure mode authored with <FailureModes> across every technique page, collected at
+// build time by parsing the MDX (site/src/lib/indexes.ts), grouped by level. Serves the skeptic
+// and the operator (the project plan's audience table): "the real downsides of each level" in one place,
+// with no writing of its own -- every word here already lives on a technique page.
+import Base from '../layouts/Base.astro';
+import { url } from '../lib/url';
+import { parseAllFailureModes, groupFailureModesByLevel } from '../lib/indexes';
+import '../styles/indexes.css';
+
+const modes = await parseAllFailureModes();
+const groups = groupFailureModesByLevel(modes);
+---
+<Base
+  title="Failure modes · Gradient Ascent"
+  description={`${modes.length} named failure modes across every technique on this site, grouped by level, each with how to notice it and how to test for it.`}
+>
+  <div class="page-hero">
+    <div class="eyebrow muted"><span class="dot"></span>Failure gallery</div>
+    <h1>{modes.length} named failure modes, by level</h1>
+    <p>
+      Every technique page that is written names its own ways of failing, how to notice one in
+      production, and how to test for it before production. This page collects all of them in one
+      place, generated from those pages, not written separately. Nothing here is invented for this
+      view.
+    </p>
+  </div>
+
+  {/* Jump links, not filters: nothing on this page is hidden, and the glossary's letter index
+      beside it is labelled the same way. The pill shape is shared with the lane switch and the
+      level explorer, which ARE controls, so the label has to say which this is. */}
+  <nav class="failure-filters filters" aria-label="Jump to a level">
+    <a class="filter" href="#main">Top of the page</a>
+    {
+      groups.map((g) => (
+        <a class="filter" href={`#level-${g.level}`} style={`--c:${g.color}`}>
+          {g.level === 'tracks' ? 'Topics' : `Level ${String(g.level).padStart(2, '0')}`}
+        </a>
+      ))
+    }
+  </nav>
+
+  <div class="fail-groups">
+    {
+      groups.map((g) => (
+        <section class="section fail-group" id={`level-${g.level}`}>
+          <div class="section-top">
+            <div>
+              <div class="eyebrow muted" style={`--c:${g.color}`}>
+                {g.level === 'tracks' ? 'Every level' : `Level ${String(g.level).padStart(2, '0')}`}
+              </div>
+              <h2>{g.levelLabel}</h2>
+            </div>
+            <p>
+              {g.modes.length} failure mode{g.modes.length === 1 ? '' : 's'}
+            </p>
+          </div>
+          <div class="panel reading failure-modes">
+            {g.modes.map((m) => (
+              <div class="failure-mode">
+                <h3>{m.name}</h3>
+                <dl>
+                  <dt>How to notice it</dt>
+                  <dd>{m.notice}</dd>
+                  <dt>How to test for it</dt>
+                  <dd>{m.test}</dd>
+                </dl>
+                <a class="fail-source-link" href={url(`/techniques/${m.slug}/`)} style={`--c:${m.color}`}>
+                  <i class="row-dot" style={`--c:${m.color}`} />
+                  {m.title}
+                </a>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</Base>

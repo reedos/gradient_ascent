@@ -1,0 +1,93 @@
+{
+  "illustrative": true,
+  "h": 640,
+  "title": "Write a research brief with citations",
+  "sub": "An agent searches and drafts; a fixed check asks one question of every citation before it ships.",
+  "pill": "Level 5 · Agents",
+  "nodes": [
+    { "id": "topic", "x": 170, "y": 34, "l": "Topic", "k": "io" },
+    { "id": "lead", "x": 170, "y": 174, "l": "Agent searches and drafts", "k": "model" },
+    { "id": "search", "x": 82, "y": 314, "l": "search(query)", "k": "tool" },
+    { "id": "read", "x": 258, "y": 314, "l": "read(source)", "k": "tool" },
+    { "id": "check", "x": 170, "y": 454, "l": "Check: does the section say it?", "k": "model" },
+    { "id": "brief", "x": 170, "y": 594, "l": "Sourced brief", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "topic", "t": "lead", "by": "code" },
+    { "id": "e2", "f": "lead", "t": "search", "by": "model", "b": 22 },
+    { "id": "e3", "f": "search", "t": "lead", "by": "code", "b": 22 },
+    { "id": "e4", "f": "lead", "t": "read", "by": "model", "b": 22 },
+    { "id": "e5", "f": "read", "t": "lead", "by": "code", "b": 22 },
+    { "id": "e6", "f": "lead", "t": "check", "by": "model" },
+    { "id": "e7", "f": "check", "t": "lead", "by": "code", "b": -40 },
+    { "id": "e8", "f": "check", "t": "brief", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The topic arrives",
+      "d": "\"Brief: how has the vendor security-disclosure window changed\nin the last year, and what triggered the change?\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The agent searches",
+      "d": "→ search(\"vendor disclosure window change this year\")",
+      "m": "380 in · 16 out · 0.8 s"
+    },
+    {
+      "e": "e3",
+      "h": "Your code returns the results",
+      "d": "3 passages. They give the new window. Nothing says why it changed.",
+      "m": "3 passages · 24 ms"
+    },
+    {
+      "e": "e4",
+      "h": "The agent opens a source before relying on it",
+      "d": "→ read(\"advisory-2026-14#3\")",
+      "m": "1,120 in · 19 out · 1.0 s"
+    },
+    {
+      "e": "e5",
+      "h": "Your code returns the document",
+      "d": "advisory-2026-14, section 3, full text.",
+      "m": "1,640 tokens · 8 ms"
+    },
+    {
+      "e": "e6",
+      "h": "The agent decides it has enough and drafts",
+      "d": "\"The window moved from 90 to 45 days [advisory-2026-14#3],\nafter a coordinated-disclosure group's public letter\nearlier this year [advisory-2026-14#3].\"",
+      "m": "2,010 in · 61 out · 1.6 s"
+    },
+    {
+      "e": "e7",
+      "h": "One sentence fails the check; code sends it back",
+      "d": "sentence 2 cites #3, which gives the new window but\nnot a reason. \"Not supported by the cited section.\"\nCode returns that sentence, and only that one.",
+      "m": "410 in · 34 out · 0.7 s"
+    },
+    {
+      "e": "e2",
+      "h": "The agent searches again for the missing claim",
+      "d": "→ search(\"why disclosure window shortened this year\")",
+      "m": "440 in · 17 out · 0.8 s"
+    },
+    {
+      "e": "e3",
+      "h": "Your code returns the results",
+      "d": "2 passages. One names the letter and the date.",
+      "m": "2 passages · 21 ms"
+    },
+    {
+      "e": "e6",
+      "h": "The agent rewrites the sentence; code re-checks it",
+      "d": "\"...after a coordinated-disclosure group's public letter\nin February [advisory-2026-14#1].\"",
+      "m": "2,240 in · 58 out · 1.5 s"
+    },
+    {
+      "e": "e8",
+      "h": "Every citation passes; code releases the brief",
+      "d": "Both sentences now match their cited sections. Brief ships.",
+      "m": "430 in · 12 out · 0.6 s"
+    }
+  ]
+}

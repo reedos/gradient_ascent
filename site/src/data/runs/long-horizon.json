@@ -1,0 +1,57 @@
+{
+  "illustrative": true,
+  "h": 800,
+  "title": "Long-running tasks",
+  "sub": "A queue of questions worked through across many sessions, each one starting on its own.",
+  "pill": "Level 7 · Always-on agents",
+  "nodes": [
+    { "id": "tick", "x": 170, "y": 30, "l": "Scheduled tick", "k": "io" },
+    { "id": "state", "x": 170, "y": 170, "l": "Checkpoint file", "k": "store" },
+    { "id": "act", "x": 170, "y": 310, "l": "reads notes, decides", "k": "model" },
+    { "id": "answer", "x": 82, "y": 450, "l": "Answer + checkpoint", "k": "code" },
+    { "id": "flag", "x": 258, "y": 450, "l": "Hand to a person", "k": "code" },
+    { "id": "human", "x": 258, "y": 590, "l": "Person resolves it", "k": "human" },
+    { "id": "done", "x": 170, "y": 730, "l": "Checkpoint written", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "tick", "t": "state", "by": "code" },
+    { "id": "e2", "f": "state", "t": "act", "by": "code" },
+    { "id": "e3", "f": "act", "t": "answer", "by": "model", "b": -24 },
+    { "id": "e4", "f": "act", "t": "flag", "by": "model", "b": 24 },
+    { "id": "e5answer", "f": "answer", "t": "done", "by": "code", "b": 140 },
+    { "id": "e5", "f": "flag", "t": "human", "by": "code" },
+    { "id": "e6", "f": "human", "t": "done", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "A scheduled tick starts a new session",
+      "d": "cron calls run_session() on a timer\nno person opened this run",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code loads the checkpoint and rebuilds the context from notes, not the transcript",
+      "d": "queue: 1 question left · 1 note carried from an earlier session\nretrieved: dr210-manual#2, specs-comparison#1\n(no earlier session's messages are replayed)",
+      "m": "2 sources · 9 ms"
+    },
+    {
+      "e": "e4",
+      "h": "The model reads the sources and the notes, and decides to flag rather than guess",
+      "d": "→ flag_for_review(reason=\"specs-comparison#1 gives 208V;\ndr210-manual#2 gives 240V; sources disagree\")\n(it could have called answer(...) instead — that branch,\nleft, was not taken this run)",
+      "m": "380 in · 22 out · 0.6 s"
+    },
+    {
+      "e": "e5",
+      "h": "Your code hands the question to a person and checkpoints",
+      "d": "pending[\"What voltage does the DR-210 need?\"] = \"sources disagree\"\nstate saved to disk; no session touches this question again\nuntil someone resolves it",
+      "m": "0 tokens · checkpoint written"
+    },
+    {
+      "e": "e6",
+      "h": "A person resolves it, on their own time, not the scheduler's",
+      "d": "resolve(): \"Checked the nameplate: it's 240V, 30A —\nthe comparison sheet was for an older model.\"",
+      "m": "decision: answered by a person"
+    }
+  ]
+}

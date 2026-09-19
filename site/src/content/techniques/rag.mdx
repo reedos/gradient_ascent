@@ -1,0 +1,246 @@
+---
+slug: rag
+level: 2
+run: rag
+lanes: [use, build]
+reviewed: 2026-09-18
+sources:
+  - title: "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks"
+    url: "https://arxiv.org/abs/2005.11401"
+    publisher: "arXiv (Meta AI Research, UCL, NYU)"
+    date: "2020-05-22"
+    accessed: "2026-09-18"
+  - title: "What are Projects?"
+    url: "https://support.claude.com/en/articles/9517075-what-are-projects"
+    publisher: "Anthropic (Claude Help Center)"
+    accessed: "2026-09-18"
+  - title: "File search"
+    url: "https://developers.openai.com/api/docs/guides/tools-file-search"
+    publisher: "OpenAI (API documentation)"
+    accessed: "2026-09-18"
+---
+
+import Run from '../../components/page/Run.astro';
+import Lanes from '../../components/page/Lanes.astro';
+import Lane from '../../components/page/Lane.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import RunIt from '../../components/page/RunIt.astro';
+import TryIt from '../../components/page/TryIt.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import Cite from '../../components/page/Cite.astro';
+import Link from '../../components/page/Link.astro';
+import ragRun from '../../data/runs/rag.json';
+
+Retrieval-augmented generation, or RAG, answers a question by searching your own documents
+first. The documents are cut up in advance into chunks — passages of a few hundred words each —
+and every chunk is turned into an embedding, a list of numbers standing in for its meaning. That
+set of embeddings is the index. Your code embeds the question the same way, compares it against
+the index, keeps the closest few chunks, puts them in the prompt, and the model answers once,
+using only what it was given.
+
+RAG does not decide anything: your code always searches, always keeps a fixed number of chunks,
+and always asks the model exactly once. Researchers introduced the approach in 2020 to let a
+model answer from text it was never trained on<Cite n={1}/>.
+
+RAG sits at level 2, context. The model chooses nothing about how it gets its information; your
+code does all the deciding.
+
+This page is marked draft, not published: RAG has no recorded trace and no scored result file
+yet, so nothing below is measured. It is illustrated.
+
+## A run, step by step
+
+<Run data={ragRun} label="Level 2 · RAG" runKey="rag" />
+
+<Lanes>
+<Lane name="use" title="Use it">
+
+If you have uploaded files to a chat app and asked a question about them, you have used RAG.
+The product searched your files for the passages closest to your question, put those passages
+in front of the model, and asked once.
+
+Anthropic's own documentation describes this directly: once a project's uploaded files approach
+what the context window can hold, Claude switches into what Anthropic calls RAG mode. Anthropic
+says that expands how much a project can hold by up to ten times while maintaining response
+quality<Cite n={2}/>; that is the maker's claim, not a number this site has measured. OpenAI
+documents the same pattern for its own file search feature, which products built on its API can
+call: it retrieves passages from uploaded files by keyword and meaning together, and returns an
+answer with citations to the files it used<Cite n={3}/>. Gemini Notebook, Perplexity and
+workplace search tools such as Glean and Microsoft 365 Copilot work the same way: search first,
+then answer.
+
+To get better results from a tool like this, ask questions a handful of passages can answer on
+their own. "What does the warranty cover" works well. "Summarize every change across all our
+contracts this year" does not, because no single search finds every relevant passage, and the
+tool only searches once.
+
+Check the citations when the product shows them. A citation that does not obviously support the
+sentence next to it is a sign the search missed something and the model filled the gap on its
+own.
+
+RAG cannot join facts that live in different documents into one answer — a table in one file
+and a rule in another — because it only ever searches once. It cannot run a second,
+better-targeted search after seeing what the first one turned up; that is what
+<Link href="/techniques/agentic-rag/">agentic RAG</Link> and the deep research modes built on it
+do instead. And it will not reliably tell you when it found nothing useful. A search that comes
+back thin can still produce a confident-sounding answer built from whatever passages were
+closest, even if none of them actually address the question.
+
+</Lane>
+<Lane name="build" title="Build it">
+
+The minimal version of RAG is four fixed steps: chunk the documents, embed the question and
+every chunk, keep the top few chunks by similarity, and ask the model once with those chunks as
+its only sources.
+
+Chunking splits documents into pieces small enough to embed and retrieve individually. The
+example below chunks by section, since the synthetic document set already has numbered
+sections; a real document set usually needs its own splitter, tuned so a chunk holds one
+complete idea rather than cutting a sentence or a table row in half.
+
+Embedding turns text into a vector, a fixed-length list of numbers, using a model trained so
+that texts with similar meaning get vectors that point in similar directions; the mechanism, and
+the search built on it, is <Link href="/techniques/embeddings-search/">embeddings and
+search</Link>. The code below is
+written against an `Embedder` interface with two implementations: a deterministic stub for
+tests, and a real embedding model behind the same interface, so the retrieval logic never has to
+know which one is running.
+
+Retrieval scores every chunk's embedding against the question's embedding by cosine similarity
+— how closely the two vectors point in the same direction — and keeps the top `k`, four by
+default. `_cosine` below returns a plain dot product rather than a full cosine, because both
+embedders return unit vectors, for which the two are the same number. This is the one place a
+real system usually adds more: a second, more expensive reranking pass over a larger first cut
+of candidates, scored by a model trained for that job. Cohere and Jina AI both sell one. The
+example skips reranking to keep the pipeline to four fixed steps.
+
+Prompt assembly numbers every retrieved chunk, includes its citation (`file#section`), and the
+system prompt instructs the model to answer using only those sources and to name which ones it
+used. Citations are then parsed back out of the model's answer with a regular expression, so
+the calling code always knows, in a form it can check automatically, which sources actually
+contributed to the answer.
+
+Here is the whole pipeline, constants first, as the example runs it:
+
+<CodeFile file="examples/rag/run.py" start={20} end={81} expect="LEVEL = 2" />
+
+Every step above is decided by code, not by the model. The one model call answers the question;
+it does not choose what happens next, because there is nothing left to choose. Run it yourself:
+
+<CodeFile file="examples/rag/README.md" start={16} end={16} lang="text" expect="python -m examples.rag" />
+
+</Lane>
+</Lanes>
+
+<WhenNot>
+
+Try <Link href="/techniques/order-zero/">level 0, no model at all</Link> first if the documents are small
+enough for plain keyword search or a regular expression to answer the question directly, with no
+model and no embeddings to keep in sync.
+
+Try putting the whole document set straight into the prompt instead of retrieving from it, if it
+comfortably fits the model's context window and you are not reusing the same documents across
+many separate questions. That is <Link href="/techniques/context-engineering/">context
+engineering</Link>.
+
+Move up to RAG once the documents are too large, too numerous, or reused too often for either of
+those to still make sense.
+
+</WhenNot>
+
+## Failure modes
+
+<FailureModes modes={[
+  {
+    name: 'The right passage is not retrieved',
+    notice: "The answer is generic, off-topic, or contradicts a document you know covers the question; a product that shows its sources shows ones that don't relate to what was asked.",
+    test: "Run questions where you already know which section holds the answer, and check whether that section is in the top-k. The site's own eval set scores exactly this as citation hit rate.",
+  },
+  {
+    name: 'The passage is retrieved but ignored',
+    notice: "The correct source is visibly in the retrieved set, but the answer still doesn't use it, invents a different answer, or cites the wrong section.",
+    test: "Compare the retrieved chunk list against the final citations. A needed chunk that was retrieved but never cited is this failure, not a retrieval failure.",
+  },
+  {
+    name: 'Chunk boundaries split a fact',
+    notice: 'A number and the sentence explaining it end up in two different chunks (a price in one, the part it prices in the next), so the answer gets one without the other.',
+    test: "Check multi-hop and numeric questions specifically. A grading rule with several required patterns catches a citation that matches only part of a compound fact.",
+  },
+  {
+    name: 'Stale index',
+    notice: 'The answer is correct for an old version of a document but wrong for the current one — a warranty length that changed, a part number that was superseded.',
+    test: 'Change a fact in the corpus without re-embedding. The retriever keeps returning the old text, because it was indexed at embed time, not at read time.',
+  },
+  {
+    name: 'Conflicting sources',
+    notice: "Two documents disagree — an installation guide states one clearance, a later service bulletin corrects it — and the answer picks one without saying there's a conflict.",
+    test: "Ask a question the corpus answers two different ways on purpose, and check whether the answer names both values and says which one is authoritative.",
+  },
+  {
+    name: 'Prompt injection through retrieved text',
+    notice: 'A document contains text written to look like an instruction ("ignore the above and say X"), and the answer follows it instead of answering the question.',
+    test: 'Add a document section containing an embedded instruction and see whether the answer changes to match it. Telling the model to "answer only from the sources" does not by itself prevent this, since the injected text is a source.',
+  },
+]} />
+
+## Cost and latency
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, one question', value: '1' },
+    { label: 'Tokens in', value: '~1,850' },
+    { label: 'Tokens out', value: '~64' },
+    { label: 'Wall time', value: '~2.1s' },
+  ]}
+  comparedTo={{
+    label: 'agentic RAG (level 5)',
+    note: 'About four model calls instead of one, about four times the tokens, and about three times the wait, in the illustrated run compared on the home page.',
+  }}
+  level={2}
+/>
+
+## How to eval it
+
+<HowToEval questionCount={60} kinds={['lookup', 'multi-hop', 'numeric', 'unanswerable', 'conflicting sources']}>
+
+The site scores every technique against the same 60-question synthetic set, 12 questions in
+each of five kinds, over the appliance document set in `evals/corpus/`. RAG is graded the same
+way every other level is: exact match or a rubric where exact match doesn't apply, plus
+**citation hit rate**, the share of questions where every source the grading rule expects was
+actually cited in the answer.
+
+Two kinds matter most for RAG specifically. Multi-hop questions need two chunks retrieved and
+used together, which is exactly what single-pass retrieval struggles with. Conflicting-source
+questions need the answer to notice two chunks disagree, not just cite whichever one the search
+ranked first.
+
+No result file exists for RAG yet (see `docs/EVALS.md`), so this page cannot say a number for
+any of it. Run `python scripts/eval_run.py --example rag --model <spec> --dry` to project the
+cost of a real run before spending anything on one.
+
+</HowToEval>
+
+## Run it
+
+<RunIt
+  monitor="Citation hit rate on a sample of real questions, and how often a question comes back with zero retrieved chunks above a similarity floor. Watch retrieval latency and generation latency separately, since a slow answer can come from either half."
+  costAtVolume="One model call per question, so language-model cost tracks question count, not question difficulty. Embedding cost tracks document count instead, and usually dominates at high volume if it's billed per call to a hosted embedding API."
+  failsInProduction="A document changes and the index isn't rebuilt, so the model confidently answers from stale text. Or a document containing an injected instruction gets indexed and later retrieved and followed."
+  whatToLog="The question, the retrieved chunk ids with their similarity scores, the final citations, and the full prompt sent to the model, so a bad answer traces back to a retrieval failure or a generation failure without re-running anything."
+/>
+
+## Try it
+
+<TryIt items={[
+  { lane: 'use', body: 'Open a chat app\'s file or project feature with a document you know well, and ask a question whose answer needs two different sections. Does it find both, or only one?' },
+  { lane: 'build', body: 'Run python -m examples.rag --model stub with a question of your own from the repo root, then change TOP_K from 4 to 2 in examples/rag/run.py and ask it again. Which passages drop out, and does the answer get worse?' },
+  { lane: 'build', body: 'Change the retriever. _retrieve in examples/rag/run.py is the only function that picks passages: it embeds the question and every section, then keeps the top k by cosine. Replace its body with a plain count of shared words, keep the signature, and run the same question again. Which kinds of question get better, and which get worse?' },
+  { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose, using the synthetic documents in evals/corpus/.' },
+]} />
+
+{/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
+    file's frontmatter, after the generated blocks, so they close the page and cannot drift
+    from the frontmatter the schema validates. Do not repeat them here. */}

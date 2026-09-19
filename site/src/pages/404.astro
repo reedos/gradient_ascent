@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro';
+import { url } from '../lib/url';
+---
+<Base title="Page not found · Gradient Ascent" description="There is no page at this address.">
+  <div class="page-hero">
+    <div class="eyebrow muted"><span class="dot"></span>404</div>
+    <h1>Page not found</h1>
+    <p>There is no page at this address. Check the address, or start from one of these.</p>
+    <div class="hero-actions">
+      <a class="button" href={url('/')}>Home <span aria-hidden="true">&rarr;</span></a>
+      <a class="text-link" href={url('/techniques/')}>Every technique <span aria-hidden="true">&rarr;</span></a>
+      <a class="text-link" href={url('/recipes/')}>Recipes <span aria-hidden="true">&rarr;</span></a>
+      <a class="text-link" href={url('/names/')}>Named things <span aria-hidden="true">&rarr;</span></a>
+    </div>
+  </div>
+</Base>
