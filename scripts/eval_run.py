@@ -349,6 +349,21 @@ NOT_SCORED = {
         "the people who ran the incident would write: steps kept, steps invented from a one-off, "
         "and how many shipped without a check somebody could run."
     ),
+    "weekly_status_report": (
+        "it assembles a week's counts, dates and totals from three fixture sources and has one "
+        "model call write the prose between them. It reads no corpus and answers no question, so "
+        "the question set has nothing to grade. Measure the two checks instead: the share of "
+        "drafts in which every number is one code computed, and the share in which every must-say "
+        "figure reached the page."
+    ),
+    "project_tracker_upkeep": (
+        "it reconciles a tracker document against three fixture sources and queues anything that "
+        "would overwrite a person's own words. Its output is a set of field changes and an "
+        "approval queue, not an answer with citations, so the graders have nothing to match. "
+        "Measure the queue instead: for each proposal, whether a person reading the same message "
+        "would have proposed the same change, and separately how many stated changes never "
+        "reached the queue at all."
+    ),
     "storyboard_from_a_script": (
         "it splits a script into scenes and shots and then checks coverage in code. The output "
         "is a shot list, not an answer, and the corpus holds no script. Measure coverage "
