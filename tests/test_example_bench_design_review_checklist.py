@@ -23,6 +23,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from examples.bench_design_review_checklist.__main__ import SCRIPTED  # noqa: E402
 from examples.bench_design_review_checklist.run import (  # noqa: E402
     C1C2_RATING_REV_C_V,
     C1C2_RATING_V,
@@ -86,6 +87,12 @@ CHECK_RESPONSE = json.dumps(
         ]
     }
 )
+
+
+#: The command's own scripted sequence: draft, then check. Built from the same two fixtures
+#: above, so this cannot drift from `SCRIPTED` in
+#: examples/bench_design_review_checklist/__main__.py by hand.
+SEQUENCE = [DRAFT_RESPONSE, CHECK_RESPONSE]
 
 
 def _scripted_model() -> StubModel:
@@ -226,6 +233,13 @@ class DesignReviewChecklistExampleTests(unittest.TestCase):
         self.assertIn("SRB-5030 revision B", report.board)
         self.assertIn("DR-14", report.text)
         self.assertEqual(len(report.citations), 7)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
 
 
 if __name__ == "__main__":

@@ -17,6 +17,7 @@ if str(ROOT) not in sys.path:
 
 from examples.common.model import Message, StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
+from examples.bench_requirements_to_test_plan.__main__ import SCRIPTED  # noqa: E402
 from examples.bench_requirements_to_test_plan.run import (  # noqa: E402
     BENCH_INSTRUMENTS,
     Blocked,
@@ -56,6 +57,46 @@ def _correct_response(requirement) -> StubResponse:
         "unit": requirement.unit,
     }
     return StubResponse(text=json.dumps(payload))
+
+
+#: The command's own proposed procedure for each requirement, in the terms
+#: `srb5030-test-spec.md` section 5 uses for the seven it already covers. Typed out independently
+#: of `SCRIPTED` in examples/bench_requirements_to_test_plan/__main__.py, so the test below is
+#: what catches the two drifting apart rather than a shared formula hiding it.
+_SCRIPTED_MEASUREMENT = {
+    "REQ-VIN": "sweep the MDN-4010 across the input range and confirm the board holds regulation",
+    "REQ-VOUT": "read VOUT on the MDN-6100, four-wire, 10 V range, at 24.0 V in, 1.000 A out",
+    "REQ-LINEREG": (
+        "read VOUT at the low and high end of the input sweep at 1.000 A out and report the "
+        "percent difference"
+    ),
+    "REQ-LOADREG": "read VOUT at 0.100 A and 3.000 A out at 24.0 V in and report the percent difference",
+    "REQ-RIPPLE": "TRN-1102 channel 1 on TP2, AC coupled, 20 MHz bandwidth limit, single acquisition, MEAS:VPP?",
+    "REQ-IQNL": "set 24.0 V in, load input off, read the MDN-4010's own current with MEAS:CURR?",
+    "REQ-FSW": "TRN-1102 on the switch node; measure the period between rising edges and compute frequency",
+    "REQ-ILIM": (
+        "TRN-2400 ramped in 50 mA steps from 3.500 A at 24.0 V in; report the first current at "
+        "which VOUT falls below 4.900 V"
+    ),
+}
+
+
+def _scripted_response(requirement) -> str:
+    return json.dumps(
+        {
+            "requirement": requirement.id,
+            "instrument": _CORRECT_INSTRUMENT[requirement.id],
+            "measurement": _SCRIPTED_MEASUREMENT[requirement.id],
+            "lower": requirement.lower,
+            "upper": requirement.effective_upper(),
+            "unit": requirement.unit,
+        }
+    )
+
+
+#: DEFAULT_QUESTION in __main__.py is "B", and any non-C revision reads the same eight
+#: requirements, so this is the sequence SCRIPTED holds.
+SEQUENCE = [_scripted_response(r) for r in _requirements_for_revision("B")]
 
 
 def _responses(revision: str, overrides: dict[str, StubResponse] | None = None) -> list[StubResponse]:
@@ -306,6 +347,21 @@ class RequirementsToTestPlanTests(unittest.TestCase):
         self.assertTrue(callable(module.resume))
         self.assertTrue(callable(module.check_coverage))
         self.assertEqual(module.LEVEL, 3)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
+
+    def test_the_scripted_sequence_clears_coverage_with_no_stale_limit(self) -> None:
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+        tracer = Tracer(example="bench_requirements_to_test_plan", level=3, model_id="stub-1")
+        result = run("B", model, tracer)
+        self.assertIsInstance(result, PendingApproval)
+        self.assertTrue(result.coverage.ok)
+        self.assertEqual(len(result.rows), len(REQUIREMENTS))
 
 
 if __name__ == "__main__":

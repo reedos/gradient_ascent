@@ -6,15 +6,21 @@
 `--serial` is any of the five boards in `evals/bench/data/characterization-2026-09.csv`
 (SRB5030-2609-0001 through -0005); it defaults to the empty string, which `run()` treats as
 unrecognized and falls back to whichever board its own corner scan finds to hold the least
-margin. There is no `--model` flag: level 0 calls no model, so `run()`'s `model` parameter (kept
-only to fit the shared `(text, model, tracer)` convention every recordable example follows) is
-always passed `None` here.
+margin.
+
+`--model` is accepted and otherwise unused: level 0 calls no model, so `run()`'s `model`
+parameter (kept only to fit the shared `(text, model, tracer)` convention every recordable
+example follows) is always passed `None` here, whatever `--model` names. The flag exists so this
+command runs the same way every other example's does (`python -m examples.bench_characterize_a_design
+--model stub`); there is no `--model stub:scripted` for this example, because there is no model
+call for a scripted reply to stand in for.
 """
 from __future__ import annotations
 
 import argparse
 import sys
 
+from examples.common.cli import MODEL_HELP
 from examples.common.trace import Tracer
 from examples.bench_characterize_a_design.run import LEVEL, Report, run
 
@@ -62,6 +68,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--serial", default="",
         help="SRB5030-2609-0001 through -0005 (default: whichever board holds the least margin)",
+    )
+    parser.add_argument(
+        "--model", default="stub",
+        help=f"{MODEL_HELP}; accepted for consistency with every other example's command, never used: level 0 calls no model",
     )
     args = parser.parse_args(sys.argv[1:] if argv is None else argv)
     tracer = Tracer(example="bench_characterize_a_design", level=LEVEL, model_id="none")

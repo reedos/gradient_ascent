@@ -27,6 +27,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from evals.bench import load_bench_documents, load_bench_sections  # noqa: E402
+from examples.bench_ask_the_datasheet.__main__ import SCRIPTED  # noqa: E402
 from examples.bench_ask_the_datasheet.run import LEVEL, SCHEMA, _retrieve, run  # noqa: E402
 from examples.common.bench import meter_accuracy_limit_v  # noqa: E402
 from examples.common.model import StubEmbedder, StubModel, StubResponse  # noqa: E402
@@ -51,6 +52,11 @@ CORRECT_RECORD = {
     "applies_to_revision": "A and B",
     "citations": [ECN_CITE, DATASHEET_CITE],
 }
+#: The command's own scripted sequence: a first reply that cites only the datasheet, then
+#: CORRECT_RECORD. Built the same way `examples/bench_ask_the_datasheet/__main__.py` builds
+#: SCRIPTED, so this cannot drift from it by hand.
+DATASHEET_ONLY_RECORD = dict(CORRECT_RECORD, citations=[DATASHEET_CITE])
+SEQUENCE = [json.dumps(DATASHEET_ONLY_RECORD), json.dumps(CORRECT_RECORD)]
 
 
 def _tracer() -> Tracer:
@@ -184,6 +190,23 @@ class RunTests(unittest.TestCase):
         self.assertEqual(LEVEL, 2)
         self.assertTrue(callable(run))
         self.assertEqual(SCHEMA["required"], ["answer", "applies_to_revision", "citations"])
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
+
+    def test_the_scripted_sequence_retries_once_and_then_cites_both_sources(self) -> None:
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+        tracer = _tracer()
+        answer = run(QUESTION, model, StubEmbedder(), tracer)
+        self.assertEqual(set(answer.citations), {ECN_CITE, DATASHEET_CITE})
+        self.assertEqual(sum(1 for s in tracer.steps if s.kind == "model"), 2)
+        validations = [s.detail for s in tracer.steps if s.title == "Validate the reply"]
+        self.assertIn("without ecn-2608-04#1, which supersedes it", validations[0])
+        self.assertEqual(validations[1], "valid")
 
 
 if __name__ == "__main__":

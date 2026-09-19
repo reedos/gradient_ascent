@@ -16,6 +16,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from evals.bench import PRODUCTION_CSV  # noqa: E402
+from examples.bench_bring_up_debug_assistant.__main__ import SCRIPTED  # noqa: E402
 from examples.bench_bring_up_debug_assistant.run import (  # noqa: E402
     FIXTURE_DMM_OFFSET_V,
     _bring_up,
@@ -29,6 +30,31 @@ from examples.common.trace import Tracer  # noqa: E402
 
 SYMPTOM = "SRB5030-2608-0011 failed VOUT on FIX-03. Why, and what should we check next?"
 
+#: The command's own scripted sequence: the canonical full walkthrough below, as SCRIPTED holds
+#: it in examples/bench_bring_up_debug_assistant/__main__.py.
+SEQUENCE = [
+    StubResponse(tool_calls=[ToolCall(name="test_log", arguments={"serial": "SRB5030-2608-0011"})]),
+    StubResponse(tool_calls=[ToolCall(name="read_doc", arguments={"cite": "failure-analysis-guide#3"})]),
+    StubResponse(tool_calls=[ToolCall(name="read_doc", arguments={"cite": "failure-analysis-guide#7"})]),
+    StubResponse(tool_calls=[ToolCall(name="measure", arguments={"instrument": "dmm", "command": "MEAS:VOLT:DC?"})]),
+    StubResponse(tool_calls=[ToolCall(name="measure", arguments={"instrument": "load", "command": "MEAS:VOLT?"})]),
+    StubResponse(tool_calls=[ToolCall(name="measure", arguments={"instrument": "dmm", "command": "*RST"})]),
+    (
+        "Cause: FIX-03's channel 2 offset, not the board. Only VOUT moved and the "
+        "DMM disagrees with the load's own terminal reading by about the fixture's "
+        "offset, the signature failure-analysis-guide#7 gives for a stale channel "
+        "offset rather than an open sense lead. Next measurement: verify FIX-03 "
+        "channel 2 per calibration-procedure#5, then retest this serial on another "
+        "fixture per failure-analysis-guide#1."
+    ),
+]
+
+
+def _model_from(script: list) -> StubModel:
+    """`SEQUENCE` mixes `StubResponse` tool calls with one plain string, the same shape
+    `examples.common.cli.scripted_stub` accepts; `StubModel` itself wants `StubResponse` only."""
+    return StubModel([StubResponse(text=e) if isinstance(e, str) else e for e in script])
+
 
 class BringUpDebugAssistantTraceTests(unittest.TestCase):
     def test_declares_its_level_and_a_run_function(self) -> None:
@@ -38,26 +64,7 @@ class BringUpDebugAssistantTraceTests(unittest.TestCase):
         self.assertEqual(module.LEVEL, 5)
 
     def test_a_full_walkthrough_records_model_decisions_for_every_call_and_the_stop(self) -> None:
-        model = StubModel(
-            [
-                StubResponse(tool_calls=[ToolCall(name="test_log", arguments={"serial": "SRB5030-2608-0011"})]),
-                StubResponse(tool_calls=[ToolCall(name="read_doc", arguments={"cite": "failure-analysis-guide#3"})]),
-                StubResponse(tool_calls=[ToolCall(name="read_doc", arguments={"cite": "failure-analysis-guide#7"})]),
-                StubResponse(tool_calls=[ToolCall(name="measure", arguments={"instrument": "dmm", "command": "MEAS:VOLT:DC?"})]),
-                StubResponse(tool_calls=[ToolCall(name="measure", arguments={"instrument": "load", "command": "MEAS:VOLT?"})]),
-                StubResponse(tool_calls=[ToolCall(name="measure", arguments={"instrument": "dmm", "command": "*RST"})]),
-                StubResponse(
-                    text=(
-                        "Cause: FIX-03's channel 2 offset, not the board. Only VOUT moved and the "
-                        "DMM disagrees with the load's own terminal reading by about the fixture's "
-                        "offset, the signature failure-analysis-guide#7 gives for a stale channel "
-                        "offset rather than an open sense lead. Next measurement: verify FIX-03 "
-                        "channel 2 per calibration-procedure#5, then retest this serial on another "
-                        "fixture per failure-analysis-guide#1."
-                    )
-                ),
-            ]
-        )
+        model = _model_from(SEQUENCE)
         tracer = Tracer(example="bench_bring_up_debug_assistant", level=5, model_id="stub-1")
         answer = run(SYMPTOM, model, tracer)
 
@@ -273,6 +280,13 @@ class UnknownToolTests(unittest.TestCase):
         answer = run(SYMPTOM, model, tracer)
         self.assertIn("unknown tool", " ".join(s.detail for s in tracer.steps))
         self.assertIsInstance(answer.text, str)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual(SCRIPTED, SEQUENCE)
 
 
 if __name__ == "__main__":

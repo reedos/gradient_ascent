@@ -31,6 +31,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from evals.bench import CHARACTERIZATION_CSV, RETEST_CSV, SOAK_CSV  # noqa: E402
+from examples.bench_test_data_by_conversation.__main__ import SCRIPTED  # noqa: E402
 from examples.bench_test_data_by_conversation.run import (  # noqa: E402
     LEVEL,
     MAX_LOOP_DEPTH,
@@ -96,6 +97,18 @@ for p in sorted(set((r["serial"], r["tamb_c"], r["vin_v"], r["iout_a"]) for r in
     if pin < pout:
         result = result + [[p, round(iin, 4), round(pin, 2), round(pout, 2)]]
 """
+
+
+#: The command's own scripted sequence: write RETEST_SNIPPET, then turn its result into a short
+#: answer. Pinned against SCRIPTED in
+#: examples/bench_test_data_by_conversation/__main__.py so the two cannot drift apart.
+SEQUENCE = [
+    StubResponse(tool_calls=[ToolCall(name="run_python", arguments={"code": RETEST_SNIPPET})]),
+    (
+        "Fifteen of the eighteen retested boards are within spec; three still fail: "
+        "SRB5030-2608-0052, SRB5030-2608-0063 and SRB5030-2608-0178."
+    ),
+]
 
 
 def _tracer() -> Tracer:
@@ -484,6 +497,22 @@ class RunEndToEndTests(unittest.TestCase):
         tracer = _tracer()
         answer = run("How many rows?", model, tracer, tables=tiny)
         self.assertEqual(answer.text, "One board.")
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual(SCRIPTED, SEQUENCE)
+
+    def test_the_scripted_sequence_runs_the_real_retest_snippet(self) -> None:
+        model = StubModel([StubResponse(text=e) if isinstance(e, str) else e for e in SEQUENCE])
+        tracer = _tracer()
+        answer = run("Do the retested boards actually pass?", model, tracer)
+        self.assertIn("SRB5030-2608-0052", answer.text)
+        self.assertEqual(answer.citations, ["retest-2026-08-31.csv"])
+        sandbox_step = next(s for s in tracer.steps if s.title == "Sandbox runs the snippet")
+        self.assertIn('"n_fail": 3', sandbox_step.detail)
 
 
 if __name__ == "__main__":

@@ -5,15 +5,20 @@
 
 `--measurement` is any name in the `measurement` column of
 `evals/bench/data/production-run-2026-08.csv` (`R_OUT`, `IQ_NL`, `VOUT`, `LINE_REG`, `LOAD_REG`,
-`EFF_FL`, `RIPPLE`, `I_LIM`); it defaults to `RIPPLE`. There is no `--model` flag: level 0 calls
-no model, so `run()`'s `model` parameter (kept only to fit the shared `(text, model, tracer)`
-convention every recordable example follows) is always passed `None` here.
+`EFF_FL`, `RIPPLE`, `I_LIM`); it defaults to `RIPPLE`.
+
+`--model` is accepted and otherwise unused: level 0 calls no model, so `run()`'s `model`
+parameter (kept only to fit the shared `(text, model, tracer)` convention every recordable
+example follows) is always passed `None` here, whatever `--model` names. The flag exists so this
+command runs the same way every other example's does; there is no `--model stub:scripted` for
+this example, because there is no model call for a scripted reply to stand in for.
 """
 from __future__ import annotations
 
 import argparse
 import sys
 
+from examples.common.cli import MODEL_HELP
 from examples.common.trace import Tracer
 from examples.bench_limits_without_a_model.run import LEVEL, GroupStats, GroupYield, Report, run
 
@@ -57,6 +62,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--measurement", default="RIPPLE",
         help="R_OUT | IQ_NL | VOUT | LINE_REG | LOAD_REG | EFF_FL | RIPPLE | I_LIM (default RIPPLE)",
+    )
+    parser.add_argument(
+        "--model", default="stub",
+        help=f"{MODEL_HELP}; accepted for consistency with every other example's command, never used: level 0 calls no model",
     )
     args = parser.parse_args(sys.argv[1:] if argv is None else argv)
     tracer = Tracer(example="bench_limits_without_a_model", level=LEVEL, model_id="none")

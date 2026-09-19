@@ -20,6 +20,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from evals.bench import PRODUCTION_CSV  # noqa: E402
+from examples.bench_test_failure_triage.__main__ import SCRIPTED  # noqa: E402
 from examples.bench_test_failure_triage.run import (  # noqa: E402
     LEVEL,
     SAMPLE_INPUT,
@@ -48,6 +49,11 @@ def _tracer() -> Tracer:
 
 def _cause_model(cause: str, evidence: str = "quoted words") -> StubModel:
     return StubModel([StubResponse(text=json.dumps({"cause": cause, "evidence": evidence}))])
+
+
+#: The command's own scripted sequence: one classification of SAMPLE_INPUT's own note. Pinned
+#: against SCRIPTED in examples/bench_test_failure_triage/__main__.py so the two cannot drift.
+SEQUENCE = [json.dumps({"cause": "dead_board", "evidence": "dead. no vout at all, u1 not switching"})]
 
 
 class LoadFailuresTests(unittest.TestCase):
@@ -256,6 +262,21 @@ class BenchFileConsistencyTests(unittest.TestCase):
         self.assertEqual(by_serial[NO_NOTE_ON_OFFSET_FIXTURE_SERIAL].note, "")
         self.assertEqual(by_serial[FIXTURE_FAULT_SERIAL].fixture, "FIX-03")
         self.assertEqual(by_serial[UNGROUPED_SERIAL].fixture, "FIX-04")
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
+
+    def test_the_scripted_sequence_overrides_the_fixture_signature(self) -> None:
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+        tracer = _tracer()
+        disposition = run(SAMPLE_INPUT, model, tracer)
+        self.assertEqual(disposition.group_signature, "fixture")
+        self.assertEqual(disposition.cause, "dead_board")
+        self.assertEqual(disposition.route, "failure_analysis")
 
 
 if __name__ == "__main__":

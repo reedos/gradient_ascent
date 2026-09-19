@@ -16,6 +16,7 @@ if str(ROOT) not in sys.path:
 from examples.common.bench import Approval, SafetyEnvelope, SafetyRefusal  # noqa: E402
 from examples.common.model import StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
+from examples.bench_instrument_script_from_the_manual.__main__ import SCRIPTED  # noqa: E402
 from examples.bench_instrument_script_from_the_manual.run import (  # noqa: E402
     LEVEL,
     TASK,
@@ -28,6 +29,11 @@ from examples.bench_instrument_script_from_the_manual.run import (  # noqa: E402
 # evals/bench/corpus/trn2400-programming-manual.md section 2.
 BAD_DRAFT = "MODE CC\nCURRent 1.000\nINP ON\nMEAS:VOLT?\nMEAS:CURR?\nINP OFF"
 GOOD_DRAFT = "MODE CC\nCURR 1.000\nINP 1\nMEAS:VOLT?\nMEAS:CURR?\nINP 0"
+#: BAD_DRAFT with only the keyword fixed: a plausible half-correction that leaves the boolean
+#: words wrong. The command's own scripted sequence draft, revise, revise again, matching
+#: SCRIPTED in examples/bench_instrument_script_from_the_manual/__main__.py.
+PARTIAL_DRAFT = "MODE CC\nCURR 1.000\nINP ON\nMEAS:VOLT?\nMEAS:CURR?\nINP OFF"
+SEQUENCE = [BAD_DRAFT, PARTIAL_DRAFT, GOOD_DRAFT]
 
 
 def make_tracer() -> Tracer:
@@ -133,6 +139,26 @@ class InstrumentScriptExampleTests(unittest.TestCase):
 
         self.assertTrue(callable(module.run))
         self.assertEqual(module.LEVEL, 3)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
+
+    def test_the_scripted_sequence_needs_both_revisions_and_then_runs_clean(self) -> None:
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+        tracer = make_tracer()
+        result = run(TASK, model, tracer)
+        self.assertEqual(len(result.attempts), 3)
+        first_codes = {error.split(",", 1)[0] for _, error in result.attempts[0].errors}
+        self.assertEqual(first_codes, {"-113", "-224"})
+        second_codes = {error.split(",", 1)[0] for _, error in result.attempts[1].errors}
+        self.assertEqual(second_codes, {"-224"}, "the keyword is fixed; only the booleans are still wrong")
+        self.assertEqual(result.attempts[2].errors, [])
+        self.assertEqual(result.final_commands, GOOD_DRAFT.splitlines())
+        self.assertTrue(result.readings)
 
 
 if __name__ == "__main__":

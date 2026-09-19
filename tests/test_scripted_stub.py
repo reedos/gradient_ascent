@@ -41,7 +41,10 @@ EXAMPLES_DIR = ROOT / "examples"
 # a decision rather than an oversight. Every other example must export SCRIPTED.
 NO_SCRIPT = {
     "ai_gateways": "the demo is two hard-coded providers, so the gateway's fallback is visible without a script",
+    "bench_characterize_a_design": "level 0: the whole point is that no model is called",
+    "bench_limits_without_a_model": "level 0: the whole point is that no model is called",
     "embeddings_search": "level 2 retrieval only: it embeds and ranks, and calls no model",
+    "household_paperwork": "level 0: the renewal and bill dates are read and sorted by code",
     "knowledge_graphs": "its command plays a transcribed extraction of its own, so --model never reaches a stub",
     "literature_watch": "the command reads the shortlist that code produced; no model call",
     "local_inference": "the command sizes a model in memory: arithmetic, no call",

@@ -24,6 +24,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from evals.bench import load_bench_sections  # noqa: E402
+from examples.bench_accuracy_specs_from_the_manual.__main__ import SCRIPTED  # noqa: E402
 from examples.bench_accuracy_specs_from_the_manual.run import (  # noqa: E402
     INTERVALS,
     LEVEL,
@@ -71,6 +72,18 @@ for _row in BAD_ROWS:
     if _row["interval"] == "1 year" and _row["range_value"] == 10.0:
         _row["ppm_of_reading"] = _donor.ppm_of_reading
         _row["ppm_of_range"] = _donor.ppm_of_range
+
+
+#: The same 15 rows with the last one left out, the way `examples/bench_accuracy_specs_from_the_
+#: manual/__main__.py` builds its own scripted first reply, so this constant cannot drift from
+#: `SCRIPTED` by hand.
+MISSING_LAST_ROW = [
+    row for row in GOOD_ROWS if not (row["interval"] == "1 year" and row["range_value"] == 1000.0)
+]
+
+#: The command's own two model calls: a first extraction missing the last row, then the full
+#: table. `ScriptedCommandTests` below pins this against `SCRIPTED`.
+SEQUENCE = [json.dumps(MISSING_LAST_ROW), json.dumps(GOOD_ROWS)]
 
 
 def _tracer() -> Tracer:
@@ -348,6 +361,23 @@ class PriceReadingTests(unittest.TestCase):
         by_name = {c.name: c.standard_uncertainty for c in priced.contributions}
         limit = by_name["meter accuracy"] * math.sqrt(3.0)
         self.assertEqual(round(limit * 1e6, 1), 284.7)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
+
+    def test_the_scripted_sequence_retries_once_and_then_returns_all_15_rows(self) -> None:
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+        tracer = _tracer()
+        result = run(SECTION_ID, model, tracer)
+        self.assertEqual(len(result.rows), 15)
+        self.assertEqual(sum(1 for s in tracer.steps if s.kind == "model"), 2)
+        problems = [s.detail for s in tracer.steps if s.title == "Validate shape, completeness and monotonicity"]
+        self.assertTrue(any("missing rows" in p for p in problems))
+        self.assertTrue(any("15 rows" in p for p in problems))
 
 
 if __name__ == "__main__":

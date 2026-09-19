@@ -369,5 +369,32 @@ class RunEntryPointTests(unittest.TestCase):
         self.assertFalse(rec.takes_embedder)
 
 
+class CommandLineTests(unittest.TestCase):
+    """This example calls no model, so it has no `SCRIPTED` sequence; `tests/test_scripted_stub.py`
+    is where that is declared, in `NO_SCRIPT`. What belongs here is that the command's own
+    `--model` flag, added only so this command runs the same way every other example's does,
+    never changes what gets printed and never fails whatever it is given."""
+
+    def test_no_scripted_sequence_is_exported(self) -> None:
+        import examples.bench_limits_without_a_model.__main__ as module
+
+        self.assertIsNone(getattr(module, "SCRIPTED", None))
+
+    def test_the_command_runs_the_same_regardless_of_model_spec(self) -> None:
+        import io
+        from contextlib import redirect_stdout
+
+        import examples.bench_limits_without_a_model.__main__ as module
+
+        outputs = []
+        for model_spec in ("stub", "stub:scripted", "ollama:some-tag"):
+            out = io.StringIO()
+            with redirect_stdout(out):
+                code = module.main(["--model", model_spec, "--measurement", "RIPPLE"])
+            self.assertEqual(code, 0)
+            outputs.append(out.getvalue())
+        self.assertTrue(all(o == outputs[0] for o in outputs))
+
+
 if __name__ == "__main__":
     unittest.main()
