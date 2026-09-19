@@ -25,8 +25,15 @@ def taxonomy():
              "description": "desc b", "pages": [page("two"), page("three")]},
         ],
         "tracks": [{"id": "evals", "pages": [page("grading")]}],
-        "threads": [{"id": "t", "pages": ["two", "three"]}],
-        "recipes": [{"slug": "r", "domain": "general", "uses": ["two", "evals"]}],
+        # Rule 22 wants a thread to cross levels, and rule 20 wants a general recipe at every
+        # level, so the fixture carries the smallest set that satisfies both: three thread pages
+        # drawn from two tiers, and one general recipe per tier.
+        "threads": [{"id": "t", "pages": ["one", "two", "three"]}],
+        "recipes": [
+            {"slug": "r", "domain": "general", "uses": ["two", "evals"]},
+            {"slug": "r0", "domain": "general", "uses": ["one"]},
+            {"slug": "r1", "domain": "general", "uses": ["three"]},
+        ],
         "teardowns": {"cap": 6, "expires_days": 180,
                       "first": [{"slug": "td", "title": "TD, decoded", "patterns": ["three"]}]},
         "relations": [
@@ -93,7 +100,7 @@ class ValidateTests(unittest.TestCase):
         tax = taxonomy()
         tax["recipes"].append({"slug": "e", "domain": "engineering", "uses": ["two"]})
         _, report = validate.validate(tax, landscape())
-        self.assertEqual(report["recipes_by_domain"], {"general": 1, "engineering": 1})
+        self.assertEqual(report["recipes_by_domain"], {"general": 3, "engineering": 1})
 
     def test_the_real_taxonomy_gives_every_recipe_a_domain(self):
         """The rule is only worth having if the shipped file obeys it."""
@@ -500,6 +507,152 @@ class ShapesTests(unittest.TestCase):
             "duplicate shape id",
         ):
             self.assertIn(needle, errors)
+
+
+class GeneralCoverageTests(unittest.TestCase):
+    """Rules 19 and 20, added in wave 9 with the general half of the recipe layer.
+
+    Both say the same thing along different axes: the site is for three audiences, and a shape or
+    a level whose only worked instance is an engineering one tells everybody else that this kind
+    of job, or this level, is not for them. Neither failure is visible in a build.
+    """
+
+    def _real(self):
+        import json as _json
+
+        content = Path(__file__).resolve().parent.parent / "content"
+        tax = _json.loads((content / "taxonomy.json").read_text(encoding="utf-8"))
+        shapes = _json.loads((content / "shapes.json").read_text(encoding="utf-8"))
+        return shapes, tax
+
+    def test_every_real_shape_has_a_general_recipe(self):
+        shapes, tax = self._real()
+        self.assertEqual(validate.validate_shapes(shapes, tax), [])
+
+    def test_a_shape_whose_recipes_are_all_engineering_is_an_error(self):
+        shapes, tax = self._real()
+        general = {r["slug"] for r in tax["recipes"] if r.get("domain") == "general"}
+        shape = next(s for s in shapes["shapes"] if set(s["recipes"]) & general)
+        shape["recipes"] = [s for s in shape["recipes"] if s not in general] or ["limits-without-a-model"]
+        errors = validate.validate_shapes(shapes, tax)
+        self.assertTrue(any(f"shape '{shape['id']}' has no general recipe" in e for e in errors), errors)
+
+    def test_a_shape_with_no_recipe_at_all_is_not_asked_for_a_general_one(self):
+        # A shape may legitimately have no worked instance yet; rule 18 already reports the other
+        # direction (a recipe outside every shape). Only a shape that HAS recipes is asked.
+        shapes, tax = self._real()
+        shape = shapes["shapes"][0]
+        moved = shape["recipes"]
+        shape["recipes"] = []
+        shapes["shapes"][1]["recipes"] = shapes["shapes"][1]["recipes"] + moved
+        errors = validate.validate_shapes(shapes, tax)
+        self.assertFalse([e for e in errors if "has no general recipe" in e], errors)
+
+    def test_every_real_level_has_a_general_recipe(self):
+        _, tax = self._real()
+        errors = validate.validate(tax, None)[0]
+        self.assertFalse([e for e in errors if "has no general recipe" in e], errors)
+
+    def test_a_level_whose_recipes_are_all_engineering_is_an_error(self):
+        tax = taxonomy()
+        for recipe in tax["recipes"]:
+            if recipe["slug"] in ("r", "r1"):  # both of the fixture's level-1 general recipes
+                recipe["domain"] = "engineering"
+        errors = validate.validate(tax, landscape())[0]
+        self.assertTrue(any("level 1 (b) has no general recipe" in e for e in errors), errors)
+
+    def test_a_recipe_that_uses_only_track_pages_counts_for_no_level(self):
+        """`recipeLevels` in site/src/lib/content.ts ignores track pages, so this must too: a
+        recipe built entirely from cross-cutting topics prints no "Needs level N" pill and cannot
+        be what makes a level covered."""
+        tax = taxonomy()
+        tax["recipes"] = [r for r in tax["recipes"] if r["slug"] != "r0"]
+        tax["recipes"].append({"slug": "rt", "domain": "general", "uses": ["evals"]})
+        errors = validate.validate(tax, landscape())[0]
+        self.assertTrue(any("level 0 (a) has no general recipe" in e for e in errors), errors)
+
+
+class PagesOnDiskTests(unittest.TestCase):
+    """Rules 21 and 22: a recipe or a thread in the taxonomy with no MDX file builds a real route
+    that renders the "not written yet" outline, which is right for a page nobody has started and
+    wrong as a thing to ship unnoticed. The reverse, a file with no entry, has no route at all.
+    """
+
+    def build(self, recipes=None, threads=None, tax=None):
+        import shutil
+        import tempfile
+
+        tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, tmp, True)
+        for folder, files in (("recipes", recipes or {}), ("threads", threads or {})):
+            content = tmp / "site" / "src" / "content" / folder
+            content.mkdir(parents=True)
+            for name, body in files.items():
+                (content / name).write_text(body, encoding="utf-8")
+        return validate.check_pages_on_disk(tmp, tax or taxonomy())
+
+    @staticmethod
+    def _page(key, value):
+        return f"---\n{key}: {value}\nreviewed: 2026-09-19\nsources: []\n---\n\nA paragraph.\n"
+
+    def _complete(self):
+        return {
+            "recipes": {f"{slug}.mdx": self._page("slug", slug) for slug in ("r", "r0", "r1")},
+            "threads": {"t.mdx": self._page("id", "t")},
+        }
+
+    def test_a_full_set_of_pages_passes(self):
+        self.assertEqual(self.build(**self._complete()), [])
+
+    def test_a_recipe_with_no_page_is_an_error(self):
+        files = self._complete()
+        del files["recipes"]["r0.mdx"]
+        errors = self.build(**files)
+        self.assertTrue(any("no page at site/src/content/recipes/r0.mdx" in e for e in errors), errors)
+
+    def test_a_page_with_no_recipe_is_an_error(self):
+        files = self._complete()
+        files["recipes"]["ghost.mdx"] = self._page("slug", "ghost")
+        errors = self.build(**files)
+        self.assertTrue(any("recipes/ghost.mdx has no matching recipe" in e for e in errors), errors)
+
+    def test_a_frontmatter_slug_that_does_not_match_the_file_name_is_an_error(self):
+        files = self._complete()
+        files["recipes"]["r.mdx"] = self._page("slug", "other")
+        errors = self.build(**files)
+        self.assertTrue(any("frontmatter slug is 'other', not 'r'" in e for e in errors), errors)
+
+    def test_a_thread_with_no_page_and_a_page_with_no_thread_are_both_errors(self):
+        files = self._complete()
+        files["threads"] = {"ghost.mdx": self._page("id", "ghost")}
+        errors = "\n".join(self.build(**files))
+        self.assertIn("thread t is in taxonomy.json with no page", errors)
+        self.assertIn("threads/ghost.mdx has no matching thread", errors)
+
+    def test_a_thread_frontmatter_id_must_match_the_file_name(self):
+        files = self._complete()
+        files["threads"]["t.mdx"] = self._page("id", "other")
+        errors = self.build(**files)
+        self.assertTrue(any("frontmatter id is 'other', not 't'" in e for e in errors), errors)
+
+    def test_a_thread_must_order_at_least_three_pages_across_two_levels(self):
+        short = taxonomy()
+        short["threads"][0]["pages"] = ["two", "three"]
+        errors = validate.validate(short, landscape())[0]
+        self.assertTrue(any("thread t lists 2 page(s)" in e for e in errors), errors)
+
+        flat = taxonomy()
+        flat["tiers"][1]["pages"].append(page("four"))
+        flat["threads"][0]["pages"] = ["two", "three", "four"]
+        errors = validate.validate(flat, landscape())[0]
+        self.assertTrue(any("thread t stays inside one level" in e for e in errors), errors)
+
+    def test_the_real_recipes_and_threads_all_have_pages(self):
+        import json as _json
+
+        root = Path(__file__).resolve().parent.parent
+        tax = _json.loads((root / "content" / "taxonomy.json").read_text(encoding="utf-8"))
+        self.assertEqual(validate.check_pages_on_disk(root, tax), [])
 
 
 class MdxReferenceTests(unittest.TestCase):

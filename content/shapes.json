@@ -18,6 +18,8 @@
         "order-zero"
       ],
       "recipes": [
+        "household-paperwork",
+        "invoice-matching",
         "limits-without-a-model",
         "characterize-a-design"
       ],
@@ -51,6 +53,7 @@
         "inference-time-reasoning"
       ],
       "recipes": [
+        "meeting-notes",
         "measurement-writeup"
       ],
       "teardowns": [],
@@ -86,6 +89,7 @@
         "document-extraction",
         "voice-notes",
         "maintenance-log",
+        "invoice-matching",
         "accuracy-specs-from-the-manual"
       ],
       "teardowns": [],
@@ -249,6 +253,8 @@
         "human-in-the-loop"
       ],
       "recipes": [
+        "contract-review",
+        "rubric-grading",
         "design-review-checklist"
       ],
       "teardowns": [],
@@ -280,6 +286,8 @@
         "human-in-the-loop"
       ],
       "recipes": [
+        "incident-runbook",
+        "storyboard-from-a-script",
         "requirements-to-test-plan"
       ],
       "teardowns": [],
@@ -410,6 +418,7 @@
         "human-in-the-loop"
       ],
       "recipes": [
+        "trip-planning",
         "repo-assistant",
         "bring-up-debug-assistant"
       ],

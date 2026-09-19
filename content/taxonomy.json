@@ -753,6 +753,98 @@
       "summary": "Turns a plain-language description of work done into a structured log entry, saved with a tool call and linked to the equipment it concerns through a small knowledge graph."
     },
     {
+      "slug": "household-paperwork",
+      "title": "Keep the household paperwork straight",
+      "status": "draft",
+      "domain": "general",
+      "uses": [
+        "order-zero"
+      ],
+      "summary": "Renewal dates, a naming rule for the folder, totals by category and a reminder before anything auto-renews. All of it is a sort, a date subtraction and a sum, so no model is involved anywhere. Level 0 is the whole recipe, and it is where most household admin actually lives; the one part that does need a model, reading a scanned bill, is its own recipe."
+    },
+    {
+      "slug": "meeting-notes",
+      "title": "Turn a meeting transcript into decisions and owners",
+      "status": "draft",
+      "domain": "general",
+      "uses": [
+        "prompt-engineering",
+        "structured-output"
+      ],
+      "summary": "One call turns a transcript into decisions, owners and open questions in a fixed shape, and somebody who was in the room reads it before it goes anywhere. Everything the job needs is already in the transcript, so level 1 is enough: the shape is what makes the output usable, not a workflow around it."
+    },
+    {
+      "slug": "invoice-matching",
+      "title": "Match invoices to purchase orders",
+      "status": "draft",
+      "domain": "general",
+      "uses": [
+        "order-zero",
+        "structured-output",
+        "human-in-the-loop"
+      ],
+      "summary": "The match itself is a join on a purchase-order number and three subtractions, which is level 0 and should stay there. A model only reads the invoice the supplier sent as a PDF into the fields the join needs, and anything that does not reconcile to the cent waits for a person."
+    },
+    {
+      "slug": "contract-review",
+      "title": "Check an agreement against your own checklist",
+      "status": "draft",
+      "domain": "general",
+      "uses": [
+        "parallelization",
+        "structured-output",
+        "human-in-the-loop"
+      ],
+      "summary": "One call per checklist item over the same agreement, each returning the clause it found and the rule that clause breaks, merged into one list a person reads. The checklist is written down in advance and does not change from one agreement to the next, which is what keeps this at level 3."
+    },
+    {
+      "slug": "incident-runbook",
+      "title": "Turn an incident write-up into a runbook",
+      "status": "draft",
+      "domain": "general",
+      "uses": [
+        "prompt-chaining",
+        "structured-output",
+        "human-in-the-loop"
+      ],
+      "summary": "A fixed chain: pull the timeline out of the write-up, turn each action that would be done again into a numbered step, then check that every step names who does it and how to tell it worked. The person who ran the incident approves it before anyone follows it. The steps are known in advance, so level 3."
+    },
+    {
+      "slug": "storyboard-from-a-script",
+      "title": "Turn a script into a shot list",
+      "status": "draft",
+      "domain": "general",
+      "uses": [
+        "prompt-chaining",
+        "structured-output"
+      ],
+      "summary": "Scenes first, then shots inside each scene, then a check in code that every line of the script is covered by a shot and every shot points back at a line. A fixed three-step chain with a person reading the result, which is level 3. Drawing the frames is a different job and this recipe does not do it."
+    },
+    {
+      "slug": "trip-planning",
+      "title": "Plan a trip and hold the bookings",
+      "status": "draft",
+      "domain": "general",
+      "uses": [
+        "single-agent",
+        "function-calling",
+        "human-in-the-loop"
+      ],
+      "summary": "Checking what is available, what is open and what connects takes a different number of steps every time, which is what level 5 is for. Read-only lookups run unattended; anything that spends money stops for a person, with the price and the cancellation terms in front of them."
+    },
+    {
+      "slug": "rubric-grading",
+      "title": "Grade against a rubric, with a second reader",
+      "status": "draft",
+      "domain": "general",
+      "uses": [
+        "debate-review",
+        "structured-output",
+        "human-in-the-loop"
+      ],
+      "summary": "Two independent passes grade the same work against the same written rubric without seeing each other's scores, and every disagreement goes to the teacher instead of being averaged away. Level 6 earns its cost here because a wrong grade is expensive to the person who receives it, and an independent second reader is what catches a misread rule."
+    },
+    {
       "slug": "limits-without-a-model",
       "title": "Check measurements against limits, and chart what drifts",
       "status": "draft",
@@ -1487,34 +1579,22 @@
   },
   "recipe_backlog": {
     "note": "Planned nodes only. They show breadth on the matrix and cost nothing until a phase picks them up.",
+    "built": "A node leaves this list when a recipe covers it. Built in wave 9: household paperwork (household-paperwork), trip planning with bookings (trip-planning), meeting to decisions and owners (meeting-notes), contract review against a checklist (contract-review), invoice matching (invoice-matching), incident response runbook (incident-runbook), storyboard from a script (storyboard-from-a-script), grading against a rubric with a human check (rubric-grading). The engineering-and-lab group is empty because the engineering recipes already cover all four of its nodes: datasheet question answering is ask-the-datasheet, design review against requirements is design-review-checklist, test log triage is test-failure-triage, and lab notebook to report is measurement-writeup.",
     "personal": [
-      "household paperwork",
-      "trip planning with bookings",
       "personal knowledge base"
     ],
     "knowledge-work": [
-      "meeting to decisions and owners",
-      "contract review against a checklist",
       "literature review"
     ],
-    "engineering-and-lab": [
-      "datasheet question answering",
-      "design review against requirements",
-      "test log triage",
-      "lab notebook to report"
-    ],
+    "engineering-and-lab": [],
     "business-operations": [
-      "invoice matching",
-      "lead qualification",
-      "incident response runbook"
+      "lead qualification"
     ],
     "creative": [
-      "storyboard from a script",
       "brand-consistent image sets"
     ],
     "education": [
-      "tutor that follows a syllabus",
-      "grading against a rubric with a human check"
+      "tutor that follows a syllabus"
     ]
   },
   "level_rule": "A new level starts where the answer to “who decides the next step” changes: nobody, you, your code, the model for one action, the model for every step, several models, the models including when to start.",

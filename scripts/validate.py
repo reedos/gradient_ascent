@@ -41,6 +41,18 @@ Rules:
       jobs from other fields, and every recipe illustrates at least one shape. A recipe outside
       every shape is a story with nothing general said about it, which is what the shapes exist
       to prevent.
+  19. Every shape names at least one recipe whose `domain` is `general`. A shape whose only
+      worked instance is an engineering one tells a reader who is not an engineer that this kind
+      of job is not theirs, which is the opposite of what a shape is for.
+  20. Every level has at least one general recipe, where a recipe's level is the highest level
+      among the techniques it uses. The same argument as rule 19, along the other axis: a level
+      with only engineering recipes reads as a level only engineers reach.
+  21. Every recipe in the taxonomy has a page at `site/src/content/recipes/<slug>.mdx`, every
+      such file is a recipe in the taxonomy, and each file's frontmatter names its own slug.
+      Without this a recipe silently renders as the "not written yet" outline.
+  22. Every thread lists at least three pages spanning at least two levels (a reading path that
+      stays inside one level is a level page, not a thread), every thread MDX file matches a
+      thread in the taxonomy, and each file's frontmatter names its own id.
 
 Techniques with no named example are reported, not failed.
 
@@ -157,11 +169,30 @@ def validate_glossary(glossary: dict, taxonomy: dict) -> list[str]:
     return errors
 
 
+def level_of_page(taxonomy: dict) -> dict[str, int]:
+    """Every tier page's slug mapped to its level. A track page has no level and is left out,
+    which is what `recipeLevels` in site/src/lib/content.ts does, so the two agree about what
+    level a recipe needs."""
+    return {
+        page["slug"]: tier["order"]
+        for tier in taxonomy.get("tiers", [])
+        for page in tier.get("pages", [])
+    }
+
+
+def recipe_level(recipe: dict, levels: dict[str, int]) -> int | None:
+    """The level a recipe needs: the highest level among the techniques it uses, or None when it
+    uses only track pages. This is the number the recipe page prints as "Needs level N"."""
+    used = [levels[slug] for slug in recipe.get("uses", []) if slug in levels]
+    return max(used) if used else None
+
+
 def validate_shapes(shapes_file: dict, taxonomy: dict) -> list[str]:
-    """Rule 18. See the module docstring."""
+    """Rules 18 and 19. See the module docstring."""
     errors: list[str] = []
     level_pages, track_pages, track_ids = page_ids(taxonomy)
     techniques = set(level_pages) | set(track_pages) | set(track_ids)
+    domain_of = {r["slug"]: r.get("domain") for r in taxonomy.get("recipes", [])}
     recipes = [r["slug"] for r in taxonomy.get("recipes", [])]
     teardowns = {t["slug"] for t in (taxonomy.get("teardowns") or {}).get("first", [])}
     levels = {t["order"] for t in taxonomy.get("tiers", [])}
@@ -186,6 +217,14 @@ def validate_shapes(shapes_file: dict, taxonomy: dict) -> list[str]:
                 errors.append(f"shapes.json: shape '{sid}' names unknown teardown '{slug}'")
         if len(shape.get("elsewhere", [])) < 3:
             errors.append(f"shapes.json: shape '{sid}' names fewer than three jobs from other fields")
+        # Rule 19: a shape is the general thing; a recipe is one worked instance of it. If every
+        # instance is an engineering one, a reader who is not an engineer reads the shape and
+        # finds nothing written for them under it.
+        if shape.get("recipes") and not any(domain_of.get(slug) == "general" for slug in shape["recipes"]):
+            errors.append(
+                f"shapes.json: shape '{sid}' has no general recipe; every instance of it "
+                f"({', '.join(shape['recipes'])}) is written for one audience"
+            )
         for key in ("title", "what", "lower_when", "higher_when"):
             if not str(shape.get(key, "")).strip():
                 errors.append(f"shapes.json: shape '{sid}' has no {key}")
@@ -315,10 +354,41 @@ def validate(taxonomy: dict, landscape: dict | None) -> tuple[list[str], dict]:
         for ref in recipe["uses"]:
             if ref not in ids:
                 errors.append(f"recipe {recipe['slug']} uses unknown id: {ref}")
+
+    # Rule 20: a level with no general recipe reads as a level only specialists reach, which is
+    # exactly backwards at levels 0 and 1, where most honest answers live.
+    levels_by_page = level_of_page(taxonomy)
+    general_levels = {
+        lvl
+        for r in taxonomy.get("recipes", [])
+        if r.get("domain") == "general"
+        for lvl in [recipe_level(r, levels_by_page)]
+        if lvl is not None
+    }
+    for tier in taxonomy.get("tiers", []):
+        if tier["order"] not in general_levels:
+            errors.append(
+                f"level {tier['order']} ({tier['id']}) has no general recipe; every level needs "
+                f"one job a reader outside engineering would recognize"
+            )
+
+    # Rule 22, the half of it the taxonomy owns: a thread orders pages that already exist into a
+    # reading path across levels. Three pages inside one level is a level page.
     for thread in taxonomy.get("threads", []):
         for ref in thread["pages"]:
             if ref not in ids:
                 errors.append(f"thread {thread['id']} lists unknown id: {ref}")
+        if len(thread.get("pages", [])) < 3:
+            errors.append(
+                f"thread {thread['id']} lists {len(thread.get('pages', []))} page(s); a thread "
+                f"orders at least three"
+            )
+        crossed = {levels_by_page[p] for p in thread.get("pages", []) if p in levels_by_page}
+        if len(crossed) < 2:
+            errors.append(
+                f"thread {thread['id']} stays inside {'one level' if crossed else 'the tracks'}; "
+                f"a thread is a path across levels, so it needs pages from at least two"
+            )
     for teardown in taxonomy.get("teardowns", {}).get("first", []):
         for ref in teardown.get("patterns", []):
             if ref not in ids:
@@ -563,6 +633,50 @@ def parse_frontmatter(text: str) -> dict[str, object]:
         elif key is not None and isinstance(out.get(key), list) and line.lstrip().startswith("- "):
             out[key].append(line.lstrip()[2:].strip())  # type: ignore[union-attr]
     return out
+
+
+def check_pages_on_disk(repo_root: Path, taxonomy: dict) -> list[str]:
+    """Rules 21 and 22: the recipe and thread pages on disk agree with the taxonomy.
+
+    Both page kinds render an honest "not written yet" outline when no MDX file matches, which is
+    right for a page nobody has started and wrong as a thing to ship unnoticed: the route builds,
+    the link works, and the page says nothing. A file with no taxonomy entry is the opposite
+    failure, a written page with no route at all. Each is silent without this check.
+    """
+    errors: list[str] = []
+    for kind, folder, listed in (
+        ("recipe", "recipes", [(r["slug"], "slug") for r in taxonomy.get("recipes", [])]),
+        ("thread", "threads", [(t["id"], "id") for t in taxonomy.get("threads", [])]),
+    ):
+        content_dir = repo_root / "site" / "src" / "content" / folder
+        if not content_dir.is_dir():
+            if listed:
+                errors.append(
+                    f"site/src/content/{folder}/ does not exist, but content/taxonomy.json lists "
+                    f"{len(listed)} {kind}(s)"
+                )
+            continue
+        files = {path.stem: path for path in sorted(content_dir.glob("*.mdx"))}
+        names = [name for name, _ in listed]
+        for name, key in listed:
+            if name not in files:
+                errors.append(
+                    f"{kind} {name} is in taxonomy.json with no page at "
+                    f"site/src/content/{folder}/{name}.mdx"
+                )
+                continue
+            front = parse_frontmatter(files[name].read_text(encoding="utf-8"))
+            if front.get(key) != name:
+                errors.append(
+                    f"site/src/content/{folder}/{name}.mdx: frontmatter {key} is "
+                    f"{front.get(key)!r}, not {name!r}"
+                )
+        for stem in files:
+            if stem not in names:
+                errors.append(
+                    f"site/src/content/{folder}/{stem}.mdx has no matching {kind} in taxonomy.json"
+                )
+    return errors
 
 
 def check_teardowns(repo_root: Path, taxonomy: dict, landscape: dict | None = None) -> list[str]:
@@ -1026,6 +1140,7 @@ def main(argv: list[str]) -> int:
         + check_mdx(repo_root, taxonomy)
         + check_runs(repo_root)
         + check_run_model_steps(repo_root, taxonomy)
+        + check_pages_on_disk(repo_root, taxonomy)
         + check_teardowns(repo_root, taxonomy, landscape)
     )
 
