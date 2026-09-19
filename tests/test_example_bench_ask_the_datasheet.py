@@ -125,6 +125,16 @@ class RunTests(unittest.TestCase):
         self.assertTrue(all(s.decided_by == "code" for s in tracer.steps))
         self.assertEqual(tracer.model_decided_count(), 0)
 
+    def test_the_token_counts_the_page_quotes(self) -> None:
+        """The recipe page's cost section quotes this call's tokens; pin them here so the page
+        cannot drift from the prompt the code actually builds. Counted by `count_tokens` over the
+        eight retrieved sections, the schema, the question and the scripted reply."""
+        model = StubModel([StubResponse(text=json.dumps(CORRECT_RECORD))])
+        tracer = _tracer()
+        run(QUESTION, model, StubEmbedder(), tracer)
+        self.assertEqual(tracer.tokens_in_total(), 1977)
+        self.assertEqual(tracer.tokens_out_total(), 42)
+
     def test_declares_its_level_a_run_function_and_a_schema(self) -> None:
         self.assertEqual(LEVEL, 2)
         self.assertTrue(callable(run))

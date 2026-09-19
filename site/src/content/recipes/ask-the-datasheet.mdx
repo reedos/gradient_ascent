@@ -26,20 +26,19 @@ design-review rules, a bring-up notebook, a failure-analysis guide, a calibratio
 the one change notice, 12 files and 78 numbered sections in total. Answering a question like
 this means finding the right section or sections and saying plainly which board revision the
 answer is for, with something a person can go check. Nothing here decides whether a board
-passes: `limits-without-a-model` is where a measurement meets a limit. This recipe only answers
-what the documents say, which is a question that comes up long before, and quite apart from, any
-single test.
+passes: <Link href="/recipes/limits-without-a-model/">limits without a model</Link> is where a
+measurement meets a limit. This recipe only answers what the documents say, which is a question
+that comes up long before, and quite apart from, any single test.
 
 ## The lowest level that answers it, and why not higher
 
-Level 0 here is a keyword search over the same 12 documents, ranked by how many of the
-question's words a section shares, with a person reading the results. For the question below,
-a keyword search over all 78 sections puts the datasheet's Recommended Operating Conditions
-section first and both of the change notice's relevant sections second and third, of 78. The
-datasheet section a person reads first even states the problem outright: "The 36.0 V maximum in
-this table is superseded for revision A and revision B boards. See ecn-2608-04.md." A reader who
-reads that sentence, not just the number in the table above it, is most of the way to the right
-answer with no model anywhere.
+Level 0 here is a keyword search over the same 12 documents, BM25 over the section text, with a
+person reading the results. For the question below, that search puts the datasheet's Recommended
+Operating Conditions section first and both of the change notice's relevant sections second and
+third, of 78. The datasheet section a person reads first even states the problem outright:
+"The 36.0 V maximum in this table is superseded for revision A and revision B boards. See
+ecn-2608-04.md." A reader who reads that sentence, not just the number in the table above it, is
+most of the way to the right answer with no model anywhere.
 
 <WhenNot>Try <Link href="/techniques/order-zero/">order zero</Link> keyword search first if a
 person is going to read the top few hits themselves. It already ranks the datasheet's
@@ -57,14 +56,23 @@ once the notice was retrieved, do that chasing in code every time, instead of de
 whoever happens to be reading that day.
 
 Climbing to <Link href="/techniques/agentic-rag/">agentic RAG</Link> (level 5), where the model
-runs a second search depending on what the first one found, buys nothing extra here, which is
-worth saying because the general shape of this problem, documents disagreeing about a number
-that depends on a revision, usually is a reason to climb a level. It is not, in this specific
-case, because the two conflicting numbers use enough of the same words, "maximum," "input
-voltage," the revision letters, that one embedding search over the corpus returns both the
-datasheet section and the notice: 1st and 6th of the top 8 sections retrieved for the walkthrough
-below. No second, dependent search is needed to find the conflict; what a second search would
-add here is nothing a single, wide one does not already have.
+runs a second search depending on what the first one found, buys nothing extra here. That is
+worth saying plainly, because the job shape this page belongs to says the opposite: documents
+disagreeing about a number that depends on a revision is normally a reason to climb. Three
+things make this corpus the exception. The two conflicting numbers use enough of the same words,
+"maximum," "input voltage," the revision letters, that one search returns both the datasheet
+section and the notice: 1st and 6th of the top 8 with the hashing stand-in embedder this repo
+tests against, and 1st and 3rd of 78 with BM25 and no embedder at all. The corpus is 78 sections,
+so a top-8 cut is a tenth of everything. And the notice names the document and the section it
+supersedes, in its first line, which is what lets code check a citation list instead of hoping.
+
+Change any of those three and the argument goes with it. A corpus of thousands of sections, where
+the cut that fits in a prompt is a fraction of a percent, can leave the notice out of the
+candidate set with nothing to say so. A notice that does not name what it supersedes gives the
+check below nothing to key on, and finding it at all means reading the first answer and searching
+again on what it said, which is the dependent second search level 5 exists for. A notice
+superseded by a later notice makes that chain longer than one hop. Any of those, and the extra
+calls and the extra ways to be wrong start buying something. On this corpus they do not.
 
 ## The walkthrough
 
@@ -116,23 +124,23 @@ of the eight retrieved sections to name, and nothing it says chooses what code d
 
 One question through this example, scripted with the correctly scoped reply above, costs one
 model call: 1,977 tokens in (the eight retrieved sections plus the schema and the question,
-counted by `count_tokens`) and 45 tokens out. A reply that fails validation costs a second call
-at roughly the same size, since the retry only appends the validation error, a few dozen more
-tokens. Level 0 costs nothing: a keyword search runs in milliseconds over already-loaded text,
-with no call to anything.
+counted by `count_tokens`) and 42 tokens out, both pinned by a test so this page cannot drift
+from the code. A reply that fails validation costs a second call at roughly the same size, since
+the retry only appends the validation error. Level 0 costs nothing: a keyword search runs in
+milliseconds over already-loaded text, with no call to anything.
 
 An engineer does not ask this once per board. They ask it when a fixture is set up for a
 revision, when someone new joins the line, or when a question like it comes up in a design
 review. A shift where it gets asked twenty times over is on the order of 40,000 tokens in and
-900 out, small next to what re-embedding all 78 sections on every single question already
-costs: this example does that on every call, and caching the corpus's embeddings, which do not
-change between questions, is the obvious next optimization and is not done here.
+840 out. That is small next to re-embedding all 78 sections, which this example does on every
+single call; caching the corpus's embeddings, which do not change between questions, is the
+obvious next optimization and is not done here.
 
 <CostStrip
   stats={[
     { label: 'Model calls, one question', value: '1 (2 if the reply fails validation)' },
     { label: 'Tokens in', value: '~1,980' },
-    { label: 'Tokens out', value: '~45' },
+    { label: 'Tokens out', value: '~42' },
     { label: 'Sections retrieved', value: '8 of 78' },
   ]}
   comparedTo={{
