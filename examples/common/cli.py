@@ -116,7 +116,7 @@ class ScriptExhausted(RuntimeError):
 def _excerpt(messages: list[Message], role: str, limit: int = 160) -> str:
     text = next((content_text(m.content) for m in reversed(messages) if m.role == role), "")
     text = " ".join(text.split())
-    return text if len(text) <= limit else text[: limit - 1] + "…"
+    return text if len(text) <= limit else text[:limit] + "..."
 
 
 def scripted_stub(script: Script, *, example: str, model_id: str = "stub-scripted") -> StubModel:
