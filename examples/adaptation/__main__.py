@@ -3,7 +3,8 @@
     python -m examples.adaptation --out .local/scratch/adaptation
 
 Writes nothing outside the directory you pass with --out. No model is called and no training
-API is contacted; this only builds and validates the data files.
+API is contacted; this only builds and validates the data files, so there is nothing for
+`stub:scripted` to play here either.
 """
 from __future__ import annotations
 
@@ -12,14 +13,23 @@ import sys
 from pathlib import Path
 
 from examples.adaptation.run import run
+from examples.common.cli import MODEL_HELP
 from examples.common.trace import Tracer
+
+DEFAULT_OUT = Path(".local/scratch/adaptation")
+
+# No model call, so no SCRIPTED sequence; --out needs a real directory to write into, and the
+# test harness substitutes a real temporary one for {tmpdir} so running the suite leaves nothing
+# behind in .local/scratch.
+DEMO_ARGV = ["--out", "{tmpdir}/adaptation"]
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Build and validate a small supervised fine-tuning file.")
-    parser.add_argument("--out", required=True, type=Path, help="directory to write train.jsonl and val.jsonl into")
+    parser.add_argument("--out", type=Path, default=DEFAULT_OUT, help=f"directory to write train.jsonl and val.jsonl into (defaults to {DEFAULT_OUT})")
     parser.add_argument("--val-fraction", type=float, default=0.2)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--model", default="stub", help=f"accepted but unused (this example calls no model); {MODEL_HELP}")
     args = parser.parse_args(sys.argv[1:] if argv is None else argv)
 
     tracer = Tracer(example="adaptation", level=1, model_id="none")

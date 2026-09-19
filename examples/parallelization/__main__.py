@@ -12,21 +12,21 @@ from __future__ import annotations
 
 import sys
 
-from examples.common.cli import build_cli_model, parse_args
+from examples.common.cli import WhenAsked, build_cli_model, parse_args
 from examples.common.trace import Tracer
 from examples.parallelization.run import LEVEL, run
 
 DEFAULT_QUESTION = "What is the DW-480's Normal cycle water use, and how often should its filter be cleaned?"
 
-# Three model calls, one per candidate section retrieved for DEFAULT_QUESTION, in retrieval
-# order: care-and-cleaning-guide#1, dw480-manual#3, dw480-manual#6. The calls run in parallel
-# threads, but examples/parallelization/run.py's use of concurrent.futures.Executor.map guarantees
-# completions[i] is the result of calling section candidates[i] regardless of which thread finishes
-# first, so SCRIPTED[i] always lands on the section it was written for.
+# Three model calls, one per candidate section retrieved for DEFAULT_QUESTION: care-and-cleaning-
+# guide#1, dw480-manual#3, dw480-manual#6. The calls run in parallel threads with no fixed call
+# order, so each reply is matched to its section by content (WhenAsked, examples/common/cli.py)
+# rather than by position: an ordered list would risk pairing one section's citation with another
+# section's answer, which is worse than an echo.
 SCRIPTED = [
-    "NOT IN THIS SECTION",
-    "The Normal cycle uses 3.0 gallons of water.",
-    "The DW-480's filter is self-cleaning and needs no routine cleaning.",
+    WhenAsked(when="[care-and-cleaning-guide#1]", reply="NOT IN THIS SECTION"),
+    WhenAsked(when="[dw480-manual#3]", reply="The Normal cycle uses 3.0 gallons of water."),
+    WhenAsked(when="[dw480-manual#6]", reply="The DW-480's filter is self-cleaning and needs no routine cleaning."),
 ]
 
 

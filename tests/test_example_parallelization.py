@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from examples.common.cli import WhenAsked  # noqa: E402
 from examples.common.model import Message, StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
 from examples.parallelization.run import NO_ANSWER, run  # noqa: E402
@@ -28,12 +29,13 @@ QUESTION = "What is the DW-480's Normal cycle water use, and how often should it
 # The real top-3 candidates bm25 returns for QUESTION, confirmed against the actual corpus.
 CANDIDATES = ["care-and-cleaning-guide#1", "dw480-manual#3", "dw480-manual#6"]
 
-# The same three replies examples/parallelization/__main__.py scripts for `--model stub:scripted`,
-# one per candidate above, in that order.
+# The same three WhenAsked entries examples/parallelization/__main__.py scripts for `--model
+# stub:scripted`, one per candidate above, matched by content since the calls run in parallel
+# with no fixed order.
 SEQUENCE = [
-    NO_ANSWER,
-    "The Normal cycle uses 3.0 gallons of water.",
-    "The DW-480's filter is self-cleaning and needs no routine cleaning.",
+    WhenAsked(when="[care-and-cleaning-guide#1]", reply=NO_ANSWER),
+    WhenAsked(when="[dw480-manual#3]", reply="The Normal cycle uses 3.0 gallons of water."),
+    WhenAsked(when="[dw480-manual#6]", reply="The DW-480's filter is self-cleaning and needs no routine cleaning."),
 ]
 
 
@@ -120,15 +122,13 @@ class ScriptedCommandTests(unittest.TestCase):
     def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
         """If these two drift apart, the command on the page stops demonstrating what this test
         says the example does."""
-        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
+        self.assertEqual(SCRIPTED, SEQUENCE)
 
     def test_the_scripted_sequence_is_stable_under_real_concurrent_calls(self) -> None:
-        # examples/common/cli.py's scripted stub answers by a shared, unlocked call counter, and
-        # run() fires all three calls from a real ThreadPoolExecutor rather than one at a time.
-        # Executor.map submits futures in candidate order and returns results in that same order
-        # regardless of which thread finishes first, so this should be stable; run it several
-        # times against the real scripted stub (not the keyed responder the other tests use) to
-        # catch the case where it is not.
+        # run() fires all three calls from a real ThreadPoolExecutor, with no fixed call order.
+        # SCRIPTED is WhenAsked entries matched by content precisely so this is safe regardless of
+        # which thread's call actually reaches the stub first; run it several times against the
+        # real scripted stub (not the keyed responder the other tests use) to prove it.
         from examples.common.cli import scripted_stub
 
         for _ in range(20):

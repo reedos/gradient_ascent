@@ -7,8 +7,10 @@
 Each scenario is a drafted answer -- its text and the citations it names -- checked against the
 synthetic corpus in evals/corpus/. `clean` cites only a section that carries the figure it
 states. `mismatch` adds a second citation whose section carries none of them. `missing` states a
-figure no cited section carries and cites one section that does not exist at all. There is no
-`--model` flag: this checker calls no model.
+figure no cited section carries and cites one section that does not exist at all.
+
+`--model` is accepted for a uniform interface with the other examples but is not used: this
+checker calls no model, so there is nothing for `stub:scripted` to play here either.
 """
 from __future__ import annotations
 
@@ -16,6 +18,7 @@ import argparse
 import sys
 
 from evals.corpus import load_sections
+from examples.common.cli import MODEL_HELP
 from examples.common.trace import Tracer
 from examples.common.types import Answer
 from examples.reviewing.run import LEVEL, run
@@ -40,6 +43,7 @@ SCENARIOS = {
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Level 2 shape: check a drafted answer's figures against the sections it cites.")
     parser.add_argument("--scenario", choices=sorted(SCENARIOS), default="mismatch")
+    parser.add_argument("--model", default="stub", help=f"accepted but unused (this example calls no model); {MODEL_HELP}")
     args = parser.parse_args(sys.argv[1:] if argv is None else argv)
 
     sections = load_sections()

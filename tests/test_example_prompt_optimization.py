@@ -17,8 +17,20 @@ from examples.common.model import Message, StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
 from examples.prompt_optimization.run import run, split_dev_held_out  # noqa: E402
 from examples.distillation.run import load_exact_questions  # noqa: E402
+from examples.prompt_optimization.__main__ import DEMO_QUESTIONS, SCRIPTED  # noqa: E402
 
 QUESTIONS_PATH = ROOT / "evals" / "questions.json"
+
+# The same 14 replies examples/prompt_optimization/__main__.py scripts for `--model
+# stub:scripted --demo-subset`: three candidates scored on 4 development questions (12 calls,
+# only the middle candidate answering correctly), then that winner scored on 2 held-out questions.
+_WRONG = "I have no idea."
+SEQUENCE = [
+    _WRONG, _WRONG, _WRONG, _WRONG,
+    "44 dBA.", "12 place settings.", "F2.", "A dedicated 240V, 30A circuit.",
+    _WRONG, _WRONG, _WRONG, _WRONG,
+    "Every 30 cycles.", "7.8 cubic feet.",
+]
 
 
 def _write_questions(tmp_dir: Path, questions: list[dict]) -> Path:
@@ -252,6 +264,30 @@ class RunTests(unittest.TestCase):
         rec = record_trace.classify("prompt_optimization")
         self.assertFalse(rec.ok)
         self.assertIn("tracer", rec.reason)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
+
+    def test_the_scripted_sequence_selects_the_real_winner_and_confirms_it_on_held_out(self) -> None:
+        # DEMO_QUESTIONS is the small, real subset --demo-subset writes to disk; write it here
+        # the same way and run the exact sequence SCRIPTED plays, to prove the 14-call demo
+        # actually shows a search finding a winner, not a tie the way --model stub alone does.
+        with tempfile.TemporaryDirectory() as tmp:
+            questions_path = _write_questions(Path(tmp), DEMO_QUESTIONS["questions"])
+            model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+            tracer = Tracer(example="prompt_optimization", level=1, model_id=model.model_id)
+            result = run(tracer, model, questions_path=questions_path)
+
+            winner = "You are a Halvorsen appliance support assistant. Answer in one or two plain sentences, with no citations and no hedging."
+            self.assertEqual(result.selected, winner)
+            by_instruction = {c.instruction: (c.dev_correct, c.dev_total) for c in result.candidates}
+            self.assertEqual(by_instruction[winner], (4, 4))
+            self.assertEqual(result.held_out_correct, 2)
+            self.assertEqual(result.held_out_total, 2)
 
 
 if __name__ == "__main__":
