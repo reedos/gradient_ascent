@@ -131,6 +131,7 @@ export function agentFiles(abs: (p: string) => string): { path: string; url: str
     f('/agents.md', 'This guide: how to turn a person’s job into a recommendation.'),
     f('/worksheet.md', 'The decision tree as text: seven questions that settle the level, four that change the advice.'),
     f('/shapes.md', 'The kinds of job, by the shape of the work and not its subject: how to recognize each, where it usually settles, what moves it lower or higher, and jobs from other fields with the same shape.'),
+    f('/method.md', 'Why the site exists, its ten principles, how a level is defined, how a name is checked, and what the registry is not. Other pages cite it.'),
     f('/data/use-cases.json', 'Every recipe and teardown: the shapes it illustrates, the level it needs, the techniques it is made from, and where to read it.'),
     f('/llms.txt', 'An index of every page with a one-line description.'),
     f('/llms-full.txt', 'Every technique, recipe, teardown and thread page as Markdown in one file. Large.'),
@@ -169,7 +170,7 @@ export function agentGuide(input: GuideInput): Block[] {
         `It holds ${counts.techniques} techniques and ${counts.topics} topics that run across every level, which together are the ${counts.techniques + counts.topics} pages under \`/techniques/\`; ` +
         `${counts.threads} threads, each following one question up the ladder; ${counts.recipes} recipes (whole jobs built from techniques); ${counts.teardowns} teardowns of products people already use; ` +
         `a registry of ${counts.names} named models, products and tools; and ${counts.terms} glossary terms. ` +
-        `Every technique, topic, thread, recipe, teardown and level page has a Markdown twin at the same address with \`.md\` appended. The index and tool pages do not: read \`/llms.txt\` instead of \`/techniques/\`, \`/recipes/\`, \`/teardowns/\`, \`/glossary/\`, \`/failures/\`, \`/map/\`, \`/names/\`, \`/method/\`, \`/timeline/\`, \`/search/\` and the home page.`,
+        `Every technique, topic, thread, recipe, teardown and level page has a Markdown twin at the same address with \`.md\` appended. The index and tool pages do not: read \`/llms.txt\` instead of \`/techniques/\`, \`/recipes/\`, \`/teardowns/\`, \`/glossary/\`, \`/failures/\`, \`/map/\`, \`/names/\`, \`/timeline/\`, \`/search/\` and the home page.`,
     },
     { kind: 'ul', items: ladder },
     {

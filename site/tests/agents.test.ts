@@ -220,9 +220,12 @@ test('the guide says which pages have no Markdown twin', () => {
   const text = guideText();
   assert.match(text, /Every technique, topic, thread, recipe, teardown and level page has a Markdown twin/);
   assert.match(text, /The index and tool pages do not/);
-  for (const page of ['/method/', '/map/', '/glossary/', '/names/', '/search/']) {
+  for (const page of ['/map/', '/glossary/', '/names/', '/search/']) {
     assert.ok(text.includes(`\`${page}\``), `the guide should name ${page} as having no twin`);
   }
+  // /method/ gained a twin on 09/19/2026 and is listed among the files instead.
+  assert.ok(!text.includes('`/method/`'), 'the guide must not list /method/ as having no twin');
+  assert.ok(text.includes(abs('/method.md')));
 });
 
 test('levels are listed lowest first whatever order they arrive in', () => {
