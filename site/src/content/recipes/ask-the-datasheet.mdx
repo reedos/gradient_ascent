@@ -63,8 +63,9 @@ things make this corpus the exception. The two conflicting numbers use enough of
 "maximum," "input voltage," the revision letters, that one search returns both the datasheet
 section and the notice: 1st and 6th of the top 8 with the hashing stand-in embedder this repo
 tests against, and 1st and 3rd of 78 with BM25 and no embedder at all. The corpus is 78 sections,
-so a top-8 cut is a tenth of everything. And the notice names the document and the section it
-supersedes, in its first line, which is what lets code check a citation list instead of hoping.
+so a top-8 cut is a tenth of everything. And the notice names what it supersedes, the document in
+its own header and the section in its first paragraph, which is what lets code check a citation
+list instead of hoping.
 
 Change any of those three and the argument goes with it. A corpus of thousands of sections, where
 the cut that fits in a prompt is a fraction of a percent, can leave the notice out of the
