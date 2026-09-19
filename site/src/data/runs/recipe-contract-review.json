@@ -1,0 +1,85 @@
+{
+  "illustrative": true,
+  "h": 610,
+  "title": "Check an agreement against a checklist, assembled",
+  "sub": "One call per checklist rule, each seeing only that rule and the agreement; code checks every quote before anyone sees the list.",
+  "pill": "Level 3 · Workflows",
+  "nodes": [
+    { "id": "in", "x": 170, "y": 34, "l": "Agreement + checklist", "k": "io" },
+    { "id": "fanout", "x": 170, "y": 110, "l": "Send one call per rule", "k": "code" },
+    { "id": "r1", "x": 82, "y": 210, "l": "Check: payment terms, alone", "k": "model" },
+    { "id": "r2", "x": 258, "y": 210, "l": "Check: assignment, alone", "k": "model" },
+    { "id": "merge", "x": 170, "y": 310, "l": "Check quotes, merge findings", "k": "code" },
+    { "id": "gate", "x": 170, "y": 396, "l": "Gate: flag breach, missing, unclear", "k": "code" },
+    { "id": "reviewer", "x": 310, "y": 486, "l": "Reviewer decides", "k": "human" },
+    { "id": "resume", "x": 170, "y": 486, "l": "Record the decision", "k": "code" },
+    { "id": "out", "x": 170, "y": 576, "l": "Findings, decision recorded", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "in", "t": "fanout", "by": "code" },
+    { "id": "e2a", "f": "fanout", "t": "r1", "by": "code" },
+    { "id": "e2b", "f": "fanout", "t": "r2", "by": "code" },
+    { "id": "e3a", "f": "r1", "t": "merge", "by": "code" },
+    { "id": "e3b", "f": "r2", "t": "merge", "by": "code" },
+    { "id": "e4", "f": "merge", "t": "gate", "by": "code" },
+    { "id": "e5", "f": "gate", "t": "reviewer", "by": "code" },
+    { "id": "e6", "f": "reviewer", "t": "resume", "by": "code" },
+    { "id": "e7", "f": "resume", "t": "out", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The agreement and the checklist arrive",
+      "d": "15-clause invented services agreement\n6 rules: payment_terms, liability_cap, notice_period,\nassignment, governing_law, data_deletion",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2a",
+      "h": "payment_terms answers alone, in parallel with the other five",
+      "d": "sees only this rule's text and the whole agreement\n{\"status\": \"breach\", \"clause\": 5,\n \"quote\": \"...within forty-five (45) days of the invoice date.\"}",
+      "m": "780 in · 39 out · 0.5 s"
+    },
+    {
+      "e": "e2b",
+      "h": "assignment answers alone, in parallel",
+      "d": "sees only this rule's text and the whole agreement\n{\"status\": \"breach\", \"clause\": 12,\n \"quote\": \"...without the other party's consent\"}",
+      "m": "792 in · 46 out · 0.5 s"
+    },
+    {
+      "e": "e3a",
+      "h": "Your code checks payment_terms's quote against clause 5",
+      "d": "quote is a verbatim substring of clause 5 -> kept as drafted",
+      "m": "0 tokens · <1 ms"
+    },
+    {
+      "e": "e3b",
+      "h": "Your code checks assignment's quote against clause 12",
+      "d": "quote is a verbatim substring of clause 12 -> kept as drafted",
+      "m": "0 tokens · <1 ms"
+    },
+    {
+      "e": "e4",
+      "h": "Your code merges all six findings, quote-checked against their own clause",
+      "d": "payment_terms breach (5) · liability_cap meets (9) · notice_period meets (7)\nassignment breach (12) · governing_law unclear (13) · data_deletion missing (none)",
+      "m": "6 of 6 findings verified against their cited clause"
+    },
+    {
+      "e": "e5",
+      "h": "Your code gates the findings",
+      "d": "4 need a person: payment_terms, assignment, governing_law, data_deletion\n2 cleared, no action needed: liability_cap, notice_period",
+      "m": "4 to review · 2 cleared"
+    },
+    {
+      "e": "e6",
+      "h": "A person reads all six findings and decides",
+      "d": "sees: every finding, its clause number and its quote\ndecides: acknowledged",
+      "m": "decision: acknowledged"
+    },
+    {
+      "e": "e7",
+      "h": "Your code records the decision",
+      "d": "review record saved: 6 findings, decision=acknowledged",
+      "m": "0 tokens · 0 ms"
+    }
+  ]
+}

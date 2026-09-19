@@ -4,5 +4,185 @@ reviewed: 2026-09-19
 sources: []
 ---
 
-This recipe is being written in this wave. The diagram, the walkthrough, what it costs,
-how it fails and what to measure are not here yet.
+import Run from '../../components/page/Run.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import Link from '../../components/page/Link.astro';
+import contractReviewRun from '../../data/runs/recipe-contract-review.json';
+
+A vendor sends over a draft agreement, and somebody on the team already keeps a short list of
+things it has to say: how long you have to pay an invoice, whether the vendor's liability is
+capped, how much notice either side owes before walking away, whether the vendor can hand the
+contract to someone else, whose state's law governs if there is ever a dispute, what happens to
+your data once the relationship ends. The checklist does not change from one vendor to the next;
+it is the same handful of rules a team decided mattered, usually after one agreement that went
+badly. What the person reviewing this agreement wants back is not an opinion on whether to sign
+it. It is a list: for each rule on the checklist, the clause of this agreement that addresses it,
+a verbatim quote from that clause, and whether the clause meets the rule, breaks it, or is simply
+absent. This recipe produces that list, from a checklist and an agreement, and nothing more. It
+does not draft a counter-clause, does not negotiate, does not read anything the checklist did not
+ask about, and it is not legal advice: the output is a list of things for a person to look at,
+never a recommendation to sign, walk away, or accept a term as written.
+
+## The assembled diagram
+
+<Run data={contractReviewRun} label="Level 3 · Check an agreement against a checklist" runKey="contract-review" />
+
+## Why this level, and why not higher
+
+Three techniques compose this recipe: <Link href="/techniques/parallelization/">parallelization</Link>
+sends one call per checklist rule, all at once, each seeing only that rule and the agreement;
+<Link href="/techniques/structured-output/">structured output</Link> keeps every reply in the same
+fixed shape, a status from a closed set, the clause number it relies on, and a verbatim quote from
+that clause; <Link href="/techniques/human-in-the-loop/">human approval</Link> holds every finding
+except a plain "meets" for a person before anything happens to it.
+
+Level 3 is enough because the checklist is exactly as fixed as a job like this gets: a team writes
+it down once, and it does not change from one agreement to the next, which is
+<Link href="/shapes/#review-against-criteria">check a piece of work against written rules</Link>'s
+own definition of the shape. Climbing to level 4 would let a model read the checklist and decide
+for itself which rules apply, or how many calls to make; that buys nothing here, since all six
+rules always apply and always get checked, and a model quietly deciding one does not is one more
+way to be wrong, on exactly the agreement where skipping mattered.
+
+The level below is where this recipe differs from its nearest sibling. <Link
+href="/recipes/design-review-checklist/">Checking a design against a review checklist</Link>
+settles five of its seven rules with arithmetic: a capacitor's voltage rating or a saturation
+margin is a number compared against a number, and code makes that comparison with no model
+involved. Nothing on a contract checklist is like that. A payment-term limit sounds arithmetic,
+thirty days against forty-five, but the forty-five is not sitting in a spreadsheet cell; it is
+inside a sentence somebody has to read out of legal prose first, and so is every other rule here:
+liability cap, notice period, assignment, governing law, data deletion are all questions about
+what a clause says, not questions a formula answers. That is why this page has no level-0 half to
+hand back to code, unlike its engineering sibling: reading is the entire job, and code only checks
+that what came back is real, never answers any of the six questions itself.
+
+## Walkthrough
+
+Every call starts the same way, and this is the whole of what one call ever sees:
+
+<CodeFile file="examples/contract_review/run.py" func="_prompt_for_rule" />
+
+Six of those go out at once against the invented fifteen-clause agreement this example ships
+with, a fulfillment services agreement between two invented companies, checked against a checklist
+a team might actually keep: a payment-term limit, a liability cap, a notice period, an assignment
+restriction, a governing-law requirement, a data-deletion requirement.
+
+What comes back is uneven, which is the point of checking a real agreement instead of a synthetic
+yes-or-no test. `payment_terms` comes back `breach`: the agreement's clause 5 gives forty-five days
+to pay an invoice against the checklist's thirty-day limit, and the quoted evidence, "within
+forty-five (45) days of the invoice date," is a verbatim piece of clause 5. `liability_cap` and
+`notice_period` both come back `meets`, against clauses 9 and 7. `assignment` comes back `breach`:
+clause 12 lets either party hand the agreement to a third party without the other's consent, which
+is exactly what the rule forbids. `governing_law` comes back `unclear`: clause 13 sets governing
+law to "the state in which Vendor maintains its principal place of business" instead of naming one,
+so the finding says the text does not settle it rather than guessing which state that is.
+`data_deletion` comes back `missing`: nothing in the fifteen clauses says what happens to the
+client's data once the agreement ends, which is a different finding from a rule the agreement
+quietly meets.
+
+<CodeFile file="examples/contract_review/run.py" func="_merge_finding" />
+
+Every one of those six replies passes through this check before it is a finding rather than just a
+completion. A quote that is not an exact substring of the clause it names, a clause number this
+agreement does not have, or a status outside breach, meets, missing and unclear is downgraded to
+`unclear` with the reason recorded, never shipped as drafted. `tests/test_example_contract_review.py`
+attacks this directly: one test hands the check a reply that quotes clause 7's own sentence while
+citing clause 12, a real sentence attached to the wrong clause, and the substring check catches it
+because it checks the quote against the clause actually cited, not against the agreement as a
+whole.
+
+<CodeFile file="examples/contract_review/run.py" func="run" />
+
+The six findings become a checkpoint, never a final answer. Four of them, `payment_terms`,
+`assignment`, `governing_law` and `data_deletion`, are not `meets`, so all four wait for a person;
+`liability_cap` and `notice_period` are listed too, but need no action from anyone. `resume` is
+where a reviewer's decision is actually recorded, whatever it turns out to be, the same shape as
+`examples/human_in_the_loop/run.py`'s own pause and resume.
+
+## What it costs
+
+<CostStrip
+  level={3}
+  stats={[
+    { label: 'Model calls, one agreement', value: '6' },
+    { label: 'Tokens in, this run', value: '4,742' },
+    { label: 'Tokens out, this run', value: '252' },
+    { label: 'Findings needing a person', value: '4 of 6' },
+  ]}
+  comparedTo={{
+    label: 'one call for the whole checklist',
+    note:
+      'The agreement itself runs about 620 tokens; sent once instead of six times, alongside all six rules in one prompt, a single combined call would run closer to 900 tokens in against this run\'s 4,742. This recipe spends the extra tokens on purpose: a finding drafted inside one long combined prompt is harder to trace back to the sentence that produced it, and a rule\'s own answer cannot be checked against its own quote when six rules and one reply are sitting in the same completion. Design-review-checklist takes the combined route for its own two model passes, because both of those passes read every judgment rule at once regardless of which one comes up short; this recipe keeps the calls separate because the whole job, not just part of it, is reading.',
+  }}
+/>
+
+The unit worth counting in is per agreement: a checklist like this gets run once per vendor
+contract, not on a schedule and not per page. At six calls and under five thousand tokens,
+checking one agreement costs a few cents at any current model's list price, which is not the
+number that matters here. What matters is the four findings a person actually has to read before
+this contract could be signed, against the two that need nothing more than a glance.
+
+## How it fails
+
+<FailureModes modes={[
+  {
+    name: 'A quote stitched from a different clause',
+    notice: 'A finding cites clause 12 and reads as though it quotes clause 12, but the words are lifted from clause 7 instead, whole and real, just attached to the wrong citation.',
+    test: 'tests/test_example_contract_review.py checks exactly this: test_a_quote_from_a_different_real_clause_is_downgraded hands the merge check a quote that is clause 7\'s own sentence, cited against clause 12, and asserts the finding is downgraded to unclear rather than shipped as a breach nobody can verify by reading clause 12 itself.',
+  },
+  {
+    name: 'A rule matched to the wrong defined term',
+    notice: 'An agreement defines two similar roles, "Vendor" and "Subcontractor," and a finding about the assignment rule reads the subcontractor clause when the checklist rule is actually asking about the vendor. The quote is real and the clause number is real; the finding is simply about the wrong party.',
+    test: 'Add a second invented agreement with a defined-term collision like this on purpose, and check by hand that each finding\'s clause and quote actually concern the party the checklist rule names, not just any clause with matching words. The substring check catches a wrong quote; it has no idea what a defined term means.',
+  },
+  {
+    name: 'A reviewer approving the whole list by reflex',
+    notice: 'Six findings land at once, four of them not "meets," and the reviewer records acknowledged without reading past the first one, the way approving a long list of anything turns into a formality once it happens every week.',
+    test: 'Log what the reviewer actually saw, not just their decision: resume records the decision and an optional note, but nothing here stops an acknowledged that never looked at payment_terms\'s forty-five-day breach. Require the note to name every breach and missing finding before a decision is accepted, and check that log against the findings list afterward, the way any approval step worth trusting has to be audited.',
+  },
+]} />
+
+## What to measure
+
+<HowToEval>
+
+A right answer here is a finding whose status, clause number and quote match what a person reading
+the agreement by hand would write for the same rule; there is no other test, since the checklist
+itself defines what counts as right. Build a labeled set from agreements a person has already
+reviewed: the checklist's six rules against a handful of past contracts with known outcomes,
+including at least one agreement where a rule is genuinely missing rather than met or broken, the
+way `data_deletion` is missing here. A review runs once per agreement, so a few dozen rule-and-
+finding pairs, not thousands, is both realistic and about all most teams will ever have.
+
+The confusion that costs the most is a false `meets`: a clause that actually breaches or omits the
+rule, reported as satisfied, is the one nobody's eyes ever land on again, since a `meets` finding
+needs no action. Watch that direction separately from a false `breach` or a false `missing`, which
+only cost a person a few minutes confirming a clause that was fine all along. No result file exists
+for this recipe (see `docs/EVALS.md`), so it claims no score; what is worth tracking by hand is how
+often the reviewer's own decision agrees with each finding's status, rule by rule, as agreements
+accumulate.
+
+</HowToEval>
+
+## Variations
+
+- Add a second, independent check on any rule where a false `meets` would be expensive: the same
+  evaluator-optimizer shape <Link href="/recipes/design-review-checklist/">design review against a
+  checklist</Link> uses for its own two rules that need reading, run only on the rules a labeled
+  set shows are actually getting missed.
+- Swap the checklist for a different fixed set of written rules and nothing about the shape
+  changes: a style and security guide checked against a pull request, a requirements document
+  checked against a test plan, a coverage checklist checked against an insurance policy.
+- Feed the agreement in from <Link href="/recipes/document-extraction/">turning photos and PDFs
+  into records</Link> once agreements arrive as scans rather than text with numbered clauses; the
+  checklist and the merge check do not change, only where the text comes from.
+- Move to <Link href="/techniques/single-agent/">a single agent</Link> only once which rules apply
+  actually varies from one agreement to the next, a lease has no assignment-to-a-third-party
+  question the same way a services agreement does; a checklist that is the same every time is
+  exactly what keeps this recipe at level 3.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}

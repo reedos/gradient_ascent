@@ -327,6 +327,13 @@ NOT_SCORED = {
         "invoices a clerk has already decided, how often the gate posts one that should have "
         "paused, which is the only direction that costs money."
     ),
+    "contract_review": (
+        "it checks one agreement against a fixed checklist, one model call per rule, and returns "
+        "findings for a person rather than an answer to a question. The corpus holds no agreement "
+        "and no checklist, so the question set has nothing to grade. Measure it on its own "
+        "checklist instead: agreement with a reviewer's own findings rule by rule, and how often "
+        "a finding is downgraded because its quote is not in the clause it cites."
+    ),
     "household_paperwork": (
         "it calls no model at all. Eleven household records go in and a report of renewals, "
         "unpaid bills, yearly totals and missing documents comes out, entirely from arithmetic, "
