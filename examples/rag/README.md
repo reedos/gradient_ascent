@@ -13,8 +13,11 @@ more than one chunk can come back for the same query.
 Run it:
 
 ```
-python -m examples.rag --model stub --question "What is the DW-300's Normal cycle water use?"
+python -m examples.rag --model stub:scripted
 ```
+
+One grounded answer and the one citation that carries the number, out of the four sections
+retrieval put in front of the model.
 
 Every step is `decided_by: "code"`: retrieval and prompting are fixed, and the one model call
 answers but does not choose what happens next.

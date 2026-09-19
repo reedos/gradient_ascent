@@ -11,8 +11,11 @@ expects. `run` never returns a usable table for that reason: it returns a propos
 Run it:
 
 ```
-python -m examples.bench_accuracy_specs_from_the_manual --model stub --question "mdn6100-programming-manual#2"
+python -m examples.bench_accuracy_specs_from_the_manual --model stub:scripted
 ```
+
+A first extraction missing one row, the validation error naming exactly which range and interval
+it is, a retry with all 15, and then a 129.8 uV meter accuracy priced off the finished table.
 
 Once a table is confirmed, `price_reading` is arithmetic: it calls no model, and it is
 `dc_voltage_budget` from `examples/common/bench.py`, reading this extraction's own table instead

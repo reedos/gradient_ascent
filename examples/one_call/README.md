@@ -12,8 +12,11 @@ between them is the value of giving the model documents at all.
 Run it:
 
 ```
-python -m examples.one_call --model stub --question "What voltage does a DR-210 need?"
+python -m examples.one_call --model stub:scripted
 ```
+
+A model with no documents in front of it declining to guess at a supply voltage, and saying where
+the number actually is. That is the best answer available at this level, not a failure of it.
 
 The trace has exactly one step of `kind: "model"`; its `decided_by` is `"code"`, since the code
 always makes this one call regardless of what the model returns. Nothing in this level is a

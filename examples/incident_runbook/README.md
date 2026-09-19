@@ -10,8 +10,11 @@ missing a role or a check is kept but flagged incomplete. Every step is `decided
 Run it:
 
 ```
-python -m examples.incident_runbook --model stub --question ""
+python -m examples.incident_runbook --model stub:scripted
 ```
+
+Four numbered steps drafted from the write-up's seven timeline events, each naming a role, the
+check that shows it worked, and the event it came from, held for the incident owner's approval.
 
 An empty `--question` uses the module's own sample incident, `SAMPLE_INPUT`. The run always
 pauses; pass `--decision approve|edit|reject` (and `--note` for `edit`) to resume it in the same

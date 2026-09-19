@@ -9,13 +9,16 @@ all reported by number, not fixed automatically.
 Run it:
 
 ```
-python -m examples.storyboard_from_a_script --model stub --question "1. A hand opens a box."
+python -m examples.storyboard_from_a_script --model stub:scripted
 ```
 
-Leave `--question` empty to run the module's own 25-line `SAMPLE_INPUT` script instead. `--model
-stub` here is the generic interactive stub, which never replies with valid JSON, so that run falls
-back to an empty scene and shot list rather than crashing; the scripted responses that exercise
-scene splitting, shot proposing and the coverage check live in the tests, not in this command.
+The module's own 25-line `SAMPLE_INPUT` script broken into 4 scenes and 20 shots, each shot with
+a size, a duration and the script lines it covers, and no line reported uncovered. Pass your own
+numbered script as `--question` to run it against a real model instead.
+
+`--model stub` never replies with valid JSON, so the same command falls back to an empty scene
+and shot list, reports every line uncovered, and does not crash. That is the coverage check
+working on a model that returned nothing usable.
 
 What it does not do: draw anything. `on_screen` is a sentence a camera operator reads, not a
 frame, and no image is generated here. It also does not decide style, casting or location; a

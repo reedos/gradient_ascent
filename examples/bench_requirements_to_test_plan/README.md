@@ -15,8 +15,23 @@ was not adopted. Nothing is adopted without that call.
 Run it:
 
 ```
+python -m examples.bench_requirements_to_test_plan --model stub:scripted
+```
+
+Eight requirements, each with a proposed test naming the instrument it runs on, its limit and its
+unit, held pending approval because the coverage check cleared.
+
+The same run against the echo stub exits 1 and prints "no test was proposed for this requirement"
+eight times:
+
+```
 python -m examples.bench_requirements_to_test_plan --model stub --question "B"
 ```
+
+That is honest, not broken. The echo is never the JSON the proposal step asks for, so no
+requirement ends up covered, `check_coverage` fails, and `run` returns `Blocked` with nothing
+pending approval. A coverage check that let a plan through on eight empty proposals would be the
+defect.
 
 `--question` takes a board revision. A bare `A`, `B` or `C` works, and so does a sentence naming
 one ("a test plan for revision C boards"), since `scripts/record_trace.py` fills this example's

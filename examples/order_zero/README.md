@@ -14,5 +14,8 @@ Run it:
 python -m examples.order_zero --question "How often should the DW-300's filter be cleaned?"
 ```
 
+The best-scoring section, printed verbatim with its citation and nothing written around it. The
+answer to this question is one sentence in the middle of it.
+
 Every trace step is `decided_by: "code"`; there is no model in the loop to decide anything.
 See `examples/common/trace.py` for what a step records, and `evals/corpus.py` for the search.

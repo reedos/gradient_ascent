@@ -13,8 +13,11 @@ proposed grade; nothing here posts a grade to a gradebook on its own.
 Run it:
 
 ```
-python -m examples.rubric_grading --model stub --question "<a submission>"
+python -m examples.rubric_grading --model stub:scripted
 ```
+
+The reviewer asks for one criterion's full rubric text, reads it, and rejects a score of 3 the
+rubric itself puts at 0. That sends the whole submission to the teacher as a checkpoint.
 
 Every reviewer turn (`CHECK: <criterion>`, `ACCEPT`, or `REJECT: <reason>`) is
 `decided_by: "model"`. The grader's own call, the quote check, the round cap, and sending a result

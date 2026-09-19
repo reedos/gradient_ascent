@@ -13,8 +13,11 @@ retrieval pass misses a fact that needs a second, differently worded query.
 Run it:
 
 ```
-python -m examples.prompt_chaining --model stub --question "Is the DR-520 vent length still 35 feet?"
+python -m examples.prompt_chaining --model stub:scripted
 ```
+
+All four steps printed: the rewrite into three queries, what the five retrievals returned, the
+draft, and the citation check keeping the one citation retrieval actually supports.
 
 Every step is `decided_by: "code"`, the same as levels 0 through 2, even the two that call the
 model: the chain never branches on what the model says.

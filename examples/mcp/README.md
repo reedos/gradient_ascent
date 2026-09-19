@@ -17,9 +17,12 @@ protocol has nothing to open: each request stands alone.
 Run it:
 
 ```
-python -m examples.mcp --model stub --question "What does part HLV-2205 cost?"
+python -m examples.mcp --model stub:scripted
 ```
 
+The server lists its one tool, the model calls it with a query it chose, the server returns the
+section, and the answer cites it.
+
 Compare the trace to `examples/function_calling`: the model's one decision looks identical: which
-tool, with what arguments. What moved is who defines the tool and who runs it -- a server behind
+tool, with what arguments. What moved is who defines the tool and who runs it: a server behind
 a protocol boundary, not a function this file wrote.

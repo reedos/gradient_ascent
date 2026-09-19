@@ -2,7 +2,7 @@
 
 Estimates how much memory a model needs to run: weights (parameters times bits per weight) plus
 a KV cache, which grows with context length and how many requests are served at once. This is an
-estimate, not a measurement -- it counts only those two costs, and real usage (activation memory,
+estimate, not a measurement: it counts only those two costs, and real usage (activation memory,
 a runtime's own overhead) runs higher, never lower.
 
 Run it:

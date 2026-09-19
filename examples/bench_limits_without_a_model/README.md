@@ -12,6 +12,9 @@ python -m examples.bench_limits_without_a_model --measurement RIPPLE
 python -m examples.bench_limits_without_a_model --measurement VOUT
 ```
 
+The first prints 198 RIPPLE readings against a 50 mV limit, broken out by lot, fixture, day and
+shift, with Cpk and yield for every group. One lot carries almost all of the loss.
+
 Every trace step is `decided_by: "code"`. The limit check in `within_limits` is two comparisons;
 Cpk in `cpk` is a mean, a standard deviation and a subtraction; the control chart in
 `control_chart` is a mean, a standard deviation and a plot. Nothing here reads a model's opinion

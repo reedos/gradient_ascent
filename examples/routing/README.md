@@ -12,8 +12,11 @@ parses citations out of free text. The model never reaches into the set of handl
 Run it:
 
 ```
-python -m examples.routing --model stub --question "What does HLV-2205 cost?"
+python -m examples.routing --model stub:scripted
 ```
+
+The label the classifier returned, the route the code picked from that label, and the cited answer
+the route produced: three lines, one per decision.
 
 Every step is `decided_by: "code"`: the classification call, the label parse, and the dispatch
 are all decisions the code makes, even though the label's *value* comes from the model.

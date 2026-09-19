@@ -18,8 +18,12 @@ exact tokens that failed, not silently patched.
 Run it:
 
 ```
-python -m examples.bench_measurement_writeup --model stub --question ""
+python -m examples.bench_measurement_writeup --model stub:scripted
 ```
+
+A four-paragraph characterization report with the margins, the expanded uncertainty and the two
+open items in it, followed by the check reporting that every number in the draft is one code
+computed.
 
 Every step is `decided_by: "code"`: the one model call always happens, and the check that follows
 it is arithmetic and a set lookup, not a judgment. This example touches no instrument; it reads a

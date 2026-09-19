@@ -10,6 +10,9 @@ Run it:
 python -m examples.household_paperwork --question "2026-09-19"
 ```
 
+Five renewals inside the next 30 days, two unpaid bills with one of them overdue, the year's cost
+by category, and three documents it cannot find in the folder.
+
 The question is the date the report is run for. Leave it empty and the module's own `AS_OF` is
 used; pass text with no date in it and the run is refused rather than quietly answered for today.
 `--model` is accepted because every example here takes it, and it is ignored: `run` calls

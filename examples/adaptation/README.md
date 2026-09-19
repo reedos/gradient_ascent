@@ -15,5 +15,8 @@ Run it:
 python -m examples.adaptation --out .local/scratch/adaptation
 ```
 
+It writes 48 training and 12 validation examples and reports that no held-out question leaked
+into training.
+
 Every step is `decided_by: "code"`: the split is a fixed shuffle-and-cut and the leak check is a
 fixed comparison: nothing here is a choice a model makes.

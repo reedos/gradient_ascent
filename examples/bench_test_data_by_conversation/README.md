@@ -13,10 +13,16 @@ not the model ever calls the tool, and it says what it found either way.
 Run it:
 
 ```
-python -m examples.bench_test_data_by_conversation --model stub --question "Do the retested boards actually pass?"
-python -m examples.bench_test_data_by_conversation --model stub --question "Did any soak unit fail to settle?"
-python -m examples.bench_test_data_by_conversation --model stub --question "Is any block of the sweep impossible?"
+python -m examples.bench_test_data_by_conversation --model stub:scripted
 ```
+
+The range check catches a millivolt column sitting under a header that says volts and corrects it
+before any analysis runs; the model then writes the analysis, and the sandbox runs it: 15 of the
+18 retested boards pass, and the three that do not are named.
+
+The scripted sequence answers that one question. "Did any soak unit fail to settle?" and "Is any
+block of the sweep impossible?" are the other two questions these tables answer, and they need a
+real model: passing either as `--question` replays the same scripted snippet.
 
 The sandbox in `run_snippet` is an allow-listed grammar, checked node by node before `exec` ever
 sees it: the same shape `examples/code_execution` uses for one arithmetic expression, extended to

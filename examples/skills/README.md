@@ -14,8 +14,11 @@ its body are always `decided_by: "code"`, the same split `examples/agentic_rag/`
 Run it:
 
 ```
-python -m examples.skills --model stub --question "Is the DW-480 drain pump covered under warranty, and for how long?"
+python -m examples.skills --model stub:scripted
 ```
+
+The three skill descriptions that are always in context, the one the model chose, its body loaded
+into the conversation, and an answer that follows that skill's own checklist.
 
 If a cap is reached before the model stops on its own, the code forces one last no-tools call for
 a final answer, `decided_by: "code"`, and the trace records which cap it was.

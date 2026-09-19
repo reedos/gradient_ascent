@@ -18,8 +18,12 @@ and how many were dropped as too old.
 Run it:
 
 ```
-python -m examples.literature_watch --model stub --question ""
+python -m examples.literature_watch --model stub:scripted
 ```
+
+Two new papers, each with a what-is-new, a why-it-matters and a read-if line and a citation code
+built from the source record. Then the three things a digest of items alone would hide: a source
+that returned nothing at all, one record dropped as already reported, and the counts behind both.
 
 `--question` is the date the watch last ran, as YYYY-MM-DD. Leave it empty for the sample date
 (09/15/2026). The sources in `run.py` are fixture records; nothing here reaches the network.

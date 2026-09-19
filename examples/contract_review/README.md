@@ -15,10 +15,14 @@ reviewer's decision.
 Run it:
 
 ```
-python -m examples.contract_review --model stub --question ""
+python -m examples.contract_review --model stub:scripted
 ```
 
-The interactive stub returns free text, not the JSON each call asks for, so every finding comes
-back `unclear` with "not valid JSON" as the reason; the six real findings this checklist produces
-are what `tests/test_example_contract_review.py` scripts and asserts. Nothing here decides whether
-to sign the agreement, and no output here is legal advice.
+Six rules, six findings, each with the clause it turns on: two breaches, two met, one missing and
+one unclear, with four of them needing a person.
+
+`--model stub` returns free text instead of the JSON each call asks for, so every finding comes
+back `unclear` with "not valid JSON" as the reason. That is what a model ignoring your schema
+costs you here: not a wrong answer, six findings nobody can act on.
+
+Nothing here decides whether to sign the agreement, and no output here is legal advice.

@@ -13,8 +13,11 @@ model stops on its own, are `decided_by: "code"`.
 Run it:
 
 ```
-python -m examples.agentic_rag --model stub --question "Does the 2026 bulletin affect the DR-210?"
+python -m examples.agentic_rag --model stub:scripted
 ```
+
+Search, then read the one section search turned up, then stop: three turns and a single citation,
+with the number of reads chosen as the run went rather than fixed in advance.
 
 This is the level where the site's dashed-edge count stops being small: compare its trace to
 `examples/function_calling`, which allows exactly one model-decided step.

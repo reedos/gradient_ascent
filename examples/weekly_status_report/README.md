@@ -25,8 +25,12 @@ for the person who reads the report before it goes out.
 Run it:
 
 ```
-python -m examples.weekly_status_report --model stub --question ""
+python -m examples.weekly_status_report --model stub:scripted
 ```
+
+The week's report, one paragraph per project and one across all three, with both checks reporting
+zero and the short figures a check cannot cover listed for the reader to confirm by eye. What the
+inbox only claims is kept separate from what the tracker has filed.
 
 `--question` is the free-text note for the week. Leave it empty for the sample note. The three
 sources in `run.py` are fixture records; nothing here reaches the network.

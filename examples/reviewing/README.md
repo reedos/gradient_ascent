@@ -9,7 +9,7 @@ points at, not that the section supports the claim, that the right sources were 
 the answer is complete. A person still does all of that. Figures are compared as values, so
 `$1,200` and `1200` are one figure and `52` is not a match for `1152`; identifiers such as
 `HLV-2205`, `DW300` and `dw300-manual#3` state no quantity and are ignored. Units are dropped and
-a date written in prose is read as separate numbers — both are pinned as limits in
+a date written in prose is read as separate numbers; both are pinned as limits in
 `tests/test_example_reviewing.py`.
 
 No model is called; every step is `decided_by: "code"`.
@@ -21,6 +21,9 @@ python -m examples.reviewing --scenario clean
 python -m examples.reviewing --scenario mismatch
 python -m examples.reviewing --scenario missing
 ```
+
+Each run prints the figures the answer states, the citations it names, whether the check came back
+clean, and the specific thing to look at where it did not.
 
 `clean` cites only a section carrying the figure it states. `mismatch` adds a citation that
 carries none. `missing` states a figure nothing carries and cites a section that does not exist.

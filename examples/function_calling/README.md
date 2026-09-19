@@ -13,8 +13,11 @@ for a final answer once a tool result is in hand. The step where the model decid
 Run it:
 
 ```
-python -m examples.function_calling --model stub --question "What does part HLV-2205 cost?"
+python -m examples.function_calling --model stub:scripted
 ```
+
+The model picks `lookup_part` over `search` and fills in the part number, the tool returns the
+price, and the final answer cites the parts list.
 
 Compare the trace to `examples/prompt_chaining`: same corpus, same kind of question, but here
 the model picks the tool and query instead of the code picking a fixed retrieval step.

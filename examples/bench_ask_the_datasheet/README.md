@@ -16,8 +16,11 @@ as correct while being wrong for the board on the bench.
 Run it:
 
 ```
-python -m examples.bench_ask_the_datasheet --model stub --question "What is the maximum input voltage of the SRB-5030, revision B, per its recommended operating conditions?"
+python -m examples.bench_ask_the_datasheet --model stub:scripted
 ```
+
+A first reply citing only the datasheet is rejected for leaving out the change notice that
+supersedes it; the retry cites both and answers 32.0 V for revisions A and B.
 
 Every step is `decided_by: "code"`: retrieval, prompting, validating and the one retry are fixed,
 and the one model call answers but does not choose what happens next. This example only reads

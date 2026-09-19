@@ -24,8 +24,12 @@ out of somebody's sentence is a claim and a claim is not a record.
 Run it:
 
 ```
-python -m examples.project_tracker_upkeep --model stub --question ""
+python -m examples.project_tracker_upkeep --model stub:scripted
 ```
+
+Two fields updated, 19 left alone, and four held for a person, each with the reason it is held:
+the two values that disagree, or the sentence a claim was read out of. Then what is stale, what
+fell out of a source, and how old each affected field is.
 
 `--question` is the date the run stands on, as YYYY-MM-DD. Leave it empty for the sample date
 (09/18/2026). The document and the three sources are fixtures inside `run.py`; nothing here

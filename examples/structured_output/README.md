@@ -12,5 +12,9 @@ the model chooses the field values, never what happens next.
 Run it:
 
 ```
-python -m examples.structured_output --model stub --question "What is the DW-480's warranty?"
+python -m examples.structured_output --model stub:scripted
 ```
+
+A first record rejected because the warranty term came back as the word "two" where the schema
+asks for an integer, the validation error going back to the model, and a second reply that
+validates.

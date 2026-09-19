@@ -1,7 +1,7 @@
 # Agent graphs
 
-Level 6: a graph runner in the same shape as `examples/workflow_graphs/run.py` -- nodes are
-functions over shared state, and the runner checkpoints after every node -- except one node, the
+Level 6: a graph runner in the same shape as `examples/workflow_graphs/run.py`, where nodes are
+functions over shared state and the runner checkpoints after every node. One node, the
 supervisor, is a model call that picks the next node from an explicit allowlist
 (`ALLOWED_HANDOFFS`, `{"research", "write"}`) instead of a fixed code rule.
 
@@ -14,8 +14,11 @@ it. `MAX_RESEARCH_HOPS` (default 4) caps how many times the supervisor may send 
 Run it:
 
 ```
-python -m examples.agent_graphs --model stub --question "What is the maximum vent run for the DR-520, and does anything supersede the manual's figure?"
+python -m examples.agent_graphs --model stub:scripted
 ```
+
+The supervisor sends the team back to `research` three times, each hop surfacing a section of the
+corpus the last one did not, and then hands off to `write`.
 
 Every "Supervisor picks the next agent" step is `decided_by: "model"`; every checkpoint, and the
 blocked-handoff and hop-cap steps, are `decided_by: "code"`.

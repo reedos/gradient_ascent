@@ -8,14 +8,17 @@ every node.
 The graph is the same draft/check/revise loop as write-and-check, plus one branch a single loop
 does not express as cleanly: if retrieval finds nothing, the graph goes straight to a dead end
 (`no_match`) instead of drafting from zero sources. `state`'s durable fields are all plain values
-— strings, an int, a list of citation strings — so the checkpoint after every node is a real
+(strings, an int, a list of citation strings) so the checkpoint after every node is a real
 `json.dumps`, not a stand-in for one.
 
 Run it:
 
 ```
-python -m examples.workflow_graphs --model stub --question "How often should the DW-300's filter be cleaned?"
+python -m examples.workflow_graphs --model stub:scripted
 ```
+
+Every node and every checkpoint in order: retrieve, draft, a check that fails on a citation
+retrieval never returned, revise, and a second check that passes.
 
 Every step is `decided_by: "code"`: each edge function is a fixed rule the code wrote before the
 graph ever ran, even though the state it reads was shaped by what a model said.

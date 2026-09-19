@@ -14,11 +14,15 @@ Routes, stays and opening hours are invented and live in `run.py` as module cons
 Run it:
 
 ```
-python -m examples.trip_planning --model stub --question "Plan a trip from Wrenfield to Aldercliff."
+python -m examples.trip_planning --model stub:scripted
 ```
 
-The interactive stub never calls a tool, so this prints a placeholder answer rather than pausing
-for a booking; see `tests/test_example_trip_planning.py` for the scripted runs that reach `book`.
+The run searches, then reaches a `book` call, and stops there: what prints is the held call's
+fare and its cancellation terms, and nothing is bought. Add `--decision approve` to run the held
+booking in the same command.
+
+`--model stub` never calls a tool at all, so the same command prints a placeholder answer and
+never reaches the checkpoint.
 
 What this does not do: no real airline, hotel or booking site, no payment, no calendar or email
 sent anywhere, and no second booking in one run, since `book` always stops the loop.

@@ -7,8 +7,8 @@ Development as of the page that cites them; this module borrows the attribute na
 finished specification. Only a `kind: "model"` step gets them; a `kind: "code"` step gets none,
 since it is not a generative AI operation.
 
-A step's `detail` -- a prompt, answer, retrieved passage or tool-argument fragment -- is left out
-unless the caller passes `capture_content=True`, and then it is written to
+A step's `detail`, which is a prompt, answer, retrieved passage or tool-argument
+fragment, is left out unless the caller passes `capture_content=True`, and then it is written to
 `gradient_ascent.detail`, never to `gen_ai.input.messages`: that attribute is defined as the
 structured chat history sent to the model, and free text is not that.
 

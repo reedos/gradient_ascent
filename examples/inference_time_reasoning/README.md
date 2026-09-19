@@ -11,5 +11,8 @@ only ever chooses what one sample says, never what the run does with the set of 
 Run it:
 
 ```
-python -m examples.inference_time_reasoning --model stub --question "What is the total price to replace the heating elements on both a DW-300 and a DW-480?"
+python -m examples.inference_time_reasoning --model stub:scripted
 ```
+
+All five samples printed, three of them agreeing on 79.50 and two landing elsewhere, then the
+tally and the majority answer. Any one sample could have been either of the wrong two.

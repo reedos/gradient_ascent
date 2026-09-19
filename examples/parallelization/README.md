@@ -13,8 +13,11 @@ of which one finishes first, so determinism comes from retrieval order, not from
 Run it:
 
 ```
-python -m examples.parallelization --model stub --question "What is the DW-480's Normal cycle water use, and how often should its filter be cleaned?"
+python -m examples.parallelization --model stub:scripted
 ```
+
+Three branches answering from one passage each, one of them saying the passage does not cover the
+question, and the two that did answer combined in retrieval order with a citation each.
 
 Every step is `decided_by: "code"`: how many calls go out, which section each one gets, and how
 the results are combined are all fixed before the first call is made.

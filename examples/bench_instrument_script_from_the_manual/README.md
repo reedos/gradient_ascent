@@ -15,8 +15,11 @@ the rail the board is at and the current the load is about to pull, the same gat
 Run it:
 
 ```
-python -m examples.bench_instrument_script_from_the_manual --model stub --question "Set the TRN-2400 to 1.000 A, enable it, read it back, disable it."
+python -m examples.bench_instrument_script_from_the_manual --model stub:scripted
 ```
+
+Three drafts, each printed with the errors the scratch instrument returned for it: three dialect
+errors, then two, then a clean script that runs for real and reads 4.993 V at 1.000 A.
 
 Every step is `decided_by: "code"`. The model is called twice at most, but code decides whether a
 draft passed, what feedback to send back, when to stop, and whether an energize command may run

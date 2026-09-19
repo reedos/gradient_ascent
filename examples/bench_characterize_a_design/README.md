@@ -14,6 +14,9 @@ python -m examples.bench_characterize_a_design --serial SRB5030-2609-0003
 python -m examples.bench_characterize_a_design --serial SRB5030-2609-0005
 ```
 
+900 readings across five boards, the worst corner for each of them, the uncertainty budget behind
+the thinnest margin, and the line regulation of the serial you named at all three ambients.
+
 A margin is a subtraction (`window_margin`); an uncertainty budget is `dc_voltage_budget`,
 `combined_uncertainty` and `expanded_uncertainty` from `examples/common/bench.py`, called and not
 reimplemented; a guardbanded verdict is `guarded_verdict`, called for every board at every

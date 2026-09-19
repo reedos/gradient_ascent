@@ -17,8 +17,12 @@ reach it.
 Run it:
 
 ```
-python -m examples.bench_bring_up_debug_assistant --model stub --question "SRB5030-2608-0011 failed VOUT on FIX-03. Why, and what should we check next?"
+python -m examples.bench_bring_up_debug_assistant --model stub:scripted
 ```
+
+Six tool calls: the board's own test log, two sections of the failure-analysis guide, two
+readings, and a `*RST` the read-only guard refuses before it reaches the meter. It ends with a
+stated cause and two citations.
 
 `decided_by: "model"` for every tool call and the stop, since the model's own output chooses
 which tool and what argument. Running the tool, refusing it, and handing the result back are all

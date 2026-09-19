@@ -12,8 +12,11 @@ back as `unassigned`, and a due date nobody stated stays an empty string; neithe
 Run it:
 
 ```
-python -m examples.meeting_notes --model stub --question ""
+python -m examples.meeting_notes --model stub:scripted
 ```
+
+Two decisions kept with their owners, a third dropped and listed as dropped because its quote is
+not in the transcript, and one open question.
 
 Leave `--question` empty to run against the module's own sample transcript
 (`examples/meeting_notes/run.py`'s `SAMPLE_INPUT`); pass your own transcript text instead to

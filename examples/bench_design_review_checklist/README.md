@@ -23,8 +23,12 @@ recorded as not met, not silently corrected, so a person redoes it.
 Run it:
 
 ```
-python -m examples.bench_design_review_checklist --model stub --question B
+python -m examples.bench_design_review_checklist --model stub:scripted
 ```
+
+All seven rules judged, five by code and two by the model, and one of those two rejected by the
+second pass for citing the thermal shutdown as the reason the design passes, which is the
+opposite of what DR-24 says.
 
 Every step is `decided_by: "code"`: both model calls always happen, and code always merges their
 output the same way. This example proposes no instrument command and touches no electronics; it

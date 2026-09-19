@@ -6,14 +6,17 @@ shape: a `ToolRegistry` (definitions plus an allowlist), a `ContextPolicy` (`kee
 caps (`MAX_STEPS`, `MAX_TOKENS`).
 
 Every tool call, its arguments, and the decision to stop are `decided_by: "model"`. Running a
-tool, trimming context, and a hook's veto are always `decided_by: "code"` -- the harness's
-decisions, made around the model rather than by it.
+tool, trimming context, and a hook's veto are always `decided_by: "code"`. Those are the
+harness's decisions, made around the model rather than by it.
 
 Run it:
 
 ```
-python -m examples.agent_harness --model stub --question "What does the DW-300's drain pump cost, and how long is it under warranty?"
+python -m examples.agent_harness --model stub:scripted
 ```
+
+The agent searches, looks up the part, and stops with an answer that carries both the price and
+the warranty term.
 
 `tests/test_example_agent_harness.py` runs the same scripted model twice, once with each context
 policy, and shows the answer changes even though the model's own logic did not: the harness
