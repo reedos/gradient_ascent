@@ -21,6 +21,10 @@ sources:
     url: "https://deepmind.google/models/veo/"
     publisher: "Google DeepMind"
     accessed: "2026-09-19"
+  - title: "Content Credentials : C2PA Technical Specification (version 2.2)"
+    url: "https://spec.c2pa.org/specifications/specifications/2.2/specs/C2PA_Specification.html"
+    publisher: "C2PA"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -79,7 +83,10 @@ still be checked against that document, the same way a citation in RAG can be ch
 source passage. A generated image or video has no source passage to check it against: the whole
 point was to make something that did not exist before. Google DeepMind's answer is the SynthID
 mark on Veo's videos<Cite n={4}/>, and a mark is not a check a reader can perform: you cannot
-tell a generated video from a real one by looking, so you trust the mark, or the product.
+tell a generated video from a real one by looking, so you trust the mark, or the product. Content
+credentials is the industry name for that record, specified by C2PA rather than one maker: signed
+assertions about where a file came from, bound to the file. The specification passes no judgment
+on whether that history is good or bad, only on whether it validates<Cite n={5}/>.
 
 For anything generated and then used somewhere that matters (a document, a report, a decision)
 treat it the way you would treat a first draft from someone whose work you have not checked

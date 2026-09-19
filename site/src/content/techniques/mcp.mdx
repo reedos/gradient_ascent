@@ -44,6 +44,10 @@ sources:
     publisher: "Model Context Protocol (specification site)"
     date: "2026-08-22"
     accessed: "2026-09-19"
+  - title: "Authorization"
+    url: "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization"
+    publisher: "Model Context Protocol (specification)"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -196,6 +200,33 @@ are in the 2026-07-28 revision: released, not proposed. What is still open is na
 roadmap lists "capability scoping for tool lists after SEP-2575" among what maintainers want to
 look at next<Cite n={9}/>, a refinement of what a stateless request can express, not a
 reconsideration of removing sessions in the first place.
+
+## Authorization
+
+Connecting to somebody else's server raises a question the rest of this page does not: how a
+server you did not write learns who is asking. The specification has a chapter for it, scoped
+narrowly. The protocol "provides authorization capabilities at the transport level, enabling MCP
+clients to make requests to restricted MCP servers on behalf of resource owners", and "This
+specification defines the authorization flow for HTTP-based transports"<Cite n={10}/>. Nothing
+here is invented for MCP: the chapter builds on OAuth 2.1 and a list of related RFCs, of which it
+implements a selected subset<Cite n={10}/>.
+
+None of that moves a decision, which is why it belongs to level 4 rather than a rung of its own.
+The model still picks one action and your code still carries it out. Authorization is the separate
+question of whether your code is allowed to carry it out, and on whose behalf.
+<Link href="/techniques/guardrails/">Guardrails</Link> limits what may be done; this settles who
+the server thinks is asking.
+
+You do not need it for a server you run yourself on your own machine: "Implementations using an
+STDIO transport SHOULD NOT follow this specification, and instead retrieve credentials from the
+environment"<Cite n={10}/>. It is optional in general, too: "Authorization is OPTIONAL for MCP
+implementations"<Cite n={10}/>. A remote server that asks for nothing still conforms, so "it
+speaks MCP" says nothing about who may call it.
+
+The failure mode the specification spends requirements on is a token reaching the wrong server.
+"MCP servers MUST validate that access tokens were issued specifically for them as the intended
+audience", and "MCP servers MUST NOT accept or transit any other tokens"<Cite n={10}/>. A host
+that passes one server's token along to another is the case those two sentences exist to stop.
 
 ## Failure modes
 

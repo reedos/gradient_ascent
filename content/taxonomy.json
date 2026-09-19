@@ -55,6 +55,9 @@
         {
           "slug": "chat",
           "title": "Chat",
+          "covers": [
+            "completion in the editor"
+          ],
           "summary": "Asking a model a question in a chat app.",
           "status": "draft"
         },
@@ -222,6 +225,9 @@
         {
           "slug": "mcp",
           "title": "Model Context Protocol",
+          "covers": [
+            "authorization for a remote tool server"
+          ],
           "summary": "A standard way to connect models to tools and data.",
           "status": "draft"
         },
@@ -444,6 +450,9 @@
         {
           "slug": "eval-frameworks",
           "title": "Evaluation frameworks",
+          "covers": [
+            "trajectory evaluation"
+          ],
           "summary": "The tools that run test sets and graders for you, and what to check before trusting their numbers.",
           "status": "draft"
         }
@@ -553,6 +562,9 @@
         {
           "slug": "local-inference",
           "title": "Running models locally",
+          "covers": [
+            "speculative decoding"
+          ],
           "summary": "Running open-weight models on your own hardware: what fits, quantization, and what you give up.",
           "status": "draft"
         }
@@ -1661,7 +1673,8 @@
     ],
     "engineering-and-lab": [],
     "business-operations": [
-      "lead qualification"
+      "lead qualification",
+      "questions over a database in natural language"
     ],
     "creative": [
       "brand-consistent image sets"

@@ -22,6 +22,18 @@ sources:
     url: "https://ollama.com/"
     publisher: "Ollama"
     accessed: "2026-09-19"
+  - title: "Getting code suggestions in your IDE with GitHub Copilot"
+    url: "https://docs.github.com/en/copilot/using-github-copilot/getting-code-suggestions-in-your-ide-with-github-copilot"
+    publisher: "GitHub"
+    accessed: "2026-09-19"
+  - title: "Tab completion"
+    url: "https://cursor.com/docs/tab"
+    publisher: "Cursor"
+    accessed: "2026-09-19"
+  - title: "Code suggestions"
+    url: "https://docs.github.com/en/copilot/concepts/completions/code-suggestions"
+    publisher: "GitHub"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -134,6 +146,30 @@ all. Level 0 is fast, free and completely predictable: three things a chat reply
 promise.
 
 </WhenNot>
+
+## Completion in the editor
+
+The editor that finishes your line as you type is this level too, and for people who write code it
+is usually the model they touch most hours of the week. GitHub's documentation says "GitHub
+Copilot offers coding suggestions as you type"<Cite n={5}/>. Cursor describes its own the same
+way: "Tab is Cursor's AI-powered autocomplete. It suggests code as you type, based on your recent
+edits, surrounding code, and linter errors"<Cite n={6}/>.
+
+Nobody decides the next step, which is what keeps it on this rung. The editor's code decides when
+to ask and what context to send, the model fills in the rest of the line, and you accept it with a
+keystroke or keep typing. That is one request and one answer. It is not level 5: a
+<Link href="/techniques/coding-agents/">coding agent</Link> picks each step and decides when it is
+finished, and a completion picks nothing.
+
+You do not need it when you already know exactly what the line says, since reading a suggestion
+costs more attention than typing eight characters, and at a bench a register write that looks
+right is worse than a blank line.
+
+The failure mode follows from that asymmetry: accepting takes one key and checking takes a minute,
+so a plausible wrong line lands in the file unread. There is a second thing an unread line can
+carry: GitHub's documentation says "GitHub Copilot checks each suggestion for matches with
+publicly available code"<Cite n={7}/>, and that a match is either discarded or offered with a code
+reference, depending on a policy setting your account or organization controls<Cite n={7}/>.
 
 ## Failure modes
 

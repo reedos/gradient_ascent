@@ -19,6 +19,14 @@ sources:
     url: "https://docs.vllm.ai/en/latest/"
     publisher: "vLLM"
     accessed: "2026-09-19"
+  - title: "Speculative Decoding"
+    url: "https://docs.vllm.ai/en/latest/features/speculative_decoding/"
+    publisher: "vLLM"
+    accessed: "2026-09-19"
+  - title: "llama.cpp server (tools/server/README.md)"
+    url: "https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md"
+    publisher: "ggml-org"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -151,6 +159,35 @@ over the same period, once data cannot leave the machine at all, once the task w
 once a model small enough to run locally already passes the eval that matters for the task.
 
 </WhenNot>
+
+## Speculative decoding
+
+Quantization makes a model fit. Speculative decoding is the other lever a local server has, and it
+changes what the same model costs per token rather than what it weighs. A small draft model
+proposes the next few tokens, the large one checks them in a single pass, and a sampler keeps the
+ones the large model would have produced itself and throws the rest away. vLLM's own guide states
+the regime it is for: to "reduce inter-token latency under medium-to-low QPS (queries per second),
+memory-bound workloads"<Cite n={5}/>. Both runtimes this page cites document it. llama.cpp's
+server lists "Speculative decoding" among its features, with `--spec-draft-model` documented as the
+"draft model for speculative decoding (default: unused)" and `--spec-draft-n-max` as the "number
+of tokens to draft for speculative decoding (default: 3)"<Cite n={6}/>.
+
+No decision moves, at any level, which is why this is a topic and never a rung. The output is
+meant to be the one the large model would have given on its own. What it costs is memory, in the
+terms this page's own estimator already uses: a second set of weights and a second key/value
+cache, which llama.cpp exposes as their own settings for the draft model's cache type and its
+layers in VRAM<Cite n={6}/>. Size for both, or the drafting that was supposed to buy speed takes
+the memory the context window needed.
+
+You do not need it if your bottleneck is fitting the model at all, or if the hardware is already
+saturated by concurrent requests rather than waiting between tokens.
+
+The failure mode to know is that "identical output" is a guarantee with edges. vLLM states that
+"Speculative decoding sampling is theoretically lossless up to the precision limits of hardware
+numerics", and, in the same section, that "variations in generated outputs with and without
+speculative decoding can occur due to following factors", naming floating-point precision and
+batch size<Cite n={5}/>. So a golden set that passed before it was turned on is worth re-running
+after, rather than assumed.
 
 ## Failure modes
 

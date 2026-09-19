@@ -44,6 +44,10 @@ sources:
     publisher: "promptfoo"
     date: "2026-03-09"
     accessed: "2026-09-19"
+  - title: "Evaluate a complex agent"
+    url: "https://docs.langchain.com/langsmith/evaluate-complex-agent"
+    publisher: "LangChain (LangSmith documentation)"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -184,6 +188,34 @@ still needs someone reading a slice of the verdicts, which is what this site's o
 default rather than on request.
 
 </WhenNot>
+
+## Scoring the path, not only the answer
+
+Everything above scores an answer against a golden set. From level 4 up there is a second thing to
+score: the path the run took to get there. A LangSmith tutorial builds a customer support agent
+and runs three kinds of evaluation on it. One of the three is the trajectory, defined there as
+"Evaluate whether the agent took the expected path (e.g., of tool calls) to arrive at the final
+answer"<Cite n={11}/>. Its concepts page makes the same split when it asks what "good" looks like
+for an agent, listing "correct tool selection and proper argument formatting or trajectory that
+the agent took"<Cite n={6}/>.
+
+This sits in the evals topic rather than on a rung because it changes nothing about who decides
+the next step. It only widens what a grader reads: from the last message to every step before it.
+The reason to bother starts where the steps are the model's own. The wrong tool, the right tool
+with the wrong arguments, six calls where one would do, and a loop that never stops are all
+failures a final-answer grader can score as a pass.
+
+You do not need it below level 4. A single call has no path, and in a
+<Link href="/techniques/prompt-chaining/">fixed chain</Link> the path is the one your code wrote,
+so scoring it measures your code rather than the model.
+
+The failure mode is scoring the path as an exact sequence. A run that reaches the right answer a
+different way then reads as a failure, and the score punishes the agent for not being your
+reference implementation. LangSmith's own tutorial gives the shape that avoids it: a trajectory
+evaluation "Compares the actual sequence of steps the agent took against an expected sequence" and
+"Calculates a score based on how many of the expected steps were completed
+correctly"<Cite n={11}/>, which is partial credit rather than a match. Report it beside the answer score, never
+instead of it: a perfect path to a wrong answer is still a wrong answer.
 
 ## Failure modes
 
