@@ -105,6 +105,31 @@ class ScriptedSequenceTests(unittest.TestCase):
                     self.assertIsInstance(entry, (str, StubResponse))
 
 
+    def test_every_sequence_is_asserted_against_by_the_example_s_own_tests(self) -> None:
+        """The other half of the guard. This file proves a sequence still *runs*; the example's
+        own test file proves it is still the sequence that test says the example needs, by
+        asserting on `SCRIPTED` directly. Without that line, a reply could be edited into
+        something the example's behavior tests never cover and nothing would notice."""
+        for name in example_names():
+            if name in NO_SCRIPT:
+                continue
+            with self.subTest(example=name):
+                path = ROOT / "tests" / f"test_example_{name}.py"
+                if not path.exists():
+                    # one_call, order_zero and rag have no test file of their own
+                    path = ROOT / "tests" / "test_examples.py"
+                asserted = [
+                    line
+                    for line in path.read_text(encoding="utf-8").splitlines()
+                    if "SCRIPTED" in line and "assert" in line
+                ]
+                self.assertTrue(
+                    asserted,
+                    f"{path.name} never asserts on {name}'s SCRIPTED, so the sequence its command "
+                    f"plays and the sequence this file scripts can drift apart silently",
+                )
+
+
 class DemoCommandTests(unittest.TestCase):
     """The real check: run each example's own command and look at what came out."""
 
