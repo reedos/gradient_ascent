@@ -1,13 +1,15 @@
 """Level 3: check a bill of materials and a netlist summary against DR-0100, Orbeck's design
 review rules, rule by rule.
 
-DR-0100 (`evals/bench/corpus/design-review-rules.md`) has seven numbered rules. Four of them --
-DR-10 (inductor saturation margin), DR-12 (semiconductor voltage derating), DR-14 (ceramic
-capacitor voltage derating) and DR-16 (resistor and capacitor power derating) -- plus DR-20's
-placement thresholds are a number compared with a number: a voltage rating divided by a factor,
-a distance in millimeters, a ratio against a saturation current. Code computes every one of
-those directly from the bill of materials and the netlist summary, with no model in the loop, the
-same way `limits-without-a-model` does for a production limit check.
+DR-0100 (`evals/bench/corpus/design-review-rules.md`) has seven numbered rules. Three of them --
+DR-10 (inductor saturation margin), DR-14 (ceramic capacitor voltage derating) and DR-20's
+placement thresholds -- are a number compared with a number: a voltage rating divided by a factor,
+a distance in millimeters, a ratio against a saturation current. Code computes all three directly
+from the bill of materials and the netlist summary, with no model in the loop, the same way
+`limits-without-a-model` does for a production limit check. Two more need no model either and are
+not comparisons: DR-12 (semiconductor voltage derating) has no subject on this board, and DR-16
+(resistor and capacitor power derating) has no evidence in the bill of materials, which rule 1
+records as not met. Code states both directly rather than pretending to compute them.
 
 Two rules are not arithmetic. DR-24 (thermal) and DR-30 (test access and markings) ask whether
 the *evidence* submitted for the review actually supports what it claims, which needs reading,
@@ -43,8 +45,12 @@ Status = Literal["met", "not met", "not applicable"]
 #: against several named clauses at once. Every other rule below is computed.
 JUDGMENT_RULES = ["DR-24", "DR-30"]
 
-#: C1, C2: OPS-3105, 10 uF, 50 V, X7R, input rail (srb5030-bom.md section 1).
+#: C1, C2: OPS-3105, 10 uF, 50 V, X7R, input rail (srb5030-bom.md section 1). Revision C fits
+#: OPS-3106, the same part in a 63 V rating (srb5030-bom.md section 4, ecn-2608-04.md section 3),
+#: which is the change that lets revision C keep the datasheet's 36.0 V ceiling. Checking a
+#: revision means checking the parts that revision actually carries, not last revision's.
 C1C2_RATING_V = 50.0
+C1C2_RATING_REV_C_V = 63.0
 #: L1: OPS-2210, 4.5 A saturation (srb5030-bom.md section 1; docs/THE-BENCH.md shows the ripple
 #: arithmetic this reuses `Dut` for, so it cannot drift from the datasheet).
 INDUCTOR_SAT_A = 4.5
@@ -132,6 +138,38 @@ CHECK_SYSTEM = (
 )
 
 _DR_ID_RE = re.compile(r"\bDR-\d+\b")
+_REVISION_IN_TEXT = re.compile(r"\brev(?:ision)?\.?\s+([A-Za-z])\b", re.IGNORECASE)
+
+#: The revision `scripts/record_trace.py` should record this example with. Its first argument is
+#: a board revision, not free text, so a recorder needs to be told one that exists.
+SAMPLE_INPUT = "B"
+
+#: The revisions the SRB-5030 has: A (pilot), B (production), C (in qualification).
+REVISIONS = ("A", "B", "C")
+DEFAULT_REVISION = "B"
+
+
+def _revision_from(text: str) -> str:
+    """The board revision a request names. `run` takes free text because every example here does
+    (`scripts/record_trace.py` fills the first parameter from `--question`), so "B", "rev B" and
+    "review revision C against DR-0100" all work. A request that names a revision this board does
+    not have is refused rather than reviewed against the wrong bill of materials. A request that
+    names none gets revision B, the revision in production, and the report says which revision it
+    checked."""
+    stripped = text.strip() if isinstance(text, str) else ""
+    if not stripped:
+        return DEFAULT_REVISION
+    if len(stripped) == 1:
+        candidate = stripped
+    else:
+        named = _REVISION_IN_TEXT.search(stripped)
+        if named is None:
+            return DEFAULT_REVISION
+        candidate = named.group(1)
+    revision = candidate.upper()
+    if revision not in REVISIONS:
+        raise ValueError(f"unknown board revision: {candidate!r}; expected 'A', 'B' or 'C'")
+    return revision
 
 
 @dataclass(frozen=True)
@@ -228,9 +266,19 @@ def _check_decoupling(entries, bulk) -> Finding:
 
 
 def _numeric_findings(revision: str) -> list[Finding]:
-    max_rail_v = VIN_MAX_ECN_V if revision in ("A", "B") else VIN_MAX_DATASHEET_V
+    """The five rules code settles, for the revision actually under review.
+
+    Two things move with the revision and they move together: the input ceiling (the ECN's
+    32.0 V for revisions A and B, the datasheet's 36.0 V for revision C) and the input capacitor
+    the board carries (50 V on A and B, 63 V on C). Checking one revision's ceiling against
+    another revision's bill of materials is the mistake this whole recipe is about.
+    """
+    rev_c = revision == "C"
+    max_rail_v = VIN_MAX_DATASHEET_V if rev_c else VIN_MAX_ECN_V
+    rating_v = C1C2_RATING_REV_C_V if rev_c else C1C2_RATING_V
+    part = "OPS-3106, 63 V X7R" if rev_c else "OPS-3105, 50 V X7R"
     return [
-        _check_capacitor_derating(C1C2_RATING_V, max_rail_v, ref="C1, C2 (OPS-3105, 50 V X7R)"),
+        _check_capacitor_derating(rating_v, max_rail_v, ref=f"C1, C2 ({part})"),
         _check_inductor_margin(Dut(), vin_v=24.0, iout_a=IOUT_MAX_A),
         _check_decoupling(DECOUPLING, BULK_CAPS),
         Finding(
@@ -336,7 +384,7 @@ def _merge_judgment_findings(drafts: list[dict], verdicts: dict[str, dict]) -> l
 
 
 def run(board_revision: str, model: Model, tracer: Tracer) -> ReviewReport:
-    revision = (board_revision or "B").strip().upper() or "B"
+    revision = _revision_from(board_revision)
     rules = _rule_sections()
     tracer.record(kind="code", decided_by="code", title="Load DR-0100", detail=f"{len(rules)} numbered rules")
 

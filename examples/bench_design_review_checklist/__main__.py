@@ -2,9 +2,10 @@
 
     python -m examples.bench_design_review_checklist --model stub --question B
 
-`--question` fills this example's board revision ("A", "B" or "C"), not a question; see
-`examples/common/cli.py` for why every example takes `--question` regardless of what its first
-parameter means. The interactive stub returns free text, not the JSON this example's two model
+`--question` fills this example's board revision ("A", "B" or "C", or a sentence naming one), not
+a question; see `examples/common/cli.py` for why every example takes `--question` regardless of
+what its first parameter means. A revision this board does not have is refused; a request naming
+none is reviewed as revision B. The interactive stub returns free text, not the JSON this example's two model
 passes ask for, so a plain `--model stub` run here shows only the five numeric findings; the two
 findings that need reading are demonstrated with a scripted stub in
 `tests/test_example_bench_design_review_checklist.py`.

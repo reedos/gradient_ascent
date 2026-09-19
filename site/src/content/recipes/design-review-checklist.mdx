@@ -29,21 +29,25 @@ does the same thing with whatever comes back: draft, then check, then merge. The
 picks the next action, so every step below is `decided_by: "code"`, the same as any other fixed
 pipeline on this site.
 
-Five of DR-0100's seven rules are arithmetic, and code computes all five with no model reading
-any of them. DR-14 is the clean case: "A ceramic capacitor on a DC rail shall be rated at least
-1.5 times the maximum steady-state rail voltage stated in the product's own datasheet." C1 and
-C2, the SRB-5030's input capacitors, are
-50 V parts. 50 / 1.5 = 33.3 V, so a 50 V part supports a 33.3 V rail and not a 36.0 V one: that
-arithmetic is exactly what ECN-2608-04 cites to justify lowering the board's maximum input to
-32.0 V for revisions A and B. Code does the division and compares it with whichever ceiling
-actually governs the revision under review (32.0 V under the ECN for A and B, 36.0 V under the
-datasheet for C once it ships), and a model asked to do that division is only an added way to get
-33.3 wrong. DR-10 (inductor saturation margin), DR-12 (semiconductor derating, not applicable on
-this board), DR-16 (resistor and capacitor power derating) and DR-20's placement thresholds are
-the same shape: a number off the bill of materials or the netlist summary, a factor or a distance
-the rule names, one comparison.
+Five of DR-0100's seven rules need no model, and code settles all five. DR-14 is the clean case:
+"A ceramic capacitor on a DC rail shall be rated at least 1.5 times the maximum steady-state rail
+voltage stated in the product's own datasheet." C1 and C2, the SRB-5030's input capacitors on
+revisions A and B, are 50 V parts. 50 / 1.5 = 33.3 V, so a 50 V part supports a 33.3 V rail and
+not a 36.0 V one: that arithmetic is exactly what ECN-2608-04 cites to justify lowering the
+board's maximum input to 32.0 V for revisions A and B. Code does the division and compares it
+with whichever ceiling governs the revision under review, using the part that revision actually
+carries: 50 V parts against the ECN's 32.0 V on revisions A and B, and on revision C the 63 V
+parts the same notice specifies, where 63 / 1.5 = 42 V is what lets that revision keep the
+datasheet's 36.0 V. A model asked to do that division is only an added way to get 33.3 wrong.
 
-Two rules are not arithmetic. DR-24 sets a numeric limit (junction temperature at or below
+DR-10 (inductor saturation margin) and DR-20's placement thresholds are the same shape: a number
+off the bill of materials or the netlist summary, a factor or a distance the rule names, one
+comparison. The last two are not comparisons at all, and still need no model: DR-12 has no subject
+on this board, since the bill of materials lists no discrete MOSFET or diode on a DC rail, and
+DR-16's evidence is missing outright, which rule 1 records as not met. Code states both directly
+rather than dressing them up as calculations.
+
+Two rules cannot be settled that way. DR-24 sets a numeric limit (junction temperature at or below
 125 degC) but also requires the calculation shown "term by term, not as a single number," and
 disclaims one specific wrong argument by name: a design that reaches thermal shutdown in normal
 use does not meet the rule, "whatever the protection does." Telling whether a piece of submitted
@@ -70,9 +74,14 @@ false findings hold up a real release should read that page next.
 No trace has been recorded for this example (see `docs/EVALS.md`), so this is an illustrated run
 on `StubModel`, not a measured one: the numeric steps below are the actual arithmetic the code
 runs, and the two model responses are scripted stub text chosen to demonstrate one specific catch,
-not a live model's output.
+not a live model's output. Two inputs are written into the example rather than read from the bench
+corpus, because the corpus has neither: the netlist summary's placement figures, and the evidence
+a reviewer submitted for the two rules that need reading. The bill of materials, DR-0100 and the
+change notice are all real files in `evals/bench/corpus/`.
 
-Checking SRB-5030 revision B:
+Checking SRB-5030 revision B, which is the revision the run is asked about. A request naming a
+revision this board does not have is refused rather than reviewed against the wrong bill of
+materials, and one naming none gets revision B, the revision in production:
 
 1. Code loads DR-0100 and keys its seven rules by id: DR-10, DR-12, DR-14, DR-16, DR-20, DR-24,
    DR-30.
@@ -153,8 +162,8 @@ rules cost nothing per review, the same way a limit check costs nothing per unit
   },
   {
     name: 'The wrong document governs the number',
-    notice: 'A numeric rule is checked against a superseded figure (the datasheet\'s 36.0 V maximum input) instead of the one that actually governs the board revision in hand (the ECN\'s 32.0 V for revisions A and B).',
-    test: "Check which ceiling the code picked against the revision it was asked about, the way test_revision_a_and_b_use_the_ecn_ceiling_revision_c_uses_the_datasheet does: the same 50 V rating must read met under one ceiling and not met under the other.",
+    notice: 'A numeric rule is checked against a superseded figure (the datasheet\'s 36.0 V maximum input) instead of the one that actually governs the board revision in hand (the ECN\'s 32.0 V for revisions A and B), or against a ceiling from one revision and a part from another.',
+    test: "Check the ceiling and the bill of materials the code picked against the revision it was asked about, the way test_revision_a_and_b_use_the_ecn_ceiling_revision_c_uses_the_datasheet does: revision B's 50 V part against 32.0 V and revision C's 63 V part against 36.0 V both read met, while the same 50 V rating checked against 36.0 V, the arithmetic in the notice itself, reads not met.",
   },
   {
     name: 'Missing evidence reads as not applicable instead of not met',
@@ -199,7 +208,9 @@ a rule is arithmetic or judgment, compute the arithmetic ones directly, and for 
 finding and check it against the rule's own full text before a person sees it. What does not port
 is DR-0100's rule numbers and thresholds, the SRB-5030's part numbers and ratings, and every figure
 in `docs/THE-BENCH.md`; a reader's own design review document and bill of materials are what a
-real port checks a finding against.
+real port checks a finding against. Which document governs a number, when a notice has changed one
+and the datasheet still prints the old figure, is <Link href="/recipes/ask-the-datasheet/">ask the
+datasheet</Link>'s subject.
 
 The same shape, work already done checked against rules already written down, fits a pull request
 against a style and security guide, a contract against a negotiation playbook, or a test plan

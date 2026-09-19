@@ -24,12 +24,15 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from examples.bench_design_review_checklist.run import (  # noqa: E402
+    C1C2_RATING_REV_C_V,
     C1C2_RATING_V,
     DERATE_FACTOR,
     INDUCTOR_SAT_A,
     LEVEL,
+    SAMPLE_INPUT,
     _check_capacitor_derating,
     _check_inductor_margin,
+    _revision_from,
     run,
 )
 from examples.common.bench import Dut, VIN_MAX_DATASHEET_V, VIN_MAX_ECN_V  # noqa: E402
@@ -95,10 +98,12 @@ class DesignReviewChecklistExampleTests(unittest.TestCase):
         self.assertTrue(callable(run))
 
     def test_dr14_derating_figure_is_the_rule_arithmetic(self) -> None:
-        """50 V / 1.5 = 33.3 V: the same number ECN-2608-04 uses to justify a 32.0 V ceiling."""
+        """50 V / 1.5 = 33.3 V: the same number ECN-2608-04 uses to justify a 32.0 V ceiling.
+        63 / 1.5 = 42 V is the notice's own figure for the revision C part."""
         supported_v = C1C2_RATING_V / DERATE_FACTOR
         self.assertAlmostEqual(supported_v, 33.333333, places=5)
         self.assertEqual(round(supported_v, 1), 33.3)
+        self.assertAlmostEqual(C1C2_RATING_REV_C_V / DERATE_FACTOR, 42.0, places=6)
 
     def test_dr14_is_met_under_the_ecn_ceiling_and_not_met_under_the_superseded_one(self) -> None:
         under_ecn = _check_capacitor_derating(C1C2_RATING_V, VIN_MAX_ECN_V, ref="C1, C2")
@@ -157,6 +162,10 @@ class DesignReviewChecklistExampleTests(unittest.TestCase):
         self.assertEqual(sum(1 for s in tracer.steps if s.kind == "model"), 2, "draft, then check")
 
     def test_revision_a_and_b_use_the_ecn_ceiling_revision_c_uses_the_datasheet(self) -> None:
+        """Each revision is checked against its own ceiling and its own bill of materials. The
+        ECN lowers revisions A and B to 32.0 V, which their 50 V parts clear; revision C keeps
+        36.0 V because it fits 63 V parts (`srb5030-bom.md` section 4), which clear it. Pairing
+        one revision's ceiling with another's capacitor is the mistake, so both halves move."""
         model_b = _scripted_model()
         tracer_b = Tracer(example="bench_design_review_checklist", level=LEVEL, model_id="stub-1")
         report_b = run("B", model_b, tracer_b)
@@ -166,7 +175,33 @@ class DesignReviewChecklistExampleTests(unittest.TestCase):
         dr14_b = next(f for f in report_b.findings if f.rule == "DR-14")
         dr14_c = next(f for f in report_c.findings if f.rule == "DR-14")
         self.assertEqual(dr14_b.status, "met", "50 V caps clear the 32.0 V ECN ceiling")
-        self.assertEqual(dr14_c.status, "not met", "the same 50 V rating does not clear 36.0 V")
+        self.assertIn("50.0 V", dr14_b.evidence)
+        self.assertIn("32.0 V maximum rail", dr14_b.evidence)
+        self.assertEqual(dr14_c.status, "met", "63 V caps clear the datasheet's 36.0 V")
+        self.assertIn("63.0 V", dr14_c.evidence)
+        self.assertIn("36.0 V maximum rail", dr14_c.evidence)
+        # The rating that actually fails is revision A and B's part under the superseded ceiling,
+        # which is the arithmetic the ECN itself runs. Checked directly, not through a run.
+        self.assertEqual(
+            _check_capacitor_derating(C1C2_RATING_V, VIN_MAX_DATASHEET_V, ref="C1, C2").status,
+            "not met",
+        )
+
+    def test_a_revision_this_board_does_not_have_is_refused(self) -> None:
+        model = _scripted_model()
+        tracer = Tracer(example="bench_design_review_checklist", level=LEVEL, model_id="stub-1")
+        with self.assertRaises(ValueError):
+            run("D", model, tracer)
+        with self.assertRaises(ValueError):
+            run("review revision D against DR-0100", model, tracer)
+
+    def test_the_revision_is_read_out_of_a_sentence_and_defaults_to_production(self) -> None:
+        self.assertEqual(_revision_from("C"), "C")
+        self.assertEqual(_revision_from("rev a"), "A")
+        self.assertEqual(_revision_from("Check revision C against DR-0100"), "C")
+        self.assertEqual(_revision_from(""), "B")
+        self.assertEqual(_revision_from("What is the maximum vent run for a DR-520?"), "B")
+        self.assertEqual(SAMPLE_INPUT, "B")
 
     def test_malformed_model_output_does_not_crash_and_drops_no_numeric_finding(self) -> None:
         model = StubModel([StubResponse(text="not json"), StubResponse(text="also not json")])
@@ -174,6 +209,15 @@ class DesignReviewChecklistExampleTests(unittest.TestCase):
         report = run("B", model, tracer)
         rules = {f.rule for f in report.findings}
         self.assertEqual(rules, {"DR-10", "DR-12", "DR-14", "DR-16", "DR-20"})
+
+    def test_the_token_counts_the_page_quotes(self) -> None:
+        """The recipe page's cost strip quotes these two totals for the scripted run above; pin
+        them so the page cannot drift from the prompts the code actually builds."""
+        model = _scripted_model()
+        tracer = Tracer(example="bench_design_review_checklist", level=LEVEL, model_id="stub-1")
+        run("B", model, tracer)
+        self.assertEqual(tracer.tokens_in_total(), 923)
+        self.assertEqual(tracer.tokens_out_total(), 212)
 
     def test_report_text_and_citations_are_readable(self) -> None:
         model = _scripted_model()
