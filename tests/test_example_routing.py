@@ -16,9 +16,14 @@ if str(ROOT) not in sys.path:
 
 from examples.common.model import StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
+from examples.routing.__main__ import SCRIPTED  # noqa: E402
 from examples.routing.run import _parse_label, run  # noqa: E402
 
 CORPUS_DIR = ROOT / "evals" / "corpus"
+
+# The canonical sequence: a classifier that answers `lookup`, then the lookup route's answer.
+# `python -m examples.routing --model stub:scripted` plays exactly this.
+SEQUENCE = ["lookup", "Every 30 cycles. Sources: dw300-manual#6"]
 
 
 class ParseLabelTests(unittest.TestCase):
@@ -50,11 +55,16 @@ class RoutingExampleTests(unittest.TestCase):
             self.assertTrue(tracer.steps)
 
     def test_lookup_label_routes_to_the_lookup_handler_and_calls_the_model_twice(self) -> None:
-        model = StubModel([StubResponse(text="lookup"), StubResponse(text="Every 30 cycles. Sources: dw300-manual#6")])
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
         tracer = Tracer(example="routing", level=3, model_id="stub-1")
         answer = run("How often should the DW-300's filter be cleaned?", model, None, tracer, corpus_dir=CORPUS_DIR)
         self.assertEqual(sum(1 for s in tracer.steps if s.kind == "model"), 2)
         self.assertIn("dw300-manual#6", answer.citations)
+
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, `python -m examples.routing --model stub:scripted` stops
+        demonstrating the route this test says the label picks."""
+        self.assertEqual(list(SCRIPTED), SEQUENCE)
 
     def test_numeric_label_with_a_part_number_answers_with_no_second_model_call(self) -> None:
         model = StubModel([StubResponse(text="numeric")])
