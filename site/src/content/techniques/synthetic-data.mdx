@@ -1,22 +1,22 @@
 ---
 slug: synthetic-data
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Self-Instruct: Aligning Language Models with Self-Generated Instructions"
     url: "https://arxiv.org/abs/2212.10560"
     publisher: "arXiv (University of Washington and others)"
     date: "2022-12-20"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "The Curse of Recursion: Training on Generated Data Makes Models Forget"
     url: "https://arxiv.org/abs/2305.17493"
     publisher: "arXiv (Shumailov, Shumaylov, Zhao, Gal, Papernot, Anderson)"
     date: "2023-05-27"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "distilabel"
     url: "https://github.com/argilla-io/distilabel"
     publisher: "Argilla"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -70,6 +70,15 @@ situation from that loop.
 None of this is unique to text. The same question applies to a generated image set, a generated
 audio set, or a generated set of tool-call examples: was each one checked against something outside
 the model that produced it, or only against how plausible it looks.
+
+For an engineer, text and measurements fall on opposite sides of that line. Five boards back from
+the board house is not enough characterization data, and generating more operator notes or fault
+descriptions to train or test a classifier is the honest half of this technique: real language,
+checked before use, the way this page's example checks a paraphrase. Generating more measurements
+is not honest in any of the three settings a bench serves: a production log needs a real unit on a
+real fixture, a characterization sweep needs a real reading at a real corner, and a precise
+measurement needs a real instrument on a real range. A model may draft the report around a
+measurement; it may not draft the measurement.
 
 </Lane>
 <Lane name="build" title="Build it">

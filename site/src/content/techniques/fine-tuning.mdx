@@ -1,33 +1,33 @@
 ---
 slug: fine-tuning
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "LoRA: Low-Rank Adaptation of Large Language Models"
     url: "https://arxiv.org/abs/2106.09685"
     publisher: "arXiv (Microsoft)"
     date: "2021-06-17"
-    accessed: "2026-09-18"
-  - title: "Fine-tuning overview"
-    url: "https://docs.together.ai/docs/fine-tuning-overview"
+    accessed: "2026-09-19"
+  - title: "Fine-tuning: overview"
+    url: "https://docs.together.ai/docs/fine-tuning/overview"
     publisher: "Together AI"
-    accessed: "2026-09-18"
-  - title: "Fine-tuning data preparation"
-    url: "https://docs.together.ai/docs/fine-tuning-data-preparation"
+    accessed: "2026-09-19"
+  - title: "Fine-tuning: data preparation"
+    url: "https://docs.together.ai/docs/fine-tuning/data-preparation"
     publisher: "Together AI"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Model optimization"
     url: "https://developers.openai.com/api/docs/guides/model-optimization"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Supervised fine-tuning"
     url: "https://developers.openai.com/api/docs/guides/supervised-fine-tuning"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Reinforcement fine-tuning"
     url: "https://developers.openai.com/api/docs/guides/reinforcement-fine-tuning"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -49,15 +49,16 @@ in a team of agents.
 It comes in two shapes. Full fine-tuning moves every weight, at a higher compute and memory cost.
 An adapter leaves the original weights alone and trains a small add-on instead: the LoRA paper
 describes freezing the pretrained weights and injecting trainable "rank decomposition matrices"
-into each layer of the Transformer architecture, and reports that "compared to GPT-3 175B
+into each layer of the Transformer architecture, and reports, "Compared to GPT-3 175B
 fine-tuned with Adam, LoRA can reduce the number of trainable parameters by 10,000 times and the
-GPU memory requirement by 3 times"<Cite n={1}/>: two figures measured against that one model
-trained with that one optimizer, not a multiplier to expect from any job. Together AI calls LoRA
-"the default training mode" on its own hosted service<Cite n={2}/>.
+GPU memory requirement by 3 times."<Cite n={1}/> Those are two figures measured against that one
+model trained with that one optimizer, not a multiplier to expect from any job. Together AI calls
+LoRA "the default training mode" on its own hosted service<Cite n={2}/>.
 
 Two methods covered below train against something other than a fixed correct answer: preference
 tuning ranks one response over another, and reinforcement fine-tuning trains against a scored
-reward. The siblings under this topic are <Link href="/techniques/distillation/">distillation</Link>,
+reward. The siblings under this topic are
+<Link href="/techniques/distillation/">distillation</Link>,
 <Link href="/techniques/synthetic-data/">synthetic data</Link> and
 <Link href="/techniques/prompt-optimization/">prompt optimization</Link>.
 
@@ -71,8 +72,8 @@ You are unlikely to run a training job yourself. You may well be the one decidin
 should, and on whose platform, and two things are worth checking first: how much data a job really
 needs, and whether the service will still be taking new jobs a year from now.
 
-On data, OpenAI's current guide states "the minimum number of examples you can provide for
-fine-tuning is 10," adds that "we see improvements from fine-tuning on 50–100 examples, but the
+On data, OpenAI's current guide states, "The minimum number of examples you can provide for
+fine-tuning is 10." It adds, "We see improvements from fine-tuning on 50–100 examples, but the
 right number for you varies greatly and depends on the use case," and recommends "starting with 50
 well-crafted demonstrations and evaluating the results." Its advice when that changes nothing is
 not more data: "If 50 examples have no impact, rethink your task or prompt before adding training
@@ -80,20 +81,24 @@ data"<Cite n={5}/>. Those are OpenAI's numbers for OpenAI's platform rather than
 fine-tuning anywhere else, and still a useful check against a pitch that starts at thousands of
 examples.
 
-On durability, the same maker's documentation states "OpenAI is winding down the fine-tuning
-platform. The platform is no longer accessible to new users, but existing users of the fine-tuning
-platform will be able to create training jobs for the coming months," and that "all fine-tuned
-models will remain available for inference until their base models are deprecated"<Cite n={4}/>.
-Read September 18, 2026: the page puts no end date on "the coming months," so neither does this one.
-Together AI's fine-tuning overview, read the same day, carries no such notice and describes
-handling "the full lifecycle: data upload, training, hosting, and inference on a dedicated
-endpoint"<Cite n={2}/>. One maker's notice and another's silence on one date is not a rule about
-hosted fine-tuning; a service can stop taking new jobs while the models it already trained keep
-answering, and the platform you are actually considering has its own current page.
+For an engineer, the same right-number question often arrives with a number attached: 200 labeled
+failure notes from bring-up, each with a confirmed root cause. OpenAI's numbers above are the
+nearest anchor, not a verdict for a different task. The test is the same whether the notes came
+from production test, engineering test, or a precise-measurement log: hold a slice back, fine-tune
+on the rest, score against the slice, then add more.
 
-A product described as "fine-tuned on our data" changed its weights once, in advance: a different
-claim from a product that reads your documents at answer time. Fine-tuning does not teach a model
-today's facts, so a question about something newer than the dataset gets whatever the model does
+On durability, the same maker's documentation states, "OpenAI is winding down the fine-tuning
+platform. The platform is no longer accessible to new users, but existing users of the fine-tuning
+platform will be able to create training jobs for the coming months."<Cite n={4}/> It adds, "All
+fine-tuned models will remain available for inference until their base models are deprecated." The
+page puts no end date on "the coming months," so neither does this one. Together AI's fine-tuning
+overview carries no such notice<Cite n={2}/>. One maker's notice and another's silence is not a
+rule about hosted fine-tuning generally; the platform you are actually considering has its own
+current page.
+
+A product described as "fine-tuned on our data" changed its weights once, in advance, a different
+claim from one that reads your documents at answer time. Fine-tuning does not teach a model
+today's facts: a question about something newer than the dataset gets whatever the model does
 when it does not know, not a lookup. That is <Link href="/techniques/rag/">retrieval</Link>'s job.
 
 </Lane>
@@ -113,10 +118,10 @@ always produces the same partition:
 <CodeFile file="examples/adaptation/run.py" func="split" />
 
 The default, 20%, exists for the same reason Together AI's own fine-tuning data preparation guide
-gives: its instructions for carving "a validation set out of a single JSONL file" end with "then
-pass both files to the job and set `n_evals` above 0," so that "the model evaluates against the
-validation set at the specified intervals" during training<Cite n={3}/>: a held-out set is only
-useful if something is scored against it while the job runs, not just kept aside.
+gives. Its instructions for carving "a validation set out of a single JSONL file" continue:
+"Then pass both files to the job and set `n_evals` above 0:" and, further on, "The model evaluates
+against the validation set at the specified intervals" during training<Cite n={3}/>. A held-out set
+is only useful if something is scored against it while the job runs, not just kept aside.
 
 `run` is the whole pipeline in order: load the questions, split them, write both files, then check
 the split for a leak.
@@ -131,17 +136,17 @@ Preference tuning and reinforcement fine-tuning have no file to build the way su
 fine-tuning does, because neither trains against one fixed right answer. Together AI's own
 overview separates two of its training methods on exactly that line: supervised fine-tuning trains
 "on demonstration data with one target completion per example," while preference fine-tuning is
-"align a model with rankings over preferred and dispreferred responses using DPO"<Cite n={2}/>.
-OpenAI documents its own DPO option in the same shape, telling a reader to "Provide both a correct
-and incorrect example response for a prompt. Indicate the correct response to help the model
-perform better," and today lists three model ids it is available for: `gpt-4.1-2025-04-14`,
-`gpt-4.1-mini-2025-04-14` and `gpt-4.1-nano-2025-04-14`<Cite n={4}/>. Reinforcement fine-tuning
-goes further still: OpenAI's own guide says that during training the platform "samples several
-responses per prompt, scores them with the grader, and applies policy-gradient updates based on
-those rewards," and that the method "is supported on o-series reasoning models only, and currently
-only for o4-mini"<Cite n={6}/>. Both are OpenAI's terms for OpenAI's platform, read September 18, 2026;
-another maker's DPO offering is its own to describe. A training file for either would be pairs or
-grader code, not the chat JSONL this example writes.
+described as, "Align a model with rankings over preferred and dispreferred responses using
+DPO."<Cite n={2}/> OpenAI documents its own DPO option in the same shape, telling a reader to
+"Provide both a correct and incorrect example response for a prompt. Indicate the correct response
+to help the model perform better."<Cite n={4}/> It lists three model ids the method is available
+for today: `gpt-4.1-2025-04-14`, `gpt-4.1-mini-2025-04-14` and `gpt-4.1-nano-2025-04-14`.
+Reinforcement fine-tuning goes further still: OpenAI's own guide says that during training the
+platform "samples several responses per prompt, scores them with the grader, and applies
+policy-gradient updates based on those rewards."<Cite n={6}/> The method "is supported on o-series
+reasoning models only, and currently only for o4-mini"<Cite n={6}/>. Both are OpenAI's terms for
+OpenAI's platform, read September 19, 2026; another maker's DPO offering is its own to describe. A
+training file for either would be pairs or grader code, not the chat JSONL this example writes.
 
 Self-run alternatives exist for anyone who would rather not depend on a hosted platform at all:
 Hugging Face's Transformers, TRL and PEFT, Unsloth, Axolotl and Apple's MLX all train adapters or

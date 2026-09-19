@@ -1,22 +1,22 @@
 ---
 slug: prompt-optimization
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines"
     url: "https://arxiv.org/abs/2310.03714"
     publisher: "arXiv (Khattab et al., Stanford)"
     date: "2023-10-05"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "DSPy Optimizers (formerly Teleprompters)"
     url: "https://github.com/stanfordnlp/dspy/blob/main/docs/docs/learn/optimization/optimizers.md"
     publisher: "DSPy (Stanford NLP), documentation source"
-    accessed: "2026-09-18"
-  - title: "Prompt improver"
+    accessed: "2026-09-19"
+  - title: "Improve your prompts in the developer console"
     url: "https://claude.com/blog/prompt-improver"
     publisher: "Anthropic"
     date: "2024-10-14"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -37,9 +37,10 @@ weights at all: where <Link href="/techniques/fine-tuning/">fine-tuning</Link> t
 instruction in, this searches for a better one to send.
 
 DSPy is the program this page quotes throughout. Its paper describes designing "a compiler that
-will optimize any DSPy pipeline to maximize a given metric"<Cite n={1}/>, and its documentation is
-specific about what an optimizer takes: "your DSPy program," "your metric," and "a few training
-inputs"<Cite n={2}/>. Two of those three have to exist before there is anything to
+will optimize any DSPy pipeline to maximize a given metric"<Cite n={1}/>, and its documentation
+names three things an optimizer takes: the program itself, a metric, and a handful of training
+inputs, which it says "may be very small (i.e., only 5 or 10 examples) and
+incomplete"<Cite n={2}/>. Two of those three have to exist before there is anything to
 optimize, which is why this page assumes <Link href="/techniques/evals/">evals</Link>. An eval set
 is not a nice-to-have here. It is the thing being optimized against, and every weakness in it is
 inherited by whatever comes out.
@@ -56,9 +57,11 @@ section, example standardization into XML, example enrichment, rewriting for cla
 prefilled assistant message), after which "you can provide feedback for Claude about what is and
 isn't working to further improve the prompt"<Cite n={3}/>. The rewrite itself compares no
 candidates and consults no score. Scoring is a separate step in the same product: Anthropic
-describes its prompt evaluator as letting you "test your prompts under various scenarios," with an
-"ideal output" column added so users can "grade model outputs on a 5-point scale"<Cite n={3}/>: a
-person grading, one prompt at a time, not a search choosing between prompts by number.
+describes its prompt evaluator as letting you "test your prompts under various
+scenarios"<Cite n={3}/>.
+It adds an "ideal output" column so users can "grade model outputs on a 5-point
+scale"<Cite n={3}/>: a person grading, one prompt at a time, not a search choosing between prompts
+by number.
 
 The tools this page is about do the choosing. They run many candidate instructions, or many
 candidate few-shot examples, and keep whichever scores highest on a set of examples. That makes the
@@ -72,6 +75,13 @@ None of this replaces writing a prompt by hand for a one-off task, and an optimi
 a permanent asset: it is fitted to one development set, on one model. Change the model (a new
 version from the same maker counts) and the search has to be re-run, or at minimum the winner
 re-scored, because nothing about the old score carries over to a model that answers differently.
+
+An engineer who wants a better prompt is often not asking a model to decide anything. The job is
+turning numbers code already computed into report prose: a production summary, an engineering-test
+lab note, or a precise-measurement writeup all still need a sentence written around a margin or a
+Cpk. A search here is a search over phrasing, scored on whether the drafted sentence states every
+number correctly, not on whether a verdict is right; the verdict came from code before the prompt
+ever ran, and stays there no matter which candidate wins.
 
 </Lane>
 <Lane name="build" title="Build it">

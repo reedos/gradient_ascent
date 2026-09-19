@@ -1,27 +1,32 @@
 ---
 slug: distillation
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Supervised fine-tuning"
-    url: "https://developers.openai.com/api/docs/guides/distillation"
+    url: "https://developers.openai.com/api/docs/guides/supervised-fine-tuning#distilling-from-a-larger-model"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Commercial Terms of Service"
     url: "https://www.anthropic.com/legal/commercial-terms"
     publisher: "Anthropic"
     date: "2025-06-17"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Gemini API Additional Terms of Service"
     url: "https://ai.google.dev/gemini-api/terms"
     publisher: "Google"
     date: "2026-03-23"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning"
     url: "https://arxiv.org/abs/2501.12948"
     publisher: "arXiv (DeepSeek-AI)"
     date: "2025-01-22"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
+  - title: "OpenAI Services Agreement"
+    url: "https://openai.com/policies/business-terms/"
+    publisher: "OpenAI"
+    date: "2026-01-01"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -41,10 +46,11 @@ data a person wrote. That is distillation, and it belongs to
 <Link href="/techniques/fine-tuning/">fine-tuning</Link>, which is what the student's training run
 actually is once the dataset exists.
 
-OpenAI's own distillation guide describes the mechanism as two steps: "Capture results generated
-from your model" and then "Use the captured responses from the large model that fit your criteria
-to generate a dataset"<Cite n={1}/>: the teacher's outputs, filtered before anything is trained on
-them. What gets captured need not stop at the final answer. DeepSeek's paper on its R1 model
+OpenAI's own distillation guide lays out a four-step flow; the middle two are the mechanism this
+page and its example build: "Capture results generated from your model" and then "Use the captured
+responses from the large model that fit your criteria to generate a dataset"<Cite n={1}/>: the
+teacher's outputs, filtered before anything is trained on them. What gets captured need not stop
+at the final answer. DeepSeek's paper on its R1 model
 reports that "the emergent reasoning patterns exhibited by these large-scale models can be
 systematically harnessed to guide and enhance the reasoning capabilities of smaller
 models"<Cite n={4}/>: what that paper describes carrying over is reasoning patterns, not a list of
@@ -56,31 +62,34 @@ example below stops exactly where a real project would start paying for one.
 <Lanes>
 <Lane name="use" title="Use it">
 
-A small, fast model marketed as unusually good at one narrow job may well be a distilled one: a
-maker ran a larger model over many examples of that job and trained a smaller model on the results.
-Two questions are worth asking about one. The first is about the dataset rather than the model:
-what task were the captured answers filtered for, and does your use fall inside that task or
-outside it?
+A small, fast model marketed as unusually good at one narrow job may well be distilled: a maker ran
+a larger model over many examples of that job and trained a smaller model on the results. Two
+questions are worth asking about one. The first is about the dataset: what task were the captured
+answers filtered for, and does your use fall inside that task or outside it?
 
-The second question is not technical, and it arrives as soon as you are building a product rather
-than using one: whether a maker's terms let you train on its model's outputs at all. This site
-gives no legal advice and cannot tell you how a clause applies to your plan. It can quote two
-documents as they read today.
+The second question is not technical: whether a maker's terms let you train on its model's outputs
+at all. This site gives no legal advice and cannot tell you how a clause applies to your plan; it
+can quote three documents as they read today.
 
-Anthropic's Commercial Terms of Service, effective June 17, 2025 and read September 18, 2026, state under Use
-Restrictions that "Customer may not and must not attempt to (a) access the Services to build a
-competing product or service, including to train competing AI models or resell the Services except
-as expressly approved by Anthropic"<Cite n={2}/>. Those are the commercial terms; Anthropic
+Anthropic's Commercial Terms of Service, effective June 17, 2025 and read September 19, 2026,
+state under Use Restrictions that "Customer may not and must not attempt to (a) access the
+Services to build a competing product or service, including to train competing AI models or
+resell the Services except as expressly approved by Anthropic"<Cite n={2}/>. Those are the
+commercial terms; Anthropic
 publishes separate consumer terms this page has not read. Google's Gemini API Additional Terms of
-Service, dated March 23, 2026, state that "You may not use the Services to develop models that compete
-with the Services (e.g., Gemini API or Google AI Studio)"<Cite n={3}/>. On the separate subject of
-what Google does with your content, the same document says "Google only uses content that you
-import or upload to our model tuning feature for that express purpose"<Cite n={3}/>: a statement
-about Google's use of uploaded data, not an exception to the restriction above.
+Service, dated March 23, 2026, state that "You may not use the Services to develop models that
+compete with the Services (e.g., Gemini API or Google AI Studio)"<Cite n={3}/>. The same document
+separately says "Google only uses content that you import or upload to our model tuning feature
+for that express purpose"<Cite n={3}/>, a statement about data use, not an exception to the
+restriction above.
 
-A third maker is missing on purpose: OpenAI's policy pages refused this site's fetcher on
-September 18, 2026, so nothing here says what its terms restrict. That is a page which could not be opened,
-not one read and found silent.
+OpenAI's own Services Agreement, effective January 1, 2026, restricts a customer, "except for a
+Permitted Exception," from using "Output to develop artificial intelligence models that compete
+with OpenAI's products and services"<Cite n={5}/>. That exception covers Output used to "develop
+artificial intelligence models primarily intended to categorize, classify, or organize data (e.g.,
+embeddings or classifiers), if these models are not distributed or made commercially available to
+third parties," and to fine tune or customize "models provided as part of OpenAI's fine-tuning or
+other Services"<Cite n={5}/>: an in-house classifier fits; a model sold to a third party does not.
 
 Distillation inherits whatever the teacher got wrong. A captured answer that reads fluently and
 would pass a casual glance is not the same as a correct one, and a student trained on enough
@@ -109,7 +118,8 @@ question set's answer key:
 <CodeFile file="examples/distillation/run.py" func="run" />
 
 Every step is `decided_by: "code"`: the code always calls the teacher, always grades the same way,
-and the model's output never changes what happens next. This is the same rule `examples/rag` follows for
+and the model's output never changes what happens next. This is the same rule `examples/rag`
+follows for
 its own single model call. Against the real question set, `python -m examples.distillation --model
 stub --out .local/scratch/distillation/student.jsonl` keeps nothing: the interactive stub's
 placeholder text matches no question's pattern, so all 32 are dropped. That is not a bug in the
@@ -124,6 +134,18 @@ describes harnessing<Cite n={4}/>. And it captures every passing answer once, wi
 against near-identical phrasings; the Build it lane on
 <Link href="/techniques/synthetic-data/">synthetic data</Link> covers the checks a larger generated
 set needs and this one, at 32 questions, does not yet require.
+
+The same shape serves an engineer whose captured data is not model answers but a log of failure
+notes: 200 fault descriptions with a confirmed root cause, filtered the way `grade_exact` filters
+an answer here, then used to train a small classifier that tags a new note with a likely category.
+Whether 200 is enough is not a number this page can give; it is the same before/after question the
+eval section below asks of any claim of improvement, in any of the three settings the notes came
+from. A triage classifier reading a production line's daily failure log is scored against a slice
+of that log's own history withheld from training. A classifier trained on a handful of bring-up
+notes from engineering test is scored the same way, on fewer notes, with a correspondingly smaller
+claim. A classifier meant to flag a note worth a second look before a measurement ships is scored
+hardest of all, since what it feeds is a person's decision to trust a number, and its own output is
+never the verdict.
 
 </Lane>
 </Lanes>
@@ -161,7 +183,7 @@ building and maintaining a captured, filtered dataset just to run it on cheaper 
   },
   {
     name: 'Captured outputs used without reading the terms',
-    notice: "A team builds and ships a product trained on a hosted model's captured outputs, and nobody has read what that maker's current terms say about training models on them. Both makers quoted on this page carry a clause about competing models; a third maker's pages could not be opened at all.",
+    notice: "A team builds and ships a product trained on a hosted model's captured outputs, and nobody has read what that maker's current terms say about training models on them. All three makers quoted on this page carry a clause about competing models, each with its own scope and its own exceptions.",
     test: "Before capturing anything, open the current terms of the maker you are actually using and find the use-restriction section. Whether your plan falls inside a clause is a question for someone who can advise on it, not for a technique page.",
   },
   {

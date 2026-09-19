@@ -1,33 +1,33 @@
 ---
 slug: adaptation
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "LoRA: Low-Rank Adaptation of Large Language Models"
     url: "https://arxiv.org/abs/2106.09685"
     publisher: "arXiv (Microsoft)"
     date: "2021-06-17"
-    accessed: "2026-09-18"
-  - title: "Fine-tuning data preparation"
-    url: "https://docs.together.ai/docs/fine-tuning-data-preparation"
+    accessed: "2026-09-19"
+  - title: "Data preparation"
+    url: "https://docs.together.ai/docs/fine-tuning/data-preparation"
     publisher: "Together AI"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Supervised fine-tuning"
-    url: "https://developers.openai.com/api/docs/guides/distillation"
+    url: "https://developers.openai.com/api/docs/guides/supervised-fine-tuning#distilling-from-a-larger-model"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Reinforcement fine-tuning"
     url: "https://developers.openai.com/api/docs/guides/reinforcement-fine-tuning"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "DSPy"
     url: "https://github.com/stanfordnlp/dspy"
     publisher: "Stanford NLP"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "distilabel"
     url: "https://github.com/argilla-io/distilabel"
     publisher: "Argilla"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -133,9 +133,10 @@ closer to what this site's own eval loop would drive than to a training file.
 Which of these a maker currently sells changes faster than the methods do. Both OpenAI guides
 cited here carried this notice when they were read for this page: "OpenAI is winding down the
 fine-tuning platform. The platform is no longer accessible to new users, but existing users of
-the fine-tuning platform will be able to create training jobs for the coming months," with
-fine-tuned models remaining available for inference until their base models are
-deprecated<Cite n={3}/><Cite n={4}/>; the reinforcement fine-tuning guide also limits that method
+the fine-tuning platform will be able to create training jobs for the coming
+months"<Cite n={3}/><Cite n={4}/>.
+Fine-tuned models stay available for inference until their base models are deprecated, the same
+notice adds; the reinforcement fine-tuning guide also limits that method
 to one reasoning model id<Cite n={4}/>. Together AI's fine-tuning documentation carries no such
 notice<Cite n={2}/>. Read the maker's own page before planning around a service; the methods
 outlast the platforms that sell them.
@@ -237,7 +238,7 @@ about the shape and volume of the calls.
   improving anything real.
 - Do not treat a fine-tuned model as a substitute for giving it current documents. Ask what the
   model was trained to do, separately from what it was trained to know.
-- Keep the data a fine-tuning job is built from somewhere it can be regenerated or re-audited —
+- Keep the data a fine-tuning job is built from somewhere it can be regenerated or re-audited,
   the same discipline `evals/questions.json` follows for this site's own eval set.
 - Four pages under this one go further than this page does on each way of adapting a model:
   <Link href="/techniques/fine-tuning/">fine-tuning and adapters</Link>,
