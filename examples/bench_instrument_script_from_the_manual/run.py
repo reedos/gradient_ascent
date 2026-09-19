@@ -11,11 +11,12 @@ Tarnley instrument would answer: `-113,"Undefined header"` or `-224,"Illegal par
 Those errors go back to the model as the only feedback it gets, and it drafts again, capped at
 `MAX_REVISIONS` attempts.
 
-Only once a draft runs clean does code execute it against the board for real. Two of its commands
-are not the model's to send outright: `CURR` is a set point, checked against `SafetyEnvelope`
-first, and `INP 1` energizes the board, which needs a person's `Approval` naming the set point --
-see `_enable_load`. Both gates raise `SafetyRefusal`, which stops the run rather than returning a
-code a caller could ignore.
+Only once a draft runs clean does code execute it against the board for real, and then through
+`GuardedLoad` rather than through the load itself. Two of its commands are not the model's to send
+outright: `CURR` is a set point, checked against `SafetyEnvelope` first, and `INP 1` puts current
+through the board, which needs a person's `Approval` naming the rail and the current -- see
+`_enable_load`. Both gates raise `SafetyRefusal`, which stops the run rather than returning a code
+a caller could ignore.
 
 Nothing here has ever been run against a real TRN-2400. `docs/THE-BENCH.md` is the simulation
 this trades against, and `examples/common/bench.py` is what a command is checked against.
@@ -30,6 +31,7 @@ from examples.common.bench import (
     Approval,
     Bench,
     ElectronicLoad,
+    GuardedLoad,
     GuardedSupply,
     SafetyEnvelope,
     SafetyRefusal,
@@ -164,29 +166,22 @@ def _check_against_manual(commands: list[str], tracer: Tracer) -> list[tuple[str
     return errors
 
 
-def _enable_load(bench: Bench, envelope: SafetyEnvelope, approval: Approval) -> None:
-    """Enable the TRN-2400's input: the one command in this script that energizes the board.
+def _enable_load(load: GuardedLoad, approval: Approval) -> None:
+    """Enable the TRN-2400's input: the one command in this script that puts current through the
+    board, and so the one command a person has to have approved.
 
-    `examples/common/bench.py`'s `GuardedLoad` does not gate `INP 1` behind an `Approval` the way
-    `GuardedSupply.output_on` gates `OUTP ON` (see `.local/page-requests/`), so this recipe adds
-    the same gate here, by hand, for the one instrument whose manual it is drafting from.
+    The gate itself is `GuardedLoad.input_on` in `examples/common/bench.py`, next to the identical
+    one `GuardedSupply.output_on` puts in front of `OUTP ON`. It refuses an enable with no
+    `Approval`, one that names a rail or a current the bench is not actually at, and one that has
+    already been spent, and it re-checks the load's own set point against `SafetyEnvelope` on the
+    way through. This recipe adds nothing of its own to that; it names the step, because a reader
+    following the drafted script needs to see where the model's line stops being the model's.
     """
-    if not isinstance(approval, Approval):
-        raise SafetyRefusal("enabling the load needs an Approval; none was given")
-    if approval.used:
-        raise SafetyRefusal(f"approval from {approval.approver} has already been used")
-    checked_current = envelope.check_load_current(bench.load.current_setpoint_a)
-    if not approval.matches(bench.wiring.input_voltage_v, checked_current):
-        raise SafetyRefusal(
-            f"approval is for {approval.voltage_v} V / {approval.current_limit_a} A; the board "
-            f"is at {bench.wiring.input_voltage_v} V and the load is set to {checked_current} A"
-        )
-    approval.used = True
-    bench.load.send("INP 1")
+    load.input_on(approval)
 
 
 def _execute(
-    commands: list[str], bench: Bench, envelope: SafetyEnvelope, approval: Approval,
+    commands: list[str], bench: Bench, load: GuardedLoad, approval: Approval,
 ) -> dict[str, float]:
     """Replay a checked, clean script against the board. `CURR` goes through the envelope; `INP 1`
     goes through `_enable_load`; everything else is a read or a plain set the manual documents."""
@@ -195,10 +190,9 @@ def _execute(
         header, _, argument = command.partition(" ")
         header, argument = header.upper(), argument.strip()
         if header == "CURR" and argument:
-            checked = envelope.check_load_current(argument)
-            bench.load.send(f"CURR {checked:.4f}")
+            load.set_current(argument)
         elif header == "INP" and argument == "1":
-            _enable_load(bench, envelope, approval)
+            _enable_load(load, approval)
         else:
             reply = bench.load.send(command)
             if header == "MEAS:VOLT?":
@@ -250,6 +244,7 @@ def run(
 
     bench = Bench()
     supply = GuardedSupply(bench, envelope)
+    load = GuardedLoad(bench, envelope)
     supply.set_voltage(24.0)
     supply.set_current_limit(4.000)
     supply.output_on(approval_supply)
@@ -258,7 +253,7 @@ def run(
         detail="24.000 V, 4.000 A supply current limit, approved by R. Osaki",
     )
 
-    readings = _execute(commands, bench, envelope, approval_load)
+    readings = _execute(commands, bench, load, approval_load)
     tracer.record(
         kind="code", decided_by="code", title="Run the checked script on the bench",
         detail=f"vout={readings.get('vout_v')} V, iout={readings.get('iout_a')} A",

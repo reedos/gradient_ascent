@@ -81,11 +81,20 @@ class InstrumentScriptExampleTests(unittest.TestCase):
         self.assertEqual(len(stop_steps), 1)
         self.assertTrue(all(s.decided_by == "code" for s in tracer.steps))
 
-    def test_enabling_the_load_without_an_approval_is_refused(self) -> None:
+    def test_enabling_the_load_on_an_approval_for_another_set_point_is_refused(self) -> None:
+        # The gate is GuardedLoad.input_on in examples/common/bench.py: the board comes up at
+        # 24.0 V and the script sets the load to 1.000 A, so an approval naming 4.5 A does not
+        # fit the enable it is being used for.
         model = StubModel([StubResponse(text=GOOD_DRAFT)])
         tracer = make_tracer()
         with self.assertRaises(SafetyRefusal):
             run(TASK, model, tracer, approval_load=Approval("R. Osaki", 24.0, 4.5, reason="wrong set point"))
+
+    def test_enabling_the_load_on_something_that_is_not_an_approval_is_refused(self) -> None:
+        model = StubModel([StubResponse(text=GOOD_DRAFT)])
+        tracer = make_tracer()
+        with self.assertRaises(SafetyRefusal):
+            run(TASK, model, tracer, approval_load="R. Osaki said it was fine")  # type: ignore[arg-type]
 
     def test_a_load_current_over_the_envelope_never_reaches_the_instrument(self) -> None:
         over_limit = GOOD_DRAFT.replace("CURR 1.000", "CURR 4.600")

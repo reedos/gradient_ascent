@@ -27,9 +27,11 @@ the load takes neither.
 
 Level 0 already runs the checked script: once a script is known good, replaying it against 50
 boards a day (the production run in `docs/THE-BENCH.md` tests 200 over four days) costs nothing
-and needs no model at any level. The job a model helps with is the one-time draft, when the script
-does not exist yet or the manual has changed, and a first draft off two disagreeing manuals is
-where a wrong keyword or a wrong boolean word actually gets typed.
+and needs no model at any level, and so does
+<Link href="/recipes/limits-without-a-model/">everything done with the readings it takes</Link>.
+The job a model helps with is the one-time draft, when the script does not exist yet or the manual
+has changed, and a first draft off two disagreeing manuals is where a wrong keyword or a wrong
+boolean word actually gets typed.
 
 A single, ungraded draft (level 1) is not enough, because "does this run clean" is not a matter of
 taste, it's a fact the simulated instrument already knows: send the command, read `SYST:ERR?`.
@@ -88,7 +90,7 @@ script asks `SYST:ERR?`, not as anything that looks like a crash.
     INP 0
 
 Clean. Now, and only now, code runs it for real: the supply brings the board to 24.000 V with a
-4.000 A current limit (approved by "R. Osaki," the name already used for this in
+4.000 A current limit (approved by "R. Osaki", the name already used for this in
 `tests/test_bench.py`), `CURR 1.000` is checked against `SafetyEnvelope` before it is sent, `INP 1`
 needs its own matching approval, and the load reads back `4.9930V` and `1.0000A`. Those are not
 invented numbers: they are what the DUT model in `examples/common/bench.py` computes at 24 V in,
@@ -101,18 +103,23 @@ Checking a command means sending it to an instrument that only knows what its ma
 
 <CodeFile file="examples/bench_instrument_script_from_the_manual/run.py" func="_check_against_manual" />
 
-Enabling the load is the one line in the whole script that actually puts current on the board, so
-it is the one line the model never gets to send outright:
+Enabling the load is the one line in the whole script that actually puts current through the
+board, so it is the one line the model never gets to send outright:
 
 <CodeFile file="examples/bench_instrument_script_from_the_manual/run.py" func="_enable_load" />
+
+That is a call and not a check, on purpose. The gate lives in `examples/common/bench.py` as
+`GuardedLoad.input_on`, beside the identical one `GuardedSupply.output_on` puts in front of
+`OUTP ON`, so every recipe that enables a load gets it from one place instead of writing its own
+version of the same three refusals. The reason a load enable is gated at all, rather than treated
+as an ordinary set command, is that the TRN-2400 will sink 30 A into a board rated for 3.0 A, and
+the envelope's own load ceiling is deliberately above that rating so the overcurrent step can find
+the real limit. Code cannot tell a deliberate limit hunt from a set point nobody meant, so a person
+names the rail and the current, and code checks the bench is actually at them.
 
 And reading a Tarnley reply back:
 
 <CodeFile file="examples/bench_instrument_script_from_the_manual/run.py" func="parse_reading" />
-
-`examples/common/bench.py`'s `GuardedLoad` does not itself gate `INP 1` behind an approval the way
-`GuardedSupply` gates `OUTP ON`; `_enable_load` above adds that by hand for this one instrument.
-See `.local/page-requests/w7-instrument-script-from-the-manual.md`.
 
 ## What it costs
 
@@ -145,6 +152,11 @@ written or the manual changes; the line is checked in code and run the same way 
       name: 'A unit suffix parsed with a bare float()',
       notice: 'A Maridun reply is a bare number and float() works; the identical call on a Tarnley reply like "1.0000A" raises, which is the good case, or a fixed-width slice returns a wrong number silently, which is worse.',
       test: 'Call the parser on both a suffixed and a bare reply and check the number, not just that it runs; parse_reading\'s own tests do this for "4.9930V", "1000.0000OHM" and "24.0000".',
+    },
+    {
+      name: 'A reading taken before the board has settled',
+      notice: 'Step 4 of the manual\'s own load sequence is "Wait 100 ms for the board and the load to settle". A drafted script that goes straight from INP 1 to MEAS:VOLT? still runs clean, because a simulated instrument settles instantly and the error queue has nothing to say about timing. The reading is a number, not a measurement.',
+      test: 'Nothing in the draft, check and revise loop catches this: the simulator is the wrong instrument to ask. It is one of the things the fourth step is for, with a person watching the first reading after the enable next to one taken a second later on the real load.',
     },
     {
       name: 'An enable command with no approval, or the wrong one',

@@ -6,9 +6,11 @@ and reading `SYST:ERR?`; an undocumented command, a long-form keyword Tarnley do
 an `ON`/`OFF` word instead of `1`/`0` all come back as the manual's own documented errors. Those
 errors, and nothing else, go back to the model for another draft, capped at `MAX_REVISIONS`.
 
-Only a script that runs clean is ever executed for real. Even then, the set point (`CURR`) goes
-through `SafetyEnvelope`, and enabling the load (`INP 1`) needs a person's `Approval` naming that
-set point, the same way `examples/common/bench.py`'s `GuardedSupply` gates `OUTP ON`.
+Only a script that runs clean is ever executed for real, and then through
+`examples/common/bench.py`'s `GuardedLoad` rather than the load itself. The set point (`CURR`)
+goes through `SafetyEnvelope`, and enabling the load (`INP 1`) needs a person's `Approval` naming
+the rail the board is at and the current the load is about to pull, the same gate
+`GuardedSupply.output_on` puts in front of `OUTP ON`.
 
 Run it:
 
