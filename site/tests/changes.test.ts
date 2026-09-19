@@ -112,10 +112,12 @@ test('the real feed renders and covers every entry', () => {
 test('the markdown twin carries every entry under its date, with its links', () => {
   const md = changesMarkdown(fixture, abs);
   assert.match(md, /^# What changed/);
-  assert.match(md, /## 2026-09-19/);
+  // House style: month-day-year wherever a reader sees a date. ISO stays in the file and the feed.
+  assert.match(md, /## 09\/19\/2026/);
+  assert.ok(!md.includes('## 2026-09-19'), 'no ISO date in the reader-facing twin');
   assert.match(md, /### The first thing that day/);
   assert.match(md, /\[Timeline\]\(https:\/\/example\.org\/gradient_ascent\/timeline\/\)/);
-  assert.ok(md.indexOf('## 2026-09-19') < md.indexOf('## 2026-09-18'), 'newest date first');
+  assert.ok(md.indexOf('## 09/19/2026') < md.indexOf('## 09/18/2026'), 'newest date first');
 });
 
 test('an empty log renders a feed and a page rather than crashing', () => {

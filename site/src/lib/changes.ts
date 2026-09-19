@@ -13,6 +13,7 @@
 // Everything here is pure: data in, strings out. site/tests/changes.test.ts drives it under plain
 // `node --test`, including the Atom rendering, which is the part most likely to break quietly.
 import data from '../../../content/changes.json' with { type: 'json' };
+import { usDate } from './dates.ts';
 
 export interface ChangePage {
   label: string;
@@ -144,7 +145,9 @@ export function changesMarkdown(entries: Change[], abs: (path: string) => string
     '',
   ];
   for (const group of changesByDate(entries)) {
-    parts.push(`## ${group.date}`, '');
+    // House style is month-day-year everywhere a reader sees a date, the .md twin included. The
+    // ISO form stays in content/changes.json and in the feed, where a machine reads it.
+    parts.push(`## ${usDate(group.date)}`, '');
     for (const entry of group.entries) {
       parts.push(`### ${entry.title}`, '', entry.what, '', entry.why, '');
       for (const page of entry.pages) parts.push(`- [${page.label}](${abs(page.path)})`);
