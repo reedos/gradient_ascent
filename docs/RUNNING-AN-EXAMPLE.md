@@ -76,7 +76,27 @@ SCRIPTED = [
 The replies are what a model behaving the way the page describes would say: the right label, a
 citation that exists in `evals/corpus/`, a first draft that genuinely fails the example's own
 check followed by a revision that passes. A scripted reply that makes the example print an empty
-result is the original defect in a new place.
+result is the original defect in a new place, and so is one that contradicts what the code around
+it produced. A check node that says every citation is supported, in a run where the draft cited a
+section retrieval never returned, prints confidently and teaches the opposite of the page.
+
+### An example whose calls run in parallel
+
+`contract_review` checks six rules at once and `parallelization` answers from three sections at
+once, both through a `ThreadPoolExecutor`. There is no call order to script against: whichever
+thread reaches the model first takes the first reply, so an ordered sequence prints one rule's
+finding under another rule's name on some runs. Those sequences are matched on the prompt
+instead, and each entry is used once:
+
+```python
+SCRIPTED = [
+    WhenAsked("Checklist rule payment_terms:", json.dumps({...})),
+    WhenAsked("Checklist rule liability_cap:", json.dumps({...})),
+]
+```
+
+A `when` has to appear in one call's prompt and in no other's. A sequence is either all ordered
+or all matched, never half of each, and `tests/test_scripted_stub.py` checks both rules.
 
 ### Running past the end of the sequence
 
@@ -84,12 +104,10 @@ An example that grows a model call, or takes a branch the sequence was not writt
 a reply that is not there. That raises `ScriptExhausted`, which names the call number, how many
 replies the sequence holds, and what that call was asking for:
 
-    routing: the scripted stub ran out on model call 3; SCRIPTED in
-    examples/routing/__main__.py has 2 replies.
-      call 3 system: You answer questions about Halvorsen appliances using only the ...
-      call 3 user:   Sources: [dw300-manual#6] Maintenance ...
-    Add the reply that call should get to SCRIPTED, in order, and to the sequence
-    tests/test_example_routing.py asserts against.
+    routing: the scripted stub ran out on model call 3; SCRIPTED in examples/routing/__main__.py has 2 replies.
+      call 3 system: You answer questions about Halvorsen appliances using only the numbered sources below. End your answer wi...
+      call 3 user:   Sources: [dw300-manual#6] Maintenance and Filter Cleaning The DW-300 uses a manual fine filter at the bot...
+    Add the reply that call should get to SCRIPTED, in order, and to the sequence tests/test_example_routing.py asserts against.
 
 Not an `IndexError`, and not an empty string. Both of those read as "the example is broken" when
 what happened is that the sequence fell behind the example.
