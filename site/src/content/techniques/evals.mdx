@@ -1,24 +1,24 @@
 ---
 slug: evals
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Define success criteria and build evaluations"
     url: "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests"
     publisher: "Anthropic (Claude Platform Docs)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Graders"
     url: "https://developers.openai.com/api/docs/guides/graders"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Evaluation"
     url: "https://docs.langchain.com/langsmith/evaluation"
     publisher: "LangChain (LangSmith documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Evaluate systematically"
     url: "https://www.braintrust.dev/docs/evaluate"
     publisher: "Braintrust"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -108,7 +108,7 @@ ran. A run against the stub model (the one used for testing) is refused a result
 the caller passes `--allow-stub`, and is marked `"stub": true` even then, because a stub answers
 nothing real:
 
-<CodeFile file="scripts/eval_run.py" start={824} end={826} expect="--allow-stub" />
+<CodeFile file="scripts/eval_run.py" start={831} end={833} expect="--allow-stub" />
 
 A result file (`evals/results/<example>/<model-id>.json`) records `score_overall` over graded
 questions only, a per-kind breakdown, `citation_hit_rate`, tokens in and out, wall time, and
