@@ -24,6 +24,7 @@ import contextlib
 import importlib
 import io
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -60,19 +61,25 @@ def load_main(example: str):
     return importlib.import_module(f"examples.{example}.__main__")
 
 
-def demo_argv(module) -> list[str]:
+def demo_argv(module, tmpdir: str = "") -> list[str]:
     """The arguments the example's documented demo command passes besides `--model`. Most
     examples need none, because their `__main__` defaults `--question` to the input the sequence
-    was written for."""
-    return list(getattr(module, "DEMO_ARGV", []))
+    was written for.
+
+    An example that writes a file writes `{tmpdir}` into its `DEMO_ARGV` where the path goes, so
+    running the suite leaves nothing behind in the repository. The command a page prints names a
+    real path instead; the arguments are otherwise the same.
+    """
+    return [arg.replace("{tmpdir}", tmpdir) for arg in getattr(module, "DEMO_ARGV", [])]
 
 
 def run_demo(example: str) -> tuple[int, str]:
     """Run one example's demo command exactly as a reader would, and capture what they see."""
     module = load_main(example)
     out = io.StringIO()
-    with contextlib.redirect_stdout(out):
-        code = module.main(["--model", SCRIPTED_SPEC, *demo_argv(module)])
+    with tempfile.TemporaryDirectory() as tmpdir:
+        with contextlib.redirect_stdout(out):
+            code = module.main(["--model", SCRIPTED_SPEC, *demo_argv(module, tmpdir)])
     return code, out.getvalue()
 
 
@@ -117,8 +124,9 @@ class DemoCommandTests(unittest.TestCase):
             with self.subTest(example=name):
                 module = load_main(name)
                 out = io.StringIO()
-                with contextlib.redirect_stdout(out):
-                    code = module.main(["--model", "stub", *demo_argv(module)])
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    with contextlib.redirect_stdout(out):
+                        code = module.main(["--model", "stub", *demo_argv(module, tmpdir)])
                 self.assertEqual(code, 0)
                 self.assertTrue(out.getvalue().strip())
 
@@ -132,9 +140,13 @@ class DemoCommandTests(unittest.TestCase):
                 module = load_main(name)
                 _, scripted = run_demo(name)
                 echo = io.StringIO()
-                with contextlib.redirect_stdout(echo):
-                    with contextlib.suppress(Exception):
-                        module.main(["--model", "stub", *demo_argv(module)])
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    with contextlib.redirect_stdout(echo):
+                        # The echo stub is allowed to fail here: several examples cannot complete
+                        # a run on an echoed reply at all, which is the defect this mode exists
+                        # for.
+                        with contextlib.suppress(Exception, SystemExit):
+                            module.main(["--model", "stub", *demo_argv(module, tmpdir)])
                 self.assertNotEqual(
                     scripted.strip(),
                     echo.getvalue().strip(),
