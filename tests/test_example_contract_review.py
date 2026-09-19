@@ -284,10 +284,24 @@ class DecidedByTests(unittest.TestCase):
 class ScriptedCommandTests(unittest.TestCase):
     def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
         """If these two drift apart, the command on the page stops demonstrating what this test
-        says the example does."""
+        says the example does. The command's entries are keyed on the rule id rather than
+        ordered, because `run` makes its six calls from a thread pool; the replies themselves
+        are the same ones."""
         from examples.contract_review.__main__ import SCRIPTED
 
-        self.assertEqual(SCRIPTED, SEQUENCE)
+        self.assertEqual([entry.reply for entry in SCRIPTED], SEQUENCE)
+
+    def test_each_entry_is_keyed_on_the_one_prompt_it_belongs_to(self) -> None:
+        # An ordered sequence would hand a rule whichever reply the race produced, and the demo
+        # would print another rule's finding under this rule's name.
+        from examples.contract_review.__main__ import SCRIPTED
+
+        prompts = {rule.id: _prompt_for_rule(rule, SAMPLE_INPUT) for rule in CHECKLIST}
+        for entry in SCRIPTED:
+            with self.subTest(when=entry.when):
+                matching = [rule_id for rule_id, prompt in prompts.items() if entry.when in prompt]
+                self.assertEqual(len(matching), 1, f"{entry.when!r} matches {matching}")
+                self.assertIn(f'"rule": "{matching[0]}"', entry.reply)
 
 
 class ClauseParsingTests(unittest.TestCase):

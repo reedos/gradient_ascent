@@ -33,6 +33,8 @@ which call ran out instead of raising `IndexError`.
 from __future__ import annotations
 
 import argparse
+import threading
+from dataclasses import dataclass
 from typing import Sequence
 
 from examples.common.model import (
@@ -51,7 +53,7 @@ SCRIPTED_SPEC = "stub:scripted"
 
 MODEL_HELP = "stub | stub:scripted | ollama:<tag> | claude:<id>"
 
-Script = Sequence["str | StubResponse"]
+Script = Sequence["str | StubResponse | WhenAsked"]
 
 
 def parse_args(
@@ -80,11 +82,18 @@ def parse_args(
             "build_embedder has no claude: branch (see examples/common/model.py)."
         ),
     )
+    if default_question is None:
+        help_text = "the question to answer"
+    else:
+        # argparse runs a help string through %-formatting, so a literal % in a default (a
+        # contract's "forty-five (45) days ... 2% discount", say) raises at add_argument time.
+        shown = default_question if len(default_question) <= 60 else default_question[:57] + "..."
+        help_text = "defaults to " + repr(shown).replace("%", "%%")
     parser.add_argument(
         "--question",
         required=default_question is None,
         default=default_question,
-        help="the question to answer" if default_question is None else f"defaults to {default_question!r}",
+        help=help_text,
     )
     return parser.parse_args(argv)
 
@@ -119,32 +128,88 @@ def _excerpt(messages: list[Message], role: str, limit: int = 160) -> str:
     return text if len(text) <= limit else text[:limit] + "..."
 
 
-def scripted_stub(script: Script, *, example: str, model_id: str = "stub-scripted") -> StubModel:
-    """A `StubModel` that returns `script` in order, one entry per `complete` call.
+@dataclass(frozen=True)
+class WhenAsked:
+    """One scripted reply chosen by what the call asks for, rather than by call order.
 
-    Entries are plain strings, or `StubResponse` where a call has to return a tool call. Running
-    past the end raises `ScriptExhausted` naming the call number and what was being asked, so a
-    sequence that has fallen behind the example says so on the first run rather than producing a
-    silently truncated demo.
+    For an example that makes its calls in parallel (`contract_review` and `parallelization` both
+    use a thread pool), there is no call order to script against: whichever thread reaches the
+    model first takes the first reply, so an ordered sequence pairs a rule with another rule's
+    finding from one run to the next. That is worse than an echo, because it prints a confident
+    answer about the wrong thing.
+
+    `when` is a substring that appears in that call's prompt and in no other's. Each entry is
+    used once.
     """
-    responses = [StubResponse(text=entry) if isinstance(entry, str) else entry for entry in script]
+
+    when: str
+    reply: str | StubResponse
+
+
+def _as_response(entry: str | StubResponse) -> StubResponse:
+    return StubResponse(text=entry) if isinstance(entry, str) else entry
+
+
+def scripted_stub(script: Script, *, example: str, model_id: str = "stub-scripted") -> StubModel:
+    """A `StubModel` that plays `script`, one entry per `complete` call.
+
+    Entries are plain strings, or `StubResponse` where a call has to return a tool call, and are
+    consumed in order. A sequence made entirely of `WhenAsked` entries is matched against each
+    call's prompt instead, for an example whose calls run in parallel.
+
+    Running past the end of an ordered sequence, or asking something no `WhenAsked` entry covers,
+    raises `ScriptExhausted` naming the call and what it was asking for, so a sequence that has
+    fallen behind its example says so on the first run rather than producing a silently truncated
+    or mispaired demo.
+    """
+    keyed = [entry for entry in script if isinstance(entry, WhenAsked)]
+    if keyed and len(keyed) != len(script):
+        raise ValueError(
+            f"examples/{example}/__main__.py mixes WhenAsked entries with ordered ones. A "
+            f"sequence is either all ordered or all matched on the prompt, never half of each."
+        )
+    lock = threading.Lock()
+
+    if keyed:
+        seen = set()
+
+        def responder(messages: list[Message], tools: list[dict] | None) -> StubResponse:
+            del tools
+            prompt = "\n".join(content_text(m.content) for m in messages)
+            with lock:
+                matches = [e for e in keyed if e.when in prompt and id(e) not in seen]
+                if len(matches) != 1:
+                    raise ScriptExhausted(
+                        f"{example}: {len(matches)} of the {len(keyed)} WhenAsked entries in "
+                        f"SCRIPTED match this call, and exactly one must.\n"
+                        f"  system: {_excerpt(messages, 'system') or '(none)'}\n"
+                        f"  user:   {_excerpt(messages, 'user') or '(none)'}\n"
+                        f"Each `when` has to appear in one call's prompt and no other's."
+                    )
+                seen.add(id(matches[0]))
+                return _as_response(matches[0].reply)
+
+        return StubModel(responder, model_id=model_id)
+
+    responses = [_as_response(entry) for entry in script]
     calls = {"n": 0}
 
     def responder(messages: list[Message], tools: list[dict] | None) -> StubResponse:
         del tools
-        index = calls["n"]
-        if index >= len(responses):
-            raise ScriptExhausted(
-                f"{example}: the scripted stub ran out on model call {index + 1}; SCRIPTED in "
-                f"examples/{example}/__main__.py has {len(responses)} "
-                f"{'reply' if len(responses) == 1 else 'replies'}.\n"
-                f"  call {index + 1} system: {_excerpt(messages, 'system') or '(none)'}\n"
-                f"  call {index + 1} user:   {_excerpt(messages, 'user') or '(none)'}\n"
-                f"Add the reply that call should get to SCRIPTED, in order, and to the sequence "
-                f"tests/test_example_{example}.py asserts against."
-            )
-        calls["n"] = index + 1
-        return responses[index]
+        with lock:
+            index = calls["n"]
+            if index >= len(responses):
+                raise ScriptExhausted(
+                    f"{example}: the scripted stub ran out on model call {index + 1}; SCRIPTED in "
+                    f"examples/{example}/__main__.py has {len(responses)} "
+                    f"{'reply' if len(responses) == 1 else 'replies'}.\n"
+                    f"  call {index + 1} system: {_excerpt(messages, 'system') or '(none)'}\n"
+                    f"  call {index + 1} user:   {_excerpt(messages, 'user') or '(none)'}\n"
+                    f"Add the reply that call should get to SCRIPTED, in order, and to the sequence "
+                    f"tests/test_example_{example}.py asserts against."
+                )
+            calls["n"] = index + 1
+            return responses[index]
 
     return StubModel(responder, model_id=model_id)
 

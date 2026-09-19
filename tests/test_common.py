@@ -331,6 +331,43 @@ class ScriptedStubTests(unittest.TestCase):
             cli.build_cli_model(cli.SCRIPTED_SPEC, example="demo", script=None)
         self.assertIn("SCRIPTED", str(caught.exception))
 
+    def test_a_percent_sign_in_a_default_question_does_not_break_argparse(self) -> None:
+        # argparse runs a help string through %-formatting. contract_review's SAMPLE_INPUT is a
+        # whole agreement, interest rate included, and passing it raised at add_argument time, so
+        # every invocation of that example crashed, not only --help.
+        args = cli.parse_args([], description="d", default_question="pay 1.5% monthly, per clause 5")
+        self.assertEqual(args.question, "pay 1.5% monthly, per clause 5")
+
+    def test_an_ordered_sequence_is_safe_to_play_from_several_threads(self) -> None:
+        # contract_review and parallelization both call the model from a thread pool. Without a
+        # lock, two threads read the same counter before either writes it back, so one reply is
+        # played twice and another never at all.
+        from concurrent.futures import ThreadPoolExecutor
+
+        model = cli.scripted_stub([str(i) for i in range(50)], example="demo")
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            replies = list(pool.map(lambda _: model.complete([Message(role="user", content="q")]).text, range(50)))
+        self.assertEqual(sorted(replies, key=int), [str(i) for i in range(50)])
+
+    def test_a_when_asked_sequence_pairs_each_reply_with_its_own_prompt(self) -> None:
+        # The fix for a thread pool: there is no call order to script against, so match on what
+        # the call asks. Ordered entries would pair a rule with whichever reply the race produced.
+        script = [cli.WhenAsked("rule alpha", "A"), cli.WhenAsked("rule beta", "B")]
+        model = cli.scripted_stub(script, example="demo")
+        self.assertEqual(model.complete([Message(role="user", content="check rule beta now")]).text, "B")
+        self.assertEqual(model.complete([Message(role="user", content="check rule alpha now")]).text, "A")
+
+    def test_a_when_asked_entry_is_used_once_and_an_unmatched_call_says_so(self) -> None:
+        model = cli.scripted_stub([cli.WhenAsked("rule alpha", "A")], example="demo")
+        model.complete([Message(role="user", content="rule alpha")])
+        with self.assertRaises(cli.ScriptExhausted) as caught:
+            model.complete([Message(role="user", content="rule alpha")])
+        self.assertIn("0 of the 1 WhenAsked entries", str(caught.exception))
+
+    def test_a_sequence_cannot_be_half_ordered_and_half_matched(self) -> None:
+        with self.assertRaises(ValueError):
+            cli.scripted_stub(["first", cli.WhenAsked("rule alpha", "A")], example="demo")
+
     def test_the_scripted_spec_builds_the_stub_embedder_rather_than_being_rejected(self) -> None:
         # build_embedder knows nothing about stub:scripted, so an example that retrieves would
         # fail on the spec rather than run. There is nothing to script about a vector.
