@@ -151,7 +151,7 @@ fails when:
 
 Each example's own `tests/test_example_<name>.py` additionally asserts that the sequence it
 scripts for its end-to-end test is the same sequence `SCRIPTED` holds. A sequence kept anywhere
-but beside the example drifts from it silently, and the first symptom is a published page whose
+but beside the example drifts from it silently, and the first symptom is a page whose
 Run it command demonstrates a truncated version of something else.
 
 ## Adding an example

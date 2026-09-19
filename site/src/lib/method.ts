@@ -77,7 +77,7 @@ export function methodSections(abs: (path: string) => string): MethodSection[] {
             '**Stay current and say how current.** Every page and every name carries the date it was last checked. Anything not checked in 90 days is flagged.',
             '**One site for beginners and experts.** Each page has a version with no code and a version with code. Both describe the same technique.',
             '**Independent.** No rankings, no sponsorship, no affiliate links. Where several companies make something, the page names more than one.',
-            '**Open.** MIT licensed. The taxonomy, the registry and the result files are published as data. Corrections are welcome.',
+            '**Open.** MIT licensed. The taxonomy, the registry and the result files are served as data. Corrections are welcome.',
             '**Private data stays private.** Examples, traces and test documents are synthetic.',
           ],
         },
