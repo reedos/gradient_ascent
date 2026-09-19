@@ -14,19 +14,23 @@ was watching for it. This is what watches.
 What it reports per source:
 
   gone        the URL does not resolve, after a retry, and we have no archived copy of it
-  archived    the original does not resolve, but this citation already records an archive_url,
-              which is the copy the page actually quotes: handled, not a defect
+  archived    the original does not resolve, or no longer serves the page we named, but this
+              citation already records an archive_url, which is the copy the page actually
+              quotes: handled, not a defect
   moved       it redirects somewhere else (the new address is printed)
   drifted     it resolves, but the page's own <title> no longer resembles the title we cite
-  blocked     the host refuses automated requests; not a defect, read it by hand. Meta, OpenAI
-              and ISO answer a script with 400, 403 or a challenge however the request is dressed
+  blocked     the host refuses automated requests, twice; not a defect, read it by hand. Meta
+              and ISO answer a script with 400 or 403 however the request is dressed
 
   ok          resolves, and the title still matches
 
 A first version of this script reported six sources gone and three of those were its own fault:
 one transient network error it never retried, one redirect it read as a failure, and one host
 that answers a script with 400 rather than 403. Hence the retry, the redirect handling and the
-wider set of refusal codes. A checker that cries wolf gets ignored, which is worse than no
+wider set of refusal codes. The 09/19/2026 run then cried wolf a second way: asking for several
+hundred pages at once got eight of them rate-limited, which reads as a refusal on one try, and
+two of those came back as a challenge page whose title looked like drift. Hence the second fetch
+after a pause when a host refuses. A checker that cries wolf gets ignored, which is worse than no
 checker.
 
 It makes no judgement about the words quoted from a page. Only a person re-reading the page can
@@ -118,7 +122,9 @@ def _title_of(html: str) -> str:
 
 
 # A page that answers 200 with one of these is refusing a script, not serving the page. Microsoft
-# does this: the body is "Your request has been blocked."
+# does this: the body is "Your request has been blocked." PyPI does it under load: the body is a
+# 228-byte page titled "Client Challenge". Read as a title, that looked like drift on two release
+# histories in the 09/19/2026 run, which it was not.
 _BLOCK_SIGNS = (
     "your request has been blocked",
     "request blocked",
@@ -126,6 +132,7 @@ _BLOCK_SIGNS = (
     "are you a robot",
     "enable javascript and cookies to continue",
     "checking your browser",
+    "client challenge",
 )
 
 
@@ -170,14 +177,8 @@ def _fetch(url: str, timeout: float) -> tuple[str, str, str]:
         return url, "", type(err).__name__
 
 
-def _check(source: Source, timeout: float) -> dict:
-    final, body, error = _fetch(source.url, timeout)
-    if error and not error.startswith(("refused", "redirect", "HTTP")):
-        # A transient failure looks exactly like a dead host on one try. Ask twice before saying
-        # a source is gone: the first version of this script called a live page dead this way.
-        time.sleep(1.5)
-        final, body, error = _fetch(source.url, timeout)
-
+def _classify(source: Source, final: str, body: str, error: str) -> dict:
+    """One fetch's outcome, as a state. Pure, so the rules can be tested without a network."""
     if error.startswith("refused"):
         return {**source._asdict(), "state": "blocked", "detail": error, "final": source.url}
     if error.startswith("redirect"):
@@ -194,8 +195,34 @@ def _check(source: Source, timeout: float) -> dict:
     if final.rstrip("/") != source.url.rstrip("/"):
         return {**source._asdict(), "state": "moved", "detail": actual, "final": final}
     if not _resembles(source.title, actual):
-        return {**source._asdict(), "state": "drifted", "detail": actual, "final": final}
+        # A citation that already records an archived copy quotes that copy, not the live page.
+        # The original drifting out from under it is the case archive_url was written for, so it
+        # is handled rather than a defect. Neeva's post is the worked example: neeva.com answers
+        # with a redirect stub now, and the capture of the publication day holds the wording.
+        state = "archived" if source.archive else "drifted"
+        return {**source._asdict(), "state": state, "detail": actual, "final": final}
     return {**source._asdict(), "state": "ok", "detail": actual, "final": final}
+
+
+def _check(source: Source, timeout: float) -> dict:
+    final, body, error = _fetch(source.url, timeout)
+    if error and not error.startswith(("refused", "redirect", "HTTP")):
+        # A transient failure looks exactly like a dead host on one try. Ask twice before saying
+        # a source is gone: the first version of this script called a live page dead this way.
+        time.sleep(1.5)
+        final, body, error = _fetch(source.url, timeout)
+
+    result = _classify(source, final, body, error)
+    if result["state"] == "blocked":
+        # A rate limit is indistinguishable from a ban on one try, and this script asks for
+        # several hundred pages at once. In the 09/19/2026 run that cost six false positives on
+        # openai.com and two on pypi.org: every one of them served the page when asked again
+        # after a pause. Wait longer than a burst window and ask once more before calling a host
+        # closed to us.
+        time.sleep(6.0)
+        final, body, error = _fetch(source.url, timeout)
+        result = _classify(source, final, body, error)
+    return result
 
 
 def main() -> int:

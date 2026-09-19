@@ -498,8 +498,9 @@
         "url": "https://courses.cs.umbc.edu/331/papers/eliza.html",
         "publisher": "Communications of the ACM, vol. 9 no. 1, January 1966 (mirror; the ACM Digital Library and cacm.acm.org copies both return 403 to this site's fetcher)"
       },
-      "checked": "2026-09-18",
-      "verified": true
+      "checked": "2026-09-19",
+      "verified": true,
+      "note": "The ACM Digital Library and cacm.acm.org both refuse this site's fetcher, so the paper is read from a university mirror of it. The sentence quoted here was checked against that mirror's text on September 19, 2026."
     },
     {
       "id": "elasticsearch-first-release",
@@ -725,13 +726,13 @@
       "registry_id": "chatgpt",
       "source": {
         "title": "ChatGPT",
-        "url": "https://openai.com/blog/chatgpt/",
+        "url": "https://openai.com/index/chatgpt/",
         "publisher": "OpenAI",
         "archive_url": "https://web.archive.org/web/20221206000504id_/https://openai.com/blog/chatgpt/"
       },
-      "checked": "2026-09-18",
+      "checked": "2026-09-19",
       "verified": true,
-      "note": "openai.com returns 403 to this site's fetcher, confirmed again on September 18, 2026. The Internet Archive's capture of OpenAI's own post, taken December 6, 2022, opens and shows both the date and the wording quoted here; that capture is recorded in source.archive_url.",
+      "note": "OpenAI moved the post from /blog/chatgpt/ to /index/chatgpt/ and has edited it since: the live page still carries the first sentence quoted here, but the research preview sentence is gone from it. The Internet Archive's capture of December 6, 2022, recorded in source.archive_url, carries both, and is what this site quotes.",
       "availability": "preview"
     },
     {
@@ -957,13 +958,13 @@
       "registry_id": "openai-api",
       "source": {
         "title": "Introducing Text and Code Embeddings in the OpenAI API",
-        "url": "https://openai.com/blog/introducing-text-and-code-embeddings",
+        "url": "https://openai.com/index/introducing-text-and-code-embeddings/",
         "archive_url": "https://web.archive.org/web/20220201184422id_/https://openai.com/blog/introducing-text-and-code-embeddings/",
         "publisher": "OpenAI"
       },
-      "checked": "2026-09-18",
+      "checked": "2026-09-19",
       "verified": true,
-      "note": "openai.com returns 403 here; read through the Internet Archive's capture of February 1, 2022."
+      "note": "OpenAI moved the post from /blog/ to /index/. Both sentences quoted here were checked against OpenAI's own live page on September 19, 2026; the Internet Archive's capture of February 1, 2022 carries the same words and is kept as a fallback for when openai.com refuses this site's fetcher."
     },
     {
       "id": "llamaindex-2022",
@@ -1001,10 +1002,10 @@
         "archive_url": "https://web.archive.org/web/20230106113818id_/https://neeva.com/blog/introducing-neevaai",
         "publisher": "Neeva"
       },
-      "checked": "2026-09-18",
+      "checked": "2026-09-19",
       "verified": true,
       "availability": "general",
-      "note": "neeva.com no longer serves the post; the Internet Archive captured it on the day it was published. Perplexity and You.com's YouChat were answering from search results in December 2022, but neither maker has a dated page for it that this site could open."
+      "note": "Neeva's own address now serves only a redirect stub, so the post is read from the Internet Archive's capture of the day it was published, recorded in source.archive_url. Perplexity and You.com's YouChat were answering from search results in December 2022, but neither maker has a dated page for it that this site could open."
     },
     {
       "id": "bing-ai-search-2023",
@@ -1220,8 +1221,9 @@
         "url": "https://pypi.org/project/langchain/#history",
         "publisher": "Python Package Index"
       },
-      "checked": "2026-09-18",
-      "verified": true
+      "checked": "2026-09-19",
+      "verified": true,
+      "note": "Checked again on September 19, 2026 against PyPI's own release page for version 0.0.1, which reads \"Released: Oct 25, 2022\", and against PyPI's JSON API for the package. PyPI answers a burst of automated requests with a challenge page rather than the release history, so read it one request at a time."
     },
     {
       "id": "zapier-openai-2022",
@@ -1236,14 +1238,14 @@
       "registry_id": "zapier",
       "source": {
         "title": "OpenAI Integrations",
-        "url": "https://zapier.com/apps/openai/integrations",
+        "url": "https://zapier.com/apps/chatgpt/integrations",
         "archive_url": "https://web.archive.org/web/20221209043525id_/https://zapier.com/apps/openai/integrations",
         "publisher": "Zapier"
       },
-      "checked": "2026-09-18",
+      "checked": "2026-09-19",
       "verified": true,
       "availability": "general",
-      "note": "December 9, 2022 is the date of the earliest Internet Archive capture of this page, not a date Zapier states. The page describes the app as “OpenAI integration for GPT-3 or DALL-E”. Zapier's earlier AI by Zapier beta (announced January 5, 2021) was invite-only, so it is not used here."
+      "note": "December 9, 2022 is the date of the earliest Internet Archive capture of this page, not a date Zapier states. The page describes the app as “OpenAI integration for GPT-3 or DALL-E”. Zapier has since moved it to /apps/chatgpt/integrations and renamed it ChatGPT (OpenAI); the wording quoted here is the captured page's, recorded in source.archive_url. Zapier's earlier AI by Zapier beta (announced January 5, 2021) was invite-only, so it is not used here."
     },
     {
       "id": "m365-copilot-2023",
@@ -1286,12 +1288,13 @@
       "registry_id": "m365-copilot",
       "source": {
         "title": "Microsoft 365 Copilot is generally available",
-        "url": "https://techcommunity.microsoft.com/blog/microsoft365copilotblog/microsoft-365-copilot-is-generally-available/3969331",
+        "url": "https://techcommunity.microsoft.com/blog/microsoft-copilot-blog/microsoft-365-copilot-is-generally-available/3969331",
         "publisher": "Microsoft"
       },
-      "checked": "2026-09-18",
+      "checked": "2026-09-19",
       "verified": true,
-      "availability": "paid plans"
+      "availability": "paid plans",
+      "note": "Microsoft renamed the blog's path from microsoft365copilotblog to microsoft-copilot-blog. The sentence quoted here was checked against the post at its new address on September 19, 2026."
     },
     {
       "id": "semantic-router-2023",
@@ -1309,8 +1312,9 @@
         "url": "https://pypi.org/project/semantic-router/#history",
         "publisher": "Python Package Index"
       },
-      "checked": "2026-09-18",
-      "verified": true
+      "checked": "2026-09-19",
+      "verified": true,
+      "note": "Checked again on September 19, 2026 against PyPI's JSON API for the package, which gives 0.0.1 an upload time of November 9, 2023. PyPI answers a burst of automated requests with a challenge page rather than the release history, so read it one request at a time."
     },
     {
       "id": "power-automate-gpt-prompts-2023",
@@ -1721,14 +1725,14 @@
       "registry_id": "replit-agent",
       "source": {
         "title": "Introducing Replit Agent",
-        "url": "https://blog.replit.com/introducing-replit-agent",
+        "url": "https://replit.com/blog/introducing-replit-agent",
         "archive_url": "https://web.archive.org/web/20240917121035id_/https://blog.replit.com/introducing-replit-agent",
         "publisher": "Replit"
       },
-      "checked": "2026-09-18",
+      "checked": "2026-09-19",
       "verified": true,
       "availability": "paid plans",
-      "note": "Replit's post is dated Mon, Sep 16, 2024 and says the launch was “last week”, so September 16 is not the launch date. The date marked is September 5, 2024: that day Replit's chief executive posted “Announcing Replit Agent in early access—available today for subscribers”, and the Internet Archive stored the post's own data, with created_at 2024-09-05T16:27:35Z, eight minutes later (https://web.archive.org/web/20240905162735id_/https://twitter.com/amasad/status/1831730911685308857). The post is quoted for what the product did; the date comes from the launch-day statement. Earlier, rougher products at this level exist (AgentGPT, live by April 9, 2023) and are under review."
+      "note": "Replit moved the post from blog.replit.com to replit.com/blog. Replit's post is dated Mon, Sep 16, 2024 and says the launch was “last week”, so September 16 is not the launch date. The date marked is September 5, 2024: that day Replit's chief executive posted “Announcing Replit Agent in early access—available today for subscribers”, and the Internet Archive stored the post's own data, with created_at 2024-09-05T16:27:35Z, eight minutes later (https://web.archive.org/web/20240905162735id_/https://twitter.com/amasad/status/1831730911685308857). The post is quoted for what the product did; the date comes from the launch-day statement. Earlier, rougher products at this level exist (AgentGPT, live by April 9, 2023) and are under review."
     },
     {
       "id": "openai-realtime-api-2024",
@@ -1762,13 +1766,14 @@
       "registry_id": "devin",
       "source": {
         "title": "Devin is now generally available",
-        "url": "https://www.cognition.ai/blog/devin-generally-available",
+        "url": "https://cognition.com/blog/devin-generally-available",
         "archive_url": "https://web.archive.org/web/20241212002718id_/https://www.cognition.ai/blog/devin-generally-available",
         "publisher": "Cognition"
       },
-      "checked": "2026-09-18",
+      "checked": "2026-09-19",
       "verified": true,
-      "availability": "general"
+      "availability": "general",
+      "note": "Cognition moved its site from cognition.ai to cognition.com. Both sentences quoted here were checked against the post at its new address on September 19, 2026."
     },
     {
       "id": "gemini-deep-research-2024",

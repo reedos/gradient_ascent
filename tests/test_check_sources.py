@@ -60,6 +60,48 @@ class BlockSignTests(unittest.TestCase):
             self.assertEqual(sign, sign.lower())
 
 
+def _source(url: str = "https://example.com/p", title: str = "A Page", archive: str = "") -> object:
+    return check_sources.Source(url=url, title=title, where="test", archive=archive)
+
+
+class ClassifyTests(unittest.TestCase):
+    """The state rules, with the fetch handed in. Each of these was a wrong answer the checker
+    gave on a real source before the rule existed."""
+
+    def _state(self, source, final=None, body="", error="") -> str:
+        return check_sources._classify(source, final or source.url, body, error)["state"]
+
+    def test_the_page_we_named_is_ok(self) -> None:
+        self.assertEqual(self._state(_source(), body="<title>A Page</title>"), "ok")
+
+    def test_a_different_final_url_is_moved(self) -> None:
+        result = check_sources._classify(_source(), "https://example.com/moved", "<title>A Page</title>", "")
+        self.assertEqual(result["state"], "moved")
+        self.assertEqual(result["final"], "https://example.com/moved")
+
+    def test_a_dead_url_with_no_capture_is_gone_and_with_one_is_archived(self) -> None:
+        self.assertEqual(self._state(_source(), error="URLError"), "gone")
+        self.assertEqual(self._state(_source(archive="https://web.archive.org/x"), error="URLError"), "archived")
+
+    def test_pypis_challenge_page_is_a_refusal_not_drift(self) -> None:
+        """PyPI answers a burst of requests with a 228-byte page titled "Client Challenge".
+        Read as a title that is drift, and it was reported as drift on two release histories."""
+        body = "<html><title>Client Challenge</title><body>...</body></html>"
+        self.assertEqual(self._state(_source(title="langchain release history"), body=body), "blocked")
+
+    def test_drift_on_a_citation_that_records_a_capture_is_archived(self) -> None:
+        """Neeva's post: neeva.com serves a redirect stub now, and the citation already records
+        the capture of the publication day, which is the copy the milestone quotes."""
+        body = "<html><title>Redirecting...</title></html>"
+        self.assertEqual(self._state(_source(title="Introducing NeevaAI"), body=body), "drifted")
+        with_capture = _source(title="Introducing NeevaAI", archive="https://web.archive.org/web/2023id_/x")
+        self.assertEqual(self._state(with_capture, body=body), "archived")
+
+    def test_a_refusal_code_is_blocked_and_a_declined_redirect_is_moved(self) -> None:
+        self.assertEqual(self._state(_source(), error="refused: HTTP 403"), "blocked")
+        self.assertEqual(self._state(_source(), final="https://example.com/q", error="redirect: HTTP 307"), "moved")
+
+
 class SourceCollectionTests(unittest.TestCase):
     def test_the_real_content_files_yield_sources_with_a_place_to_look(self) -> None:
         sources = check_sources._json_sources() + check_sources._mdx_sources()
