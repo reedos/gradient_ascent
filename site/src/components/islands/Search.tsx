@@ -124,8 +124,8 @@ export default function Search() {
       {!loadError && trimmed === '' && (
         <div className="search-empty">
           <p>
-            Type a word to search every technique, recipe, level, glossary term, name and failure
-            mode on the site. Not sure where to start? The{' '}
+            Type a word to search every technique, recipe, teardown, thread, level, glossary term,
+            name and failure mode on the site. Not sure where to start? The{' '}
             <a href={url('/worksheet/')}>worksheet</a> finds the right level for a task in a few
             questions, and the <a href={url('/glossary/')}>glossary</a> defines every term the
             site uses.

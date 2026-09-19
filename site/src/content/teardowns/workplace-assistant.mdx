@@ -119,8 +119,9 @@ Neither maker publishes a number for how often a citation actually supports the 
 it, and this page does not invent one. Underneath the permission check, both systems are still a
 search, and <Link href="/techniques/rag/">RAG</Link>'s own failure modes predict the rest: a
 chunk boundary splitting a fact in two, a passage cited without being the one the answer actually
-used, two sources disagreeing with no sign either was checked. A permission check that correctly hides a
-document you can't see says nothing about whether the document it did show you was the right one.
+used, two sources disagreeing with no sign either was checked. The permission check decides which
+documents an answer may draw on. It does not decide whether the ones it drew on support the
+sentence they are attached to.
 
 ## If you build one
 
