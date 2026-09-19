@@ -18,6 +18,13 @@ without the result looking any different: the split is a deterministic, disjoint
 given seed; every held-out question is asked exactly once, after selection, and only under the
 selected instruction; and a tie resolves to the first candidate in list order, which means a run
 whose candidates all tie has selected nothing at all.
+
+`max_questions` bounds the search. The full set costs one call per question per candidate plus
+the held-out pass, which is 80 calls on the 32 exact-graded questions, more than a demonstration
+needs. It takes the first `n` questions of the set rather than sampling, so two runs of the same
+bound search the same questions, and it is applied before the split rather than after, so a
+bounded run is a smaller version of the same procedure and not a different one. What it does
+narrow is what a score is evidence about: 4/4 on four questions is four questions.
 """
 from __future__ import annotations
 
@@ -100,11 +107,20 @@ def run(
     questions_path: Path = DEFAULT_QUESTIONS_PATH,
     instructions: list[str] | None = None,
     held_out_fraction: float = 0.25,
+    max_questions: int | None = None,
     seed: int = 0,
 ) -> OptimizationResult:
     instructions = instructions if instructions is not None else CANDIDATE_INSTRUCTIONS
     questions = load_exact_questions(questions_path)
-    tracer.record(kind="code", decided_by="code", title="Load exact-graded questions", detail=f"{len(questions)} questions")
+    loaded = len(questions)
+    if max_questions is not None:
+        if max_questions < 1:
+            raise ValueError(f"max_questions={max_questions} leaves no questions to search over")
+        questions = questions[:max_questions]
+    detail = f"{len(questions)} questions"
+    if len(questions) < loaded:
+        detail = f"{len(questions)} of {loaded} questions, bounded by max_questions={max_questions}"
+    tracer.record(kind="code", decided_by="code", title="Load exact-graded questions", detail=detail)
 
     dev, held_out = split_dev_held_out(questions, held_out_fraction=held_out_fraction, seed=seed)
     if not dev:

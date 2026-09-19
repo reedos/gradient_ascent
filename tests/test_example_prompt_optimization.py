@@ -3,6 +3,8 @@ split, the best-scoring one is selected, and only the selected candidate is then
 held-out split. No model beyond StubModel is ever called."""
 from __future__ import annotations
 
+import contextlib
+import io
 import json
 import sys
 import tempfile
@@ -17,12 +19,13 @@ from examples.common.model import Message, StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
 from examples.prompt_optimization.run import run, split_dev_held_out  # noqa: E402
 from examples.distillation.run import load_exact_questions  # noqa: E402
-from examples.prompt_optimization.__main__ import DEMO_QUESTIONS, SCRIPTED  # noqa: E402
+from examples.prompt_optimization.__main__ import DEMO_ARGV, DEMO_MAX_QUESTIONS, SCRIPTED  # noqa: E402
+from examples.prompt_optimization.__main__ import main as demo_main  # noqa: E402
 
 QUESTIONS_PATH = ROOT / "evals" / "questions.json"
 
 # The same 14 replies examples/prompt_optimization/__main__.py scripts for `--model
-# stub:scripted --demo-subset`: three candidates scored on 4 development questions (12 calls,
+# stub:scripted --max-questions 6`: three candidates scored on 4 development questions (12 calls,
 # only the middle candidate answering correctly), then that winner scored on 2 held-out questions.
 _WRONG = "I have no idea."
 SEQUENCE = [
@@ -266,6 +269,77 @@ class RunTests(unittest.TestCase):
         self.assertIn("tracer", rec.reason)
 
 
+class MaxQuestionsTests(unittest.TestCase):
+    """`max_questions` bounds the search. It has to bound it without changing what the run is:
+    same questions, same grading, same split rule, fewer of them."""
+
+    def _count_calls(self, **kwargs) -> int:
+        asked: list[str] = []
+
+        def responder(messages: list[Message], tools: list[dict] | None) -> StubResponse:
+            asked.append(messages[-1].content)
+            return StubResponse(text="nope")
+
+        model = StubModel(responder)
+        tracer = Tracer(example="prompt_optimization", level=1, model_id=model.model_id)
+        run(tracer, model, questions_path=QUESTIONS_PATH, **kwargs)
+        return len(asked)
+
+    def test_none_searches_the_whole_set(self) -> None:
+        questions = load_exact_questions(QUESTIONS_PATH)
+        dev, held_out = split_dev_held_out(questions, held_out_fraction=0.25, seed=0)
+        from examples.prompt_optimization.run import CANDIDATE_INSTRUCTIONS
+
+        self.assertEqual(
+            self._count_calls(max_questions=None),
+            len(dev) * len(CANDIDATE_INSTRUCTIONS) + len(held_out),
+        )
+
+    def test_a_bound_cuts_the_calls_to_the_bounded_set(self) -> None:
+        # 6 questions: 4 development x 3 candidates, plus 2 held-out for the winner.
+        self.assertEqual(self._count_calls(max_questions=6), 14)
+
+    def test_the_bound_takes_the_first_n_so_two_runs_search_the_same_questions(self) -> None:
+        """Sampling would make a bounded score depend on which questions a run happened to draw,
+        which is not a bound, it is a different measurement each time."""
+        full = load_exact_questions(QUESTIONS_PATH)
+        asked_per_run = []
+        for _ in range(2):
+            seen: list[str] = []
+
+            def responder(messages: list[Message], tools: list[dict] | None) -> StubResponse:
+                seen.append(messages[-1].content)
+                return StubResponse(text="nope")
+
+            model = StubModel(responder)
+            tracer = Tracer(example="prompt_optimization", level=1, model_id=model.model_id)
+            run(tracer, model, questions_path=QUESTIONS_PATH, max_questions=6)
+            asked_per_run.append(sorted(set(seen)))
+        self.assertEqual(asked_per_run[0], asked_per_run[1])
+        self.assertEqual(asked_per_run[0], sorted(q.text for q in full[:6]))
+
+    def test_a_bound_larger_than_the_set_is_the_whole_set(self) -> None:
+        questions = load_exact_questions(QUESTIONS_PATH)
+        self.assertEqual(self._count_calls(max_questions=len(questions) + 50), self._count_calls())
+
+    def test_a_bound_below_one_is_refused_rather_than_returning_an_empty_search(self) -> None:
+        model = StubModel(lambda messages, tools: StubResponse(text="nope"))
+        tracer = Tracer(example="prompt_optimization", level=1, model_id=model.model_id)
+        with self.assertRaises(ValueError):
+            run(tracer, model, questions_path=QUESTIONS_PATH, max_questions=0)
+
+    def test_the_trace_says_the_search_was_bounded(self) -> None:
+        """A bounded score read as a full-set score is the thing that makes a demo dishonest, so
+        the run records how many of how many it actually searched."""
+        model = StubModel(lambda messages, tools: StubResponse(text="nope"))
+        tracer = Tracer(example="prompt_optimization", level=1, model_id=model.model_id)
+        run(tracer, model, questions_path=QUESTIONS_PATH, max_questions=6)
+
+        loaded = [s for s in tracer.steps if s.title == "Load exact-graded questions"]
+        self.assertEqual(len(loaded), 1)
+        self.assertIn("6 of 32", loaded[0].detail)
+
+
 class ScriptedCommandTests(unittest.TestCase):
     def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
         """If these two drift apart, the command on the page stops demonstrating what this test
@@ -273,21 +347,42 @@ class ScriptedCommandTests(unittest.TestCase):
         self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
 
     def test_the_scripted_sequence_selects_the_real_winner_and_confirms_it_on_held_out(self) -> None:
-        # DEMO_QUESTIONS is the small, real subset --demo-subset writes to disk; write it here
-        # the same way and run the exact sequence SCRIPTED plays, to prove the 14-call demo
-        # actually shows a search finding a winner, not a tie the way --model stub alone does.
-        with tempfile.TemporaryDirectory() as tmp:
-            questions_path = _write_questions(Path(tmp), DEMO_QUESTIONS["questions"])
-            model = StubModel([StubResponse(text=t) for t in SEQUENCE])
-            tracer = Tracer(example="prompt_optimization", level=1, model_id=model.model_id)
-            result = run(tracer, model, questions_path=questions_path)
+        # The demo runs against the site's own question set, bounded to DEMO_MAX_QUESTIONS. Run
+        # the exact sequence SCRIPTED plays against that same set, to prove the 14-call demo
+        # shows a search finding a winner, not a tie the way --model stub alone does.
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+        tracer = Tracer(example="prompt_optimization", level=1, model_id=model.model_id)
+        result = run(tracer, model, questions_path=QUESTIONS_PATH, max_questions=DEMO_MAX_QUESTIONS)
 
-            winner = "You are a Halvorsen appliance support assistant. Answer in one or two plain sentences, with no citations and no hedging."
-            self.assertEqual(result.selected, winner)
-            by_instruction = {c.instruction: (c.dev_correct, c.dev_total) for c in result.candidates}
-            self.assertEqual(by_instruction[winner], (4, 4))
-            self.assertEqual(result.held_out_correct, 2)
-            self.assertEqual(result.held_out_total, 2)
+        winner = "You are a Halvorsen appliance support assistant. Answer in one or two plain sentences, with no citations and no hedging."
+        self.assertEqual(result.selected, winner)
+        by_instruction = {c.instruction: (c.dev_correct, c.dev_total) for c in result.candidates}
+        self.assertEqual(by_instruction[winner], (4, 4))
+        self.assertEqual(result.held_out_correct, 2)
+        self.assertEqual(result.held_out_total, 2)
+
+    def test_the_demo_bound_is_the_one_the_sequence_was_written_for(self) -> None:
+        """SCRIPTED's replies are answers to specific questions, in a specific order. If the demo
+        command's bound and the sequence's length stop agreeing, the demo plays one question's
+        answer against another question and still prints a clean-looking score."""
+        self.assertEqual(DEMO_ARGV, ["--max-questions", str(DEMO_MAX_QUESTIONS)])
+        questions = load_exact_questions(QUESTIONS_PATH)[:DEMO_MAX_QUESTIONS]
+        dev, held_out = split_dev_held_out(questions, held_out_fraction=0.25, seed=0)
+        from examples.prompt_optimization.run import CANDIDATE_INSTRUCTIONS
+
+        self.assertEqual(len(SEQUENCE), len(dev) * len(CANDIDATE_INSTRUCTIONS) + len(held_out))
+
+    def test_the_demo_command_runs_and_writes_nothing(self) -> None:
+        """The demo used to write a subset file, which is how a directory named for an
+        unsubstituted `{tmpdir}` placeholder ended up in the repository. It takes no path now."""
+        self.assertFalse(any("{" in arg for arg in DEMO_ARGV))
+        before = {p.name for p in ROOT.iterdir()}
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = demo_main(["--model", "stub:scripted", *DEMO_ARGV])
+        self.assertEqual(code, 0)
+        self.assertIn("held-out score", out.getvalue())
+        self.assertEqual({p.name for p in ROOT.iterdir()}, before)
 
 
 if __name__ == "__main__":
