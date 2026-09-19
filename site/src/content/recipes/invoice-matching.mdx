@@ -4,5 +4,172 @@ reviewed: 2026-09-19
 sources: []
 ---
 
-This recipe is being written in this wave. The diagram, the walkthrough, what it costs,
-how it fails and what to measure are not here yet.
+import Run from '../../components/page/Run.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import Link from '../../components/page/Link.astro';
+import invoiceRun from '../../data/runs/recipe-invoice-matching.json';
+
+An accounts payable clerk has three documents open at once: the invoice a supplier sent, the
+purchase order that authorized the buy, and the receiving log saying what actually came off the
+truck. The question in front of them is narrow and expensive to get wrong: does this invoice
+match well enough to pay, or does something about it need a person's eyes first. Three things go
+wrong often enough to be worth checking every time: a supplier bills for more than was delivered,
+a unit price drifts from what was agreed, or an invoice's own arithmetic does not add up to its
+own total. Any of those, paid without a look, is money out the door that nobody notices until the
+books do not close.
+
+Nothing here reads a scan or a PDF directly; that step, turning a photographed or emailed document
+into text, is <Link href="/recipes/document-extraction/">its own recipe</Link> and this one starts
+after it. Nothing here cuts a check either: posting means the match cleared for payment, not that
+money moved. And nothing here reconciles a vendor's running account balance or handles a credit
+memo; it is one invoice against the one purchase order it names. The household version of this
+same seam is <Link href="/recipes/household-paperwork/">a household's own paperwork</Link>, where
+nobody is billed by a stranger for a delivery a stranger also controls the record of; a business
+needs the extra check because the two sides of the transaction don't trust each other by default.
+
+## The assembled diagram
+
+<Run data={invoiceRun} label="Level 3 · Match an invoice" runKey="invoice-matching" />
+
+## Why this level, and why not higher
+
+Three techniques compose this recipe. <Link href="/techniques/order-zero/">Order zero</Link> is
+the match itself: once the invoice is a record instead of a PDF, finding its purchase order and
+comparing three numbers against it is a lookup and a subtraction, the same as any other order-zero
+job. <Link href="/techniques/structured-output/">Structured output</Link> is what turns the
+invoice's free-form text into that record in the first place, with a fixed schema, a validation
+pass and one retry if the reply doesn't parse. <Link
+href="/techniques/human-in-the-loop/">Human approval</Link> is the gate: nothing that fails to
+reconcile to the cent posts on its own.
+
+Say the level-0 part plainly, because it is most of the job: the lookup and the three subtractions
+never touch a model. Quantity invoiced against quantity received, unit price invoiced against the
+price the order was placed at, and the invoice's own stated total recomputed from its own lines,
+independent of whatever the invoice claims. All three are code, checked with a zero-cent
+tolerance rather than a guessed-at cushion, because a quantity is a count and a price and a total
+are both printed on the document: any drift at all is a transcription error worth a glance, not
+rounding.
+
+<CodeFile file="examples/invoice_matching/run.py" func="_three_way_match" />
+
+Climbing to level 4 would let the model decide for itself whether a small mismatch is close
+enough to wave through, or whether to go looking for a second purchase order the invoice might
+actually belong to. That is exactly the decision this page argues a model must never make: a
+verdict on whether an invoice may be paid. It would also cost more to run and more to check, a
+second call over the same numbers to produce a judgment nobody can audit against a fixed rule
+afterward, replacing "the invoice is $0.01 over" with "the model thought $0.01 was fine this time."
+Staying below level 1, asking a person to extract every invoice by hand instead, is what accounts
+payable clerks already did before software existed for this; the schema-and-retry step is what
+makes that keying-in unnecessary at any real volume, without asking the model to also decide
+anything.
+
+## Walkthrough
+
+The read comes first, and it is the only step that touches a model:
+
+<CodeFile file="examples/invoice_matching/run.py" func="_extract_invoice" />
+
+Against `SAMPLE_INPUT`, a clean invoice from Corrigan Fasteners naming PO-4410, the model replies
+with a supplier, a PO number, an invoice number, a currency, two line items and a stated total,
+all in the fixed shape the schema names. It validates on the first try, so there is no retry
+step in this run; a reply that didn't parse as JSON, or that was missing a field, would get one
+more chance with the validation error appended to the prompt before the run gives up and pauses
+rather than posting on a guess.
+
+<CodeFile file="examples/invoice_matching/run.py" func="run" />
+
+From there `run` looks up PO-4410 (found, two lines, both fully received per `GOODS_RECEIVED`),
+runs the three subtractions above, finds nothing outside tolerance, and posts: $756.00 to
+Corrigan Fasteners against PO-4410, invoice INV-77012. A different invoice, one line billed a
+cent over what the order was placed at, takes the same path up through the comparison and then
+pauses instead, with the exact cent figure named in the reason a reviewer reads. `resume` is the
+second half, called separately once a person has actually looked: approve posts the invoice as
+the supplier stated it, on the reviewer's own authority, and reject sends it back unposted with
+whatever note explains why. Nothing about resuming is a model decision either; it is the same
+`decided_by="code"` as everything upstream of it, recording a choice a person already made.
+
+## What it costs
+
+<CostStrip
+  level={3}
+  stats={[
+    { label: 'Model calls per invoice', value: '1 (2 on a retry)' },
+    { label: 'Tokens in, one invoice', value: '236' },
+    { label: 'Tokens out, one invoice', value: '68' },
+    { label: 'Tokens a month, 500 invoices', value: '~152,000 (estimate)' },
+  ]}
+  comparedTo={{
+    label: 'asking the model whether a small mismatch is close enough to post',
+    note:
+      'The three subtractions this recipe runs are exact, so there is nothing for a second opinion to add once they disagree. A version that asked the model to eyeball a borderline mismatch instead of pausing every time would spend roughly another 250 tokens in and 40 out per invoice it was asked about, about 145,000 additional tokens a month at the same volume, to turn a fixed rule into a guess nobody could reproduce afterward. The figures are an estimate, not a measurement.',
+  }}
+/>
+
+The unit here is per invoice, and the monthly figure is worked from that at a stated volume, 500
+invoices, rather than assumed: 236 tokens in and 68 out, measured from the scripted run above,
+times 500 is about 152,000 tokens a month, and a retry on every single one would roughly double
+it. Whatever a real accounts payable desk's own volume is, the number that matters is not the
+token cost, which is small at any volume this job runs at: it is that the match itself costs
+nothing extra to run correctly every time, because it was never a model call to begin with.
+
+## How it fails
+
+<FailureModes modes={[
+  {
+    name: 'A purchase order number read wrong off a scan',
+    notice: 'The invoice posts against the wrong order\'s terms, or pauses for a reason that has nothing to do with what is actually wrong, because the join is by PO number alone and the code never checks that the extracted supplier name agrees with the order it matched.',
+    test: 'Read PURCHASE_ORDERS for two orders from different suppliers and confirm by hand that the three-way match only catches a swapped number when doing so also changes what gets compared; it is not, by design, a check on who is being paid. Add that comparison to the review checklist rather than assuming the gate covers it.',
+  },
+  {
+    name: 'A quantity read from the wrong column',
+    notice: 'A unit price or a line number lands in the quantity field instead of the actual count, so the figure the model reports has nothing to do with what was ordered or received.',
+    test: 'tests/test_example_invoice_matching.py\'s test_an_invoice_quantity_above_what_was_received_pauses_with_that_reason proves the comparison catches this whenever the wrong number does not happen to equal what was received: PO-4411 ordered 500 mailers, the dock logged 480, and an invoice for the full 500 pauses naming both figures.',
+  },
+  {
+    name: 'A duplicate invoice number posting twice',
+    notice: 'The same invoice, resent by the supplier or reprocessed by mistake, posts a second time, because nothing in this recipe remembers what it already posted.',
+    test: 'Run the example twice on the same input and watch it post twice; there is no state between runs. A real system needs a table of posted invoice numbers checked before the gate, which this recipe leaves out on purpose: it is a match, not a ledger, and the two need to be tested separately.',
+  },
+]} />
+
+## What to measure
+
+<HowToEval>
+
+A right answer here is not a label a person assigns; it is whatever the accounts payable clerk
+would have decided reading the same three documents, which makes building a labeled set mostly
+free: pull invoices already paid last month, and record whether each one should have posted
+cleanly or should have paused, against the purchase order and receiving record it actually
+matched. Twenty or thirty is enough to start, since the check itself is arithmetic and what is
+being scored is really the extraction step, not the comparison.
+
+The confusion that matters is not symmetric. A false post, an invoice the match should have
+caught but didn't, pays money out that has to be clawed back or written off. A false pause, an
+invoice that was actually fine, costs a clerk a few minutes of review and nothing else. Score the
+first direction, and only the first direction, as the number to drive toward zero; the zero-cent
+tolerance above is already a deliberate choice in that direction, and the right response to seeing
+too many false pauses is to look at why the extraction disagrees with the purchase order, not to
+loosen the tolerance until the gate stops catching real ones. No result file exists for this
+recipe, so it claims no score, only this method for building one.
+
+</HowToEval>
+
+## Variations
+
+- Widen the tolerance from zero to a small guardband once a real month of false pauses shows the
+  drift is rounding rather than typos, and say so on the ledger: a tolerance is a business
+  decision made once, in the open, not a default this recipe should quietly assume for you.
+- Add the duplicate-invoice-number check this recipe deliberately leaves out, against a table of
+  what has already posted, before the gate runs at all.
+- Feed this recipe from <Link href="/recipes/document-extraction/">document extraction</Link> once
+  invoices arrive as scans or photographs instead of text a PDF reader already pulled out.
+- Move the purchase order lookup from an in-memory table to a live query against a real ERP system
+  once one exists; that is still level 0 code calling an API, not a reason to reach for <Link
+  href="/techniques/function-calling/">function calling</Link>, unless the model itself starts
+  choosing when to look something up.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}

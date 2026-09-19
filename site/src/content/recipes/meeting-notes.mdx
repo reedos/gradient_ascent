@@ -4,5 +4,168 @@ reviewed: 2026-09-19
 sources: []
 ---
 
-This recipe is being written in this wave. The diagram, the walkthrough, what it costs,
-how it fails and what to measure are not here yet.
+import Run from '../../components/page/Run.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import Link from '../../components/page/Link.astro';
+import meetingNotesRun from '../../data/runs/recipe-meeting-notes.json';
+
+Someone runs a weekly team meeting and has a transcript afterward: a call recording turned to
+text, or the notes someone typed live while people talked. What they want back is short. Which
+decisions actually got made. Who owns each one. When it is due, if anyone said. What is still
+open. Not a summary of everything that was discussed, a log somebody can act on without rereading
+the whole meeting to find the four sentences that mattered.
+
+The transcript already has everything this job needs. Nobody has to look anything up, check a
+policy, or compare against last week's minutes; the words on the page are the whole source. That
+is what keeps this at level 1: one call reads the transcript once and returns a fixed shape, and
+the shape is the entire value this recipe adds over reading the transcript and typing the same
+four things by hand.
+
+Not in scope: filing a decision into a task tracker, checking it against what a past meeting
+decided, or judging whether the team decided the right thing. And this recipe cannot tell a reader
+whether something the model calls a decision was actually agreed to in the room. Only a person who
+was there can say that, which is why one reads the notes before they go anywhere.
+
+## The assembled diagram
+
+<Run data={meetingNotesRun} label="Level 1 · Meeting notes, one call" runKey="meeting-notes" />
+
+## Why this level, and why not higher
+
+Two techniques compose this recipe. <Link href="/techniques/prompt-engineering/">Prompt
+engineering</Link> is the system prompt itself: a required shape instead of prose, an explicit
+line about what counts as a decision (something the room agreed to, not something raised or put
+off), and instructions for the two fields a model would otherwise be tempted to guess, the owner
+and the due date. <Link href="/techniques/structured-output/">Structured output</Link> is the
+schema, the validation and the one retry: every decision comes back as an object with the same
+four fields, code checks it against the schema before accepting anything, and a reply still
+invalid after one retry is reported as failed rather than returned as though it worked.
+
+One more check runs entirely in code, level 0, and it is the one this page is really about:
+whether a decision's quote is actually a sentence from the transcript. That needs no model at all,
+only a whitespace-normalized substring check, and it is the difference between a decision a person
+can verify at a glance and one they have to take on faith.
+
+Level 2 would add retrieval: a search over other meetings' notes before answering, so a decision
+could be checked against what this team agreed to last time, or linked to the one it changes.
+Nothing in a single transcript needs that. It would cost a second call, an index of every past
+meeting's notes to search, and a new way to be wrong, the wrong past meeting retrieved. It is worth
+adding once these notes are read against a history, not when they are written from one transcript.
+
+Level 0 on its own is not enough: which sentences in a transcript describe something the room
+actually settled, as opposed to a proposal, a question, or an idea two people talked themselves out
+of, is not a rule a regular expression can write. Speakers phrase agreement a dozen different ways
+in one meeting, and reading which one it was this time is the part of the job that needs a model.
+
+## Walkthrough
+
+Run against the sample transcript in `examples/meeting_notes/run.py`, a 25-line invented weekly
+sync with four attendees, the model reads the whole thing once and replies with attendees,
+decisions and open questions in the fixed shape. Two of the three decisions it proposes survive
+the code that follows: shipping the new signup flow on Friday, owned by the person who said they
+would cut the release, and the FAQ for that flow going to whoever is on support rotation next
+week, an owner named by role rather than by name because that is genuinely how the room left it.
+The one open question, whether a vendor's new pricing tier applies to this team, comes back
+alongside them.
+
+<CodeFile file="examples/meeting_notes/run.py" func="run" />
+
+The fourth decision in that run, a marketing budget cut nobody in this transcript raised, is there
+on purpose: its quote does not appear anywhere in the source text. The quote check is a plain
+substring comparison after both strings are stripped down to single spaces, since a model's reply
+often re-wraps a sentence's line breaks even when it copies the words correctly.
+
+<CodeFile file="examples/meeting_notes/run.py" func="_check_quotes" />
+
+Read against the real transcript, that run keeps two decisions and drops one, reported by name
+rather than removed, at a cost of 712 tokens in and 194 tokens out for the single call. A reply
+that fails validation the first time, tested separately, costs a second call and doubles the token
+count for that meeting; the retry exists so a stray formatting mistake does not sink the whole run,
+not to try harder at reading the meeting.
+
+## What it costs
+
+<CostStrip
+  level={1}
+  stats={[
+    { label: 'Model calls, one meeting', value: '1, or 2 if the first reply fails validation' },
+    { label: 'Tokens in, this run', value: '712' },
+    { label: 'Tokens out, this run', value: '194' },
+    { label: 'Decisions kept and dropped, this run', value: '2 kept, 1 dropped' },
+  ]}
+  comparedTo={{
+    label: 'a second pass that checks every kept decision against the transcript (level 3, write and check)',
+    note:
+      'Adding a check-and-retry pass over the decisions this run kept would roughly double the call count for a meeting this size, the same shape climbing to a write-and-check workflow costs everywhere else on this site. It earns that cost once real runs show the single call keeping something it should not, not before: the quote check above already catches the failure a substring comparison can catch.',
+  }}
+/>
+
+The unit here is per meeting, not per month. A team running this once after every weekly sync
+spends under a thousand tokens to get four names and two dates typed out in a shape somebody can
+act on, instead of a person rereading a transcript they would otherwise have to open anyway. Volume
+does not change this recipe's economics the way it changes a production line's: there is one
+transcript, one call, and one person reading the result before anything happens.
+
+## How it fails
+
+<FailureModes modes={[
+  {
+    name: 'A model that summarizes instead of extracting',
+    notice: 'The reply is valid JSON and every decision has a real quote behind it, but reading the list feels like reading a recap of the meeting rather than a list of things that got settled: entries with no clear owner, or a due date left blank on something that plainly needed one.',
+    test: 'Read the kept decisions against the transcript by hand on a sample of real runs. Nothing in the schema or the quote check can tell a summarized talking point from an actual decision; both can carry an accurate quote.',
+  },
+  {
+    name: 'An owner invented from context',
+    notice: 'A decision names a person as its owner who was never actually said to own it, guessed from who talked about the topic most rather than read off what the room actually agreed.',
+    test: 'tests/test_example_meeting_notes.py checks the other half of this directly: when the transcript never names an owner, the code accepts the literal word unassigned unchanged rather than filling in a name of its own. Attack it by scripting a reply where the model invents a plausible-looking name for an unnamed action item and confirm nothing downstream of run catches that on its own; only a person comparing the owner to the transcript can.',
+  },
+  {
+    name: 'A decision that was discussed but never made',
+    notice: 'Something the room explicitly put off, or debated without agreeing on, comes back in the decisions list anyway, backed by a real sentence from the part of the meeting where people were still arguing about it.',
+    test: 'tests/test_example_meeting_notes.py scripts exactly this: a reply that claims the team decided to raise a discount, quoting, word for word, the sentence where one attendee asked for another week before anyone committed to a number. The quote check keeps the decision, since the words really are in the transcript, which is the limit of what a substring comparison can catch.',
+  },
+]} />
+
+## What to measure
+
+<HowToEval>
+
+A right answer is a kept-decisions list that matches what a person who was in the meeting would
+also call a decision, each with the owner and due date that person would write down themselves and
+a quote that actually supports it, with nothing real left off the list. Collect ten to fifteen of
+the reader's own transcripts with a person's own notes written alongside them before tuning
+anything; one team's meetings vary enough in how people phrase agreement that five is too few to
+trust a rate from.
+
+The confusion that matters is not spread evenly across the four fields. It is calling something a
+decision that was not one: the deferred-item test above shows a wrong decision can carry a real,
+accurate quote, so nothing in the pipeline catches it before a person does. A real decision the
+recipe misses costs a rereading of the transcript to find it. A decision it invents can cost the
+thing itself, once someone reads the notes instead of the meeting and acts on what they say. Score
+false decisions, not missed ones, as the number to drive toward zero.
+
+No result file exists for this recipe yet, so it claims no score. What exists is the shape of the
+check a person should run by hand, which is the same one the failure modes above describe.
+
+</HowToEval>
+
+## Variations
+
+- Swap the schema for a different meeting shape, a one-on-one or a board vote, and keep the
+  ask-validate-retry contract and the quote check exactly as written; only the fields change.
+- Move to <Link href="/techniques/evaluator-optimizer/">write and check</Link> at level 3 once
+  real runs show the single call keeping a decision the quote check cannot catch, or missing one
+  a person would have caught. Add a second pass that checks each kept decision against the rule
+  the failure modes above describe, rather than a longer prompt asking the first call to be more
+  careful.
+- Move to <Link href="/techniques/rag/">retrieval</Link> at level 2 only once these notes have to
+  be checked against, or linked to, what past meetings decided. One transcript needs none of that.
+- Start from a recording instead of a transcript. <Link
+  href="/techniques/multimodal/">Feeding audio in directly</Link> replaces the first step; the
+  schema, the validation and the quote check downstream of it do not change.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}

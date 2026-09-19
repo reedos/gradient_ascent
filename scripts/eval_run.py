@@ -313,6 +313,20 @@ NOT_SCORED = {
         'This example runs on the electronics test bench in evals/bench/, a second document set and data set with no question file of its own, so the 60-question set has nothing to grade it against. '
         'Measure instead row accuracy against the manual, counting two mistakes separately: a value transcribed wrong, and a right value taken from the wrong row.'
     ),
+    "meeting_notes": (
+        "it turns one meeting transcript into decisions, owners and open questions. There is no "
+        "transcript in the corpus and no question for it to answer, so the graders have nothing "
+        "to match. Measure the extraction instead, against a person's own notes on the same "
+        "meetings: decisions found and missed, the owner and due date field by field, and how "
+        "often a decision is dropped because its quote is not in the transcript."
+    ),
+    "invoice_matching": (
+        "it reads one invoice into a fixed record and then matches it against a purchase order "
+        "and a goods-received record in code. It answers no question about the corpus and cites "
+        "nothing. Measure the two halves separately: field accuracy on the extraction, and, on "
+        "invoices a clerk has already decided, how often the gate posts one that should have "
+        "paused, which is the only direction that costs money."
+    ),
     "household_paperwork": (
         "it calls no model at all. Eleven household records go in and a report of renewals, "
         "unpaid bills, yearly totals and missing documents comes out, entirely from arithmetic, "

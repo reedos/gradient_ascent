@@ -1,0 +1,54 @@
+{
+  "illustrative": true,
+  "h": 434,
+  "title": "Meeting notes, assembled",
+  "sub": "Ask for decisions in a fixed shape, then check every quote against the transcript before a person reads it.",
+  "pill": "Level 1 · One call",
+  "nodes": [
+    { "id": "transcript", "x": 170, "y": 34, "l": "Transcript arrives", "k": "io" },
+    { "id": "ask", "x": 170, "y": 110, "l": "Ask the model for JSON", "k": "model" },
+    { "id": "validate", "x": 170, "y": 186, "l": "Validate against the schema", "k": "code" },
+    { "id": "quotes", "x": 170, "y": 262, "l": "Check each quote against the transcript", "k": "code" },
+    { "id": "reviewer", "x": 170, "y": 338, "l": "Person who was in the room reads it", "k": "human" },
+    { "id": "out", "x": 170, "y": 414, "l": "Notes acted on", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "transcript", "t": "ask", "by": "code" },
+    { "id": "e2", "f": "ask", "t": "validate", "by": "code" },
+    { "id": "e3", "f": "validate", "t": "quotes", "by": "code" },
+    { "id": "e4", "f": "quotes", "t": "reviewer", "by": "code" },
+    { "id": "e5", "f": "reviewer", "t": "out", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The transcript arrives",
+      "d": "Weekly sync, Thornwood product team: 25 lines, 4 attendees,\na shipped decision, a deferred discount, a role-owned action\nitem, and one open question about a vendor's pricing tier",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code asks the model for JSON matching the schema",
+      "d": "attendees, decisions[{decision, owner, due_date, quote}],\nopen_questions",
+      "m": "712 tokens in · 194 tokens out · 620 ms"
+    },
+    {
+      "e": "e3",
+      "h": "Your code validates the reply against the schema",
+      "d": "every required field present and the right type: valid,\nno retry needed this run",
+      "m": "0 problems found"
+    },
+    {
+      "e": "e4",
+      "h": "Your code checks each decision's quote against the transcript",
+      "d": "2 kept: the signup flow ship, the FAQ ownership\n1 dropped: \"Cut the marketing budget by half.\"\n(no matching sentence anywhere in the transcript)",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e5",
+      "h": "A person who was in the meeting reads the notes",
+      "d": "sees: 2 decisions with their quotes, 1 dropped decision,\n1 open question\nconfirms the two decisions are right before anyone acts",
+      "m": "reviewed before it goes anywhere"
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "illustrative": true,
+  "h": 530,
+  "title": "Match an invoice, assembled",
+  "sub": "Read the invoice into fixed fields, then let code run the join: quantity, price and total against the purchase order and what was received.",
+  "pill": "Level 3 · Workflows",
+  "nodes": [
+    { "id": "invoice", "x": 170, "y": 34, "l": "Invoice text arrives", "k": "io" },
+    { "id": "extract", "x": 170, "y": 110, "l": "Read into fixed fields", "k": "model" },
+    { "id": "lookup", "x": 170, "y": 186, "l": "Look up the purchase order", "k": "code" },
+    { "id": "compare", "x": 170, "y": 262, "l": "Quantity, price and total", "k": "code" },
+    { "id": "gate", "x": 170, "y": 338, "l": "Check the gate", "k": "code" },
+    { "id": "reviewer", "x": 310, "y": 414, "l": "AP clerk decides", "k": "human" },
+    { "id": "resume", "x": 170, "y": 414, "l": "Post or send back", "k": "code" },
+    { "id": "posted", "x": 170, "y": 490, "l": "Posted to accounts payable", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "invoice", "t": "extract", "by": "code" },
+    { "id": "e2", "f": "extract", "t": "lookup", "by": "code" },
+    { "id": "e3", "f": "lookup", "t": "compare", "by": "code" },
+    { "id": "e4", "f": "compare", "t": "gate", "by": "code" },
+    { "id": "e5pass", "f": "gate", "t": "posted", "by": "code", "b": 140 },
+    { "id": "e5pause", "f": "gate", "t": "resume", "by": "code" },
+    { "id": "e6", "f": "reviewer", "t": "resume", "by": "code" },
+    { "id": "e7", "f": "resume", "t": "posted", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The invoice's own text arrives",
+      "d": "\"Corrigan Fasteners, Invoice #INV-77012, PO Number: PO-4410,\nFST-2201 qty 40 @ $12.50, FST-2209 qty 40 @ $6.40,\nTotal due: $756.00\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code asks the model for the fixed fields",
+      "d": "supplier, po_number, invoice_number, currency,\nline items (code, quantity, unit price in cents), stated total",
+      "m": "236 tokens in · 68 tokens out · 1 call"
+    },
+    {
+      "e": "e3",
+      "h": "Your code looks up PO-4410",
+      "d": "PO-4410: found, Corrigan Fasteners, USD, 2 lines",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e4",
+      "h": "Your code runs the three subtractions",
+      "d": "FST-2201: invoiced 40, received 40, $12.50 ordered\nFST-2209: invoiced 40, received 40, $6.40 ordered\ninvoice states $756.00, its own lines sum to $756.00",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e5pass",
+      "h": "Your code checks the gate: everything reconciles",
+      "d": "no discrepancies\n(the pause to accounts payable, below, was not taken this run)",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e5pause",
+      "h": "A different invoice pauses here instead",
+      "d": "example: FST-2201 invoiced at $12.51 against a $12.50 order,\nreason=mismatch, +1 cent on one line\n(the direct pass-through to Posted, above, was not taken on that run)",
+      "m": "0 tokens · paused"
+    },
+    {
+      "e": "e6",
+      "h": "The AP clerk reviews the paused match and decides",
+      "d": "sees: the invoice, the purchase order, the discrepancy in cents\ndecides: reject, and asks the supplier for a corrected invoice",
+      "m": "decision: reject"
+    },
+    {
+      "e": "e7",
+      "h": "Your code resumes and posts, or sends the invoice back",
+      "d": "this run: posted PO-4410 / INV-77012, $756.00 to accounts payable",
+      "m": "0 tokens · 0 ms"
+    }
+  ]
+}
