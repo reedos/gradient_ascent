@@ -40,10 +40,8 @@ const ogImage = new URL(url('/og.png'), Astro.site).toString();
     <meta name="twitter:image" content={ogImage} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- finish-weight: only the weights actually set anywhere in site/src/styles or an island's
-         inline style are requested here -- DM Sans 400/500/550/600/650, Manrope 450/500/550/750
-         (checked by grepping every "font:"/"font-weight:" declaration; see the commit message).
-         Was 7 weights per family (14 faces); this is 5 + 4 = 9. -->
+    {/* Only the font weights actually set in the stylesheets or an island's inline style are
+        requested: DM Sans 400/500/550/600/650 and Manrope 450/500/550/750. */}
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;550;600;650&family=Manrope:wght@450;500;550;750&display=swap"
