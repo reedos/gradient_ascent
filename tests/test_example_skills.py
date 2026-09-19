@@ -15,19 +15,22 @@ if str(ROOT) not in sys.path:
 
 from examples.common.model import StubModel, StubResponse, ToolCall  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
+from examples.skills.__main__ import SCRIPTED  # noqa: E402
 from examples.skills.run import SKILLS, run  # noqa: E402
 
 QUESTION = "Is the DW-480 drain pump covered under warranty, and for how long?"
 
+# The canonical end-to-end sequence: the model loads the skill whose description fits the
+# question, then answers using its body. Mirrored in examples/skills/__main__.py's SCRIPTED.
+SEQUENCE = [
+    StubResponse(tool_calls=[ToolCall(name="load_skill", arguments={"name": "warranty-checklist"})]),
+    StubResponse(text="Covered: the 2-year warranty applies and nothing here voids it."),
+]
+
 
 class SkillsExampleTests(unittest.TestCase):
     def test_choosing_a_skill_and_stopping_are_the_only_model_decisions(self) -> None:
-        model = StubModel(
-            [
-                StubResponse(tool_calls=[ToolCall(name="load_skill", arguments={"name": "warranty-checklist"})]),
-                StubResponse(text="Covered: the 2-year warranty applies and nothing here voids it."),
-            ]
-        )
+        model = StubModel(list(SEQUENCE))
         tracer = Tracer(example="skills", level=5, model_id="stub-1")
         answer = run(QUESTION, model, None, tracer)
         self.assertEqual(tracer.model_decided_count(), 2)
@@ -124,6 +127,13 @@ class SkillsExampleTests(unittest.TestCase):
 
         self.assertTrue(callable(module.run))
         self.assertEqual(module.LEVEL, 5)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual(list(SCRIPTED), SEQUENCE)
 
 
 if __name__ == "__main__":

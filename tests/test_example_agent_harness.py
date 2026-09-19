@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from examples.agent_harness.__main__ import SCRIPTED  # noqa: E402
 from examples.agent_harness.run import (  # noqa: E402
     DEFAULT_REGISTRY,
     ToolRegistry,
@@ -29,6 +30,15 @@ from examples.common.trace import Tracer  # noqa: E402
 
 CORPUS_DIR = ROOT / "evals" / "corpus"
 QUESTION = "What does the DW-300's drain pump cost, and how long is it under warranty?"
+
+# The canonical end-to-end sequence this command runs with the default harness (every tool result
+# kept, no hook): search, lookup, then answer from both results. Mirrored in
+# examples/agent_harness/__main__.py's SCRIPTED.
+SEQUENCE = [
+    StubResponse(tool_calls=[ToolCall(name="search", arguments={"query": "DW-300 warranty term"})]),
+    StubResponse(tool_calls=[ToolCall(name="lookup_part", arguments={"part_number": "HLV-2201"})]),
+    StubResponse(text="$46.00, and the DW-300 has a 2-year full warranty."),
+]
 
 
 def _scripted_responder(messages, tools):
@@ -45,6 +55,19 @@ def _scripted_responder(messages, tools):
     if "warranty-policy" in seen:
         return StubResponse(text="$46.00, and the DW-300 has a 2-year full warranty.")
     return StubResponse(text="$46.00. I could not confirm the warranty term from what's in front of me.")
+
+
+class DefaultHarnessEndToEndTests(unittest.TestCase):
+    """The command this page prints runs with no flags: the default harness, `keep_everything`
+    and `allow_everything`. This is the one fixed sequence that shape actually produces."""
+
+    def test_the_default_harness_runs_search_then_lookup_then_answers(self) -> None:
+        model = StubModel(list(SEQUENCE))
+        tracer = Tracer(example="agent_harness", level=5, model_id="stub-1")
+        answer = run(QUESTION, model, None, tracer, corpus_dir=CORPUS_DIR)
+        self.assertEqual(tracer.model_decided_count(), 3)
+        self.assertIn("parts-list#2", answer.citations)
+        self.assertIn("46.00", answer.text)
 
 
 class HarnessChangesTheOutcomeTests(unittest.TestCase):
@@ -257,6 +280,13 @@ class DecidedByPatternTests(unittest.TestCase):
 
         self.assertTrue(callable(module.run))
         self.assertEqual(module.LEVEL, 5)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual(list(SCRIPTED), SEQUENCE)
 
 
 if __name__ == "__main__":

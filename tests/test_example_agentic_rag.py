@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from examples.agentic_rag.__main__ import SCRIPTED  # noqa: E402
 from examples.agentic_rag.run import run  # noqa: E402
 from examples.common.model import StubModel, StubResponse, ToolCall  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
@@ -22,16 +23,18 @@ from examples.common.trace import Tracer  # noqa: E402
 CORPUS_DIR = ROOT / "evals" / "corpus"
 QUESTION = "How often should the DW-300's filter be cleaned?"
 
+# The canonical end-to-end sequence: search, read the section search named, then stop and answer.
+# Mirrored in examples/agentic_rag/__main__.py's SCRIPTED.
+SEQUENCE = [
+    StubResponse(tool_calls=[ToolCall(name="search", arguments={"query": "DW-300 filter"})]),
+    StubResponse(tool_calls=[ToolCall(name="read", arguments={"cite": "dw300-manual#6"})]),
+    StubResponse(text="Every 30 cycles, per dw300-manual#6."),
+]
+
 
 class AgenticRagExampleTests(unittest.TestCase):
     def test_records_a_model_decided_step_for_every_tool_call_and_the_stop(self) -> None:
-        model = StubModel(
-            [
-                StubResponse(tool_calls=[ToolCall(name="search", arguments={"query": "DW-300 filter"})]),
-                StubResponse(tool_calls=[ToolCall(name="read", arguments={"cite": "dw300-manual#6"})]),
-                StubResponse(text="Every 30 cycles, per dw300-manual#6."),
-            ]
-        )
+        model = StubModel(list(SEQUENCE))
         tracer = Tracer(example="agentic_rag", level=5, model_id="stub-1")
         answer = run(QUESTION, model, None, tracer, corpus_dir=CORPUS_DIR)
         # one search call, one read call, one stop: three model-decided steps
@@ -104,6 +107,13 @@ class AgenticRagExampleTests(unittest.TestCase):
 
         self.assertTrue(callable(module.run))
         self.assertEqual(module.LEVEL, 5)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual(list(SCRIPTED), SEQUENCE)
 
 
 if __name__ == "__main__":

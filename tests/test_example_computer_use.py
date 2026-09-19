@@ -18,7 +18,13 @@ if str(ROOT) not in sys.path:
 
 from examples.common.model import StubModel, StubResponse, ToolCall  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
+from examples.computer_use.__main__ import SCRIPTED  # noqa: E402
 from examples.computer_use.run import ALLOWED_ELEMENT_IDS, render_screen, run  # noqa: E402
+
+# The canonical end-to-end sequence: the model's one action for this level, typing the search
+# term into the one field the allowlist permits. Mirrored in examples/computer_use/__main__.py's
+# SCRIPTED.
+SEQUENCE = [StubResponse(tool_calls=[ToolCall(name="type", arguments={"id": "search-box", "text": "warranty"})])]
 
 
 class RenderScreenTests(unittest.TestCase):
@@ -46,9 +52,7 @@ class ComputerUseExampleTests(unittest.TestCase):
         self.assertEqual(answer.text, "Clicked search-button.")
 
     def test_typing_into_an_allowed_field_runs(self) -> None:
-        model = StubModel(
-            [StubResponse(tool_calls=[ToolCall(name="type", arguments={"id": "search-box", "text": "warranty"})])]
-        )
+        model = StubModel(list(SEQUENCE))
         tracer = Tracer(example="computer_use", level=4, model_id="stub-1")
         answer = run("Search for warranty information", model, None, tracer)
         self.assertEqual(answer.text, "Typed 'warranty' into search-box.")
@@ -92,6 +96,13 @@ class ComputerUseExampleTests(unittest.TestCase):
         run("Search", model, None, tracer)
         render_steps = [s for s in tracer.steps if s.title == "Render the screen as text"]
         self.assertEqual(len(render_steps), 1)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual(list(SCRIPTED), SEQUENCE)
 
 
 if __name__ == "__main__":

@@ -19,9 +19,17 @@ if str(ROOT) not in sys.path:
 
 from examples.common.model import StubModel, StubResponse, ToolCall  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
+from examples.function_calling.__main__ import SCRIPTED  # noqa: E402
 from examples.function_calling.run import run  # noqa: E402
 
 CORPUS_DIR = ROOT / "evals" / "corpus"
+
+# The canonical end-to-end sequence: a lookup_part call, then the final answer built from its
+# result. Mirrored in examples/function_calling/__main__.py's SCRIPTED.
+SEQUENCE = [
+    StubResponse(tool_calls=[ToolCall(name="lookup_part", arguments={"part_number": "HLV-2205"})]),
+    StubResponse(text="Part HLV-2205 is a drain pump and costs $52.00. Sources: parts-list#2"),
+]
 
 
 class FunctionCallingExampleTests(unittest.TestCase):
@@ -32,12 +40,7 @@ class FunctionCallingExampleTests(unittest.TestCase):
         self.assertEqual(module.LEVEL, 4)
 
     def test_a_tool_call_is_the_only_model_decided_step(self) -> None:
-        model = StubModel(
-            [
-                StubResponse(tool_calls=[ToolCall(name="lookup_part", arguments={"part_number": "HLV-2205"})]),
-                StubResponse(text="Part HLV-2205 is a drain pump and costs $52.00. Sources: parts-list#2"),
-            ]
-        )
+        model = StubModel(list(SEQUENCE))
         tracer = Tracer(example="function_calling", level=4, model_id="stub-1")
         answer = run("What does part HLV-2205 cost?", model, None, tracer, corpus_dir=CORPUS_DIR)
         self.assertEqual(tracer.model_decided_count(), 1, "exactly one step should be decided_by model")
@@ -116,6 +119,13 @@ class FunctionCallingExampleTests(unittest.TestCase):
         run_step = next(s for s in tracer.steps if s.title.startswith("Run tool"))
         self.assertIn("not found", run_step.detail)
         self.assertEqual(answer.citations, [])
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual(list(SCRIPTED), SEQUENCE)
 
 
 if __name__ == "__main__":

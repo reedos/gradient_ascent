@@ -17,11 +17,20 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from examples.code_execution.__main__ import SCRIPTED  # noqa: E402
 from examples.code_execution.run import MAX_DEPTH, UnsafeExpression, run, safe_eval  # noqa: E402
 from examples.common.model import StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
 
 CORPUS_DIR = ROOT / "evals" / "corpus"
+
+# The canonical end-to-end sequence: a valid expression built from numbers in the retrieved
+# sources, then the final answer once the sandbox has evaluated it. Plain strings, since this
+# example never offers a tool. Mirrored in examples/code_execution/__main__.py's SCRIPTED.
+SEQUENCE = [
+    "38.50 + 41.00",
+    "$79.50 (parts-list#2).",
+]
 
 
 class SafeEvalTests(unittest.TestCase):
@@ -158,12 +167,7 @@ class CodeExecutionExampleTests(unittest.TestCase):
         self.assertEqual(module.LEVEL, 4)
 
     def test_writing_a_valid_expression_is_the_only_model_decided_step(self) -> None:
-        model = StubModel(
-            [
-                StubResponse(text="38.50 + 41.00"),
-                StubResponse(text="$79.50 (parts-list#2)."),
-            ]
-        )
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
         tracer = Tracer(example="code_execution", level=4, model_id="stub-1")
         answer = run(
             "What is the total price to replace the heating elements on both a DW-300 and a DW-480?",
@@ -204,6 +208,13 @@ class CodeExecutionExampleTests(unittest.TestCase):
         tracer = Tracer(example="code_execution", level=4, model_id="stub-1")
         answer = run("What does it cost?", model, None, tracer, corpus_dir=CORPUS_DIR)
         self.assertIn("Could not safely evaluate", answer.text)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual(list(SCRIPTED), SEQUENCE)
 
 
 if __name__ == "__main__":

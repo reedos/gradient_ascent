@@ -18,9 +18,17 @@ if str(ROOT) not in sys.path:
 from evals.corpus import DEFAULT_CORPUS_DIR, load_sections  # noqa: E402
 from examples.common.model import StubModel, StubResponse, ToolCall  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
+from examples.mcp.__main__ import SCRIPTED  # noqa: E402
 from examples.mcp.run import SEARCH_TOOL, StandInServer, call_tool, connect, list_tools, run  # noqa: E402
 
 CORPUS_DIR = ROOT / "evals" / "corpus"
+
+# The canonical end-to-end sequence: the model calls the stand-in server's one tool, then answers
+# from what it returned. Mirrored in examples/mcp/__main__.py's SCRIPTED.
+SEQUENCE = [
+    StubResponse(tool_calls=[ToolCall(name="search_halvorsen_docs", arguments={"query": "HLV-2205"})]),
+    StubResponse(text="HLV-2205 is a drain pump that costs $52.00. Sources: parts-list#2"),
+]
 
 
 class StandInProtocolTests(unittest.TestCase):
@@ -57,12 +65,7 @@ class McpExampleTests(unittest.TestCase):
         self.assertEqual(module.LEVEL, 4)
 
     def test_a_tool_call_is_the_only_model_decided_step(self) -> None:
-        model = StubModel(
-            [
-                StubResponse(tool_calls=[ToolCall(name="search_halvorsen_docs", arguments={"query": "HLV-2205"})]),
-                StubResponse(text="HLV-2205 is a drain pump that costs $52.00. Sources: parts-list#2"),
-            ]
-        )
+        model = StubModel(list(SEQUENCE))
         tracer = Tracer(example="mcp", level=4, model_id="stub-1")
         answer = run("What does part HLV-2205 cost?", model, None, tracer, corpus_dir=CORPUS_DIR)
         self.assertEqual(tracer.model_decided_count(), 1)
@@ -100,6 +103,13 @@ class McpExampleTests(unittest.TestCase):
         run("anything", model, None, tracer, corpus_dir=CORPUS_DIR)
         self.assertEqual(tracer.steps[0].title, "List tools from the MCP server")
         self.assertEqual(tracer.steps[0].decided_by, "code")
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual(list(SCRIPTED), SEQUENCE)
 
 
 if __name__ == "__main__":

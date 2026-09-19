@@ -13,9 +13,10 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from examples.coding_agents.__main__ import SCRIPTED  # noqa: E402
+from examples.coding_agents.run import BUGGY_SOURCE, FUNC_NAME, TASK, _run_tests, check_source, run  # noqa: E402
 from examples.common.model import StubModel, StubResponse, ToolCall  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
-from examples.coding_agents.run import BUGGY_SOURCE, FUNC_NAME, TASK, _run_tests, check_source, run  # noqa: E402
 
 # The escape an audit found in the version of this example that ran model-written source through
 # `exec(source, {"__builtins__": {}}, ns)` and called that a sandbox. It uses no builtin name at
@@ -53,6 +54,39 @@ STILL_BROKEN_SOURCE = (
     "        total += n\n"  # sums everything, not just evens
     "    return total\n"
 )
+
+# The two proposed fixes the scripted command's own sequence uses: a first draft that fails for a
+# different reason than STILL_BROKEN_SOURCE above (it counts the even numbers instead of summing
+# them), and the same correct fix. Kept as their own literals, rather than reusing
+# STILL_BROKEN_SOURCE and CORRECT_SOURCE, so this file's other tests (which check the specific
+# values those two produce) are untouched by what the command demonstrates.
+_SCRIPTED_STILL_BROKEN_SOURCE = (
+    "def sum_evens(numbers):\n"
+    '    """Return the sum of the even numbers in numbers."""\n'
+    "    total = 0\n"
+    "    for n in numbers:\n"
+    "        if n % 2 == 0:\n"
+    "            total += 1\n"
+    "    return total\n"
+)
+_SCRIPTED_CORRECT_SOURCE = (
+    "def sum_evens(numbers):\n"
+    '    """Return the sum of the even numbers in numbers."""\n'
+    "    total = 0\n"
+    "    for n in numbers:\n"
+    "        if n % 2 == 0:\n"
+    "            total += n\n"
+    "    return total\n"
+)
+
+# The canonical end-to-end sequence: a wrong fix, a right one, then the model's own decision to
+# stop once the test result says every case passed. Mirrored in
+# examples/coding_agents/__main__.py's SCRIPTED.
+SEQUENCE = [
+    StubResponse(tool_calls=[ToolCall(name="propose_edit", arguments={"new_source": _SCRIPTED_STILL_BROKEN_SOURCE})]),
+    StubResponse(tool_calls=[ToolCall(name="propose_edit", arguments={"new_source": _SCRIPTED_CORRECT_SOURCE})]),
+    StubResponse(text="That fixed it."),
+]
 
 
 class RunTestsHelperTests(unittest.TestCase):
@@ -132,13 +166,7 @@ class CodingAgentExampleTests(unittest.TestCase):
         self.assertIn("even", answer.text)
 
     def test_a_wrong_fix_then_a_right_one_takes_three_model_decisions(self) -> None:
-        model = StubModel(
-            [
-                StubResponse(tool_calls=[ToolCall(name="propose_edit", arguments={"new_source": STILL_BROKEN_SOURCE})]),
-                StubResponse(tool_calls=[ToolCall(name="propose_edit", arguments={"new_source": CORRECT_SOURCE})]),
-                StubResponse(text="That fixed it."),
-            ]
-        )
+        model = StubModel(list(SEQUENCE))
         tracer = Tracer(example="coding_agents", level=5, model_id="stub-1")
         answer = run(TASK, model, None, tracer, max_steps=5)
         self.assertEqual(tracer.model_decided_count(), 3)
@@ -199,6 +227,13 @@ class CodingAgentExampleTests(unittest.TestCase):
 
         self.assertTrue(callable(module.run))
         self.assertEqual(module.LEVEL, 5)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual(list(SCRIPTED), SEQUENCE)
 
 
 if __name__ == "__main__":
