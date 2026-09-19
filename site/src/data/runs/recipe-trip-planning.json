@@ -1,0 +1,95 @@
+{
+  "illustrative": true,
+  "h": 560,
+  "title": "Plan a trip and hold the bookings, assembled",
+  "sub": "Read-only lookups run in a loop; a booking call stops the loop and waits for a person to see the price and the cancellation terms.",
+  "pill": "Level 5 · Agents",
+  "nodes": [
+    { "id": "request", "x": 170, "y": 34, "l": "Trip request arrives", "k": "io" },
+    { "id": "pick", "x": 170, "y": 140, "l": "Model picks a tool", "k": "model" },
+    { "id": "lookup", "x": 82, "y": 260, "l": "search_routes / search_stays / opening_hours", "k": "tool" },
+    { "id": "book", "x": 258, "y": 260, "l": "book(kind, ref)", "k": "tool" },
+    { "id": "hold", "x": 170, "y": 380, "l": "Hold the checkpoint: price + terms, nothing spent", "k": "code" },
+    { "id": "reviewer", "x": 310, "y": 456, "l": "Person sees the price and the terms", "k": "human" },
+    { "id": "resume", "x": 170, "y": 456, "l": "Run only the approved call, or refuse", "k": "code" },
+    { "id": "outcome", "x": 170, "y": 532, "l": "Booked, at the price a person approved", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "request", "t": "pick", "by": "code" },
+    { "id": "e2lookup", "f": "pick", "t": "lookup", "by": "model" },
+    { "id": "e2loop", "f": "lookup", "t": "pick", "by": "code", "b": 30 },
+    { "id": "e2book", "f": "pick", "t": "book", "by": "model" },
+    { "id": "e3", "f": "book", "t": "hold", "by": "code" },
+    { "id": "e4hold", "f": "hold", "t": "resume", "by": "code" },
+    { "id": "e4reviewer", "f": "reviewer", "t": "resume", "by": "code" },
+    { "id": "e5", "f": "resume", "t": "outcome", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The request arrives",
+      "d": "\"Plan a trip from Wrenfield to Aldercliff for November 14 to\n17, find somewhere to stay, and book the cheapest outbound\nroute.\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2lookup",
+      "h": "The model picks a read-only tool",
+      "d": "-> search_routes(origin=\"Wrenfield\", destination=\"Aldercliff\")",
+      "m": "159 in · 13 out · 0.6 s"
+    },
+    {
+      "e": "e2loop",
+      "h": "Your code runs it and returns the result",
+      "d": "R1 08:10-10:55 $89.00, refundable up to 24 hours before\nR2 17:40-20:25 $64.00, non-refundable",
+      "m": "0 tokens · 4 ms"
+    },
+    {
+      "e": "e2lookup",
+      "h": "The model picks another read-only tool",
+      "d": "-> search_stays(city=\"Aldercliff\")",
+      "m": "235 in · 6 out · 0.7 s"
+    },
+    {
+      "e": "e2loop",
+      "h": "Your code runs it and returns the result",
+      "d": "S1 The Cormorant Inn $112.00/night, free cancellation to 48h\nS2 Harrow Lane Hostel $43.00/night, non-refundable",
+      "m": "0 tokens · 3 ms"
+    },
+    {
+      "e": "e2lookup",
+      "h": "The model checks one more thing before deciding",
+      "d": "-> opening_hours(place=\"Aldercliff Museum of Tides\")",
+      "m": "289 in · 10 out · 0.6 s"
+    },
+    {
+      "e": "e2loop",
+      "h": "Your code runs it and returns the result",
+      "d": "open 09:00-17:00, closed Monday",
+      "m": "0 tokens · 2 ms"
+    },
+    {
+      "e": "e2book",
+      "h": "The model decides what to book",
+      "d": "-> book(kind=\"route\", ref=\"R1\")\n(R2 is cheaper but arrives at 20:25, the evening the museum\nwould already be closed; the model picked R1 instead)",
+      "m": "326 in · 8 out · 0.7 s"
+    },
+    {
+      "e": "e3",
+      "h": "Your code stops the loop and holds the checkpoint",
+      "d": "R1: Wrenfield -> Aldercliff, 2026-11-14 08:10-10:55, $89.00\nrefundable up to 24 hours before departure\nnothing is booked yet; the run returns here",
+      "m": "0 tokens · paused"
+    },
+    {
+      "e": "e4reviewer",
+      "h": "A person reviews the held booking and decides",
+      "d": "sees: the route, $89.00, refundable up to 24 hours before\ndeparture\ndecides: approve",
+      "m": "decision: approve"
+    },
+    {
+      "e": "e5",
+      "h": "Your code checks the fingerprint and books it",
+      "d": "the call still matches what was approved, so it runs:\n\"Booked R1: Wrenfield -> Aldercliff, 2026-11-14 08:10-10:55\nfor $89.00.\"",
+      "m": "0 tokens · 0 ms"
+    }
+  ]
+}

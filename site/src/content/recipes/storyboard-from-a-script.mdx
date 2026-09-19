@@ -4,5 +4,181 @@ reviewed: 2026-09-19
 sources: []
 ---
 
-This recipe is being written in this wave. The diagram, the walkthrough, what it costs,
-how it fails and what to measure are not here yet.
+import Run from '../../components/page/Run.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import Link from '../../components/page/Link.astro';
+import storyboardRun from '../../data/runs/recipe-storyboard-from-a-script.json';
+
+A two-minute script for a product video is finished, or close to it: numbered lines of action,
+dialogue and an occasional line of voiceover with no character attached. What is not finished is
+the plan for the shoot day. A camera operator needs to know how many setups there are and what is
+in frame for each. An editor needs to know which shot stands in for which line, so a cut traces
+back to the page. A director needs both, plus one thing the script never states on its own:
+whether every line has a shot, and whether some line asks for two things one shot cannot show at
+once.
+
+This recipe reads a numbered script and returns a shot list: scenes first, then shots inside each
+scene, each carrying a size, what is on screen, an estimated length in seconds, and the lines it
+covers. A check written in code, never asked of a model, confirms every line sits inside a shot
+and every shot sits inside the script and its own scene, reporting by line number wherever that
+fails. What this does not do: draw anything. No frame or image comes out of it, and no page here
+generates one. It does not decide style, casting or location; a director reads the output and
+makes those calls.
+
+## The assembled diagram
+
+<Run data={storyboardRun} label="Level 3 · Turn a script into a shot list" runKey="storyboard-from-a-script" />
+
+## Why this level, and why not higher
+
+Two techniques compose this recipe. <Link href="/techniques/prompt-chaining/">Prompt
+chaining</Link> is the two-step sequence itself: split into scenes, then propose shots, always in
+that order, always both steps, whatever either call returns. <Link
+href="/techniques/structured-output/">Structured output</Link> is what keeps each of those two
+calls in a fixed schema, a scene number, heading and line range for the first call and a shot
+number, size, on-screen description, seconds and line range for the second, so code can validate
+the reply and retry once rather than pull the shape out of prose.
+
+Level 3 is enough because nothing after the first call has to branch. The code that asks for shots
+runs the same way whether the model found four scenes or six, and the coverage check runs the same
+way whether the model covered every line or missed one. A single call against the shot schema
+alone, level 1, structured output without the chain, could ask for a whole shot list in one shot.
+But a shot list built with no scene step has no scene structure of its own to check a shot's line
+range against, and a scene boundary that exists only inside the model's one answer is not
+something code can compare anything to afterward. The scene step is not there to make the job
+harder; it produces a second fixed structure, checked in code, that the shot step's output is then
+checked against. That is the actual argument for chaining over structured output alone here: two
+schemas, checked against each other, rather than one schema nobody can check.
+
+The level above, <Link href="/techniques/function-calling/">function calling</Link> or <Link
+href="/techniques/single-agent/">a single agent</Link>, would let the model decide something based
+on what an earlier step found: whether to re-read a scene, how many passes to take, which shot to
+revise. Nothing here asks for that. The coverage check either finds a gap or it does not, and
+fixing one means asking the model to look at that range again, which is still code choosing to
+make one more fixed call, not the model choosing to. Reaching higher buys a shot list that patches
+its own gaps automatically, at the cost of a call count that is no longer fixed, a harder thing to
+evaluate, and a loop that could keep rewriting shots until a person never sees the disagreement the
+check actually found. A person reading the report and asking for a specific fix is cheaper and more
+legible than a model deciding that under its own direction.
+
+## Walkthrough
+
+The chain runs on the 25-line script in `SCRIPT_LINES`, invented for this example: a product video
+for a desk lamp, with one line of pure voiceover naming no visual of its own (line 15, a real trap
+for a check that only looks at what sits next to an action) and one line describing two things
+happening in the same beat (line 14, which needs two shots, not one). `parse_script` turns the
+numbered text back into a `{line number: text}` mapping before anything else runs.
+
+The first model call asks for scenes; the code always makes this call, always with the same
+schema, and validates the reply the same way structured output's own example does: JSON parsed,
+required fields checked, one retry with the validation error appended if it fails.
+
+<CodeFile file="examples/storyboard_from_a_script/run.py" func="_ask_json" />
+
+The second call proposes shots for every scene in one request rather than one call per scene,
+because a shot near a scene boundary needs to see the neighboring scene's own line range to avoid
+crossing into it, and because one call keeps the token cost from scaling with how many scenes a
+given script happens to have. Against the sample script this returns 20 shots: ten in the first
+scene, five in the third, three in the closing tag, and two in the short middle scene that packs
+up the lamp, which is where the two-shots-for-one-line case lives, an insert on the lamp folding
+and a wider shot on the box being zipped shut, the second one's range stretching to cover the
+voiceover line right after it.
+
+Coverage is the part nothing upstream of it can be trusted to get right on its own, so it is
+arithmetic on line numbers, not a reading of what either call said:
+
+<CodeFile file="examples/storyboard_from_a_script/run.py" func="check_coverage" />
+
+Run against that scene list and that shot list, coverage comes back clean: no uncovered lines, no
+shot dropped for pointing outside the script, no shot escaping its own scene. The shots sum to
+50.5 seconds of runtime against roughly 137.6 seconds estimated to read the script aloud, well
+under the three-times threshold that would otherwise flag the list for a person to check by hand.
+
+<CodeFile file="examples/storyboard_from_a_script/run.py" func="run" />
+
+## What it costs
+
+<CostStrip
+  level={3}
+  stats={[
+    { label: "Model calls per script", value: "2 (4 worst case, one retry each)" },
+    { label: "Tokens in / out, the scenes call", value: "565 / 89" },
+    { label: "Tokens in / out, the shots call", value: "664 / 816" },
+    { label: "Shots proposed for the sample script", value: "20" },
+  ]}
+  comparedTo={{
+    label: "a person breaking the same script into shots by hand",
+    note:
+      "Two calls, about 1,229 tokens in and 905 tokens out for a 25-line, roughly two-minute script: a few thousand tokens either way. The figures are estimates read off the traced run, not a measurement of a live model. What they are worth is not the token price, which is a small fraction of a cent at any current published rate: it is standing in for the thirty to forty-five minutes a person spends doing the same scene-then-shot pass by hand, coverage check included, before anyone reads it.",
+  }}
+/>
+
+The unit here is per script, because that is what a person actually has: one script, once, not a
+slate of scripts run every day. Nothing on this page should be amortized over a volume a single
+production does not have. Reading the output still costs a director's time, and the recipe is
+explicit that it should: the model calls replace the mechanical first pass, not the read.
+
+## How it fails
+
+<FailureModes modes={[
+  {
+    name: "A line with no shot covering it",
+    notice: "The coverage check reports an uncovered line number; nothing about the shot list itself looks wrong until that report is read, because a missing line leaves no gap in the shots that came back, only in what they add up to.",
+    test: "tests/test_example_storyboard_from_a_script.py drops the shot that would otherwise cover the voiceover line at line 15 and checks that report.uncovered_lines names it by number, exactly the trap a pure-voiceover line with no visual of its own sets for a check that only looks at what sits next to an action.",
+  },
+  {
+    name: "A shot describing something the script never asked for",
+    notice: "The on_screen text names an object, an action or a character that is not in the line range the shot claims to cover, a fabrication the coverage check cannot see, since it compares line numbers, not what a shot says is in frame.",
+    test: "Read the exact lines a shot cites against its on_screen description, by hand, for every shot the chain returns; nothing in this package checks the content of a shot against the content of a line, only that the line numbers line up, which is a limit this page states rather than a check it claims to have.",
+  },
+  {
+    name: "Durations that read as measured but are not",
+    notice: "Every shot carries a number of seconds, and a spreadsheet full of numbers looks measured whether or not it is; the model's estimate and a stopwatch produce the same-looking column.",
+    test: "Compare the shot list's total seconds against a script's own likely read time. tests/test_example_storyboard_from_a_script.py builds a one-line script and a single shot timed at four times its read estimate, and checks that report.over_budget comes back true and that total_seconds is reported unchanged rather than quietly shortened; the flag is a signal for a person, not a correction the code applies.",
+  },
+]} />
+
+## What to measure
+
+<HowToEval>
+
+A right answer here is not a single correct shot list; two different, reasonable directors would
+not storyboard this script identically. What a person can check without disagreement is narrower:
+every line inside a shot's range, every shot inside its scene, sizes that vary the way a director
+would actually vary them rather than repeating "medium" down the page, and an `on_screen`
+description that names something visible rather than restating the line it came from. A shot list
+that mostly repeats the dialogue as its own on-screen description is really a rewrite of the
+script wearing a shot list's schema, and it is worth naming as its own failure separately from an
+uncovered line, since the coverage check will call it clean.
+
+Collect real scripts before tuning anything. Five or six, hand-reviewed against the four checks
+above, will surface whether the scene step tends to split at the wrong beat or the shot step tends
+to under-shoot two-thing lines like line 14 here, long before a meaningful pass rate is knowable.
+No result file exists for prompt chaining or structured output yet (see `docs/EVALS.md`), so this
+recipe claims no score of its own. The confusion that costs more is a false clean report: the
+coverage check saying every line is covered while a shot's own description has drifted from what
+that line actually asks for, since a false uncovered-line report is caught the moment a person
+reads the report, and a false clean one is not caught until someone is standing on set.
+
+</HowToEval>
+
+## Variations
+
+- Swap the schema's `size` and `on_screen` fields for a documentary or interview format's own
+  vocabulary, b-roll and sync sound instead of shot sizes; the scene step, the schema-and-retry
+  pattern and the coverage check carry over unchanged.
+- Move to <Link href="/techniques/human-in-the-loop/">human approval</Link> as an explicit gate,
+  pausing the run and recording a director's decision, once this stops being one script read by
+  one person and becomes several scripts a small team is turning around every week.
+- Add a scene-level pass that flags a shot count far outside what similar scenes have needed, once
+  a few months of real scripts exist to say what "similar" means, rather than guessing at a
+  threshold today.
+- Feed the finished shot list into a scheduling pass that groups shots by location or by cast
+  member present, once the shot list itself is trusted; that is a different job building on this
+  one's output, not a change to this recipe.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}

@@ -4,5 +4,184 @@ reviewed: 2026-09-19
 sources: []
 ---
 
-This recipe is being written in this wave. The diagram, the walkthrough, what it costs,
-how it fails and what to measure are not here yet.
+import Run from '../../components/page/Run.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import Link from '../../components/page/Link.astro';
+import tripPlanningRun from '../../data/runs/recipe-trip-planning.json';
+
+Someone is putting a trip together: a couple of cities, a handful of days, and a short list of
+things that have to line up. Does a route actually connect at a time that leaves the evening
+free. Is there a room left where they want to stay. Is the one thing they came to see even open
+on the day they would be there. They do not walk in with a folder of records the way a household
+paperwork job does; what they have is a request in their own words and a handful of places to
+check, each of which can change what the next one needs to check. A route that does not connect
+sends the search back to an earlier city. A stay with no room left sends it to a different one.
+What they want back is not a page of raw search results to sort through themselves: it is a plan
+that already accounts for what the last lookup said, and a way to actually hold a reservation
+without a dollar figure ever moving without somebody seeing it first.
+
+This is not what a travel search tab does, comparing forty fares on a screen for a person to pick
+from by hand. It is not a real booking site, a real airline or a real payment processor: the
+routes, the stays and the opening hours here are invented for this recipe, on invented cities. And
+it is not a trip that books itself. The part that only reads, checking what exists and what
+connects, runs on its own for as long as the trip needs. The part that spends money or forfeits a
+refund always stops, with the exact price and the cancellation terms in front of a person, before
+anything is reserved.
+
+## The assembled diagram
+
+<Run data={tripPlanningRun} label="Level 5 · Plan a trip and hold the bookings" runKey="trip-planning" />
+
+## Why this level, and why not higher
+
+Three techniques carry this job. <Link href="/techniques/single-agent/">Single agent</Link> is the
+loop: the model keeps calling tools and reading what comes back until it has decided what to
+reserve, rather than following a search order written down in advance.
+<Link href="/techniques/function-calling/">Function calling</Link> is the shape of what it can
+call, four fixed tools with fixed arguments. <Link href="/techniques/human-in-the-loop/">
+Human-in-the-loop</Link> is the pause on the one tool that spends money: a checkpoint a person
+approves or turns down before it ever runs.
+
+Level 5, not level 3, because the number of lookups is not knowable in advance. Sometimes the first
+route works and the first stay has a room; sometimes the cheapest route lands after the one thing
+the traveler wanted to see has closed, and the plan has to back up and check a different route or a
+different day. A fixed workflow commits to an order of searches before it has seen a single result,
+which is right for one trip and wrong for the next, the same argument
+<Link href="/recipes/bring-up-debug-assistant/">a bring-up assistant</Link> makes about a bench
+symptom: which check comes next depends on what the last one said. Level 4 is not enough either: one
+tool call and an answer forces the model to guess ahead of time how many results it will need
+before it has seen any of them.
+
+The level above would be a second agent, <Link href="/techniques/orchestrator-workers/">a lead
+agent and workers</Link>, reviewing the plan before a person sees it. That earns its cost when a
+wrong plan is expensive to catch late, or several travelers have independent legs to coordinate.
+For one trip and four tools it is another agent's worth of calls spent duplicating a check a person
+already makes at the pause. Level 7, an agent that starts work on its own, does not fit at all:
+nothing here happens while nobody is watching, and the pause exists for the moment a person is.
+
+One part of this job is level 0 on purpose. Once a booking is approved, totaling what the trip
+costs and checking that two reservations do not land at the same hour are a sum and a comparison,
+not a question for a model. The approval gate is not there because a model might get something
+wrong; it is there because a booking is expensive and hard to take back, exactly the question
+<Link href="/techniques/delegating/">deciding what to hand over</Link> asks: not "can it do this"
+but "what does it cost to be wrong here, and can it be undone."
+
+## Walkthrough
+
+`run` is the loop. It offers the model four tools, runs the three read-only ones the moment they
+are called, and stops the instant the model calls `book`, returning a checkpoint instead of running
+it.
+
+<CodeFile file="examples/trip_planning/run.py" func="run" />
+
+A real pass through it: `search_routes("Wrenfield", "Aldercliff")` returns two options, one landing
+at 10:55 for $89.00 and a cheaper one landing at 20:25 for $64.00 with no refund. `search_stays`
+returns two places in Aldercliff. `opening_hours` answers for the museum: open 09:00 to 17:00,
+closed Mondays. Nothing here needed this order; the model chose it, and could have skipped the
+museum check entirely. With that in hand it calls `book(kind="route", ref="R1")`, the earlier and
+pricier route, because the cheaper one lands after the museum has closed. `run` does not execute
+that call: it builds a `BookingCall` from the record `R1` actually is, hashes it, and returns a
+`PendingBooking` holding the price, the cancellation terms and that fingerprint. Nothing is
+reserved.
+
+`approve` is a second, separate call, made once a person has looked at the checkpoint.
+
+<CodeFile file="examples/trip_planning/run.py" func="approve" />
+
+On a reject it books nothing. On an approval it does not simply trust the checkpoint it was handed:
+it recomputes the fingerprint from the call inside it and only runs that call if the hash still
+matches.
+
+<CodeFile file="examples/trip_planning/run.py" func="_fingerprint" />
+
+That check is what catches a checkpoint changed after approval. `tests/test_example_trip_planning.py`
+attacks it directly: take the pending booking `run` returned, replace its price or its date with
+`dataclasses.replace` while leaving the approved fingerprint in place, and call `approve`. Both
+attempts raise, since a fingerprint of the wrong call does not pass a check written against the
+right one. The untouched checkpoint, run through the same path, books `R1` for $89.00.
+
+## What it costs
+
+<CostStrip
+  level={5}
+  stats={[
+    { label: 'Tool calls, this walkthrough', value: '4' },
+    { label: 'Model-decided steps (calls plus the booking decision)', value: '4' },
+    { label: 'Tokens in, cumulative', value: '1,009' },
+    { label: 'Tokens out, cumulative', value: '37' },
+  ]}
+  comparedTo={{
+    label: "the traveler's own hour",
+    note: 'Four tool calls and a short reply run in a few seconds and cost a fraction of a cent at any current model price. That number is not the comparison that matters here: it is against the time it takes a person to open three tabs, cross-check a museum against a flight time by hand, and decide which of two fares is actually the better one once the closing time rules one out. The unit is per trip planned, not per lookup or per token, and nothing here is amortized over a volume a single traveler has.',
+  }}
+/>
+
+The figures above come from the scripted run `tests/test_example_trip_planning.py` pins: three
+searches, one booking call, and the token totals `Tracer.tokens_in_total()` and
+`tokens_out_total()` report for exactly that sequence. A trip that connects on the first try costs
+less than this; one that has to back up and check a different city costs more, and nothing caps how
+much more except the step and token budgets in `run`.
+
+## How it fails
+
+<FailureModes modes={[
+  {
+    name: 'A price that moved between the search and the approval',
+    notice: 'The number a person approved is not the number that would actually run, because a fare or a rate changed in the gap between the search that found it and the moment a person clicked approve.',
+    test: 'tests/test_example_trip_planning.py::test_an_approval_whose_price_changed_after_approval_is_refused changes the price on an already-approved checkpoint with dataclasses.replace and asserts approve refuses it: the fingerprint no longer matches, so nothing books.',
+  },
+  {
+    name: 'A booking approved on a summary that left out the cancellation terms',
+    notice: "A reviewer sees a price and a route but not what it costs to change their mind, and approves something that looked fine because the one detail that mattered was trimmed out of what they were shown.",
+    test: 'tests/test_example_trip_planning.py::test_a_book_call_pauses_with_the_price_and_terms_and_books_nothing asserts the cancellation terms appear in full in the same trace detail that holds the price, not in a separate step a reviewer could miss.',
+  },
+  {
+    name: 'An itinerary that books two things at the same hour',
+    notice: 'A route lands the traveler in one city at the same hour a reservation begins in another, which is not a wrong lookup, it is two right lookups that were never checked against each other.',
+    test: 'Once a plan can hold more than the one booking this example pauses on, check every pair of reservations for an overlapping time before any of them is approved; that check is a comparison of two clocks, not a question for a model, the same argument the household-paperwork recipe makes about its own date arithmetic.',
+  },
+]} />
+
+## What to measure
+
+<HowToEval>
+
+A right answer here is not one sentence graded against another the way a document question is: it
+is a plan where every date actually checks out against the data (the route lands before the stay's
+check-in, the attraction is open at the hour the plan visits it) and a booking proposal whose price
+and terms match the record it was built from, character for character. There is no shared question
+set for this the way the document-QA recipes have one; a reader building this for real would want a
+handful of scripted trips with a known right plan, not sixty, since a trip does not repeat at volume
+the way a support ticket does.
+
+The two mistakes here are not symmetric. A plan that looks complete but is not, a museum visited an
+hour after it closes, is the expensive direction: it reaches a person as something to approve rather
+than something to double-check, and the pause assumes what it shows is accurate. A plan that asks
+for one more lookup than it needed costs a few seconds and nothing else. Score accordingly: a wrong
+"this works" is worse than an over-cautious "let me check one more thing." No result file exists for
+this recipe, so it claims no measured score, only this description of what one would look at.
+
+</HowToEval>
+
+## Variations
+
+- Hold more than one booking in a single plan. That needs a checkpoint per reservation instead of
+  one, so a flight and a stay each get their own price and their own approval rather than a single
+  yes standing in for both.
+- Give the traveler a budget to set before the run starts, and let anything under it through
+  without a pause while anything over it still stops. That moves the gate's threshold; it does not
+  change which level this is.
+- Watch a fare over several days and only propose booking once it drops. That is a schedule bolted
+  onto the read-only half of this loop, the same argument
+  <Link href="/recipes/nightly-monitor/">the nightly source monitor</Link> makes about a timer
+  being infrastructure rather than a reason to climb a level.
+- Once the same trip recurs every month and the searches never actually change, write the steps
+  down instead of asking a model to rediscover them each time. That is
+  <Link href="/levels/3/">a level 3 workflow</Link>, with the same approval gate kept on the one
+  step that spends money.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}

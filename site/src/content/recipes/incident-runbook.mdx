@@ -4,5 +4,183 @@ reviewed: 2026-09-19
 sources: []
 ---
 
-This recipe is being written in this wave. The diagram, the walkthrough, what it costs,
-how it fails and what to measure are not here yet.
+import Run from '../../components/page/Run.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import Link from '../../components/page/Link.astro';
+import incidentRunbookRun from '../../data/runs/recipe-incident-runbook.json';
+
+Somebody who was on call last night has a write-up: a timestamped account of what they checked,
+what they tried, and what happened, written while the incident was still open or right after it
+closed. They want something different from it than the postmortem will eventually hold: a short
+list of steps a person can follow the next time the same kind of thing happens, each one naming
+who does it and how they will know it worked. What they have is one incident's account, in
+whatever mix of full sentences and shorthand a tired person types at three in the morning. What
+they want back is not a summary of the night and not a finding about the root cause; both already
+have a home, one in the postmortem and one in whatever ticket tracks the bug. This recipe turns
+the notes into steps, and nothing else. It does not decide what caused the incident, and it does
+not decide that any step belongs in the runbook forever. A runbook drawn from a single write-up is
+a first draft, built from whatever happened to be true on one particular night, and the person who
+was there is the one who says which parts of it still hold on an ordinary day.
+
+## The assembled diagram
+
+<Run data={incidentRunbookRun} label="Level 3 · Draft a runbook, then approve it" runKey="incident-runbook" />
+
+## Why this level, and why not higher
+
+Three techniques compose this recipe. <Link href="/techniques/prompt-chaining/">Prompt
+chaining</Link> is the shape of the whole thing: pull the timeline out of the write-up, then turn
+what it holds into steps, two model calls in a fixed order with a check between them, never the
+model choosing what runs next. <Link href="/techniques/structured-output/">Structured
+output</Link> is what each call asks for: a timeline is a list of events with a time, an actor and
+an action, and a draft runbook is a list of steps with an action, a role and a check, both fixed
+shapes a validator can hold the reply to rather than prose a person has to parse by eye.
+<Link href="/techniques/human-in-the-loop/">Human approval</Link> is the gate at the end: every
+draft pauses for the person who ran the incident, because nothing here knows enough to ship a
+runbook on its own.
+
+Level 3 is enough because the steps are known in advance and so is their order: extract, draft,
+verify, hold. What moves between one incident and the next is only the content the model fills
+into those fixed steps, never which step runs. Level 4 would let the model decide whether to
+re-read the write-up again or look something else up before drafting, and nothing here needs that:
+one write-up, one pass, is what a person actually has. Level 5 would let the draft's own content
+decide what happens next, and it never does; the same four steps run whether the write-up is clean
+or garbled, and a bad reply is something step three reports, not something that reroutes the
+chain. Going up either level buys nothing and costs a call, a few seconds, and one more thing a
+person would have to check.
+
+Most of the checking is level 0, worth saying plainly. Assigning each event an id and joining a
+step's cited id back against the events that actually exist are a loop and a set membership check,
+the same kind of arithmetic
+<Link href="/recipes/requirements-to-test-plan/">turning requirements into a test plan</Link>
+runs to check a proposed test against a requirement. Structured output alone, with no chain and no
+check, is not enough: asking for the timeline and the runbook in one call is one long, mixed
+instruction, with nothing to stop an unusable step from reaching a person unmarked.
+
+## Walkthrough
+
+No recorded run exists for this recipe yet, so what follows is a stepped walkthrough of the code
+against `SAMPLE_INPUT`, run with a scripted stand-in for the model's replies, the same one the
+test file checks against.
+
+<CodeFile file="examples/incident_runbook/run.py" func="run" />
+
+The write-up is 27 lines. The first model call returns seven events, timestamped from the page
+firing at 02:14 to the incident owner closing it at 03:25, and code assigns each one an id, `e1`
+through `e7`, in the order they came back. The second call sees that numbered timeline and drafts
+four steps: check the queue-depth figure (`e2`), restart the worker pool (`e4`), roll back only
+alongside a restart rather than in place of one (`e5`, the one event that is a lesson more than an
+action), and check the lag metric came back down (`e6`). Two events do not become steps: deciding
+to wake a specific person (`e3`) and drafting an email to specific customers (`e7`), both true of
+this incident and not obviously true of the next one.
+
+<CodeFile file="examples/incident_runbook/run.py" func="_verify_steps" />
+
+Verification is where this recipe keeps its promise, and the one step that never touches the
+model. A step whose `from_event` names an id nothing in the timeline has is dropped, with the made
+up citation recorded rather than silently discarded:
+`test_a_step_citing_an_event_not_in_the_timeline_is_dropped_and_reported` plants exactly that. A
+step with no check, or no role, is kept and flagged incomplete instead of dropped: a step nobody
+can tell has worked is still worth a person's attention. What verification cannot do is tell a
+real repeatable action from a one-off the model generalized by mistake. "Call dcho and wake them"
+and "check the queue-depth figure" can both carry a perfectly formed role and check; nothing about
+their shape marks one as belonging to this incident alone.
+`test_a_one_off_action_with_a_plausible_role_and_check_passes_verification_unflagged` proves the
+negative directly: that step is not dropped and not flagged. Nothing in code catches it, which is
+the argument for what comes next.
+
+<CodeFile file="examples/incident_runbook/run.py" func="resume" />
+
+The draft, however it came out, is a `PendingApproval` and never anything more until the incident
+owner reads it and calls `resume`. Approving ships the draft text as written; editing replaces it
+with whatever the reviewer typed, while still keeping the same steps for citation; rejecting ships
+nothing, because a runbook one person read and refused is not a runbook anybody should follow.
+
+## What it costs
+
+<CostStrip
+  level={3}
+  stats={[
+    { label: 'Model calls per incident', value: '2' },
+    { label: 'Tokens in', value: '785' },
+    { label: 'Tokens out', value: '427' },
+    { label: 'Steps drafted from 7 events, this incident', value: '4' },
+  ]}
+  comparedTo={{
+    label: 'a person writing the runbook by hand from the same notes',
+    note:
+      'Reading a write-up, picking out what would be done again, and writing down who does it and how to tell it worked is an hour or two of somebody\'s time, done once per incident. 1,212 tokens against that is not close, but the token count is not the number that matters here: a wrong total in a spreadsheet gets caught the next time someone adds it up, and a wrong step in a runbook gets caught the next time someone follows it during an outage.',
+  }}
+/>
+
+The unit here is the incident, not the year and not the team. A company has a handful of
+incidents worth writing a runbook from, not thousands of units a day, so there is no volume to
+divide this cost by and no honest way to say what it costs "at scale." Two calls and about 1,200
+tokens turn one write-up into a draft; the figure that matters is how much of the hour or two a
+person would spend writing it by hand this saves, against how much of that hour they still spend
+reading the draft closely enough to catch what it got wrong.
+
+## How it fails
+
+<FailureModes modes={[
+  {
+    name: 'A step nobody can check',
+    notice: 'A step in the draft names an action and a role but no way to tell whether it worked, so a person following it during a future incident has no signal to stop on.',
+    test: 'tests/test_example_incident_runbook.py\'s test_a_step_with_no_check_is_kept_and_flagged_incomplete_not_silently_accepted plants a drafted step with an empty check and confirms verification keeps it, marks it incomplete, and names the missing field, rather than either dropping it or shipping it clean.',
+  },
+  {
+    name: 'A one-off action generalized into a permanent step',
+    notice: 'The draft tells the next on-call engineer to wake a specific person or email specific customers, because that is what happened this time, and nothing about the step\'s shape says it should not happen again exactly that way.',
+    test: 'test_a_one_off_action_with_a_plausible_role_and_check_passes_verification_unflagged in the same file plants "call dcho and wake them" with a complete role and check and confirms verification does not catch it. This is not a gap to close in code; it is why the incident owner reads the draft before anyone follows it.',
+  },
+  {
+    name: 'An order that only worked because of that particular night',
+    notice: 'The write-up shows the queue draining after a rollback and a restart happened close together, and the draft turns that into a fixed sequence, when only one of the two actions was actually doing anything.',
+    test: 'Nothing in this example checks this; it is a question for the person reading the draft, not a schema. Ask, for each ordered pair of steps, whether the second one\'s check would still pass if the first one had not run.',
+  },
+]} />
+
+## What to measure
+
+<HowToEval>
+
+A right answer here is not a label a script can compare against a key. It is a step a person who
+ran the incident reads and either approves as written, edits, or rejects, and the record worth
+building is that decision itself: keep every draft alongside what happened to it, incident by
+incident. There is no set to collect before this is usable, because there is nothing to hold out;
+a company sees a handful of incidents worth a runbook in a year, and the first real draft is
+already the first data point.
+
+The confusion that matters is not accuracy across steps evenly. It is the difference between a
+step verification drops or flags and one it lets through clean. A step dropped for citing nothing,
+or flagged for missing a check, stays visible in the draft as a problem someone can see and fix in
+a minute: the cheap direction. A one-off promoted into a step that looks exactly as complete as
+the real ones is expensive, because nothing marks it and it is only caught if the reviewer reads
+closely enough to ask "would I really do this again." Watch that direction, not the counts.
+
+No result file exists for this recipe (see `docs/EVALS.md`), so nothing here is a score: only what
+to start writing down, chiefly how often a rejected or edited step turns out to have been a
+one-off nothing in code caught.
+
+</HowToEval>
+
+## Variations
+
+- Feed the same chain a different after-the-fact narrative: a deployment rollback log, a support
+  escalation thread, a lab notebook entry from a failed experiment. The shape carries over
+  unchanged; only the categories of "would be done again" and "specific to this one" move.
+- Once a few months of approved and rejected drafts exist, retune what verification flags as
+  incomplete from what reviewers actually caught, rather than from a guess.
+- A runbook is not permanent because it was once approved. Nothing here re-checks a runbook
+  against a system that has since changed, and nothing should be trusted to have done that
+  silently; treat an old approval as a reason to re-run this on a fresh write-up, not as proof the
+  steps still hold.
+- <Link href="/recipes/requirements-to-test-plan/">Turning requirements into a test plan</Link> is
+  the same shape, extract-draft-verify-approve, over a stronger source: a requirement is written
+  down on purpose, and a write-up is only an account of what happened to occur.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}

@@ -334,6 +334,33 @@ NOT_SCORED = {
         "checklist instead: agreement with a reviewer's own findings rule by rule, and how often "
         "a finding is downgraded because its quote is not in the clause it cites."
     ),
+    "incident_runbook": (
+        "it turns one incident write-up into a draft runbook: a timeline, then numbered steps, "
+        "then a code check that every step names a role and a way to tell it worked. It answers "
+        "no question and cites no corpus section. Measure the draft instead, against the runbook "
+        "the people who ran the incident would write: steps kept, steps invented from a one-off, "
+        "and how many shipped without a check somebody could run."
+    ),
+    "storyboard_from_a_script": (
+        "it splits a script into scenes and shots and then checks coverage in code. The output "
+        "is a shot list, not an answer, and the corpus holds no script. Measure coverage "
+        "instead: script lines left out of every shot, shots pointing outside their own scene, "
+        "and how a director's own edit differs from the first pass."
+    ),
+    "trip_planning": (
+        "it runs a level-5 loop over read-only travel lookups and stops rather than booking "
+        "anything. There is no document question anywhere in it and no citation. Measure the "
+        "split instead: how often a booking proposal reaches a person with the price and the "
+        "cancellation terms attached, how often the loop converges inside its step cap, and "
+        "whether an approval bound to one set of arguments ever executes another."
+    ),
+    "rubric_grading": (
+        "it grades one submission against a written rubric twice, independently, and sends every "
+        "disagreement to a teacher. It produces scores, not an answer to a question about the "
+        "corpus. Measure the grading instead, against a teacher's own marks: agreement per "
+        "criterion, how often the second reader catches a misread rubric line, and how often a "
+        "score is dropped because its quoted evidence is not in the submission."
+    ),
     "household_paperwork": (
         "it calls no model at all. Eleven household records go in and a report of renewals, "
         "unpaid bills, yearly totals and missing documents comes out, entirely from arithmetic, "

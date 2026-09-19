@@ -1,0 +1,61 @@
+{
+  "illustrative": true,
+  "h": 374,
+  "title": "Grade against a rubric, assembled",
+  "sub": "An independent reviewer, who never sees the grader's reasoning, catches a misread rubric line before it becomes a grade.",
+  "pill": "Level 6 · Teams of agents",
+  "nodes": [
+    { "id": "sub", "x": 170, "y": 30, "l": "Submission arrives", "k": "io" },
+    { "id": "grade", "x": 170, "y": 106, "l": "Grader scores each criterion", "k": "model" },
+    { "id": "checkq", "x": 170, "y": 182, "l": "Check every quote against the text", "k": "code" },
+    { "id": "reviewer", "x": 170, "y": 258, "l": "Reviewer decides what to check", "k": "model" },
+    { "id": "lookup", "x": 310, "y": 258, "l": "That criterion's full rubric text", "k": "store" },
+    { "id": "out", "x": 170, "y": 334, "l": "Checkpoint for the teacher", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "sub", "t": "grade", "by": "code" },
+    { "id": "e2", "f": "grade", "t": "checkq", "by": "code" },
+    { "id": "e3", "f": "checkq", "t": "reviewer", "by": "code" },
+    { "id": "e4", "f": "reviewer", "t": "lookup", "by": "model", "b": 22 },
+    { "id": "e5", "f": "lookup", "t": "reviewer", "by": "code", "b": 22 },
+    { "id": "e6", "f": "reviewer", "t": "out", "by": "model" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The submission arrives",
+      "d": "A short essay on extending the lunch period, four rubric criteria: thesis,\nevidence, counterargument, organization",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "The grader scores every criterion, with a quote for each",
+      "d": "thesis: 1 · evidence: 1 · counterargument: 3, quoted \"I don't really\nhave a counterargument because everyone agrees lunch should be\nlonger anyway\" · organization: 1",
+      "m": "601 in · 194 out"
+    },
+    {
+      "e": "e3",
+      "h": "Code checks every quote against the submission, verbatim",
+      "d": "all four quotes found in the text; none dropped as unevidenced\n(the counterargument quote is real -- it is just not evidence\nof what the rubric asks for)",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e4",
+      "h": "The reviewer, independently, decides what to check",
+      "d": "→ CHECK: counterargument\n(the reviewer has not seen the grader's reasoning, only\nthe submission, the rubric and these four proposed scores)",
+      "m": "384 in · 6 out"
+    },
+    {
+      "e": "e5",
+      "h": "Code returns that criterion's full rubric text and the submission again",
+      "d": "counterargument (0-4 points): describes a real opposing position\naccurately and responds to it, rather than dismissing it or\nasserting that no one holds it -- level 0: no opposing position\nappears anywhere in the essay",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e6",
+      "h": "The reviewer rejects, naming the criterion",
+      "d": "\"REJECT: counterargument scores 3 but the quote never states\nan opposing position, it only claims no one holds one, which\nthe rubric's level 0 describes, not level 3.\"",
+      "m": "519 in · 41 out"
+    }
+  ]
+}

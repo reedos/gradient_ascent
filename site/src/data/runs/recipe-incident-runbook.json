@@ -1,0 +1,70 @@
+{
+  "illustrative": true,
+  "h": 530,
+  "title": "Incident write-up to draft runbook, assembled",
+  "sub": "Pull out the timeline, turn the repeatable events into steps, verify in code, then hold for the incident owner.",
+  "pill": "Level 3 · Workflows",
+  "nodes": [
+    { "id": "writeup", "x": 170, "y": 34, "l": "Incident write-up arrives", "k": "io" },
+    { "id": "extract", "x": 170, "y": 110, "l": "Pull out the timeline", "k": "model" },
+    { "id": "draft", "x": 170, "y": 186, "l": "Draft steps for repeatable events", "k": "model" },
+    { "id": "verify", "x": 170, "y": 262, "l": "Verify: drop bad citations, flag incomplete", "k": "code" },
+    { "id": "assemble", "x": 170, "y": 338, "l": "Assemble the draft runbook", "k": "code" },
+    { "id": "owner", "x": 310, "y": 414, "l": "Incident owner reviews", "k": "human" },
+    { "id": "resume", "x": 170, "y": 414, "l": "Approve, edit, or reject", "k": "code" },
+    { "id": "out", "x": 170, "y": 490, "l": "Runbook, or nothing yet", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "writeup", "t": "extract", "by": "code" },
+    { "id": "e2", "f": "extract", "t": "draft", "by": "code" },
+    { "id": "e3", "f": "draft", "t": "verify", "by": "code" },
+    { "id": "e4", "f": "verify", "t": "assemble", "by": "code" },
+    { "id": "e5", "f": "assemble", "t": "resume", "by": "code" },
+    { "id": "e6", "f": "owner", "t": "resume", "by": "code" },
+    { "id": "e7", "f": "resume", "t": "out", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The write-up arrives",
+      "d": "\"02:14 - on-call page fires for jrivera...\"\n27 lines, one incident, Thistledown Labs order-sync backlog",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code asks the model for the timeline",
+      "d": "7 events: e1 page fires ... e7 dcho drafts a customer email\ncode assigns each event its id, e1 through e7",
+      "m": "447 tokens in · 235 tokens out"
+    },
+    {
+      "e": "e3",
+      "h": "Your code shows the numbered timeline back and asks for steps",
+      "d": "4 steps drafted, each citing the event it came from:\ncheck queue depth (e2), restart the worker pool (e4),\nroll back only alongside a restart (e5), check the lag metric (e6)\n(waking dcho, e3, and the customer email, e7, were left out this run)",
+      "m": "338 tokens in · 192 tokens out"
+    },
+    {
+      "e": "e4",
+      "h": "Your code verifies every step",
+      "d": "4 of 4 steps cite a real event id, kept\n0 dropped, 0 missing a role or a check this run",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e5",
+      "h": "Your code assembles the draft and pauses",
+      "d": "the run returns a checkpoint here; no runbook is usable\nuntil the incident owner decides",
+      "m": "0 tokens · paused"
+    },
+    {
+      "e": "e6",
+      "h": "The incident owner reads the draft and decides",
+      "d": "sees: the write-up, the timeline, all 4 drafted steps\ndecides: approve",
+      "m": "decision: approve"
+    },
+    {
+      "e": "e7",
+      "h": "Your code resumes and the runbook exists",
+      "d": "4 steps, each with a role, a check, and the event it traces to",
+      "m": "0 tokens · 0 ms"
+    }
+  ]
+}

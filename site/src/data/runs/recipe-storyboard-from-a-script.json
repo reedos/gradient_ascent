@@ -1,0 +1,62 @@
+{
+  "illustrative": true,
+  "h": 530,
+  "title": "Turn a script into a shot list, assembled",
+  "sub": "Split the script into scenes, propose shots inside each one, then check in code that every line is covered and every shot stays inside the script and its own scene.",
+  "pill": "Level 3 · Workflows",
+  "nodes": [
+    { "id": "script", "x": 170, "y": 34, "l": "Numbered script arrives", "k": "io" },
+    { "id": "scenes", "x": 170, "y": 110, "l": "Split into scenes", "k": "model" },
+    { "id": "parse_scenes", "x": 170, "y": 186, "l": "Parse the scene list", "k": "code" },
+    { "id": "shots", "x": 170, "y": 262, "l": "Propose shots for all scenes", "k": "model" },
+    { "id": "coverage", "x": 170, "y": 338, "l": "Check coverage against the script", "k": "code" },
+    { "id": "director", "x": 310, "y": 414, "l": "Director reads the shot list", "k": "human" },
+    { "id": "out", "x": 170, "y": 490, "l": "Shot list, or the gaps it found", "k": "io" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "script", "t": "scenes", "by": "code" },
+    { "id": "e2", "f": "scenes", "t": "parse_scenes", "by": "code" },
+    { "id": "e3", "f": "parse_scenes", "t": "shots", "by": "code" },
+    { "id": "e4", "f": "shots", "t": "coverage", "by": "code" },
+    { "id": "e5", "f": "coverage", "t": "director", "by": "code" },
+    { "id": "e6", "f": "director", "t": "out", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The numbered script arrives",
+      "d": "1. Open on a cluttered desk at dusk...\n2. A hand pulls a plain shipping box from a mailer...\n...25 numbered lines in all, through 25. \"One light, wherever you put it.\"",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code asks the model to split the script into scenes",
+      "d": "4 scenes: INT. HOME OFFICE - DUSK (1-13), INT. HOME OFFICE - CONTINUOUS (14-15),\nINT. BEDROOM - NIGHT (16-21), TAG - PRODUCT CARD (22-25)",
+      "m": "565 tokens in · 89 tokens out · 210 ms"
+    },
+    {
+      "e": "e3",
+      "h": "Your code reads the scene list back into 4 ranges",
+      "d": "1-13, 14-15, 16-21, 22-25: no gap, no overlap, all 25 lines assigned to a scene",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e4",
+      "h": "Your code asks the model for shots across all four scenes in one call",
+      "d": "20 shots proposed. Scene 2 gets two: an insert on the lamp's arm folding (line 14)\nand a shot on Mara zipping the box (lines 14-15, carrying the voiceover line\nthat names no visual of its own)",
+      "m": "664 tokens in · 816 tokens out · 640 ms"
+    },
+    {
+      "e": "e5",
+      "h": "Your code checks coverage: every line inside a shot, every shot inside its scene and the script",
+      "d": "0 uncovered lines, 0 shots dropped, 0 shots escaping their scene.\n50.5s of shots across 4 scenes against roughly 137.6s to read the script aloud",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e6",
+      "h": "A director reads the shot list before anyone shoots it",
+      "d": "sees: every shot, its scene, its line range, its estimated seconds, and the\ncoverage check's own report; decides whether to shoot it as drafted or send\na scene back for another pass",
+      "m": "decision: read and confirm"
+    }
+  ]
+}
