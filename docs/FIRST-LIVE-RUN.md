@@ -30,7 +30,7 @@ written as `python` for short.
   an HTTP 404 with your local server's own message; pull it yourself, deliberately, so you know
   which tag you measured.
 - **`context_engineering` is the one to run last on a local model.** It puts the whole document
-  set in every prompt by design — about 14,000 input tokens a question against `rag`'s 508 — which
+  set in every prompt by design — about 14,000 input tokens a question against `rag`'s 519 — which
   is the difference between minutes and an hour on a local model.
 
 ## Order
@@ -108,7 +108,7 @@ python scripts/record_trace.py --list
 This prints every example under `examples/` and, for the ones it cannot record, why — an entry
 point that is not named `run`, or a required argument `--question` cannot fill in.
 `.local/page-requests/wave6-traces.md` has the exact change each of those would need; most pages
-do not need it, since 28 of the 44 examples are recordable as they stand.
+do not need it, since 39 of the 44 examples are recordable as they stand.
 
 **Then project the call before making it**, the same discipline as `eval_run.py --dry`:
 
