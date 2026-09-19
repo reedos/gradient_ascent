@@ -18,7 +18,8 @@
         "order-zero"
       ],
       "recipes": [
-        "limits-without-a-model"
+        "limits-without-a-model",
+        "characterize-a-design"
       ],
       "teardowns": [],
       "elsewhere": [
@@ -47,7 +48,9 @@
         "prompt-engineering",
         "inference-time-reasoning"
       ],
-      "recipes": [],
+      "recipes": [
+        "measurement-writeup"
+      ],
       "teardowns": [],
       "elsewhere": [
         "Summarize a meeting transcript",
@@ -79,7 +82,8 @@
       "recipes": [
         "document-extraction",
         "voice-notes",
-        "maintenance-log"
+        "maintenance-log",
+        "accuracy-specs-from-the-manual"
       ],
       "teardowns": [],
       "elsewhere": [

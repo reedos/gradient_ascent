@@ -1,0 +1,19 @@
+---
+slug: accuracy-specs-from-the-manual
+reviewed: 2026-09-19
+sources: []
+---
+
+An instrument's accuracy specification is a table in a PDF: one row per range, per calibration
+interval, in parts per million of reading plus parts per million of range, with a temperature band
+and a coefficient for every degree outside it. Nothing downstream can price a measurement until
+that table is data. The model reads the manual and fills the schema, code validates the rows and
+computes the budget from them, and a person checks every row against the manual before a number is
+quoted from it. The failure this recipe exists for is not a garbled row. It is a clean, plausible
+row taken from the wrong calibration interval or the wrong range, which produces an uncertainty
+three times too small and looks exactly like a correct one.
+
+Draft in progress. This page is a slot: the taxonomy entry, the techniques it composes and the
+level it needs are settled, and the writing is not. See `docs/WRITING-AN-ENGINEERING-RECIPE.md`
+for what belongs here, and `docs/THE-BENCH.md` for the bench every engineering recipe runs on,
+including the accuracy table in `evals/bench/corpus/mdn6100-programming-manual.md`.

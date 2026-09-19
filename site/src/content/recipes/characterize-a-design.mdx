@@ -1,0 +1,18 @@
+---
+slug: characterize-a-design
+reviewed: 2026-09-19
+sources: []
+---
+
+Five prototype boards come back from the board house and nobody knows yet what the design does at
+the edges of its own specification. A sweep over input voltage, load current and ambient
+temperature is a nested loop. The margin to a datasheet limit at each of those corners is a
+subtraction. The uncertainty that says whether a margin is real is a root sum of squares over four
+named numbers, and guardbanding a limit by it is another subtraction. No model is involved
+anywhere, and none should be: a model never produces a reported measurement, an uncertainty, a
+margin or a verdict.
+
+Draft in progress. This page is a slot: the taxonomy entry, the techniques it composes and the
+level it needs are settled, and the writing is not. See `docs/WRITING-AN-ENGINEERING-RECIPE.md`
+for what belongs here, and `docs/THE-BENCH.md` for the bench every engineering recipe runs on,
+including the answer key to `evals/bench/data/characterization-2026-09.csv`.

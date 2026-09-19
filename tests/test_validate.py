@@ -105,11 +105,40 @@ class ValidateTests(unittest.TestCase):
         for recipe in real["recipes"]:
             self.assertIn(recipe.get("domain"), declared, recipe["slug"])
         engineering = [r for r in real["recipes"] if r["domain"] == "engineering"]
-        self.assertGreaterEqual(len(engineering), 8)
-        # The level-0 recipe leads its group: it is the one that says most of this job needs
-        # no model at all, and it reads first on the page.
-        self.assertEqual(engineering[0]["slug"], "limits-without-a-model")
-        self.assertEqual(engineering[0]["uses"], ["order-zero"])
+        self.assertGreaterEqual(len(engineering), 11)
+        # Two level-0 recipes lead the group, as a pair, and neither is the default: one is
+        # production test (limits-without-a-model), one is engineering test
+        # (characterize-a-design), and both say that most of the job needs no model at all.
+        # Whichever of the two a reader's work looks like, the other is beside it rather than
+        # above it, and the index aside says so.
+        self.assertEqual(
+            [r["slug"] for r in engineering[:2]],
+            ["limits-without-a-model", "characterize-a-design"],
+        )
+        for recipe in engineering[:2]:
+            self.assertEqual(recipe["uses"], ["order-zero"], recipe["slug"])
+
+    def test_the_engineering_recipes_are_ordered_by_the_level_they_need(self):
+        """The list's order is a claim the index makes in its aside, so it is checked here.
+
+        Ordering by level is what keeps either setting from reading as the default: production
+        test and engineering test interleave through the list by what each recipe needs, not by
+        which audience it belongs to.
+        """
+        import json
+
+        real = json.loads((ROOT / "content" / "taxonomy.json").read_text(encoding="utf-8"))
+        level_of = {
+            page["slug"]: tier["order"]
+            for tier in real["tiers"]
+            for page in tier["pages"]
+        }
+        levels = [
+            max(level_of.get(use, 0) for use in r["uses"])
+            for r in real["recipes"]
+            if r["domain"] == "engineering"
+        ]
+        self.assertEqual(levels, sorted(levels), levels)
 
     def test_every_engineering_recipe_has_a_page_file(self):
         import json

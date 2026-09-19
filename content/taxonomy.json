@@ -763,6 +763,27 @@
       "summary": "Limits, first-pass yield, Cpk, a control chart, and the same measurements grouped by lot, by fixture, by day and by shift. No model is involved anywhere, and the pass or fail decision never should be: a wrong pass ships a bad unit. Level 0 is the whole recipe, and most of a test engineer's week is this."
     },
     {
+      "slug": "characterize-a-design",
+      "title": "Sweep a design over its corners and report the margins",
+      "status": "draft",
+      "domain": "engineering",
+      "uses": [
+        "order-zero"
+      ],
+      "summary": "Five prototype boards, a sweep over line, load and temperature, the margin to every datasheet limit at every corner, the uncertainty budget behind each margin and the guardbanded verdict that follows from it. All of it is arithmetic: a sweep is a loop, a margin is a subtraction, a budget is a root sum of squares. The engineering-test counterpart to limits-without-a-model, and level 0 is the whole recipe."
+    },
+    {
+      "slug": "measurement-writeup",
+      "title": "Turn a measurement session into a report somebody can review",
+      "status": "draft",
+      "domain": "engineering",
+      "uses": [
+        "order-zero",
+        "prompt-engineering"
+      ],
+      "summary": "The notebook and the computed results become a characterization report a reviewer can read. Code computes every number and places it; the model writes the prose around the numbers and never touches them; a check in code confirms that every figure in the draft is one code produced; a person reads it before it goes out. One call, so level 1, and the check is what makes the call safe to make."
+    },
+    {
       "slug": "ask-the-datasheet",
       "title": "Answer questions from a datasheet, a test spec and a change notice",
       "status": "draft",
@@ -772,6 +793,18 @@
         "structured-output"
       ],
       "summary": "Retrieval over the documents an engineer already has, answered with citations that can be checked. The case that matters is a change notice contradicting the datasheet on one number, where the right answer depends on the board revision. Level 2 is enough because one search finds the passage."
+    },
+    {
+      "slug": "accuracy-specs-from-the-manual",
+      "title": "Pull an instrument's accuracy table out of its manual",
+      "status": "draft",
+      "domain": "engineering",
+      "uses": [
+        "order-zero",
+        "structured-output",
+        "human-in-the-loop"
+      ],
+      "summary": "The model reads a programming manual and fills a schema: one row per range per calibration interval, ppm of reading and ppm of range, the temperature band and the coefficient outside it. Code validates the rows and computes the budget from them, and a person checks every row against the manual before anything is quoted from it. The case that matters is a right-looking number from the wrong interval or the wrong range."
     },
     {
       "slug": "test-failure-triage",
@@ -784,6 +817,29 @@
         "human-in-the-loop"
       ],
       "summary": "Failing measurements and free-text operator notes are sorted into the causes the failure analysis guide already lists, then routed. A person confirms before anything is scrapped or reworked. The categories are known in advance, so this is classification into fixed classes and not an agent."
+    },
+    {
+      "slug": "design-review-checklist",
+      "title": "Check a board against the design review rules",
+      "status": "draft",
+      "domain": "engineering",
+      "uses": [
+        "evaluator-optimizer",
+        "structured-output"
+      ],
+      "summary": "A bill of materials and a netlist summary are checked rule by rule against the written design review rules. One pass drafts findings, a second checks each finding against the rule text it cites and drops the ones that cite nothing. Level 3, because code decides every step and the rules do not change between boards."
+    },
+    {
+      "slug": "requirements-to-test-plan",
+      "title": "Turn a requirements list into a test plan",
+      "status": "draft",
+      "domain": "engineering",
+      "uses": [
+        "prompt-chaining",
+        "structured-output",
+        "human-in-the-loop"
+      ],
+      "summary": "A fixed chain: read the requirements, propose a test for each, build the traceability table, then check that every requirement has a test and every test names a requirement. A person approves before any of it is adopted. The order of the steps is known in advance, which is what keeps this at level 3."
     },
     {
       "slug": "instrument-script-from-the-manual",
@@ -820,29 +876,6 @@
         "safety"
       ],
       "summary": "An agent with read-only tools, instrument queries, the test log and the datasheet, works a low output down to a cause and proposes the next measurement. Queries run unattended; anything that sets a voltage, a current limit or an output goes through the envelope and a person. Level 5 because each measurement depends on the last."
-    },
-    {
-      "slug": "design-review-checklist",
-      "title": "Check a board against the design review rules",
-      "status": "draft",
-      "domain": "engineering",
-      "uses": [
-        "evaluator-optimizer",
-        "structured-output"
-      ],
-      "summary": "A bill of materials and a netlist summary are checked rule by rule against the written design review rules. One pass drafts findings, a second checks each finding against the rule text it cites and drops the ones that cite nothing. Level 3, because code decides every step and the rules do not change between boards."
-    },
-    {
-      "slug": "requirements-to-test-plan",
-      "title": "Turn a requirements list into a test plan",
-      "status": "draft",
-      "domain": "engineering",
-      "uses": [
-        "prompt-chaining",
-        "structured-output",
-        "human-in-the-loop"
-      ],
-      "summary": "A fixed chain: read the requirements, propose a test for each, build the traceability table, then check that every requirement has a test and every test names a requirement. A person approves before any of it is adopted. The order of the steps is known in advance, which is what keeps this at level 3."
     }
   ],
   "relations": [
