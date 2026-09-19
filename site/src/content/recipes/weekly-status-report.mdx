@@ -1,0 +1,278 @@
+---
+slug: weekly-status-report
+reviewed: 2026-09-19
+sources: []
+---
+
+import Run from '../../components/page/Run.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import Link from '../../components/page/Link.astro';
+import statusRun from '../../data/runs/recipe-weekly-status-report.json';
+
+The office manager at a twelve-person firm sends the same email every Friday afternoon: what
+moved this week, what is behind, and what somebody has to deal with before Monday. Putting it
+together takes an hour and a half, and almost none of that is writing. It is opening the project
+tracker and counting what closed, opening the shared client inbox and working out which threads
+have been sitting on the firm's side too long, opening the spreadsheet where somebody types the
+hours, and adding them up against what each project was budgeted. Three systems, three different
+shapes, three different degrees of trustworthiness, and one email at the end of it.
+
+This is the job people mean when they say they want AI to do their reporting, and most of it
+turns out not to need one. The counting, the comparing and the schedule are arithmetic. What a
+model is genuinely good for here is the last twenty minutes: turning a table nobody wants to read
+into four paragraphs they will.
+
+Not in scope: writing anything back to any of the three systems, which is
+<Link href="/recipes/project-tracker-upkeep/">a different recipe and a harder one</Link>; deciding
+whether a project is in trouble; and sending the email. The report comes out with its own
+problems named on it, and a person reads it before anyone else does.
+
+## The assembled diagram
+
+<Run data={statusRun} label="Level 1 · Standing report" runKey="weekly-status-report" />
+
+## Why this level, and why not higher
+
+This job is more than one <Link href="/shapes/">job shape</Link>, so the worksheet is walked once
+per half and the joined job takes the higher answer.
+
+The assembly half is two shapes at once, which is worth saying because the shapes are not a filing
+system with one drawer per job. It is a watch: a fixed list of sources, checked on a schedule,
+with code working out what changed since last time. It is also a calculation: the input is
+records and the right answer is fixed by arithmetic. Both descriptions are true of the same code,
+and both land it in the same place. The writing half is the third shape, turning one piece of
+text into another.
+
+That is a different join from <Link href="/recipes/literature-watch/">the literature watch</Link>,
+which is the site's other page about two shapes meeting, and the difference is worth a sentence
+because it changes what the seam protects. There the two halves run in series and the watch half
+decides how many model calls happen: five records listed, two new, two calls. Here the halves
+meet head on. Three sources fan into one set of figures, and there is exactly one call whatever
+kind of week it was, because the report is one document. The watch half is not deciding how much
+to spend. It is deciding what is true.
+
+**The assembly half is level 0.** Walk the questions against the job of working out the week's
+numbers. The sources are a list somebody wrote down once. The window is the schedule's, from the
+last report to this one. Everything after that is counting rows, comparing dates, adding hours and
+dividing by a budget. Two people handed the same three exports would produce the same 38 figures,
+which is what the floor means. Reaching for a model to read the tracker export would be asking one
+to do a lookup and a subtraction, and it would produce numbers nobody could reproduce next week.
+
+The one part of the assembly that looks like judgment is not. Three systems spell the same project
+three ways, so the names have to be reconciled before anything can be counted. That is a table a
+person wrote once, and the important behavior is what happens to a name the table does not have:
+it is reported, not attached to the nearest match and not dropped. A thread quietly filed under
+the wrong project is worse than a thread nobody counted.
+
+**The writing half is level 1.** One call, and everything it needs is in front of it. Nothing has
+to be looked up, which is the question that would push it to level 2: there is no document to
+retrieve, because the figures are the whole of the input and code computed them. Nothing has to
+pass a check before a person sees it, which is what would push it to level 3. Two checks do run,
+but they are code, they run once, and they do not retry: a draft that fails one is handed to a
+person with the failures named, not quietly repaired and sent.
+
+**So the joined job settles at level 1**, which is lower than where a watch usually lands and lower
+than most people expect for something that reads three systems.
+
+Two ways it would climb, both real. It becomes level 3 the day nobody reads the report before it
+goes out, because then the check has to stand in for the reader rather than help them. It also
+becomes level 3 the day something downstream starts parsing the prose instead of a person reading
+it, a dashboard or another program, because then a sentence is an interface and has to be right
+rather than readable. Neither is true here.
+
+It does not become level 5 by adding sources. A researcher at level 5 decides what to look at
+next; this decides nothing, because a person chose the three systems once and the schedule is a
+timer.
+
+And it is worth saying what is below. If the people receiving this would read a table, drop the
+model: the assembly half alone, mailed as a table with the overdue rows at the top, is a complete
+and honest answer at level 0, and it costs nothing to run. The call earns its place only when the
+report is read by people who will not read a table, which at a twelve-person firm is most of them.
+
+## What makes it a standing job, and what that changes
+
+A one-off report is assembled by somebody who already knows what happened. A standing one runs
+whether or not anything interesting happened, on a day nobody chose for a reason, over sources
+nobody looked at first. Four things follow, and all four are in the code rather than in the prose.
+
+**The window comes from the schedule, not from judgment.** The run covers 09/11/2026 to
+09/18/2026 because that is where the last report stopped. A task closed on the day of the previous
+report belongs to that one. Without a fixed window, tasks get counted twice or not at all,
+depending on when somebody happened to run it.
+
+**A quiet week still produces a report.** A standing job that goes silent when nothing happened is
+indistinguishable from one that broke, and a team learns within a month to stop noticing either.
+
+**A stale source is not a quiet week.** The time spreadsheet says it is current only to
+09/15/2026, three days behind the report. Reporting zero hours for the week would be a lie code
+could have caught, so the figures carry the date the hours actually run through and the report is
+required to say so. That is a mild version of a failure that does real damage in
+<Link href="/recipes/project-tracker-upkeep/">the tracker recipe</Link>, where the same silence
+ages a document instead of spoiling one email.
+
+**Nobody is watching the inputs, so the code has to speak up.** One project name in the inbox
+matched nothing on the firm's list. In a report assembled by hand, somebody would have seen it.
+Here it is a figure like any other and it appears in the email.
+
+## Walkthrough
+
+Every figure is computed first, formatted once, and labeled. The format is the point: what the
+model is allowed to write is a character sequence, not a number, so nothing has to be reformatted
+downstream and the checks can compare strings.
+
+<CodeFile file="examples/weekly_status_report/run.py" func="compute_figures" />
+
+On the sample week that produces 38 figures. Three tasks closed and three opened. Two are overdue,
+one on each of two projects. The library project has used 98.3 percent of its 60 budgeted hours
+and still has three tasks open, which is the line the whole email exists to deliver. Two client
+threads have been waiting on the firm for more than three days, one for six days and one for
+eight. And the hours behind all of that only run through 09/11/2026, because the spreadsheet has
+not been touched since.
+
+Those figures and the note the office manager typed go into one prompt, and the model writes the
+paragraphs between them. Then two checks read the draft, and they point in opposite directions.
+
+The first is the one <Link href="/recipes/measurement-writeup/">the measurement writeup</Link>
+argues for at length, and the argument carries over unchanged: every numeric token in the draft
+has to be, character for character, one of the figures code produced.
+
+<CodeFile file="examples/weekly_status_report/run.py" func="unsupported_figures" />
+
+Dates are matched first and checked whole, so 09/18/2026 is one token rather than three numbers.
+Task identifiers are blanked next, so BW-104 is not read as an invented figure. What is left is
+scanned. A total the model added up itself, 124.0 hours across two projects, is caught even though
+both of the numbers behind it are real. A figure tidied from 98.3 to 98 is caught. So, strictly,
+is a real date written a different way: 9/10/2026 is the same day as 09/10/2026 and is not the
+same string, and the answer to that is to redraft rather than to loosen the check.
+
+The second check is the one a standing report needs and a one-off report does not. A draft can be
+entirely truthful and still be useless, because it left out the only line anybody had to act on.
+
+<CodeFile file="examples/weekly_status_report/run.py" func="missing_required" />
+
+Code marks some figures as must-say: the date an overdue task was due, a project at or over 90
+percent of its budgeted hours, the date a stale source is current to. If the draft never quotes
+one, the report comes back naming it.
+
+The honest limit is built into that check rather than argued around it. A figure has to be at
+least three characters long before it can be marked must-say at all, because confirming that a
+draft mentions "2" somewhere is not confirming anything. Four figures in the sample week are
+must-say and too short to test, all of them counts, and code says so instead of claiming a check
+it cannot perform:
+
+<CodeFile file="examples/weekly_status_report/run.py" func="short_must_say" />
+
+Those four are handed to the person reading the report, which is the step this recipe ends on and
+not an optional one.
+
+## What it costs
+
+<CostStrip
+  level={1}
+  stats={[
+    { label: 'Model calls, one week', value: '1, whatever happened in the week' },
+    { label: 'Tokens in, this run', value: '812' },
+    { label: 'Tokens out, this run', value: '285' },
+    { label: 'Figures computed and handed over', value: '38' },
+  ]}
+  comparedTo={{
+    label: 'handing the model the three exports and asking it for the figures as well as the prose',
+    note:
+      'The three exports serialized as text are about 570 tokens on these fixtures, against 484 for the figures block, so a version that asked the model to do the counting as well would cost slightly more to run, not less. That is the point of the comparison: the reason not to do it has nothing to do with money. It is that the counts, the dates and the totals would then be a model\'s arithmetic, unreproducible next week, and neither check above could exist, because there would be no computed figures to check a draft against. Both figures come from the stub, so they illustrate the ratio rather than measure it.',
+  }}
+/>
+
+The unit is per week, and the number worth watching is not the token count. At one call a week it
+is a rounding error against anything, including the hour and a half it replaces. The number worth
+watching is how much of the report the model is responsible for, which is none of the figures and
+all of the sentences.
+
+## How it fails
+
+<FailureModes modes={[
+  {
+    name: 'A right figure next to the wrong project',
+    notice: 'The draft says the commons project has used 98.3 percent of its budgeted hours. The figure is real and the project is real and the sentence is false, because 98.3 belongs to the library. Both checks pass: one sees a number it recognizes, the other sees a must-say figure present.',
+    test: 'tests/test_example_weekly_status_report.py proves the check waves this through, rather than leaving a reader to assume it would not. The only thing that catches it is a person reading each figure against the claim it is sitting next to, which takes about a minute for a report this size and is why the last step of this recipe is a person.',
+  },
+  {
+    name: 'A must-say figure confirmed by coincidence',
+    notice: 'Two figures can carry the same text for different reasons. If the date the last report closed and the date a permit expired are both 09/11/2026, a draft that mentions the first satisfies the requirement for the second, and nothing says the permit was never mentioned.',
+    test: 'tests/test_example_weekly_status_report.py builds exactly that pair and shows the check cannot tell them apart. compute_figures avoids it in the sample week by requiring a date no other figure carries, which is a thing a person has to think about when choosing what to mark must-say, not something the check can do for them.',
+  },
+  {
+    name: 'A source that is behind, reported as a quiet week',
+    notice: 'The spreadsheet has not been updated, so a week of work shows up as no hours logged, and a project that is quietly burning through its budget looks calm.',
+    test: 'tests/test_example_weekly_status_report.py checks that no this-week hours figure exists at all, because the source cannot support one, and that the date the spreadsheet is current to is marked must-say so the report has to admit it. Watch that line: a source behind two weeks running is broken, not quiet.',
+  },
+  {
+    name: 'A project name nobody reconciled',
+    notice: 'A client writes about a job the tracker calls something else, and the thread is counted against the wrong project, or against none.',
+    test: 'tests/test_example_weekly_status_report.py checks that a name no list recognizes comes back as itself and is counted in the report, rather than being matched to the closest-looking project. The alias table is a person\'s job to keep, and the count of unrecognized names is how they find out it needs keeping.',
+  },
+]} />
+
+## What to measure
+
+<HowToEval>
+
+Score the two halves separately, because they fail separately and one number over the email hides
+which one moved.
+
+For the assembly half there is a right answer and it is free to get: take a week somebody already
+put together by hand and compare figure against figure. Every difference is a defect in the code
+or in the alias table, not a matter of taste. Three or four weeks is enough to shake out the name
+reconciliation, which is where the mistakes will be.
+
+For the writing half, the check that costs nothing runs already: what share of drafts come back
+with nothing unsupported and nothing must-say left out. That is a pass or a fail rather than a
+judgment, and a rate below 100 percent means the prompt is losing the copy-the-figure instruction,
+not that the arithmetic is wrong. What it does not measure is the failure that matters most, a
+real figure attached to the wrong claim, so keep five or six past reports and read each one
+against its own figures, checking the claim each number sits next to.
+
+No result file exists for this recipe, so it claims no score. What is above is the method for
+building one.
+
+</HowToEval>
+
+## If you would rather buy this than build it
+
+Plenty of software will assemble a weekly report from the systems an office already runs, and for
+many firms that is the right answer. Four questions to hold one to, whatever it is called:
+
+- **Who computes the numbers?** If the answer is that a model reads the exports and reports what
+  it finds, the figures are unreproducible and no check like the two above can exist. Ask to see
+  the same week run twice.
+- **What happens when a source is behind or empty?** A product that reports zero where it should
+  report "not updated since" will quietly tell you a busy week was a quiet one.
+- **Does a person see it before it goes?** And can they edit it, or only approve it?
+- **Can you get the assembled figures out, separately from the prose?** That is the part with
+  lasting value, and a report you cannot export the numbers from is a report you have to
+  reassemble by hand the day you change tools.
+
+None of those is a question about how good the writing is, which is the thing a demonstration will
+show you and the thing least likely to go wrong.
+
+## Variations
+
+- Send a different report to different readers from the same figures: one call per audience over
+  the same computed set, with a different instruction about what to lead with. Nothing in the
+  assembly half changes, and the checks are unchanged because the figures are.
+- Add a source by writing one more pull and one more set of figures. Everything downstream takes
+  figures, not systems, which is what makes the seam worth having.
+- Mark fewer figures must-say rather than more. A must-say list long enough to cover everything
+  turns the second check into noise, and the point of it is that a failure is worth reading.
+- Move to <Link href="/techniques/evaluator-optimizer/">write and check</Link> at level 3 only if
+  real weeks show the single call losing the copy-the-figure rule often enough to be worth a
+  second call. The check above is cheaper and catches exactly that failure, so the case for
+  climbing has to come from somewhere else.
+- Where the report has to change a system rather than describe it, that is
+  <Link href="/recipes/project-tracker-upkeep/">the tracker recipe</Link>, and it settles two
+  levels higher for one reason: a document somebody else relies on is not a draft a person reads.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}

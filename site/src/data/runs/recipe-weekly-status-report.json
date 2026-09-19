@@ -1,0 +1,70 @@
+{
+  "illustrative": true,
+  "h": 586,
+  "title": "Weekly status report, assembled",
+  "sub": "Three sources, every figure computed in code, one call for the sentences, and two checks over the draft before a person sends it.",
+  "pill": "Level 1 · Standing report",
+  "nodes": [
+    { "id": "timer", "x": 170, "y": 34, "l": "The Friday timer fires", "k": "io" },
+    { "id": "pull", "x": 170, "y": 110, "l": "Pull the three sources", "k": "code" },
+    { "id": "names", "x": 170, "y": 186, "l": "Reconcile the project names", "k": "code" },
+    { "id": "figures", "x": 170, "y": 262, "l": "Compute every figure the report may quote", "k": "code" },
+    { "id": "draft", "x": 170, "y": 338, "l": "One call writes the sentences between them", "k": "model" },
+    { "id": "check", "x": 170, "y": 414, "l": "Check the draft in both directions", "k": "code" },
+    { "id": "report", "x": 170, "y": 490, "l": "The week's report, with its failures named", "k": "io" },
+    { "id": "reader", "x": 170, "y": 566, "l": "A person reads it and sends it", "k": "human" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "timer", "t": "pull", "by": "code" },
+    { "id": "e2", "f": "pull", "t": "names", "by": "code" },
+    { "id": "e3", "f": "names", "t": "figures", "by": "code" },
+    { "id": "e4", "f": "figures", "t": "draft", "by": "code" },
+    { "id": "e5", "f": "draft", "t": "check", "by": "code" },
+    { "id": "e6", "f": "check", "t": "report", "by": "code" },
+    { "id": "e7", "f": "report", "t": "reader", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The timer fires: nothing decided anything",
+      "d": "The same day every week, whatever kind of week it was.\nThe window runs from the last report, 09/11/2026,\nto this one, 09/18/2026",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code pulls each system",
+      "d": "The tracker export and the inbox are current to 09/18/2026\nThe time spreadsheet says it is current only to 09/15/2026,\nwhich is reported rather than read as a week with no hours",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e3",
+      "h": "Your code reconciles the project names",
+      "d": "Three systems spell the same project three ways\nOne name in the inbox matches nothing on the list and is\nreported, not attached to the nearest project",
+      "m": "no model call: a table a person wrote once"
+    },
+    {
+      "e": "e4",
+      "h": "Your code computes every figure",
+      "d": "38 figures: closed, opened, open, overdue, earliest due date,\nhours against budget, threads waiting on us\n4 are marked must say and are long enough to check",
+      "m": "no model call: this is the level-0 half"
+    },
+    {
+      "e": "e5",
+      "h": "One call, with the figures and the week's note",
+      "d": "The model is handed every figure formatted exactly as it may\nquote it, and writes the prose between them\nIt has nothing to look up and nothing to decide",
+      "m": "812 tokens in · 285 tokens out · 1 call"
+    },
+    {
+      "e": "e6",
+      "h": "Your code checks the draft both ways",
+      "d": "Every number in the draft has to be one of the figures\nEvery must-say figure has to appear in the draft\nA draft that fails either is handed back, never patched",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e7",
+      "h": "A person reads it before it goes out",
+      "d": "The checks cannot tell whether a real figure is sitting next\nto the claim it belongs to, and the four must-say figures too\nshort to test are named for the reader to confirm by eye",
+      "m": "read before anyone acts on it"
+    }
+  ]
+}

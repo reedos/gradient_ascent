@@ -1,0 +1,295 @@
+---
+slug: project-tracker-upkeep
+reviewed: 2026-09-19
+sources: []
+---
+
+import Run from '../../components/page/Run.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
+import Link from '../../components/page/Link.astro';
+import trackerRun from '../../data/runs/recipe-project-tracker-upkeep.json';
+
+The same twelve-person firm keeps one document everybody looks at: a row per project, with its
+status, the next milestone and when it falls, the hours used so far, who owns it, and a line or
+two of notes somebody typed after a phone call. It is the thing people open before a client rings
+back, and it is only useful while it is true. Keeping it true is somebody's Monday morning, and
+it is the job that slips first.
+
+That sounds like <Link href="/recipes/weekly-status-report/">the Friday report</Link> and it is
+not. A report is written once and read once; if a figure in it is a week old, it is wrong for an
+afternoon. A document has to still be true next week, and next month, which means the work is not
+producing text at all. It is reconciling what changed against what is already written: deciding
+what is new, what is stale, what conflicts with something a person put there on purpose, and
+leaving the rest alone. Most of the document does not change most weeks, and a run that rewrites
+it anyway has destroyed the one thing it was for.
+
+Not in scope: deciding which of two disagreeing dates is right, judging whether a project is in
+trouble, or creating the new row it proposes. A new row needs an owner and nothing here can
+supply one.
+
+## The assembled diagram
+
+<Run data={trackerRun} label="Level 3 · Standing upkeep" runKey="project-tracker-upkeep" />
+
+## Why this level, and why not higher
+
+Two <Link href="/shapes/">job shapes</Link> again, and again they settle separately.
+
+The join runs the other way round from
+<Link href="/recipes/weekly-status-report/">the report's</Link>. There the model is the last step
+and writes nothing but prose, over figures code has already fixed. Here the model is the first
+step and writes nothing to the document at all. It reads the one source that is prose, the shared
+inbox, and turns each message into proposed changes; everything after it is comparison, and the
+document changes only when a person says so. Both pages put a model next to a set of records and
+neither lets it touch them, and the two seams are in opposite places for the same reason: the
+thing being protected is whichever artifact somebody else will rely on.
+
+**The reconcile half is level 0.** It is a watch, over a fixed list of sources on a schedule, and
+a calculation, because the right answer for every field is fixed by a rule. Field by field,
+against the source that owns that field: the value matches, or it differs, or nobody sent one.
+Two people given the same document and the same three exports would mark the same cells. There is
+no free text in it and nothing to weigh up. Asking a model whether anything changed would be
+asking for a comparison with a probability attached to it, which is strictly worse than the
+comparison.
+
+**The reading half is level 1 on its own, and the job as a whole is level 3.** One call per
+message, a fixed schema, one retry if the reply does not parse, and everything the call needs is
+in the message. That is a level-1 shape. What lifts the joined job is not the reading, it is where
+the output goes. Level 1's own test is that a person reads the result before it matters. Here the
+result is not read, it is applied: a value written into a document other people will act on
+without ever seeing this run. So the run stops. Anything that would overwrite a field a person
+wrote waits for a person, with the old value, the new one, the reason and the sentence it came
+from side by side. That gate is what
+<Link href="/techniques/human-in-the-loop/">human approval</Link> means on this site, and it is
+what makes this level 3.
+
+**Why not level 4.** At level 4 the model chooses an action: which record to look up, whether to
+apply something, whether to go and check. Nothing here lets it choose anything. It reads one
+message and returns proposals; code decides which project they belong to, whether the field
+exists, whether the document already says that, and whether a person has to see it. Climbing would
+mean letting the model look up the current row and decide for itself whether its proposal is news,
+which is precisely the decision this page hands to a person.
+
+**Why not level 5, and what it would take.** An agent at level 5 would chase a thread: read a
+message, notice a project it has not heard of, go looking for it, open last month's mail to work
+out whether a date moved once or twice. Every one of those is the model deciding what happens
+next. Nothing here decides anything; the source list is fixed and the schedule is a timer. If the
+job became "find out what is actually going on with this project", that is
+<Link href="/recipes/research-brief/">a research job</Link> and it costs accordingly.
+
+**And below.** If every field in the document came from a system, this is level 0 and should stay
+there: comparison, a gate for anything that overwrites a person's work, no model anywhere. The
+model is earning its place here for one reason only, that one of the sources is prose and somebody
+would otherwise read forty messages to find the four that change something.
+
+## The four outcomes, and the one that is usually missing
+
+Code sorts every field into one of four piles, and the fourth is the one most systems do not have.
+
+**Applied.** A field the last run wrote, whose owning source now says something different. The
+tracker export moved the library project from design development to cost estimate out, and its
+milestone from 09/30/2026 to 10/07/2026. Both are written by code and disagreed with by the system
+of record, so both are applied, with the old value kept.
+
+**Queued.** Anything that would overwrite a field a person wrote, and everything the model
+proposed, without exception. Somebody typed 09/24/2026 into the commons project's milestone after
+a call; the export still says 09/21/2026. The document keeps what the person wrote and the
+disagreement goes in the queue. So does a project the export lists that no row covers yet, because
+a new row needs an owner.
+
+**Left alone.** Nineteen of the document's twenty-one cells, this week. That is the normal case
+and it is the whole reason the recipe exists.
+
+**Nobody confirmed it.** Not the same as left alone, and this is the pile with the failure in it.
+
+## The failure that matters: silence reads as agreement
+
+A source that stops sending looks exactly like a source that has nothing to say. In a document
+that only shows values, the two are identical, and the second one is fine while the first one
+quietly ages everything downstream of it. Nobody notices for a month, and by then the document has
+been wrong for a month in a way that leaves no trace.
+
+It has two shapes here and both are in the sample week.
+
+A **whole source can stop advancing.** The time spreadsheet says it is current to 09/15/2026, the
+same date the previous run saw. Its rows may look identical to last week's because they are last
+week's. So nothing it feeds is marked confirmed, and every field it owns is reported with its age:
+three hours figures, the oldest fourteen days.
+
+A **single record can fall out of a source that is otherwise current.** The tracker export is
+up to date and no longer lists the bridge survey. That project did not end. A filter changed, or
+somebody archived a board. Its status stays exactly as it was, its fields are reported as aging
+with the reason, and the run says the export stopped mentioning it. A system that read a missing
+row as a finished project would have closed a live job on its own.
+
+The test that makes this a behavior rather than a sentence is the negative control: the same run
+with the spreadsheet's date moved forward and its numbers unchanged reports nothing aging at all.
+Absence and agreement look the same in the values and are different in the dates, which is why
+every cell in this document carries when it was last confirmed and by whom.
+
+## Walkthrough
+
+The document's shape is what makes the rest possible. Every cell knows who last wrote it and when:
+
+<CodeFile file="examples/project_tracker_upkeep/run.py" cls="Cell" />
+
+Without that there is no way to tell a value the last run wrote from a value somebody typed after
+a phone call, and a tracker that cannot tell those apart will eventually overwrite the second with
+the first. That is the quiet way these systems lose people's trust: not a wrong value, a value
+somebody had already corrected.
+
+The reading half is one call per unread message, and the check on it is a quote check. Every
+proposal has to carry the sentence it came from, word for word:
+
+<CodeFile file="examples/project_tracker_upkeep/run.py" func="_check_quotes" />
+
+The comparison normalizes whitespace, because a model re-wraps a sentence even when it copies the
+words correctly. What it catches is a quote the model wrote rather than copied, which is the
+common failure and usually arrives attached to a plausible value. What it cannot catch is a real
+sentence read to mean something it does not say, and the tests prove that directly rather than
+leaving a reader to assume otherwise: a proposal built on "we will need the updated site plan a
+week before that" survives the check with a date nobody stated. The quote is printed next to the
+change in the queue for exactly that reason. A person reading a proposed date next to the sentence
+it supposedly came from catches this in a second.
+
+Then the comparison, which is the level-0 half and most of the file:
+
+<CodeFile file="examples/project_tracker_upkeep/run.py" func="reconcile" />
+
+On the sample week it applies two changes, queues four, leaves nineteen cells alone, names one
+stale source, one project the export dropped, and six aging fields. Nothing the model returned was
+applied.
+
+The gate is a separate function, called after a person has actually looked:
+
+<CodeFile file="examples/project_tracker_upkeep/run.py" func="approve" />
+
+Two refusals are worth pointing at. A cell written here is marked as a person's, because it is,
+and that is what stops next week's run overwriting it without asking again. And approving two
+changes to the same cell raises rather than letting the later one win: the queue legitimately
+holds two different answers for the commons project's milestone, the export's and the client's,
+and choosing between them is the decision being approved.
+
+## What it costs
+
+<CostStrip
+  level={3}
+  stats={[
+    { label: 'Model calls, one week', value: '3, one per unread message' },
+    { label: 'Tokens in, this run', value: '920' },
+    { label: 'Tokens out, this run', value: '99' },
+    { label: 'Cells changed without asking', value: '2 of 21' },
+  ]}
+  comparedTo={{
+    label: 'a version with no gate, applying every proposal it read out of a message',
+    note:
+      'It would cost the same to run: the calls are identical and the comparison is free. What it would cost is the document. Two of this week\'s four queued changes overwrite something a person put there on purpose, and one of those is a date read out of a client\'s sentence that disagrees with the firm\'s own system. A tracker that takes both, in whichever order they arrived, is a tracker people stop correcting, because their corrections do not survive the week. The figures come from the stub and illustrate the shape of the run rather than measuring it.',
+  }}
+/>
+
+The unit is per week and it scales with the mail, not with the document: a firm with forty unread
+messages pays forty calls and still changes a handful of cells. That ratio is the thing to watch
+if this ever gets expensive, and the fix is upstream, filtering which messages are worth reading
+at all, not a cleverer prompt.
+
+## How it fails
+
+<FailureModes modes={[
+  {
+    name: 'A source goes quiet and the document ages',
+    notice: 'A spreadsheet nobody has updated, an export whose filter changed, a feed whose credentials expired. Every one of them returns something that looks like agreement, and a document that only shows values cannot distinguish that from a week in which nothing happened.',
+    test: 'tests/test_example_project_tracker_upkeep.py attacks this from both ends: a source whose date did not advance is named stale and ages every field it owns, and the same run with the date moved forward and the numbers unchanged ages nothing. The second half is the one that matters, because without it the reporting could be coming from anywhere.',
+  },
+  {
+    name: 'A missing row read as a finished project',
+    notice: 'A project falls out of an export that is otherwise current, and anything that treats absence as an instruction closes it, archives it, or drops it off the list. The work carries on and the document stops mentioning it.',
+    test: 'tests/test_example_project_tracker_upkeep.py holds the row, keeps its status and its last-confirmed date exactly as they were, and reports the project as no longer listed. Watch that line in the run: a project absent two weeks running is a question for a person, not a state to act on.',
+  },
+  {
+    name: 'A plausible value on a quote the model wrote',
+    notice: 'The proposal says the milestone moved to a date that is not in the message, attached to a sentence that is not in the message either. It reads perfectly well, because both were written by something fluent.',
+    test: 'tests/test_example_project_tracker_upkeep.py scripts a paraphrased quote and confirms the proposal is dropped and named rather than queued. The check is a whitespace-normalized substring comparison, so a re-wrapped line still passes and an invented sentence does not.',
+  },
+  {
+    name: 'A real sentence read to mean the wrong thing',
+    notice: 'The quote is genuinely in the message and the value read out of it is wrong: a date mentioned as a deadline for something else, a condition read as an agreement.',
+    test: 'Nothing in code catches this, and tests/test_example_project_tracker_upkeep.py says so with a case that passes every check and proposes a date nobody stated. The queue prints the quote next to the change so a person catches it in the second it takes to read the sentence, which is the only defense there is.',
+  },
+  {
+    name: 'A correction that does not survive the week',
+    notice: 'Somebody fixes a date by hand on Tuesday and the next run puts the system\'s value back on Friday, because nothing recorded that a person had written it. After this happens twice, people stop correcting the document, and then it really is wrong.',
+    test: 'tests/test_example_project_tracker_upkeep.py runs two weeks: an approved value written by a person survives the following run, and the source that disagrees with it is queued again rather than applied. Every cell carrying who wrote it is what makes that possible, so a document without per-field provenance cannot run this recipe at all.',
+  },
+]} />
+
+## What to measure
+
+<HowToEval>
+
+The two halves fail differently and should be scored separately.
+
+The reconcile half has a right answer and no judgment in it, so what is being measured is whether
+the code does what the rules say. Take a week, mark by hand which fields should have changed,
+which should have waited for you and which should have been left alone, and compare. Any
+difference is a defect. Four or five weeks is plenty, because the rules do not vary.
+
+The reading half is scored on the queue, not on the document. For each proposal that reached you,
+would a person who read the same message have proposed the same change to the same field. Count
+two mistakes separately, because they cost differently: a change proposed that the message does
+not support, and a change the message did state that never reached the queue. The first costs you
+a few seconds of reading and is caught by the quote printed beside it. The second is silent, and
+the only way to find it is to read a sample of the messages yourself and see what the run did not
+bring you. Ten or fifteen messages is enough to see the pattern.
+
+There is a third number worth keeping and it is not about the model at all: how many fields are
+aging, week over week. A count that climbs is a source going quiet, and it will show up here
+weeks before anybody notices the document is wrong.
+
+No result file exists for this recipe, so it claims no score. What is above is the method for
+building one.
+
+</HowToEval>
+
+## If you would rather buy this than build it
+
+Software that keeps a tracker in step with other systems is an old and crowded category, and much
+of it is good. Five questions to hold one to:
+
+- **Does it record who wrote each field?** If it cannot tell a value it wrote from a value you
+  typed, it will overwrite your correction, and that is not a setting you can turn off later.
+- **What does it do when a source goes quiet?** Ask specifically. The answer you want is that it
+  tells you; the common answer is that nothing happens, which looks the same as everything being
+  fine.
+- **What does it do with a record that disappears from a source?** A product that closes or
+  archives on absence will eventually do it to a live job.
+- **Where anything reads free text, what reaches the document without a person?** And can you see
+  the sentence a change was read out of, next to the change?
+- **Can you export the document, with its history?** A tracker you cannot take with you is a
+  tracker you will rebuild by hand one day.
+
+The first two are the ones nobody demonstrates, because the demonstration is a week in which
+nothing goes wrong.
+
+## Variations
+
+- Run it more often than weekly. Nothing in the code cares, as long as the previous run's source
+  dates are carried forward; the aging threshold is the only number that has to change with the
+  interval.
+- Let a person approve a rule rather than a change: always take the export's status, never take a
+  date from mail. That is a standing decision recorded once, and it belongs in code next to
+  FIELD_SOURCE rather than in a prompt.
+- Drop the model entirely where every source is a system. The reconcile half is the recipe, and it
+  is level 0 and costs nothing.
+- Where what you want is a description of the week rather than a document that stays true, that is
+  <Link href="/recipes/weekly-status-report/">the status report</Link>, at level 1, and the two
+  run off the same three systems.
+- Add <Link href="/techniques/evaluator-optimizer/">a second pass</Link> over the proposals only
+  once real weeks show the reading half missing changes a person would have caught. A checking
+  pass over a proposal can only see what the message also says, so it catches an invented change
+  and not a missed one, and the missed one is the expensive mistake here.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}

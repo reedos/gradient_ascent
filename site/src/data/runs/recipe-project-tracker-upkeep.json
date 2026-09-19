@@ -1,0 +1,78 @@
+{
+  "illustrative": true,
+  "h": 662,
+  "title": "Tracker upkeep, assembled",
+  "sub": "The model reads the inbox and proposes; code compares every field against the source that owns it; a person approves anything that overwrites a person's work.",
+  "pill": "Level 3 · Standing upkeep",
+  "nodes": [
+    { "id": "timer", "x": 170, "y": 34, "l": "The weekly timer fires", "k": "io" },
+    { "id": "fresh", "x": 170, "y": 110, "l": "Check what each source is current to", "k": "code" },
+    { "id": "read", "x": 170, "y": 186, "l": "Read each unread message, one call each", "k": "model" },
+    { "id": "quotes", "x": 170, "y": 262, "l": "Drop any proposal the message does not say", "k": "code" },
+    { "id": "compare", "x": 170, "y": 338, "l": "Compare every field against the source that owns it", "k": "code" },
+    { "id": "split", "x": 170, "y": 414, "l": "Apply, queue, or leave alone", "k": "code" },
+    { "id": "absent", "x": 170, "y": 490, "l": "Report what nobody confirmed this week", "k": "code" },
+    { "id": "queue", "x": 170, "y": 566, "l": "The approval queue, with both values side by side", "k": "io" },
+    { "id": "person", "x": 170, "y": 642, "l": "A person approves, and the document changes", "k": "human" }
+  ],
+  "edges": [
+    { "id": "e1", "f": "timer", "t": "fresh", "by": "code" },
+    { "id": "e2", "f": "fresh", "t": "read", "by": "code" },
+    { "id": "e3", "f": "read", "t": "quotes", "by": "code" },
+    { "id": "e4", "f": "quotes", "t": "compare", "by": "code" },
+    { "id": "e5", "f": "compare", "t": "split", "by": "code" },
+    { "id": "e6", "f": "split", "t": "absent", "by": "code" },
+    { "id": "e7", "f": "absent", "t": "queue", "by": "code" },
+    { "id": "e8", "f": "queue", "t": "person", "by": "code" }
+  ],
+  "steps": [
+    {
+      "e": "e1",
+      "h": "The timer fires: nothing decided anything",
+      "d": "The same day every week. A tracker that is only updated\nwhen somebody remembers is a tracker nobody trusts,\nwhich is the whole reason this runs on a schedule",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e2",
+      "h": "Your code asks each source what it is current to",
+      "d": "The tracker export and the inbox both moved to 09/18/2026\nThe time spreadsheet still says 09/15/2026, the same date the\nlast run saw, so nothing it feeds was confirmed this week",
+      "m": "no model call: two date comparisons"
+    },
+    {
+      "e": "e3",
+      "h": "One call per unread message",
+      "d": "3 messages, 3 calls, each returning zero or more proposed\nfield changes with the sentence each came from\nOne message says nothing and proposes nothing, correctly",
+      "m": "920 tokens in · 99 tokens out · 3 calls"
+    },
+    {
+      "e": "e4",
+      "h": "Your code throws away what the message does not say",
+      "d": "A proposal whose quote is not in the message it came from is\ndropped and named. So is one naming a project no row covers,\na field the tracker does not have, or a value already there",
+      "m": "0 tokens · 0 ms"
+    },
+    {
+      "e": "e5",
+      "h": "Your code compares field by field",
+      "d": "21 cells, each against the source that owns it\nA value that matches is confirmed and dated; a value that\ndiffers goes to one of the two piles below",
+      "m": "no model call: this is the level-0 half"
+    },
+    {
+      "e": "e6",
+      "h": "Apply, queue, or leave alone",
+      "d": "2 fields updated, both written by code and disagreed with by\nthe system of record\n4 queued, 19 cells left exactly as they were",
+      "m": "nothing the model returned was applied"
+    },
+    {
+      "e": "e7",
+      "h": "Your code reports what nobody confirmed",
+      "d": "1 source not refreshed since the last run\n1 project the export stopped listing, which is not the same\nas finished\n6 fields now aging, with how long and why",
+      "m": "absence is reported, never read as agreement"
+    },
+    {
+      "e": "e8",
+      "h": "A person approves what overwrites a person's work",
+      "d": "Each queued change shows the old value, the new one, the\nreason, and the sentence it was read out of\nApproving two changes to one cell is refused, not resolved",
+      "m": "the document changes only here"
+    }
+  ]
+}
