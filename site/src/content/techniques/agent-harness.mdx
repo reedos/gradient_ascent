@@ -94,7 +94,7 @@ not necessarily running a bigger model; it may just be compacting well.
 
 **What it will let run.** Anthropic's SDK lets a hook "short-circuit the loop: a PreToolUse hook
 that rejects a tool call prevents it from executing, and Claude receives the rejection message
-instead"<Cite n={2}/>: the same veto shape this page's own example builds. OpenAI's Codex
+instead"<Cite n={2}/>. This is the same veto shape this page's own example builds. OpenAI's Codex
 documents the same split from the sandbox side: "Sandboxing and approvals are different controls
 that work together. The sandbox defines technical boundaries. The approval policy decides when the
 agent must stop and ask before crossing them"<Cite n={6}/>: enforced on macOS "using the built-in Seatbelt
@@ -205,7 +205,7 @@ after that.
   },
   {
     name: 'A hook veto reads as the model refusing',
-    notice: "A run stops short of an action, and it reads, from the transcript alone, like the model chose caution: when a hook actually blocked a call the model had already decided to make.",
+    notice: "A run stops short of an action, and it reads, from the transcript alone, like the model chose caution, when a hook actually blocked a call the model had already decided to make.",
     test: 'Read the trace, not the transcript. A veto is its own decided_by: "code" step; a model declining on its own is decided_by: "model". Confusing the two hides who is actually setting the policy.',
   },
   {

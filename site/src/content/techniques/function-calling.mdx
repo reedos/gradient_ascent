@@ -207,7 +207,7 @@ trace is wrong before the answer is even graded.
 
 Unlike routing, whose `--dry` projection follows the cheapest branch because the token-counting
 stand-in cannot produce a label the code recognizes, this example's branch depends on whether
-`tools` were offered, not on parsed text: and the stand-in calls the first tool every time tools
+`tools` were offered, not on parsed text, and the stand-in calls the first tool every time tools
 are offered, so `--dry` already projects the tool-calling branch, the more expensive one.
 
 No result file exists for function calling yet. Run `python scripts/eval_run.py --example

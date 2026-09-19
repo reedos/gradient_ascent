@@ -122,7 +122,7 @@ a computed answer or a plain refusal:
 <CodeFile file="examples/code_execution/run.py" start={112} end={143} expect="first = model.complete(messages, max_tokens=60)" />
 
 Declining (`NONE`) and writing a real expression are both the one `decided_by: "model"` step this
-level records: the same rule as function calling's tool-or-not choice. A refusal from the
+level records. This is the same rule as function calling's tool-or-not choice. A refusal from the
 sandbox is `decided_by: "code"`, same as running a tool: the model already made its one decision
 by the time the sandbox looks at what it wrote, so rejecting the content is code's call, not a
 second model decision. Run it yourself:

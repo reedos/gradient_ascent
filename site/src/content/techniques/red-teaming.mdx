@@ -129,7 +129,7 @@ what keeps a fixed bug fixed when the surrounding code changes next year.
 <WhenNot>
 
 Skip a formal red-teaming exercise for a single-user tool with no retrieved content and nothing
-it can act on: the same floor <Link href="/techniques/safety/">safety</Link> sets for a
+it can act on. This is the same floor <Link href="/techniques/safety/">safety</Link> sets for a
 permission check and a delimiter. Reading the code once for the obvious cases is proportionate
 there; a taught defense that decides who gets money, what a tool is allowed to do, or what an
 unattended system does next is not that case.
@@ -145,7 +145,7 @@ correct; being small did not make any of them safe to leave untested.
 <FailureModes modes={[
   {
     name: 'A defense is trusted because it reads correctly',
-    notice: "Code that looks right on inspection is treated as done, with no input constructed specifically to break it: which is exactly the gap all three of this page's own repository examples shared before an audit found them.",
+    notice: "Code that looks right on inspection is treated as done, with no input constructed specifically to break it. This is exactly the gap all three of this page's own repository examples shared before an audit found them.",
     test: "Before trusting a check, write the one input most specifically designed to defeat it (not a random or typical input), the way this page's own examples' regression tests do.",
   },
   {
@@ -176,7 +176,7 @@ correct; being small did not make any of them safe to leave untested.
   type directly) is the whole scope, since there is no retrieved content and no tool call yet
   for an attack to reach.
 - <Link href="/levels/2/">Context</Link>: retrieved content is now something to attack, not just
-  the user's own message: the same expansion <Link href="/techniques/safety/">safety</Link>'s
+  the user's own message. This is the same expansion <Link href="/techniques/safety/">safety</Link>'s
   own "at each level" section names for prompt injection generally.
 - <Link href="/levels/4/">Tools</Link>: an attack that used to only produce a bad sentence can
   now attempt a real action, so this is the level where the highest-value finding usually lives

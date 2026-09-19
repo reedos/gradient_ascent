@@ -173,7 +173,7 @@ and shape of the subtasks depend on what the specific question turns out to need
   },
   {
     name: 'The lead drops a worker at combine time',
-    notice: "A worker returned a real, cited answer, but the combined final answer never uses it: the same failure RAG has when a retrieved passage goes unused, one level up.",
+    notice: "A worker returned a real, cited answer, but the combined final answer never uses it. This is the same failure RAG has when a retrieved passage goes unused, one level up.",
     test: "Compare every worker's citations against the final answer's citations. A worker's citation that never appears in the combined answer was dropped, not wrong.",
   },
   {

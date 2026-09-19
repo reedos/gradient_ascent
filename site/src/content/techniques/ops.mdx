@@ -65,7 +65,7 @@ n={2}/>: a product built on a repeated system prompt or a shared document set th
 this is leaving a documented discount on the table.
 Does it batch anything that doesn't need an instant answer? OpenAI's Batch API documents "50%
 cost discount compared to synchronous APIs" in exchange for results that complete "within 24
-hours (and often more quickly)" instead of immediately<Cite n={3}/>: the same idea any product
+hours (and often more quickly)" instead of immediately<Cite n={3}/>. This is the same idea any product
 can apply to its own non-urgent work. And does it route easy requests to a cheaper model and
 escalate only the hard ones? A product that sends everything to its most capable model pays top
 price for questions a smaller one would have answered.
@@ -122,7 +122,7 @@ a page, not for production monitoring across every call a system makes. A real d
 generally reaches for a shared standard instead: OpenTelemetry describes itself as "vendor- and
 tool-agnostic," an "observability framework and toolkit" for producing traces, metrics and logs
 that many different backends can read, explicitly leaving "the backend (storage) and the frontend
-(visualization)... to other tools"<Cite n={4}/>: the same tokens-in, tokens-out and wall-time
+(visualization)... to other tools"<Cite n={4}/>. These are the same tokens-in, tokens-out and wall-time
 fields this example reads out of a trace file, but emitted in a shape a tracing backend already
 knows how to store, query and alert on.
 
@@ -206,7 +206,7 @@ just as well as the expensive one.
 - <Link href="/levels/6/">Teams of agents</Link>: several models working one task multiplies
   every per-call number by however many agents are in the team, the way
   <Link href="/techniques/orchestrator-workers/">a lead and its workers</Link> cost several times
-  a single call for the same question: which is exactly where routing a smaller model to the
+  a single call for the same question. This is exactly where routing a smaller model to the
   easy seats and a stronger one to the hard seat earns its keep.
 - <Link href="/levels/7/">Always-on agents</Link>: a system that runs continuously has a cost
   that is a rate, not a number per question (<Link href="/techniques/agent-teammates/">an
@@ -244,7 +244,7 @@ just as well as the expensive one.
   individual request still succeeds, which is why it needs its own metric, not just an error
   count."
   whatToLog="Tokens in and out, wall time, model id, cache hit or miss, and which level or
-  technique a call belongs to, on every call: the same fields the example's estimator reads back
+  technique a call belongs to, on every call. These are the same fields the example's estimator reads back
   out of a trace file."
 />
 
@@ -252,7 +252,7 @@ just as well as the expensive one.
 
 <TryIt items={[
   { lane: 'use', body: "Find an AI product you pay for by usage and check its documentation for whether it caches repeated content or batches non-urgent work. If it doesn't say, that silence is itself an answer worth noting." },
-  { lane: 'build', body: 'Run python -m examples.ops --demo from the repo root and read the per-level report it prints. Then edit DEMO_PRICES in examples/ops/__main__.py to double the RAG model\'s output price and run it again: which level\'s mean cost changes, and by how much?' },
+  { lane: 'build', body: 'Run python -m examples.ops --demo from the repo root and read the per-level report it prints. Then edit DEMO_PRICES in examples/ops/__main__.py to double the RAG model\'s output price and run it again. Which level\'s mean cost changes, and by how much?' },
   { lane: 'either', body: "Pick one technique's Cost and latency strip elsewhere on this site and estimate what running it 10,000 times a day would cost, using the illustrative numbers on that page. Then note which lever here (caching, batching, routing) would cut that number the most." },
 ]} />
 

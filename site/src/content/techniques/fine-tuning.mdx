@@ -192,7 +192,7 @@ neither is a failure that happened twice.
   },
   {
     name: 'A reward the grader can game',
-    notice: "A reinforcement-fine-tuned model's score against its own grader climbs while answers read by a person do not improve: the training-time version of the grader-hacking risk the site's evals topic covers for testing.",
+    notice: "A reinforcement-fine-tuned model's score against its own grader climbs while answers read by a person do not improve. This is the training-time version of the grader-hacking risk the site's evals topic covers for testing.",
     test: "Hand-check a sample of the grader's own verdicts on the training data, the way a rubric grader's verdicts are hand-checked at eval time, rather than trusting the reward curve alone.",
   },
 ]} />
@@ -233,7 +233,7 @@ off-task prompts checked before and after, to catch the forgetting failure mode 
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: "Find a product that advertises a small, fast, task-specific model. Look for whether its own page says LoRA/adapter, full fine-tuning, or doesn't say: and whether that silence changes how much you'd trust a claim that it 'matches' a bigger model." },
+  { lane: 'use', body: "Find a product that advertises a small, fast, task-specific model. Look for whether its own page says LoRA/adapter, full fine-tuning, or doesn't say, and whether that silence changes how much you'd trust a claim that it 'matches' a bigger model." },
   { lane: 'build', body: 'Run python -m examples.adaptation --out .local/scratch/fine-tuning from the repo root, then open val.jsonl and count the lines. Change --val-fraction to 0.1 and run it again; does the count change the way split\'s docstring says it should?' },
   { lane: 'either', body: "Pick two questions from evals/questions.json about the same appliance and decide whether they're close enough that training on one and validating on the other would leak. Run the leak check and see whether your judgment matches leaked_questions's." },
 ]} />

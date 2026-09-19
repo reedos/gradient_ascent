@@ -75,7 +75,7 @@ yet, so nothing below is measured. It is illustrated.
 Robotics models moved fast in 2026. Google DeepMind's current robotics model is Gemini Robotics
 2<Cite n={1}/>. Physical Intelligence's π0.7 "can follow new language commands and perform tasks
 that were never seen in its training data" and "can compose and recombine the skills it learned
-to solve new tasks", per its own post: which compares it against that maker's earlier specialist
+to solve new tasks", per its own post. This post compares it against that maker's earlier specialist
 models, not against π0<Cite n={4}/>.
 
 Latency is not an abstraction here the way it is for a chat reply. Physical Intelligence's post
@@ -100,7 +100,7 @@ distinguishable from outside.
 
 Three questions to ask of any machine like this, because the answer is rarely on the marketing
 page. What persists between runs (a learned routine, a map of your rooms, recorded video) and
-where it is kept. What it may do unattended, and what waits for a person: the same split
+where it is kept. What it may do unattended, and what waits for a person, is the same split
 <Link href="/techniques/agent-teammates/">always-on assistants</Link> make in software, with a
 worse failure if it is wrong. And how you stop it: a physical button within reach that cuts
 power, because stopping must not depend on the thing you are stopping.
@@ -202,7 +202,7 @@ written and tested like any other piece of code, before the first real move, not
   },
   {
     name: 'Latency drops the control loop below what the task needs',
-    notice: "The perceive-plan step takes long enough that the actual target has moved, or the manipulation itself needs a correction rate the model cannot sustain: not a wrong decision, a decision arriving too late to be right.",
+    notice: "The perceive-plan step takes long enough that the actual target has moved, or the manipulation itself needs a correction rate the model cannot sustain, not a wrong decision, but a decision arriving too late to be right.",
     test: "Measure wall-clock time from scene to proposed move under load, not just on an idle machine, and compare it against the control frequency the task actually needs.",
   },
   {
@@ -254,7 +254,7 @@ not just safety), and the wall-clock time from scene to actuated move under load
   monitor="The rate of refused and clamped moves against total proposals: a rising rate is worth reading as a sign the model is drifting toward the envelope's edges, not just a number to alert on, and the wall-clock time of the perceive-plan step against the control frequency the task actually needs."
   costAtVolume="Cost tracks calls per second, which for a real control loop is fixed by the task (up to 50 a second for dexterous manipulation, per Physical Intelligence's own figure for π0), not by how many decisions turn out to matter: most steps are ordinary and cost the same as the ones that trip the envelope."
   failsInProduction="The envelope and a hardware limit disagree about what is safe, or a policy that only ever saw simulation makes a confident, wrong move against real friction or real sensor noise the simulation never modeled."
-  whatToLog="Every proposed move, the envelope's decision and why, the move actually sent to the actuator when one was, and the wall-clock time for the whole perceive-plan-act step: so a near-miss can be reconstructed from the log without needing the robot to reproduce it."
+  whatToLog="Every proposed move, the envelope's decision and why, the move actually sent to the actuator when one was, and the wall-clock time for the whole perceive-plan-act step, so a near-miss can be reconstructed from the log without needing the robot to reproduce it."
 />
 
 ## Try it

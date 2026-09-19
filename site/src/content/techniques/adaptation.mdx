@@ -68,7 +68,7 @@ completion) is often a distilled or fine-tuned version of a larger one, trained 
 own distillation guide documents: capture a larger model's outputs that meet your bar, then use
 that captured set to train a smaller model on the same task<Cite n={3}/>. The question worth
 asking about a claim like "our small model matches the big one on this task" is: matches it on
-what, exactly: the same narrow task it was trained for, or everything the big model could do?
+what, exactly? The same narrow task it was trained for, or everything the big model could do?
 Training on one task's examples optimizes for that task; nothing about it preserves the rest of
 what the larger model could do, so the scope of the comparison is the part to check.
 
@@ -183,7 +183,7 @@ about the shape and volume of the calls.
   },
   {
     name: 'A reward the grader can game',
-    notice: "A reinforcement-fine-tuned model's score against its own reward model climbs while its answers, read by a person, do not actually improve: the same grader-hacking risk this site's evals topic covers, applied to training instead of testing.",
+    notice: "A reinforcement-fine-tuned model's score against its own reward model climbs while its answers, read by a person, do not actually improve. This is the same grader-hacking risk this site's evals topic covers, applied to training instead of testing.",
     test: "Hand-check a sample of the reward grader's own verdicts the way this site's eval runner checks a rubric grader's, rather than trusting the trend of the reward curve alone.",
   },
 ]} />

@@ -45,7 +45,7 @@ language found online": "We find that use of model-generated content in training
 irreversible defects in the resulting models, where tails of the original content distribution
 disappear. We refer to this effect as Model Collapse and show that it can occur in Variational
 Autoencoders, Gaussian Mixture Models and LLMs."<Cite n={2}/> A finding about web-scale generated
-content, shown in three named settings: not a verdict on every dataset a model helped write.
+content, shown in three named settings, not a verdict on every dataset a model helped write.
 
 This page is marked draft, not published: no generated dataset has been used for anything on this
 site, so nothing below is measured.
@@ -158,7 +158,7 @@ interesting half. One without the other produces volume, not data.
   {
     name: 'Leakage between a generated training set and the real eval set',
     notice: "A paraphrase generated for training turns out to be close enough to a question already in the eval set that training on it inflates a later score on that same question.",
-    test: "Check generated text against every question the eval set holds, not only against the seeds it was generated from: which is the wider net this page's example casts, and it still only catches identical text once normalized, never a genuine rewording.",
+    test: "Check generated text against every question the eval set holds, not only against the seeds it was generated from. This is the wider net this page's example casts, and it still only catches identical text once normalized, never a genuine rewording.",
   },
 ]} />
 

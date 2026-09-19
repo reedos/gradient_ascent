@@ -165,7 +165,7 @@ connect to than reimplement.
 "Stateless" is not shorthand here. The specification's own changelog uses the word directly: one
 of its listed major changes for the current revision reads "Make MCP stateless: remove the
 initialize/notifications/initialized handshake. Every request now carries its protocol version
-and client capabilities in _meta"<Cite n={6}/>: so this is the specification's own description,
+and client capabilities in _meta"<Cite n={6}/>. This is the specification's own description,
 not a blog post's paraphrase of something the spec calls by another name.
 
 Two changes shipped together in the 2026-07-28 revision. That is the current one: the
@@ -272,7 +272,7 @@ No result file exists for MCP yet. Run `python scripts/eval_run.py --example mcp
 ## Run it
 
 <RunIt
-  monitor="Which servers and tools are actually being called versus merely listed, and how often the model declines every offered tool. A tool nobody ever calls is either miscategorized or badly described: the same failure routing's dead fallback route is, one level up."
+  monitor="Which servers and tools are actually being called versus merely listed, and how often the model declines every offered tool. A tool nobody ever calls is either miscategorized or badly described, the same failure routing's dead fallback route is, one level up."
   costAtVolume="Every question pays for at least the tools/list round trip and one model call; a second model call only happens when a tool actually ran. Over a real transport, each round trip also pays network latency an in-process call does not, so cost tracks server count and network distance, not just question count."
   failsInProduction="A server's tool descriptions change and the host is still working from a cached list, so the model is offered a tool that no longer behaves the way its old description said. A server outside your control changes what a tool's description tells the model to do, and nothing downstream re-checks it."
   whatToLog="Which server and tool were listed and called, the raw request and result at the protocol boundary, and whether the call succeeded or came back as a protocol or tool-execution error, so a wrong answer traces back to a bad tool choice, a bad argument, or the server itself."

@@ -109,7 +109,7 @@ question set's answer key:
 <CodeFile file="examples/distillation/run.py" func="run" />
 
 Every step is `decided_by: "code"`: the code always calls the teacher, always grades the same way,
-and the model's output never changes what happens next: the same rule `examples/rag` follows for
+and the model's output never changes what happens next. This is the same rule `examples/rag` follows for
 its own single model call. Against the real question set, `python -m examples.distillation --model
 stub --out .local/scratch/distillation/student.jsonl` keeps nothing: the interactive stub's
 placeholder text matches no question's pattern, so all 32 are dropped. That is not a bug in the
@@ -136,7 +136,7 @@ training a smaller model on its outputs adds a dataset to build, a filter to tru
 run to pay for, in exchange for a cost saving you have not yet shown you need.
 
 Distillation earns its cost once the larger model's per-call price or latency, multiplied by real
-call volume, is the actual problem: not before. A task called a few times a day rarely justifies
+call volume, is the actual problem, not before. A task called a few times a day rarely justifies
 building and maintaining a captured, filtered dataset just to run it on cheaper hardware.
 
 </WhenNot>

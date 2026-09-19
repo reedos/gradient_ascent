@@ -115,7 +115,7 @@ Run it yourself:
 <CodeFile file="examples/agent_graphs/README.md" start={17} end={17} lang="text" expect="python -m examples.agent_graphs" />
 
 Every "Supervisor picks the next agent" step is `decided_by: "model"`; every checkpoint, the
-blocked-handoff step and the hop-cap step are `decided_by: "code"`: the same distinction <Link
+blocked-handoff step and the hop-cap step are `decided_by: "code"`. This is the same distinction <Link
 href="/techniques/workflow-graphs/">workflow graphs</Link>' own page draws, with one more place a
 model, not code, now gets to choose.
 
@@ -133,7 +133,7 @@ one context window is enough: a graph of separate agents is only worth its extra
 the task needs more than one agent's own context to hold.
 
 Move up to agent graphs once a node's own output has to pick which agent runs next, not just what
-a fixed step does: the same reason <Link href="/techniques/workflow-graphs/">workflow graphs</Link>
+a fixed step does. This is the same reason <Link href="/techniques/workflow-graphs/">workflow graphs</Link>
 justifies moving up from a plain chain, one level higher.
 
 </WhenNot>

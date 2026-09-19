@@ -99,7 +99,7 @@ a photograph of an appliance's rating plate followed by the question about it:
 
 The picture is a reference here, not bytes. Both documented backends take an image as base64:
 Anthropic's `image` block accepts a base64 source, a URL or an uploaded `file_id`<Cite n={1}/>,
-Ollama's chat API takes an `images` array of base64 strings: so a real caller reads the file and
+Ollama's chat API takes an `images` array of base64 strings. A real caller reads the file and
 passes base64. Nothing in this repository ships a photograph, and an example that runs against a
 stub has nothing to look at anyway, so the part carries a label and the trace prints that.
 

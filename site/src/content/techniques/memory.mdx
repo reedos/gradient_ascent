@@ -96,7 +96,7 @@ shape (one model call, always made, that fills in content rather than choosing w
 next). What this example shows instead is what happens after writing: `recall` ranks stored facts
 by cosine similarity to a new question, the same mechanism as
 <Link href="/techniques/embeddings-search/">embeddings and search</Link> and the same bag-of-words
-stub embedder, just over a handful of personal facts instead of a document corpus: so the scores
+stub embedder, just over a handful of personal facts instead of a document corpus. The scores
 it prints show the mechanism and say nothing about how a real embedding model would rank them.
 `forget` removes an entry outright; nothing recalled afterward can include it again, which is the
 whole reason the operation exists rather than being another kind of write.

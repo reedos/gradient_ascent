@@ -198,7 +198,7 @@ everything rather than reimplemented in each application that calls a model.
   in either direction, so nothing about <Link href="/techniques/function-calling/">function
   calling</Link> is this layer's concern: only the token accounting around the call is.
 - <Link href="/levels/5/">Agents</Link>: the number of calls a run makes is not fixed in advance,
-  so a gateway's per-key budget is a real backstop here, not just bookkeeping: the same ceiling
+  so a gateway's per-key budget is a real backstop here, not just bookkeeping. This is the same ceiling
   <Link href="/techniques/single-agent/">a single agent</Link>'s own `max_tokens` cap is meant to
   provide, enforced one layer further out in case the cap inside the loop fails to hold.
 - <Link href="/levels/6/">Teams of agents</Link>: several agents can share one gateway key or

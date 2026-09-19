@@ -92,7 +92,7 @@ The author retrieves its own top sources and drafts an answer in one fixed call:
 "code"`, the same shape as <Link href="/techniques/rag/">RAG</Link>'s single call. The reviewer
 never sees what the author retrieved. Each reviewer turn is one model call that replies with
 exactly one of three things: `CHECK: <query>` to search one specific claim, `ACCEPT`, or `REJECT:
-<reason>`: and every one of those turns is `decided_by: "model"`, because the reviewer's own
+<reason>`, and every one of those turns is `decided_by: "model"`, because the reviewer's own
 output picks whether to keep checking or to stop, the same kind of decision a single agent makes
 about calling a tool versus answering.
 
@@ -121,7 +121,7 @@ Compare this to <Link href="/techniques/evaluator-optimizer/">write and check</L
 same author-drafts-then-checked shape, but there `PASS_TOKEN` is the entire contract and every
 step is `decided_by: "code"`, because the checker answers one fixed, mechanical question the code
 itself could grade. Here the reviewer decides what "check" even means each round, which is exactly
-why it can catch something a fixed criterion was never written to look for: and exactly why it
+why it can catch something a fixed criterion was never written to look for, and exactly why it
 needs its own retrieval, not just a copy of the author's.
 
 </Lane>

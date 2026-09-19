@@ -106,7 +106,7 @@ the way an approval step does, and one that matches too eagerly reports clean wh
 
 `_figure`, the helper called on each token, is where the judgment sits. It compares figures as
 values rather than as text, so `$1,200` and `1200` are one figure and `52` is not a match for
-`1152`: which a substring search would have accepted, reporting a citation as support for a
+`1152`. A substring search would have accepted this, reporting a citation as support for a
 price it says nothing about. A token with a letter before its digits (`HLV-2205`, `DW300`,
 `v2.1`, `dw300-manual#3`) states no quantity, so nothing is claimed about it. A range states both
 of its ends; an ISO date is one figure rather than three.
@@ -166,7 +166,7 @@ flag rate on real output, which is a claim about that system, not about models i
   which keeps a person's time on the judgment that no check can make."
   failsInProduction="The review step is still in the process and nobody is doing it. Approvals
   come back in seconds, flags stop appearing, and the record shows a hundred consecutive clean
-  results: which is what both a reliable system and an unread queue look like."
+  results. That is what both a reliable system and an unread queue look like."
   whatToLog="For every reviewed item: what was changed, rejected or flagged, and why. That log
   is what tells the two cases above apart, and it is the raw material a trust record is built
   from."

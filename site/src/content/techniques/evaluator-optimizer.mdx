@@ -196,7 +196,7 @@ there are.
   monitor="The cap-hit rate over time (the share of runs that exhaust max_revisions still failing) and the average revisions per run. A cap-hit rate that rises with no change to the checker's prompt is a sign the questions arriving have shifted, not that the checker got stricter."
   costAtVolume="Cost per question is variable here, unlike a fixed-step workflow: it depends on how often the checker fails the first draft. Budget for the worst case (every question uses the full cap), not the average, or a bad week of drafts becomes a bad week of the bill too."
   failsInProduction="The writer and the checker share a blind spot neither prompt was built to catch, so confidently wrong answers pass their own check at the normal rate, with no signal in the trace that anything is different from a correctly-checked answer."
-  whatToLog="Every draft, every check verdict verbatim, and every revision, in order, for each question: not just the final answer. A checker that starts passing bad drafts is invisible in aggregate metrics until you can see its actual verdicts change."
+  whatToLog="Every draft, every check verdict verbatim, and every revision, in order, for each question, not just the final answer. A checker that starts passing bad drafts is invisible in aggregate metrics until you can see its actual verdicts change."
 />
 
 ## Try it

@@ -55,7 +55,7 @@ with no account and no per-call bill; the pricing section of Ollama's own home p
 "Local models are always free"<Cite n={1}/>. What you give up against a hosted frontier model is quality at the
 top end: the largest, most capable models are usually not ones an ordinary computer can run at
 all, so a local setup means picking a model that actually fits, and checking on your own task
-whether it is good enough: the same question an <Link href="/techniques/evals/">eval</Link>
+whether it is good enough. This is the same question an <Link href="/techniques/evals/">eval</Link>
 exists to answer, not a general claim this page can make for you.
 
 Quantization is the lever that makes a large model fit smaller hardware. It reduces the
@@ -184,7 +184,7 @@ once a model small enough to run locally already passes the eval that matters fo
   answer), the least memory this page's own estimator will ever report for a given model.
 - <Link href="/levels/2/">Context</Link>: a retrieved passage set or a large pasted document
   fills the context window before the model answers at all, so context length, not just model
-  size, starts to drive the memory number: the same window
+  size, starts to drive the memory number. This is the same window
   <Link href="/techniques/rag/">RAG</Link>'s own prompt assembly fills.
 - <Link href="/levels/4/">Tools</Link>: tool definitions and their results are extra tokens in
   the same context window, so a tool-heavy <Link href="/techniques/function-calling/">function

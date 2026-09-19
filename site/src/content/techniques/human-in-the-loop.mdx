@@ -117,7 +117,7 @@ and the resume can both be exercised on `StubModel` with no actual person or liv
 If you would rather not write the checkpoint yourself, LangGraph has this built in. Its
 documentation describes middleware that pauses when a model proposes an action that might need
 review, waits for a decision, and saves the graph's state so the run can resume
-later<Cite n={5}/>: the same two halves as `run` and `resume` above, with the persistence
+later<Cite n={5}/>. These are the same two halves as `run` and `resume` above, with the persistence
 supplied. The decisions it names are the three this example takes plus one more: approve, edit,
 reject, and answer the model directly.
 
@@ -131,7 +131,7 @@ after the fact: a gate adds latency and a person's attention, and both are waste
 nobody needed to check.
 
 Move up to a real approval gate once being wrong is expensive, hard to undo, or the kind of
-mistake nobody would notice until it was too late to matter: and pick the threshold from what
+mistake nobody would notice until it was too late to matter, and pick the threshold from what
 actually made past answers wrong, not a guess.
 
 </WhenNot>

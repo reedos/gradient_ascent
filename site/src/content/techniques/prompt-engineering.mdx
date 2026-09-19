@@ -44,7 +44,7 @@ Every maker that publishes a model also publishes its own guidance for this, bec
 each one helps do not<Cite n={1}/><Cite n={2}/><Cite n={3}/>. None of it is worth doing once and
 trusting forever: write down what a correct answer looks like before changing a prompt, then check
 the new version against the same cases the old one had to pass. This page's example makes that
-concrete: the same question and the same source text, asked two ways, checked by a regular
+concrete. It uses the same question and the same source text, asked two ways, checked by a regular
 expression rather than by reading the reply and deciding it looks better.
 
 This page is marked draft, not published: it has no recorded trace and no scored result file yet,
@@ -96,8 +96,8 @@ done by hand instead of programmed once.
 </Lane>
 <Lane name="build" title="Build it">
 
-The example runs the exact contrast above: the same question, against the same source passage,
-sent to the model two ways. The structured prompt adds a role, an explicit two-field output
+The example runs the exact contrast above. It sends the same question, against the same source passage,
+to the model two ways. The structured prompt adds a role, an explicit two-field output
 format, and one worked example: the moves OpenAI's and Anthropic's guides both
 describe<Cite n={1}/><Cite n={2}/>. The bare prompt is the question and the passage with nothing
 else added.
