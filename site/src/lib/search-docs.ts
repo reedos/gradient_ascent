@@ -244,7 +244,12 @@ export async function buildSearchDocs(): Promise<SearchDoc[]> {
   }
 
   // Registry names: models, products, tools. Linked to the first technique they demonstrate, per
-  // the task's own instruction, with /names/ as a second link for "everything this ships in."
+  // the task's own instruction, with /names/ as a second link for "everything this ships in." That
+  // second link is the same href and label on all 216 of these docs, so it is not carried per-doc
+  // here (audit-weight, wave 6: it was 216 repeats of the identical "/names/"/"All names" pair,
+  // about 6.9 KB of the shipped index for a value that never varies). search.ts's
+  // NAME_SECONDARY_LINK is the one place that constant now lives; search.astro and Search.tsx both
+  // render it for every `kind === 'name'` doc, which is exactly the set that used to carry it.
   for (const n of named) {
     const firstSlug = n.demonstrates[0];
     const target = firstSlug ? techniqueBySlug(firstSlug) : undefined;
@@ -260,8 +265,6 @@ export async function buildSearchDocs(): Promise<SearchDoc[]> {
       body: demonstratesTitles.length ? demonstratesTitles.join(', ') : undefined,
       level: target?.level,
       url: target ? url(`/techniques/${target.slug}/`) : url('/names/'),
-      secondaryUrl: url('/names/'),
-      secondaryLabel: 'All names',
     });
   }
 
@@ -269,11 +272,18 @@ export async function buildSearchDocs(): Promise<SearchDoc[]> {
   // which would roughly double the index for detail a result row does not show anyway (the
   // notice and test read in full on the technique page a click lands on). One per technique per
   // named mode -- see indexes.ts's own parser, which is also what builds /failures/, so this
-  // list matches that page exactly.
+  // list matches that page exactly. `id` counts within a technique's own modes rather than
+  // spelling the mode's name out a second time (it was `failure:${slug}:${m.name}`, repeating the
+  // exact text the `title` field already carries -- audit-weight, wave 6): the id only has to be
+  // unique and stable for one build, which a per-technique index already is, since
+  // parseAllFailureModes reads each file's modes in the fixed order they appear in its source.
   const modes = await parseAllFailureModes();
+  const failureIndexBySlug = new Map<string, number>();
   for (const m of modes) {
+    const i = failureIndexBySlug.get(m.slug) ?? 0;
+    failureIndexBySlug.set(m.slug, i + 1);
     docs.push({
-      id: `failure:${m.slug}:${m.name}`,
+      id: `failure:${m.slug}:${i}`,
       kind: 'failure',
       title: m.name,
       meta: m.levelLabel,

@@ -8,7 +8,8 @@
 import Base from '../layouts/Base.astro';
 import Search from '../components/islands/Search';
 import { buildSearchDocs } from '../lib/search-docs';
-import { KIND_ORDER, KIND_LABEL, type SearchDoc } from '../lib/search';
+import { KIND_ORDER, KIND_LABEL, NAME_SECONDARY_LINK, type SearchDoc } from '../lib/search';
+import { url } from '../lib/url';
 import '../styles/search.css';
 
 const docs = await buildSearchDocs();
@@ -65,9 +66,9 @@ function levelColor(level: SearchDoc['level']): string | undefined {
                   </a>
                   {item.meta && <span class="search-result-meta">{item.meta}</span>}
                   {item.summary && <p class="search-result-summary">{item.summary}</p>}
-                  {item.secondaryUrl && (
-                    <a class="search-result-secondary" href={item.secondaryUrl}>
-                      {item.secondaryLabel ?? 'More'} &rarr;
+                  {item.kind === 'name' && (
+                    <a class="search-result-secondary" href={url(NAME_SECONDARY_LINK.path)}>
+                      {NAME_SECONDARY_LINK.label} &rarr;
                     </a>
                   )}
                 </div>

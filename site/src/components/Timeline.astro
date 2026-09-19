@@ -201,7 +201,15 @@ function markClass(p: LanePoint): string {
                 <span
                   class="tl-dot"
                   tabindex="0"
-                  aria-label={`${p.mark ? p.mark.label + ': ' : ''}${p.milestone.title}, ${formatDate(p.milestone.date, p.milestone.precision)}, level ${l.level} ${l.title}. ${p.milestone.what}${p.unverifiedReason ? ' Not verified: ' + p.unverifiedReason : ''}`}
+                  // A short accessible NAME, not the full description: `what` and the unverified
+                  // reason already ship right here as visible text in .tl-tip (shown on hover AND
+                  // on :focus-within, so a keyboard user reaches it the moment this dot is
+                  // focused) and again in the full list below, which this chart's own
+                  // aria-describedby points at. Restating both in every one of ~96 aria-label
+                  // attributes duplicated the milestone's `what` sentence a third time across the
+                  // page for no reader anyone could reach that the tooltip and list did not
+                  // already serve (audit-weight, wave 6).
+                  aria-label={`${p.mark ? p.mark.label + ': ' : ''}${p.milestone.title}, ${formatDate(p.milestone.date, p.milestone.precision)}, level ${l.level} ${l.title}${p.unverified ? ' (not verified)' : ''}`}
                 >
                   {/* The shape class belongs HERE, on the element with the actual fill/border, not
                       on .tl-point above: an earlier version put it there, where border-radius was

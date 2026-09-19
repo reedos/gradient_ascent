@@ -42,10 +42,15 @@ export interface SearchDoc {
   url: string;
   /** For the level color dot; 'tracks' renders the neutral topics color. */
   level?: number | 'tracks';
-  /** A name's registry page, shown as a second, smaller link beside the primary one. */
-  secondaryUrl?: string;
-  secondaryLabel?: string;
 }
+
+/** The second, smaller link every `kind === 'name'` result carries beside its primary one: "All
+ *  names" -> /names/, the same pair on all 216 of them. Used to live as a secondaryUrl/
+ *  secondaryLabel pair repeated on every one of those docs; it is fixed and derives entirely from
+ *  the kind, so it is a constant here instead of shipped data (audit-weight, wave 6). `path` has
+ *  no base prefix -- a renderer passes it through its own `url()` the way it does every other
+ *  site-relative path. */
+export const NAME_SECONDARY_LINK = { path: '/names/', label: 'All names' } as const;
 
 export interface ScoredDoc extends SearchDoc {
   tier: number;

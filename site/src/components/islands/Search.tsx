@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { url } from '../../lib/url';
-import { search, groupResults, type SearchDoc, type ScoredDoc, type ResultGroup } from '../../lib/search';
+import {
+  search,
+  groupResults,
+  NAME_SECONDARY_LINK,
+  type SearchDoc,
+  type ScoredDoc,
+  type ResultGroup,
+} from '../../lib/search';
 
 /**
  * The interactive half of /search/: one input, results grouped by kind. Reads and writes `?q=`
@@ -102,6 +109,14 @@ export default function Search() {
         {docs && <span className="search-count">{docs.length} entries indexed</span>}
       </div>
 
+      {/* Results appear and change as the query is typed, with nothing on screen that says how
+          many there are. This says it to assistive technology only (WCAG 2.1 4.1.3): it is in
+          the page from the start so the first change is announced, and it is empty until there
+          is something to announce. */}
+      <p className="sr-only" role="status">
+        {trimmed === '' || !docs ? '' : `${results.length} result${results.length === 1 ? '' : 's'} for ${trimmed}`}
+      </p>
+
       {loadError && (
         <p className="search-status">The search index could not be loaded. Reload the page to try again.</p>
       )}
@@ -161,9 +176,9 @@ function SearchResultRow({
       </a>
       {item.meta && <span className="search-result-meta">{item.meta}</span>}
       {item.summary && <p className="search-result-summary">{item.summary}</p>}
-      {item.secondaryUrl && (
-        <a className="search-result-secondary" href={item.secondaryUrl}>
-          {item.secondaryLabel ?? 'More'} &rarr;
+      {item.kind === 'name' && (
+        <a className="search-result-secondary" href={url(NAME_SECONDARY_LINK.path)}>
+          {NAME_SECONDARY_LINK.label} &rarr;
         </a>
       )}
     </div>
