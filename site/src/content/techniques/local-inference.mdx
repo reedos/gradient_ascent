@@ -1,24 +1,24 @@
 ---
 slug: local-inference
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Ollama"
     url: "https://ollama.com/"
     publisher: "Ollama"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "llama.cpp"
     url: "https://github.com/ggml-org/llama.cpp"
     publisher: "ggml-org"
-    accessed: "2026-09-18"
-  - title: "Quantizing models"
+    accessed: "2026-09-19"
+  - title: "llama.cpp/tools/quantize/README.md at master · ggml-org/llama.cpp · GitHub"
     url: "https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/README.md"
     publisher: "ggml-org"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "vLLM documentation"
     url: "https://docs.vllm.ai/en/latest/"
     publisher: "vLLM"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -51,28 +51,34 @@ site, so nothing below reports a measured number.
 <Lane name="use" title="Use it">
 
 Ollama, llama.cpp and LM Studio all let a person run an open-weight model on their own computer
-with no account and no per-call bill; the pricing section of Ollama's own home page states that
-"Local models are always free"<Cite n={1}/>. What you give up against a hosted frontier model is quality at the
-top end: the largest, most capable models are usually not ones an ordinary computer can run at
-all, so a local setup means picking a model that actually fits, and checking on your own task
-whether it is good enough. This is the same question an <Link href="/techniques/evals/">eval</Link>
-exists to answer, not a general claim this page can make for you.
+with no account and no per-call bill; Ollama's own pricing section states that "Local models are
+always free"<Cite n={1}/>. What you give up against a hosted frontier model is quality at the top
+end: the largest, most capable models usually do not run on an ordinary computer at all, so a
+local setup means picking a model that actually fits and checking on your own task whether it is
+good enough, the same question an <Link href="/techniques/evals/">eval</Link> exists to answer.
 
-Quantization is the lever that makes a large model fit smaller hardware. It reduces the
-precision each weight is stored at, llama.cpp's own documentation puts it plainly: quantization
-"reduces the precision of model weights (e.g., from 32-bit floats to 4-bit integers), which
-shrinks the model's size and can speed up inference." The same page is careful about the cost:
-the process "may introduce some accuracy loss which is usually measured in Perplexity (ppl)
-and/or Kullback–Leibler Divergence (kld)," and that it "can be minimized by using a suitable
-imatrix file"<Cite n={3}/>. So: a smaller quantization fits smaller hardware and may run
-faster, at a quality cost that is specific to the model, the method and the setting, and is
-measured rather than assumed. Name the exact quantization you ran (Q4_K_M is not "4-bit" in
-general) whenever you report what it cost you.
+Quantization is the lever that makes a large model fit smaller hardware: it reduces the precision
+each weight is stored at. llama.cpp's own documentation puts it plainly: quantization "reduces
+the precision of model weights (e.g., from 32-bit floats to 4-bit integers), which shrinks the
+model's size and can speed up inference," at a cost the same page is careful about: it "may
+introduce some accuracy loss which is usually measured in Perplexity (ppl) and/or Kullback–Leibler
+Divergence (kld)," minimized "by using a suitable imatrix file"<Cite n={3}/>. So: a smaller
+quantization fits smaller hardware and may run faster, at a quality cost specific to the model,
+method and setting, measured rather than assumed. Name the exact quantization you ran (Q4_K_M is
+not "4-bit" in general) whenever you report what it cost you.
 
 Context length is the other lever, and the less obvious one: a longer context window costs
-memory even before a single token of it is used, which is what this page's own example measures.
-A chat app or assistant that lets you pick a smaller "context size" or "memory" setting locally
-is trading exactly this (how much the model can see at once) for how much hardware it needs.
+memory before a single token of it is used, which is what this page's own example measures. A
+chat app that lets you pick a smaller "context size" or "memory" setting locally is trading
+exactly this (how much the model can see at once) for how much hardware it needs.
+
+The privacy reason lands differently by setting. A production test station triaging today's
+retest log cannot send serial numbers and yield data off the floor network, so the model runs
+there regardless of a hosted API's price. An engineer characterizing five prototype boards before
+a design review is not weighing a per-call bill at all: five runs in an afternoon barely register
+either way, and the real reason to stay local is that the schematics are not public yet. A person
+writing one measurement's uncertainty budget has the smallest stake: a model's contribution
+there, if any, costs rounding error against the instrument's own calibration.
 
 </Lane>
 <Lane name="build" title="Build it">
@@ -82,8 +88,8 @@ has, how many bits each weight is stored at, how long the context window is, and
 requests are being served at once. Every number it prints is an estimate, and the demo says so
 above the table: it counts only weights and a key/value cache, the two costs every runtime
 accounts for in some form, and leaves out activation memory and a framework's own overhead, both
-of which only ever add to the real figure. Use it to size hardware with room to spare, not to
-predict what a runtime will report.
+of which only add to the real figure. Use it to size hardware with room to spare, not to predict
+what a runtime will report.
 
 <CodeFile file="examples/local_inference/run.py" func="weights_bytes" />
 
@@ -109,13 +115,13 @@ several attention heads share one key/value head, so a model's key/value head co
 fraction of its attention head count, and passing the larger number quietly inflates the whole
 estimate. It comes from the model's own config, not from this function.
 
-The cache then multiplies by how many sequences (concurrent requests) are held at once, which
-is the cost of serving several users from one running model rather than one at a time. That
-multiplication is the naive ceiling, and servers are built to avoid paying it in full: vLLM
-documents "Efficient management of attention key and value memory with PagedAttention" and
-"Continuous batching of incoming requests" among its own features<Cite n={4}/>. This example
-models neither, so a real server with either should need less than the number printed here for
-the same concurrency, while still needing more than it for everything else.
+The cache then multiplies by how many sequences (concurrent requests) are held at once: the cost
+of serving several users from one running model rather than one at a time. That multiplication is
+the naive ceiling, and servers are built to avoid paying it in full: vLLM documents "Efficient
+management of attention key and value memory with PagedAttention" and "Continuous batching of
+incoming requests" among its own features<Cite n={4}/>. This example models neither, so a real
+server with either should need less than the number printed here for the same concurrency, while
+still needing more for everything else.
 
 `python -m examples.local_inference --demo` prints the same illustrative 8B-parameter shape four
 ways (full precision against roughly 4-bit, a short context against a long one, one user against

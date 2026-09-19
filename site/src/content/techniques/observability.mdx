@@ -1,24 +1,24 @@
 ---
 slug: observability
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Traces"
     url: "https://opentelemetry.io/docs/concepts/signals/traces/"
     publisher: "OpenTelemetry"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Sampling"
     url: "https://opentelemetry.io/docs/concepts/sampling/"
     publisher: "OpenTelemetry"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Semantic conventions for generative client AI spans"
     url: "https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-spans.md"
     publisher: "OpenTelemetry"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Attribute Requirement Levels"
     url: "https://opentelemetry.io/docs/specs/semconv/general/attribute-requirement-level/"
     publisher: "OpenTelemetry"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -34,9 +34,9 @@ import Link from '../../components/page/Link.astro';
 Observability is recording what each run did, in enough detail that a bad result can be traced
 back to the step that caused it: which passages a retrieval step picked, which tool a model
 called and with what arguments, which branch a workflow took, and how many tokens and how much
-time each step spent. OpenTelemetry, an open standard for this, defines a trace as "the path of
-a request through your application" and a span as a unit of work that is one of "the building
-blocks" of a trace, carrying attributes, its own "key-value pairs" of metadata about the
+time each step spent. OpenTelemetry, an open standard for this, describes a trace this way: "The
+path of a request through your application." It defines a span, one of "the building blocks" of a
+trace, as a unit of work carrying attributes, its own "key-value pairs" of metadata about the
 operation it tracked<Cite n={1}/>.
 
 This topic is not a level on the ladder; it applies at every level, the way
@@ -77,6 +77,14 @@ after "considering all or most of the spans within the trace" (tail sampling)<Ci
 product that traces everything, forever, at full detail either has very little traffic or is
 about to have a very large bill.
 
+A hosted tracing backend is the same question from another angle. Once a span leaves the process
+that recorded it, whatever it carries (a prompt fragment, a tool call's arguments, an answer)
+travels to a company whose own retention and access terms apply, not the model maker's. Check
+what a tracing product itself documents about what it stores, for how long, and whether capturing
+message content can be turned off, the same question this page asks about the trace format
+itself. See <Link href="/techniques/safety/">safety, privacy and governance</Link> for what an
+intermediary between a person and a model means for data more generally.
+
 </Lane>
 <Lane name="build" title="Build it">
 
@@ -90,8 +98,7 @@ code, dashed for model:
 What a step's `detail` holds is exactly the "what NOT to log" question. Four things do not belong
 in a trace by default: personal data about a customer, any secret pasted into a message, whole
 documents or retrieved passages, and prompt and answer text itself. The first three are usually
-obvious once someone asks; the fourth is the one that gets left on, because it is the most useful
-field to have when debugging.
+obvious; the fourth stays on because it is the most useful field to have when debugging.
 
 OpenTelemetry's own conventions treat it as the separate, riskier case it is. The attribute that
 carries the chat history, `gen_ai.input.messages`, is marked with the requirement level `Opt-In`
@@ -104,36 +111,34 @@ instrumentation to do so. Instrumentation that doesn't support configuration MUS
 `examples/observability/run.py` shows the same shape working on a real trace: `to_otel_spans`
 turns this site's own step list into span-shaped dictionaries named the way OpenTelemetry's own
 generative AI conventions name them (`gen_ai.operation.name`, `gen_ai.usage.input_tokens`,
-`gen_ai.usage.output_tokens`), so a trace this site already records could be handed to any
-OpenTelemetry-reading backend instead of only this site's own player. Those three names are
-copied from a specification whose own status line reads Development as of the date above; nothing
-here claims to implement a finished standard, only to borrow its attribute names<Cite n={3}/>.
+`gen_ai.usage.output_tokens`), so a recorded trace could be handed to any OpenTelemetry-reading
+backend instead of only this site's own player. Those three names are copied from a specification
+whose own status line reads Development as of the date above; nothing here claims to implement a
+finished standard, only to borrow its attribute names<Cite n={3}/>.
 
 <CodeFile file="examples/observability/run.py" func="to_otel_spans" />
 
 The content question is a parameter, not an afterthought: `capture_content` defaults to `False`,
 so a step's `detail` never reaches the returned spans unless a caller turns it on deliberately.
 `tests/test_example_observability.py` pins that a secret planted in a `detail` is absent from the
-default output and present only when `capture_content=True`. Three attacks on that redaction are
-worth knowing about, and the same test file pins all three. A `detail` is free text (it can hold
-a retrieved passage, a tool call's arguments, or an error message that quotes the prompt back),
-so redaction has to cover the field, not a list of the things people expect to find in it. A
-captured `detail` goes to this site's own `gradient_ascent.detail`, never to
-`gen_ai.input.messages`, which the specification defines as a structured list of messages: the
-right attribute name for the wrong shape of value misleads a backend rather than informing it.
-And a step's `title` becomes the span name with no redaction at all, which is why a title on this
-site names a tool or a section and is never built out of content.
+default output and present only when `capture_content=True`, plus a few attacks worth knowing
+about beyond that pass/fail. A `detail` is free text (a retrieved passage, a tool call's
+arguments, an error message that quotes the prompt back), so redaction has to cover the field,
+not a list of expected patterns. A captured `detail` goes to this site's own
+`gradient_ascent.detail`, never to `gen_ai.input.messages`, which the specification defines as a
+structured list of messages: the right attribute name for the wrong shape of value misleads a
+backend rather than informing it. And a step's `title` becomes the span name with no redaction at
+all, which is why a title on this site names a tool or a section and is never built out of
+content.
 
-Redaction at export is also the last place it can happen, not the first. Turning it on today does
-nothing about a `trace.json` written yesterday with content already in it, and a trace store is
-much easier to fill than to clean.
+Redaction at export is also the last place it can happen, not the first: turning it on today does
+nothing for a `trace.json` already written with content in it, and a store is much easier to fill
+than to clean.
 
 Linking a trace to a scored result is a join on fields both already carry: this site's
-`trace.json` records a `commit`, and a result file under `evals/results/` (see
-`docs/EVALS.md`) records its own `commit` and `run_date` alongside `citation_hit_rate` and
-`tokens_in`/`tokens_out`. No such pair exists yet (no example has a recorded trace or a
-non-stub result file), but the fields to join them on are already there on both sides. Run it
-yourself:
+`trace.json` records a `commit`, and a result file under `evals/results/` (see `docs/EVALS.md`)
+records its own `commit` and `run_date` alongside `citation_hit_rate` and `tokens_in`/`tokens_out`.
+No such pair exists yet, but the join fields are already there on both sides. Run it yourself:
 
 <CodeFile file="examples/observability/README.md" start={22} end={22} lang="text" expect="python -m examples.observability --demo" />
 

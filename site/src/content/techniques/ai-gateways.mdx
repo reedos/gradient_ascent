@@ -1,20 +1,20 @@
 ---
 slug: ai-gateways
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "OpenRouter"
     url: "https://openrouter.ai/"
     publisher: "OpenRouter"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "LiteLLM documentation"
     url: "https://docs.litellm.ai/docs/"
     publisher: "BerriAI"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "AI Gateway"
     url: "https://developers.cloudflare.com/ai-gateway/"
     publisher: "Cloudflare"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -34,14 +34,13 @@ the way out and back. LiteLLM's own documentation describes its proxy mode as a 
 Gateway (Proxy) with virtual keys, cost tracking, and an admin UI," offering "Virtual keys with
 per-key/team/user budgets" and "Centralized logging, guardrails, and caching"<Cite n={2}/>.
 
-A gateway is not an agent framework: it decides nothing about what a model should do next, and
+A gateway is not an agent framework: it decides nothing about what a model should do next and
 holds no task state. It overlaps with an API aggregator without being the same thing: LiteLLM's
 own docs describe a library that "gives you a single, unified interface to call 100+ LLMs" and a
 separately named "Gateway (Proxy)" run on top of it, adding keys, budgets and policy<Cite n={2}/>.
-
-Two things come with the entry point: everything now depends on one component that can itself be
-down, and a hosted gateway is one more party that sees your traffic. Neither is a reason not to
-use one; both are decisions to make on purpose.
+Two costs come with the entry point either way: one component everything now depends on, and one
+more party that sees your traffic. Neither is a reason not to use one; both are decisions to make
+on purpose.
 
 This topic is not a level on the ladder; it applies at every level, the way
 <Link href="/techniques/ops/">ops</Link> does. This page is marked draft, not published: no
@@ -62,16 +61,19 @@ infrastructure. Fall back to other providers when one goes down"<Cite n={1}/>. T
 maker's words for what its product is for, not a result this site has checked.
 
 What a gateway costs is a new component between you and the model, and a new question about who
-sees your traffic. A hosted gateway (OpenRouter is one, and Cloudflare AI Gateway another, whose
-documented features include caching, rate limiting, logging and "model fallbacks in case of
-an error"<Cite n={3}/>) is a third party that a request passes through before
-it reaches the model provider at all, on top of whatever the model provider itself sees. That is
-a question to answer, not a warning: what does this company say it retains, for how long, and is
-that acceptable for the traffic you are about to send through it. A self-hosted gateway, the mode
-LiteLLM's own proxy is built to run as, keeps that hop inside infrastructure you already control,
-at the cost of running and patching one more service yourself. Neither is strictly better: it is
-the same shape of trade-off <Link href="/techniques/local-inference/">running a model
-locally</Link> makes against calling an API, one layer up the stack.
+sees your traffic. A gateway of either kind sees every prompt sent and every response returned,
+in full, because that is what routing and logging a call requires. A hosted one (OpenRouter is
+one, and Cloudflare AI Gateway another, whose documented features include caching, rate limiting,
+logging and "model fallbacks in case of an error"<Cite n={3}/>) is a third party seeing that
+traffic on top of whatever the model provider itself sees, under its own logging and retention
+terms, not the model maker's. Check its documentation for what it stores, for how long, and
+whether logging prompt and response content can be turned off; see
+<Link href="/techniques/safety/">safety, privacy and governance</Link> for the same question
+asked of an intermediary in general. A self-hosted gateway, the mode LiteLLM's own proxy is built
+to run as, keeps that hop inside infrastructure you already control, at the cost of running and
+patching one more service yourself. Neither is strictly better: it is the same shape of trade-off
+<Link href="/techniques/local-inference/">running a model locally</Link> makes against calling an
+API, one layer up the stack.
 
 If a product you use suddenly starts failing every request instead of degrading gracefully, a
 gateway outage is worth considering before assuming every provider behind it is down at once.

@@ -1,28 +1,28 @@
 ---
 slug: ops
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Rate limits"
     url: "https://platform.claude.com/docs/en/api/rate-limits"
     publisher: "Anthropic (Claude Platform Docs)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Prompt caching"
     url: "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
     publisher: "Anthropic (Claude Platform Docs)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Batch API"
     url: "https://developers.openai.com/api/docs/guides/batch"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "What is OpenTelemetry?"
     url: "https://opentelemetry.io/docs/what-is-opentelemetry/"
     publisher: "OpenTelemetry"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Ollama"
     url: "https://ollama.com/"
     publisher: "Ollama"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -65,8 +65,8 @@ n={2}/>: a product built on a repeated system prompt or a shared document set th
 this is leaving a documented discount on the table.
 Does it batch anything that doesn't need an instant answer? OpenAI's Batch API documents "50%
 cost discount compared to synchronous APIs" in exchange for results that complete "within 24
-hours (and often more quickly)" instead of immediately<Cite n={3}/>. This is the same idea any product
-can apply to its own non-urgent work. And does it route easy requests to a cheaper model and
+hours (and often more quickly)" instead of immediately<Cite n={3}/>, the same trade any product
+can make on its own non-urgent work. And does it route easy requests to a cheaper model and
 escalate only the hard ones? A product that sends everything to its most capable model pays top
 price for questions a smaller one would have answered.
 
@@ -79,11 +79,11 @@ quietly is doing you a favor; one that just errors during a spike is passing its
 problem on to you.
 
 Running a model on your own hardware instead of an API is its own trade-off, not a strictly
-better choice. Ollama, one tool built for this, says of running locally that "nothing you run
-locally ever leaves your machine" and "your prompts are never tracked or trained on"<Cite
-n={5}/>: a property of where the computation happens, not a policy that can be revised. What it
-costs instead is hardware you buy and keep running, and a choice limited to models small enough
-to fit on it; what that limit costs you is a question for an
+better choice. Ollama, one tool built for this, labels one card on its own front page "Local" and
+states under it, "Nothing you run locally ever leaves your machine."<Cite n={5}/> That is a
+property of where the computation happens, not a policy that can be revised. What it costs
+instead is hardware you buy and keep running, and a choice limited to models small enough to fit
+on it; what that limit costs you is a question for an
 <Link href="/techniques/evals/">eval</Link> on your own task, not a general answer.
 
 </Lane>

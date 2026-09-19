@@ -1,16 +1,16 @@
 ---
 slug: cost-optimization
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Prompt caching"
     url: "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
     publisher: "Anthropic (Claude Platform Docs)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Batch API"
     url: "https://developers.openai.com/api/docs/guides/batch"
     publisher: "OpenAI (API documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -59,13 +59,14 @@ trimmed to fit a smaller window can quietly drop the passage a later question ne
 
 Caching a repeated prefix only pays for itself if it is genuinely read again inside its window,
 and the break-even is arithmetic you can do from the maker's own published multipliers. On the
-Claude API as its prompt-caching page reads on September 18, 2026, a cache write is charged above the
-ordinary input rate ("1.25 times the base input tokens price" for a five-minute cache, "2 times"
-for a one-hour one) and a read at "0.1 times the base input tokens price." A footnote names two of its current models
-whose cache hits and refreshes are "priced at 0.025x the base input price," and says that "All
-other models use the standard 0.1x multiplier."<Cite n={1}/> Those are Anthropic's figures for
-Anthropic's models on that date, and they say nothing about any other provider. The shape they
-imply is general, though: one write and no read loses money against not caching at all.
+Claude API as its prompt-caching page reads on September 19, 2026, a cache write is charged above
+the ordinary input rate ("1.25 times the base input tokens price" for a five-minute cache, "2
+times" for a one-hour one) and a read at "0.1 times the base input tokens price." A footnote names
+two of its current models whose cache hits and refreshes are "priced at 0.025x the base input
+price," and says that "All other models use the standard 0.1x multiplier."<Cite n={1}/> Those are
+Anthropic's figures for Anthropic's models on that date, and they say nothing about any other
+provider. The shape they imply is general, though: one write and no read loses money against not
+caching at all.
 
 Batching trades a wait for a discount. OpenAI's Batch API page, read the same day, offers a "50%
 cost discount compared to synchronous APIs" where "Each batch completes within 24 hours (and
@@ -102,6 +103,17 @@ one that answers once, even though every individual call was cheaper. That is ex
 <Link href="/techniques/evals/">eval</Link> scored on outcomes, not on call count, is built to
 catch: the site's own `citation_hit_rate` and `score_overall` fields, read alongside `tokens_in`
 and `tokens_out` from the same result file, are what a real version of this comparison would use.
+
+The same two numbers read differently depending who is asking, and this estimator does not care
+which: a caller divides them however its own setting counts cost. A production line watching
+4,000 units a day divides by units and by day, the way <Link href="/techniques/ops/">ops</Link>'s
+own cost strip does, so a fraction of a cent a call is worth chasing. An engineer validating five
+prototype boards before a design review divides by runs instead: five calls in an afternoon
+almost never read a cached prefix a second time inside its window, so caching rarely earns back
+its own write at that volume, and the number worth comparing against is the time the drafting
+saved, not the token price. A person writing one measurement's uncertainty budget into a report
+is not dividing by anything: if a model drafts the surrounding prose at all, its cost is rounding
+error against the instrument's own calibration, and the only cost that matters is being wrong.
 
 `tests/test_example_ops.py` checks this arithmetic directly and is not mine to extend, but it is
 worth reading here: 1,000 input and 1,000 output tokens against a $1/$2-per-1,000-token made-up
