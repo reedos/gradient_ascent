@@ -39,9 +39,11 @@ LEVEL = 3
 @dataclass(frozen=True)
 class Requirement:
     """One line of the datasheet's Recommended Operating Conditions or Electrical
-    Characteristics table. `source` is the citation for the number as printed. `superseded_upper`
-    and `superseded_by` are set only for the one requirement a later engineering change notice
-    overrides; every other requirement's datasheet number is still the number in force."""
+    Characteristics table. `source` is the citation for the number as printed. The three
+    `superseded_*` fields are set only on the requirements a later engineering change notice
+    overrides; every other requirement's datasheet text is still the text in force. A notice can
+    override the limit (REQ-VIN's ceiling) or the conditions the limit is measured under
+    (REQ-LINEREG's sweep), and the two are not the same field."""
 
     id: str
     parameter: str
@@ -51,6 +53,7 @@ class Requirement:
     unit: str
     source: str
     superseded_upper: float | None = None
+    superseded_condition: str | None = None
     superseded_by: str | None = None
 
     def effective_upper(self) -> float | None:
@@ -58,18 +61,26 @@ class Requirement:
         this requirement, the datasheet's own number otherwise."""
         return self.superseded_upper if self.superseded_upper is not None else self.upper
 
+    def effective_condition(self) -> str:
+        """The conditions actually in force, for the same reason and the same way."""
+        return self.superseded_condition if self.superseded_condition is not None else self.condition
+
 
 #: `srb5030-datasheet.md` sections 3 (Recommended Operating Conditions) and 4 (Electrical
 #: Characteristics). REQ-FSW has no step in `srb5030-test-spec.md` section 4 at all -- the
 #: production test plan simply does not cover it, which is exactly the kind of gap this recipe
 #: exists to catch. REQ-VIN's datasheet figure, 36.0 V, is superseded to 32.0 V for revisions A
 #: and B by `ecn-2608-04.md#1`; revision C is not affected, since revision C fits the 63 V input
-#: capacitors the notice describes.
+#: capacitors the notice describes. The same notice, section 4, moves REQ-LINEREG's sweep down
+#: with it: production may not apply 36.0 V to a revision A or B board, including during test, so
+#: the line regulation requirement for those revisions is measured 9.0 V to 32.0 V. That is the
+#: condition, not the limit; the 0.30 percent figure itself does not change.
 REQUIREMENTS: tuple[Requirement, ...] = (
     Requirement(
         id="REQ-VIN", parameter="Input voltage", condition="steady state",
         lower=9.0, upper=36.0, unit="V", source="srb5030-datasheet#3",
         superseded_upper=32.0, superseded_by="ecn-2608-04#1",
+        superseded_condition="steady state, 32.0 V ceiling per ECN-2608-04",
     ),
     Requirement(
         id="REQ-VOUT", parameter="Output voltage",
@@ -79,6 +90,8 @@ REQUIREMENTS: tuple[Requirement, ...] = (
     Requirement(
         id="REQ-LINEREG", parameter="Line regulation", condition="9.0 V to 36.0 V in, 1.0 A out",
         lower=None, upper=0.30, unit="%", source="srb5030-datasheet#4",
+        superseded_condition="9.0 V to 32.0 V in, 1.0 A out",
+        superseded_by="ecn-2608-04#4",
     ),
     Requirement(
         id="REQ-LOADREG", parameter="Load regulation", condition="0.1 A to 3.0 A out, 24.0 V in",
@@ -112,18 +125,21 @@ BENCH_INSTRUMENTS = frozenset({"MDN-4010", "MDN-6100", "TRN-2400", "TRN-1102"})
 
 
 def _requirements_for_revision(revision: str) -> tuple[Requirement, ...]:
-    """The requirements as they actually stand for one board revision. Only REQ-VIN moves: the
-    ECN's 32.0 V ceiling covers revisions A and B; revision C's 63 V input capacitors restore the
-    datasheet's original 36.0 V, per `ecn-2608-04.md` section 3."""
+    """The requirements as they actually stand for one board revision. Two move, both because of
+    the same notice: REQ-VIN's ceiling and REQ-LINEREG's sweep. Revision C's 63 V input capacitors
+    restore the datasheet's original 36.0 V, per `ecn-2608-04.md` section 3, and with it the
+    original sweep, so for revision C the datasheet's own text is the text in force again."""
     rev = revision.strip().upper()
     if rev not in ("A", "B", "C"):
         raise ValueError(f"unknown board revision: {revision!r}; expected 'A', 'B' or 'C'")
     if rev != "C":
         return REQUIREMENTS
-    unsuperseded = dataclasses.replace(
-        REQUIREMENTS_BY_ID["REQ-VIN"], superseded_upper=None, superseded_by=None
+    return tuple(
+        dataclasses.replace(r, superseded_upper=None, superseded_condition=None, superseded_by=None)
+        if r.superseded_by is not None
+        else r
+        for r in REQUIREMENTS
     )
-    return tuple(unsuperseded if r.id == "REQ-VIN" else r for r in REQUIREMENTS)
 
 
 # ---------------------------------------------------------------------------
@@ -179,8 +195,10 @@ def _as_float(value: object) -> float | None:
 def _propose_test(requirement: Requirement, model: Model, tracer: Tracer) -> TestProposal | None:
     lower, upper = requirement.lower, requirement.effective_upper()
     prompt = (
-        f"Requirement {requirement.id}: {requirement.parameter}, {requirement.condition}. "
-        f"Limit: lower={lower} upper={upper} {requirement.unit}, per {requirement.source}."
+        f"Requirement {requirement.id}: {requirement.parameter}, "
+        f"{requirement.effective_condition()}. "
+        f"Limit: lower={lower} upper={upper} {requirement.unit}, per {requirement.source}"
+        + (f", as superseded by {requirement.superseded_by}." if requirement.superseded_by else ".")
     )
     completion = model.complete(
         [Message(role="system", content=PROPOSE_SYSTEM), Message(role="user", content=prompt)],
@@ -348,7 +366,9 @@ def _revision_from(text: str) -> str:
     A: the ECN's 32.0 V ceiling is the stricter limit, so that is the safe way to be wrong, and
     the trace says which revision was used."""
     stripped = text.strip()
-    if len(stripped) <= 1:
+    if not stripped:
+        return "A"
+    if len(stripped) == 1:
         return stripped
     named = _REVISION_IN_TEXT.search(stripped)
     return named.group(1) if named else "A"

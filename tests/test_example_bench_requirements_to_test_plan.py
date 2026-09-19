@@ -248,6 +248,38 @@ class RequirementsToTestPlanTests(unittest.TestCase):
         self.assertEqual(_revision_from("Write the test plan for Revision C boards"), "C")
         # names no revision: revision A, whose 32.0 V ceiling is the stricter of the two
         self.assertEqual(_revision_from("What is the maximum vent run for a DR-520?"), "A")
+        self.assertEqual(_revision_from("   "), "A", "an empty request names no revision either")
+
+    def test_the_line_regulation_sweep_stops_at_the_ceiling_in_force(self) -> None:
+        """ECN-2608-04 section 4: production may not apply 36.0 V to a revision A or B board,
+        including during test, and `srb5030-test-spec.md` step 4 already sweeps to 32.0 V. A plan
+        drafted for those revisions must not hand the model the datasheet's 36.0 V sweep."""
+        by_id = {r.id: r for r in _requirements_for_revision("B")}
+        self.assertEqual(by_id["REQ-LINEREG"].effective_condition(), "9.0 V to 32.0 V in, 1.0 A out")
+        self.assertEqual(by_id["REQ-LINEREG"].superseded_by, "ecn-2608-04#4")
+        # the limit itself is untouched: only the conditions moved
+        self.assertEqual(by_id["REQ-LINEREG"].upper, 0.30)
+        self.assertEqual(by_id["REQ-LINEREG"].effective_upper(), 0.30)
+        for_c = {r.id: r for r in _requirements_for_revision("C")}
+        self.assertEqual(for_c["REQ-LINEREG"].effective_condition(), "9.0 V to 36.0 V in, 1.0 A out")
+        self.assertEqual(for_c["REQ-VIN"].effective_upper(), 36.0)
+
+    def test_the_prompt_carries_the_superseded_condition_not_the_datasheets(self) -> None:
+        scripted = _responses("B")
+        seen: list[str] = []
+
+        def responder(messages: list[Message], tools: list[dict] | None) -> StubResponse:
+            del tools
+            seen.append(messages[-1].content)
+            return scripted[len(seen) - 1]
+
+        tracer = Tracer(example="bench_requirements_to_test_plan", level=3, model_id="stub-1")
+        run("B", StubModel(responder), tracer)
+        prompts = [p for p in seen if "REQ-LINEREG" in p]
+        self.assertEqual(len(prompts), 1)
+        self.assertIn("9.0 V to 32.0 V in", prompts[0])
+        self.assertNotIn("36.0 V", prompts[0])
+        self.assertIn("ecn-2608-04#4", prompts[0])
 
     def test_stale_limit_helper_is_none_when_the_proposal_already_uses_the_current_limit(self) -> None:
         requirement = REQUIREMENTS[0]  # REQ-VIN
@@ -256,6 +288,16 @@ class RequirementsToTestPlanTests(unittest.TestCase):
             lower=9.0, upper=32.0, unit="V",
         )
         self.assertIsNone(_stale_limit(requirement, proposal))
+
+    def test_the_token_counts_the_page_quotes(self) -> None:
+        """The recipe page's cost strip quotes these totals; pin them so the page cannot drift
+        from the code. Counted by `count_tokens` over the eight prompts the example builds and the
+        eight scripted replies, the same way every stub-model token count on this site is."""
+        model = StubModel(_responses("B"))
+        tracer = Tracer(example="bench_requirements_to_test_plan", level=3, model_id="stub-1")
+        run("B", model, tracer)
+        self.assertEqual(tracer.tokens_in_total(), 1608)
+        self.assertEqual(tracer.tokens_out_total(), 283)
 
     def test_declares_its_level_and_a_run_function(self) -> None:
         import examples.bench_requirements_to_test_plan.run as module

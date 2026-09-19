@@ -18,8 +18,14 @@ Run it:
 python -m examples.bench_requirements_to_test_plan --model stub --question "B"
 ```
 
-`--question` takes a board revision, `A`, `B` or `C`: the datasheet's 36.0 V input ceiling is
-superseded to 32.0 V for revisions A and B, and the requirement used to build the plan reflects
-that. Add `--decision approve` (or `reject`) to resume a run that cleared the coverage check
+`--question` takes a board revision. A bare `A`, `B` or `C` works, and so does a sentence naming
+one ("a test plan for revision C boards"), since `scripts/record_trace.py` fills this example's
+first argument from `--question` like any other. A revision this board does not have is refused
+rather than guessed at, and a request that names none gets revision A, whose 32.0 V ceiling is the
+stricter of the two. The revision decides two requirements: the datasheet's 36.0 V input ceiling
+is superseded to 32.0 V for revisions A and B, and the line regulation sweep those revisions are
+tested over stops at 32.0 V with it.
+
+Add `--decision approve` (or `reject`) to resume a run that cleared the coverage check
 immediately instead of just printing the checkpoint. Every step is `decided_by: "code"`: the
 model drafts, and code decides everything else, including whether the plan ever reaches a person.

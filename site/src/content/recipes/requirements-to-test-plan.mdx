@@ -56,14 +56,25 @@ Illustrated, not measured: no recorded trace exists for this example yet (see
 replies, the same eight requirements and stand-in `tests/test_example_bench_requirements_to_test_plan.py`
 checks against.
 
-Reading the requirements for a revision B board pulls eight rows from
-`srb5030-datasheet.md` sections 3 and 4, and flags one of them: REQ-VIN's 36.0 V ceiling is
-superseded to 32.0 V by `ecn-2608-04#1` for revisions A and B. The model is then asked about each
-requirement in turn, eight separate calls. Five proposals land clean: REQ-VOUT to the MDN-6100 at
-4.900 to 5.100 V, REQ-LINEREG and REQ-LOADREG to the MDN-6100 at 0.30% and 0.80%, REQ-RIPPLE to
-the TRN-1102 (not the MDN-6100, whose AC volts function stops at 300 kHz, well under what a
-500 kHz switcher's ripple needs) at 50.0 mV, and REQ-IQNL to the MDN-4010 at 25.0 mA. Three do
-not:
+Which revision the plan is for comes out of the request itself: "B", "rev B" and "a test plan for
+revision C boards" all work, a revision this board does not have is refused rather than guessed
+at, and a request naming none gets revision A, since the ECN's 32.0 V ceiling is the stricter of
+the two ways to be wrong.
+
+Reading the requirements for a revision B board pulls eight rows from `srb5030-datasheet.md`
+sections 3 and 4, and the same notice moves two of them. REQ-VIN's 36.0 V ceiling is superseded
+to 32.0 V by `ecn-2608-04#1`. REQ-LINEREG's sweep goes with it, by section 4 of the notice:
+production may not apply 36.0 V to a revision A or B board, even during test, so the line
+regulation those revisions are tested for is measured 9.0 V to 32.0 V. The limit itself, 0.30%,
+does not change; only the conditions it is measured under do. A plan drafted from the datasheet's
+own sweep would tell production to do something the notice forbids, so the superseded sweep never
+reaches the model at all.
+
+The model is then asked about each requirement in turn, eight separate calls. Five proposals land
+clean: REQ-VOUT to the MDN-6100 at 4.900 to 5.100 V, REQ-LINEREG and REQ-LOADREG to the MDN-6100
+at 0.30% and 0.80%, REQ-RIPPLE to the TRN-1102 (not the MDN-6100, whose AC volts function stops
+at 300 kHz, well under what a 500 kHz switcher's ripple needs) at 50.0 mV, and REQ-IQNL to the
+MDN-4010 at 25.0 mA. Three do not:
 
 | Requirement | Proposal | Coverage check |
 | --- | --- | --- |
@@ -91,7 +102,7 @@ plan adopted, as `Answer.text`, a plain comma-separated table with every source 
 <CostStrip
   stats={[
     { label: 'Model calls per revision', value: '8' },
-    { label: 'Tokens in', value: '1,584' },
+    { label: 'Tokens in', value: '1,608' },
     { label: 'Tokens out', value: '283' },
     { label: 'Coverage check cost', value: '$0, no model' },
   ]}
@@ -99,12 +110,15 @@ plan adopted, as `Answer.text`, a plain comma-separated table with every source 
 />
 
 Eight calls, one per requirement, for one board revision's plan: no branching, so a ninth or
-tenth requirement adds one more call and nothing else. The 1,584 tokens in and 283 out above are
+tenth requirement adds one more call and nothing else. The 1,608 tokens in and 283 out above are
 `tracer.tokens_in_total()` and `tracer.tokens_out_total()` from a scripted stub run of all eight
-requirements for revision B, counted the same way `scripts/eval_run.py --dry` projects a ceiling:
-real, not billed against any paid backend. Building the traceability table and checking it costs
-nothing measured in tokens: both are loops over eight rows, the same level-0 arithmetic
-`limits-without-a-model` argues most of test automation already is.
+requirements for revision B, counted by `count_tokens` over the prompts the example actually
+builds and the replies scripted into the test. That is an estimate of what a backend would bill,
+not a measurement of one, and the test pins both numbers so this page cannot drift from the code.
+Building the traceability table and checking it costs nothing measured in tokens: both are loops
+over eight rows, the same level-0 arithmetic <Link
+href="/recipes/limits-without-a-model/">limits without a model</Link> argues most of test
+automation already is.
 
 Compare that against the cost of the mistake the check exists to catch. A stale 36.0 V limit that
 ships on a revision B line either fails a good board on a rail the ECN says is actually fine at
@@ -128,7 +142,7 @@ allows all the way to 40.0 V before anything is actually damaged.
   {
     name: 'A limit copied from a datasheet number an ECN superseded',
     notice: 'The plan looks complete and the test even runs; it checks a rail against 36.0 V on a board a later notice has capped at 32.0 V for the revisions actually in the field.',
-    test: '_stale_limit compares a proposal’s upper limit against both the datasheet’s own figure and Requirement.effective_upper(); one test plants the stale figure on a revision B board and checks it is caught, another plants the identical figure on a revision C board, where it is correct, and checks it is not.',
+    test: '_stale_limit flags a proposed upper limit that matches the datasheet’s own figure for a requirement a notice supersedes; one test plants the stale figure on a revision B board and checks it is caught, another plants the identical figure on a revision C board, where it is correct, and checks it is not. A third checks the superseded sweep never reaches the model in the first place.',
   },
   {
     name: 'A test that answers a different requirement than the one it was asked about',
@@ -165,16 +179,23 @@ rather than re-catching in every plan. No result file exists for this example ye
 
 ## How to adapt it to your own bench
 
-Every instrument on this bench is one `send(command: str) -> str` method, the shape PyVISA's
-`write` and `query` pair covers, so the code that drafts a proposal, builds the table and checks
-it does not change; only the transport under `send` does. That is a pointer to follow, not a
-tested fact: nothing in this recipe has been run against real hardware.
+Nothing in this recipe sends a command. It reads two documents and writes a third, and an
+instrument appears in it only as a name a proposed test has to match against the equipment list.
+What ports is the check: your own equipment list in place of `BENCH_INSTRUMENTS`, and your own
+requirement ids. When one of these plans becomes a script that actually drives an instrument, that
+is <Link href="/recipes/instrument-script-from-the-manual/">drafting a script from the
+manual</Link>'s job, and it carries the rule that matters there: the model drafts, code checks
+every command against that instrument's own manual, the script runs on a simulated instrument
+first, and a person bench-checks it with the current limit set low before it touches hardware.
+Nothing in this repo has been run against real hardware.
 
 What does not port is everything specific to this board: the SRB-5030's eight requirements, its
-`REQUIREMENTS` tuple, `BENCH_INSTRUMENTS`'s four names, and the ECN that supersedes one of them.
+`REQUIREMENTS` tuple, `BENCH_INSTRUMENTS`'s four names, and the ECN that supersedes two of them.
 Your own datasheet has its own list, your own test spec has its own gaps, and if a later notice
 has overridden one of your own numbers, that notice, not this page, is the one to check the
-proposed limit against.
+proposed limit against. <Link href="/recipes/ask-the-datasheet/">Ask the datasheet</Link> is the
+same conflict read from the other end: what the documents say, before anyone drafts a test from
+them.
 
 The shape carries further than electronics. Anywhere a written list of requirements needs a
 matching, provably complete set of checks before anyone signs off, the same four steps apply: a
