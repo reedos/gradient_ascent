@@ -255,7 +255,7 @@ a person resolves it.
 
 <TryIt items={[
   { lane: 'use', body: "If you use one of these products, find its approval or activity history and check one week back. How many actions ran without asking you, how many waited for you, and is there anything in the first group you would rather have been in the second?" },
-  { lane: 'build', body: 'Run python -m examples.agent_teammates --model stub --question "..." with a made-up digest of your own, then open tests/test_example_agent_teammates.py and read test_all_three_policy_classes_in_one_tick to see a model that actually proposes all three kinds of action in one call.' },
+  { lane: 'build', body: 'Run python -m examples.agent_teammates --model stub:scripted from the repo root. One tick proposes three actions and the policy splits them three ways: archiving a newsletter runs unattended, sending an email is queued for approval, and paying a $4,200 invoice is refused outright. The sequence is a fixture, so a digest of your own gets the same three proposals back; what decides their fate is POLICY in examples/agent_teammates/run.py. With --model stub the tick proposes nothing at all, which the run prints as the valid answer it is.' },
   { lane: 'either', body: "Pick one of the failure modes above and try to cause it on purpose: for the missing-policy-entry failure, add a new tool to ACTION_TOOLS in examples/agent_teammates/run.py without adding it to POLICY, and confirm it still comes out refused rather than auto-run." },
 ]} />
 

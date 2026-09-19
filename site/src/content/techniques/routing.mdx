@@ -231,7 +231,7 @@ exists yet (see `docs/EVALS.md`). Run `python scripts/eval_run.py --example rout
 
 <TryIt items={[
   { lane: 'use', body: 'Find a form or a support inbox that already sorts incoming items into a few fixed categories. Write down what happens to something that fits none of them well. Is there a real fallback, or does it get forced into the closest category?' },
-  { lane: 'build', body: 'Run python -m examples.routing --model stub with a question that names a part number not in the parts list (try "What does HLV-9999 cost?"), then one with no part number in it at all ("What does the drain pump cost?"). Which route does each one reach, and how does the answer differ?' },
+  { lane: 'build', body: 'Run python -m examples.routing --model stub:scripted from the repo root. The classifier returns lookup, the code routes on that one word, and the lookup route answers with its citation. Run it again with --model stub: the echo is not one of the labels, so every question lands in the unclear fallback and gets the same answer, which is what a classifier that never returns a label looks like from the outside.' },
   { lane: 'either', body: 'Write five questions on purpose to land in the "unclear" fallback. How easy was that? A route that is too easy to fall into is a sign the other categories are drawn too narrowly.' },
 ]} />
 

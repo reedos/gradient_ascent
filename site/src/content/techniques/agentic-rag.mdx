@@ -221,7 +221,7 @@ real run before spending anything on one.
 
 <TryIt items={[
   { lane: 'use', body: 'Give a deep-research mode a question with two parts that live in different sources, and check its shown searches or sources: did it actually run more than one search, and does each part of the answer trace to one it ran?' },
-  { lane: 'build', body: 'Run python -m examples.agentic_rag --model stub with a question of your own from the repo root, then read tests/test_example_agentic_rag.py to see a scripted model that actually searches, reads, and stops.' },
+  { lane: 'build', body: 'Run python -m examples.agentic_rag --model stub:scripted from the repo root. The model searches, reads the one section its own search turned up, and stops: three turns, one citation. Run it again with --model stub, where the echo is never a tool call, and the loop ends on the first turn having retrieved nothing.' },
   { lane: 'either', body: 'Compare this page\'s run to RAG\'s: RAG\'s five steps are all solid (code-decided); count how many of this run\'s eight are dashed instead. What does the difference buy, and what does it cost?' },
 ]} />
 

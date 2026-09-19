@@ -241,7 +241,7 @@ real run before spending anything on one.
 
 <TryIt items={[
   { lane: 'use', body: 'Ask a coding agent or a deep-research tool to do something that takes several steps, and watch what happens if it does not finish: does it say it hit a turn or time limit, or does it just hand back a partial answer with no explanation?' },
-  { lane: 'build', body: 'Run python -m examples.single_agent --model stub with a question of your own from the repo root. The interactive stub never calls a tool, so it always stops after the plan step; run python -m unittest tests.test_example_single_agent -v instead to see a scripted model that actually calls both tools and hits both caps.' },
+  { lane: 'build', body: 'Run python -m examples.single_agent --model stub:scripted from the repo root. The model writes a plan, acts on it twice (search, then lookup_part), and stops on its own with a priced, warranty-scoped answer, every cited section one a tool really returned. Run it again with --model stub: the echo is never a tool call, so the run stops after the plan step with no citations. For the caps, run python -m unittest tests.test_example_single_agent -v.' },
   { lane: 'either', body: 'Pick one of the failure modes above and try to script a StubModel response that causes it on purpose, using the pattern in tests/test_example_single_agent.py.' },
 ]} />
 

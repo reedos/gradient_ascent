@@ -231,7 +231,7 @@ the wrong claim is still in the text a grader reads, with the reason it is wrong
 
 <TryIt items={[
   { lane: 'use', body: 'Find a product that shows a "reviewing" or "verifying" step. Read its own documentation: does the reviewer have its own sources or its own criteria, or is it the same model reading the same context again?' },
-  { lane: 'build', body: 'Run python -m examples.debate_review --model stub with a question of your own from the repo root. The interactive stub never says exactly CHECK, ACCEPT or REJECT, so run python -m unittest tests.test_example_debate_review -v instead to see a scripted reviewer actually check a planted wrong answer and reject it.' },
+  { lane: 'build', body: 'Run python -m examples.debate_review --model stub:scripted from the repo root. The reviewer decides what to check, its own search turns up the service bulletin, and it rejects a draft that quoted the manual\'s superseded 35-foot figure. Run it again with --model stub: the echo is never CHECK, ACCEPT or REJECT, so the first turn becomes the verdict, and what comes back is the draft with a review under it that is neither an accept nor a reject.' },
   { lane: 'either', body: "Take a claim you disagree with and write the specific, checkable thing you would verify first, the way this page's reviewer writes a CHECK query. If you cannot state one, you have an opinion about the claim, not a review of it." },
 ]} />
 

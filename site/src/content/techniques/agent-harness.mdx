@@ -268,7 +268,7 @@ one is not model variance, it is what the harness cost the run.
 
 <TryIt items={[
   { lane: 'use', body: 'Pick two agent products (a coding agent and a research or deep-research tool, say) and try to name, for each, its step or turn cap, whether it asks before an irreversible action, and what it says when it hits a limit. That is the harness, not the model, and most products document at least part of it.' },
-  { lane: 'build', body: 'Run python -m examples.agent_harness --model stub with a question of your own, then open tests/test_example_agent_harness.py and change trim_to_budget(15) to a much larger number in the harness-changes-the-outcome test. Does the answer come back the same as the generous policy\'s?' },
+  { lane: 'build', body: 'Run python -m examples.agent_harness --model stub:scripted from the repo root. The same model searches, looks up the part, and stops with a priced, warranty-scoped answer, all of it the harness\'s doing rather than the model\'s. Then open tests/test_example_agent_harness.py and change trim_to_budget(15) to a much larger number in the harness-changes-the-outcome test. Does the answer come back the same as the generous policy\'s?' },
   { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose, using the pattern in tests/test_example_agent_harness.py.' },
   { lane: 'build', body: 'Read READ_ONLY_HEADERS and is_read_only in examples/common/bench.py, then SafetyEnvelope and Approval right after them. That is the same allowlist-plus-hook shape this page\'s own ToolRegistry and Hook build, in a setting where the one class of command that actually energizes a board needs a person\'s approval naming the set point before it runs at all.' },
 ]} />

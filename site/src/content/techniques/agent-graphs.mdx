@@ -211,7 +211,7 @@ what a typical question costs.
 
 <TryIt items={[
   { lane: 'use', body: 'Watch a multi-step assistant handle a task that plausibly needs more than one kind of expertise (research plus writing, say). Does anything in its reply say a different specialist or stage handled part of it, or is the switch invisible?' },
-  { lane: 'build', body: 'Run python -m examples.agent_graphs --model stub with a question of your own from the repo root. The interactive stub never says exactly "research" or "write", so every run gets its handoff blocked immediately; run python -m unittest tests.test_example_agent_graphs -v instead to see a scripted supervisor actually take three research hops before writing.' },
+  { lane: 'build', body: 'Run python -m examples.agent_graphs --model stub:scripted from the repo root. The supervisor sends the team to research three times, each hop surfacing a section the last one did not, then hands off to write, and the answer cites the service bulletin that supersedes the manual. Run it again with --model stub to see why the scripted sequence exists: the echo is not one of the two agent names, so the first hop goes nowhere and the run ends with no citations at all.' },
   { lane: 'either', body: 'Pick one of the failure modes above and try to script a StubModel response that causes it on purpose, using the pattern in tests/test_example_agent_graphs.py.' },
 ]} />
 

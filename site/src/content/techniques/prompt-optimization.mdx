@@ -110,8 +110,11 @@ instruction: the test asserts the ordering, not just the instruction, since a he
 scored early and re-scored later would still have leaked. Every candidate is scored on the same
 development questions. And ties resolve to the first candidate in list order, which means a run
 where everything ties has selected nothing: `python -m examples.prompt_optimization --model stub`
-does exactly that, scoring every candidate 0/24 against the interactive stub, so the "winner" is
-list position. A `held_out_fraction` that would leave no development questions raises instead of
+does exactly that, scoring every candidate 0/24 against the echoing stub, so the "winner" is
+list position. `--model stub:scripted --max-questions 6` is the other case, bounded to a run small
+enough to read: three candidates scored on the same four development questions, two of them taking
+0/4 and one taking 4/4, which then confirms 2/2 on the two questions held back. A
+`held_out_fraction` that would leave no development questions raises instead of
 returning, because selecting on nothing and then printing a held-out score reads precisely like a
 search that worked.
 

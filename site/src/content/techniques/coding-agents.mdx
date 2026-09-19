@@ -250,7 +250,7 @@ runner for the measures above exists yet.
 
 <TryIt items={[
   { lane: 'use', body: 'Find a project\'s AGENTS.md, CLAUDE.md, or similar instructions file, if it has one. Does it name a test command a coding agent could actually run, or only prose a human would read?' },
-  { lane: 'build', body: 'Run python -m examples.coding_agents --model stub with a question of your own from the repo root, then read tests/test_example_coding_agents.py to see a scripted model that proposes a wrong fix before a right one, and one that never fixes it at all.' },
+  { lane: 'build', body: 'Run python -m examples.coding_agents --model stub:scripted from the repo root. The first proposed edit counts the even numbers instead of summing them and the test catches it (3, not 12); the second passes all four cases. For the run that never gets there, read test_step_cap_forces_a_stop_when_the_model_never_fixes_it in tests/test_example_coding_agents.py.' },
   { lane: 'either', body: 'Open examples/coding_agents/run.py and change TEST_CASES to add a case the current BUGGY_SOURCE and the fix in the tests both need to handle differently. Does the existing scripted fix in the tests still pass?' },
 ]} />
 

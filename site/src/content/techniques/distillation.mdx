@@ -120,8 +120,11 @@ Every step is `decided_by: "code"`: the code always calls the teacher, always gr
 and the model's output never changes what happens next. This is the same rule `examples/rag`
 follows for
 its own single model call. Against the real question set, `python -m examples.distillation --model
-stub --out .local/scratch/distillation/student.jsonl` keeps nothing: the interactive stub's
-placeholder text matches no question's pattern, so all 32 are dropped. That is not a bug in the
+stub:scripted --out .local/scratch/distillation/student.jsonl` keeps 30 of the 32 and names the two
+it dropped, L06 and N04, which is the shape of a capture worth keeping; the teacher's answers are a
+written-down fixture, so the 30 is not a pass rate anything was measured at. The same command with
+`--model stub` keeps nothing: the echoing stub's placeholder text matches no question's pattern, so
+all 32 are dropped. That is not a bug in the
 filter; it is what an honest filter does to an answer that was never actually trying to be right,
 and it is the same reason a real captured dataset needs a real teacher model before the filter's
 pass rate means anything.

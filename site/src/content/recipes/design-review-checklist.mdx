@@ -134,10 +134,12 @@ one:
 
 <CodeFile file="examples/bench_design_review_checklist/run.py" func="_merge_judgment_findings" />
 
-Run it: `python -m examples.bench_design_review_checklist --model stub --question B`. The
-interactive stub returns free text, not the JSON the two model passes ask for, so that command by
-itself shows only the five numeric findings; the scripted two-pass catch above is what
-`tests/test_example_bench_design_review_checklist.py` runs and asserts.
+Run it: `python -m examples.bench_design_review_checklist --model stub:scripted`. All seven rules
+come back judged, five by code and two by the model, with DR-24's drafted "met" rejected by the
+second pass in the words the walkthrough describes. The same command with `--model stub` returns
+free text where the two model passes ask for JSON, so it prints the five numeric findings and
+stops there, which is the honest floor: the code half of this checklist works without a model at
+all.
 
 ## What it costs
 

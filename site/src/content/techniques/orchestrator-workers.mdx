@@ -240,7 +240,7 @@ ceiling counts every worker the cap allows.
 
 <TryIt items={[
   { lane: 'use', body: 'Give a coding agent that has subagents (Claude Code, for one) a task big enough that it might delegate part of it. Does it tell you it spawned a subagent, and if so, what was that subagent asked to do?' },
-  { lane: 'build', body: 'Run python -m examples.orchestrator_workers --model stub with a question of your own from the repo root. The interactive stub never really splits (it echoes one placeholder line back as the only sub-question), so run python -m unittest tests.test_example_orchestrator_workers -v instead to see a scripted lead actually split a question, hit the worker cap, and hit the team token budget.' },
+  { lane: 'build', body: 'Run python -m examples.orchestrator_workers --model stub:scripted from the repo root. The lead splits one two-part question into two, spawns a worker for each, and merges both answers with both citations. Run it again with --model stub and the split never happens: the echo comes back as one placeholder sub-question, so one worker is spawned and the merge has one thing to merge. For the caps, run python -m unittest tests.test_example_orchestrator_workers -v, which scripts a lead into the worker cap and the team token budget.' },
   { lane: 'either', body: "Write a two-part question a single call could not answer well, then write what you would tell two separate people to go find, if you were the lead instead of a model. Compare that split to what the example's stub test scripts the lead to propose." },
 ]} />
 

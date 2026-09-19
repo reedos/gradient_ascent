@@ -236,7 +236,7 @@ long a real queue of paused checkpoints takes a person to clear.
 
 <TryIt items={[
   { lane: 'use', body: 'Find a tool you use that asks you to approve something before it acts (a form, an agent, an automation). Time how long you actually spend reading before you click approve. Is that enough time to have caught a real mistake?' },
-  { lane: 'build', body: "Run python -m examples.human_in_the_loop --model stub --question 'zzqqx frobnitz wibble' to see it pause for low_confidence, then add --decision reject to resume it as rejected instead. Then try --question 'Is the HLV-2205 priced over $50?' and watch it pause for high_cost instead, because the retrieved parts pricing lands inside the stub's own echoed text." },
+  { lane: 'build', body: "Run python -m examples.human_in_the_loop --model stub:scripted from the repo root. The draft is a real cited answer and it pauses anyway, for high_cost, because it names $52.00; add --decision reject and the run ends with no answer given, or --decision approve and the same draft ships unchanged. Then run --model stub --question 'zzqqx frobnitz wibble', which matches nothing: that draft has no citation, so it pauses for low_confidence instead, and the two thresholds are visible one against the other." },
   { lane: 'either', body: 'Take an approval step you own and write down the last three things it stopped. If you cannot name one, the threshold is either too loose to catch anything or too tight to be read.' },
   { lane: 'build', body: 'Open READ_ONLY_HEADERS and is_read_only in examples/common/bench.py, then output_on in the same file. Name the two things a person has to approve before it will send OUTP ON, and what happens if only one of them is supplied.' },
 ]} />
