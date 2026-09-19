@@ -36,6 +36,11 @@ Rules:
   17. Every recipe has a `domain` drawn from the declared `domains`, and at least one domain is
       declared. The recipes index groups by domain; an unlisted one drops a recipe out of every
       heading on the page.
+  18. content/shapes.json, when present: shape ids are unique, `usual_level` is a real level,
+      every technique, recipe and teardown a shape names exists, every shape names at least three
+      jobs from other fields, and every recipe illustrates at least one shape. A recipe outside
+      every shape is a story with nothing general said about it, which is what the shapes exist
+      to prevent.
 
 Techniques with no named example are reported, not failed.
 
@@ -149,6 +154,44 @@ def validate_glossary(glossary: dict, taxonomy: dict) -> list[str]:
             if ref.strip().lower() not in all_names:
                 errors.append(f"glossary: term {term!r} has a see reference that resolves to nothing: {ref!r}")
 
+    return errors
+
+
+def validate_shapes(shapes_file: dict, taxonomy: dict) -> list[str]:
+    """Rule 18. See the module docstring."""
+    errors: list[str] = []
+    level_pages, track_pages, track_ids = page_ids(taxonomy)
+    techniques = set(level_pages) | set(track_pages) | set(track_ids)
+    recipes = [r["slug"] for r in taxonomy.get("recipes", [])]
+    teardowns = {t["slug"] for t in (taxonomy.get("teardowns") or {}).get("first", [])}
+    levels = {t["order"] for t in taxonomy.get("tiers", [])}
+    seen: set[str] = set()
+    covered: set[str] = set()
+    for shape in shapes_file.get("shapes", []):
+        sid = shape.get("id", "<no id>")
+        if sid in seen:
+            errors.append(f"shapes.json: duplicate shape id '{sid}'")
+        seen.add(sid)
+        if shape.get("usual_level") not in levels:
+            errors.append(f"shapes.json: shape '{sid}' has usual_level {shape.get('usual_level')!r}, which is not a level")
+        for slug in shape.get("techniques", []):
+            if slug not in techniques:
+                errors.append(f"shapes.json: shape '{sid}' names unknown technique '{slug}'")
+        for slug in shape.get("recipes", []):
+            if slug not in recipes:
+                errors.append(f"shapes.json: shape '{sid}' names unknown recipe '{slug}'")
+            covered.add(slug)
+        for slug in shape.get("teardowns", []):
+            if slug not in teardowns:
+                errors.append(f"shapes.json: shape '{sid}' names unknown teardown '{slug}'")
+        if len(shape.get("elsewhere", [])) < 3:
+            errors.append(f"shapes.json: shape '{sid}' names fewer than three jobs from other fields")
+        for key in ("title", "what", "lower_when", "higher_when"):
+            if not str(shape.get(key, "")).strip():
+                errors.append(f"shapes.json: shape '{sid}' has no {key}")
+    for slug in recipes:
+        if slug not in covered:
+            errors.append(f"shapes.json: recipe '{slug}' illustrates no shape")
     return errors
 
 
@@ -993,6 +1036,13 @@ def main(argv: list[str]) -> int:
         glossary_count = len(glossary.get("terms", []))
         errors = errors + validate_glossary(glossary, taxonomy)
 
+    shapes_path = content_dir / "shapes.json"
+    shapes_count = 0
+    if shapes_path.exists():
+        shapes_file = json.loads(shapes_path.read_text(encoding="utf-8"))
+        shapes_count = len(shapes_file.get("shapes", []))
+        errors = errors + validate_shapes(shapes_file, taxonomy)
+
     timeline_path = content_dir / "timeline.json"
     timeline_count = 0
     if timeline_path.exists():
@@ -1013,6 +1063,8 @@ def main(argv: list[str]) -> int:
         print(f"glossary: {glossary_count} terms")
     if timeline_path.exists():
         print(f"timeline: {timeline_count} milestones")
+    if shapes_path.exists():
+        print(f"shapes: {shapes_count} job shapes")
     if report["unnamed"]:
         print("techniques with no named example: " + ", ".join(report["unnamed"]))
     for err in errors:

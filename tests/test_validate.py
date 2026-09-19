@@ -429,6 +429,50 @@ class GlossaryTests(unittest.TestCase):
         self.assertLessEqual(len(glossary_data["terms"]), 140)
 
 
+class ShapesTests(unittest.TestCase):
+    """Rule 18: the job shapes resolve against the taxonomy and leave no recipe out."""
+
+    def _real(self):
+        import json as _json
+
+        content = Path(__file__).resolve().parent.parent / "content"
+        tax = _json.loads((content / "taxonomy.json").read_text(encoding="utf-8"))
+        shapes = _json.loads((content / "shapes.json").read_text(encoding="utf-8"))
+        return shapes, tax
+
+    def test_the_real_shapes_file_is_clean(self):
+        shapes, tax = self._real()
+        self.assertEqual(validate.validate_shapes(shapes, tax), [])
+
+    def test_a_recipe_outside_every_shape_is_an_error(self):
+        shapes, tax = self._real()
+        slug = tax["recipes"][0]["slug"]
+        for shape in shapes["shapes"]:
+            shape["recipes"] = [r for r in shape["recipes"] if r != slug]
+        errors = validate.validate_shapes(shapes, tax)
+        self.assertTrue(any(f"recipe '{slug}' illustrates no shape" in e for e in errors), errors)
+
+    def test_unknown_references_a_bad_level_a_duplicate_and_a_thin_elsewhere(self):
+        shapes, tax = self._real()
+        first = shapes["shapes"][0]
+        first["techniques"] = first["techniques"] + ["no-such-technique"]
+        first["recipes"] = first["recipes"] + ["no-such-recipe"]
+        first["teardowns"] = ["no-such-teardown"]
+        first["usual_level"] = 9
+        first["elsewhere"] = first["elsewhere"][:2]
+        shapes["shapes"].append(copy.deepcopy(shapes["shapes"][1]))
+        errors = "\n".join(validate.validate_shapes(shapes, tax))
+        for needle in (
+            "unknown technique 'no-such-technique'",
+            "unknown recipe 'no-such-recipe'",
+            "unknown teardown 'no-such-teardown'",
+            "usual_level 9",
+            "fewer than three jobs",
+            "duplicate shape id",
+        ):
+            self.assertIn(needle, errors)
+
+
 class MdxReferenceTests(unittest.TestCase):
     """Rules 11 and 12, added 2026-09-18.
 

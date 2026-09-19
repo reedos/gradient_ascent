@@ -8,6 +8,9 @@ import Sources from '../../components/page/Sources.astro';
 import Reviewed from '../../components/page/Reviewed.astro';
 import { url } from '../../lib/url';
 import { recipes, techniquesForRecipe, recipeLevels } from '../../lib/content';
+import { shapes } from '../../lib/agents-data';
+import { shapesFor } from '../../lib/shapes';
+import '../../styles/shapes.css';
 
 export function getStaticPaths() {
   return recipes.map((r) => ({ params: { slug: r.slug } }));
@@ -88,6 +91,28 @@ const reviewedISO = entry ? entry.data.reviewed.toISOString().slice(0, 10) : und
       }
     </div>
   </section>
+
+  {
+    // A recipe is one worked instance of a job shape. Saying so on the page, with jobs of the same
+    // shape from other fields, keeps a reader from deciding the recipe is not about them.
+    shapesFor(shapes, slug).map((sh) => (
+      <section class="section">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow muted">Same shape, other jobs</div>
+            <h2>{sh.title}</h2>
+          </div>
+          <p>
+            This recipe is one worked instance of a kind of job. The reasoning carries over to the
+            others; the subject does not. <a href={url(`/shapes/#${sh.id}`)} style="color:var(--accent)">See the shape</a>.
+          </p>
+        </div>
+        <div class="shape-else reading">
+          <ul>{sh.elsewhere.map((e) => <li>{e}</li>)}</ul>
+        </div>
+      </section>
+    ))
+  }
 
   {
     sources.length > 0 && (
