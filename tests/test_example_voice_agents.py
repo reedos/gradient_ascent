@@ -15,10 +15,17 @@ if str(ROOT) not in sys.path:
 
 from examples.common.model import AudioPart, StubModel, StubResponse, TextPart, ToolCall  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
+from examples.voice_agents.__main__ import SCRIPTED  # noqa: E402
 from examples.voice_agents.run import run  # noqa: E402
 
 QUESTION = "What time do you close tonight?"
 CONTINUE = ToolCall(name="continue_speaking", arguments={})
+
+# The same sequence examples/voice_agents/__main__.py plays under --model stub:scripted.
+SEQUENCE = [
+    StubResponse(text="We close at nine,", tool_calls=[CONTINUE]),
+    "but the kitchen closes at eight-thirty.",
+]
 
 
 class VoiceAgentsExampleTests(unittest.TestCase):
@@ -42,12 +49,7 @@ class VoiceAgentsExampleTests(unittest.TestCase):
         self.assertEqual(answer.text, "We close at nine tonight.")
 
     def test_a_multi_chunk_answer_records_a_model_decision_per_chunk_plus_the_stop(self) -> None:
-        model = StubModel(
-            [
-                StubResponse(text="We close at nine,", tool_calls=[CONTINUE]),
-                StubResponse(text="but the kitchen closes at eight-thirty."),
-            ]
-        )
+        model = StubModel([StubResponse(text=t) if isinstance(t, str) else t for t in SEQUENCE])
         tracer = Tracer(example="voice_agents", level=5, model_id="stub-1")
         answer = run(QUESTION, model, None, tracer)
         self.assertEqual(tracer.model_decided_count(), 2)
@@ -111,6 +113,11 @@ class VoiceAgentsExampleTests(unittest.TestCase):
 
         self.assertTrue(callable(module.run))
         self.assertEqual(module.LEVEL, 5)
+
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual(SCRIPTED, SEQUENCE)
 
 
 if __name__ == "__main__":

@@ -16,22 +16,24 @@ if str(ROOT) not in sys.path:
 
 from examples.common.model import StubEmbedder, StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
+from examples.orchestrator_workers.__main__ import SCRIPTED  # noqa: E402
 from examples.orchestrator_workers.run import MAX_WORKERS, run  # noqa: E402
 
 CORPUS_DIR = ROOT / "evals" / "corpus"
 QUESTION = "What is the DW-300's annual energy use, and how much does the DR-520's drive belt cost?"
 
+# The same sequence examples/orchestrator_workers/__main__.py plays under --model stub:scripted.
+SEQUENCE = [
+    "What is the DW-300's annual energy use?\nWhat does the DR-520's drive belt cost?",
+    "260 kWh per year. Sources: dw300-manual#3",
+    "$9.75, part HLV-6601. Sources: parts-list#3",
+    "The DW-300 uses about 260 kWh per year [dw300-manual#3]. The DR-520's drive belt costs $9.75 [parts-list#3]. Sources: dw300-manual#3, parts-list#3",
+]
+
 
 class OrchestratorWorkersExampleTests(unittest.TestCase):
     def test_split_is_the_only_model_decided_step(self) -> None:
-        model = StubModel(
-            [
-                StubResponse(text="What is the DW-300's annual energy use?\nWhat does the DR-520's drive belt cost?"),
-                StubResponse(text="260 kWh per year. Sources: dw300-manual#3"),
-                StubResponse(text="$9.75, part HLV-6601. Sources: parts-list#3"),
-                StubResponse(text="The DW-300 uses about 260 kWh per year [dw300-manual#3]. The DR-520's drive belt costs $9.75 [parts-list#3]. Sources: dw300-manual#3, parts-list#3"),
-            ]
-        )
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
         tracer = Tracer(example="orchestrator_workers", level=6, model_id="stub-1")
         answer = run(QUESTION, model, StubEmbedder(), tracer, corpus_dir=CORPUS_DIR)
 
@@ -89,6 +91,11 @@ class OrchestratorWorkersExampleTests(unittest.TestCase):
 
         self.assertTrue(callable(module.run))
         self.assertEqual(module.LEVEL, 6)
+
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
 
 
 if __name__ == "__main__":

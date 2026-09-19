@@ -1,12 +1,20 @@
 """Estimate cost and latency from recorded trace files and a price table you supply.
 
-    python -m examples.ops --traces "path/to/*.json" --prices path/to/prices.json
+    python -m examples.ops
     python -m examples.ops --demo
+    python -m examples.ops --traces "path/to/*.json" --prices path/to/prices.json
 
 `--demo` needs no files: it writes two synthetic trace files (real `Tracer` output, not a
 canned dict) to a temporary directory, using a small made-up price table clearly held apart from
 `examples.ops.run` -- nothing in that module hard-codes a price, and this table is not a vendor's
-published number, only a stand-in so the report has something to divide by.
+published number, only a stand-in so the report has something to divide by. Passing neither
+`--traces`/`--prices` nor `--demo` runs the demo too, so the bare command above has something to
+show; passing only one of `--traces`/`--prices` is still an error, since that is a caller who
+meant to point at real files and left one out.
+
+Nothing here calls a model: this module only reads numbers already recorded in a trace and
+multiplies them by a table it was handed, so `--model` is accepted for a uniform interface with
+the other examples but is not used.
 """
 from __future__ import annotations
 
@@ -16,6 +24,7 @@ import sys
 import tempfile
 from pathlib import Path
 
+from examples.common.cli import MODEL_HELP
 from examples.common.trace import Tracer
 from examples.ops.run import PriceTable, Report, build_report, load_price_table
 
@@ -57,10 +66,11 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--traces", help="glob of trace JSON files, e.g. 'examples/*/trace.json'")
     parser.add_argument("--prices", type=Path, help="price table JSON file (see load_price_table)")
-    parser.add_argument("--demo", action="store_true", help="use synthetic traces and a made-up price table")
+    parser.add_argument("--demo", action="store_true", help="use synthetic traces and a made-up price table (the default with no --traces/--prices)")
+    parser.add_argument("--model", default="stub", help=f"accepted but unused, no model is ever called ({MODEL_HELP})")
     args = parser.parse_args(sys.argv[1:] if argv is None else argv)
 
-    if args.demo:
+    if args.demo or not (args.traces or args.prices):
         with tempfile.TemporaryDirectory() as tmp:
             paths = _write_demo_traces(Path(tmp))
             _print_report(build_report(paths, DEMO_PRICES))

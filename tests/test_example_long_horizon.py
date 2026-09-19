@@ -17,6 +17,7 @@ if str(ROOT) not in sys.path:
 
 from examples.common.model import StubModel, StubResponse, ToolCall  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
+from examples.long_horizon.__main__ import SCRIPTED  # noqa: E402
 from examples.long_horizon.run import (  # noqa: E402
     MAX_NOTES,
     CheckpointError,
@@ -30,6 +31,12 @@ CORPUS_DIR = ROOT / "evals" / "corpus"
 Q1 = "What does the DW-300's drain pump cost?"
 Q2 = "How long is the DW-300 under warranty?"
 Q3 = "What voltage does the DR-210 need?"
+
+# The same sequence examples/long_horizon/__main__.py plays under --model stub:scripted, for its
+# default question (Q1).
+SEQUENCE = [
+    StubResponse(tool_calls=[ToolCall(name="answer", arguments={"text": "$46.00, part HLV-2201.", "citations": ["parts-list#2"]})]),
+]
 
 
 def _answer_response(text: str, citations: list[str]) -> StubResponse:
@@ -241,6 +248,30 @@ class LongHorizonExampleTests(unittest.TestCase):
         import examples.long_horizon.run as module
 
         self.assertEqual(module.LEVEL, 7)
+
+    def test_the_command_s_scripted_session_answers_with_a_real_citation(self) -> None:
+        """The end-to-end scenario `python -m examples.long_horizon --model stub:scripted`
+        runs: one session against Q1, the default question, answered by the same sequence
+        SCRIPTED plays."""
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            state_path = Path(tmp) / "state.json"
+            model = StubModel(list(SCRIPTED))
+            tracer = self._tracer()
+            answer = run_session(state_path, model, tracer, questions=[Q1], corpus_dir=CORPUS_DIR)
+
+            self.assertIsNotNone(answer)
+            self.assertEqual(answer.text, "$46.00, part HLV-2201.")
+            self.assertEqual(answer.citations, ["parts-list#2"])
+            state = QueueState.load(state_path, questions=[])
+            self.assertIn(Q1, state.answers)
+
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does. Every entry here is a StubResponse with tool calls, not plain
+        text, so the sequences are compared directly rather than by their `.text`."""
+        self.assertEqual(SCRIPTED, SEQUENCE)
 
 
 class RecordableRunWrapperTests(unittest.TestCase):

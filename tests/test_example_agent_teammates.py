@@ -13,11 +13,23 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from examples.agent_teammates.__main__ import SCRIPTED  # noqa: E402
 from examples.agent_teammates.run import Mailbox, approve, run_tick  # noqa: E402
 from examples.common.model import StubModel, StubResponse, ToolCall  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
 
 EVENTS = "3 new emails: a newsletter, a meeting request from a client, and an invoice asking to be paid."
+
+# The same sequence examples/agent_teammates/__main__.py plays under --model stub:scripted.
+SEQUENCE = [
+    StubResponse(
+        tool_calls=[
+            ToolCall(name="archive_email", arguments={"detail": "newsletter"}),
+            ToolCall(name="send_email", arguments={"detail": "confirm the meeting"}),
+            ToolCall(name="make_payment", arguments={"detail": "pay the invoice, $4,200"}),
+        ]
+    ),
+]
 
 
 def _tracer() -> Tracer:
@@ -50,17 +62,7 @@ class AgentTeammatesExampleTests(unittest.TestCase):
         self.assertEqual((result.executed, result.queued, result.refused), ([], [], []))
 
     def test_all_three_policy_classes_in_one_tick(self) -> None:
-        model = StubModel(
-            [
-                StubResponse(
-                    tool_calls=[
-                        ToolCall(name="archive_email", arguments={"detail": "newsletter"}),
-                        ToolCall(name="send_email", arguments={"detail": "confirm the meeting"}),
-                        ToolCall(name="make_payment", arguments={"detail": "pay the invoice, $4,200"}),
-                    ]
-                )
-            ]
-        )
+        model = StubModel(list(SEQUENCE))
         tracer = _tracer()
         box = Mailbox()
         approvals: list[dict] = []
@@ -167,6 +169,12 @@ class AgentTeammatesExampleTests(unittest.TestCase):
         import examples.agent_teammates.run as module
 
         self.assertEqual(module.LEVEL, 7)
+
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does. Every entry here is a StubResponse with tool calls, not plain
+        text, so the sequences are compared directly rather than by their `.text`."""
+        self.assertEqual(SCRIPTED, SEQUENCE)
 
 
 class RecordableRunWrapperTests(unittest.TestCase):

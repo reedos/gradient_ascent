@@ -15,7 +15,21 @@ if str(ROOT) not in sys.path:
 
 from examples.common.model import StubModel, StubResponse, ToolCall  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
-from examples.organizations_swarms.run import BUDGET_PER_ROLE, Board, Task, coordinate  # noqa: E402
+from examples.organizations_swarms.__main__ import SCRIPTED  # noqa: E402
+from examples.organizations_swarms.run import BUDGET_PER_ROLE, SAMPLE_TASKS, Board, Task, coordinate  # noqa: E402
+
+# The same sequence examples/organizations_swarms/__main__.py plays under --model stub:scripted.
+SEQUENCE = [
+    StubResponse(
+        tool_calls=[
+            ToolCall(name="assign", arguments={"task_id": "T1", "role": "researcher"}),
+            ToolCall(name="assign", arguments={"task_id": "T2", "role": "writer"}),
+            ToolCall(name="assign", arguments={"task_id": "T3", "role": "reviewer"}),
+            ToolCall(name="assign", arguments={"task_id": "T4", "role": "researcher"}),
+            ToolCall(name="assign", arguments={"task_id": "T1", "role": "writer"}),
+        ]
+    ),
+]
 
 
 def _tracer() -> Tracer:
@@ -142,6 +156,37 @@ class OrganizationsSwarmsExampleTests(unittest.TestCase):
         import examples.organizations_swarms.run as module
 
         self.assertEqual(module.LEVEL, 7)
+
+    def test_the_command_s_scripted_round_splits_the_work_and_refuses_the_double_claim(self) -> None:
+        """The end-to-end scenario `python -m examples.organizations_swarms --model
+        stub:scripted` runs: the three sample tasks plus one built from a question, coordinated
+        by the same sequence SCRIPTED plays. Checks that all four open tasks land on the roles
+        the coordinator named, and that its later attempt to also hand T1 to a second role is
+        refused rather than overwriting the first claim."""
+        board = _board(*[t.description for t in SAMPLE_TASKS], "Fact-check the DW-300 section before it ships")
+        model = StubModel(list(SCRIPTED))
+        tracer = _tracer()
+        made = coordinate(board, model, tracer)
+
+        self.assertEqual(
+            made,
+            [
+                {"task": "T1", "role": "researcher"},
+                {"task": "T2", "role": "writer"},
+                {"task": "T3", "role": "reviewer"},
+                {"task": "T4", "role": "researcher"},
+            ],
+        )
+        self.assertEqual([t.id for t in board.tasks if t.status == "open"], [])
+        refusals = [s for s in tracer.steps if s.title == "Refuse: task is not open"]
+        self.assertEqual(len(refusals), 1)
+        self.assertIn("T1", refusals[0].detail)
+
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does. Every entry here is a StubResponse with tool calls, not plain
+        text, so the sequences are compared directly rather than by their `.text`."""
+        self.assertEqual(SCRIPTED, SEQUENCE)
 
 
 class RecordableRunWrapperTests(unittest.TestCase):

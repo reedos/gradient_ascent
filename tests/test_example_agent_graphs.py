@@ -14,12 +14,22 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from examples.agent_graphs.__main__ import SCRIPTED  # noqa: E402
 from examples.common.model import Message, StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
 from examples.agent_graphs.run import ALLOWED_HANDOFFS, MAX_RESEARCH_HOPS, run  # noqa: E402
 
 CORPUS_DIR = ROOT / "evals" / "corpus"
 QUESTION = "What is the maximum vent run for the DR-520, and does anything supersede the manual's figure?"
+
+# The same sequence examples/agent_graphs/__main__.py plays under --model stub:scripted.
+SEQUENCE = [
+    "research",
+    "research",
+    "research",
+    "write",
+    "The DR-520's vent run is limited to 25 feet with up to 3 elbows, which supersedes the manual's 35-foot, 4-elbow figure. Sources: dr520-manual#4, service-bulletin#2",
+]
 
 
 def _supervisor_prompt(m: Message) -> bool:
@@ -28,15 +38,7 @@ def _supervisor_prompt(m: Message) -> bool:
 
 class AgentGraphsExampleTests(unittest.TestCase):
     def test_three_research_hops_then_a_natural_write_decision(self) -> None:
-        model = StubModel(
-            [
-                StubResponse(text="research"),
-                StubResponse(text="research"),
-                StubResponse(text="research"),
-                StubResponse(text="write"),
-                StubResponse(text="The DR-520's vent run is limited to 25 feet with up to 3 elbows, which supersedes the manual's 35-foot, 4-elbow figure. Sources: dr520-manual#4, service-bulletin#2"),
-            ]
-        )
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
         tracer = Tracer(example="agent_graphs", level=6, model_id="stub-1")
         answer = run(QUESTION, model, None, tracer, corpus_dir=CORPUS_DIR)
 
@@ -98,6 +100,11 @@ class AgentGraphsExampleTests(unittest.TestCase):
         self.assertTrue(callable(module.run))
         self.assertEqual(module.LEVEL, 6)
         self.assertEqual(module.MAX_RESEARCH_HOPS, MAX_RESEARCH_HOPS)
+
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
 
 
 if __name__ == "__main__":

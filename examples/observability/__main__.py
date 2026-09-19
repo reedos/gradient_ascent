@@ -1,12 +1,16 @@
 """Export a demo trace to OpenTelemetry-shaped spans and print both a redacted and an
 unredacted rendering side by side.
 
+    python -m examples.observability
     python -m examples.observability --demo
 
 Builds one small trace with a real `Tracer` -- a retrieval step and a model step, shaped like
 this site's own `rag` example -- then calls `to_otel_spans` twice: once with the default
 `capture_content=False`, once with it turned on, so the difference is visible in the printed
 output rather than only in the code.
+
+Nothing here calls a model: this module reads a trace already recorded and renames its fields, so
+`--model` is accepted for a uniform interface with the other examples but is not used.
 """
 from __future__ import annotations
 
@@ -14,6 +18,7 @@ import argparse
 import json
 import sys
 
+from examples.common.cli import MODEL_HELP
 from examples.common.trace import Tracer
 from examples.observability.run import span_summary, to_otel_spans
 
@@ -41,10 +46,9 @@ def _demo_trace() -> dict:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--demo", action="store_true", help="export a synthetic trace (the only mode today)")
-    args = parser.parse_args(sys.argv[1:] if argv is None else argv)
-    if not args.demo:
-        parser.error("pass --demo")
+    parser.add_argument("--demo", action="store_true", help="export a synthetic trace (the default and only mode today)")
+    parser.add_argument("--model", default="stub", help=f"accepted but unused, no model is ever called ({MODEL_HELP})")
+    parser.parse_args(sys.argv[1:] if argv is None else argv)
 
     trace = _demo_trace()
     redacted = to_otel_spans(trace)

@@ -16,12 +16,19 @@ if str(ROOT) not in sys.path:
 
 from examples.common.model import StubModel, StubResponse, ToolCall  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
+from examples.embodied.__main__ import SCRIPTED  # noqa: E402
 from examples.embodied.run import BOUNDS, HOME, MAX_SPEED_MM_S, Move, envelope, run_step  # noqa: E402
 
 INF = float("inf")
 NAN = float("nan")
 
 SCENE = "A part sits 100mm to the right of home; pick it up."
+
+# The same sequence examples/embodied/__main__.py plays under --model stub:scripted, for its
+# default scene ("A part sits 320mm to the right of home; pick it up quickly.").
+SEQUENCE = [
+    StubResponse(tool_calls=[ToolCall(name="move", arguments={"x": 320.0, "y": 0.0, "z": 50.0, "speed": 400.0})]),
+]
 
 
 def _move_response(x: float, y: float, z: float, speed: float) -> StubModel:
@@ -178,6 +185,27 @@ class EmbodiedExampleTests(unittest.TestCase):
         import examples.embodied.run as module
 
         self.assertEqual(module.LEVEL, 7)
+
+    def test_the_command_s_scripted_move_is_clamped_not_refused_or_actuated_raw(self) -> None:
+        """The end-to-end scenario `python -m examples.embodied --model stub:scripted` runs:
+        one step against the default scene, with the model's proposal (320mm right, well past
+        the workspace's x bound, at a speed above the cap) played by the same sequence SCRIPTED
+        plays."""
+        model = StubModel(list(SCRIPTED))
+        tracer = _tracer()
+        log: list[Move] = []
+        result = run_step(model, tracer, scene="A part sits 320mm to the right of home; pick it up quickly.", actuator_log=log)
+
+        self.assertEqual(result.outcome, "clamped")
+        self.assertEqual(result.move.x, BOUNDS["x"][1])
+        self.assertEqual(result.move.speed, MAX_SPEED_MM_S)
+        self.assertEqual(log, [result.move])
+
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does. Every entry here is a StubResponse with tool calls, not plain
+        text, so the sequences are compared directly rather than by their `.text`."""
+        self.assertEqual(SCRIPTED, SEQUENCE)
 
 
 class RecordableRunWrapperTests(unittest.TestCase):
