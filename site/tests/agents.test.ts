@@ -62,7 +62,7 @@ const input = (over: Partial<GuideInput> = {}): GuideInput => ({
   levels,
   counts: { techniques: 49, topics: 5, threads: 4, recipes: 20, teardowns: 3, names: 216, milestones: 96, terms: 103 },
   namesAsOf: '2026-09-18',
-  allDraft: true,
+  noneMeasured: true,
   domainCounts: { general: 15 },
   shapes: fixtureShapes,
   ...over,
@@ -138,12 +138,12 @@ test('the rule the site is built on is stated, and level 0 is defended', () => {
   assert.match(text, /If the honest answer is level 0/);
 });
 
-test('while every page is a draft, the guide forbids quoting a number as a measurement', () => {
+test('while nothing is measured, the guide forbids quoting a number as a measurement', () => {
   assert.match(guideText(), /Nothing on this site is measured yet/);
   assert.match(guideText(), /Do not quote a number from this site as a measurement/);
-  const later = toMarkdown('T', agentGuide(input({ allDraft: false })));
+  const later = toMarkdown('T', agentGuide(input({ noneMeasured: false })));
   assert.ok(!later.includes('Nothing on this site is measured yet'));
-  assert.match(later, /only a page marked Published carries measured numbers/);
+  assert.match(later, /only a page marked Measured carries measured numbers/);
 });
 
 test('the guide points at engineering recipes only when the data has some', () => {

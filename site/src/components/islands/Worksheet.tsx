@@ -36,8 +36,8 @@ interface Props {
 }
 
 const STATUS_LABEL: Record<string, string> = {
-  published: 'Published',
-  draft: 'Draft',
+  measured: 'Measured',
+  sourced: 'Sourced',
   stub: 'Outline',
   planned: 'Planned',
 };

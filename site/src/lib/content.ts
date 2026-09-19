@@ -5,7 +5,7 @@
 import taxonomyData from '../../../content/taxonomy.json';
 import landscapeData from '../../../content/landscape.json';
 
-export type Status = 'planned' | 'stub' | 'draft' | 'published';
+export type Status = 'planned' | 'stub' | 'sourced' | 'measured';
 export type Kind = 'model' | 'product' | 'tool';
 export type Lane = 'use' | 'build';
 

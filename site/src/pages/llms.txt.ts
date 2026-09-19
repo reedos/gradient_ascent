@@ -31,7 +31,7 @@ export const GET: APIRoute = async ({ site }) => {
   lines.push(`> How a level is defined: ${taxonomy.level_rule}`);
   lines.push('');
   lines.push(
-    '> Status: every technique, topic and recipe page is a DRAFT — written, sourced and reviewed, ' +
+    '> Status: every technique, topic and recipe page is SOURCED — written, and every factual claim checked against a primary source, ' +
       'but with no recorded run and no scored result file behind it. No page on this site reports ' +
       'a measured number. Every cost strip and every stepped trace is an illustration and is ' +
       'labeled as one.',

@@ -14,7 +14,7 @@
 // (there is exactly one taxonomy.json, read here and in lib/content.ts).
 import taxonomyData from '../../../content/taxonomy.json' with { type: 'json' };
 
-export type Status = 'planned' | 'stub' | 'draft' | 'published';
+export type Status = 'planned' | 'stub' | 'sourced' | 'measured';
 export type RelationType = 'requires' | 'upgrades_to' | 'combines_with' | 'alternative_to';
 
 export interface MapPageIn {

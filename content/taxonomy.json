@@ -4,8 +4,8 @@
   "statuses": [
     "planned",
     "stub",
-    "draft",
-    "published"
+    "sourced",
+    "measured"
   ],
   "domains": [
     "general",
@@ -39,7 +39,7 @@
             "the cost of a wrong answer"
           ],
           "summary": "How to tell when ordinary code, search or a form is enough.",
-          "status": "draft"
+          "status": "sourced"
         }
       ],
       "short": "Rules, search, forms",
@@ -59,19 +59,19 @@
             "completion in the editor"
           ],
           "summary": "Asking a model a question in a chat app.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "prompt-engineering",
           "title": "Prompt engineering",
           "summary": "Writing instructions that get consistent results.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "structured-output",
           "title": "Structured output",
           "summary": "Getting answers in a fixed format such as JSON.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "inference-time-reasoning",
@@ -82,7 +82,7 @@
             "best-of-N"
           ],
           "summary": "Letting the model think for longer before it answers.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "multimodal",
@@ -92,7 +92,7 @@
             "image, audio and video out"
           ],
           "summary": "Giving the model images, audio, video and documents, and getting them back.",
-          "status": "draft"
+          "status": "sourced"
         }
       ],
       "short": "One question, one answer",
@@ -109,19 +109,19 @@
           "slug": "context-engineering",
           "title": "Context engineering",
           "summary": "Deciding what goes into the request, and caching the parts that repeat.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "embeddings-search",
           "title": "Embeddings and search",
           "summary": "Finding text by meaning instead of by keyword.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "rag",
           "title": "Retrieval-augmented generation (RAG)",
           "summary": "Searching your documents and giving the results to the model.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "knowledge-graphs",
@@ -133,13 +133,13 @@
             "provenance"
           ],
           "summary": "Storing facts as entities and relations, for questions that span several documents.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "memory",
           "title": "Memory",
           "summary": "Keeping information from one conversation to the next.",
-          "status": "draft"
+          "status": "sourced"
         }
       ],
       "short": "You pick what it sees",
@@ -156,13 +156,13 @@
           "slug": "prompt-chaining",
           "title": "Prompt chaining",
           "summary": "Splitting a task into steps, each with its own prompt.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "routing",
           "title": "Routing",
           "summary": "Sorting inputs and sending each one to the right prompt.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "parallelization",
@@ -172,13 +172,13 @@
             "voting"
           ],
           "summary": "Running several prompts at once and combining the results.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "evaluator-optimizer",
           "title": "Write and check",
           "summary": "One prompt writes, another checks, and the loop repeats until the check passes.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "workflow-graphs",
@@ -191,13 +191,13 @@
             "checkpoints"
           ],
           "summary": "Describing a workflow as steps and the connections between them.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "human-in-the-loop",
           "title": "Human approval",
           "summary": "Pausing for a person to approve or correct.",
-          "status": "draft"
+          "status": "sourced"
         }
       ],
       "short": "Your code runs the steps",
@@ -214,13 +214,13 @@
           "slug": "function-calling",
           "title": "Function calling",
           "summary": "Letting the model call functions that you define.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "code-execution",
           "title": "Code execution",
           "summary": "Letting the model write code and run it in a sandbox.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "mcp",
@@ -229,13 +229,13 @@
             "authorization for a remote tool server"
           ],
           "summary": "A standard way to connect models to tools and data.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "computer-use",
           "title": "Computer and browser use",
           "summary": "Letting the model operate a screen, a mouse and a keyboard.",
-          "status": "draft"
+          "status": "sourced"
         }
       ],
       "short": "It picks, your code acts",
@@ -256,37 +256,37 @@
             "plan-and-execute"
           ],
           "summary": "A model that plans, acts and checks its own work in a loop.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "agent-harness",
           "title": "The agent harness",
           "summary": "Everything around the model in an agent: the loop, tools, context handling, permissions, caps and sandbox.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "agentic-rag",
           "title": "Agentic RAG and deep research",
           "summary": "An agent that runs its own searches until it has an answer.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "coding-agents",
           "title": "Coding agents",
           "summary": "Agents that read, write, run and test code.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "skills",
           "title": "Skills",
           "summary": "Reusable instructions that an agent loads when it needs them.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "voice-agents",
           "title": "Voice agents",
           "summary": "Agents you talk to in real time.",
-          "status": "draft"
+          "status": "sourced"
         }
       ],
       "short": "It repeats until done",
@@ -303,7 +303,7 @@
           "slug": "orchestrator-workers",
           "title": "Lead agent and workers",
           "summary": "A lead agent splits the task and hands parts to other agents.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "agent-graphs",
@@ -317,13 +317,13 @@
             "agent-to-agent protocols"
           ],
           "summary": "Describing a team of agents and how work passes between them.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "debate-review",
           "title": "Review and debate",
           "summary": "Agents that check, or argue with, each other's work.",
-          "status": "draft"
+          "status": "sourced"
         }
       ],
       "short": "Agents split the work",
@@ -345,7 +345,7 @@
             "schedules"
           ],
           "summary": "Tasks that run for hours or days.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "agent-teammates",
@@ -369,19 +369,19 @@
           ],
           "note": "The capstone page: nearly every lower level composes here (model, computer, storage, tools, memory, routines).",
           "summary": "Agents with their own computer that work without being asked.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "organizations-swarms",
           "title": "Organizations of agents",
           "summary": "Large groups of agents with roles and shared goals.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "embodied",
           "title": "Robots and machines",
           "summary": "Models that control robots and other machines.",
-          "status": "draft"
+          "status": "sourced"
         }
       ],
       "short": "It runs on its own",
@@ -445,7 +445,7 @@
       "title": "Evals",
       "why": "Every level claims to beat the one below it. This is how the claim is tested.",
       "summary": "Measuring whether a change made the results better.",
-      "status": "draft",
+      "status": "sourced",
       "pages": [
         {
           "slug": "eval-frameworks",
@@ -454,7 +454,7 @@
             "trajectory evaluation"
           ],
           "summary": "The tools that run test sets and graders for you, and what to check before trusting their numbers.",
-          "status": "draft"
+          "status": "sourced"
         }
       ]
     },
@@ -471,31 +471,31 @@
       ],
       "why": "Orthogonal to the ladder: any level can run on a specialized model.",
       "summary": "Fine-tuning, distillation, synthetic data and automated prompt tuning.",
-      "status": "draft",
+      "status": "sourced",
       "pages": [
         {
           "slug": "fine-tuning",
           "title": "Fine-tuning and adapters",
           "summary": "Training a model further on your own examples, in full or with small adapters such as LoRA.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "distillation",
           "title": "Distillation",
           "summary": "Training a smaller model to reproduce what a larger one does on your task.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "synthetic-data",
           "title": "Synthetic data",
           "summary": "Using a model to write training or test examples, and checking them before they are used.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "prompt-optimization",
           "title": "Prompt optimization",
           "summary": "Letting a program search for better prompts against a test set.",
-          "status": "draft"
+          "status": "sourced"
         }
       ]
     },
@@ -512,19 +512,19 @@
         "audit trails"
       ],
       "summary": "Prompt injection, permissions, data handling and audit.",
-      "status": "draft",
+      "status": "sourced",
       "pages": [
         {
           "slug": "guardrails",
           "title": "Guardrails",
           "summary": "Checks on what goes into a model and what comes out, and the limits of those checks.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "red-teaming",
           "title": "Red teaming",
           "summary": "Attacking your own system on purpose, before someone else does, and turning what you find into tests.",
-          "status": "draft"
+          "status": "sourced"
         }
       ]
     },
@@ -539,25 +539,25 @@
         "model selection"
       ],
       "summary": "Cost, speed, monitoring and running models on your own hardware.",
-      "status": "draft",
+      "status": "sourced",
       "pages": [
         {
           "slug": "observability",
           "title": "Observability",
           "summary": "Recording what each run did, so a bad result can be traced to the step that caused it.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "ai-gateways",
           "title": "AI gateways",
           "summary": "One entry point in front of several model providers, for keys, routing, limits, fallback and logs.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "cost-optimization",
           "title": "Cost optimization",
           "summary": "Spending fewer tokens and less time for the same result: caching, batching, smaller models, shorter context.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "local-inference",
@@ -566,7 +566,7 @@
             "speculative decoding"
           ],
           "summary": "Running open-weight models on your own hardware: what fits, quantization, and what you give up.",
-          "status": "draft"
+          "status": "sourced"
         }
       ]
     },
@@ -579,29 +579,29 @@
           "slug": "briefing",
           "title": "Briefing: saying what you want",
           "summary": "Saying what you want clearly enough that the model does not have to guess.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "reviewing",
           "title": "Reviewing work you did not do",
           "summary": "Checking work you did not do yourself before it goes anywhere.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "delegating",
           "title": "Deciding what to hand over",
           "summary": "Deciding which parts of a task to hand to a model and which to keep.",
-          "status": "draft"
+          "status": "sourced"
         },
         {
           "slug": "trust",
           "title": "Calibrating trust",
           "summary": "Learning, from results over time, how much to rely on a model without checking.",
-          "status": "draft"
+          "status": "sourced"
         }
       ],
       "summary": "How to brief a model, review its work and decide what to hand over.",
-      "status": "draft"
+      "status": "sourced"
     }
   ],
   "threads": [
@@ -615,7 +615,7 @@
         "agent-graphs"
       ],
       "summary": "Two uses of graphs that are often confused: graphs that connect information, and graphs that connect work.",
-      "status": "draft"
+      "status": "sourced"
     },
     {
       "id": "who-approves-what",
@@ -630,7 +630,7 @@
         "trust"
       ],
       "summary": "The same question asked at every level: which part of this does a person still decide? The answer moves from reading each result to setting the limits a run happens inside.",
-      "status": "draft"
+      "status": "sourced"
     },
     {
       "id": "checking-the-work",
@@ -644,7 +644,7 @@
         "observability"
       ],
       "summary": "How you tell whether it worked, from a person reading one answer to a scored set and a recorded trace. The check changes shape at every level; the question does not.",
-      "status": "draft"
+      "status": "sourced"
     },
     {
       "id": "what-the-model-sees",
@@ -659,7 +659,7 @@
         "long-horizon"
       ],
       "summary": "One question followed across the site: what is in front of the model this turn, and who decided to put it there. The answers run from a written instruction to a note a session leaves for the next one.",
-      "status": "draft"
+      "status": "sourced"
     }
   ],
   "recipes": [
@@ -667,7 +667,7 @@
       "slug": "document-qa",
       "title": "Answer questions about a set of documents",
       "running_task": true,
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "rag",
@@ -679,7 +679,7 @@
     {
       "slug": "inbox-triage",
       "title": "Sort an inbox",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "routing",
@@ -691,7 +691,7 @@
     {
       "slug": "research-brief",
       "title": "Write a research brief with citations",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "agentic-rag",
@@ -702,7 +702,7 @@
     {
       "slug": "repo-assistant",
       "title": "Coding assistant on your own repo",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "coding-agents",
@@ -714,7 +714,7 @@
     {
       "slug": "document-extraction",
       "title": "Turn photos and PDFs into records",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "multimodal",
@@ -726,7 +726,7 @@
     {
       "slug": "voice-notes",
       "title": "Voice notes into structured entries",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "multimodal",
@@ -738,7 +738,7 @@
     {
       "slug": "support-desk",
       "title": "Support desk",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "routing",
@@ -751,7 +751,7 @@
     {
       "slug": "nightly-monitor",
       "title": "Nightly source monitor",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "routing",
@@ -764,7 +764,7 @@
     {
       "slug": "data-analysis",
       "title": "Data analysis by conversation",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "code-execution",
@@ -775,7 +775,7 @@
     {
       "slug": "content-pipeline",
       "title": "Drafting with a reviewer",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "evaluator-optimizer",
@@ -786,7 +786,7 @@
     {
       "slug": "assistant-team",
       "title": "A team of personal assistants",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "agent-teammates",
@@ -799,7 +799,7 @@
     {
       "slug": "maintenance-log",
       "title": "Plain-language maintenance log",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "function-calling",
@@ -811,7 +811,7 @@
     {
       "slug": "household-paperwork",
       "title": "Keep the household paperwork straight",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "order-zero"
@@ -821,7 +821,7 @@
     {
       "slug": "meeting-notes",
       "title": "Turn a meeting transcript into decisions and owners",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "prompt-engineering",
@@ -832,7 +832,7 @@
     {
       "slug": "invoice-matching",
       "title": "Match invoices to purchase orders",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "order-zero",
@@ -844,7 +844,7 @@
     {
       "slug": "contract-review",
       "title": "Check an agreement against your own checklist",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "parallelization",
@@ -856,7 +856,7 @@
     {
       "slug": "incident-runbook",
       "title": "Turn an incident write-up into a runbook",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "prompt-chaining",
@@ -868,7 +868,7 @@
     {
       "slug": "storyboard-from-a-script",
       "title": "Turn a script into a shot list",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "prompt-chaining",
@@ -879,7 +879,7 @@
     {
       "slug": "trip-planning",
       "title": "Plan a trip and hold the bookings",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "single-agent",
@@ -891,7 +891,7 @@
     {
       "slug": "rubric-grading",
       "title": "Grade against a rubric, with a second reader",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "debate-review",
@@ -903,7 +903,7 @@
     {
       "slug": "literature-watch",
       "title": "Watch a topic for new work and summarize what turns up",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "order-zero",
@@ -917,7 +917,7 @@
     {
       "slug": "weekly-status-report",
       "title": "Assemble a weekly status report from several systems",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "order-zero",
@@ -930,7 +930,7 @@
     {
       "slug": "project-tracker-upkeep",
       "title": "Keep a tracker document current from several sources",
-      "status": "draft",
+      "status": "sourced",
       "domain": "general",
       "uses": [
         "order-zero",
@@ -943,7 +943,7 @@
     {
       "slug": "limits-without-a-model",
       "title": "Check measurements against limits, and chart what drifts",
-      "status": "draft",
+      "status": "sourced",
       "domain": "engineering",
       "uses": [
         "order-zero"
@@ -953,7 +953,7 @@
     {
       "slug": "characterize-a-design",
       "title": "Sweep a design over its corners and report the margins",
-      "status": "draft",
+      "status": "sourced",
       "domain": "engineering",
       "uses": [
         "order-zero"
@@ -963,7 +963,7 @@
     {
       "slug": "measurement-writeup",
       "title": "Turn a measurement session into a report somebody can review",
-      "status": "draft",
+      "status": "sourced",
       "domain": "engineering",
       "uses": [
         "order-zero",
@@ -974,7 +974,7 @@
     {
       "slug": "ask-the-datasheet",
       "title": "Answer questions from a datasheet, a test spec and a change notice",
-      "status": "draft",
+      "status": "sourced",
       "domain": "engineering",
       "uses": [
         "rag",
@@ -985,7 +985,7 @@
     {
       "slug": "accuracy-specs-from-the-manual",
       "title": "Pull an instrument's accuracy table out of its manual",
-      "status": "draft",
+      "status": "sourced",
       "domain": "engineering",
       "uses": [
         "order-zero",
@@ -997,7 +997,7 @@
     {
       "slug": "test-failure-triage",
       "title": "Sort failing units and operator notes into causes",
-      "status": "draft",
+      "status": "sourced",
       "domain": "engineering",
       "uses": [
         "routing",
@@ -1009,7 +1009,7 @@
     {
       "slug": "design-review-checklist",
       "title": "Check a board against the design rules document",
-      "status": "draft",
+      "status": "sourced",
       "domain": "engineering",
       "uses": [
         "evaluator-optimizer",
@@ -1020,7 +1020,7 @@
     {
       "slug": "requirements-to-test-plan",
       "title": "Turn a requirements list into a test plan",
-      "status": "draft",
+      "status": "sourced",
       "domain": "engineering",
       "uses": [
         "prompt-chaining",
@@ -1032,7 +1032,7 @@
     {
       "slug": "instrument-script-from-the-manual",
       "title": "Draft an instrument control script from its programming manual",
-      "status": "draft",
+      "status": "sourced",
       "domain": "engineering",
       "uses": [
         "rag",
@@ -1044,7 +1044,7 @@
     {
       "slug": "test-data-by-conversation",
       "title": "Ask questions of a production test log",
-      "status": "draft",
+      "status": "sourced",
       "domain": "engineering",
       "uses": [
         "code-execution",
@@ -1055,7 +1055,7 @@
     {
       "slug": "bring-up-debug-assistant",
       "title": "Work a bring-up problem at the bench",
-      "status": "draft",
+      "status": "sourced",
       "domain": "engineering",
       "uses": [
         "single-agent",

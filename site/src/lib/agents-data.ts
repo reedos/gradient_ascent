@@ -76,7 +76,7 @@ export function guideInput(site: URL | undefined): GuideInput {
       terms: glossaryTerms.length,
     },
     namesAsOf: asOf,
-    allDraft: allPages().every((p) => p.status !== 'published'),
+    noneMeasured: allPages().every((p) => p.status !== 'measured'),
     domainCounts: useCases(site).reduce<Record<string, number>>((acc, c) => {
       acc[c.domain] = (acc[c.domain] ?? 0) + 1;
       return acc;

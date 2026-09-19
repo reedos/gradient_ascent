@@ -468,7 +468,7 @@ def validate(taxonomy: dict, landscape: dict | None) -> tuple[list[str], dict]:
                 # re-reading the registry.
                 if not entry.get("verified"):
                     for ref in refs:
-                        if statuses_by_id.get(ref) == "published":
+                        if statuses_by_id.get(ref) == "measured":
                             errors.append(
                                 f"registry entry {eid} is not verified but is named by published "
                                 f"page {ref}"

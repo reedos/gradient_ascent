@@ -211,7 +211,7 @@ export function maxQuestions(data: ResolvedWorksheetData): number {
 
 // -- Result-view shapes. buildLevelInfo (worksheet.ts) fills these in server-side. --
 
-export type WorksheetStatus = 'planned' | 'stub' | 'draft' | 'published';
+export type WorksheetStatus = 'planned' | 'stub' | 'sourced' | 'measured';
 
 export interface WorksheetTechnique {
   slug: string;

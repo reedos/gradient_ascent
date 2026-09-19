@@ -15,7 +15,7 @@ def page(slug, **extra):
 
 def taxonomy():
     return {
-        "statuses": ["planned", "stub", "draft", "published"],
+        "statuses": ["planned", "stub", "sourced", "measured"],
         "domains": ["general", "engineering"],
         "relation_types": {"requires": "", "upgrades_to": ""},
         "tiers": [
@@ -1458,7 +1458,7 @@ class UnverifiedEntryTests(unittest.TestCase):
         for tier in tax["tiers"]:
             for page in tier["pages"]:
                 if page["slug"] == slug:
-                    page["status"] = "published"
+                    page["status"] = "measured"
         return tax
 
     def test_an_unverified_entry_named_by_a_published_page_is_an_error(self):

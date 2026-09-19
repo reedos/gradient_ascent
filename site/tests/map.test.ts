@@ -34,20 +34,20 @@ function fixture(): MapTaxonomyIn {
       {
         order: 0,
         title: 'No model',
-        pages: [{ slug: 'order-zero', title: 'When not to use a model', summary: 's', status: 'draft' }],
+        pages: [{ slug: 'order-zero', title: 'When not to use a model', summary: 's', status: 'sourced' }],
       },
       {
         order: 1,
         title: 'One call',
         pages: [
-          { slug: 'chat', title: 'Chat', summary: 's', status: 'draft' },
-          { slug: 'prompt-engineering', title: 'Prompt engineering', summary: 's', status: 'draft' },
+          { slug: 'chat', title: 'Chat', summary: 's', status: 'sourced' },
+          { slug: 'prompt-engineering', title: 'Prompt engineering', summary: 's', status: 'sourced' },
         ],
       },
       {
         order: 2,
         title: 'Context',
-        pages: [{ slug: 'rag', title: 'Retrieval-augmented generation (RAG)', summary: 's', status: 'draft' }],
+        pages: [{ slug: 'rag', title: 'Retrieval-augmented generation (RAG)', summary: 's', status: 'sourced' }],
       },
     ],
     tracks: [
@@ -55,17 +55,17 @@ function fixture(): MapTaxonomyIn {
         id: 'evals',
         title: 'Evals',
         summary: 's',
-        status: 'draft',
-        pages: [{ slug: 'eval-frameworks', title: 'Evaluation frameworks', summary: 's', status: 'draft' }],
+        status: 'sourced',
+        pages: [{ slug: 'eval-frameworks', title: 'Evaluation frameworks', summary: 's', status: 'sourced' }],
       },
       {
         id: 'safety',
         title: 'Safety, privacy and governance',
         summary: 's',
-        status: 'draft',
+        status: 'sourced',
         pages: [
-          { slug: 'guardrails', title: 'Guardrails', summary: 's', status: 'draft' },
-          { slug: 'red-teaming', title: 'Red teaming', summary: 's', status: 'draft' },
+          { slug: 'guardrails', title: 'Guardrails', summary: 's', status: 'sourced' },
+          { slug: 'red-teaming', title: 'Red teaming', summary: 's', status: 'sourced' },
         ],
       },
     ],
@@ -193,8 +193,8 @@ test('no two nodes overlap, on the real taxonomy', () => {
 test('same-band nodes never overlap even when adjacent titles are long', () => {
   const tax = fixture();
   tax.tiers[0].pages = [
-    { slug: 'a', title: 'A very long title indeed, much longer than most', summary: 's', status: 'draft' },
-    { slug: 'b', title: 'Another quite long title that also runs on', summary: 's', status: 'draft' },
+    { slug: 'a', title: 'A very long title indeed, much longer than most', summary: 's', status: 'sourced' },
+    { slug: 'b', title: 'Another quite long title that also runs on', summary: 's', status: 'sourced' },
   ];
   const layout = computeMapLayout(tax);
   const a = layout.nodes.find((n) => n.slug === 'a')!;
@@ -250,8 +250,8 @@ test('the canvas width is fixed at CANVAS_LEVEL_W regardless of the topics band'
   // topics band could still widen the canvas, this would grow it. It must not.
   tax.tracks[1].pages = [
     ...(tax.tracks[1].pages ?? []),
-    { slug: 'extra-1', title: 'A third sub-page', summary: 's', status: 'draft' },
-    { slug: 'extra-2', title: 'A fourth sub-page here', summary: 's', status: 'draft' },
+    { slug: 'extra-1', title: 'A third sub-page', summary: 's', status: 'sourced' },
+    { slug: 'extra-2', title: 'A fourth sub-page here', summary: 's', status: 'sourced' },
   ];
   const layout = computeMapLayout(tax);
   assert.equal(layout.width, CANVAS_LEVEL_W);
@@ -268,7 +268,7 @@ test('a lone node aligns with the first node of a band that is not capped-and-ce
   // needs the full width outright) -- those start at PAD_X too, by construction. Build one here
   // (six nodes wide enough to need the width) alongside the fixture's single-node level 0.
   const tax = fixture();
-  tax.tiers[1].pages = Array.from({ length: 6 }, (_, i) => ({ slug: `p${i}`, title: 'Structured output', summary: 's', status: 'draft' as const }));
+  tax.tiers[1].pages = Array.from({ length: 6 }, (_, i) => ({ slug: `p${i}`, title: 'Structured output', summary: 's', status: 'sourced' as const }));
   const layout = computeMapLayout(tax);
   const orderZero = layout.nodes.find((n) => n.slug === 'order-zero')!;
   const level1First = layout.nodes.filter((n) => n.level === 1).sort((a, b) => a.col - b.col)[0];
@@ -294,7 +294,7 @@ test('a band with enough nodes to need the full width is not capped, and reaches
   // Six pages titled like real technique names (not four-letter "Chat"s): six of these are wide
   // enough that even at MAX_GAP between each, they still need the full available width.
   const tax = fixture();
-  tax.tiers[1].pages = Array.from({ length: 6 }, (_, i) => ({ slug: `p${i}`, title: 'Structured output', summary: 's', status: 'draft' as const }));
+  tax.tiers[1].pages = Array.from({ length: 6 }, (_, i) => ({ slug: `p${i}`, title: 'Structured output', summary: 's', status: 'sourced' as const }));
   const layout = computeMapLayout(tax);
   const nodes = layout.nodes.filter((n) => n.level === 1).sort((a, b) => a.col - b.col);
   const last = nodes[nodes.length - 1];
@@ -324,9 +324,9 @@ test('orderByBelow (via computeMapLayout) swaps two nodes to match their neighbo
   // engineering" -> the leftmost) so the expected swap does not depend on the fallback score any
   // unscored item would otherwise get.
   tax.tiers[0].pages = [
-    { slug: 'a-first', title: 'A', summary: 's', status: 'draft' },
-    { slug: 'm-mid', title: 'M', summary: 's', status: 'draft' },
-    { slug: 'z-last', title: 'Z', summary: 's', status: 'draft' },
+    { slug: 'a-first', title: 'A', summary: 's', status: 'sourced' },
+    { slug: 'm-mid', title: 'M', summary: 's', status: 'sourced' },
+    { slug: 'z-last', title: 'Z', summary: 's', status: 'sourced' },
   ];
   tax.relations.push({ from: 'chat', type: 'requires', to: 'z-last' }, { from: 'prompt-engineering', type: 'requires', to: 'a-first' });
   const layout = computeMapLayout(tax);
@@ -342,11 +342,11 @@ test('orderByBelow (via computeMapLayout) swaps two nodes to match their neighbo
 
 test('orderByBelow leaves an unscored item roughly in its original position, not collapsed to one end', () => {
   const tax = fixture();
-  tax.tiers[0].pages = [{ slug: 'only-below', title: 'Only', summary: 's', status: 'draft' }];
+  tax.tiers[0].pages = [{ slug: 'only-below', title: 'Only', summary: 's', status: 'sourced' }];
   tax.tiers[1].pages = [
-    { slug: 'unscored-1', title: 'Unscored one', summary: 's', status: 'draft' },
-    { slug: 'scored', title: 'Scored', summary: 's', status: 'draft' },
-    { slug: 'unscored-2', title: 'Unscored two', summary: 's', status: 'draft' },
+    { slug: 'unscored-1', title: 'Unscored one', summary: 's', status: 'sourced' },
+    { slug: 'scored', title: 'Scored', summary: 's', status: 'sourced' },
+    { slug: 'unscored-2', title: 'Unscored two', summary: 's', status: 'sourced' },
   ];
   tax.relations.push({ from: 'scored', type: 'requires', to: 'only-below' });
   const layout = computeMapLayout(tax);
@@ -416,7 +416,7 @@ test('a same-row edge between neighbors, with nothing between them, does not arc
 
 test('a same-row edge between non-adjacent nodes arcs clear of the node between them, not through it', () => {
   const tax = fixture();
-  tax.tiers[1].pages.push({ slug: 'third', title: 'A third page', summary: 's', status: 'draft' });
+  tax.tiers[1].pages.push({ slug: 'third', title: 'A third page', summary: 's', status: 'sourced' });
   const layout = computeMapLayout(tax);
   const level1 = layout.nodes.filter((n) => n.level === 1).sort((a, b) => a.col - b.col);
   assert.equal(level1.length, 3);

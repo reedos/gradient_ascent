@@ -115,7 +115,7 @@ export interface GuideInput {
     terms: number;
   };
   namesAsOf: string;
-  allDraft: boolean;
+  noneMeasured: boolean;
   /** How many use cases carry each domain, from the data. The guide may only point an agent at a
    *  domain that has something in it: a cold sitting on 09/19/2026 caught the first version
    *  telling agents to prefer `engineering` recipes before a single one existed. */
@@ -223,9 +223,9 @@ export function agentGuide(input: GuideInput): Block[] {
     {
       kind: 'ul',
       items: [
-        input.allDraft
-          ? '**Nothing on this site is measured yet.** Every technique, topic and recipe page is marked Draft: written, sourced and reviewed, with no recorded run and no scored result behind it. Every cost strip and every stepped trace is an illustration and says so. Do not quote a number from this site as a measurement, and do not tell the person a technique "scores" anything.'
-          : 'Pages marked Draft have no recorded run behind them; only a page marked Published carries measured numbers. Say which kind you are quoting.',
+        input.noneMeasured
+          ? '**Nothing on this site is measured yet.** Every technique, topic and recipe page is marked Sourced: written, checked against its sources and reviewed, with no recorded run and no scored result behind it. Every cost strip and every stepped trace is an illustration and says so. Do not quote a number from this site as a measurement, and do not tell the person a technique "scores" anything.'
+          : 'Pages marked Sourced have no recorded run behind them; only a page marked Measured carries measured numbers. Say which kind you are quoting.',
         `**Names go out of date.** The registry was last checked on ${input.namesAsOf}. Products are renamed and retired; read \`retired\`, \`superseded_by\` and \`formerly\` before you name one, and say when the registry was checked.`,
         '**Attribute, do not absorb.** Claims about a product on this site are quoted from that product’s maker and sourced. Pass them on as the maker’s claim, with the link, and not as your own knowledge or the site’s finding.',
         '**Do not bend the job to fit an example.** The recipes are a few worked stories, not a catalog of what is possible, and the person\u2019s job is almost certainly not one of them. The level comes from the worksheet and the approach from the shape and its techniques. If you find yourself describing their job in a recipe\u2019s words, go back to theirs.',

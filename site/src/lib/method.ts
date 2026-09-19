@@ -119,7 +119,7 @@ export function methodSections(abs: (path: string) => string): MethodSection[] {
         {
           kind: 'p',
           text:
-            'A registry entry needs a primary source, a checked date and a verified flag before a published page can cite it. Entries unchecked for 90 days are flagged.',
+            'A registry entry needs a primary source, a checked date and a verified flag before a measured page can cite it. Entries unchecked for 90 days are flagged.',
         },
         { kind: 'h3', text: 'How the site changes' },
         {
@@ -142,7 +142,7 @@ export function methodSections(abs: (path: string) => string): MethodSection[] {
         {
           kind: 'p',
           text:
-            `Every technique, topic and recipe page is a **draft**: written, sourced and reviewed, but with no recorded run and no scored result file behind it. Nothing on this site reports a measured number. Every cost-and-latency strip and every stepped trace is an illustration, labeled as one above its figures, and a page becomes **published** only once a real run and a real eval sit behind it. The [evals](${abs('/techniques/evals/')}) page describes how that measurement works and what it will record.`,
+            `Every technique, topic and recipe page is **sourced**: written, and every factual claim checked against a primary source, but with no recorded run and no scored result file behind it. A page becomes **measured** when it has both. The two words say which of those a reader is looking at, and nothing on this site is measured yet. Nothing on this site reports a measured number. Every cost-and-latency strip and every stepped trace is an illustration, labeled as one above its figures, and a page becomes **published** only once a real run and a real eval sit behind it. The [evals](${abs('/techniques/evals/')}) page describes how that measurement works and what it will record.`,
         },
       ],
     },
