@@ -4,6 +4,57 @@
   "note": "What changed on this site, and why it matters to somebody reading it. Newest first. Entries are written for a reader, not for whoever made the change: they say what is different and what it is good for, never what a commit did. Every entry links the pages it touched. Several entries can share a date; within a date, file order is the order shown. docs/CHANGES.md says how to add one.",
   "changes": [
     {
+      "id": "threads-across-levels",
+      "date": "2026-09-19",
+      "title": "Three more threads that follow one question up the ladder",
+      "what": "A thread reads across the levels instead of down one: who approves what, how you tell whether it worked, and what is in front of the model this turn. Each one puts the pages that answer it in a single table, lowest level first, and says what the climb costs.",
+      "why": "The levels are a good way to file a technique and a bad way to answer a question that every level answers differently. Somebody who wants to know where a person still signs off had to read eight pages and hold the comparison in their head.",
+      "pages": [
+        {
+          "label": "Who approves what",
+          "path": "/threads/who-approves-what/"
+        },
+        {
+          "label": "What the model sees",
+          "path": "/threads/what-the-model-sees/"
+        }
+      ]
+    },
+    {
+      "id": "everyday-recipes",
+      "date": "2026-09-19",
+      "title": "Eight more recipes for jobs outside an office",
+      "what": "Household paperwork, meeting notes, invoice matching, checking an agreement against a checklist, turning an incident write-up into a runbook, a shot list from a script, planning a trip, and grading against a rubric. Two of them settle at level 0 and never call a model.",
+      "why": "The recipes leaned toward software work, which made the site read as though it were written for people who ship code. Most of the jobs a language model is good at are nobody's job title.",
+      "pages": [
+        {
+          "label": "Recipes",
+          "path": "/recipes/"
+        },
+        {
+          "label": "Job shapes",
+          "path": "/shapes/"
+        }
+      ]
+    },
+    {
+      "id": "three-more-teardowns",
+      "date": "2026-09-19",
+      "title": "Three more products taken apart",
+      "what": "A search-grounded answer engine, a workplace assistant over your own documents, and a browser agent, each broken into the techniques it is built from, with every claim about it quoted from its maker's own page.",
+      "why": "A reader who already uses one of these can start from something they know rather than from a level number. Seeing which techniques a familiar product is made of is the fastest way to learn what a technique is for.",
+      "pages": [
+        {
+          "label": "Teardowns",
+          "path": "/teardowns/"
+        },
+        {
+          "label": "A search-grounded answer engine, decoded",
+          "path": "/teardowns/answer-engine/"
+        }
+      ]
+    },
+    {
       "id": "frontier-blocks",
       "date": "2026-09-19",
       "title": "Every level page says what is still unsolved at that level",

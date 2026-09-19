@@ -4,10 +4,10 @@
 // site/tests/matrix.test.ts can run it under plain `node --test` with no bundler, the same
 // arrangement lib/timeline.ts and lib/search.ts use.
 //
-// One judgment is baked in: a technique NO recipe uses gets no column. The site has 49 technique
-// and topic pages and twelve recipes; a full 49-column grid would be mostly empty, would not fit
-// any screen, and would say less than the columns that earn their place. The count of dropped
-// columns is returned so the page can say so out loud rather than quietly showing a subset.
+// One judgment is baked in: a technique NO recipe uses gets no column. The site has 54 technique
+// and topic pages; a grid with a column for each would be mostly empty, would not fit any screen,
+// and would say less than the columns that earn their place. The count of dropped columns is
+// returned so the page can say so out loud rather than quietly showing a subset.
 
 export type MatrixLevel = number | 'tracks';
 

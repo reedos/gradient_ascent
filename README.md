@@ -24,7 +24,7 @@ virtual environment, and no `requirements.txt`. Python 3.11 or newer; Node 22.12
 git clone <this repository> && cd gradient_ascent
 
 python scripts/validate.py                    # the content files: 8 levels, 49 techniques, the registry
-python -m unittest discover -s tests          # 1213 tests, about 3 seconds (some skip until the site is built)
+python -m unittest discover -s tests          # 1563 tests, about 4 seconds (some skip until the site is built)
 
 cd site && npm ci && npm run build            # the site, into site/dist/
 npm run dev                                   # or serve it at localhost:4321
@@ -36,8 +36,9 @@ Run an example against the stub model — no network, no API key, no local model
 python -m examples.rag --model stub --question "What is the DW-300's Normal cycle water use?"
 ```
 
-Every one of the 44 examples takes `--model stub` and prints what it did. Each has a README with
-its own command; `examples/rag/README.md` is the one to read first.
+Every one of the 63 examples takes `--model stub` and prints what it did. Each has a README with
+its own command; `examples/rag/README.md` is the one to read first. Eleven of them are the
+engineering recipes' example packages, which run on the simulated bench in `evals/bench/`.
 
 ## What is where
 
@@ -84,7 +85,7 @@ exactly one per run, and level 5 records one per tool call plus one for the stop
 Everything here was built without calling a model, local or remote. That means:
 
 - **Real:** the examples, which run end to end against `StubModel`; the tests; the validator; the
-  synthetic corpus and the 60 questions; the site and all 70 written pages.
+  synthetic corpus and the 60 questions; the site and all 95 written pages.
 - **Not real:** every number on the site. The cost strips are illustrative and say so above the
   numbers. Every run diagram carries `"illustrative": true`. No example has a recorded
   `trace.json`, and `evals/results/` is empty.
@@ -104,7 +105,7 @@ If you are changing code here, two things will bite you otherwise:
 
 1. **Before any commit**, both of these must exit 0: `python scripts/validate.py` and
    `python -m unittest discover -s tests`.
-2. **Pages pin code by line number.** Fifty-four `<CodeFile start={…} end={…}>` pins point into
+2. **Pages pin code by line number.** Fifty-six `<CodeFile start={…} end={…}>` pins point into
    `examples/` and `scripts/`, each guarded by an `expect=` literal. Editing one of those files
    above a pinned range slides it, and the validator will tell you. See
    `docs/WRITING-A-TECHNIQUE-PAGE.md` for which files, and prefer `func=` over a range in new
