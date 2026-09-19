@@ -298,8 +298,20 @@ const feedbackHref = `${REPO_URL}/issues/new?template=feedback.yml`;
     if (link instanceof HTMLAnchorElement) window.location.href = link.href;
   });
 
-  // Keep the current page visible in a rail that scrolls sideways on a phone.
+  // Keep the current page visible in a rail that scrolls sideways on a phone. Centering the
+  // current item used to leave the rail parked part way through the label before it, so the
+  // first thing a phone reader saw was half a word ("o approves what"), which reads as a typo
+  // rather than as something that scrolls. Land on an item's own left edge instead.
   const rail = document.querySelector<HTMLElement>('[data-rail]');
   const current = rail?.querySelector<HTMLElement>('[aria-current="true"]');
-  if (rail && current) rail.scrollLeft = Math.max(0, current.offsetLeft - rail.clientWidth / 2 + current.offsetWidth / 2);
+  if (rail && current) {
+    const centered = current.offsetLeft - rail.clientWidth / 2 + current.offsetWidth / 2;
+    let left = 0;
+    for (const item of Array.from(rail.children)) {
+      const edge = (item as HTMLElement).offsetLeft;
+      if (edge > centered) break;
+      left = edge;
+    }
+    rail.scrollLeft = Math.max(0, Math.min(left, rail.scrollWidth - rail.clientWidth));
+  }
 </script>

@@ -9,8 +9,11 @@ import { feedbackUrl, INDEXABLE } from '../lib/site';
 interface Props {
   title: string;
   description: string;
+  /** Leave the canonical tag off. Only /404.html wants this: GitHub Pages serves that file at
+   *  every missing address, so its own canonical would name /404/, which is not a built page. */
+  noCanonical?: boolean;
 }
-const { title, description } = Astro.props;
+const { title, description, noCanonical = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 const feedback = feedbackUrl(canonical, title);
 // Link previews need an absolute image URL; most scrapers will not resolve a relative one.
@@ -24,7 +27,7 @@ const ogImage = new URL(url('/og.png'), Astro.site).toString();
     <meta name="theme-color" content="#0c0f17" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {!noCanonical && <link rel="canonical" href={canonical} />}
     {!INDEXABLE && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href={url('/favicon.svg')} />
     <meta property="og:title" content={title} />

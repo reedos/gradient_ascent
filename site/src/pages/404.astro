@@ -2,7 +2,11 @@
 import Base from '../layouts/Base.astro';
 import { url } from '../lib/url';
 ---
-<Base title="Page not found · Gradient Ascent" description="There is no page at this address.">
+<Base
+  title="Page not found · Gradient Ascent"
+  description="There is no page at this address."
+  noCanonical
+>
   <div class="page-hero">
     <div class="eyebrow muted"><span class="dot"></span>404</div>
     <h1>Page not found</h1>

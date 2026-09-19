@@ -132,7 +132,11 @@ html.nav-sheet-open { overflow: hidden }
 .section-rail { border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 55%, var(--bg)) }
 .section-rail-inner { max-width: 1392px; margin: auto; padding: 0 48px; display: flex; align-items: center; gap: 22px; height: 44px }
 .section-rail-label { flex: 0 0 auto; font: 600 10px/1 var(--font); letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); padding-right: 22px; border-right: 1px solid var(--line); height: 16px; display: flex; align-items: center }
-.section-rail-items { display: flex; align-items: stretch; gap: 2px; height: 100%; min-width: 0; overflow-x: auto; scrollbar-width: none }
+/* The right-hand fade says "there is more of this" on a phone, where the rail scrolls sideways
+   and has no scrollbar. It covers only the last few pixels, so it fades nothing when the whole
+   rail fits. Header.astro's script parks the rail on an item's left edge, never mid-label. */
+.section-rail-items { display: flex; align-items: stretch; gap: 2px; height: 100%; min-width: 0; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent 100%); mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent 100%) }
+.section-rail-items a { scroll-snap-align: start }
 .section-rail-items::-webkit-scrollbar { display: none }
 .section-rail-items a { position: relative; display: inline-flex; align-items: center; gap: 7px; padding: 0 12px; font-size: 12.5px; color: var(--muted); white-space: nowrap; transition: color .15s }
 .section-rail-items a:hover { color: var(--text) }
