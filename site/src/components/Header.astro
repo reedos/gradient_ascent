@@ -118,7 +118,7 @@ const feedbackHref = `${REPO_URL}/issues/new?template=feedback.yml`;
     </div>
   </div>
 
-  <div class="nav-sheet" id="nav-sheet" hidden>
+  <div class="nav-sheet" id="nav-sheet" tabindex="-1" hidden>
     <div class="nav-sheet-inner">
       <a class="nav-sheet-cta" href={url('/worksheet/')}>
         <b>Find your level</b>
@@ -195,22 +195,44 @@ const feedbackHref = `${REPO_URL}/issues/new?template=feedback.yml`;
   // a click outside close it. The phone sheet: the Menu link stops being a link to the footer
   // sitemap and opens a full-height sheet under the bar.
   const groups = Array.from(document.querySelectorAll<HTMLElement>('[data-nav-group]'));
+  const setExpanded = (g: HTMLElement, on: boolean) =>
+    g.querySelector('.nav-trigger')?.setAttribute('aria-expanded', String(on));
+  // A panel the trigger's own focus is holding open (CSS :focus-within) cannot be closed by
+  // removing .is-open alone. "is-dismissed" closes it in CSS while the trigger KEEPS focus; the
+  // earlier version blurred instead, which left the keyboard user at the top of the document
+  // with no focus ring anywhere on the page.
   const closeAll = (except?: HTMLElement) => {
     for (const g of groups) {
       if (g === except) continue;
       g.classList.remove('is-open');
-      g.querySelector('.nav-trigger')?.setAttribute('aria-expanded', 'false');
+      if (g.contains(document.activeElement)) g.classList.add('is-dismissed');
+      setExpanded(g, false);
     }
   };
   for (const g of groups) {
     const trigger = g.querySelector<HTMLButtonElement>('.nav-trigger');
     if (!trigger) continue;
     trigger.addEventListener('click', () => {
-      const open = !g.classList.contains('is-open');
+      const open = g.classList.contains('is-dismissed') || !g.classList.contains('is-open');
       closeAll(g);
       g.classList.toggle('is-open', open);
-      trigger.setAttribute('aria-expanded', String(open));
-      if (!open) trigger.blur();
+      g.classList.toggle('is-dismissed', !open);
+      setExpanded(g, open);
+    });
+    // The panel opens on plain keyboard focus too, so aria-expanded has to follow that: without
+    // this a screen reader was told "collapsed" while the panel's links were in the tab order.
+    g.addEventListener('focusin', () => {
+      g.classList.remove('is-dismissed');
+      setExpanded(g, true);
+    });
+    g.addEventListener('focusout', (event) => {
+      if (g.contains((event as FocusEvent).relatedTarget as Node | null)) return;
+      g.classList.remove('is-dismissed');
+      if (!g.classList.contains('is-open')) setExpanded(g, false);
+    });
+    // A mouse arriving fresh should get the hover panel back even after Escape dismissed it.
+    g.addEventListener('pointerenter', () => {
+      if (!g.contains(document.activeElement)) g.classList.remove('is-dismissed');
     });
   }
   document.addEventListener('click', (event) => {
@@ -227,6 +249,10 @@ const feedbackHref = `${REPO_URL}/issues/new?template=feedback.yml`;
     document.documentElement.classList.toggle('nav-sheet-open', open);
     const label = burger.querySelector('.nav-burger-label');
     if (label) label.textContent = open ? 'Close' : 'Menu';
+    // Move focus into the sheet when it opens, so a screen reader starts at the top of it
+    // instead of on the button behind it; Escape below puts focus back on the button.
+    if (open) sheet.focus();
+    else if (sheet.contains(document.activeElement)) burger.focus();
   };
   burger?.addEventListener('click', (event) => {
     event.preventDefault();
@@ -244,9 +270,12 @@ const feedbackHref = `${REPO_URL}/issues/new?template=feedback.yml`;
 
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
-      const open = groups.find((g) => g.classList.contains('is-open') || g.contains(document.activeElement));
+      // Escape closes the menus. Focus goes back to the trigger of whichever panel it was in --
+      // FIRST, so the focusin that move fires cannot undo the dismissal below, and so that
+      // closing the panel out from under a focused link does not drop focus on <body>.
+      const inGroup = groups.find((g) => g.contains(document.activeElement));
+      if (inGroup) inGroup.querySelector<HTMLElement>('.nav-trigger')?.focus();
       closeAll();
-      if (open) (document.activeElement as HTMLElement | null)?.blur();
       if (sheet && !sheet.hasAttribute('hidden')) {
         setSheet(false);
         burger?.focus();

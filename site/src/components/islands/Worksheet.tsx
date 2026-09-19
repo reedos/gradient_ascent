@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { url } from '../../lib/url';
 // worksheet-core, NOT worksheet: this module runs in the browser, and lib/worksheet.ts imports
 // the taxonomy and the registry. Importing the evaluators from there put 86 KB of site data --
@@ -113,6 +113,16 @@ function sanitize(data: ResolvedWorksheetData, raw: AnswerPair[]): AnswerPair[] 
 
 export default function Worksheet({ data, levelInfo }: Props) {
   const [answered, setAnswered] = useState<AnswerPair[]>([]);
+  // Answering replaces the question, so the button that was focused is removed from the page and
+  // focus falls back to <body>: a keyboard user loses their place and a screen reader never hears
+  // the next question. After an answer, focus moves to the heading that replaced it.
+  const advanced = useRef(false);
+
+  useEffect(() => {
+    if (!advanced.current) return;
+    advanced.current = false;
+    document.querySelector<HTMLElement>('.ws-card [data-ws-focus]')?.focus();
+  });
 
   useEffect(() => {
     function sync() {
@@ -132,6 +142,7 @@ export default function Worksheet({ data, levelInfo }: Props) {
   const askedSoFar = answered.length;
 
   function choose(qid: string, aid: string) {
+    advanced.current = true;
     const next: AnswerPair[] = [...answered, [qid, aid]];
     if (typeof window !== 'undefined') window.location.hash = buildHash(next);
     setAnswered(next);
@@ -164,7 +175,9 @@ export default function Worksheet({ data, levelInfo }: Props) {
         <span>
           Question {askedSoFar + 1} of up to {total}
         </span>
-        <span className="ws-progress-bar">
+        {/* The line above already says "Question 3 of up to 11"; the bar is the same fact drawn,
+            so it is hidden from assistive technology rather than announced twice. */}
+        <span className="ws-progress-bar" aria-hidden="true">
           <span
             className="ws-progress-fill"
             style={{ width: `${Math.min(100, (askedSoFar / total) * 100)}%` }}
@@ -172,7 +185,7 @@ export default function Worksheet({ data, levelInfo }: Props) {
         </span>
       </div>
       <div className="panel ws-question">
-        <h3>{question.prompt}</h3>
+        <h3 data-ws-focus tabIndex={-1}>{question.prompt}</h3>
         {step.phase === 'core' ? (
           step.question.help && <p className="ws-help">{step.question.help}</p>
         ) : (
@@ -220,7 +233,7 @@ function ResultView({
           <span className="dot" />
           Level {pad(info.order)}
         </div>
-        <h2>{info.title}</h2>
+        <h2 data-ws-focus tabIndex={-1}>{info.title}</h2>
         <p>{info.description}</p>
         <div className="connection" style={{ '--c': color } as React.CSSProperties}>
           <strong>Who decides the next step</strong>

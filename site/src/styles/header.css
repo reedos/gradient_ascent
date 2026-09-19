@@ -48,6 +48,13 @@
 .nav-group.is-open .nav-trigger,
 .nav-group:focus-within .nav-trigger { color: var(--text) }
 .nav-group.is-open .nav-trigger svg { transform: rotate(180deg); opacity: 1 }
+/* Escape (and a second click on an open trigger) has to close a panel that the trigger's own
+   focus is holding open through :focus-within. The old script blurred the trigger to get there,
+   which threw the keyboard user back to the top of the document with no focus ring anywhere.
+   This class closes the panel while the trigger keeps focus; Header.astro clears it when focus
+   leaves the group or the pointer arrives. It comes after the :focus-within and :hover rules,
+   which it ties with on specificity, so source order decides. */
+.nav-group.is-dismissed .nav-panel { opacity: 0; visibility: hidden; transform: translateY(-6px) }
 
 .nav-blurb { font-size: 12.5px; line-height: 1.55; color: var(--muted); max-width: 52ch; margin: 0 0 16px }
 .nav-heading { font: 600 10px/1 var(--font); letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; opacity: .8 }
@@ -103,7 +110,9 @@
 .nav-sheet-inner { max-width: 640px; margin: 0 auto; padding: 18px 20px 48px; display: flex; flex-direction: column; gap: 26px }
 .nav-sheet-cta { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; border-radius: 10px; background: var(--accent); color: var(--on-accent) }
 .nav-sheet-cta b { font: 600 16px var(--display); letter-spacing: -.3px }
-.nav-sheet-cta span { font-size: 12.5px; opacity: .85 }
+/* .92, not .85: at .85 this line composites to #112152 on the accent, which is 4.30:1 -- under
+   the 4.5:1 WCAG 2.1 asks of 12.5px text. .92 gives 4.75:1 and still sits below the title. */
+.nav-sheet-cta span { font-size: 12.5px; opacity: .92 }
 .nav-sheet-group h2 { font: 600 10.5px/1 var(--font); letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; padding-bottom: 10px; border-bottom: 1px solid var(--line) }
 .nav-sheet-group .nav-heading { margin: 14px 0 4px }
 .nav-sheet-group ul { list-style: none; margin: 0; padding: 0 }
@@ -114,6 +123,10 @@
 .nav-sheet-levels a { display: flex; align-items: baseline; gap: 9px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 13.5px; background: var(--panel) }
 .nav-sheet-levels a[aria-current="true"] { border-color: var(--c); background: var(--panel2) }
 html.nav-sheet-open { overflow: hidden }
+/* The sheet takes focus when it opens so a screen reader starts reading at the top of it
+   instead of staying on the button behind it. It is a container, not a control, so it draws no
+   ring of its own; everything inside it is visible anyway. */
+.nav-sheet:focus, .nav-sheet:focus-visible { outline: none }
 
 /* ---- section rail ---- */
 .section-rail { border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 55%, var(--bg)) }
@@ -153,6 +166,18 @@ html.nav-sheet-open { overflow: hidden }
   .site-header .brand { font-size: 19px; gap: 8px }
   .section-rail-inner { gap: 12px; height: 42px }
   .section-rail-label { padding-right: 12px }
+}
+/* WCAG 1.4.10 Reflow: at a 320px viewport (a small phone, or 400% zoom on a desktop) the brand,
+   the search button and the word "Menu" overran the bar by 13px and every page scrolled
+   sideways -- worse with the sheet open, where the word becomes the wider "Close". The bars
+   carry the button visually at this width; the word stays for assistive technology, which is
+   where the button's accessible name comes from. */
+@media (max-width: 374.98px) {
+  .nav-burger { gap: 0; padding: 0 11px }
+  .nav-burger-label {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .nav-panel, .nav-trigger svg, .nav-burger-bars i { transition: none }
