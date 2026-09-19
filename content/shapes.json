@@ -443,7 +443,7 @@
         "Fix a bug or add a feature in a repository",
         "Work a bring-up problem with read-only queries to instruments, the log and the datasheet",
         "Reproduce somebody else's measurement from their notebook and say where the two differ",
-        "Reconcile records between two systems",
+        "Reconcile two systems when finding the matching record is itself the work, rather than a field-by-field comparison",
         "Migrate configuration from one format to another",
         "Reproduce a reported defect"
       ]
