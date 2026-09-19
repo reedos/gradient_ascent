@@ -13,6 +13,8 @@ interface Props {
 const { title, description } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 const feedback = feedbackUrl(canonical, title);
+// Link previews need an absolute image URL; most scrapers will not resolve a relative one.
+const ogImage = new URL(url('/og.png'), Astro.site).toString();
 ---
 <!doctype html>
 <html lang="en">
@@ -29,7 +31,13 @@ const feedback = feedbackUrl(canonical, title);
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:site_name" content="Gradient Ascent" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Gradient Ascent: every way to work with AI, from a question to a workforce." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImage} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- finish-weight: only the weights actually set anywhere in site/src/styles or an island's

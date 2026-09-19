@@ -233,6 +233,9 @@ const headingText = headline ? climbHeadlineText(headline) : 'What the timeline 
 
 {
   variant === 'home' && (
-    <a class="section-link" href={url('/timeline/')}>See the full timeline &rarr;</a>
+    <p class="tls-links">
+      <a class="section-link" href={url('/timeline/')}>See the full timeline &rarr;</a>
+      <a class="section-link" href={url('/timeline/#capability')}>What the models could do over the same years &rarr;</a>
+    </p>
   )
 }

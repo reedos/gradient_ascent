@@ -142,12 +142,12 @@ test('markKeys drops a null value (a missing mark) without erroring', () => {
   assert.deepEqual(markKeys(entry), ['described']);
 });
 
-test('markKeys places an unrecognised extra key after the known ones, alphabetically', () => {
+test('markKeys places an unrecognized extra key after the known ones, alphabetically', () => {
   const entry: LevelMarkEntry = { level: 3, available: 'a', described: 'd', zenith: 'z' };
   assert.deepEqual(markKeys(entry), ['described', 'available', 'zenith']);
 });
 
-test('markLabel falls back to a title-cased key for an unrecognised mark', () => {
+test('markLabel falls back to a title-cased key for an unrecognized mark', () => {
   assert.equal(markLabel('described'), 'Described');
   assert.equal(markLabel('buildable'), 'Buildable');
   assert.equal(markLabel('zenith'), 'Zenith');

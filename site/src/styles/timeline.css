@@ -614,3 +614,5 @@
 .tl-shiftcard-apps { margin: 0 0 14px; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 9px; max-width: 72ch; color: var(--muted); font-size: 14px; line-height: 1.6; }
 .tl-shiftcard-apps li b { color: var(--text); font-weight: 600; }
 .tl-shiftcard-apps li a { color: var(--accent); white-space: nowrap; }
+
+.tls-links { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 0 }
