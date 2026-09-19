@@ -67,6 +67,8 @@ export function guideInput(site: URL | undefined): GuideInput {
     levels: agentLevels(),
     counts: {
       techniques: counts.techniques,
+      topics: counts.topics,
+      threads: counts.threads,
       recipes: counts.recipes,
       teardowns: counts.teardowns,
       names: counts.named,

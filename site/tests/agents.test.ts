@@ -60,7 +60,7 @@ const input = (over: Partial<GuideInput> = {}): GuideInput => ({
   abs,
   levelRule: 'A new level starts where the answer to who decides changes.',
   levels,
-  counts: { techniques: 49, recipes: 20, teardowns: 3, names: 216, milestones: 96, terms: 103 },
+  counts: { techniques: 49, topics: 5, threads: 4, recipes: 20, teardowns: 3, names: 216, milestones: 96, terms: 103 },
   namesAsOf: '2026-09-18',
   allDraft: true,
   domainCounts: { general: 15 },
@@ -188,9 +188,32 @@ test('an answer built by analogy has to say so', () => {
 });
 
 test('the guide carries live counts and the registry date, not typed ones', () => {
-  const text = toMarkdown('T', agentGuide(input({ counts: { techniques: 7, recipes: 3, teardowns: 1, names: 9, milestones: 2, terms: 4 }, namesAsOf: '2030-01-02' })));
-  assert.match(text, /7 technique pages, 3 recipes/);
+  const text = toMarkdown('T', agentGuide(input({ counts: { techniques: 7, topics: 2, threads: 1, recipes: 3, teardowns: 1, names: 9, milestones: 2, terms: 4 }, namesAsOf: '2030-01-02' })));
+  assert.match(text, /7 techniques and 2 topics/);
+  assert.match(text, /3 recipes \(whole jobs built from techniques\)/);
   assert.match(text, /last checked on 2030-01-02/);
+});
+
+// Two cold sittings on 09/19/2026 stopped on the same sentence: the guide said "49 technique
+// pages" while `/techniques/` serves 54 files and /map/ says "54 pages", so an agent that
+// listed the directory concluded the site had miscounted itself. The guide now states the
+// techniques, the topics and the sum, and the sum has to be the arithmetic, not a third number
+// somebody typed.
+test('the technique and topic counts add up to the number of pages under /techniques/', () => {
+  const text = toMarkdown('T', agentGuide(input({ counts: { techniques: 7, topics: 2, threads: 1, recipes: 3, teardowns: 1, names: 9, milestones: 2, terms: 4 }, namesAsOf: '2030-01-02' })));
+  assert.match(text, /the 9 pages under `\/techniques\/`/);
+});
+
+// The same sittings found /method/ cited by technique pages but with no Markdown twin, against a
+// guide that promised one for every page. The guide now names the pages that have none, so an
+// agent told to "read the pages in their .md form" knows where that instruction stops.
+test('the guide says which pages have no Markdown twin', () => {
+  const text = guideText();
+  assert.match(text, /Every technique, topic, thread, recipe, teardown and level page has a Markdown twin/);
+  assert.match(text, /The index and tool pages do not/);
+  for (const page of ['/method/', '/map/', '/glossary/', '/names/', '/search/']) {
+    assert.ok(text.includes(`\`${page}\``), `the guide should name ${page} as having no twin`);
+  }
 });
 
 test('levels are listed lowest first whatever order they arrive in', () => {

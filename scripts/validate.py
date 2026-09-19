@@ -402,6 +402,32 @@ def validate(taxonomy: dict, landscape: dict | None) -> tuple[list[str], dict]:
     statuses_by_id = status_by_id(taxonomy)
     counts = {key: 0 for key in REGISTRY_LISTS}
     if landscape is not None:
+        # The registry's `as_of` is what the site prints as "names listed 09/18/2026", on the home
+        # page, in the footer, on every level page and in the agent guide's "say when the registry
+        # was checked" line. It is written by hand, and a pass that re-checks a handful of entries
+        # updates their `checked` dates without touching it: seventeen entries were re-checked a
+        # day after `as_of` and every one of those lines understated how current the registry was.
+        # Nothing about the site looks wrong when that happens, so it needs a rule.
+        registry_as_of = landscape.get("as_of", "")
+        if not DATE_PATTERNS["day"].match(registry_as_of):
+            errors.append(f"registry: as_of {registry_as_of!r} is not a YYYY-MM-DD date")
+        else:
+            newest = max(
+                (
+                    entry["checked"]
+                    for key in REGISTRY_LISTS
+                    for entry in landscape.get(key, [])
+                    if isinstance(entry.get("checked"), str)
+                    and DATE_PATTERNS["day"].match(entry["checked"])
+                ),
+                default="",
+            )
+            if newest > registry_as_of:
+                errors.append(
+                    f"registry: as_of is {registry_as_of!r} but an entry was checked on {newest!r}; "
+                    f"the site prints as_of as the date the names were listed, so it may not be "
+                    f"older than the newest checked date"
+                )
         developers = {d["id"] for d in landscape.get("developers", [])}
         registry_ids = {
             entry["id"]

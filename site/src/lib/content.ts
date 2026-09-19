@@ -484,6 +484,14 @@ const techniqueCount =
 
 export const counts = {
   techniques: techniqueCount,
+  /** The five track roots. They are pages under /techniques/ too, but they are topics, not
+   *  techniques, which is why `techniques` above leaves them out. */
+  topics: tracks.length,
+  threads: threads.length,
+  /** Every file served under /techniques/: the techniques plus the five topic roots. A reader or
+   *  an agent that lists the directory counts this, so anything that says "technique pages"
+   *  rather than "techniques" has to use this number or the site contradicts itself. */
+  techniquePages: techniqueCount + tracks.length,
   recipes: recipes.length,
   teardowns: teardowns.length,
   named: named.length,

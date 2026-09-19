@@ -103,7 +103,17 @@ export interface GuideInput {
   abs: (path: string) => string;
   levelRule: string;
   levels: AgentLevel[];
-  counts: { techniques: number; recipes: number; teardowns: number; names: number; milestones: number; terms: number };
+  counts: {
+    techniques: number;
+    /** The five track roots: pages under /techniques/ that are topics, not techniques. */
+    topics: number;
+    threads: number;
+    recipes: number;
+    teardowns: number;
+    names: number;
+    milestones: number;
+    terms: number;
+  };
   namesAsOf: string;
   allDraft: boolean;
   /** How many use cases carry each domain, from the data. The guide may only point an agent at a
@@ -156,8 +166,10 @@ export function agentGuide(input: GuideInput): Block[] {
       kind: 'p',
       text:
         `A manual of the ways to use a language model, in eight levels. ${input.levelRule} ` +
-        `It holds ${counts.techniques} technique pages, ${counts.recipes} recipes (whole jobs built from techniques), ${counts.teardowns} teardowns of products people already use, ` +
-        `a registry of ${counts.names} named models, products and tools, and ${counts.terms} glossary terms. Every page has a Markdown twin at the same address with \`.md\` appended.`,
+        `It holds ${counts.techniques} techniques and ${counts.topics} topics that run across every level, which together are the ${counts.techniques + counts.topics} pages under \`/techniques/\`; ` +
+        `${counts.threads} threads, each following one question up the ladder; ${counts.recipes} recipes (whole jobs built from techniques); ${counts.teardowns} teardowns of products people already use; ` +
+        `a registry of ${counts.names} named models, products and tools; and ${counts.terms} glossary terms. ` +
+        `Every technique, topic, thread, recipe, teardown and level page has a Markdown twin at the same address with \`.md\` appended. The index and tool pages do not: read \`/llms.txt\` instead of \`/techniques/\`, \`/recipes/\`, \`/teardowns/\`, \`/glossary/\`, \`/failures/\`, \`/map/\`, \`/names/\`, \`/method/\`, \`/timeline/\`, \`/search/\` and the home page.`,
     },
     { kind: 'ul', items: ladder },
     {

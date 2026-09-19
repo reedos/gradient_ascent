@@ -17,6 +17,7 @@ export type SearchKind =
   | 'technique'
   | 'recipe'
   | 'teardown'
+  | 'thread'
   | 'level'
   | 'view'
   | 'glossary'
@@ -60,6 +61,7 @@ export const KIND_ORDER: SearchKind[] = [
   'technique',
   'recipe',
   'teardown',
+  'thread',
   'level',
   'view',
   'glossary',
@@ -72,6 +74,7 @@ export const KIND_LABEL: Record<SearchKind, string> = {
   technique: 'Techniques and topics',
   recipe: 'Recipes',
   teardown: 'Teardowns',
+  thread: 'Threads',
   level: 'Levels',
   view: 'Views',
   glossary: 'Glossary',

@@ -125,6 +125,26 @@ export async function buildSearchDocs(): Promise<SearchDoc[]> {
     });
   }
 
+  // Threads: a question followed across the levels. They shipped with their own pages, their own
+  // menu section and their own Markdown twins, and were the one page kind the index never learned
+  // about, so "who approves what" found the technique pages that mention approval and not the
+  // page written to answer it. Indexed like a technique: summary plus section snippets.
+  for (const th of taxonomy.threads) {
+    const entry = await getEntry('threads', th.id);
+    const body = entry
+      ? sectionSnippets(flattenMdxBody(entry.body ?? '', `site/src/content/threads/${th.id}.mdx`))
+      : undefined;
+    docs.push({
+      id: `thread:${th.id}`,
+      kind: 'thread',
+      title: th.title,
+      meta: 'Thread · across the levels',
+      summary: th.summary,
+      body,
+      url: url(`/threads/${th.id}/`),
+    });
+  }
+
   // Levels: the eight tiers, plus the tracks overview page ("Topics at every level").
   for (const tier of levels) {
     docs.push({
@@ -211,6 +231,27 @@ export async function buildSearchDocs(): Promise<SearchDoc[]> {
       summary:
         'How a level is defined, how a page is written and reviewed, and what the numbers on this site do and do not mean.',
       path: '/method/',
+    },
+    {
+      id: 'shapes',
+      title: 'Job shapes',
+      summary:
+        'The kinds of job people bring to a model, sorted by the shape of the work rather than its subject, with what moves each one to a lower or a higher level.',
+      path: '/shapes/',
+    },
+    {
+      id: 'changes',
+      title: 'What changed',
+      summary:
+        'A dated record of what changed on this site and why it matters to a reader, newest first, with an Atom feed.',
+      path: '/changes/',
+    },
+    {
+      id: 'agents',
+      title: 'For your agent',
+      summary:
+        "The procedure this site hands a reader's own AI assistant: what to ask, how to walk a job down to the lowest level that does it, and what not to claim.",
+      path: '/agents/',
     },
   ];
   for (const v of views) {

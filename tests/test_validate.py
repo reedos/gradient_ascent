@@ -53,6 +53,9 @@ def stages():
 
 def landscape():
     return {
+        # The date the site prints as "names listed". It has to be at least as new as the newest
+        # entry's `checked` date below, which is the rule RegistryAsOfTests exercises.
+        "as_of": "2026-09-18",
         "developers": [{"id": "lab", "name": "Lab"}],
         "models": [{"id": "m1", "name": "M1", "developer": "lab", "category": "model", "demonstrates": ["one"]}],
         "products": [{"id": "p1", "name": "P1", "by": "Lab", "category": "app", "demonstrates": ["two"],
@@ -1382,6 +1385,63 @@ class TeardownTests(unittest.TestCase):
     def test_the_real_teardowns_are_valid(self):
         taxonomy_data, landscape_data = validate.load(ROOT / "content")
         self.assertEqual(validate.check_teardowns(ROOT, taxonomy_data, landscape_data), [])
+
+
+class RegistryAsOfTests(unittest.TestCase):
+    """The registry's `as_of` is what the site prints as "names listed 09/18/2026" on the home
+    page, in the footer, on every level page and in the agent guide's "say when the registry was
+    checked" line. It is written by hand and every one of those lines reads it, so a pass that
+    re-checks a few entries and forgets it makes the whole site understate its own freshness with
+    nothing looking wrong. That is what happened on 09/19/2026: seventeen entries were re-checked
+    and `as_of` stayed on the 18th."""
+
+    def errors(self, land):
+        return validate.validate(taxonomy(), land)[0]
+
+    def _as_of_errors(self, land):
+        return [e for e in self.errors(land) if e.startswith("registry: as_of")]
+
+    def test_an_as_of_newer_than_every_checked_date_passes(self):
+        land = landscape()
+        land["as_of"] = "2026-09-20"
+        self.assertEqual(self._as_of_errors(land), [])
+
+    def test_an_as_of_equal_to_the_newest_checked_date_passes(self):
+        land = landscape()
+        land["as_of"] = "2026-09-18"
+        self.assertEqual(self._as_of_errors(land), [])
+
+    def test_an_entry_checked_after_as_of_is_an_error(self):
+        land = landscape()
+        land["products"][0]["checked"] = "2026-09-19"
+        errs = self._as_of_errors(land)
+        self.assertTrue(errs, "an entry checked after as_of should be reported")
+        self.assertIn("2026-09-19", errs[0])
+
+    def test_the_newest_checked_date_is_the_one_reported_not_the_first_found(self):
+        land = landscape()
+        land["products"][0]["checked"] = "2026-09-19"
+        land["tools"][0].update(
+            {"verified": True, "source": "https://example.org", "checked": "2026-09-25"}
+        )
+        errs = self._as_of_errors(land)
+        self.assertTrue(errs)
+        self.assertIn("2026-09-25", errs[0])
+
+    def test_a_missing_or_malformed_as_of_is_an_error(self):
+        for value in ("", "2026-09", "09/18/2026", "yesterday"):
+            land = landscape()
+            land["as_of"] = value
+            with self.subTest(as_of=value):
+                self.assertTrue(
+                    self._as_of_errors(land), f"as_of {value!r} should not be accepted"
+                )
+
+    def test_an_entry_with_no_checked_date_does_not_break_the_rule(self):
+        """A seed carries no `checked` at all. It is not evidence about freshness either way."""
+        land = landscape()
+        land["tools"][0].pop("checked", None)
+        self.assertEqual(self._as_of_errors(land), [])
 
 
 class UnverifiedEntryTests(unittest.TestCase):

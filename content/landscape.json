@@ -1,7 +1,7 @@
 {
   "version": 3,
-  "as_of": "2026-09-18",
-  "note": "Registry of named things: who makes what, and which technique each one demonstrates. Pages reference an id here and never type a name, so a rename or a retirement is one edit. An entry with no 'source' is a seed: it was listed from general knowledge or a secondary search result and has not been checked. A seed cannot be cited on a published page until it has a primary source, a 'checked' date and 'verified': true. The build flags verified entries unchecked for 90 days. Where a technique has more than one maker, a page names at least two. The site ranks nothing and links no affiliate.",
+  "as_of": "2026-09-19",
+  "note": "Registry of named things: who makes what, and which technique each one demonstrates. Pages reference an id here and never type a name, so a rename or a retirement is one edit. An entry with no 'source' is a seed: it was listed from general knowledge or a secondary search result and has not been checked. A seed cannot be cited on a published page until it has a primary source, a 'checked' date and 'verified': true. The build flags verified entries unchecked for 90 days. Where a technique has more than one maker, a page names at least two. The site ranks nothing and links no affiliate. 'as_of' is the date the site prints as 'names listed', so it must never be older than the newest entry's 'checked' date; scripts/validate.py enforces that.",
   "kinds": {
     "model": "A trained model, addressed by a versioned name. 'developer' is the id of the organization that trained it.",
     "product": "Something a person uses: a chat app, a coding agent, an automation service.",
