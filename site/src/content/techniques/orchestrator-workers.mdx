@@ -3,30 +3,30 @@ slug: orchestrator-workers
 level: 6
 run: orchestrator-workers
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Building effective agents"
     url: "https://www.anthropic.com/engineering/building-effective-agents"
     publisher: "Anthropic"
     date: "2024-12-19"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "How we built our multi-agent research system"
     url: "https://www.anthropic.com/engineering/multi-agent-research-system"
     publisher: "Anthropic"
     date: "2025-06-13"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Subagents"
     url: "https://code.claude.com/docs/en/subagents"
     publisher: "Anthropic (Claude Agent SDK documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "crewAI"
     url: "https://github.com/crewAIInc/crewAI"
     publisher: "CrewAI"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "AutoGen"
     url: "https://github.com/microsoft/autogen"
     publisher: "Microsoft"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -67,20 +67,21 @@ scored result file yet, so nothing below is measured. It is illustrated.
 <Lane name="use" title="Use it">
 
 Claude Code's subagents are the clearest version of this a reader outside a research lab has
-likely used: "when Claude encounters a task that matches a subagent's description, it delegates to
-that subagent, which works independently and returns results"<Cite n={3}/>, each one running "in
-its own context window with a custom system prompt, specific tool access, and independent
-permissions"<Cite n={3}/>: the isolation is the point, not a side effect. Anthropic's own Claude
-Research feature works the same way at the product level: "the lead agent analyzes [a query],
-develops a strategy, and spawns subagents to explore different aspects simultaneously"<Cite
-n={2}/>. Grok Build and Devin Desktop are both registered as demonstrating this shape too, under
-their own names.
+likely used. Each one runs "in its own context window with a custom system prompt, specific tool
+access, and independent permissions", and the handoff is described this way: "When Claude
+encounters a task that matches a subagent's description, it delegates to that subagent, which
+works independently and returns results"<Cite n={3}/>. The isolation is the point, not a side
+effect. Anthropic's own Research feature is built the same way: its engineering post says that
+when a user submits a query, "the lead agent analyzes it, develops a strategy, and spawns
+subagents to explore different aspects simultaneously"<Cite n={2}/>. Grok Build and Devin Desktop
+are registered against this shape too, under their own names.
 
 The separate context window is the actual benefit, not a detail: each worker reads only its own
 slice of the problem, so a task too large for one window still fits, and a worker's dead ends
-never crowd the lead's own reasoning. Anthropic writes that "subagents facilitate compression by
-operating in parallel with their own context windows, exploring different aspects of the question
-simultaneously"<Cite n={2}/>.
+never crowd the lead's own reasoning. Anthropic puts it this way: "Subagents facilitate
+compression by operating in parallel with their own context windows, exploring different aspects
+of the question simultaneously before condensing the most important tokens for the lead research
+agent"<Cite n={2}/>.
 
 That isolation is also what the failures above look like. Without a specific brief, Anthropic's
 own team found "agents duplicate work, leave gaps, or fail to find necessary information"<Cite
@@ -103,7 +104,7 @@ One call asks the lead to split the question into independent sub-questions, one
 most `MAX_WORKERS` (3 by default). Code parses that text into a list, drops exact duplicates, and
 caps it at `MAX_WORKERS` if the lead asked for more: the lead's split is a proposal the code is
 free to cut down, never a command code obeys blindly. Anthropic's own research system names what a
-good brief needs: "each subagent needs an objective, an output format, guidance on the tools and
+good brief needs: "Each subagent needs an objective, an output format, guidance on the tools and
 sources to use, and clear task boundaries"<Cite n={2}/>; this example's brief is just the
 sub-question text, the simplest version of that, since every worker already shares one tool (the
 corpus) and one output shape (a cited answer).
@@ -130,10 +131,11 @@ Run it yourself:
 
 <CodeFile file="examples/orchestrator_workers/README.md" start={16} end={16} lang="text" expect="python -m examples.orchestrator_workers" />
 
-CrewAI's own README describes a similar split: a "Crew" is built for "dynamic task delegation and
-collaboration"<Cite n={4}/>, and its optional hierarchical process "automatically assigns a manager
+CrewAI's own README describes a similar split. It lists what Crews enable, and the first two
+entries are "Natural, autonomous decision-making between agents" and "Dynamic task delegation and
+collaboration"<Cite n={4}/>; its optional hierarchical process "automatically assigns a manager
 to the defined crew to properly coordinate the planning and execution of tasks through delegation
-and validation of results"<Cite n={4}/>: the manager checks the work as well as parcelling it out,
+and validation of results"<Cite n={4}/>. That manager checks the work as well as parceling it out,
 which this example's combine step does not. Microsoft's AutoGen, also registered against this
 technique, now carries a maintenance notice: "AutoGen is now in maintenance mode. It will not
 receive new features or enhancements and is community managed going forward." and "New users
@@ -152,6 +154,11 @@ once the work genuinely does not fit one window or one line of reasoning.
 Try <Link href="/techniques/parallelization/">parallel calls</Link> instead if you already know,
 before the question arrives, what the fixed set of subtasks is: sectioning a document into three
 known parts, for instance. That costs the same every run and needs no lead call to decide anything.
+
+The same test in engineering terms: a characterization sweep over five prototype boards, four
+input voltages, three load currents and three ambients is a set of conditions written down before
+the run starts, so it is a nested loop with no model anywhere in it, not a team. Splitting it
+across agents buys nothing a loop does not already give you, and costs a model call per condition.
 
 Move up to a lead and workers once the split itself cannot be written down in advance: the number
 and shape of the subtasks depend on what the specific question turns out to need.

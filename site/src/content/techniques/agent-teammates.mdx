@@ -3,35 +3,35 @@ slug: agent-teammates
 level: 7
 run: agent-teammates
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Introducing Grok Bot"
     url: "https://x.ai/news/introducing-grok-bot"
     publisher: "xAI (SpaceXAI)"
     date: "2026-08-11"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Introducing Muse: The World's First Personal AI Agent Built for Everyone"
     url: "https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/"
     publisher: "Meta"
     date: "2026-09-08"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Claude Cowork and chat are now one Claude"
     url: "https://claude.com/blog/cowork-is-now-claude"
     publisher: "Anthropic"
     date: "2026-09-16"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "The Gemini app becomes more agentic, delivering proactive, 24/7 help"
     url: "https://blog.google/innovation-and-ai/products/gemini-app/next-evolution-gemini-app/"
     publisher: "Google"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "OpenClaw"
     url: "https://openclaw.ai/"
     publisher: "OpenClaw Foundation"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Hermes Agent"
     url: "https://hermes-agent.nousresearch.com/"
     publisher: "Nous Research"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -72,10 +72,12 @@ yet, so nothing below is measured. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Grok Bot, Muse and Gemini Spark all launched in 2026; Out there, below, dates each one. Claude
-Cowork is retired: Anthropic's post says "Claude Cowork and chat are merging into one Claude" as
-of September 16, 2026, and describes what that leaves as "hand over a report due at noon, and Claude
-takes it from there, even after you've closed your laptop"<Cite n={3}/>.
+Grok Bot, Muse and Gemini Spark all arrived in 2026, and Out there, below, dates each one. How
+finished each is varies: xAI says "Grok Bot is in beta and available today" for a named set of
+paid tiers<Cite n={1}/>, and Claude Cowork is ceasing to exist as a separate product, with
+Anthropic's post of September 16, 2026 saying "Starting today, Claude Cowork and chat are merging
+into one Claude" and that "It's rolling out on Pro and Max plans over the next few weeks, with
+more plans to follow"<Cite n={3}/>.
 
 Delegate what is routine and reversible; keep anything that spends money, sends something
 outside, or is hard to undo behind an approval. Several makers build that split in. Muse "checks
@@ -87,24 +89,21 @@ look"<Cite n={3}/>.
 
 A roster is the more advanced version. Grok Bot's own page: "People inside SpaceXAI often run
 multiple Bots in parallel, with one to manage the others. A chief of staff sits on top, with a
-specialist for each lane"<Cite n={1}/>. The same page describes how a bot learns a routine: "The
-best way for a Bot to learn your workflow is to ask it to follow along the next time you do a
-job. It watches the steps and remembers how you like the work done"<Cite n={1}/>: demonstration,
-not a written spec.
+specialist for each lane"<Cite n={1}/>. The same page describes how a bot learns a routine: ask it
+to follow along the next time you do the job, and "It watches the steps and remembers how you like
+the work done"<Cite n={1}/>. Demonstration, not a written spec.
 
 Three mechanisms matter though you rarely see them. A credential vault: "Muse has no visibility
 into people's passwords or payment methods. Any credentials a person shares go into secure
 storage, so Muse can use them without seeing them"<Cite n={2}/>. A credential good for one
-purchase instead of a card on file: Meta says Muse checks out with Link, built by Stripe, whose
-"wallet for agents generates a one-time-use card so your real card details stay hidden"<Cite
-n={2}/>. And one system checking another rather than a model checking itself: "A separate
-Sentinel agent runs on that same machine, kept apart from Muse at the system level. Nothing Muse
-does reaches the internet unless the Sentinel approves it, and it asks the person for permission
-when needed"<Cite n={2}/>.
+purchase instead of a card on file: Meta says Muse checks out with Link, whose "wallet for agents
+generates a one-time-use card so your real card details stay hidden"<Cite n={2}/>. And one system
+checking another rather than a model checking itself: Meta says a "separate Sentinel agent" runs
+on the same machine as Muse, "kept apart from Muse at the system level"<Cite n={2}/>.
 
 Find three things before relying on any of them: what it keeps between sessions, what it may do
 while you are asleep, and how to stop it without the assistant's cooperation. Then read the
-approval queue and the overnight activity log each morning: the only account you get of what
+approval queue and the activity log each morning: they are the only account you get of what
 happened while you were away.
 
 </Lane>
@@ -137,23 +136,30 @@ blank one, which makes "a recorded approval" a thing the code requires rather th
 log happens to mention. And the model has no way to approve anything of its own: its tools are
 generated from `POLICY`, and approving is not an entry in it.
 
+The same three classes turn up wherever an action has a physical consequence. On the electronics
+bench behind this site's engineering recipes, an instrument query changes nothing, so an agent may
+run it unasked; a set point goes through a code-side envelope that refuses anything over the
+board's ceiling; and the two commands that energize a board need a person's approval naming the
+voltage and the current limit, re-checked against what the bench is actually set to.
+
 If you are building rather than subscribing to one of the products above, two self-hosted options
-document the same shape. Nous Research's Hermes Agent, MIT licensed, offers "natural-language
-scheduling for reports, backups, and briefings — running unattended through the gateway"<Cite
-n={6}/> and "isolated subagents with their own conversations, terminals, and Python RPC scripts"
-for a roster rather than one assistant<Cite n={6}/>. OpenClaw, also MIT licensed, describes the
-unattended half as "cron jobs, reminders, background tasks" and the approval half as "remote
-action approvals paired to your own Gateway"<Cite n={5}/>. This example builds neither a scheduler
+document parts of the same shape. Nous Research's Hermes Agent, "free and open source under the
+MIT license", lists "Natural-language scheduling for reports, backups, and briefings" that runs
+"unattended through the gateway, focused every time", and "Isolated subagents with their own
+conversations, terminals, and Python RPC scripts for zero-context-cost pipelines" for a roster
+rather than one assistant<Cite n={6}/>. OpenClaw, whose foundation "keeps the whole product MIT
+licensed", names the approval half in its own announcement of its phone apps: "remote action
+approvals paired to your own Gateway"<Cite n={5}/>. This example builds neither a scheduler
 nor a roster; it is the policy layer any of them still needs once the tick fires and the model has
 said what it wants to do. For the scheduler and the state that survives between ticks, see
 <Link href="/techniques/long-horizon/">long-running tasks</Link>.
 
 `tests/test_example_agent_teammates.py` scripts a model that proposes one action from each of the
 three classes in a single tick and checks all three outcomes at once (the `auto` one ran, the
-`approval` one sits queued and unrun, and the `forbidden` one never touches `Mailbox`) plus
-separate tests that an action type nobody classified defaults to forbidden rather than auto, that
-a forbidden item planted directly in the queue is still refused at approval time, and that an
-approval with nobody's name on it runs nothing. Run it yourself:
+`approval` one sits queued and unrun, the `forbidden` one never touches `Mailbox`), plus tests
+that an unclassified action type defaults to forbidden, that a forbidden item planted in the queue
+is still refused at approval time, and that an approval with nobody's name on it runs nothing.
+Run it yourself:
 
 <CodeFile file="examples/agent_teammates/README.md" start={16} end={16} lang="text" expect="python -m examples.agent_teammates" />
 

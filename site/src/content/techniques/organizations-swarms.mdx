@@ -3,27 +3,27 @@ slug: organizations-swarms
 level: 7
 run: organizations-swarms
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Generative Agents: Interactive Simulacra of Human Behavior"
     url: "https://arxiv.org/abs/2304.03442"
     publisher: "arXiv (Stanford University, Google Research)"
     date: "2023-04-07"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "MetaGPT: Meta Programming for a Multi-Agent Collaborative Framework"
     url: "https://arxiv.org/abs/2308.00352"
     publisher: "arXiv"
     date: "2023-08-01"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "FoundationAgents/MetaGPT"
     url: "https://github.com/FoundationAgents/MetaGPT"
     publisher: "MetaGPT (GitHub README)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Hallucination Cascade: Analyzing Error Propagation in Multi-Agent LLM Systems"
     url: "https://arxiv.org/abs/2606.07937"
     publisher: "arXiv"
     date: "2026-06-06"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -67,8 +67,8 @@ yet, so nothing below is measured. It is illustrated.
 
 Almost nothing you can subscribe to today is a genuine standing organization of agents; what
 exists and ships is a framework a developer assembles, not a product you turn on. MetaGPT is the
-one this page can name with a source: its own documentation states the idea outright:
-"assign different roles to GPTs to form a collaborative entity for complex tasks", and lists
+one this page can name with a source: its own README states the idea outright, as
+"Assign different roles to GPTs to form a collaborative entity for complex tasks", and lists
 "product managers / architects / project managers / engineers" as the roles it
 includes<Cite n={3}/>. That is a fixed roster running a fixed procedure on one task, closer to a
 simulated org chart than to agents that keep existing and deciding what to work on next.
@@ -92,16 +92,17 @@ working.
 Accountability is the fifth and the one this page cannot settle. When a mistake reaches a person
 by way of two or three roles that each added something, who is responsible: the role that made
 the error, the one that passed it on, or whoever set the roster up? No maker's page or paper this
-site has read answers that. Decide it on purpose, in writing, before relying on a system like
-this for anything that matters.
+site has read answers that. A calibration certificate carries the name of whoever signed it for
+exactly this reason, and a roster of agents has no equivalent unless someone builds one. Decide
+it on purpose, in writing, before relying on one for anything that matters.
 
 </Lane>
 <Lane name="build" title="Build it">
 
 The example is deliberately small: three roles (researcher, writer, reviewer) share one task
 board, and a coordinator model decides which open task goes to which role. What each role would
-actually do with an assigned task is out of scope; a role agent would use whatever pattern
-elsewhere in this manual fits its own job. What this example isolates is only the part specific
+do with an assigned task is out of scope; a role agent would use whatever pattern in this manual
+fits its own job. What this example isolates is only the part specific
 to an organization: the shared board, and an assignment step the model does not fully control.
 
 <CodeFile file="examples/organizations_swarms/run.py" func="coordinate" />
@@ -114,8 +115,8 @@ proposal as its own dashed edge and says so under its tally.
 been assigned two tasks this round gets no more, whatever the coordinator's output requests next.
 Claiming is checked against the board itself, not against what the coordinator believes is true:
 `task.status != "open"` refuses an assignment outright, so if the coordinator's own single call
-proposes the same task to two different roles (which its output can do, since nothing stops a
-model from repeating itself), only the first proposal is ever honored. The second reads the board
+proposes the same task to two different roles (nothing stops a model from repeating itself), only
+the first proposal is ever honored. The second reads the board
 fresh, sees the task is no longer open, and is refused, not silently overwritten and not queued
 to run later. That check is what the shared board is actually for: a coordinator's plan is a
 proposal against it, not an instruction the board has to accept.
@@ -131,8 +132,8 @@ benchmarks, against the systems they chose to compare with, and not a result thi
 measured.
 
 A different line of research reaches for coordination without any fixed roster at all. Park et
-al.'s Generative Agents paper populated a sandbox environment (twenty-five agents in a small
-town, no shared board and no fixed roles, just memory, planning and reflection) and reports
+al.'s Generative Agents paper populated a sandbox (twenty-five agents in a small town, no shared
+board and no fixed roles, just memory, planning and reflection) and reports
 that "starting with only a single user-specified notion that one agent wants to throw a
 Valentine's Day party, the agents autonomously spread invitations to the party over the next two
 days, make new acquaintances, ask each other out on dates to the party, and coordinate to show up

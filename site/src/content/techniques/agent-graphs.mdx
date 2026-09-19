@@ -3,20 +3,20 @@ slug: agent-graphs
 level: 6
 run: agent-graphs
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Handoffs"
     url: "https://openai.github.io/openai-agents-python/handoffs/"
     publisher: "OpenAI (Agents SDK documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Agent2Agent (A2A) Protocol"
     url: "https://a2a-protocol.org/v1.0.0/"
     publisher: "Linux Foundation (Agent2Agent Protocol)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "microsoft/agent-framework"
     url: "https://github.com/microsoft/agent-framework"
     publisher: "Microsoft"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -66,8 +66,8 @@ through the same script every time.
 
 The names behind that are ones a reader following the tooling, not a chat app, is more likely to
 meet. LangGraph, Microsoft Agent Framework, CrewAI and Google's Agent Development Kit are all
-registered against this technique. One open protocol exists specifically so agents built on
-different ones of those frameworks can still hand work to each other. Agent2Agent (A2A) states its
+registered against this technique. An open protocol exists for the case where agents built on
+different ones of those frameworks have to hand work to each other. Agent2Agent (A2A) states its
 purpose as "Connect agents built on different platforms (LangGraph, CrewAI, Semantic Kernel, custom
 solutions) to create powerful, composite AI systems."<Cite n={2}/> Its own site says A2A was
 "Originally developed by Google and now donated to the Linux Foundation"<Cite n={2}/>, and is at
@@ -114,7 +114,7 @@ Run it yourself:
 
 <CodeFile file="examples/agent_graphs/README.md" start={17} end={17} lang="text" expect="python -m examples.agent_graphs" />
 
-Every "Supervisor picks the next agent" step is `decided_by: "model"`; every checkpoint, the
+Every step the trace names `Supervisor picks the next agent` is `decided_by: "model"`; every checkpoint, the
 blocked-handoff step and the hop-cap step are `decided_by: "code"`. This is the same distinction <Link
 href="/techniques/workflow-graphs/">workflow graphs</Link>' own page draws, with one more place a
 model, not code, now gets to choose.

@@ -3,23 +3,23 @@ slug: debate-review
 level: 6
 run: debate-review
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Improving Factuality and Reasoning in Language Models through Multiagent Debate"
     url: "https://arxiv.org/abs/2305.14325"
     publisher: "arXiv"
     date: "2023-05-23"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena"
     url: "https://arxiv.org/abs/2306.05685"
     publisher: "arXiv"
     date: "2023-06-09"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Introducing Muse: The World's First Personal AI Agent Built for Everyone"
     url: "https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/"
     publisher: "Meta"
     date: "2026-09-08"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -64,7 +64,8 @@ result file yet, so nothing below is measured. It is illustrated.
 Be honest about what a "reviewing" or "checking" step in a product actually verifies before
 trusting it. Zheng et al. studied using one model to judge another's output. Their paper is
 mostly a case *for* the practice: it reports that "strong LLM judges like GPT-4 can match both
-controlled and crowdsourced human preferences well, achieving over 80% agreement"<Cite n={2}/>,
+controlled and crowdsourced human preferences well, achieving over 80% agreement, the same level
+of agreement between humans"<Cite n={2}/>,
 but it examines the limitations too, "including position, verbosity, and self-enhancement biases,
 as well as limited reasoning ability", and proposes "solutions to mitigate some of them"<Cite
 n={2}/>. Self-enhancement bias (a judge favoring output that resembles its own) is the sharpest
@@ -137,6 +138,11 @@ way twice.
 Try a single reviewer with a fixed checklist, not a full agent, if a person is going to read the
 output anyway regardless of what a second model says; a second model's opinion adds cost without
 changing what happens next.
+
+The engineering version of that first test: a board checked rule by rule against a written design
+review list stays at level 3, because the rules do not change between boards and one fixed second
+pass can drop every finding that cites no rule. A second agent earns its cost there only when the
+failure is one no written rule anticipated.
 
 Move up to review and debate once a fixed criterion cannot catch the failure you actually see,
 because the drafter and a same-shaped checker are likely to be wrong about it the same way, and the

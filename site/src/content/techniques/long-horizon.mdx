@@ -3,32 +3,32 @@ slug: long-horizon
 level: 7
 run: long-horizon
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Effective context engineering for AI agents"
     url: "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
     publisher: "Anthropic (Engineering blog)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Your First Session"
     url: "https://docs.devin.ai/get-started/first-run"
     publisher: "Cognition (Devin documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Session Insights"
     url: "https://docs.devin.ai/product-guides/session-insights"
     publisher: "Cognition (Devin documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Understanding Temporal"
     url: "https://docs.temporal.io/evaluate/understanding-temporal"
     publisher: "Temporal (documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "How Inngest functions are executed: Durable Execution"
     url: "https://www.inngest.com/docs/learn/how-functions-are-executed"
     publisher: "Inngest (documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Archival memory"
-    url: "https://docs.letta.com/guides/core-concepts/memory/archival-memory"
+    url: "https://docs.letta.com/v1-sdk/memory/archival-memory"
     publisher: "Letta (documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -169,7 +169,9 @@ Try a plain scheduled job (<Link href="/techniques/order-zero/">level 0, no mode
 <Link href="/techniques/workflow-graphs/">workflow</Link> triggered on a timer) if what runs and
 when is fully known in advance. That still starts on its own, but nothing needs to decide whether
 there is work to do or what to do about it; a model is not required to make a decision that is
-already written down.
+already written down. A 90-minute soak that samples three units every five minutes and charts
+each one's output against its case temperature is that job exactly: the trigger is a timer, the
+finding is a trend line, and no model is involved anywhere in it.
 
 Move up to a long-running task once the work can neither finish in one sitting nor be scripted in
 advance: a queue that grows on its own schedule, work whose next step depends on what an earlier,
