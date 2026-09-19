@@ -1,24 +1,24 @@
 ---
 slug: guardrails
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "LLM01:2025 Prompt Injection"
     url: "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
     publisher: "OWASP Gen AI Security Project"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "NeMo Guardrails"
     url: "https://github.com/NVIDIA-NeMo/Guardrails"
     publisher: "NVIDIA"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Guardrails AI"
     url: "https://github.com/guardrails-ai/guardrails"
     publisher: "Guardrails AI"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Getting Started with AI Guardrails"
     url: "https://docs.lakera.ai/docs/quickstart"
     publisher: "Check Point"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Llama Guard 4 Model Card"
     url: "https://huggingface.co/meta-llama/Llama-Guard-4-12B"
     publisher: "Meta (model card)"
@@ -27,7 +27,7 @@ sources:
     url: "https://typesafe.ai/blog/introducing-system-one-models-and-jev"
     publisher: "TypeSafe AI"
     date: "2026-09-15"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -44,24 +44,19 @@ Guardrails are checks on what goes into a model and what comes out: an input fil
 user's own message or retrieved content, an output validator over what the model produced, a
 separate classifier model trained to say whether something is safe, a schema check that an
 answer is well-formed, and an allowlist of which actions are even reachable. OWASP's own
-mitigation list for prompt injection names one form of this directly: "apply semantic filters and
+mitigation list for prompt injection names one form of this directly: "Apply semantic filters and
 use string-checking to scan for non-allowed content"<Cite n={1}/>.
 
-Be precise about what that is and is not. A guardrail is a probabilistic check: it decides that
-something *looks* disallowed, usually with a model of its own, and it can be wrong in both
-directions. It is not the control that holds. The control that holds is a check in code that
-tests a specific fact and refuses the action when the fact is false, whatever anything upstream
-concluded: <Link href="/techniques/safety/">safety</Link>'s own example is exactly that check. A
-guardrail lowers how often that check gets tested. It never stands in for it.
+A guardrail is a probabilistic check: it decides that something *looks* disallowed, usually with a
+model of its own, and it can be wrong in both directions. It is not the control that holds. The
+control that holds is a check in code that tests a specific fact and refuses the action when the
+fact is false, whatever anything upstream concluded: <Link href="/techniques/safety/">safety</Link>'s
+own example is exactly that check. A guardrail lowers how often that check gets tested; it never
+stands in for it.
 
 This topic is not a level on the ladder; it applies at every level, the way
-<Link href="/techniques/safety/">safety</Link> does.
-
-A guardrail is a decision made on every request, so its cost and its delay are paid every time.
-That is the case TypeSafe AI makes for Jev, a model announced in September 2026 that returns typed
-decisions with probabilities and no text: "Score, judge, verify, guardrail, and detect jailbreaks
-of LLM prompts, reasoning traces, and/or outputs"<Cite n={6}/>. It is in early access and the
-claims are the maker's own; nothing here has tested it as a guardrail.
+<Link href="/techniques/safety/">safety</Link> does. It is also a decision made on every request,
+so its cost and its delay are paid every time.
 
 This page is marked draft, not published: no result file or production trace exists for this
 site, so nothing below reports a measured number.
@@ -122,20 +117,34 @@ inputs (prompt classification) and in LLM responses (response classification)"<C
 second opinion from a second model, which can itself be wrong, rather than a deterministic check
 on a specific fact the way `_permitted` is.
 
+TypeSafe AI's Jev, announced in September 2026 and, in the maker's own words, "available today in
+early access"<Cite n={6}/>, returns a typed, probabilistic verdict instead of text. Its own pitch
+names this directly: "Score, judge, verify, guardrail, and detect jailbreaks of LLM prompts,
+reasoning traces, and/or outputs"<Cite n={6}/>. The claims are the maker's own and untested here.
+
 Schema and structured-output checks are the guardrail form aimed at a different failure: not
 "is this unsafe" but "is this well-formed." Guardrails AI's own README describes its two
 functions as running "Input/Output Guards" that "detect, quantify and mitigate the presence of
-specific types of risks," and separately helping "generate structured data from LLMs"<Cite
+specific types of risks", and separately helping "generate structured data from LLMs"<Cite
 n={3}/>: a schema check catches a malformed answer a safety classifier would never flag, because
 nothing about a badly-shaped JSON object is unsafe, only wrong.
 
 A product aimed at the whole request and response pair, rather than one side of it, is AI
-Guardrails (Lakera Guard). Its documentation says it "screens user and external content going
-into LLMs and the resulting output, detecting any threats," and that it "blocks the interaction
-and shows the user a crafted response when threats are detected"<Cite n={4}/>. Two names are in
-play because the product changed hands: it was Lakera Guard, and the documentation is published
-by Check Point as AI Guardrails today. Worth knowing when you search for it, and worth checking
-in your own code and runbooks, where a former name outlives an acquisition for years.
+Guardrails (Lakera Guard). Its documentation says Check Point AI Guardrails "screens user and
+external content going into LLMs and the resulting output, detecting any threats and providing
+real time protection for your GenAI application and users"<Cite n={4}/>. Detecting and blocking
+are separate settings, and the same page is careful about it: "flagged will always be false if
+your project is in Detect mode", and its tutorial only blocks an interaction after a reader turns
+on "Simulate blocking" in the demo chatbot<Cite n={4}/>. It was Lakera Guard; Check Point
+publishes the documentation as AI Guardrails today, worth searching for under either name.
+
+A guardrail like this is also, itself, an intermediary: the content it screens reaches wherever the
+check runs, on every call, including calls it passes through unchanged. "We added a guardrail" can
+mean a second company now sees every prompt and response, not only the ones it flags. Check whose
+service runs the check, what it retains, and whether your own hardware could run the same
+classifier instead: Llama Guard 4, quoted above, is published as a downloadable model card. See
+<Link href="/techniques/safety/">safety, privacy and governance</Link> for the same question asked
+about the model maker itself.
 
 </Lane>
 </Lanes>
@@ -191,8 +200,8 @@ replace it.
   check on the answer are the only two points that exist yet. These are the same two halves
   <Link href="/techniques/chat/">chat</Link>'s single call has.
 - <Link href="/levels/2/">Context</Link>: a retrieval rail becomes relevant for the first time,
-  since retrieved content is now something a check can inspect before it reaches the model —
-  exactly the failure mode <Link href="/techniques/rag/">RAG</Link> names for prompt injection
+  since retrieved content is now something a check can inspect before it reaches the model. That
+  is exactly the failure mode <Link href="/techniques/rag/">RAG</Link> names for prompt injection
   through retrieved text.
 - <Link href="/levels/4/">Tools</Link>: an execution rail (a check on what a tool call is about
   to do, before it runs) is where the code-side permission check
@@ -221,8 +230,8 @@ replace it.
   a tool call before it runs, an answer before it is returned.
 - Log the decision and the reason, not just the outcome, so a refusal rate can later be split
   into correct and incorrect rather than only counted.
-- Attack your own checks on a schedule rather than when something goes wrong —
-  <Link href="/techniques/red-teaming/">red teaming</Link> is how a guardrail's real precision
+- Attack your own checks on a schedule rather than when something goes wrong.
+  <Link href="/techniques/red-teaming/">Red teaming</Link> is how a guardrail's real precision
   gets found before a user finds it.
 
 ## Run it

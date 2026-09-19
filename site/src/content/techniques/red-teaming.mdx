@@ -1,25 +1,29 @@
 ---
 slug: red-teaming
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Challenges in red teaming AI systems"
     url: "https://www.anthropic.com/news/challenges-in-red-teaming-ai-systems"
     publisher: "Anthropic"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Announcing the OWASP Gen AI Red Teaming Guide"
     url: "https://genai.owasp.org/2025/01/22/announcing-the-owasp-gen-ai-red-teaming-guide/"
     publisher: "OWASP Gen AI Security Project"
     date: "2025-01-22"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "AI Risk Management Framework"
     url: "https://www.nist.gov/itl/ai-risk-management-framework"
     publisher: "NIST"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "PyRIT"
     url: "https://github.com/microsoft/PyRIT"
     publisher: "Microsoft"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
+  - title: "AI RMF Core"
+    url: "https://airc.nist.gov/airmf-resources/airmf/5-sec-core/"
+    publisher: "NIST (AI Resource Center)"
+    accessed: "2026-09-19"
 ---
 
 import Lanes from '../../components/page/Lanes.astro';
@@ -57,21 +61,33 @@ method, not taken as a fixed guarantee. Anthropic, one maker that publishes its 
 describes several distinct methods rather than one. Its "domain-specific expert teaming"
 "involves collaborating with subject matter experts to identify and assess potential
 vulnerabilities or risks in AI systems within their area of expertise"; separate sections of the
-same post cover automated red teaming and multilingual and multicultural red teaming<Cite n={1}/>. "We red-team our models" can mean any of several different things, and the
+same post cover automated red teaming and multilingual and multicultural red
+teaming<Cite n={1}/>. "We red-team our models" can mean any of several different things, and the
 specifics (who did it, what they were looking for, how recently) are what actually tells you
 anything.
 
 A finding does not have to mean "broken." What matters more is what happened next: was the gap
 fixed, is it a known, documented limitation, or does using the product a certain way avoid it?
-NIST's AI Risk Management Framework (AI RMF 1.0, published as NIST AI 100-1 and, in NIST's
-words, "intended for voluntary use") organizes the work into four functions it names govern,
-map, measure and manage<Cite n={3}/>. A finding that cannot be fixed outright still has to land
-in one of those, scoped and owned, rather than being known about and forgotten.
+NIST's AI Risk Management Framework, published as NIST AI 100-1, is, in NIST's own words,
+"intended for voluntary use"<Cite n={3}/>. NIST's own excerpt of the framework says its Core "is
+composed of four functions: govern, map, measure, and manage"<Cite n={5}/>. A finding that cannot
+be fixed outright still has to land in one of those, scoped and owned, rather than being known
+about and forgotten.
 
 If you operate a system rather than build one, the same instinct applies at smaller scale: before
 trusting a check that is supposed to catch bad output, try to make it fail on purpose. A check
 nobody has tried to break is a check nobody knows the limits of, which is the other half of what
 <Link href="/techniques/guardrails/">guardrails</Link> says about a filter's real precision.
+
+An engineer already does a version of this, under other names, and it splits three ways. In
+production test, the sequence runs the same units the same way every shift, so the case nobody
+wrote is the case nobody sees: the equivalent of red teaming is the deliberate bad unit, the
+swapped fixture, the operator note typed on the wrong row. In design verification, five
+prototypes leave room for one adversarial case per corner, which is the shape of this page's own
+coding-agent example below: the corner nobody swept, ordinary attribute access rather than a
+blocked name, was the one that mattered. In precise measurement nothing attacks the number, and
+the gap is somewhere else entirely, in an unchecked coverage factor or an accuracy row read from
+the wrong calibration interval.
 
 </Lane>
 <Lane name="build" title="Build it">
