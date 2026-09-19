@@ -135,7 +135,7 @@ this contract could be signed, against the two that need nothing more than a gla
   },
   {
     name: 'A rule matched to the wrong defined term',
-    notice: 'An agreement defines two similar roles, "Vendor" and "Subcontractor," and a finding about the assignment rule reads the subcontractor clause when the checklist rule is actually asking about the vendor. The quote is real and the clause number is real; the finding is simply about the wrong party.',
+    notice: 'An agreement defines two similar roles, "Vendor" and "Subcontractor", and a finding about the assignment rule reads the subcontractor clause when the checklist rule is actually asking about the vendor. The quote is real and the clause number is real; the finding is simply about the wrong party.',
     test: 'Add a second invented agreement with a defined-term collision like this on purpose, and check by hand that each finding\'s clause and quote actually concern the party the checklist rule names, not just any clause with matching words. The substring check catches a wrong quote; it has no idea what a defined term means.',
   },
   {
