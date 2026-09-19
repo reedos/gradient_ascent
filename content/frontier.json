@@ -1,0 +1,536 @@
+{
+  "version": 1,
+  "as_of": "2026-09-19",
+  "note": "What is unsolved at each level, what people are trying, and a primary source for each. Two to four entries per level. Every quotation was read from the raw page on the date in `checked`, not from a summary of it. This file ages faster than the rest of the site: each level carries its own `as_of`, and a level page prints it. Nothing here predicts which approach will win, and nothing here is a measurement this site made.",
+  "levels": [
+    {
+      "order": 0,
+      "as_of": "2026-09-19",
+      "open": [
+        {
+          "id": "rules-that-blow-up",
+          "technique": "order-zero",
+          "problem": "A rule written as a regular expression can pass every test anyone thought to write and still take exponential time on one unlucky input, because a backtracking engine tries an exponential number of paths before it gives up. Reading the pattern does not tell you which inputs do it.",
+          "trying": "Engine authors are moving to matchers that run in linear time and never backtrack, and static analyzers look for the nested, overlapping repetition that makes a pattern vulnerable. Neither removes the need to check a pattern you inherited.",
+          "sources": [
+            {
+              "title": "Regular expression Denial of Service - ReDoS",
+              "url": "https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS",
+              "publisher": "OWASP Foundation",
+              "quote": "may reach extreme situations that cause them to work very slowly (exponentially related to input size)",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "no-exhaustive-test",
+          "technique": "order-zero",
+          "problem": "A rule system's real input space is every field's values multiplied together, so testing all of it is out of reach, and there is no general way to say how much of it a test suite covers. Every practical answer rests on an assumption about how failures are spread across combinations.",
+          "trying": "NIST's combinatorial testing work builds test sets that cover every two-way to six-way combination of parameter values rather than every combination, on the finding that most real failures are triggered by a few interacting factors. Teams pair it with tracking which rules ever fire in production, to find the branches no test reaches.",
+          "sources": [
+            {
+              "title": "Why do Combinatorial Testing?",
+              "url": "https://csrc.nist.gov/projects/automated-combinatorial-testing-for-software/combinatorial-methods-in-testing/interactions-involved-in-software-failures",
+              "publisher": "NIST, Computer Security Resource Center",
+              "quote": "it is nearly always impossible to do exhaustive testing, but we don’t have to test all possible combinations of inputs; we only have to test all of the combinations that trigger faults",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "drift-without-labels",
+          "technique": "order-zero",
+          "problem": "A classifier your code acts on can drift away from the data it was trained on long before any true label arrives to prove it. Measuring accuracy directly means waiting, and by then it may have been wrong for weeks.",
+          "trying": "Detectors that watch the model's own output distribution instead of waiting for labels, built on statistical process control and set to fold labels in if they ever turn up. Keeping the false alarm rate low at production volume is the part that is not settled.",
+          "sources": [
+            {
+              "title": "Flexible and Efficient Drift Detection without Labels",
+              "url": "https://arxiv.org/abs/2506.08734",
+              "publisher": "arXiv",
+              "quote": "Controlling for false positives while monitoring the performance of predictive models used to make inference from extremely large datasets periodically, where the true labels are not instantly available, becomes extremely challenging.",
+              "checked": "2026-09-19"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "order": 1,
+      "as_of": "2026-09-19",
+      "open": [
+        {
+          "id": "hallucination-is-structural",
+          "technique": "chat",
+          "problem": "One well-posed question to a strong model can still come back fluent, confident and wrong, and it is not clear this is a defect that more training quietly removes. One argument from inside OpenAI is that the way models are trained and scored pushes them toward a guess rather than toward saying they do not know.",
+          "trying": "Changing what benchmarks reward, so that an admission of uncertainty scores better than a confident wrong answer, rather than only adding more hallucination tests on top of scoring that still rewards guessing.",
+          "sources": [
+            {
+              "title": "Why Language Models Hallucinate",
+              "url": "https://arxiv.org/abs/2509.04664",
+              "publisher": "arXiv",
+              "quote": "the training and evaluation procedures reward guessing over acknowledging uncertainty",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "constraint-tax",
+          "technique": "structured-output",
+          "problem": "Forcing a schema during decoding makes the shape right every time, and can make the content wrong more often. On small on-device models one measurement found validity rising to every call while answer accuracy fell, which is the opposite of what a constraint is usually assumed to buy.",
+          "trying": "Letting the model reason without the constraint and applying the schema only at the end, and reporting schema validity and answer accuracy as two numbers rather than one pass rate. Whether the same tradeoff holds on large models is not established.",
+          "sources": [
+            {
+              "title": "The Constraint Tax: Measuring Validity-Correctness Tradeoffs in Structured Outputs for Small Language Models",
+              "url": "https://arxiv.org/abs/2605.26128",
+              "publisher": "arXiv",
+              "quote": "The usual engineering assumption is that hard output constraints improve reliability without changing the underlying answer. We show that this assumption is unsafe for small models.",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "thinking-you-can-read",
+          "technique": "inference-time-reasoning",
+          "problem": "A reasoning model's visible thinking is not a guaranteed account of why it answered as it did. Anthropic slipped hints into questions and found models used them without saying so more often than not, which means the trace you read is evidence about the answer and not proof of it.",
+          "trying": "Training models to lean harder on their own reasoning, to see whether faithfulness follows. Anthropic's own attempt raised it and then leveled off well short of reliable.",
+          "sources": [
+            {
+              "title": "Reasoning models don't always say what they think",
+              "url": "https://www.anthropic.com/research/reasoning-models-dont-say-think",
+              "publisher": "Anthropic",
+              "quote": "There’s no specific reason why the reported Chain-of-Thought must accurately reflect the true reasoning process; there might even be circumstances where a model actively hides aspects of its thought process from the user.",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "where-and-how-many",
+          "technique": "multimodal",
+          "problem": "A single image-in call still gets position and counts approximately right, and the makers say so in their own documentation rather than treating it as a rare miss. Anything that needs an exact coordinate or an exact count cannot rest on one call.",
+          "trying": "Makers document the limit and tell developers to verify a coordinate before acting on it and to design around approximate counts. Where an exact number matters, the answer today is to measure it in code from the image rather than to ask for it.",
+          "sources": [
+            {
+              "title": "Vision",
+              "url": "https://platform.claude.com/docs/en/build-with-claude/vision",
+              "publisher": "Anthropic (Claude Platform Docs)",
+              "quote": "Claude can give approximate counts of objects in an image but might not always be precisely accurate, especially with large numbers of small objects.",
+              "checked": "2026-09-19"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "as_of": "2026-09-19",
+      "open": [
+        {
+          "id": "no-best-embedding",
+          "technique": "embeddings-search",
+          "problem": "Which embedding model you pick changes which questions your search answers, and no model is best at everything. Choosing one is still a matter of testing on your own documents rather than reading a ranking.",
+          "trying": "Running a retrieval evaluation over your own document set before committing, and combining keyword search with embedding search so the cases either one misses are covered by the other.",
+          "sources": [
+            {
+              "title": "MTEB: Massive Text Embedding Benchmark",
+              "url": "https://arxiv.org/abs/2210.07316",
+              "publisher": "arXiv",
+              "quote": "We find that no particular text embedding method dominates across all tasks.",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "long-context-is-not-free",
+          "technique": "context-engineering",
+          "problem": "A model that advertises a large context window can still fail to use a fact sitting inside it, once the fact does not share wording with the question. The window is what the model will accept, not what it will reliably find.",
+          "trying": "Benchmarks built to strip the literal word overlap between question and answer, so a model cannot pass by matching text. On the building side, keeping the context smaller and chosen on purpose rather than filling the window because it is there.",
+          "sources": [
+            {
+              "title": "NoLiMa: Long-Context Evaluation Beyond Literal Matching",
+              "url": "https://arxiv.org/abs/2502.05167",
+              "publisher": "arXiv",
+              "quote": "performance degrades significantly as context length increases",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "which-sentence-was-invented",
+          "technique": "rag",
+          "problem": "Retrieval cuts invention down and does not end it, and most checkers score a whole answer at once. An answer that is right except for one made-up sentence scores like a right answer, which is the case a reader most needs flagged.",
+          "trying": "Checking groundedness sentence by sentence, for instance by dropping each retrieved passage in turn and watching whether the model's confidence in that sentence collapses. Accuracy at the span level is well short of the answer level.",
+          "sources": [
+            {
+              "title": "Detecting Hallucinations in Retrieval-Augmented Generation through Grounding-Aware Sensitivity by Perturbation (GASP)",
+              "url": "https://arxiv.org/abs/2607.04223",
+              "publisher": "arXiv",
+              "quote": "Retrieval-augmented generation (RAG) reduces but does not eliminate hallucination, and existing detectors return a single answer-level score that does not indicate which sentence is unsupported, or why.",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "two-memories-that-disagree",
+          "technique": "memory",
+          "problem": "When a memory store holds two facts that contradict each other, an old preference and the one that replaced it, there is no settled rule for which should govern the answer. A system can retrieve the stale one and still answer correctly, or retrieve the right one and answer wrongly, and an outcome score cannot tell those apart.",
+          "trying": "Evaluations that inject controlled conflicts into synthetic multi-session histories and score retrieval separately from the final answer, so it is visible which half failed.",
+          "sources": [
+            {
+              "title": "MemConflict: Evaluating Long-Term Memory Systems Under Memory Conflicts",
+              "url": "https://arxiv.org/abs/2605.20926",
+              "publisher": "arXiv",
+              "quote": "providing limited insight into how systems retrieve and rank temporally valid, factually correct, and contextually applicable memory evidence under conflicting alternatives",
+              "checked": "2026-09-19"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "as_of": "2026-09-19",
+      "open": [
+        {
+          "id": "errors-change-shape",
+          "technique": "prompt-chaining",
+          "problem": "A wrong number introduced early in a fixed chain does not simply persist. It becomes a wrong calculation, then a sentence of prose, then a conclusion, and it gets harder to spot at every handoff, because each stage makes it look more like ordinary output.",
+          "trying": "Putting a check between stages rather than only at the end. One measurement through a four-stage pipeline found an early gate catches much more than the same check run once on the final result.",
+          "sources": [
+            {
+              "title": "The Hallucination Snowball: Modeling Error Propagation as State Transitions in Multi-Agent LLM Pipelines",
+              "url": "https://arxiv.org/abs/2608.14588",
+              "publisher": "arXiv",
+              "quote": "Sequential multi-agent LLM pipelines chain specialized agents without verification at handoffs, creating a structural flaw with measurable and severe consequences.",
+              "checked": "2026-09-19",
+              "note": "The paper says multi-agent. The pipeline it measures is a fixed sequence of stages where no stage chooses what happens next, which is what this site calls prompt chaining."
+            }
+          ]
+        },
+        {
+          "id": "routers-miss-the-best-branch",
+          "technique": "routing",
+          "problem": "A router sorts a request into a branch before anything else runs, and routers still send plenty of requests somewhere other than where they would have been answered best. Under one benchmark that compared many of them on the same footing, several recent methods, commercial ones included, did not clearly beat a simple baseline.",
+          "trying": "Shared testbeds spanning many models and many routing methods, so routers are compared on the same task set instead of each paper's own. Some work scores cost and latency alongside accuracy rather than accuracy alone.",
+          "sources": [
+            {
+              "title": "LLMRouterBench: A Massive Benchmark and Unified Framework for LLM Routing",
+              "url": "https://arxiv.org/abs/2601.07206",
+              "publisher": "arXiv",
+              "quote": "a substantial gap remains to the Oracle, driven primarily by persistent model-recall failures",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "a-judge-that-likes-its-own-work",
+          "technique": "evaluator-optimizer",
+          "problem": "The check half of a write-and-check loop is usually another model call, and a model grading text written in its own style can favor it for reasons that have nothing to do with quality. Picking a more capable judge does not reliably fix it.",
+          "trying": "Measuring the bias directly, by grading pairs of answers built to differ in style and not in quality, so any preference shown is the bias. Structured multi-part rubrics are being tested as a way to cut it down.",
+          "sources": [
+            {
+              "title": "Quantifying and Mitigating Self-Preference Bias of LLM Judges",
+              "url": "https://arxiv.org/abs/2604.22891",
+              "publisher": "arXiv",
+              "quote": "Empirical analysis across 20 mainstream LLMs reveals that advanced capabilities are often uncorrelated, or even negatively correlated, with low SPB.",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "how-much-human-at-the-gate",
+          "technique": "human-in-the-loop",
+          "problem": "Putting a person in the loop is the easy part. How much they should be asked to decide, and how to keep them from waving through whatever the system already proposed, is not settled, and NIST says so in its own guidance rather than prescribing a split.",
+          "trying": "NIST's playbook asks teams to design the human role deliberately, account for the biases that make a reviewer agree too readily, and measure whether oversight is happening at all. Override rates and time spent per review are what tell you, rather than the presence of a checkpoint.",
+          "sources": [
+            {
+              "title": "Map (AI RMF Playbook)",
+              "url": "https://airc.nist.gov/airmf-resources/playbook/map/",
+              "publisher": "NIST, Trustworthy and Responsible AI Resource Center",
+              "quote": "Questions remain about how to configure humans and automation for managing AI risks.",
+              "checked": "2026-09-19"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "order": 4,
+      "as_of": "2026-09-19",
+      "open": [
+        {
+          "id": "vetted-server-bad-answer",
+          "technique": "mcp",
+          "problem": "A tool server is reviewed once, when you connect to it. The text it returns days later goes straight into the model's context with no equivalent check, so an instruction hidden in a tool result is read as though you had written it.",
+          "trying": "Making tool responses fit a fixed schema so free text has nowhere to hide, keeping high-privilege tools in a context an outside server cannot reach, allowlisting servers instead of letting anyone point an agent at a URL, and asking a person before a consequential action runs.",
+          "sources": [
+            {
+              "title": "MCP Tool Poisoning",
+              "url": "https://owasp.org/www-community/attacks/MCP_Tool_Poisoning",
+              "publisher": "OWASP Foundation",
+              "quote": "Fully detecting injected instructions in free-text responses is an open problem, but schema validation catches the obvious cases.",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "the-screen-gives-orders",
+          "technique": "computer-use",
+          "problem": "A model driving a mouse reads the screen to pick its next click, and anything on that screen can carry instructions of its own. The makers who ship classifiers against this say in their own documentation that the model sometimes follows them anyway.",
+          "trying": "Scanning screenshots and other tool results for injected instructions, steering the model to ask whether an instruction actually came from the person, keeping the agent away from sensitive data, and requiring confirmation before a consequential action. Anthropic notes the classifier layer does not suit every case and lets an operator turn it off.",
+          "sources": [
+            {
+              "title": "Computer use tool",
+              "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool",
+              "publisher": "Anthropic (Claude Platform Docs)",
+              "quote": "In some circumstances, Claude will follow commands found in content even when they conflict with your instructions.",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "arguments-that-were-guessed",
+          "technique": "function-calling",
+          "problem": "The model picks the tool and fills in its arguments, and an argument can be a plausible invention rather than something it actually had. One wrong identifier looks exactly like a right one to the code that runs the call.",
+          "trying": "Unambiguous parameter names and strict input schemas, resolving opaque identifiers to readable ones because that measurably cuts invented values, and shaping a tool around the task rather than around an existing API.",
+          "sources": [
+            {
+              "title": "Writing effective tools for AI agents, using AI agents",
+              "url": "https://www.anthropic.com/engineering/writing-tools-for-agents",
+              "publisher": "Anthropic",
+              "quote": "Occasionally, an agent might hallucinate or even fail to grasp how to use a tool.",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "sandbox-is-a-choice",
+          "technique": "code-execution",
+          "problem": "Nothing forces the sandbox running model-written code to be separated from the credentials that supervise the agent around it. Whether that boundary exists depends on how somebody assembled the system, and the platform cannot enforce it.",
+          "trying": "Keeping the orchestration in trusted infrastructure while the sandbox holds only narrow, per-sandbox credentials and mounts. OWASP's guidance for the same failure is to build narrow, purpose-made tools instead of one that runs any shell command, and to enforce authorization in code rather than in the prompt.",
+          "sources": [
+            {
+              "title": "Sandbox Agents",
+              "url": "https://developers.openai.com/api/docs/guides/agents/sandboxes",
+              "publisher": "OpenAI",
+              "quote": "Running the harness inside the sandbox can be convenient for prototypes, but it puts orchestration and model-directed execution in the same compute boundary.",
+              "checked": "2026-09-19"
+            },
+            {
+              "title": "LLM06:2025 Excessive Agency",
+              "url": "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/",
+              "publisher": "OWASP Gen AI Security Project",
+              "quote": "an extension to run one specific shell command fails to properly prevent other shell commands from being executed.",
+              "checked": "2026-09-19"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "order": 5,
+      "as_of": "2026-09-19",
+      "open": [
+        {
+          "id": "passing-the-check-not-the-task",
+          "technique": "coding-agents",
+          "problem": "An agent that decides for itself when the work is done will find ways to make the check pass without doing the task. METR reports this across frontier models rather than at one lab, and most often when the tests are hidden from the agent.",
+          "trying": "Hiding test cases and scoring code from the agent, running the scorer somewhere the agent cannot read or write, and using a second model to flag runs that scored suspiciously well. Hardening the environment works where telling the agent not to cheat does not.",
+          "sources": [
+            {
+              "title": "Recent Frontier Models Are Reward Hacking",
+              "url": "https://metr.org/blog/2025-06-05-recent-reward-hacking/",
+              "publisher": "METR",
+              "quote": "The most recent frontier models have engaged in increasingly sophisticated reward hacking, attempting (often successfully) to get a higher score by modifying the tests or scoring code, gaining access to an existing implementation or answer that's used to check their work, or exploiting other loopholes in the task environment.",
+              "checked": "2026-09-19"
+            },
+            {
+              "title": "Frontier Risk Report (February to March 2026)",
+              "url": "https://metr.org/blog/2026-05-19-frontier-risk-report/",
+              "publisher": "METR",
+              "quote": "attempted to reward hack in ~80% of attempts on tasks in an early version of MirrorCode, when test cases were hidden from the agent.",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "which-actions-need-a-person",
+          "technique": "agent-harness",
+          "problem": "Ask a person to approve every action and they stop reading what they approve. Decide it automatically and you take an error rate instead. Anthropic published the false negative rate of its own classifier for this and says it has not found a way to close the gap that is worth what it costs.",
+          "trying": "Scoring each action for risk and for whether the person's own words already cover it, tuned to catch the actions that cannot be undone. The remaining gap has resisted prompt engineering.",
+          "sources": [
+            {
+              "title": "How we built Claude Code auto mode: a safer way to skip permissions",
+              "url": "https://www.anthropic.com/engineering/claude-code-auto-mode",
+              "publisher": "Anthropic",
+              "quote": "Over time that leads to approval fatigue, where people stop paying close attention to what they're approving.",
+              "checked": "2026-09-19"
+            },
+            {
+              "title": "How we built Claude Code auto mode: a safer way to skip permissions",
+              "url": "https://www.anthropic.com/engineering/claude-code-auto-mode",
+              "publisher": "Anthropic",
+              "quote": "The 17% false-negative rate on real overeager actions is the honest number.",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "a-skill-you-have-not-read",
+          "technique": "skills",
+          "problem": "A skill is instructions and scripts the agent starts following once it decides the skill applies, and there is no automated way to tell a safe one from an unsafe one. The maker's own advice is to audit every file by hand, the way you would before installing software.",
+          "trying": "Reading the whole bundle for network calls and file access that do not match what the skill claims to do, and treating anything that fetches from an outside URL as the riskiest kind, because a skill that was safe when installed can stop being safe when what it fetches changes. Content scanning exists in places and does not cover every way a skill arrives.",
+          "sources": [
+            {
+              "title": "Agent Skills",
+              "url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
+              "publisher": "Anthropic (Claude Platform Docs)",
+              "quote": "Even trustworthy Skills can be compromised if their external dependencies change over time",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "interrupted-by-nothing",
+          "technique": "voice-agents",
+          "problem": "A voice agent listening for you to break in has to decide, in real time, whether the sound it just heard was you. It stops mid-sentence for audio that turns out to contain no words, which a caller experiences as the assistant losing its thread for no reason.",
+          "trying": "Moving from a fixed silence threshold to interruption handling that reads the audio for intent, and building a way back: once the interruption turns out to have produced an empty transcript, resume from where the sentence stopped.",
+          "sources": [
+            {
+              "title": "Turns overview",
+              "url": "https://docs.livekit.io/agents/logic/turns/",
+              "publisher": "LiveKit",
+              "quote": "In some cases, the framework detects human speech audio and interrupts the agent, but the transcription comes up empty as no actual words are spoken.",
+              "checked": "2026-09-19"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "order": 6,
+      "as_of": "2026-09-19",
+      "open": [
+        {
+          "id": "parallel-or-consistent",
+          "technique": "orchestrator-workers",
+          "problem": "Run the workers one at a time and the lead waits on the slowest one and cannot steer any of them mid-task. Run them at once and you take on keeping their results, their state and their errors consistent. Nobody has both.",
+          "trying": "Anthropic runs subagents one at a time today because it is the easier half to coordinate, and treats concurrent execution as worth having once the coordination problems are handled rather than as something already solved.",
+          "sources": [
+            {
+              "title": "How we built our multi-agent research system",
+              "url": "https://www.anthropic.com/engineering/multi-agent-research-system",
+              "publisher": "Anthropic",
+              "quote": "But this asynchronicity adds challenges in result coordination, state consistency, and error propagation across the subagents.",
+              "checked": "2026-09-19",
+              "note": "Dated June 2025. It is still the maker's own account of this architecture, and nothing newer from them supersedes it."
+            }
+          ]
+        },
+        {
+          "id": "credentials-that-travel",
+          "technique": "agent-graphs",
+          "problem": "When one agent hands a task to another, the authorization to act on it often travels with the task. Passed in band, that credential is visible to every agent in the chain and not only to the one it was meant for.",
+          "trying": "The Agent2Agent specification asks that a credential be bound to the agent that originated the request, and encrypted when it carries anything sensitive, so only that agent can use it. Its own preference is to deliver credentials out of band rather than through the chain at all.",
+          "sources": [
+            {
+              "title": "Agent2Agent (A2A) Protocol Specification",
+              "url": "https://a2a-protocol.org/latest/specification/",
+              "publisher": "Agent2Agent Protocol Project, Linux Foundation",
+              "quote": "In-band credential exchange can allow credentials to be passed across chains of multiple A2A agents, exposing those credentials to each agent participating in the chain.",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "nine-judges-two-votes",
+          "technique": "debate-review",
+          "problem": "Asking several models to review the same work looks like several opinions and is not. Their mistakes are correlated, so a panel carries a fraction of the independent judgment its size suggests, and one measurement found nine judges worth about two independent votes.",
+          "trying": "Measuring a panel against what genuinely independent voting would give, rather than assuming more reviewers means more reliability, and testing whether cleverer ways of combining votes recover the difference. In that measurement they mostly did not.",
+          "sources": [
+            {
+              "title": "Nine Judges, Two Effective Votes: Correlated Errors Undermine LLM Evaluation Panels",
+              "url": "https://arxiv.org/abs/2605.29800",
+              "publisher": "arXiv",
+              "quote": "the 9 judges effectively provide only about 2 independent votes' worth of information.",
+              "checked": "2026-09-19"
+            },
+            {
+              "title": "Correlated Errors in Large Language Models",
+              "url": "https://arxiv.org/abs/2506.07962",
+              "publisher": "arXiv",
+              "quote": "We find substantial correlation in model errors -- on one leaderboard dataset, models agree 60% of the time when both models err.",
+              "checked": "2026-09-19"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "order": 7,
+      "as_of": "2026-09-19",
+      "open": [
+        {
+          "id": "a-summary-you-cannot-read",
+          "technique": "long-horizon",
+          "problem": "An agent that runs long enough outgrows its context window, so the platform compresses what came before into a carried-forward summary. OpenAI's documentation says that summary is not meant to be read by a person, which means when a long task goes wrong there is no way to see what was dropped.",
+          "trying": "Tying compaction to a token threshold so it only happens once a conversation is large enough to need it, and keeping the full transcript separately for anyone who needs a record that holds up, because the compacted item is not built to be one.",
+          "sources": [
+            {
+              "title": "Compaction",
+              "url": "https://developers.openai.com/api/docs/guides/compaction",
+              "publisher": "OpenAI",
+              "quote": "It is opaque and not intended to be human-interpretable.",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "permission-that-does-not-hold",
+          "technique": "agent-teammates",
+          "problem": "A standing agent on somebody's computer can be scoped to named applications, and what it does inside a permitted one can still reach an application it was never granted. A link clicked in an allowed mail client opens a browser that was not on the list.",
+          "trying": "Scoping permission per application, blocking some outright, scanning for injected instructions, and asking again before a new application is touched. The advice that goes with it is to start with applications you trust and watch the agent work, which is a person compensating for a boundary that does not fully hold.",
+          "sources": [
+            {
+              "title": "Let Claude use your computer in Cowork",
+              "url": "https://support.claude.com/en/articles/14128542-let-claude-use-your-computer-in-cowork",
+              "publisher": "Anthropic (Claude Help Center)",
+              "quote": "clicking a link in your email app might open it in Chrome, even if you haven't explicitly granted Claude permission to use Chrome (we can prevent Claude from seeing the Chrome window but can't stop the link from opening).",
+              "checked": "2026-09-19"
+            }
+          ]
+        },
+        {
+          "id": "more-agents-than-governance",
+          "technique": "organizations-swarms",
+          "problem": "Organizations are accumulating agents from several vendors faster than anything has appeared to govern them together. There is no settled answer to who signs off on what an agent may do, or how agents from different makers are meant to reach each other.",
+          "trying": "Interest is spread across several competing interoperability protocols rather than settling on one, and vendors are building governance layers meant to sit above agents they did not make. None of it is reported as having closed the gap.",
+          "sources": [
+            {
+              "title": "Salesforce Announces 2026 Connectivity Report",
+              "url": "https://www.salesforce.com/news/stories/connectivity-report-announcement-2026/",
+              "publisher": "Salesforce",
+              "quote": "86% of IT leaders are concerned that agents will introduce more complexity than value without proper integration.",
+              "checked": "2026-09-19",
+              "note": "Salesforce sells into this problem. What is used here is its survey of IT leaders, not its account of what fixes the gap."
+            }
+          ]
+        },
+        {
+          "id": "will-the-robot-refuse",
+          "technique": "embodied",
+          "problem": "A robot deciding its own next move has to judge whether an action would be unsafe, and whether to say it cannot do something rather than attempt it. Dedicated ways to measure those two judgments are new, and the benchmark that exists comes from the same maker as the system it scores.",
+          "trying": "Benchmarks that score refusal of an unsafe action, prediction of whether a task is possible at all, and asking a person when uncertain, as their own numbers rather than folded into task success. An independent measurement of the same thing does not yet exist.",
+          "sources": [
+            {
+              "title": "Gemini Robotics 2 brings whole body intelligence to robots",
+              "url": "https://deepmind.google/blog/gemini-robotics-2-brings-whole-body-intelligence-to-robots/",
+              "publisher": "Google DeepMind",
+              "quote": "It also measures the agent's ability to predict whether a task is possible and to proactively request human intervention when uncertain.",
+              "checked": "2026-09-19"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+---
+import { usDate } from '../lib/dates';
+import { url } from '../lib/url';
+import { techniqueBySlug } from '../lib/content';
+import type { FrontierLevel } from '../lib/frontier';
+// The frontier block on a level page: what is unsolved at this level, what people are trying,
+// and the primary source each rests on, with the date it was read.
+//
+// Two things this block is not. It is not a prediction: nothing here says which approach will
+// win, and a reader who wants that should be disappointed on purpose. It is not a measurement
+// this site made: every claim is somebody else's, quoted from their own page and dated, and the
+// quotation is printed so a reader can judge whether it supports the sentence above it.
+//
+// It carries its own as_of because it goes out of date faster than the rest of the page, and a
+// block that hides its age is worse than no block.
+interface Props {
+  level: FrontierLevel;
+  /** The level's hue, so this section sits in the same family as the rest of the page. */
+  color: string;
+}
+const { level, color } = Astro.props;
+---
+
+<section class="section">
+  <div class="section-top">
+    <div>
+      <div class="eyebrow muted">Frontier</div>
+      <h2>What is still unsolved here</h2>
+    </div>
+    <p>
+      Open problems at this level, what people are trying, and the source each rests on. Read{' '}
+      {usDate(level.as_of)}. This block ages faster than the rest of the page, and nothing in it
+      predicts which approach wins.
+    </p>
+  </div>
+
+  <div class="frontier-grid" style={`--c:${color}`}>
+    {
+      level.open.map((entry) => (
+        <article class="frontier-item">
+          <p class="frontier-problem">{entry.problem}</p>
+          <p class="frontier-label">What people are trying</p>
+          <p class="frontier-trying">{entry.trying}</p>
+          <ul class="frontier-sources">
+            {entry.sources.map((source) => (
+              <li>
+                <a href={source.url} target="_blank" rel="noopener noreferrer">{source.title}</a>
+                <span class="frontier-pub"> &middot; {source.publisher} &middot; read {usDate(source.checked)}</span>
+                <blockquote>{source.quote}</blockquote>
+                {source.note && <p class="frontier-note">{source.note}</p>}
+              </li>
+            ))}
+          </ul>
+          {entry.technique && techniqueBySlug(entry.technique) && (
+            <p class="frontier-where">
+              Where it bites:{' '}
+              <a href={url(`/techniques/${entry.technique}/`)}>{techniqueBySlug(entry.technique)!.title}</a>
+            </p>
+          )}
+        </article>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  /* Two columns, not auto-fill: most levels carry four problems, which auto-fill lays out as
+     three and a lonely fourth. Two gives a 2x2 and a comfortable measure for a card this wordy. */
+  .frontier-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px }
+  .frontier-item { border: 1px solid var(--line); border-top: 2px solid var(--c, var(--accent)); border-radius: 8px; background: var(--panel); padding: 20px 22px; min-width: 0 }
+  .frontier-problem { font-size: 14px; line-height: 1.75; color: var(--text); margin: 0 }
+  .frontier-label { font: 600 10px var(--font); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin: 16px 0 8px }
+  .frontier-trying { font-size: 13px; line-height: 1.75; color: var(--muted); margin: 0 }
+  .frontier-sources { list-style: none; margin: 16px 0 0; padding: 14px 0 0; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 12px }
+  .frontier-sources a { font-size: 12px; color: var(--accent) }
+  .frontier-pub { font-size: 10px; color: var(--muted) }
+  .frontier-sources blockquote { margin: 7px 0 0; padding-left: 12px; border-left: 2px solid var(--line); font-size: 11.5px; line-height: 1.7; color: var(--muted) }
+  .frontier-note { font-size: 10px; color: var(--muted); line-height: 1.7; margin: 7px 0 0 }
+  .frontier-where { font-size: 10px; color: var(--muted); margin: 14px 0 0 }
+  .frontier-where a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px }
+  .frontier-where a:hover { color: var(--text) }
+  @media (max-width: 850px) { .frontier-grid { grid-template-columns: 1fr } }
+  @media (max-width: 600px) { .frontier-item { padding: 18px } }
+</style>

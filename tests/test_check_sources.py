@@ -110,6 +110,12 @@ class SourceCollectionTests(unittest.TestCase):
             self.assertTrue(source.url.startswith("http"), source)
             self.assertTrue(source.where, source)
 
+    def test_the_frontier_blocks_sources_are_checked_too(self) -> None:
+        """Every source under content/frontier.json is quoted on a live level page, so it has to
+        be in the set this script watches."""
+        places = {s.where for s in check_sources._json_sources()}
+        self.assertTrue(any(p.startswith("frontier.json ") for p in places), sorted(places)[:5])
+
     def test_a_citation_that_records_an_archive_carries_it(self) -> None:
         """A dead original with an archived copy recorded is handled, not a defect, and the
         checker can only know that if the archive_url travels with the source."""

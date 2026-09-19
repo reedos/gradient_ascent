@@ -101,6 +101,20 @@ def _json_sources() -> list[Source]:
             for entry in landscape.get(key, []):
                 if entry.get("source"):
                     out.append(Source(entry["source"], entry.get("name", ""), f"landscape.json {entry.get('id')}", entry.get("archive_url", "")))
+    # The frontier blocks. These are the site's fastest-rotting citations: a page about what is
+    # unsolved cites work published this year, and a preprint that becomes a conference paper
+    # moves. Every entry's `quote` is what the level page prints, so a drift here is a quotation
+    # on a live page that no longer exists on the page it names.
+    frontier_path = CONTENT / "frontier.json"
+    if frontier_path.exists():
+        frontier = json.loads(frontier_path.read_text(encoding="utf-8"))
+        for level in frontier.get("levels", []):
+            for entry in level.get("open", []):
+                for source in entry.get("sources", []):
+                    if source.get("url"):
+                        out.append(Source(source["url"], source.get("title", ""),
+                                          f"frontier.json level {level.get('order')} {entry.get('id')}", ""))
+
     capability_path = CONTENT / "capability.json"
     if capability_path.exists():
         source = json.loads(capability_path.read_text(encoding="utf-8")).get("source") or {}

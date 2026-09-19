@@ -7,7 +7,9 @@ import Connection from '../../components/Connection.astro';
 import TechniqueRow from '../../components/TechniqueRow.astro';
 import RecipeRow from '../../components/RecipeRow.astro';
 import NameList from '../../components/NameList.astro';
+import Frontier from '../../components/Frontier.astro';
 import Reviewed from '../../components/page/Reviewed.astro';
+import { frontierFor } from '../../lib/frontier';
 import { url } from '../../lib/url';
 import { levels, tracks, taxonomy, namesForLevel, relationsFor, asOf, namesChecked } from '../../lib/content';
 import { recipesForLevel } from '../../lib/worksheet';
@@ -54,6 +56,11 @@ const next = !isTracks && (order as number) < levels.length - 1 ? levels.find((t
 // The recipes whose highest level is exactly this one, from the same helper the worksheet's
 // result view uses, so the two pages cannot disagree about which recipes top out where.
 const levelRecipes = isTracks ? [] : recipesForLevel(order as number);
+
+// The frontier block: what is unsolved at this level, from content/frontier.json. Only the eight
+// levels have one; /levels/tracks/ is a list of topics, not a rung, so nothing is unsolved "at"
+// it in the sense the block means.
+const frontier = isTracks ? undefined : frontierFor(order as number);
 
 // A level page is generated from taxonomy.json, which carries no `reviewed` field for a tier
 // (see .local/page-requests/finish-indexes.md). Rather than invent one, print the OLDEST reviewed
@@ -172,6 +179,8 @@ const mdHref = url(isTracks ? '/levels/tracks.md' : `/levels/${order}.md`);
       <NameList groups={groups} emptyText="No names listed for this level yet." />
     </div>
   </section>
+
+  {frontier && <Frontier level={frontier} color={color} />}
 
   {
     (prev || next) && (
