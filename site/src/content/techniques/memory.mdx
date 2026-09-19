@@ -3,20 +3,20 @@ slug: memory
 level: 2
 run: memory
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Use Claude's chat search and memory to build on previous context"
     url: "https://support.claude.com/en/articles/11817273-use-claude-s-chat-search-and-memory-to-build-on-previous-context"
     publisher: "Anthropic (Claude Help Center)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "mem0ai/mem0"
     url: "https://github.com/mem0ai/mem0"
     publisher: "Mem0 (GitHub README)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Archival memory"
-    url: "https://docs.letta.com/guides/core-concepts/memory/archival-memory"
+    url: "https://docs.letta.com/v1-sdk/memory/archival-memory"
     publisher: "Letta (documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -40,11 +40,11 @@ somewhere and reading them back into a later, otherwise unrelated conversation.
 Two different things get called memory. A summary is a compressed account of what happened, cheap
 to reread, but whatever it leaves out is gone. A record is closer to the raw fact (a purchase on
 a date, a preference stated once) kept on its own and searched later. Letta draws that line in
-its own product: a small "core" memory that stays in the context window, and a larger "archival"
-memory that cannot be pinned there and has to be queried on demand with a search
-tool<Cite n={3}/>. Mem0, which sells memory infrastructure for other people's products rather than
-a chat app, states the record approach outright: memories accumulate, nothing is overwritten, and
-a search returns the relevant ones<Cite n={2}/>.
+its own product: unlike memory blocks, "archival memory fragments cannot be pinned to the context
+window, and must be queried on-demand via tools"<Cite n={3}/>. Mem0, which sells memory
+infrastructure for other people's products rather than a chat app, states the record approach
+outright: memories accumulate, nothing is overwritten, and a search returns the relevant
+ones<Cite n={2}/>.
 
 Memory sits at level 2, context: every write, search and deletion here is your code's, and the
 model only answers with what it was handed. This page is marked draft, not published: it has no
@@ -128,6 +128,11 @@ survive after a conversation ends: a single session never needs it.
 Move to memory once a product needs to answer questions using something a user said in a
 different, earlier conversation, not just the one open right now.
 
+Memory is one of the techniques behind the
+<Link href="/shapes/#help-desk">answer people in conversation, looking things up and taking small
+actions</Link> job shape, wherever a good reply depends on what an earlier conversation already
+said.
+
 </WhenNot>
 
 ## Failure modes
@@ -208,7 +213,7 @@ fact never reaches an answer again.
 
 <TryIt items={[
   { lane: 'use', body: 'Open a chat app\'s memory settings, if it has them, and look at what it says it has stored about you. Delete one entry, then start a new conversation and ask something that entry would have answered. Does the answer still reflect it?' },
-  { lane: 'build', body: 'Run python -m examples.memory --model stub with a question of your own, then edit SAMPLE_FACTS in examples/memory/__main__.py to add a fact that contradicts an existing one. Which one does recall rank higher, and does the answer notice the contradiction?' },
+  { lane: 'build', body: 'Run python -m examples.memory --model stub with a question of your own, then edit SAMPLE_FACTS in examples/memory/__main__.py to add a fact that contradicts an existing one and run it again. The recalled: line shows which one ranks higher, by memory ID; the printed answer is only --model stub\'s placeholder text, not a real judgment, so read tests/test_example_memory.py to see a real, scripted answer built from whichever fact recall ranks first.' },
   { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose using the synthetic facts in examples/memory/__main__.py.' },
 ]} />
 

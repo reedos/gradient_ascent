@@ -3,24 +3,24 @@ slug: knowledge-graphs
 level: 2
 run: knowledge-graphs
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Welcome - GraphRAG"
     url: "https://microsoft.github.io/graphrag/"
     publisher: "Microsoft (GraphRAG documentation)"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Knowledge graph"
     url: "https://neo4j.com/use-cases/knowledge-graph/"
     publisher: "Neo4j"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "LazyGraphRAG: Setting a new standard for quality and cost"
     url: "https://www.microsoft.com/en-us/research/blog/lazygraphrag-setting-a-new-standard-for-quality-and-cost/"
     publisher: "Microsoft Research (blog)"
-    accessed: "2026-09-18"
-  - title: "Enterprise Graph"
-    url: "https://www.glean.com/product/knowledge-graph"
+    accessed: "2026-09-19"
+  - title: "Enterprise Graph: Powering AI with Deep Organizational Knowledge"
+    url: "https://www.glean.com/enterprise-context/enterprise-graph"
     publisher: "Glean"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -42,7 +42,8 @@ between them: nodes, relationships and properties, in Neo4j's description of the
 sells<Cite n={2}/>. "Halvorsen makes the DR-520" becomes two entities joined by a "makes"
 relationship. Enough facts like that and you can follow a chain of them, hop by hop, from one
 document to another, instead of needing one passage to state the whole answer. Each hop is a
-separate, checkable edge; Neo4j calls that capturing evidence provenance<Cite n={2}/>.
+separate, checkable edge: a report quoted on Neo4j's own page credits that structure with
+"capturing evidence provenance"<Cite n={2}/>.
 
 GraphRAG, as Microsoft documents it, builds one automatically: slice the corpus, have a model
 extract the entities, relationships and claims, cluster the result, summarize each
@@ -55,8 +56,8 @@ this site's, and it puts full GraphRAG's indexing at roughly a thousand times pl
 This is one of three pages in the site's
 <Link href="/threads/graph-engineering/">graph engineering thread</Link>: knowledge graphs connect
 information, while <Link href="/techniques/workflow-graphs/">workflow graphs</Link> and
-<Link href="/techniques/agent-graphs/">agent graphs</Link> connect work. They sit at level 2 —
-your code decides to extract, and how to walk what comes back. Marked draft, not published: no
+<Link href="/techniques/agent-graphs/">agent graphs</Link> connect work. They sit at level 2: your
+code decides to extract, and how to walk what comes back. Marked draft, not published: no
 recorded trace, no scored result file, nothing below measured.
 
 ## A run, step by step
@@ -68,7 +69,7 @@ recorded trace, no scored result file, nothing below measured.
 
 Knowledge graphs are usually invisible plumbing, the same way
 <Link href="/techniques/embeddings-search/">embeddings and search</Link> are. Occasionally one is
-named: Glean, a workplace search product, calls the layer under its answers the Enterprise Graph
+named: Glean, an enterprise AI platform, calls the layer under its answers the Enterprise Graph
 and describes it as a knowledge graph of the entities a company works around: projects, people,
 customers and products<Cite n={4}/>. More often nothing says so, and what you can notice instead
 is the shape of an answer. A tool built on retrieval alone tends to answer from one strong match. A tool that can
@@ -90,6 +91,10 @@ once from a document set that keeps changing goes stale the same way a search in
 a stale edge can join two facts that used to be true together and no longer are: a subtler
 failure than a stale passage, because neither fact on its own looks wrong.
 
+Knowledge graphs are one of the techniques behind the
+<Link href="/shapes/#answer-from-documents">answer questions from a body of documents</Link> job
+shape.
+
 </Lane>
 <Lane name="build" title="Build it">
 
@@ -109,6 +114,13 @@ arbitrary question. If a hop is missing (no edge extracted for a part that was n
 example) the code reports no path found rather than guessing, and if a part fits more than one
 model, the walk follows whichever edge was extracted first, which is a real limitation worth
 noticing rather than a subtle bug this page pretends does not exist.
+
+This shape has a second case on the bench. Which document governs the SRB-5030's maximum input
+voltage depends on the revision in hand: the ECN caps revisions A and B at 32 V; the datasheet's
+36 V applies only to revision C. A two-hop graph, serial to revision to governing document, gets
+that right where one passage alone is wrong for two of three revisions. Production test already
+sweeps to the ECN's 32 V; an engineer characterizing a new prototype still has to confirm the
+revision before trusting either number.
 
 <CodeFile file="examples/knowledge_graphs/run.py" func="run" />
 
@@ -214,6 +226,7 @@ number for any of it. Run `python scripts/eval_run.py --example knowledge_graphs
   { lane: 'use', body: 'Ask a deep-research tool a question that needs two different topics joined together, and look at how it shows its sources. Does it show a connected chain of specific facts, or one flat list of links at the end?' },
   { lane: 'build', body: 'Run python -m examples.knowledge_graphs --model stub --question "What warranty class covers the model that HLV-5520 fits?" and read the path it prints. Then ask the same question about HLV-7734, which the parts list itself gives no fitment for, and check that the answer reports no path rather than guessing one. Point --model at a real backend to see what changes when a model, not a transcription, does the extracting.' },
   { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose: edit one of the two source sections in a copy of evals/corpus/ and see whether the graph the example builds still points at the changed fact or the old one.' },
+  { lane: 'either', body: 'Sketch the two-hop graph for the SRB-5030 story above: a board revision to the document that governs its input-voltage limit. Then find a document pair you actually work with, an old manual and the change notice that supersedes part of it, and sketch the same shape for it.' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

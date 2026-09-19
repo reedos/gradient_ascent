@@ -3,21 +3,21 @@ slug: prompt-chaining
 level: 3
 run: prompt-chaining
 lanes: [use, build]
-reviewed: 2026-09-18
+reviewed: 2026-09-19
 sources:
   - title: "Building effective agents"
     url: "https://www.anthropic.com/engineering/building-effective-agents"
     publisher: "Anthropic"
     date: "2024-12-19"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "n8n"
     url: "https://n8n.io"
     publisher: "n8n"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
   - title: "Temporal"
     url: "https://temporal.io"
     publisher: "Temporal"
-    accessed: "2026-09-18"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -95,9 +95,10 @@ step *content*; it never picks the next step.
 The fourth step is the gate. `_check_citations` takes the set of citations the draft actually
 claims and the set of sections retrieval actually found, and keeps only the intersection: a
 citation the model invented, to a section nothing ever retrieved, is silently dropped rather
-than trusted. This is what Anthropic means by adding "programmatic checks... on any intermediate
-steps to ensure that the process is still on track"<Cite n={1}/>: the check does not ask the
-model whether it did well, it tests the output against a fact the code can verify on its own.
+than trusted. This is exactly the gate Anthropic describes: "You can add programmatic checks (see
+'gate' in the diagram below) on any intermediate steps to ensure that the process is still on
+track"<Cite n={1}/>. The check does not ask the model whether it did well; it tests the output
+against a fact the code can verify on its own.
 
 Because each step is an ordinary function that takes plain values and returns plain values, each
 one is testable without the others and without a real model. `_check_citations` takes a draft
@@ -114,6 +115,15 @@ Apache Airflow, Inngest) exist mainly to make that first kind of failure recover
 silent: Temporal's own description is that its workflows "automatically capture state at every
 step, and in the event of failure, can pick up exactly where they left off"<Cite n={3}/>, which
 is a durability guarantee this example's plain function calls do not have.
+
+The same shape shows up turning a requirements list into a test plan: read each requirement (say,
+the SRB-5030's datasheet limits), propose a test for it, build a traceability table linking tests
+to requirements, then check that every requirement has a test and every test names a requirement.
+All four steps stay in this order regardless of the model's answers, the way the walkthrough
+above does, and a person still approves the table before a production test sequence or an
+engineering characterization plan is built from it. Prompt chaining is one of the techniques
+behind the <Link href="/shapes/#plan-and-decompose">turn a goal or a set of requirements into a
+structured plan</Link> job shape.
 
 <CodeFile file="examples/prompt_chaining/run.py" start={20} end={97} expect="LEVEL = 3" />
 
@@ -208,8 +218,9 @@ whether that expectation holds. Run `python scripts/eval_run.py --example prompt
 
 <TryIt items={[
   { lane: 'use', body: 'Find a multi-step automation you already use (an email rule, a form that files a ticket, a scheduled report) and write down its steps in order. Which step, if it silently got something wrong, would nobody downstream catch?' },
-  { lane: 'build', body: 'Run python -m examples.prompt_chaining --model stub with a question of your own from the repo root. Then edit MAX_QUERIES in examples/prompt_chaining/run.py from 3 down to 1 and run the same question again: does the rewrite step still find the correcting document?' },
+  { lane: 'build', body: 'Run python -m examples.prompt_chaining --model stub with a question of your own from the repo root, then edit MAX_QUERIES in examples/prompt_chaining/run.py from 3 down to 1 and run it again. The output will not change: --model stub only ever emits one candidate query. Read tests/test_example_prompt_chaining.py, which scripts three real candidate queries, to see a single one actually miss the correcting document that three find.' },
   { lane: 'either', body: 'Take the gate that never fails, above, and cause it on purpose: find a check in a process you run that has never once rejected anything, and work out whether that is because nothing bad has arrived or because the check cannot see the thing that would be bad.' },
+  { lane: 'either', body: 'Take a short requirements list you actually have and chain it by hand: propose a test for each requirement, build the traceability table, then check that every requirement has a test and every test names a requirement. Where does the chain, not the requirements, turn out to be the hard part?' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
