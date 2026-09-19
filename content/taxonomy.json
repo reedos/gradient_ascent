@@ -770,7 +770,7 @@
       "uses": [
         "order-zero"
       ],
-      "summary": "Five prototype boards, a sweep over line, load and temperature, the margin to every datasheet limit at every corner, the uncertainty budget behind each margin and the guardbanded verdict that follows from it. All of it is arithmetic: a sweep is a loop, a margin is a subtraction, a budget is a root sum of squares. The engineering-test counterpart to limits-without-a-model, and level 0 is the whole recipe."
+      "summary": "Five prototype boards, a sweep over line, load and temperature, the margin to every datasheet limit at every corner, the uncertainty budget behind each margin and the guardbanded verdict that follows from it. All of it is arithmetic: a sweep is a loop, a margin is a subtraction, a budget is a root sum of squares. The engineering-test counterpart to the production limits recipe, and level 0 is the whole recipe."
     },
     {
       "slug": "measurement-writeup",
