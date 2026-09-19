@@ -4,8 +4,207 @@ reviewed: 2026-09-19
 sources: []
 ---
 
-An engineer answering "what is the maximum input voltage of this board" is reading a datasheet, a test specification and whatever change notices came after them. The hard part is not finding the number. It is noticing that two documents give different numbers and that the right one depends on which revision of the board is on the bench.
+import Link from '../../components/page/Link.astro';
+import WhenNot from '../../components/page/WhenNot.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
 
-Draft in progress. This page is a slot: the taxonomy entry, the techniques it composes and the
-level it needs are settled, and the writing is not. See `docs/WRITING-AN-ENGINEERING-RECIPE.md`
-for what belongs here, and `docs/THE-BENCH.md` for the bench every engineering recipe runs on.
+Before an SRB-5030 board goes on the bench, someone has to answer one question: how high can
+the input go. The number lives in the datasheet's Recommended Operating Conditions table,
+section 3: 36.0 V. It also lives in ECN-2608-04, an engineering change notice that lowers it to
+32.0 V for board revisions A and B and leaves 36.0 V standing only for revision C, a board that
+has not shipped yet. The datasheet itself has not been reissued to match. An engineer who opens
+the datasheet, the document everyone reaches for first, and stops at the number in the table
+gets 36.0 V, which is wrong for every revision A or B board actually in the building.
+
+This is what an engineer actually has: not one authoritative datasheet, but a stack of documents
+that update each other. `evals/bench/corpus/` holds the whole stack for the SRB-5030: the
+datasheet, the test specification, four instrument programming manuals, a bill of materials,
+design-review rules, a bring-up notebook, a failure-analysis guide, a calibration procedure, and
+the one change notice, 12 files and 78 numbered sections in total. Answering a question like
+this means finding the right section or sections and saying plainly which board revision the
+answer is for, with something a person can go check. Nothing here decides whether a board
+passes: `limits-without-a-model` is where a measurement meets a limit. This recipe only answers
+what the documents say, which is a question that comes up long before, and quite apart from, any
+single test.
+
+## The lowest level that answers it, and why not higher
+
+Level 0 here is a keyword search over the same 12 documents, ranked by how many of the
+question's words a section shares, with a person reading the results. For the question below,
+a keyword search over all 78 sections puts the datasheet's Recommended Operating Conditions
+section first and both of the change notice's relevant sections second and third, of 78. The
+datasheet section a person reads first even states the problem outright: "The 36.0 V maximum in
+this table is superseded for revision A and revision B boards. See ecn-2608-04.md." A reader who
+reads that sentence, not just the number in the table above it, is most of the way to the right
+answer with no model anywhere.
+
+<WhenNot>Try <Link href="/techniques/order-zero/">order zero</Link> keyword search first if a
+person is going to read the top few hits themselves. It already ranks the datasheet's
+Recommended Operating Conditions section and the change notice inside the top three of 78
+sections for the question this page walks through.</WhenNot>
+
+So the case for level 2 here is not that retrieval is hard: it plainly is not. It is that a
+person chasing one footnote at a time does not scale to a shop asking dozens of these questions
+a day, and a narrower lookup, "find the max input voltage in the datasheet," can return the
+datasheet's number and never reach the footnote at all. <Link
+href="/techniques/rag/">RAG</Link>, retrieving broadly across the whole corpus rather than one
+document, and <Link href="/techniques/structured-output/">structured output</Link>, requiring
+the reply to name which revision it is for and rejecting a citation list that drops the notice
+once the notice was retrieved, do that chasing in code every time, instead of depending on
+whoever happens to be reading that day.
+
+Climbing to <Link href="/techniques/agentic-rag/">agentic RAG</Link> (level 5), where the model
+runs a second search depending on what the first one found, buys nothing extra here, which is
+worth saying because the general shape of this problem, documents disagreeing about a number
+that depends on a revision, usually is a reason to climb a level. It is not, in this specific
+case, because the two conflicting numbers use enough of the same words, "maximum," "input
+voltage," the revision letters, that one embedding search over the corpus returns both the
+datasheet section and the notice: 1st and 6th of the top 8 sections retrieved for the walkthrough
+below. No second, dependent search is needed to find the conflict; what a second search would
+add here is nothing a single, wide one does not already have.
+
+## The walkthrough
+
+No example on this site has called a live model yet (`docs/EVALS.md`), so nothing below is a
+recorded trace: it is worked by hand from the same code and the same stub the tests exercise,
+and is labeled illustrated because it is one.
+
+The question: "What is the maximum input voltage of the SRB-5030, revision B, per its
+recommended operating conditions?" `run()` loads all 78 sections of `evals/bench/corpus/`,
+embeds the question and every section, and keeps the top 8 by cosine similarity. Two of those
+eight are the ones that matter: `ecn-2608-04#1` ("Change," the notice itself, ranked 1st of 8)
+and `srb5030-datasheet#3` ("Recommended Operating Conditions," ranked 6th of 8). The other six
+share some vocabulary but not the conflict: a calibration procedure, two instrument manuals, and
+two more sections of the datasheet and the notice. All eight go into one prompt, with a JSON
+schema requiring an `answer`, an `applies_to_revision`, and a `citations` list.
+
+A correctly scoped reply looks like this:
+
+```
+{
+  "answer": "The maximum input voltage is 32.0 V, not the datasheet's 36.0 V.",
+  "applies_to_revision": "A and B",
+  "citations": ["ecn-2608-04#1", "srb5030-datasheet#3"]
+}
+```
+
+Code checks three things before this is handed back as the answer: every citation was actually
+one of the eight retrieved sections, `applies_to_revision` is not blank, and, because
+`srb5030-datasheet#3` is cited, `ecn-2608-04#1` is cited too, since the notice was retrieved and
+does supersede that section. A reply missing any of those gets one retry with the specific
+problem appended to the prompt; a reply still wrong after that comes back labeled unvalidated
+rather than returned as an answer.
+
+## The code
+
+The whole pipeline, retrieval through validation:
+
+<CodeFile file="examples/bench_ask_the_datasheet/run.py" func="run" />
+
+The check that makes the difference between this and plain RAG runs after every reply:
+
+<CodeFile file="examples/bench_ask_the_datasheet/run.py" func="_validate" />
+
+Every step above is `decided_by: "code"`. Retrieval, the prompt, the schema, and the retry count
+are all fixed before the model ever runs; the model composes the `answer` text and picks which
+of the eight retrieved sections to name, and nothing it says chooses what code does next.
+
+## What it costs
+
+One question through this example, scripted with the correctly scoped reply above, costs one
+model call: 1,977 tokens in (the eight retrieved sections plus the schema and the question,
+counted by `count_tokens`) and 45 tokens out. A reply that fails validation costs a second call
+at roughly the same size, since the retry only appends the validation error, a few dozen more
+tokens. Level 0 costs nothing: a keyword search runs in milliseconds over already-loaded text,
+with no call to anything.
+
+An engineer does not ask this once per board. They ask it when a fixture is set up for a
+revision, when someone new joins the line, or when a question like it comes up in a design
+review. A shift where it gets asked twenty times over is on the order of 40,000 tokens in and
+900 out, small next to what re-embedding all 78 sections on every single question already
+costs: this example does that on every call, and caching the corpus's embeddings, which do not
+change between questions, is the obvious next optimization and is not done here.
+
+<CostStrip
+  stats={[
+    { label: 'Model calls, one question', value: '1 (2 if the reply fails validation)' },
+    { label: 'Tokens in', value: '~1,980' },
+    { label: 'Tokens out', value: '~45' },
+    { label: 'Sections retrieved', value: '8 of 78' },
+  ]}
+  comparedTo={{
+    label: 'level 0, keyword search',
+    note: 'No model call and no tokens: BM25 over the same 78 sections, with a person reading the result instead of a schema checking it.',
+  }}
+  level={2}
+/>
+
+## How it fails on this bench
+
+<FailureModes modes={[
+  {
+    name: 'A number read off the datasheet, the notice unmentioned',
+    notice: "The answer states 36.0 V for a revision A or B board and cites only the datasheet, naming no notice and no other document, even though the datasheet's own sentence next to the number says the figure has been superseded.",
+    test: 'Script a reply that cites the Recommended Operating Conditions section without the change notice and confirm it is rejected whenever the notice was itself among the retrieved sections, rather than accepted because the citation it does have is real.',
+  },
+  {
+    name: 'A search narrow enough to miss the notice entirely',
+    notice: 'The answer is confident and the citation list names only the datasheet, because retrieval asked for the top two or three sections rather than a wider set, and the notice never reached the candidates code could even check.',
+    test: 'Retrieve the top two sections for a phrasing close to the datasheet’s own wording and confirm the notice is not among them while the datasheet section is. Retrieval has to be wide enough, eight of 78 sections here, before the citation check has anything to check against.',
+  },
+  {
+    name: 'A number with no revision attached',
+    notice: 'The answer gives 32.0 V or 36.0 V with nothing saying which board revision it holds for: correct for one revision, silently wrong for the other, with nothing on the page to tell them apart.',
+    test: 'Script a reply with applies_to_revision left blank and confirm it is rejected and retried rather than returned as the answer.',
+  },
+]} />
+
+## How to evaluate it
+
+<HowToEval>
+
+This example is not one of the ones `evals/questions.json` and `scripts/eval_run.py` score (see
+`docs/EVALS.md`): that set is graded against `evals/corpus/`, the Halvorsen appliance documents,
+and this recipe answers questions about a different corpus with a different, revision-sensitive
+answer shape. A bench-specific eval would need its own small golden set, a dozen questions to
+start, over `evals/bench/corpus/`, each with a known right value, a known right
+`applies_to_revision`, and the exact citations a right answer has to include.
+
+A right answer here is not just the correct number. It is the correct number, the correct
+revision, and, wherever a retrieved change notice supersedes what another retrieved passage
+says, a citation to that notice. Grading stays code, the way it is everywhere else on this
+site: compare the parsed value and revision against the golden answer, and compare the citation
+set against a `must_cite` list, the same citation hit rate <Link
+href="/recipes/document-qa/">document Q&A</Link>'s eval section already tracks. The asymmetry
+worth watching is not accuracy overall, it is a reply that gets the number right and stays
+silent on the revision: that is the one shape of wrong answer this recipe exists to catch, and a
+golden set with no revision-sensitive question in it would never measure it.
+
+</HowToEval>
+
+## How to adapt it
+
+What ports: chunk by a corpus's own numbered sections rather than writing a splitter, retrieve
+broadly enough that a conflicting document is actually in the candidate set before code can
+check for it, and require a reply to name what a value applies to rather than accepting a bare
+number. `SUPERSEDED_BY` in `_validate` is the specific move worth keeping: whenever a newer,
+retrieved document supersedes something an older one says, a reply citing the older one without
+the newer one does not validate.
+
+What does not: the corpus loader's assumption that every document is Markdown with numbered `##
+N. Title` headings (a real datasheet is usually a PDF, with tables that need their own parser),
+the `SUPERSEDED_BY` map itself, which is hand knowledge about this one bench and not something
+code discovered on its own, and every number here: the SRB-5030's name, its 36.0 V and 32.0 V
+figures, ECN-2608-04's own number. A reader's own documents carry their own supersession
+history, to read and hand-encode the same way, or to replace this one small dictionary with a
+general mechanism, which this example does not attempt.
+
+The same shape shows up anywhere a newer document quietly changes what an older one says without
+the older one being reissued: an amendment against a contract, an errata sheet against a
+standard, a policy update against a handbook, one instrument's calibration procedure revised
+without its programming manual catching up. The reasoning carries over even where nothing is
+electronics: retrieve widely enough to see both documents in one pass, and never let an answer
+name a value without saying which version of the document it came from.
