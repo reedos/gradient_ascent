@@ -59,8 +59,9 @@ answers like sentiment analysis (positive, negative, neutral)", and points to mo
 on a rating scale for qualities like tone and coherence instead<Cite n={1}/>; a page that reports
 one number with no mention of which kind was used has left out something that changes how much to
 trust it. Second, was any of the grading checked by a person? OpenAI's own documentation on
-graders says "writing grader prompts is an iterative process," and warns that "models being
-trained sometimes learn to exploit weaknesses in model graders, also known as 'grader hacking'".
+graders says "Writing grader prompts is an iterative process", and under a heading it calls
+Grader hacking says that "Models being trained sometimes learn to exploit weaknesses in model
+graders", naming the behavior both "grader hacking" and "reward hacking".
 The detection it describes is to run both kinds and compare: a model that has hacked the grader
 "will score highly on model grader evals but score poorly on expert human evaluations"<Cite
 n={2}/>. A number nobody has checked by hand carries that risk with no way to tell from the

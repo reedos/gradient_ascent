@@ -604,6 +604,50 @@
       ],
       "summary": "Two uses of graphs that are often confused: graphs that connect information, and graphs that connect work.",
       "status": "draft"
+    },
+    {
+      "id": "who-approves-what",
+      "title": "Who approves what",
+      "line": "A person never leaves; what they hold changes from the answer, to the action, to the rules the actions run under.",
+      "pages": [
+        "delegating",
+        "human-in-the-loop",
+        "function-calling",
+        "agent-harness",
+        "agent-teammates",
+        "trust"
+      ],
+      "summary": "The same question asked at every level: which part of this does a person still decide? The answer moves from reading each result to setting the limits a run happens inside.",
+      "status": "draft"
+    },
+    {
+      "id": "checking-the-work",
+      "title": "Checking the work",
+      "line": "Every level has a way to be wrong that the level below could not be, and a check that costs less than the mistake.",
+      "pages": [
+        "structured-output",
+        "evaluator-optimizer",
+        "debate-review",
+        "evals",
+        "observability"
+      ],
+      "summary": "How you tell whether it worked, from a person reading one answer to a scored set and a recorded trace. The check changes shape at every level; the question does not.",
+      "status": "draft"
+    },
+    {
+      "id": "what-the-model-sees",
+      "title": "What the model sees",
+      "line": "A model knows what it was trained on and what is in this request; everything else is a choice somebody made.",
+      "pages": [
+        "prompt-engineering",
+        "context-engineering",
+        "rag",
+        "memory",
+        "skills",
+        "long-horizon"
+      ],
+      "summary": "One question followed across the site: what is in front of the model this turn, and who decided to put it there. The answers run from a written instruction to a note a session leaves for the next one.",
+      "status": "draft"
     }
   ],
   "recipes": [

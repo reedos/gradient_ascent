@@ -1,0 +1,71 @@
+---
+id: what-the-model-sees
+reviewed: 2026-09-19
+sources: []
+---
+
+import Link from '../../components/page/Link.astro';
+
+A model knows two things: what it was trained on, and what is in the request in front of it.
+Everything else a system appears to know, the document, the policy, the conversation from last
+week, the procedure for this particular task, got there because something put it there. Most of
+what the levels add is another answer to the question of what goes in, who chooses it, and when.
+
+These six pages are that question followed from a written instruction to a note one session
+leaves for the next. They are also the pages people most often confuse with each other, because
+from the outside all six look like "the model remembered something".
+
+## Six answers to one question
+
+| Level | Page | What goes in | Who chooses it, and when |
+|---|---|---|---|
+| 1 | <Link href="/techniques/prompt-engineering/">Prompt engineering</Link> | the instruction itself, written to get a consistent result | you, once, before any run |
+| 2 | <Link href="/techniques/context-engineering/">Context engineering</Link> | the whole request: which instructions, which examples, which documents, how much of the conversation | your code, on every call |
+| 2 | <Link href="/techniques/rag/">RAG</Link> | passages found by searching your documents for this question | a retrieval step your code runs before the call |
+| 2 | <Link href="/techniques/memory/">Memory</Link> | facts written down in an earlier conversation and read back into a later one | your code, by writing on the way out and reading on the way in |
+| 5 | <Link href="/techniques/skills/">Skills</Link> | a procedure kept on the shelf until it is needed | the agent, which loads a skill's body when the task triggers it |
+| 7 | <Link href="/techniques/long-horizon/">Long-running tasks</Link> | a written record a fresh session reads, because no session sees the one before it | the running agent, which takes notes for whoever runs next |
+
+## The distinctions worth keeping straight
+
+**Retrieval fetches facts; a skill supplies a procedure.** Both put text in front of the model
+that was not there a moment ago, and that is where the similarity ends. Skills' own page draws the
+line against RAG in exactly those terms, and describes the loading as progressive disclosure: a
+skill's name and description are in context from the start, its instructions load when it is
+triggered, and anything else it bundles costs nothing until it is read.
+
+**A summary and a record are both called memory and behave differently.** The memory page
+separates them: a summary is a compressed account, cheap to reread, and whatever it left out is
+gone; a record keeps the fact itself to be searched later. A product that "remembers you" is doing
+one or the other, and which one decides what it will be unable to tell you next year.
+
+**More is not free.** Context engineering's page carries two costs that are easy to miss. Order
+affects price, because a matching prefix can be cached and billed at a lower rate, which is why
+the advice is to put what never changes first and what changes every call last. And length
+affects quality on its own: the research that page cites across eighteen models reports that
+models do not use their context uniformly and grow less reliable as the input grows, even on
+simple tasks. A page that treats a big context window as a reason to stop choosing has not read
+the second half of that.
+
+**At level 7 the model is writing the context, for itself.** A long-running task runs across
+separate sessions with separate context windows, so nothing carries over except what was written
+down. That page describes structured note-taking, notes persisted outside the context window, as
+what a new session starts from, and it is the only case in this thread where the thing choosing
+what goes in is the model rather than your code.
+
+## How to use this thread
+
+Work down the table and stop at the first row that answers your question. A system that needs one
+document in the prompt does not need retrieval. A system that needs the same procedure in every
+run does not need a skill, it needs the instruction. A system whose sessions never outlive a
+conversation does not need memory, and one whose work never outlives a session does not need
+notes on disk.
+
+Climbing this thread has a distinctive cost: each row adds something that can be stale. A
+retrieved passage can be from a superseded document. A remembered fact can have been true once. A
+skill can describe a procedure that has changed. A note from last night's session can describe a
+system that has since been restarted. None of those is a wrong answer by the model, and all of
+them look like one.
+
+This page introduces no claim of its own. Every mechanism above is described on one of the six
+pages it links, each with its own primary sources.
