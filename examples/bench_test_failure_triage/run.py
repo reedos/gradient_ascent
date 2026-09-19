@@ -5,7 +5,7 @@ fails again" (`evals/bench/corpus/failure-analysis-guide.md` section 1). Everyth
 that default, or leaves it alone; nothing here decides pass or fail, which the test executive
 already did before this file ever runs.
 
-Two causes never need the model. Grouping today's VOUT failures by fixture finds a stale
+Two causes never need the model. Grouping the run's VOUT failures by fixture finds a stale
 calibration offset (guide section 7); the same grouping by lot would find a bad reel of output
 capacitors for RIPPLE failures (section 4). Both are a count and a share, computed in
 `_group_signature` before any note is read, the same argument `limits-without-a-model` makes for
@@ -123,7 +123,7 @@ def load_failures(measurement: str, *, production_csv: Path = PRODUCTION_CSV) ->
 
 
 def _group_signature(failures: list[FailureRow], row: FailureRow, *, min_count: int = 3, min_share: float = 0.5) -> str:
-    """Level 0: does this row's fixture, or its lot, already account for most of today's
+    """Level 0: does this row's fixture, or its lot, already account for most of the run's
     failures on this measurement? A `GROUP BY` and a count, nothing else -- see
     `evals/bench/corpus/failure-analysis-guide.md` section 7 (fixture) and section 4 (lot), and
     `docs/THE-BENCH.md`'s Story 1 and Story 2 for the numbers this threshold is checked against.
@@ -221,7 +221,7 @@ def run(
     production_csv: Path = PRODUCTION_CSV,
 ) -> Disposition:
     failures = load_failures(measurement, production_csv=production_csv)
-    tracer.record(kind="code", decided_by="code", title=f"Load today's {measurement} failures", detail=f"{len(failures)} rows")
+    tracer.record(kind="code", decided_by="code", title=f"Load the run's {measurement} failures", detail=f"{len(failures)} rows")
 
     row = next((f for f in failures if f.serial == serial), None)
     if row is None:

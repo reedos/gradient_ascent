@@ -42,11 +42,11 @@ exactly that kind of wording.
 
 Most of the job is level 0 and never reaches a model. Which unit failed, and on which limit, is a
 column read out of `evals/bench/data/production-run-2026-08.csv`: 200 units, eight steps each,
-already scored PASS or FAIL by the test executive. The routing table in the guide's section 1 is a
-lookup by step number, no judgment involved. And grouping the day's VOUT failures by fixture, or
-by lot, is a count and a share: `_group_signature` finds that FIX-03 carries six of the month's
-eight VOUT failures, which is `limits-without-a-model`'s whole argument playing out inside one
-recipe rather than across it.
+1,586 rows, already scored PASS or FAIL by the test executive. The routing table in the guide's
+section 1 is a lookup by step number, no judgment involved. And grouping the run's VOUT failures
+by fixture, or by lot, is a count and a share: `_group_signature` finds that FIX-03 carries six of
+the run's eight VOUT failures, which is `limits-without-a-model`'s whole argument playing out
+inside one recipe rather than across it.
 
 <CodeFile file="examples/bench_test_failure_triage/run.py" func="_group_signature" />
 
@@ -63,8 +63,8 @@ one is not claimed as one. Two units from `evals/bench/data/production-run-2026-
 whole argument.
 
 **SRB5030-2608-0011** failed VOUT at 4.9497 V against a 4.9500 V lower limit, on FIX-03, with the
-note "low again on fix3, thats 3 today." Grouping today's VOUT failures finds FIX-03 behind six of
-the eight, so `_group_signature` already returns `"fixture"` before the note is read. The note
+note "low again on fix3, thats 3 today." Grouping the run's VOUT failures finds FIX-03 behind six
+of the eight, so `_group_signature` already returns `"fixture"` before the note is read. The note
 agrees, and the route comes out `hold_check_fixture`: check the calibration record, not the board.
 
 **SRB5030-2608-0063** also failed VOUT, on the same fixture, with the note "dead. no vout at all,
@@ -108,11 +108,11 @@ The whole thing is a checkpoint, never a disposition on its own:
   comparedTo={{
     label: 'classifying every row instead of only the failures',
     note:
-      'load_failures filters 200 rows to 8 before any note is read, and two of those eight carry no note and never reach the model either. Skipping that filter and asking the model about every row would spend roughly 244 tokens times 200, about 48,800 tokens a run, to answer the same 6 questions this recipe answers for about 1,570 (244 plus 18 tokens, six times).',
+      'load_failures filters the file’s 1,586 rows to 8 before any note is read, and two of those eight carry no note and never reach the model either. Skipping that filter and asking the model about every row would spend roughly 262 tokens in and out per row across 1,586 rows, about 416,000 tokens a run, to answer the same 6 questions this recipe answers for about 1,570.',
   }}
 />
 
-The 192 units that passed VOUT cost nothing here; they never reach this code at all. For a
+The 190 units that passed VOUT cost nothing here; they never reach this code at all. For a
 level-0 recipe like <Link href="/recipes/limits-without-a-model/">limits-without-a-model</Link>
 that grouping is the whole page; here it is one line among several, because the two failures with
 no note also cost nothing, and the two group-flagged failures whose notes agree with the group

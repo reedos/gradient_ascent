@@ -22,6 +22,7 @@ if str(ROOT) not in sys.path:
 from evals.bench import PRODUCTION_CSV  # noqa: E402
 from examples.bench_test_failure_triage.run import (  # noqa: E402
     LEVEL,
+    SAMPLE_INPUT,
     FailureRow,
     _group_signature,
     _route,
@@ -229,6 +230,15 @@ class BenchFileConsistencyTests(unittest.TestCase):
 
     def test_production_csv_exists(self) -> None:
         self.assertTrue(PRODUCTION_CSV.exists())
+
+    def test_the_recorder_sample_is_a_serial_that_really_failed(self) -> None:
+        """`scripts/record_trace.py` runs this example with `SAMPLE_INPUT` when it is given no
+        `--question`, and `run` refuses a serial that did not fail. So the sample has to be a real
+        failing serial in the production log, not a plausible-looking one."""
+        self.assertEqual(SAMPLE_INPUT, DEAD_ON_OFFSET_FIXTURE_SERIAL)
+        self.assertIn(SAMPLE_INPUT, {f.serial for f in load_failures("VOUT")})
+        disposition = run(SAMPLE_INPUT, _cause_model("dead_board", "u1 not switching"), _tracer())
+        self.assertEqual(disposition.route, "failure_analysis")
 
     def test_the_named_serials_still_carry_the_notes_the_tests_assume(self) -> None:
         failures = load_failures("VOUT")
