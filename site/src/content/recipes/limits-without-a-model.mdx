@@ -48,8 +48,8 @@ Nothing here talks to an instrument. The four instruments that produced this log
 `production-run-2026-08.csv`; this recipe starts after that, reading the file the way
 `evals.bench.PRODUCTION_CSV` names it.
 
-Row 8 of the log is unit `SRB5030-2608-0001`'s RIPPLE step: 22.7 mV against an upper limit of
-50.0 mV. `within_limits(22.7, None, 50.0)` compares once and passes. Further down, unit
+The first unit in the log, `SRB5030-2608-0001`, has a RIPPLE row of 22.7 mV against an upper limit
+of 50.0 mV. `within_limits(22.7, None, 50.0)` compares once and passes. Further down, unit
 `SRB5030-2608-0008`'s RIPPLE row reads 52.2 mV against the same 50.0 mV limit and fails by 2.2 mV,
 with an operator's note that reads "ripple 52mv": the note repeats the number, it does not add
 anything the row didn't already say.
@@ -63,14 +63,15 @@ Grouping every RIPPLE reading by lot finds the first story in the data:
 | L2608C | 47 | 21.50 | 1.36 | 6.97 |
 | L2608D | 48 | 21.67 | 3.54 | 2.67 |
 
-Lot L2608B's ripple mean is more than double the other three lots', and its Cpk of 0.50 says the
-process is not capable of holding the 50 mV limit, against 2.67 or higher everywhere else. Grouped
+Ripple has one limit, so Cpk here is the one-sided form against the upper limit,
+`(50.0 - mean) / (3 * sd)`. Lot L2608B's ripple mean is more than double the other three lots',
+and its Cpk of 0.50 says the process is not capable of holding the 50 mV limit, against 2.67 or
+higher everywhere else. Grouped
 by lot, first-pass yield tells almost none of this: 96.2 percent, 90.4 percent, 89.6 percent and
 91.7 percent for the four lots in order, and L2608B is not even the worst of the four. A mean that
 doubles and a Cpk that drops from 2.82 to 0.50 is a different lot of parts; a yield that moves by a
-few points is what an ordinary process already does from lot to lot. This is the argument for
-charting the measurement instead of counting failures: the ripple numbers say plainly what the
-yield numbers all but hide.
+few points is what an ordinary process already does from lot to lot. That is the argument for
+charting the measurement rather than counting the failures.
 
 A Shewhart individuals chart over the same 198 RIPPLE readings, in the order the log recorded
 them, makes the same point without being told which lot is which. Its center line is the overall
@@ -79,10 +80,13 @@ next (the moving range), not from the 50 mV spec limit and not from the sample s
 center 27.37 mV, upper control limit 42.11 mV, lower control limit 12.62 mV. Thirty-eight of the
 198 readings fall outside those limits, and thirty-six of the thirty-eight are L2608B units: the
 chart finds the same lot the grouped table did, from run order alone, before anyone thinks to
-group by anything.
+group by anything. The other two are the boards with no output at all, 0.0 mV and 0.4 mV, under
+the lower control limit for a reason that has nothing to do with ripple. A chart says a reading
+does not belong with the others, and never says why.
 
 Grouping VOUT by fixture (two boards with no output at all set aside first; more on that below)
-finds a second, unrelated story:
+finds a second, unrelated story. VOUT is bounded on both sides, 4.9500 V to 5.0500 V, so its Cpk
+is the two-sided form, the smaller of the two one-sided numbers:
 
 | Fixture | n | Mean (V) | Cpk |
 | --- | --- | --- | --- |
@@ -91,10 +95,14 @@ finds a second, unrelated story:
 | FIX-03 | 49 | 4.9640 | 0.44 |
 | FIX-04 | 50 | 4.9906 | 1.09 |
 
-FIX-03 reads about 27 mV low and nowhere else does; its LINE_REG, LOAD_REG and EFF_FL means, which
-are differences of two readings rather than one absolute reading, do not move, because a fixed
-offset in the measurement path cancels in a difference. That is a stale calibration constant on
-one fixture, not a board problem, and grouping by fixture is what tells the two apart.
+FIX-03's mean sits about 27 mV below the other three, and nowhere else does it move: its LINE_REG,
+LOAD_REG and EFF_FL means, which are differences of two readings rather than one absolute reading,
+do not, because a fixed offset in the measurement path cancels in a difference. That is a stale
+calibration constant on one fixture, not a board problem, and grouping by fixture is what tells
+the two apart. Confirming it takes one reading of the same node through a path that does not go
+through that channel, which is where
+<Link href="/recipes/bring-up-debug-assistant/">working one of those boards at the bench</Link>
+picks the story up and measures the offset itself at 30 mV.
 
 Grouping either measurement by day or by shift finds nothing worth following up. RIPPLE's four
 daily means span 1.55 mV and its two shift means span 2.01 mV, against the 23.2 mV the lot
@@ -142,7 +150,7 @@ decide anything. Run it yourself:
   ]}
   comparedTo={{
     label: "test-failure-triage",
-    note: "The recipe just above this one on the engineering list classifies a cause from an operator's note once per failing unit. This same run has 16 failing units: 16 calls that this recipe's limit check and grouping never make, because there is nothing here for a model to read.",
+    note: "The recipe that classifies a cause from an operator's note spends a model call on every failing unit. This same run has 16 failing units: 16 calls that this recipe's limit check and grouping never make, because there is nothing here for a model to read.",
   }}
 />
 
@@ -203,7 +211,7 @@ reader at it as if it did.
 ## How to adapt it
 
 Every number in the two tables above, the 50 mV ripple limit, the four lots and fixtures, the
-28 mV fixture offset, is this bench's own and specific to `docs/THE-BENCH.md`. A real line has its
+fixture offset itself, is this bench's own and specific to `docs/THE-BENCH.md`. A real line has its
 own test specification, its own lots and fixtures (or panels, reels or work orders, whichever your
 line actually calls them), and its own answer for which limits are one-sided and which are two.
 Read the real limits from the real spec the same way `load_readings` reads them from the log's own

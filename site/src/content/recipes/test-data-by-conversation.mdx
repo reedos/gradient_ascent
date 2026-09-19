@@ -108,7 +108,7 @@ container.
 Two model calls per question, the same shape as one tool call anywhere on this site: one to write
 the snippet, one to turn the result into a sentence. Nothing on this site has called a live model,
 so this is an estimate, worked in the open with the same deterministic token counter the stub runs
-use: the retest question above runs 505 input tokens and 145 output tokens across its two calls,
+use: the retest question above runs 505 input tokens and 155 output tokens across its two calls,
 counting the system prompt describing both tables, the snippet, the sandbox's JSON result, and the
 final sentence. A question whose result echoes more rows costs more on the second call and nothing
 more on the first; a real model's own tokenizer will not match this count exactly, but the shape,
@@ -122,7 +122,11 @@ an ad hoc question costs a person with a spreadsheet and a filter box.
 
 A retest export merged on a column named for volts and filled with millivolts is the whole first
 story above, and what catches it is the range check, in code, before any snippet runs, not a model
-noticing the numbers look large. A snippet that runs clean and computes the wrong thing (averaging
+noticing the numbers look large. That check is blunt on purpose and it can be wrong in one
+direction: a column that really is volts with a single mistyped row in it would be scaled by a
+thousand along with the bad row, and every value would still be inside the ceiling afterward. That
+is why the correction is written into the trace on every run instead of being applied quietly, and
+why the sentence that says what code changed belongs next to the answer. A snippet that runs clean and computes the wrong thing (averaging
 `value_v` before the correction, say, or comparing case temperature in the wrong direction) is not
 caught by the sandbox at all; it is caught by a person reading the code next to the number, which is
 why the code is on the page and not just the answer. The pass or fail decision on any of these
