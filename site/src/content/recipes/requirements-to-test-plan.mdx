@@ -4,8 +4,185 @@ reviewed: 2026-09-19
 sources: []
 ---
 
-Turning a requirements list into a test plan is four known steps in a known order, ending in a traceability table that has to close both ways: every requirement covered by a test, every test tracing to a requirement. A person approves the plan before it is adopted, because a test plan is a commitment about what will and will not be caught.
+import Link from '../../components/page/Link.astro';
+import CodeFile from '../../components/page/CodeFile.astro';
+import FailureModes from '../../components/page/FailureModes.astro';
+import CostStrip from '../../components/page/CostStrip.astro';
+import HowToEval from '../../components/page/HowToEval.astro';
 
-Draft in progress. This page is a slot: the taxonomy entry, the techniques it composes and the
-level it needs are settled, and the writing is not. See `docs/WRITING-AN-ENGINEERING-RECIPE.md`
-for what belongs here, and `docs/THE-BENCH.md` for the bench every engineering recipe runs on.
+Orbeck's SRB-5030 datasheet states eight numbers a production board has to meet: an input
+voltage range, an output voltage window, two regulation percentages, a ripple ceiling, a no-load
+current draw, a switching frequency band and a current limit. Before a board ships, each of those
+numbers needs a step in the production test spec that actually measures it, on the right
+instrument, against the right limit. Drop one and a board can ship with a real requirement nobody
+tests for. Copy a number a later engineering change notice has since overridden and a good board
+can fail a test against a limit that is no longer the real one, or the test can quietly stop
+catching what it was written to catch. This recipe reads the datasheet's requirements, drafts one
+test per requirement, and builds a table proving every requirement traces to a test and every
+test traces back to a requirement, before a person signs off on the plan.
+
+## Level 3, and why not higher
+
+Two of the four steps are level 0. Building the traceability table is a `zip` of two equal-length
+lists. Checking it is four comparisons per row: does a proposal exist, does it name the right
+requirement, is its instrument one of the four this bench has, does it carry a limit and a unit.
+`check_coverage` never calls a model and never treats what a model wrote as anything but a string
+or a number to compare. The one step that needs a model is turning a requirement's free text
+("output stays within plus or minus two percent over line, load and temperature") into a
+structured proposal naming an instrument, a measurement and a limit with its unit, the same
+paraphrase into a fixed shape <Link href="/techniques/structured-output/">structured
+output</Link>'s own page walks through.
+
+A model could also be handed the whole eight-row datasheet table at once and asked to draft the
+whole plan in one call. That would still be level 3: the same fixed steps run in the same order
+regardless of what comes back. What actually changes at level 3 is asking once per requirement,
+<Link href="/techniques/prompt-chaining/">prompt chaining</Link>'s own shape, so one requirement's
+mangled reply drops only that row instead of risking the whole table, and so the trace shows
+which specific call a bad proposal came from.
+
+Nothing here needs level 4 or level 5. Level 4 would let the model decide whether to look something
+up before answering, but every run reads the same two documents for the same board, so there is
+nothing to decide. Level 5 would let one proposal's content change what happens next, but it does
+not: even a proposal that copies a superseded limit does not change the chain's next step, only
+what the coverage check reports about that row once every proposal is already in. The order is
+fixed by code before the first model call; the coverage check is code after the last one; the
+model only ever drafts what sits between them, and a person, not the check and not the model,
+is who decides whether the plan is adopted.
+
+## The run on the bench, stepped
+
+Illustrated, not measured: no recorded trace exists for this example yet (see
+`docs/EVALS.md`), so the run below is `run()` called with a scripted stand-in for the model's
+replies, the same eight requirements and stand-in `tests/test_example_bench_requirements_to_test_plan.py`
+checks against.
+
+Reading the requirements for a revision B board pulls eight rows from
+`srb5030-datasheet.md` sections 3 and 4, and flags one of them: REQ-VIN's 36.0 V ceiling is
+superseded to 32.0 V by `ecn-2608-04#1` for revisions A and B. The model is then asked about each
+requirement in turn, eight separate calls. Five proposals land clean: REQ-VOUT to the MDN-6100 at
+4.900 to 5.100 V, REQ-LINEREG and REQ-LOADREG to the MDN-6100 at 0.30% and 0.80%, REQ-RIPPLE to
+the TRN-1102 (not the MDN-6100, whose AC volts function stops at 300 kHz, well under what a
+500 kHz switcher's ripple needs) at 50.0 mV, and REQ-IQNL to the MDN-4010 at 25.0 mA. Three do
+not:
+
+| Requirement | Proposal | Coverage check |
+| --- | --- | --- |
+| REQ-VIN | MDN-4010, upper 36.0 V | fails: 36.0 V is `srb5030-datasheet#3`'s figure; `ecn-2608-04#1` supersedes it to 32.0 V |
+| REQ-FSW | (declined) | fails: no test was proposed for this requirement |
+| REQ-ILIM | TRN-2500, 3.70 to 5.00 A | fails: names an instrument this bench does not have (the load here is a TRN-2400) |
+
+`check_coverage` returns three problems, one per row above, and `run` returns a `Blocked` result
+rather than a checkpoint: there is nothing yet for a person to approve. Once REQ-FSW gets a
+proposal, REQ-ILIM's instrument is corrected to TRN-2400, and REQ-VIN's upper limit is corrected
+to 32.0 V, the same eight calls clear the check and `run` returns a `PendingApproval` holding all
+eight rows. A person reads it and calls `resume(pending, "approve", tracer)`; only then is the
+plan adopted, as `Answer.text`, a plain comma-separated table with every source cited.
+
+## The code
+
+<CodeFile file="examples/bench_requirements_to_test_plan/run.py" func="run" />
+
+`check_coverage` is the part that decides pass or fail:
+
+<CodeFile file="examples/bench_requirements_to_test_plan/run.py" func="check_coverage" />
+
+## What it costs
+
+<CostStrip
+  stats={[
+    { label: 'Model calls per revision', value: '8' },
+    { label: 'Tokens in', value: '1,584' },
+    { label: 'Tokens out', value: '283' },
+    { label: 'Coverage check cost', value: '$0, no model' },
+  ]}
+  level={3}
+/>
+
+Eight calls, one per requirement, for one board revision's plan: no branching, so a ninth or
+tenth requirement adds one more call and nothing else. The 1,584 tokens in and 283 out above are
+`tracer.tokens_in_total()` and `tracer.tokens_out_total()` from a scripted stub run of all eight
+requirements for revision B, counted the same way `scripts/eval_run.py --dry` projects a ceiling:
+real, not billed against any paid backend. Building the traceability table and checking it costs
+nothing measured in tokens: both are loops over eight rows, the same level-0 arithmetic
+`limits-without-a-model` argues most of test automation already is.
+
+Compare that against the cost of the mistake the check exists to catch. A stale 36.0 V limit that
+ships on a revision B line either fails a good board on a rail the ECN says is actually fine at
+that voltage, or, worse, a test built from it never exercises the fixture near the 32.0 V ceiling
+that is the board's real one, on input capacitors the datasheet's own absolute maximum table
+allows all the way to 40.0 V before anything is actually damaged.
+
+## How it fails on a real bench, specifically
+
+<FailureModes modes={[
+  {
+    name: 'A requirement the model never answers',
+    notice: 'The traceability table has a row with no proposed test at all, easy to miss by eye in a table of dozens of rows.',
+    test: 'check_coverage reports the requirement by id when its row has no proposal; test_coverage_catches_a_requirement_silently_dropped plants exactly that (REQ-FSW, which the eight-step production spec never tests either) and checks the report names it.',
+  },
+  {
+    name: 'A test naming an instrument this bench does not have',
+    notice: 'The plan reads fine until someone tries to run a TRN-2500’s command set against a fixture that has a TRN-2400, and there is no TRN-2500 on the bench or in any manual.',
+    test: 'check_coverage compares every proposed instrument against the four this bench actually has; test_coverage_catches_an_instrument_not_on_this_bench plants TRN-2500 for REQ-ILIM and checks the report names it.',
+  },
+  {
+    name: 'A limit copied from a datasheet number an ECN superseded',
+    notice: 'The plan looks complete and the test even runs; it checks a rail against 36.0 V on a board a later notice has capped at 32.0 V for the revisions actually in the field.',
+    test: '_stale_limit compares a proposal’s upper limit against both the datasheet’s own figure and Requirement.effective_upper(); one test plants the stale figure on a revision B board and checks it is caught, another plants the identical figure on a revision C board, where it is correct, and checks it is not.',
+  },
+  {
+    name: 'A test that answers a different requirement than the one it was asked about',
+    notice: 'Two rows end up pointing at the same test and one requirement is left with none, the kind of copy and paste error a hand built spreadsheet makes too.',
+    test: 'check_coverage compares the requirement id the proposal itself states against the requirement it was actually asked about; test_coverage_catches_a_test_that_names_the_wrong_requirement constructs exactly that mismatch and checks it is caught.',
+  },
+]} />
+
+One thing the check as written does not catch: an instrument that exists on this bench but is
+the wrong one for the measurement, the MDN-6100 proposed for REQ-RIPPLE instead of the TRN-1102.
+`check_coverage` only checks that a named instrument is one of the four here, not that it is the
+right one for what it is measuring; catching that needs a second, requirement-specific rule (a
+ripple test that does not name the scope fails, specifically), which this recipe leaves for a
+reader to add once real proposals show whether the model needs it.
+
+## How to evaluate it
+
+<HowToEval>
+
+There is no right or wrong answer to grade here the way a question over a document set has one.
+`check_coverage`'s verdict is already a pass or fail, and a test proves what it catches, so what
+is worth measuring is how often the model's proposals need it: collect the plan for every
+requirement across a handful of real board revisions (ten to twenty requirements is enough to
+start seeing a pattern) and track two counts separately, since the cost of getting each wrong is
+different. False drops, a real requirement that gets no usable proposal, are the more expensive
+kind: a missing test is a missing test until somebody notices. False instruments and stale limits
+are the kind `check_coverage` catches for free, so what is worth watching there is whether the
+model converges on the same mistake repeatedly (always sending ripple to the meter, say) once a
+pattern like that shows up, since a repeated mistake is worth fixing in the prompt or the schema
+rather than re-catching in every plan. No result file exists for this example yet (see
+`docs/EVALS.md`), so none of this is claimed as a score, only as what to start counting.
+
+</HowToEval>
+
+## How to adapt it to your own bench
+
+Every instrument on this bench is one `send(command: str) -> str` method, the shape PyVISA's
+`write` and `query` pair covers, so the code that drafts a proposal, builds the table and checks
+it does not change; only the transport under `send` does. That is a pointer to follow, not a
+tested fact: nothing in this recipe has been run against real hardware.
+
+What does not port is everything specific to this board: the SRB-5030's eight requirements, its
+`REQUIREMENTS` tuple, `BENCH_INSTRUMENTS`'s four names, and the ECN that supersedes one of them.
+Your own datasheet has its own list, your own test spec has its own gaps, and if a later notice
+has overridden one of your own numbers, that notice, not this page, is the one to check the
+proposed limit against.
+
+The shape carries further than electronics. Anywhere a written list of requirements needs a
+matching, provably complete set of checks before anyone signs off, the same four steps apply: a
+project brief turned into tasks with an owner and a due date for each line, an incident report
+turned into a runbook step for each contributing cause, a compliance document checked clause by
+clause against whatever satisfies it. What moves between domains is the content of the check;
+what stays fixed is reading the requirements, drafting one check per requirement, building the
+table, and verifying coverage in code before a person, not the model, signs off.
+
+{/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
+    the page. Do not repeat it here. */}
