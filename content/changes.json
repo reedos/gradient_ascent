@@ -4,6 +4,27 @@
   "note": "What changed on this site, and why it matters to somebody reading it. Newest first. Entries are written for a reader, not for whoever made the change: they say what is different and what it is good for, never what a commit did. Every entry links the pages it touched. Several entries can share a date; within a date, file order is the order shown. docs/CHANGES.md says how to add one.",
   "changes": [
     {
+      "id": "the-standing-office-jobs",
+      "date": "2026-09-19",
+      "title": "The two jobs a small office actually runs on",
+      "what": "Two recipes, worked end to end. The first assembles a weekly status report out of a project tracker, a shared inbox and a spreadsheet: code pulls the sources and computes every count, date and total, one model call writes the prose between the figures, and two checks read the draft afterward, one for a number nobody computed and one for a figure the draft left out. The second keeps a tracker document current from the same three sources, which is a different job: a report is read once, a document has to still be true next week, so the work is deciding what is new, what conflicts and what to leave alone, and holding anything that overwrites a person's own words for that person to approve.",
+      "why": "Somebody asked for a worked example of exactly this and the site only had the pieces it is made of. Both pages settle each half of the job on its own level and say plainly how much of the work needs no model at all, which is most of it. The tracker page is built around the failure that quietly ruins a shared document: a source that goes silent looks exactly like a week in which nothing changed.",
+      "pages": [
+        {
+          "label": "Weekly status report",
+          "path": "/recipes/weekly-status-report/"
+        },
+        {
+          "label": "Keep a tracker current",
+          "path": "/recipes/project-tracker-upkeep/"
+        },
+        {
+          "label": "Job shapes",
+          "path": "/shapes/"
+        }
+      ]
+    },
+    {
       "id": "two-shapes-joined",
       "date": "2026-09-19",
       "title": "A recipe that is honestly two job shapes joined",

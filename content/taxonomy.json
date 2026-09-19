@@ -912,7 +912,33 @@
         "ops",
         "evals"
       ],
-      "summary": "The one recipe on this site that is honestly two job shapes joined. A standing weekly watch over a fixed list of sources works out in code which records are new, which is arithmetic and calls no model: level 0. Each new record then gets one call that turns its title and abstract into three sentences, with the citation attached by code from the source record and never written by the model: level 1. Neither half needs more, so the joined job settles at level 1, below where a watch usually lands. Deciding what to look for next, or following a reference to the next paper, would be level 5 research, and this is not that."
+      "summary": "The site's first worked join of two job shapes, and still the simplest one. A standing weekly watch over a fixed list of sources works out in code which records are new, which is arithmetic and calls no model: level 0. Each new record then gets one call that turns its title and abstract into three sentences, with the citation attached by code from the source record and never written by the model: level 1. Neither half needs more, so the joined job settles at level 1, below where a watch usually lands. Deciding what to look for next, or following a reference to the next paper, would be level 5 research, and this is not that."
+    },
+    {
+      "slug": "weekly-status-report",
+      "title": "Assemble a weekly status report from several systems",
+      "status": "draft",
+      "domain": "general",
+      "uses": [
+        "order-zero",
+        "prompt-engineering",
+        "ops",
+        "evals"
+      ],
+      "summary": "The standing Friday report a small office runs on, pulled from a project tracker, a shared inbox and a spreadsheet. The assembly is level 0 and it is most of the job: pull three sources, reconcile the names they spell differently, and compute every count, date and total the report may quote. The writing is one call, level 1, handed those figures and nothing it could compute a number from. Two checks in code then read the draft in opposite directions, one for a number the model invented and one for a figure it left out, and a person reads it before it goes out."
+    },
+    {
+      "slug": "project-tracker-upkeep",
+      "title": "Keep a tracker document current from several sources",
+      "status": "draft",
+      "domain": "general",
+      "uses": [
+        "order-zero",
+        "structured-output",
+        "human-in-the-loop",
+        "ops"
+      ],
+      "summary": "The other half of the same office's week, and a different job from writing a report: a report is read once, a tracker has to still be true next week. Code compares every field against the source that owns it and leaves most of the document alone. A model reads the shared inbox, one call per message, and proposes changes it can quote; none of them writes, because a fact read out of a sentence is a claim and not a record. A person approves anything that overwrites a field a person wrote, which is what makes the joined job level 3. The failure it is built around is absence: a source that goes quiet reads as nothing changed and quietly ages the whole document, so silence is detected and reported rather than assumed."
     },
     {
       "slug": "limits-without-a-model",

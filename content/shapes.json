@@ -21,7 +21,9 @@
         "household-paperwork",
         "invoice-matching",
         "limits-without-a-model",
-        "characterize-a-design"
+        "characterize-a-design",
+        "weekly-status-report",
+        "project-tracker-upkeep"
       ],
       "teardowns": [],
       "elsewhere": [
@@ -32,6 +34,7 @@
         "Find scheduling conflicts in a calendar",
         "Reorder stock when a count falls below a minimum",
         "Convert units or currencies",
+        "Roll a week of work up into the counts, dates and totals a status report quotes",
         "Check a bill of materials for end-of-life parts against a supplier list"
       ]
     },
@@ -55,7 +58,8 @@
       "recipes": [
         "meeting-notes",
         "measurement-writeup",
-        "literature-watch"
+        "literature-watch",
+        "weekly-status-report"
       ],
       "teardowns": [],
       "elsewhere": [
@@ -91,7 +95,8 @@
         "voice-notes",
         "maintenance-log",
         "invoice-matching",
-        "accuracy-specs-from-the-manual"
+        "accuracy-specs-from-the-manual",
+        "project-tracker-upkeep"
       ],
       "teardowns": [],
       "elsewhere": [
@@ -323,7 +328,9 @@
       ],
       "recipes": [
         "nightly-monitor",
-        "literature-watch"
+        "literature-watch",
+        "weekly-status-report",
+        "project-tracker-upkeep"
       ],
       "teardowns": [],
       "elsewhere": [
@@ -332,6 +339,7 @@
         "Calibration due dates across a bench of instruments",
         "Releases of the libraries you depend on",
         "Competitor pricing pages",
+        "A shared document that has to stay true: a project tracker, a roster, a risk register",
         "New papers in a field",
         "A supplier's errata for a chip you have designed in"
       ]
