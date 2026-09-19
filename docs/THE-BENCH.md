@@ -178,14 +178,24 @@ limit (above the 3.0 A rating, below the 4.5 A the inductor saturates at) and a 
 The MDN-4010 will happily do 40 V and 10 A. The envelope is about what is safe for the board in
 the fixture.
 
+The two commands in the third class go through the same gate in front of two instruments:
+`GuardedSupply.output_on` for `OUTP ON`, `GuardedLoad.input_on` for `INP 1`. Each takes an
+`Approval` naming the two numbers a person would say out loud before reaching for the switch. For
+the supply those are its voltage set point and its current limit; for the load they are the rail
+the board is already running at and the current the load is about to pull out of it. Enabling the
+load is the command that actually puts current through the board, and the envelope's 4.5 A load
+ceiling sits above the board's 3.0 A rating so the overcurrent step can find the real limit, so
+code by itself cannot tell a deliberate limit hunt from a set point nobody meant. That is the
+whole reason a person names the number.
+
 It refuses, and `tests/test_bench.py` proves each one:
 
 - a negative voltage or current
 - `float("nan")` and `float("inf")`, and the strings `"nan"`, `"inf"` and `"1e400"`
 - a value that is not a number at all, including `None`, a list and a boolean
 - a set point over the ceiling by any margin: 32.001 V is refused, with no tolerance band
-- an output enable with no approval
-- an approval that names a different set point than the supply is actually at
+- an output enable or a load input enable with no approval
+- an approval that names a different set point than the bench is actually at
 - an approval that has already been used once
 - `OUTP ON` sent as a command string, which cannot carry an approval
 - any message that sets two things at once (`VOLT 24;CURR 1`)

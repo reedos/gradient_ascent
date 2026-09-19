@@ -628,7 +628,9 @@ class TestFullSequence(unittest.TestCase):
         supply.set_current_limit(4.0)
         supply.output_on(Approval("R. Osaki", 24.0, 4.0, reason="TS-5030 step 3"))
         load.set_current(1.0)
-        load.input_on()
+        # A second approval, for the second command that energizes the board: 1.000 A out of a
+        # board that is already at 24.0 V in.
+        load.input_on(Approval("R. Osaki", 24.0, 1.0, reason="TS-5030 step 3"))
         reading = float(bench.dmm.send("MEAS:VOLT:DC? 10"))
         self.assertGreaterEqual(reading, 4.9500)
         self.assertLessEqual(reading, 5.0500)
@@ -643,6 +645,73 @@ class TestFullSequence(unittest.TestCase):
         with self.assertRaises(SafetyRefusal):
             load.set_current(5.0)
         self.assertEqual(bench.load.send("CURR?"), "0.0000A")
+
+
+class TestGuardedLoadEnable(unittest.TestCase):
+    """`INP 1` is the second command `docs/THE-BENCH.md` classes as energizing a board, and it is
+    gated the same way `OUTP ON` is: an `Approval` naming the rail the board is at and the current
+    the load is about to pull, good for one use."""
+
+    def setUp(self) -> None:
+        self.bench = Bench()
+        self.supply = GuardedSupply(self.bench)
+        self.load = GuardedLoad(self.bench)
+        self.supply.set_voltage(24.0)
+        self.supply.set_current_limit(4.0)
+        self.supply.output_on(Approval("R. Osaki", 24.0, 4.0, reason="bring-up"))
+        self.load.set_current(1.0)
+
+    def approval(self, volts: float = 24.0, amps: float = 1.0) -> Approval:
+        return Approval("R. Osaki", volts, amps, reason="production test step 3")
+
+    def test_the_normal_path(self) -> None:
+        self.load.input_on(self.approval())
+        self.assertEqual(self.bench.load.send("INP?"), "1")
+        self.assertAlmostEqual(self.bench.wiring.load_current_a, 1.0)
+
+    def test_a_load_enable_with_no_approval(self) -> None:
+        for bad in (None, "approved", True, object()):
+            with self.assertRaises(SafetyRefusal, msg=repr(bad)):
+                self.load.input_on(bad)
+        self.assertEqual(self.bench.load.send("INP?"), "0")
+        self.assertEqual(self.bench.wiring.load_current_a, 0.0)
+
+    def test_an_approval_must_name_the_current_the_load_is_actually_set_to(self) -> None:
+        with self.assertRaises(SafetyRefusal):
+            self.load.input_on(self.approval(amps=3.0))
+        self.assertEqual(self.bench.load.send("INP?"), "0")
+
+    def test_an_approval_must_name_the_rail_the_board_is_actually_at(self) -> None:
+        with self.assertRaises(SafetyRefusal):
+            self.load.input_on(self.approval(volts=12.0))
+        self.assertEqual(self.bench.load.send("INP?"), "0")
+
+    def test_an_approval_is_good_once(self) -> None:
+        approval = self.approval()
+        self.load.input_on(approval)
+        self.load.input_off()
+        with self.assertRaises(SafetyRefusal):
+            self.load.input_on(approval)
+        self.assertEqual(self.bench.load.send("INP?"), "0")
+
+    def test_the_supplys_own_approval_cannot_enable_the_load(self) -> None:
+        """The supply came up at 24.0 V with a 4.0 A limit; the load is set to 1.0 A. An approval
+        written for one enable does not fit the other, which is the point of naming the numbers."""
+        with self.assertRaises(SafetyRefusal):
+            self.load.input_on(Approval("R. Osaki", 24.0, 4.0, reason="bring-up"))
+
+    def test_a_set_point_over_the_envelope_is_refused_even_with_a_matching_approval(self) -> None:
+        """An approval is permission to energize at a set point, not permission to exceed one."""
+        self.bench.load.send("CURR 5.0000")  # around GuardedLoad, the way a stray script would
+        with self.assertRaises(SafetyRefusal):
+            self.load.input_on(self.approval(amps=5.0))
+        self.assertEqual(self.bench.load.send("INP?"), "0")
+
+    def test_a_non_cc_mode_is_refused_because_the_envelope_cannot_check_it(self) -> None:
+        self.bench.load.send("MODE CR")
+        with self.assertRaises(SafetyRefusal):
+            self.load.input_on(self.approval())
+        self.assertEqual(self.bench.load.send("INP?"), "0")
 
 
 def power_up(bench: Bench, *, volts: float, amps: float) -> None:

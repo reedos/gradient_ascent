@@ -22,13 +22,15 @@ Three pieces:
    Wiring is explicit: `Bench` connects the supply to the DUT input and the load to the DUT
    output, and every measurement is computed from the DUT model through that wiring.
 
-3. `SafetyEnvelope`, `Approval` and `GuardedSupply` -- the code-side limits. The model never
-   drives an instrument directly in any example on this site: it proposes a command, code checks
-   it against the envelope, a person approves the output enable, and only then does the
-   (simulated) instrument act. The envelope refuses negative and non-finite values, values over
-   its ceiling by any margin at all, an output enable with no approval, an approval that does not
-   match the set point it is being used for, a reused approval, and any message that tries to set
-   two things at once.
+3. `SafetyEnvelope`, `Approval`, `GuardedSupply` and `GuardedLoad` -- the code-side limits. The
+   model never drives an instrument directly in any example on this site: it proposes a command,
+   code checks it against the envelope, a person approves the enable, and only then does the
+   (simulated) instrument act. Both commands that energize a board go through the same gate:
+   `OUTP ON` on the supply through `GuardedSupply.output_on`, `INP 1` on the load through
+   `GuardedLoad.input_on`. The envelope refuses negative and non-finite values, values over its
+   ceiling by any margin at all, an enable with no approval, an approval that does not match the
+   set point it is being used for, a reused approval, and any message that tries to set two
+   things at once.
 
 Standard library only, deterministic, no network. `tests/test_bench.py` is the contract.
 """
@@ -1053,9 +1055,16 @@ class SafetyEnvelope:
 class Approval:
     """A person's approval to energize the board at one named set point, good for one enable.
 
-    It names the voltage and the current limit it was granted for. Code re-checks the supply's
-    actual set point against those numbers at the moment of the enable, so an approval obtained
-    for 12 V cannot energize a board at 32 V, and an approval already spent cannot be replayed.
+    It names the two numbers that describe the set point being approved, and code re-checks the
+    bench's actual state against them at the moment of the enable, so an approval obtained for
+    12 V cannot energize a board at 32 V and an approval already spent cannot be replayed.
+
+    Which two numbers depends on which enable it is for, and both are what a person would say out
+    loud before reaching for the switch:
+
+    - `GuardedSupply.output_on`: the supply's voltage set point and its current limit.
+    - `GuardedLoad.input_on`: the rail the board is already running at, and the current the load
+      is about to pull out of it.
     """
 
     approver: str
@@ -1069,6 +1078,27 @@ class Approval:
             abs(self.voltage_v - voltage_v) <= 1e-9
             and abs(self.current_limit_a - current_limit_a) <= 1e-9
         )
+
+
+def _check_approval(
+    approval: object, voltage_v: float, current_a: float, *, enable: str, state: str
+) -> Approval:
+    """The three refusals both energize commands share, in one place rather than two.
+
+    No approval at all, an approval already spent, and an approval that names a set point the
+    bench is not actually at. It checks and returns; spending the approval is the caller's, after
+    its own envelope re-checks, so an enable the envelope refuses does not burn a person's
+    approval on the way out.
+    """
+    if not isinstance(approval, Approval):
+        raise SafetyRefusal(f"{enable} needs an Approval; none was given")
+    if approval.used:
+        raise SafetyRefusal(f"approval from {approval.approver} has already been used")
+    if not approval.matches(voltage_v, current_a):
+        raise SafetyRefusal(
+            f"approval is for {approval.voltage_v} V / {approval.current_limit_a} A; {state}"
+        )
+    return approval
 
 
 class GuardedSupply:
@@ -1106,20 +1136,21 @@ class GuardedSupply:
         return checked
 
     def output_on(self, approval: object) -> None:
-        if not isinstance(approval, Approval):
-            raise SafetyRefusal("output enable needs an Approval; none was given")
-        if approval.used:
-            raise SafetyRefusal(f"approval from {approval.approver} has already been used")
         supply = self.bench.supply
-        if not approval.matches(supply.voltage_setpoint_v, supply.current_limit_a):
-            raise SafetyRefusal(
-                f"approval is for {approval.voltage_v} V / {approval.current_limit_a} A; "
-                f"the supply is set to {supply.voltage_setpoint_v} V / {supply.current_limit_a} A"
-            )
+        checked = _check_approval(
+            approval,
+            supply.voltage_setpoint_v,
+            supply.current_limit_a,
+            enable="output enable",
+            state=(
+                f"the supply is set to {supply.voltage_setpoint_v} V / "
+                f"{supply.current_limit_a} A"
+            ),
+        )
         # Re-check the set points themselves: an approval is permission, not an override.
         self.envelope.check_voltage(supply.voltage_setpoint_v)
         self.envelope.check_current_limit(supply.current_limit_a)
-        approval.used = True
+        checked.used = True
         supply.send("OUTP ON")
         self._require_no_error()
         self.log.append("OUTP ON")
@@ -1175,7 +1206,16 @@ class GuardedSupply:
 
 
 class GuardedLoad:
-    """The electronic load, with the same envelope in front of its current set point.
+    """The electronic load, with the same envelope in front of its current set point and the same
+    approval in front of its input enable.
+
+    `INP 1` is the second of the two commands `docs/THE-BENCH.md` classes as energizing a board,
+    and it is gated exactly the way `GuardedSupply.output_on` gates `OUTP ON`. The reason is not
+    symmetry for its own sake. Enabling a load is the command that actually puts current through
+    the board: the TRN-2400 will sink 30 A, this board is rated for 3.0 A, and the envelope's own
+    4.5 A ceiling is set above the rating so an overcurrent test can find the real limit, which
+    means code alone cannot tell a deliberate 4.2 A limit hunt from a set point nobody meant. A
+    person names the rail and the current, and code checks the bench is actually at them.
 
     Note `INP 1` rather than `INP ON`: the TRN-2400 does not accept the word, and its manual says
     so. This class is where that difference is absorbed, once, instead of in every example.
@@ -1184,21 +1224,59 @@ class GuardedLoad:
     def __init__(self, bench: Bench, envelope: SafetyEnvelope | None = None) -> None:
         self.bench = bench
         self.envelope = envelope if envelope is not None else SafetyEnvelope()
+        self.log: list[str] = []
 
     def set_current(self, amps: object) -> float:
         checked = self.envelope.check_load_current(amps)
         self.bench.load.send("MODE CC")
         self.bench.load.send(f"CURR {checked:.4f}")
+        self._require_no_error()
+        self.log.append(f"CURR {checked:.4f}")
         self.bench.refresh()
         return checked
 
-    def input_on(self) -> None:
-        self.bench.load.send("INP 1")
+    def input_on(self, approval: object) -> None:
+        """Enable the input, at the current set point, on a board at the rail it is already at.
+
+        The approval names both numbers. The load's own set point is re-checked against the
+        envelope here as well: an approval is permission to energize at a set point, never
+        permission to exceed one.
+        """
+        load = self.bench.load
+        if load.mode != "CC":
+            # The envelope knows how to check an amp value. In CR or CV mode the current the load
+            # will pull is a consequence of the board, not a number anybody set, so there is
+            # nothing here to check it against and this refuses rather than guess.
+            raise SafetyRefusal(
+                f"the load is in {load.mode} mode; this gate only checks a constant-current "
+                f"set point"
+            )
+        rail_v = float(self.bench.wiring.input_voltage_v)
+        setpoint_a = load.current_setpoint_a
+        checked = _check_approval(
+            approval,
+            rail_v,
+            setpoint_a,
+            enable="the load input enable",
+            state=f"the board is at {rail_v} V and the load is set to {setpoint_a} A",
+        )
+        self.envelope.check_load_current(setpoint_a)
+        checked.used = True
+        load.send("INP 1")
+        self._require_no_error()
+        self.log.append("INP 1")
         self.bench.refresh()
 
     def input_off(self) -> None:
         self.bench.load.send("INP 0")
+        self.log.append("INP 0")
         self.bench.refresh()
+
+    def _require_no_error(self) -> None:
+        """A checked value the instrument still rejected means the two disagree. Stop."""
+        error = self.bench.load.send("SYST:ERR?")
+        if error != NO_ERROR:
+            raise SafetyRefusal(f"the load rejected a checked command: {error}")
 
 
 __all__ = [
