@@ -29,14 +29,6 @@ import {
 import TimelineStrip from './TimelineStrip.astro';
 import '../styles/timeline.css';
 
-interface Props {
-  /** The id of the heading that introduces the full list below this chart -- wired as
-   *  aria-describedby on the chart itself, per the task's "the list below serves as its text
-   *  alternative" requirement. */
-  listHeadingId: string;
-}
-const { listHeadingId } = Astro.props;
-
 const axis = buildMainAxis();
 const series = levelSeriesTopDown();
 const stubIndexById = new Map(axis.stubMilestones.map((m, i) => [m.id, i]));
@@ -162,7 +154,19 @@ function markClass(p: LanePoint): string {
   <p class="tl-chart-scale-note">
     To scale from {Math.floor(axis.startYear)} onward. {axis.stubMilestones.length > 0 && `Before that, level 0's early history is compressed and not to scale.`}
   </p>
-  <div class="tl-chart" tabindex="0" role="img" aria-describedby={listHeadingId} aria-label={`A chart of ${lanes.length} levels from ${Math.floor(axis.startYear)} to ${asOf}, each level as a horizontal lane with its dated milestones. The full list below has the same milestones as text.`}>
+  {/* One image, and now true to it. `role="img"` tells assistive technology to treat this as a
+      single graphic and not to walk inside, which is the right call for 96 data points that are
+      all repeated as text below. It used to contain 451 tab stops -- every dot was `tabindex="0"`
+      and every tooltip held four links -- so a keyboard user crossed 451 silent stops inside
+      something they had been told was one picture (audit-a11y, wave 6). The dots are no longer
+      focusable and the tooltip links are out of the tab order, so the chart is one stop and the
+      full list below is where everyone, mouse or keyboard or screen reader, gets the detail and
+      the links. `tabindex="0"` stays on the chart itself: it scrolls sideways, and a scrollable
+      region has to be reachable by keyboard.
+
+      No `aria-describedby`: it used to point at the list's sort-order note, which describes how
+      the list is ordered rather than what this chart is. The label below says what it is. */}
+  <div class="tl-chart" tabindex="0" role="img" aria-label={`A chart of ${lanes.length} levels from ${Math.floor(axis.startYear)} to ${asOf}, each level as a horizontal lane with its dated milestones. Every milestone is listed as text below, with its sources and links.`}>
     <div class="tl-body">
       <div class="tl-labels">
         <div class="tl-years-spacer" />
@@ -200,7 +204,6 @@ function markClass(p: LanePoint): string {
               >
                 <span
                   class="tl-dot"
-                  tabindex="0"
                   // A short accessible NAME, not the full description: `what` and the unverified
                   // reason already ship right here as visible text in .tl-tip (shown on hover AND
                   // on :focus-within, so a keyboard user reaches it the moment this dot is
@@ -229,11 +232,14 @@ function markClass(p: LanePoint): string {
                   <span class="tl-tip-maker">{p.milestone.maker}</span>
                   <span class="tl-tip-kind">{KIND_LABEL[p.milestone.kind]}</span>
                   <span class="tl-tip-what">{p.milestone.what}</span>
+                  {/* A mouse affordance. Every one of these links is on the milestone's own
+                      entry in the list below, so taking them out of the tab order costs a
+                      keyboard user nothing and saves them 450 stops. */}
                   <span class="tl-tip-links">
-                    <a href={p.milestone.source.url} target="_blank" rel="noopener noreferrer">{p.milestone.source.publisher} &#8599;</a>
-                    {p.tech && <a href={p.tech.href}>{p.tech.title} &rarr;</a>}
-                    {p.registry && <a href={url('/names/')}>{p.registry.name} in the registry &rarr;</a>}
-                    <a href={`#${p.milestone.id}`}>Full entry in the list below &darr;</a>
+                    <a href={p.milestone.source.url} target="_blank" rel="noopener noreferrer" tabindex="-1">{p.milestone.source.publisher} &#8599;</a>
+                    {p.tech && <a href={p.tech.href} tabindex="-1">{p.tech.title} &rarr;</a>}
+                    {p.registry && <a href={url('/names/')} tabindex="-1">{p.registry.name} in the registry &rarr;</a>}
+                    <a href={`#${p.milestone.id}`} tabindex="-1">Full entry in the list below &darr;</a>
                   </span>
                   {p.unverifiedReason && <span class="tl-tip-unverified">Not verified: {p.unverifiedReason}</span>}
                 </span>

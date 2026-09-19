@@ -193,7 +193,11 @@ const headingText = headline ? climbHeadlineText(headline) : 'What the timeline 
 {
   shiftRows.length > 0 && (
     <div class="tls-shifts">
-      <h3>Two changes in the models themselves</h3>
+      {/* A heading under the home page's own section heading (SectionTop renders an h2), so h3 is
+          the right level there. In the compact variant there is no section heading above it and
+          an h3 straight after the page's h1 is a skipped level, so it is a plain label instead;
+          /timeline/ carries the same two shifts under a real heading of its own further down. */}
+      {variant === 'home' ? <h3>Two changes in the models themselves</h3> : <p class="tls-shifts-label">Two changes in the models themselves</p>}
       <ul>
         {shiftRows.map((x) => (
           <li>

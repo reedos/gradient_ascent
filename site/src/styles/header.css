@@ -86,7 +86,7 @@
 .header-actions { display: flex; align-items: center; gap: 10px; flex: 0 0 auto }
 .nav-search {
   display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 10px 0 11px;
-  border: 1px solid var(--line); border-radius: 8px; font-size: 12.5px; color: var(--muted); transition: color .15s, border-color .15s;
+  border: 1px solid var(--line-control); border-radius: 8px; font-size: 12.5px; color: var(--muted); transition: color .15s, border-color .15s;
 }
 .nav-search:hover, .nav-search[aria-current="page"] { color: var(--text); border-color: color-mix(in srgb, var(--line) 40%, var(--muted)) }
 .nav-search kbd { font: 500 10.5px var(--font); color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; margin-left: 8px }
@@ -95,7 +95,7 @@
   font-size: 12.5px; font-weight: 600; color: var(--on-accent); background: var(--accent); transition: filter .15s;
 }
 .nav-cta:hover { filter: brightness(1.1) }
-.nav-burger { display: none; align-items: center; gap: 9px; height: 34px; padding: 0 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 12.5px; color: var(--text) }
+.nav-burger { display: none; align-items: center; gap: 9px; height: 34px; padding: 0 12px; border: 1px solid var(--line-control); border-radius: 8px; font-size: 12.5px; color: var(--text) }
 .nav-burger-bars { position: relative; width: 14px; height: 8px; display: block }
 .nav-burger-bars i { position: absolute; left: 0; right: 0; height: 1.5px; background: currentColor; border-radius: 2px; transition: transform .2s, top .2s }
 .nav-burger-bars i:first-child { top: 0 }
@@ -120,7 +120,7 @@
 .nav-sheet-group li a small { font-size: 12px; color: var(--muted) }
 .nav-sheet-group li a[aria-current="page"] > span { color: var(--accent) }
 .nav-sheet-levels { display: grid; grid-template-columns: 1fr 1fr; gap: 6px }
-.nav-sheet-levels a { display: flex; align-items: baseline; gap: 9px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 13.5px; background: var(--panel) }
+.nav-sheet-levels a { display: flex; align-items: baseline; gap: 9px; padding: 11px 12px; border: 1px solid var(--line-control); border-radius: 8px; font-size: 13.5px; background: var(--panel) }
 .nav-sheet-levels a[aria-current="true"] { border-color: var(--c); background: var(--panel2) }
 html.nav-sheet-open { overflow: hidden }
 /* The sheet takes focus when it opens so a screen reader starts reading at the top of it

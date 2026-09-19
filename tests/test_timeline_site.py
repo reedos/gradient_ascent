@@ -191,15 +191,29 @@ class TimelinePageTests(unittest.TestCase):
 
     # -- accessibility wiring -----------------------------------------------------------------------
 
-    def test_chart_is_described_by_the_list_heading(self) -> None:
-        # Timeline.astro's chart carries aria-describedby pointing at the full list's heading id.
-        m = re.search(r'aria-describedby="([^"]+)"', self.html_raw)
-        self.assertIsNotNone(m, "no aria-describedby found on the timeline page")
-        described_by = m.group(1)
-        self.assertIn(f'id="{described_by}"', self.html_raw, "aria-describedby target id does not exist on the page")
+    def test_the_chart_names_itself_and_says_where_the_text_version_is(self) -> None:
+        """`role="img"` makes the chart one graphic to assistive technology, so its accessible
+        name is the whole of what a screen-reader user gets from it. It has to say that the
+        milestones are listed as text below, because that is where they have to go for them."""
+        m = re.search(r'<div class="tl-chart"[^>]*aria-label="([^"]+)"', self.html_raw)
+        self.assertIsNotNone(m, "the chart has no accessible name")
+        label = m.group(1)
+        self.assertIn("listed as text below", label, f"the chart's name does not point at the list: {label!r}")
 
-    def test_dots_are_keyboard_focusable(self) -> None:
-        self.assertIn('tabindex="0"', self.html_raw)
+    def test_the_chart_holds_no_tab_stops_of_its_own(self) -> None:
+        """An audit (wave 6) found `role="img"` wrapped around 451 focusable descendants: 96
+        focusable dots and their tooltip links. ARIA seals a `role="img"` subtree, so a keyboard
+        user crossed 451 stops that no screen reader announced. The dots are not focusable now
+        and the tooltip links are out of the tab order; every one of those links is on the
+        milestone's own entry in the list below. The chart itself stays focusable because it
+        scrolls sideways.
+        """
+        start = self.html_raw.index('<div class="tl-chart"')
+        end = self.html_raw.index('id="timeline-list-heading"') if 'id="timeline-list-heading"' in self.html_raw else len(self.html_raw)
+        chart = self.html_raw[start:end]
+        # One stop: the scrollable chart container itself.
+        self.assertEqual(chart.count('tabindex="0"'), 1, "something inside the chart is focusable again")
+        self.assertNotIn('<a href', chart.split('tl-tip-links')[0][200:], "a link crept back into the chart's own markup")
 
 
 class TimelineHomeStripTests(unittest.TestCase):

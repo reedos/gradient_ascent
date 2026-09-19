@@ -19,6 +19,14 @@
   --panel: #121622;
   --panel2: #181d2c;
   --line: #293047;
+  /* The edge of something you can operate: a button, a filter, a text field, a pager link.
+     WCAG 1.4.11 asks 3:1 of a UI component's boundary. `--line` is 1.29:1 on the lightest panel,
+     which is right for a hairline that only separates and wrong for an edge that tells you where
+     a control is. This clears 3:1 on all three grounds (3.48 on --bg, 3.28 on --panel, 3.05 on
+     --panel2) and keeps the same navy bias, so the design does not coarsen. Dividers keep
+     `--line`: a decorative separator is exempt, and making every hairline this heavy would
+     change the look of the whole site to fix something that is not broken. */
+  --line-control: #5c688d;
   --text: #eceff7;
   --muted: #9ba5bd;
   --accent: #4f80ff;
@@ -105,7 +113,7 @@ main { max-width: 1392px; margin: auto; padding: 0 48px; min-height: 60vh }
 .section-top p { color: var(--muted); font-size: 12px; max-width: 370px }
 
 .filters { display: flex; gap: 9px; flex-wrap: wrap; margin: 0 0 14px }
-.filter { border: 1px solid var(--line); background: var(--panel); border-radius: 5px; padding: 8px 15px; font-size: 11px; transition: border-color .2s }
+.filter { border: 1px solid var(--line-control); background: var(--panel); border-radius: 5px; padding: 8px 15px; font-size: 11px; transition: border-color .2s }
 .filter:hover { border-color: var(--muted) }
 .filter[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); font-weight: 600 }
 .connection { padding: 16px 20px; border-left: 2px solid var(--c, var(--accent)); background: var(--panel2); border-radius: 0 5px 5px 0; font-size: 12px; color: var(--muted) }
@@ -182,7 +190,7 @@ main { max-width: 1392px; margin: auto; padding: 0 48px; min-height: 60vh }
 .tally b.zero { color: var(--text) }
 .tally span { font-size: 11px; color: var(--muted) }
 .controls { display: flex; align-items: center; gap: 8px; margin-bottom: 20px }
-.controls button { border: 1px solid var(--line); background: var(--panel2); border-radius: 5px; padding: 8px 13px; font-size: 11px }
+.controls button { border: 1px solid var(--line-control); background: var(--panel2); border-radius: 5px; padding: 8px 13px; font-size: 11px }
 .controls button:hover:not(:disabled) { border-color: var(--muted) }
 .controls button:disabled { opacity: .4 }
 .controls input[type=range] { flex: 1; min-width: 0; accent-color: var(--accent) }
@@ -238,7 +246,7 @@ main { max-width: 1392px; margin: auto; padding: 0 48px; min-height: 60vh }
 .breadcrumb { display: flex; gap: 10px; flex-wrap: wrap; font-size: 11px; color: var(--muted); margin-bottom: 28px }
 .breadcrumb a:hover { color: var(--text) }
 .level-pager { display: flex; justify-content: space-between; gap: 16px; margin-top: 20px; font-size: 12px }
-.level-pager a { border: 1px solid var(--line); border-radius: 6px; padding: 10px 15px; color: var(--text); flex: 1; max-width: 280px }
+.level-pager a { border: 1px solid var(--line-control); border-radius: 6px; padding: 10px 15px; color: var(--text); flex: 1; max-width: 280px }
 .level-pager a:hover { border-color: var(--muted) }
 .level-pager .next { text-align: right; margin-left: auto }
 .status-note { font-size: 11px; color: var(--muted); border: 1px dashed var(--line); border-radius: 6px; padding: 14px 16px; margin-top: 8px; line-height: 1.8; max-width: 780px }
@@ -303,7 +311,7 @@ main { max-width: 1392px; margin: auto; padding: 0 48px; min-height: 60vh }
 /* The lane switch is the page's main control, so it reads at the weight of a section heading
    rather than as a row of small filter pills tucked under the diagram. */
 .lanes { margin: 34px 0 0 }
-.lanes > .filters { gap: 0; margin-bottom: 0; border: 1px solid var(--line); border-radius: 7px; display: inline-flex; overflow: hidden }
+.lanes > .filters { gap: 0; margin-bottom: 0; border: 1px solid var(--line-control); border-radius: 7px; display: inline-flex; overflow: hidden }
 .lanes > .filters .filter { border: 0; border-right: 1px solid var(--line); border-radius: 0; padding: 11px 22px; font-size: 12px; background: transparent }
 .lanes > .filters .filter:last-child { border-right: 0 }
 .lanes > .filters .filter[aria-pressed="true"] { background: var(--panel2); color: var(--text); font-weight: 600; box-shadow: inset 0 2px 0 var(--accent) }
