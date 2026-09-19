@@ -35,7 +35,17 @@ from __future__ import annotations
 import argparse
 from typing import Sequence
 
-from examples.common.model import Message, Model, StubModel, StubResponse, build_model, content_text
+from examples.common.model import (
+    Embedder,
+    Message,
+    Model,
+    StubEmbedder,
+    StubModel,
+    StubResponse,
+    build_embedder,
+    build_model,
+    content_text,
+)
 
 SCRIPTED_SPEC = "stub:scripted"
 
@@ -156,3 +166,19 @@ def build_cli_model(spec: str, *, example: str, script: Script | None = None) ->
             )
         return scripted_stub(script, example=example)
     return build_model(spec, stub=interactive_stub())
+
+
+def build_cli_embedder(spec: str | None, *, model_spec: str, stub: Embedder | None = None) -> Embedder:
+    """The embedder for an example whose `run()` takes one: `--embedder` if it was given, else
+    whatever `--model` was, which is the pairing `scripts/record_trace.py` also defaults to.
+
+    `stub:scripted` reads as plain `stub` here. There is nothing to script about a vector: the
+    sequence is a list of things a model *said*, and `StubEmbedder` is deterministic already, so
+    the retrieval a reader sees under `stub:scripted` is the same retrieval `--model stub` does.
+    Without this, `build_embedder` would reject the spec and the command would fail on an example
+    that retrieves.
+    """
+    spec = spec or model_spec
+    if spec == SCRIPTED_SPEC:
+        spec = "stub"
+    return build_embedder(spec, stub=stub or StubEmbedder())

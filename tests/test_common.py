@@ -331,6 +331,13 @@ class ScriptedStubTests(unittest.TestCase):
             cli.build_cli_model(cli.SCRIPTED_SPEC, example="demo", script=None)
         self.assertIn("SCRIPTED", str(caught.exception))
 
+    def test_the_scripted_spec_builds_the_stub_embedder_rather_than_being_rejected(self) -> None:
+        # build_embedder knows nothing about stub:scripted, so an example that retrieves would
+        # fail on the spec rather than run. There is nothing to script about a vector.
+        self.assertIsInstance(cli.build_cli_embedder(None, model_spec=cli.SCRIPTED_SPEC), StubEmbedder)
+        self.assertIsInstance(cli.build_cli_embedder(None, model_spec="stub"), StubEmbedder)
+        self.assertEqual(cli.build_cli_embedder("ollama:e", model_spec="claude:x").model_id, "ollama:e")
+
     def test_the_scripted_stub_makes_no_network_call(self) -> None:
         # The same rule as every other stub here: constructing and running one is offline.
         model = cli.scripted_stub(["a"], example="demo")
