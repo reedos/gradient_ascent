@@ -40,9 +40,13 @@ EXAMPLES_DIR = ROOT / "examples"
 # An example that never calls a model has nothing to script, and saying so here is how that stays
 # a decision rather than an oversight. Every other example must export SCRIPTED.
 NO_SCRIPT = {
+    "ai_gateways": "the demo is two hard-coded providers, so the gateway's fallback is visible without a script",
     "embeddings_search": "level 2 retrieval only: it embeds and ranks, and calls no model",
-    "knowledge_graphs": "the command builds and queries the graph; extraction is the tested path",
+    "knowledge_graphs": "its command plays a transcribed extraction of its own, so --model never reaches a stub",
     "literature_watch": "the command reads the shortlist that code produced; no model call",
+    "local_inference": "the command sizes a model in memory: arithmetic, no call",
+    "observability": "the command reads recorded traces; nothing in it calls a model",
+    "ops": "the command costs recorded traces out; nothing in it calls a model",
     "order_zero": "level 0: the whole point is that no model is called",
 }
 

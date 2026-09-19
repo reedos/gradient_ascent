@@ -697,10 +697,10 @@ class BackendRequestShapeTests(unittest.TestCase):
 
 
 class ScriptedCommandTests(unittest.TestCase):
-    """`one_call` and `rag` are the two examples with no test file of their own, so the binding
-    between the sequence their command plays (`SCRIPTED`) and the sequence this file scripts for
-    them lives here. If the two drift apart, the command on the page stops demonstrating what
-    these tests say the example does."""
+    """`one_call` is the only example with a scripted command and no test file of its own, so the
+    binding between the sequence its command plays (`SCRIPTED`) and the sequence this file scripts
+    for it lives here. If the two drift apart, the command on the page stops demonstrating what
+    this test says the example does. `rag`'s equivalent is in `tests/test_example_rag.py`."""
 
     ONE_CALL_SEQUENCE = [
         "I don't have any Halvorsen documentation here, so I can't tell you the DR-210's supply "
@@ -708,7 +708,6 @@ class ScriptedCommandTests(unittest.TestCase):
         "the manual for that model. I would rather say I don't know than guess at a number you "
         "would wire to.",
     ]
-    RAG_SEQUENCE = ["3.2 gallons per Normal cycle. Sources: dw300-manual#3"]
 
     def test_one_call_s_command_plays_the_sequence_this_file_scripts(self) -> None:
         from examples.one_call.__main__ import SCRIPTED
@@ -722,23 +721,6 @@ class ScriptedCommandTests(unittest.TestCase):
         answer = one_call_run("What voltage does a DR-210 need?", model, None, tracer)
         self.assertEqual(answer.citations, [], "level 1 has no sources to cite")
         self.assertNotRegex(answer.text, r"\b\d+\s*V\b", "the reply must not invent a voltage")
-
-    def test_rag_s_command_plays_the_sequence_this_file_scripts(self) -> None:
-        from examples.rag.__main__ import SCRIPTED
-
-        self.assertEqual(list(SCRIPTED), self.RAG_SEQUENCE)
-
-    def test_rag_s_sequence_cites_a_section_that_really_says_it(self) -> None:
-        # A scripted citation that is not in the corpus would demonstrate the opposite of the
-        # page's claim while looking right.
-        tracer = Tracer(example="rag", level=2, model_id="stub-1")
-        model = StubModel([StubResponse(text=t) for t in self.RAG_SEQUENCE])
-        answer = rag_run(
-            "What is the DW-300's Normal cycle water use?", model, StubEmbedder(), tracer, corpus_dir=CORPUS_DIR
-        )
-        self.assertEqual(answer.citations, ["dw300-manual#3"])
-        sections = corpus.load_sections(CORPUS_DIR)
-        self.assertIn("3.2 gallons", sections["dw300-manual#3"].text)
 
 
 if __name__ == "__main__":
