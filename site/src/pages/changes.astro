@@ -1,0 +1,92 @@
+---
+import Base from '../layouts/Base.astro';
+import { usDate } from '../lib/dates';
+import { url } from '../lib/url';
+import { changes, changesByDate, changesAsOf } from '../lib/changes';
+
+// /changes/: what changed on the site, newest first, grouped by the day it changed.
+//
+// Written for a reader rather than for whoever made the change. Each entry says what is different
+// and what it is good for, and links the pages it touched, so somebody who read a page last month
+// can tell whether it has been corrected since. The feed at /changes.xml carries the same entries.
+const groups = changesByDate(changes);
+const mdHref = url('/changes.md');
+const feedHref = url('/changes.xml');
+---
+<Base
+  title="What changed · Gradient Ascent"
+  description="A dated record of what changed on this site and why it matters to a reader, with an Atom feed."
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href={url('/')}>Home</a>
+    <span aria-hidden="true">/</span>
+    <span>What changed</span>
+  </nav>
+
+  <div class="page-hero">
+    <div class="eyebrow muted"><span class="dot"></span>Reference</div>
+    <h1>What changed</h1>
+    <p>
+      This site is written to be corrected, so it keeps a record of the corrections. Newest first,{' '}
+      {changes.length} entries, current to {usDate(changesAsOf)}. Each one says what is different
+      and what it is good for, and links the pages it touched.
+    </p>
+    <p class="changes-actions">
+      <a href={feedHref}>Subscribe by feed &#8599;</a>
+      <a href={mdHref}>Markdown version of this page</a>
+    </p>
+  </div>
+
+  {
+    groups.map((group) => (
+      <section class="section">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow muted">Changed</div>
+            <h2>{usDate(group.date)}</h2>
+          </div>
+          <p>{group.entries.length === 1 ? 'One change.' : `${group.entries.length} changes.`}</p>
+        </div>
+        <div class="changes-list">
+          {group.entries.map((entry) => (
+            <article class="changes-item" id={entry.id}>
+              <h3>{entry.title}</h3>
+              <p class="changes-what">{entry.what}</p>
+              <p class="changes-why">{entry.why}</p>
+              {entry.pages.length > 0 && (
+                <p class="changes-pages">
+                  {entry.pages.map((page, i) => (
+                    <>
+                      {i > 0 && <span aria-hidden="true"> &middot; </span>}
+                      <a href={url(page.path)}>{page.label}</a>
+                    </>
+                  ))}
+                </p>
+              )}
+            </article>
+          ))}
+        </div>
+      </section>
+    ))
+  }
+
+  <p class="reviewed-note">
+    Entries are added by hand, from <code>content/changes.json</code>. Nothing on this site is
+    written by a model, and no entry here reports a measured number.
+    {' '}<a class="md-link" href={mdHref}>Markdown version of this page</a>
+  </p>
+</Base>
+
+<style>
+  .changes-actions { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 18px; font-size: 12px }
+  .changes-actions a { color: var(--accent) }
+  .changes-list { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line) }
+  .changes-item { padding: 22px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 130px }
+  .changes-item h3 { font-size: 17px; letter-spacing: -.3px; margin: 0 0 10px; max-width: 62ch }
+  .changes-what { font-size: 14px; line-height: 1.8; color: var(--text); margin: 0; max-width: 78ch }
+  .changes-why { font-size: 13px; line-height: 1.8; color: var(--muted); margin: 10px 0 0; max-width: 78ch }
+  .changes-pages { font-size: 11px; color: var(--muted); margin: 14px 0 0 }
+  .changes-pages a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px }
+  .changes-pages a:hover { color: var(--text) }
+  @media (max-width: 600px) { .changes-item h3 { font-size: 16px } .changes-what { font-size: 13.5px } }
+</style>

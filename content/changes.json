@@ -1,0 +1,186 @@
+{
+  "version": 1,
+  "as_of": "2026-09-19",
+  "note": "What changed on this site, and why it matters to somebody reading it. Newest first. Entries are written for a reader, not for whoever made the change: they say what is different and what it is good for, never what a commit did. Every entry links the pages it touched. Several entries can share a date; within a date, file order is the order shown. docs/CHANGES.md says how to add one.",
+  "changes": [
+    {
+      "id": "frontier-blocks",
+      "date": "2026-09-19",
+      "title": "Every level page says what is still unsolved at that level",
+      "what": "Each of the eight level pages now ends with two to four open problems: what nobody has solved at that level, what people are actually trying, and a quotation from the source each rests on with the date it was read.",
+      "why": "The rest of the site tells you what works. This is the other half of an honest answer, and it is where the site is most likely to go out of date, so each block prints its own date rather than letting the page's freshness stand for it.",
+      "pages": [
+        {
+          "label": "Level 02 · Context",
+          "path": "/levels/2/"
+        },
+        {
+          "label": "Level 05 · Agents",
+          "path": "/levels/5/"
+        }
+      ]
+    },
+    {
+      "id": "sources-repaired",
+      "date": "2026-09-19",
+      "title": "Rotted links repaired across the timeline and the registry",
+      "what": "Ten timeline milestones and seventeen registry entries pointed at pages that had moved, been renamed or been taken down. Each was fetched and read again, and now cites the page that documents it today. Where a maker has since edited the post this site quotes, the entry says so and links the archived copy the words came from.",
+      "why": "A citation that quietly stops resolving turns a sourced claim into an unsourced one, and nothing about the page looks different when it happens.",
+      "pages": [
+        {
+          "label": "Timeline",
+          "path": "/timeline/"
+        },
+        {
+          "label": "Names",
+          "path": "/names/"
+        }
+      ]
+    },
+    {
+      "id": "changes-page",
+      "date": "2026-09-19",
+      "title": "This page, and a feed",
+      "what": "A dated record of what changed on the site and why it matters, with an Atom feed at /changes.xml.",
+      "why": "The site is written to be corrected. Without a log, a reader who came back had no way to tell whether a page had been fixed since they last read it.",
+      "pages": [
+        {
+          "label": "What changed",
+          "path": "/changes/"
+        }
+      ]
+    },
+    {
+      "id": "bench-three-ways",
+      "date": "2026-09-19",
+      "title": "The engineering pages cover three settings, not one",
+      "what": "The engineering material used to assume a production test line, where the same measurement runs thousands of times. It now covers three settings and says on each page which one it is written for: production test, engineering test at low volume, and precise measurement where the uncertainty of the number is the point.",
+      "why": "Most engineering work is not production test, and advice written for one setting is quietly wrong in the others. A gate that is fine at ten thousand units a week is not fine when you have five prototypes.",
+      "pages": [
+        {
+          "label": "Job shapes",
+          "path": "/shapes/"
+        },
+        {
+          "label": "Recipes",
+          "path": "/recipes/"
+        }
+      ]
+    },
+    {
+      "id": "engineering-recipes",
+      "date": "2026-09-19",
+      "title": "Recipes for engineers, on an invented bench",
+      "what": "Eleven recipes for electronics test, measurement, design and bring-up, all worked on one invented board with four invented instruments and a documented accuracy specification. They cover reading a datasheet, turning requirements into a test plan, triaging a test failure, writing an instrument script from the manual, characterizing a design, and writing up a measurement with its uncertainty.",
+      "why": "The rule these pages exist to demonstrate is that a model never produces a reported measurement, an uncertainty, a margin or a verdict. Showing it on a bench makes the line concrete rather than a slogan, and one recipe deliberately uses no model at all.",
+      "pages": [
+        {
+          "label": "Recipes",
+          "path": "/recipes/"
+        },
+        {
+          "label": "Level 00 · No model",
+          "path": "/levels/0/"
+        }
+      ]
+    },
+    {
+      "id": "job-shapes",
+      "date": "2026-09-19",
+      "title": "Match a job to its shape, not to the nearest recipe",
+      "what": "A page of job shapes: the kinds of work a request can be, sorted by what the work is rather than what it is about. A recipe is now presented as one worked instance of a shape, so you take its reasoning and leave its subject.",
+      "why": "Readers were matching their problem to whichever recipe sounded closest in subject, which is the wrong axis. Sorting invoices and sorting test results are the same shape of job; two jobs about invoices can be different shapes.",
+      "pages": [
+        {
+          "label": "Job shapes",
+          "path": "/shapes/"
+        },
+        {
+          "label": "Recipes",
+          "path": "/recipes/"
+        }
+      ]
+    },
+    {
+      "id": "for-your-agent",
+      "date": "2026-09-19",
+      "title": "The site, written for a reader's own AI agent",
+      "what": "If somebody points their assistant at this site to help them choose an approach, there is now a procedure for it to follow: what to ask, how to walk the worksheet down to the lowest level that does the job, what a good answer contains and what not to claim. Every page also has a clean Markdown version at the same address with .md on the end, and the content files are published as JSON.",
+      "why": "People increasingly arrive here through an assistant rather than a browser. An assistant that reads the prose and guesses at the procedure gives worse advice than one handed the procedure.",
+      "pages": [
+        {
+          "label": "For your agent",
+          "path": "/agents/"
+        },
+        {
+          "label": "Method",
+          "path": "/method/"
+        }
+      ]
+    },
+    {
+      "id": "claims-reread",
+      "date": "2026-09-19",
+      "title": "Every quotation read again against the page it came from",
+      "what": "A pass over the written pages that re-fetched each cited page and tested every quotation as an exact substring of it. Claims that had drifted from what their source actually says were corrected or cut, and two numbers a guide had gone stale on were fixed.",
+      "why": "A quotation that is nearly right is worse than none: it reads as evidence and is not.",
+      "pages": [
+        {
+          "label": "Method",
+          "path": "/method/"
+        }
+      ]
+    },
+    {
+      "id": "lighter-pages",
+      "date": "2026-09-19",
+      "title": "The timeline and the search index got smaller",
+      "what": "The timeline page and the search index were both carrying far more than a reader needed to load, and were cut down. The timeline's chart is one image rather than many, and the control borders on the site now meet the contrast ratio they were supposed to.",
+      "why": "This site is read on phones. A page that is slow to load on one is a page that does not get read, and a control you cannot see the edge of is a control you cannot use.",
+      "pages": [
+        {
+          "label": "Timeline",
+          "path": "/timeline/"
+        },
+        {
+          "label": "Search",
+          "path": "/search/"
+        }
+      ]
+    },
+    {
+      "id": "capability-chart",
+      "date": "2026-09-18",
+      "title": "A capability chart on the timeline",
+      "what": "The timeline page carries a chart of Epoch AI's Epoch Capabilities Index, plotted by model release date, with this site's own dates for when each level reached the public drawn against it.",
+      "why": "The levels are about who decides the next step, not about how capable a model is. Putting the two on one chart shows where they line up and where they do not, instead of implying one causes the other.",
+      "pages": [
+        {
+          "label": "Timeline",
+          "path": "/timeline/"
+        }
+      ]
+    },
+    {
+      "id": "launch",
+      "date": "2026-09-18",
+      "title": "Gradient Ascent is public",
+      "what": "The first public release: eight levels from no model to always-on agents, a page for every technique in them, the map of how those techniques connect, a worksheet that walks a problem down to the lowest level that does the job, recipes, a glossary built from the pages, a gallery of how each technique fails, a registry of named models, products and tools, and a timeline of when each level reached the public.",
+      "why": "The site's rule is to recommend the lowest level that does the job, and it is hard to follow that rule without seeing the whole ladder. Every page is a draft: written, sourced and reviewed, with no recorded run and no scored result behind it, and each one says so.",
+      "pages": [
+        {
+          "label": "Home",
+          "path": "/"
+        },
+        {
+          "label": "All techniques",
+          "path": "/techniques/"
+        },
+        {
+          "label": "Find your level",
+          "path": "/worksheet/"
+        }
+      ]
+    }
+  ]
+}

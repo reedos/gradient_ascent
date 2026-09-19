@@ -58,9 +58,18 @@ test('practice and reference pages resolve, including their children', () => {
   for (const p of ['/worksheet/', '/shapes/', '/recipes/', '/recipes/support-desk/', '/teardowns/coding-agent/', '/failures/']) {
     assert.equal(navContext(p, levels, tracks).group, 'practice', p);
   }
-  for (const p of ['/timeline/', '/names/', '/glossary/', '/method/', '/agents/']) {
+  for (const p of ['/timeline/', '/names/', '/glossary/', '/method/', '/changes/', '/agents/']) {
     assert.equal(navContext(p, levels, tracks).group, 'reference', p);
   }
+});
+
+test('the reference group lists the change log, so the footer sitemap carries it too', () => {
+  const reference = groups.find((g) => g.id === 'reference')!;
+  const paths = reference.sections.flatMap((s) => s.items.map((i) => i.path));
+  assert.ok(paths.includes('/changes/'), 'reference lists /changes/');
+  // It sits after Method and before the agent page: a reader looking for what is new reads the
+  // record of the site before the instructions for their own tooling.
+  assert.deepEqual(paths.slice(-3), ['/method/', '/changes/', '/agents/']);
 });
 
 test('home, search and unknown paths have no section, so no rail', () => {
