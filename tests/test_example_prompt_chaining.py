@@ -24,8 +24,17 @@ from examples.common.trace import Tracer  # noqa: E402
 from evals.corpus import Section  # noqa: E402
 import examples.prompt_chaining.run as pc_run  # noqa: E402
 from examples.prompt_chaining.run import LEVEL, _check_citations, run  # noqa: E402
+from examples.prompt_chaining.__main__ import SCRIPTED  # noqa: E402
 
 QUESTION = "Is the DR-520 vent length still 35 feet?"
+
+# The same two replies examples/prompt_chaining/__main__.py scripts for `--model stub:scripted`:
+# a rewrite into three differently worded queries, then a draft that cites the section only the
+# extra two queries are needed to find.
+SEQUENCE = [
+    "DR-520 vent length\nDR-520 service bulletin update\nDR-520 vent specification revision",
+    "The maximum vent run for the DR-520 is now 25 feet. Sources: service-bulletin#2",
+]
 
 
 def _model() -> StubModel:
@@ -116,6 +125,22 @@ class MaxQueriesTests(unittest.TestCase):
             [],
             "the first query alone should not have retrieved the correcting section",
         )
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
+
+    def test_the_scripted_sequence_actually_grounds_the_corrected_citation(self) -> None:
+        # The point of scripting three rewritten queries instead of one: the single obvious query
+        # alone would miss service-bulletin#2 (see MaxQueriesTests above), so a reader running
+        # --model stub:scripted has to see the grounded citation, not an empty list.
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+        tracer = Tracer(example="prompt_chaining", level=LEVEL, model_id="stub-1")
+        answer = run(QUESTION, model, None, tracer)
+        self.assertEqual(answer.citations, ["service-bulletin#2"])
 
 
 if __name__ == "__main__":

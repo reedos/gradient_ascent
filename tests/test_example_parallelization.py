@@ -20,12 +20,21 @@ if str(ROOT) not in sys.path:
 from examples.common.model import Message, StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
 from examples.parallelization.run import NO_ANSWER, run  # noqa: E402
+from examples.parallelization.__main__ import SCRIPTED  # noqa: E402
 
 CORPUS_DIR = ROOT / "evals" / "corpus"
 QUESTION = "What is the DW-480's Normal cycle water use, and how often should its filter be cleaned?"
 
 # The real top-3 candidates bm25 returns for QUESTION, confirmed against the actual corpus.
 CANDIDATES = ["care-and-cleaning-guide#1", "dw480-manual#3", "dw480-manual#6"]
+
+# The same three replies examples/parallelization/__main__.py scripts for `--model stub:scripted`,
+# one per candidate above, in that order.
+SEQUENCE = [
+    NO_ANSWER,
+    "The Normal cycle uses 3.0 gallons of water.",
+    "The DW-480's filter is self-cleaning and needs no routine cleaning.",
+]
 
 
 def _keyed_responder(answers: dict[str, str]):
@@ -105,6 +114,30 @@ class ParallelizationExampleTests(unittest.TestCase):
 
         self.assertTrue(callable(module.run))
         self.assertEqual(module.LEVEL, 3)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
+
+    def test_the_scripted_sequence_is_stable_under_real_concurrent_calls(self) -> None:
+        # examples/common/cli.py's scripted stub answers by a shared, unlocked call counter, and
+        # run() fires all three calls from a real ThreadPoolExecutor rather than one at a time.
+        # Executor.map submits futures in candidate order and returns results in that same order
+        # regardless of which thread finishes first, so this should be stable; run it several
+        # times against the real scripted stub (not the keyed responder the other tests use) to
+        # catch the case where it is not.
+        from examples.common.cli import scripted_stub
+
+        for _ in range(20):
+            model = scripted_stub(SCRIPTED, example="parallelization")
+            tracer = Tracer(example="parallelization", level=3, model_id="stub-scripted")
+            answer = run(QUESTION, model, None, tracer, corpus_dir=CORPUS_DIR)
+            self.assertEqual(answer.citations, sorted(["dw480-manual#3", "dw480-manual#6"]))
+            self.assertIn("3.0 gallons", answer.text)
+            self.assertIn("self-cleaning", answer.text)
 
 
 if __name__ == "__main__":

@@ -16,8 +16,13 @@ if str(ROOT) not in sys.path:
 from examples.common.model import StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
 from examples.human_in_the_loop.run import PendingReview, resume, run  # noqa: E402
+from examples.human_in_the_loop.__main__ import SCRIPTED  # noqa: E402
 
 CORPUS_DIR = ROOT / "evals" / "corpus"
+
+# The one reply examples/human_in_the_loop/__main__.py scripts for `--model stub:scripted`: a
+# draft naming a real dollar figure, which trips the high_cost threshold and pauses the run.
+SEQUENCE = ["It costs $52.00. Sources: parts-list#2"]
 
 
 def _scripted_reviewer(pending: PendingReview) -> str:
@@ -102,6 +107,30 @@ class HumanInTheLoopExampleTests(unittest.TestCase):
         self.assertTrue(callable(module.run))
         self.assertTrue(callable(module.resume))
         self.assertEqual(module.LEVEL, 3)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
+
+    def test_the_scripted_sequence_pauses_for_high_cost(self) -> None:
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+        tracer = Tracer(example="human_in_the_loop", level=3, model_id="stub-1")
+        result = run("What does HLV-2205 cost?", model, None, tracer, corpus_dir=CORPUS_DIR)
+        self.assertIsInstance(result, PendingReview)
+        self.assertEqual(result.reason, "high_cost")
+
+    def test_approve_and_reject_resume_to_visibly_different_answers(self) -> None:
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+        tracer = Tracer(example="human_in_the_loop", level=3, model_id="stub-1")
+        pending = run("What does HLV-2205 cost?", model, None, tracer, corpus_dir=CORPUS_DIR)
+        approved = resume(pending, "approve", tracer)
+        rejected = resume(pending, "reject", tracer)
+        self.assertNotEqual(approved.text, rejected.text)
+        self.assertIn("52.00", approved.text)
+        self.assertEqual(rejected.citations, [])
 
 
 if __name__ == "__main__":

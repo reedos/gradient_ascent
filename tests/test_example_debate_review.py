@@ -19,8 +19,16 @@ from examples.common.model import StubModel, StubResponse  # noqa: E402
 from examples.common.model import content_text  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
 from examples.debate_review.run import DRAFT_CLOSE, DRAFT_OPEN, MAX_ROUNDS, run  # noqa: E402
+from examples.debate_review.__main__ import SCRIPTED  # noqa: E402
 
 CORPUS_DIR = ROOT / "evals" / "corpus"
+
+# The same three replies examples/debate_review/__main__.py scripts for `--model stub:scripted`.
+SEQUENCE = [
+    "The DR-520's vent run is limited to 35 feet with up to 4 elbows. Sources: dr520-manual#4",
+    "CHECK: DR-520 vent run service bulletin",
+    "REJECT: the draft never checked for a superseding bulletin, and service-bulletin#1 confirms one revises this figure.",
+]
 
 
 class DebateReviewExampleTests(unittest.TestCase):
@@ -170,6 +178,22 @@ class DebateReviewExampleTests(unittest.TestCase):
 
         self.assertTrue(callable(module.run))
         self.assertEqual(module.LEVEL, 6)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
+
+    def test_the_scripted_sequence_rejects_using_a_real_independent_search(self) -> None:
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+        tracer = Tracer(example="debate_review", level=6, model_id="stub-1")
+        answer = run("What is the maximum vent run for the DR-520?", model, None, tracer, corpus_dir=CORPUS_DIR)
+        search_steps = [s for s in tracer.steps if s.title == "Reviewer's own search runs"]
+        self.assertEqual(len(search_steps), 1)
+        self.assertIn("service-bulletin#1", search_steps[0].detail)
+        self.assertIn("REJECT", answer.text)
 
 
 if __name__ == "__main__":

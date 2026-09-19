@@ -17,9 +17,19 @@ if str(ROOT) not in sys.path:
 from examples.common.model import StubModel, StubResponse  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
 from examples.workflow_graphs.run import PASS_TOKEN, run  # noqa: E402
+from examples.workflow_graphs.__main__ import SCRIPTED  # noqa: E402
 
 CORPUS_DIR = ROOT / "evals" / "corpus"
 QUESTION = "How often should the DW-300's filter be cleaned?"
+
+# The same four replies examples/workflow_graphs/__main__.py scripts for `--model stub:scripted`:
+# a first draft that fails the check node, then a revision that passes it.
+SEQUENCE = [
+    "Every 30 cycles. Sources: dw300-manual#6",
+    "MISSING: dw300-manual#6",
+    "Every 30 cycles, per the care and cleaning guide.\nSources: care-and-cleaning-guide#1",
+    "ALL CITATIONS SUPPORTED",
+]
 
 
 class WorkflowGraphsExampleTests(unittest.TestCase):
@@ -96,6 +106,23 @@ class WorkflowGraphsExampleTests(unittest.TestCase):
 
         self.assertTrue(callable(module.run))
         self.assertEqual(module.LEVEL, 3)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
+
+    def test_the_scripted_sequence_visits_the_revise_node_once_before_passing(self) -> None:
+        model = StubModel([StubResponse(text=t) for t in SEQUENCE])
+        tracer = Tracer(example="workflow_graphs", level=3, model_id="stub-1")
+        answer = run(QUESTION, model, None, tracer, corpus_dir=CORPUS_DIR)
+        node_titles = [s.title for s in tracer.steps if s.title.startswith("Node:")]
+        self.assertEqual(node_titles, ["Node: retrieve", "Node: draft", "Node: check", "Node: revise", "Node: check"])
+        self.assertEqual(answer.citations, ["care-and-cleaning-guide#1"])
+        last_checkpoint = [s for s in tracer.steps if s.title.startswith("Checkpoint")][-1]
+        self.assertIn("-> next: stop", last_checkpoint.detail)
 
 
 if __name__ == "__main__":

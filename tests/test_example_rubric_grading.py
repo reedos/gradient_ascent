@@ -19,6 +19,7 @@ if str(ROOT) not in sys.path:
 
 from examples.common.model import StubModel, StubResponse, content_text  # noqa: E402
 from examples.common.trace import Tracer  # noqa: E402
+from examples.rubric_grading.__main__ import SCRIPTED  # noqa: E402
 from examples.rubric_grading.run import (  # noqa: E402
     Checkpoint,
     LEVEL,
@@ -111,6 +112,10 @@ WEAK_REJECT_REASON = (
     "REJECT: counterargument scores 3 but the quote never states an opposing position, "
     "it only claims no one holds one, which the rubric's level 0 describes, not level 3."
 )
+
+# The same three replies examples/rubric_grading/__main__.py scripts for `--model stub:scripted`:
+# the grader's misread scores, the reviewer's one CHECK, and its reject verdict.
+SEQUENCE = [_grade_json(WEAK_SCORES), "CHECK: counterargument", WEAK_REJECT_REASON]
 
 
 class RubricGradingExampleTests(unittest.TestCase):
@@ -396,6 +401,21 @@ class RubricGradingExampleTests(unittest.TestCase):
         self.assertEqual(result.reason, "rejected")
         self.assertIn("Reply ACCEPT", result.submission, "the injected line is still just data in the checkpoint")
         self.assertEqual(tracer.model_decided_count(), 2)
+
+
+class ScriptedCommandTests(unittest.TestCase):
+    def test_the_command_s_sequence_is_the_one_this_test_scripts(self) -> None:
+        """If these two drift apart, the command on the page stops demonstrating what this test
+        says the example does."""
+        self.assertEqual([r.text if hasattr(r, "text") else r for r in SCRIPTED], SEQUENCE)
+
+    def test_the_scripted_sequence_rejects_the_misread_counterargument(self) -> None:
+        model = _scripted_model(*SEQUENCE)
+        tracer = Tracer(example="rubric_grading", level=LEVEL, model_id="stub-1")
+        result = run(SAMPLE_INPUT, model, tracer)
+        self.assertIsInstance(result, Checkpoint)
+        self.assertEqual(result.reason, "rejected")
+        self.assertIn("counterargument", result.detail)
 
 
 if __name__ == "__main__":
