@@ -13,8 +13,10 @@ already built: <Link href="/recipes/limits-without-a-model/">limits, first-pass 
 are charted from the production log, grouped by lot, by fixture, by day and by shift. The question
 that shows up next is never one of those charts. An engineer reads the August 31 retest export and
 the numbers look wrong. A soak log from a 90-minute burn-in has three units in it and a person wants
-to know, in words, whether any of them drifted. Nobody built a report for that question because
-nobody knew to ask it until the data was already open on screen.
+to know, in words, whether any of them drifted. A September sweep of five prototypes has 900
+readings in it and nobody has asked whether any of them is impossible. Two of those three are
+production test and the third is engineering test, which is the point: what makes a question this
+recipe's is not the setting it came from, it is that nobody built a chart for it.
 
 ## The lowest level that does it, and why not higher
 
@@ -28,26 +30,24 @@ a sandbox that never trusts the model's text on its own.
 It is not level 5. <Link href="/recipes/data-analysis/">Data analysis by conversation</Link> is the
 same shape with a loop around it, for a question whose second computation depends on what the first
 one showed: "how does this quarter compare to last" cannot even name its second query until the
-first one has answered. Neither question on this page works that way. "Do the retested boards
-actually pass" and "did any soak unit fail to settle" each take one snippet and one look at the
-result; a loop would buy nothing here but a second, unnecessary model call. If a reader's own
-questions turn out to chain, that recipe is where to go; this one is for the case that does not.
+first one has answered. None of the three questions below works that way. Each takes one snippet
+and one look at the result, and a loop would buy nothing here but a second, unnecessary model
+call. If a reader's own questions turn out to chain, that recipe is where to go.
 
 It is also not level 0, and that is worth saying plainly: a fixed report cannot answer a question
-nobody wrote a query for yet. What is level 0 is the check inside the snippet itself, and the check
-that runs before either snippet does. Both are ordinary code, and neither one is the model's to get
-right or wrong.
+nobody wrote a query for yet. What is level 0 is the arithmetic inside the snippet, and the check
+that runs before any snippet does. Both are ordinary code, and neither is the model's to get right
+or wrong.
 
 ## The run on the bench, stepped
 
 **"Do the retested boards actually pass?"** Eighteen boards were pulled back for a retest on August
-31 and written to `retest-2026-08-31.csv`, whose `value_v` column is meant to be volts. Before any
-snippet touches it, code checks every value against 40.0 V, the widest node an SRB-5030 has
-anywhere on it (the datasheet's absolute maximum input, `VIN_ABS_MAX_V` in
-`examples/common/bench.py`). Sixteen of the eighteen readings, numbers like 4973.5 and 5007.7,
-clear that ceiling by two orders of magnitude. Dividing by 1000 brings all sixteen back under it, so
-code applies that correction and says so, every time the table loads, whether or not the model ever
-calls the tool:
+31 into `retest-2026-08-31.csv`, whose `value_v` column is meant to be volts. Before any snippet
+touches it, code checks every value against 40.0 V, the widest node an SRB-5030 has anywhere
+(`VIN_ABS_MAX_V`, the datasheet's absolute maximum input). Sixteen of the eighteen, numbers like
+4973.5 and 5007.7, clear that ceiling by two orders of magnitude, and dividing by 1000 brings all
+sixteen back under it, so code applies that correction and says so every time the table loads,
+whether or not the model calls the tool:
 
 <CodeFile file="examples/bench_test_data_by_conversation/run.py" func="_as_plausible_volts" />
 
@@ -56,21 +56,38 @@ magnitude, which is the trap: a check that only looks at the lower limit calls a
 Once the model asks for the snippet and code runs it on the corrected table, the real numbers come
 back: fifteen of the eighteen sit between 4.9678 V and 5.0077 V, mean 4.9840 V; three do not
 (SRB5030-2608-0052, SRB5030-2608-0063, SRB5030-2608-0178). The file's own `result` column already
-had this right, because whatever tool wrote the export judged pass and fail correctly and only
-printed the wrong header; the millivolts version was never a passable measurement, only a
-mislabeled one.
+had this right: whatever tool wrote the export judged pass and fail correctly and only printed the
+wrong header.
 
 **"Did any soak unit fail to settle?"** Three boards ran 90 minutes at full load on August 27, five
 minutes between samples, in `soak-2026-08-27.csv`. Asked to look at the whole run rather than the
 last row, the model's snippet takes the first and last sample per serial and reports the output
 drop and the case-temperature rise. Two boards settle: 2.5 mV and 1.2 mV of drop against a case
 that climbs to about 60 degC and stays there. The third, SRB5030-2608-0121, drops 75.5 mV while its
-case keeps climbing to 91.7 degC and never levels off, which is what a resistive joint does: current
-squared times resistance heats the joint, and a hotter joint is more resistive. `docs/THE-BENCH.md`
+case keeps climbing to 91.7 degC and never levels off, which is what a resistive joint does:
+current squared times resistance heats it, and a hotter joint is more resistive. `docs/THE-BENCH.md`
 records that this same serial is the only genuine efficiency failure in the whole production run,
-at 79.6%. Nothing in this snippet reads the production log or draws that connection; it is a fact
-about the bench, not a number the sandbox computed, and a person who has read both the soak table
-and the production log is the one who gets to make it.
+at 79.6%. Nothing in this snippet reads the production log or draws that connection; a person who
+has read both tables is the one who gets to make it.
+
+**"Is any block of the sweep impossible?"** Five prototypes were swept over line, load and
+temperature in September into `characterization-2026-09.csv`: 900 readings, no limits column and
+no verdict, because what an engineer computes from it is a margin. The same range check runs on
+its `vout_v` column, finds every value plausible as volts, and says so: a guard that only speaks
+when it fires cannot be told apart from one nobody wired up. Then the question, which no dashboard
+has a tile for. A board cannot put out more power than it takes in, so the snippet averages each
+of the 180 blocks and compares `vin_v * iin_a` against `iout_a * vout_v`. One block comes back:
+SRB5030-2609-0001 at a labeled 12.0 V and 3.000 A draws 0.6729 A where that same point on the
+other four boards draws 1.3123 A, which is 8.08 W in against 14.95 W out. The supply was still at
+24.0 V from the block before it. The output voltage gives nothing away, since holding it steady
+while the input moves is the whole job of the part, and no uncertainty budget would have caught it
+either: every reading in that block is a good reading of a condition nobody asked for.
+
+The same file's other trap is not this recipe's. A block of readings scatters seven times as wide
+as the rest because the meter was left on the 100 V range, and finding that is a `GROUP BY` on a
+column nobody thinks to group by, which is
+<Link href="/recipes/characterize-a-design/">the engineering-test level-0 page</Link>'s work. Ask
+this recipe only what a grouping has already failed to answer.
 
 ## The code, embedded
 
@@ -78,8 +95,8 @@ The model's one decision, and what code does with it, in `run`:
 
 <CodeFile
   file="examples/bench_test_data_by_conversation/run.py"
-  start={331}
-  end={351}
+  start={368}
+  end={388}
   expect="call = first.tool_calls[0]"
 />
 
@@ -93,30 +110,27 @@ names, and loops nested no more than two deep:
 <CodeFile file="examples/bench_test_data_by_conversation/run.py" func="run_snippet" />
 
 What that grammar protects against: every classic escape this site's own tests try against it
-(`(1).__class__`, `__import__('os')`, `open(...)`, reassigning `len` to something else, an f-string,
-a walrus, a `while True`) is refused the same way, because the node type it needs is simply not in
-the allow-list, not because the code recognized an attack. What it does not protect against: a
-snippet that runs clean and answers a question other than the one asked, which is why the sandbox's
-own output goes on the page next to the prose, not instead of it, and why the loop cap and the node
-cap are a coarse defense against a runaway snippet, not a real wall-clock timeout. A production
-deployment of this shape wants an OS-level sandbox around this too, the same point
-<Link href="/techniques/code-execution/">code execution</Link>'s own page makes about a real
-container.
+(`(1).__class__`, `__import__('os')`, `open(...)`, an f-string, a walrus, a `while True`) is
+refused the same way, because the node type it needs is not in the allow-list, not because the
+code recognized an attack. What it does not protect against: a snippet that runs clean and answers
+a question other than the one asked, which is why the sandbox's own output goes next to the prose
+and not instead of it, and why the loop and node caps are a coarse defense against a runaway
+snippet rather than a wall-clock timeout. A production deployment wants an OS-level sandbox around
+this too, the same point <Link href="/techniques/code-execution/">code execution</Link> makes about
+a real container.
 
 ## What it costs
 
-Two model calls per question, the same shape as one tool call anywhere on this site: one to write
-the snippet, one to turn the result into a sentence. Nothing on this site has called a live model,
-so this is an estimate, worked in the open with the same deterministic token counter the stub runs
-use: the retest question above runs 505 input tokens and 155 output tokens across its two calls,
-counting the system prompt describing both tables, the snippet, the sandbox's JSON result, and the
-final sentence. A question whose result echoes more rows costs more on the second call and nothing
-more on the first; a real model's own tokenizer will not match this count exactly, but the shape,
-one write call and one answer call, holds regardless of which model runs it. Call it a few hundred
-tokens a question, against a person who would otherwise have opened the CSV and typed the same
-filter by hand. That is the honest comparison: this recipe is not competing with the dashboard,
-which already answers most questions for nothing per question; it is competing with the ten minutes
-an ad hoc question costs a person with a spreadsheet and a filter box.
+The unit here is the question, in all three settings, because a question is what a person asks
+once. Two model calls each: one to write the snippet, one to turn the result into a sentence.
+Nothing on this site has called a live model, so this is an estimate, worked in the open with the
+same deterministic token counter the stub runs use: the retest question above runs 617 input
+tokens and 155 output tokens across its two calls, counting the system prompt describing all three
+tables, the snippet, the sandbox's JSON result and the final sentence. A real model's tokenizer
+will not match that exactly, but the shape holds whichever model runs it. This recipe is not
+competing with the dashboard, which answers most questions
+for nothing per question; it is competing with the ten minutes an ad hoc question costs a person
+with a spreadsheet and a filter box.
 
 ## How it fails on a real bench, specifically
 
@@ -125,14 +139,15 @@ story above, and what catches it is the range check, in code, before any snippet
 noticing the numbers look large. That check is blunt on purpose and it can be wrong in one
 direction: a column that really is volts with a single mistyped row in it would be scaled by a
 thousand along with the bad row, and every value would still be inside the ceiling afterward. That
-is why the correction is written into the trace on every run instead of being applied quietly, and
-why the sentence that says what code changed belongs next to the answer. A snippet that runs clean and computes the wrong thing (averaging
-`value_v` before the correction, say, or comparing case temperature in the wrong direction) is not
-caught by the sandbox at all; it is caught by a person reading the code next to the number, which is
-why the code is on the page and not just the answer. The pass or fail decision on any of these
-boards never runs through this recipe at all: it already happened, in the file's own `result`
-column and in the fixed limits every earlier step checked, and nothing here asks a model to confirm,
-overturn, or summarize that call.
+is why the correction goes into the trace on every run instead of being applied quietly. A snippet
+that runs clean and computes the wrong thing is not caught by the sandbox at all; it is caught by a
+person reading the code next to the number, which is why the code is on the page and not just the
+answer. No number this recipe reports is the model's:
+the sandbox computes every figure and the model writes the sentence around it, because a model
+never produces a reported measurement, an uncertainty, a margin or a verdict. The pass or fail on
+the retested boards already happened, in the file's own `result` column and the limits every
+earlier step checked. The sweep's margins are not on this page at all, for the same reason: a
+margin is a subtraction, and a subtraction belongs where it costs nothing per question.
 
 ## How to evaluate it
 
@@ -145,11 +160,11 @@ program rather than a person's judgment: whether the figures in the final answer
 the executed snippet actually printed, which the tests in this recipe's own example package check
 against numbers recomputed independently from the CSVs, and whether the range check stops the
 mislabeled `value_v` column before a snippet ever sees it. Beyond that, a real eval is a small set
-of ad hoc questions over these two tables with answers worked out by hand, scored on whether the
+of ad hoc questions over these three tables with answers worked out by hand, scored on whether the
 snippet ran clean or the sandbox refused it, and whether the final number matches the hand-worked
-one exactly. Track a sandbox refusal separately from a wrong-but-clean answer; the two are
-different failures with different fixes, one the sandbox doing its job and the other a prompt that
-needs sharper instructions about what the tables hold.
+one exactly. Track a sandbox refusal separately from a wrong-but-clean answer; they are different
+failures with different fixes, one the sandbox doing its job and the other a prompt that needs to
+say more about what the tables hold.
 
 </HowToEval>
 
@@ -157,12 +172,12 @@ needs sharper instructions about what the tables hold.
 
 The shape ports past this bench whenever a table and a question already exist and a fixed report
 cannot anticipate the question: a regional sales dip, survey responses, server logs after an
-incident, characterization data across temperature and voltage. What ports specifically: one
-tool, a grammar checked node by node before anything runs, a range check on any column whose unit
-is a fact you already know, and a person reading the snippet next to the number.
+incident. What ports specifically: one tool, a grammar checked node by node before anything runs,
+a range check on any column whose unit is a fact you already know, a physical identity the data
+has to satisfy the way a power balance does, and a person reading the snippet next to the number.
 
 What does not port: the 40 V ceiling, which is this board's absolute maximum input and nobody
-else's; the column names; and the two tables themselves, which are `evals/bench/data/` CSVs
-invented for this site. A reader's own data has its own plausible ranges and its own known units,
-and the whole lesson of the first story above is that those are worth checking in code before a
-snippet ever runs, on every table a reader points this at, not just these two.
+else's; the column names; and the three tables themselves, which are `evals/bench/data/` CSVs
+invented for this site. A reader's own data has its own plausible ranges, its own known units and
+its own identities that have to hold, and the lesson of the first and third stories above is that
+those are worth checking in code before a snippet runs, on every table, not just these three.

@@ -1,14 +1,16 @@
 """Level 4: the dashboard (`examples/bench_limits_without_a_model`) already charts limits,
 first-pass yield and Cpk from the production log. This example is for the question that dashboard
 does not answer: the model writes one short Python snippet, and a sandbox -- never the model --
-runs it against the August 31 retest export or the August 27 soak log, and the final answer is
-built from what the snippet returned.
+runs it against the August 31 retest export, the August 27 soak log or the September
+characterization sweep, and the final answer is built from what the snippet returned.
 
-Before either table is handed to anything, `_as_plausible_volts` range-checks the retest export's
-`value_v` column against the widest node this board has anywhere (0 to 40 V, `VIN_ABS_MAX_V`).
-Sixteen of its eighteen readings are millivolts under a header that says volts, and code catches
-that and corrects it every time `_load_tables` runs, whether or not the model ever calls the tool.
-`docs/THE-BENCH.md` Story 4 is the answer key this module's numbers are checked against.
+Before any table is handed to anything, `_as_plausible_volts` range-checks its volts column
+against the widest node this board has anywhere (0 to 40 V, `VIN_ABS_MAX_V`). Sixteen of the
+retest export's eighteen readings are millivolts under a header that says volts, and code catches
+that and corrects it every time `_load_tables` runs, whether or not the model ever calls the tool;
+the characterization sweep's `vout_v` column goes through the same check, passes it, and code says
+so rather than leaving a reader to assume it was checked. `docs/THE-BENCH.md` Story 4 and Story D
+are the answer keys this module's numbers are checked against.
 
 The sandbox (`run_snippet`) is an allow-listed grammar, the same shape as
 `examples/code_execution`'s `safe_eval` for one arithmetic expression, extended to short
@@ -26,7 +28,7 @@ import csv
 import json
 import statistics
 
-from evals.bench import RETEST_CSV, SOAK_CSV
+from evals.bench import CHARACTERIZATION_CSV, RETEST_CSV, SOAK_CSV
 from examples.common.bench import VIN_ABS_MAX_V
 from examples.common.model import Message, Model
 from examples.common.trace import Tracer
@@ -35,7 +37,11 @@ from examples.common.types import Answer
 LEVEL = 4
 
 #: Which CSV backs each table the sandbox can see, for the citation on the final answer.
-TABLE_SOURCES = {"retest": RETEST_CSV.name, "soak": SOAK_CSV.name}
+TABLE_SOURCES = {
+    "retest": RETEST_CSV.name,
+    "soak": SOAK_CSV.name,
+    "characterization": CHARACTERIZATION_CSV.name,
+}
 
 MAX_SOURCE_CHARS = 1500
 MAX_NODES = 200
@@ -117,12 +123,40 @@ def _parse_soak_rows() -> list[dict]:
         ]
 
 
+def _parse_characterization_rows() -> list[dict]:
+    """The engineering-test sweep: one row per reading, five readings a point, no limits and no
+    verdict column. What a reader computes from it is a margin, not a pass."""
+    with CHARACTERIZATION_CSV.open(newline="", encoding="utf-8") as handle:
+        return [
+            {
+                "serial": row["serial"],
+                "tamb_c": float(row["tamb_c"]),
+                "vin_v": float(row["vin_v"]),
+                "iout_a": float(row["iout_a"]),
+                "reading_n": int(row["reading_n"]),
+                "meter_range_v": float(row["meter_range_v"]),
+                "vout_v": float(row["vout_v"]),
+                "iin_a": float(row["iin_a"]),
+            }
+            for row in csv.DictReader(handle)
+        ]
+
+
 def _load_tables() -> tuple[dict[str, list[dict]], str]:
-    """Both tables the sandbox may see. The retest table has already been through
-    `_as_plausible_volts` by the time anything else touches it."""
+    """The three tables the sandbox may see. Every volts column has already been through
+    `_as_plausible_volts` by the time anything else touches them, and the note says what the check
+    found on each: the retest export is millivolts and gets corrected, the characterization
+    sweep is volts already and is left alone. A check that only ever reports when it fires is a
+    check a reader cannot tell from one that never ran."""
     retest_rows, retest_note = _as_plausible_volts(_parse_retest_rows())
-    note = retest_note or "the retest export's value_v column was already plausible as volts"
-    return {"retest": retest_rows, "soak": _parse_soak_rows()}, note
+    char_rows, char_note = _as_plausible_volts(_parse_characterization_rows(), field="vout_v")
+    note = " ".join(
+        [
+            retest_note or "the retest export's value_v column was already plausible as volts",
+            char_note or "the characterization sweep's vout_v column was already plausible as volts.",
+        ]
+    )
+    return {"retest": retest_rows, "soak": _parse_soak_rows(), "characterization": char_rows}, note
 
 
 # ---------------------------------------------------------------------------
@@ -291,10 +325,13 @@ TOOLS = [RUN_PYTHON_TOOL]
 
 SYSTEM_PROMPT = (
     "You answer questions about Orbeck SRB-5030 test data by writing one short Python snippet "
-    "for run_python. Two tables are loaded: TABLES['retest'] (serial, lot, fixture, measurement, "
+    "for run_python. Three tables are loaded: TABLES['retest'] (serial, lot, fixture, measurement, "
     "value_v, result -- one row per retested board, value_v already checked and corrected to "
-    "volts) and TABLES['soak'] (serial, elapsed_min, vin_v, iout_a, vout_v, tcase_c -- one row "
-    "per five-minute sample of a 90-minute soak). Call run_python at most once, with a snippet "
+    "volts), TABLES['soak'] (serial, elapsed_min, vin_v, iout_a, vout_v, tcase_c -- one row "
+    "per five-minute sample of a 90-minute soak) and TABLES['characterization'] (serial, tamb_c, "
+    "vin_v, iout_a, reading_n, meter_range_v, vout_v, iin_a -- one row per reading of a sweep of "
+    "five prototypes over line, load and temperature, with no limits and no verdict column). "
+    "Call run_python at most once, with a snippet "
     "that assigns its answer to a variable named result. You may call only len, sum, min, max, "
     "sorted, round, abs, set, list, dict, float, int, str, mean and stdev; no import, no "
     "attribute access (a.b), no lambda, no while, no function or class definitions. If you "

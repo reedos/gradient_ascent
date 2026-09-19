@@ -17,8 +17,11 @@ wide margin. Before that board goes to failure analysis and gets opened up, an e
 know whether it is actually a bad board, or a fixture reading low, and what to check next to tell
 the two apart.
 
-That last question is the job. It is not whether this unit is in spec, a comparison the test
-executive already made; it is what the log and one more reading say about what to check next. The
+That last question is the job, and it is engineering test even though the board came off a
+production line: one board on a bench, an answer that is a cause and a next measurement rather
+than a pass or a fail, and a cost counted in a person's afternoon rather than per unit. It is not
+whether this unit is in spec, a comparison the test executive already made; it is what the log and
+one more reading say about what to check next. The
 artifacts an engineer reaches for are the ones this bench keeps: the day's test log,
 the datasheet and test spec, the calibration procedure, the bring-up notebook, and the failure
 analysis guide, plus the bench itself for a confirmation reading. An assistant that works this
@@ -52,10 +55,10 @@ fixture-versus-board reasoning SRB5030-2608-0011 does: the first tool call alrea
 A level 3 workflow, code deciding a fixed order in advance, could certainly encode a script: read
 the log, then always compare the DMM against the load's own terminal reading, then always check
 the calibration procedure. That order is right for 0011 and wastes two calls on 0063, where the
-DMM and the load terminals would simply agree, both near zero, and the log already had the answer.
-Run it the other way, read the log and then go straight to failure analysis, and it scraps a good
-board and a good fixture cycle to fix nothing. The order that is right depends on the shape of the
-first answer, which is exactly what a level 5 loop is for and a checklist is not.
+two readings would simply agree near zero and the log already had the answer. Reverse it, straight
+from the log to failure analysis, and it scraps a good board to fix nothing. Which order is right
+depends on the shape of the first answer, which is what a level 5 loop is for and a checklist is
+not.
 
 The next level up, <Link href="/techniques/orchestrator-workers/">a second agent</Link> reviewing
 the first one's cause before it reaches a person, would catch a wrong read the first agent stated
@@ -133,6 +136,11 @@ offset, not the board, and the next measurement is a person's, not the agent's: 
 channel 2 against `calibration-procedure.md` section 5, then retest this serial on another
 fixture per `failure-analysis-guide.md` section 1's routing rule.
 
+Nothing in that answer is a measurement. The two readings came from instruments, the 30 mV between
+them is a subtraction, and the cause is a hypothesis a person confirms: a model never produces a
+reported measurement, an uncertainty, a margin or a verdict. What it produced here is an order of
+questions.
+
 ## The code
 
 `run` is the loop: offer the three tools, run whichever one the model calls, hand back the
@@ -146,8 +154,8 @@ own decision; running or refusing a tool is always code's.
 decides whether that call happens at all, not whether the model asked politely. Sending a command
 never touched by the check would be the actual bug; this function makes sure that path does not
 exist. It is the only check here, deliberately: the line between a query and a state change is
-written down once, in the bench module every example on this site imports, and a second copy of it
-in this file would be a second copy to keep in step with the first.
+written down once, in the bench module every example on this site imports, and a second copy here
+would be a second copy to keep in step.
 
 <CodeFile file="examples/bench_bring_up_debug_assistant/run.py" func="_measure" />
 
@@ -171,8 +179,8 @@ Every step above is `decided_by: "model"` or `decided_by: "code"` exactly as
 `examples/common/trace.py` requires; the cost figures come from
 `tests/test_example_bench_bring_up_debug_assistant.py`'s scripted walkthrough on `StubModel`,
 which counts tokens deterministically and stands in for what a real model would be asked, not for
-what one would say. No board on this bench gets an agent call by default: this recipe runs on a
-failure that already needs a person's attention, not on every unit that passes.
+what one would say. The unit is the board somebody is already standing over, not the board tested:
+no board on this bench gets an agent call by default.
 
 ## How it fails on a real bench, specifically
 

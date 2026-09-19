@@ -2,8 +2,9 @@
 
     python -m examples.bench_test_data_by_conversation --model stub --question "..."
 
-`--question` is the ad hoc question about the retest export or the soak log; `run.py`'s module
-docstring says which tables are loaded and what the sandbox will and will not run.
+`--question` is the ad hoc question about the retest export, the soak log or the characterization
+sweep; `run.py`'s module docstring says which tables are loaded and what the sandbox will and will
+not run.
 """
 from __future__ import annotations
 

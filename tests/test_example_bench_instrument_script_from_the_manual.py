@@ -111,6 +111,23 @@ class InstrumentScriptExampleTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             float("4.9930V")  # the naive call this function exists to not make
 
+    def test_the_recipe_pages_token_figures_are_what_a_run_actually_counts(self) -> None:
+        """The cost section states ~760 tokens for a clean draft and ~1,575 for one with a single
+        dialect mistake in it, and the low-volume line reuses the second figure as the whole model
+        cost of an afternoon's characterization script. Both are counted by
+        `examples/common/model.py`'s deterministic estimator over the manual excerpt this example
+        actually sends, not by a provider's tokenizer, so they move whenever the excerpt does.
+        """
+        for responses, expected in (
+            ([StubResponse(text=GOOD_DRAFT)], 760),
+            ([StubResponse(text=BAD_DRAFT), StubResponse(text=GOOD_DRAFT)], 1575),
+        ):
+            with self.subTest(total=expected):
+                tracer = make_tracer()
+                run(TASK, StubModel(responses), tracer)
+                total = sum((s.tokens_in or 0) + (s.tokens_out or 0) for s in tracer.steps)
+                self.assertEqual(total, expected)
+
     def test_declares_its_level_and_a_run_function(self) -> None:
         import examples.bench_instrument_script_from_the_manual.run as module
 

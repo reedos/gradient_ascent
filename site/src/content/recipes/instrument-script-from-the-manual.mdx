@@ -16,22 +16,26 @@ the load's own programming manual, a PDF of tables and a worked example, and wri
 means paging through it for every keyword, every unit, every argument order. That's the job: turn
 a manual into a script, for one instrument, without hand-typing every line.
 
-The trap is that this bench has two instrument vendors, and their SCPI dialects disagree. Maridun
-Instruments' supply and multimeter accept `VOLTage` or `VOLT`, `ON`/`OFF` or `1`/`0`, and answer a
-query with a bare number. Tarnley Test Systems' load and scope take the short keyword only, take
-`1`/`0` and nothing else, and answer a query with a unit stuck to the number: `1.0000A`. An
-engineer who has just written the supply's script types `CURRent` and `INP ON` out of habit, and
-the load takes neither.
+The walkthrough below is a production test step, because that is the script this bench's manual
+prints a worked example for. The same loop is worth more at low volume: a one-off characterization
+script runs five times, has no golden run to be checked against, and costs a person their
+afternoon if it is wrong. Volume changes the economics, not the level and not one of the four
+steps below.
+
+The trap is that this bench has two instrument vendors whose SCPI dialects disagree. Maridun
+Instruments' supply and meter accept `VOLTage` or `VOLT` and `ON` or `1`, and answer a query with a
+bare number. Tarnley Test Systems' load and scope take the short keyword and `1`/`0` only, and
+answer with a unit stuck to the number: `1.0000A`. An engineer who has just written the supply's
+script types `CURRent` and `INP ON` out of habit, and the load takes neither.
 
 ## Why level 3, not lower or higher
 
-Level 0 already runs the checked script: once a script is known good, replaying it against 50
-boards a day (the production run in `docs/THE-BENCH.md` tests 200 over four days) costs nothing
-and needs no model at any level, and so does
-<Link href="/recipes/limits-without-a-model/">everything done with the readings it takes</Link>.
-The job a model helps with is the one-time draft, when the script does not exist yet or the manual
-has changed, and a first draft off two disagreeing manuals is where a wrong keyword or a wrong
-boolean word actually gets typed.
+Level 0 already runs the checked script: once it is known good, replaying it costs nothing and
+needs no model at any level, whether against 50 boards a day or across the corners of one
+prototype, and so does <Link href="/recipes/limits-without-a-model/">everything done with the
+readings it takes</Link>. The job a model helps with is the one-time draft, when the script does
+not exist yet or the manual has changed, and a first draft off two disagreeing manuals is where a
+wrong keyword or a wrong boolean word actually gets typed.
 
 A single, ungraded draft (level 1) is not enough, because "does this run clean" is not a matter of
 taste, it's a fact the simulated instrument already knows: send the command, read `SYST:ERR?`.
@@ -39,9 +43,8 @@ Throwing that answer away wastes it. Level 3 puts that check in a loop: draft, c
 against the instrument's own documented set, and if anything was rejected, hand back exactly what
 `SYST:ERR?` said and draft again, capped at a fixed number of tries. Climbing past level 3, to a
 model that also decides *when* to stop or reads back its own success, buys nothing here: whether a
-script is clean is binary and already computed by the simulator, and letting a model decide when
-"clean enough" has been reached would be asking it to grade the one thing code already grades for
-free.
+script is clean is binary and already computed by the simulator, and a model deciding when "clean
+enough" has been reached would be grading the one thing code grades for free.
 
 Four things stay true whether the load on the other end is this simulator or a real TRN-2400 on a
 bench, because the same code runs either way:
@@ -60,11 +63,9 @@ simulator: it is the step the same code takes when the target is not simulated.
 
 ## Walking a draft through the bench
 
-No recorded trace exists for this page: `docs/EVALS.md` explains why, and the numbers below come
-from running `examples/bench_instrument_script_from_the_manual` on `StubModel`, scripted to make
-exactly the mistake a Maridun-trained habit makes. The task is
-`examples.bench_instrument_script_from_the_manual.run.TASK`: set the load to 1.000 A, enable it,
-read it back, disable it.
+No recorded trace exists for this page; `docs/EVALS.md` explains why. The numbers below come from
+running the example on `StubModel`, scripted to make exactly the mistake a Maridun-trained habit
+makes, against `run.TASK`: set the load to 1.000 A, enable it, read it back, disable it.
 
 **Draft 1**, sent to a scratch TRN-2400 with no board wired to it at all:
 
@@ -90,12 +91,13 @@ script asks `SYST:ERR?`, not as anything that looks like a crash.
     INP 0
 
 Clean. Now, and only now, code runs it for real: the supply brings the board to 24.000 V with a
-4.000 A current limit (approved by "R. Osaki", the name already used for this in
-`tests/test_bench.py`), `CURR 1.000` is checked against `SafetyEnvelope` before it is sent, `INP 1`
-needs its own matching approval, and the load reads back `4.9930V` and `1.0000A`. Those are not
-invented numbers: they are what the DUT model in `examples/common/bench.py` computes at 24 V in,
-1.000 A out, and they match the load manual's own worked example exactly, because both describe
-the same board.
+4.000 A current limit approved by R. Osaki, `CURR 1.000` is checked against `SafetyEnvelope`
+before it is sent, `INP 1` needs its own matching approval, and the load reads back `4.9930V` and
+`1.0000A`. Those are not invented numbers: they are what the DUT model in
+`examples/common/bench.py` computes at 24 V in, 1.000 A out, and they match the load manual's own
+worked example exactly, because both describe the same board. Neither went through the model. It
+drafted the commands that took them, and that is where its output stops: a model never produces a
+reported measurement, an uncertainty, a margin or a verdict.
 
 ## The code
 
@@ -109,13 +111,11 @@ board, so it is the one line the model never gets to send outright:
 <CodeFile file="examples/bench_instrument_script_from_the_manual/run.py" func="_enable_load" />
 
 That is a call and not a check, on purpose. The gate lives in `examples/common/bench.py` as
-`GuardedLoad.input_on`, beside the identical one `GuardedSupply.output_on` puts in front of
-`OUTP ON`, so every recipe that enables a load gets it from one place instead of writing its own
-version of the same three refusals. The reason a load enable is gated at all, rather than treated
-as an ordinary set command, is that the TRN-2400 will sink 30 A into a board rated for 3.0 A, and
-the envelope's own load ceiling is deliberately above that rating so the overcurrent step can find
-the real limit. Code cannot tell a deliberate limit hunt from a set point nobody meant, so a person
-names the rail and the current, and code checks the bench is actually at them.
+`GuardedLoad.input_on`, beside the one `GuardedSupply.output_on` puts in front of `OUTP ON`, so
+every recipe that enables a load gets it from one place. It is gated because the TRN-2400 will
+sink 30 A into a board rated for 3.0 A, and because code cannot tell a deliberate limit hunt from
+a set point nobody meant. A person names the rail and the current; code checks the bench is
+actually at them.
 
 And reading a Tarnley reply back:
 
@@ -134,10 +134,19 @@ And reading a Tarnley reply back:
 />
 
 Those are the illustrative run's own numbers, counted by `examples/common/model.py`'s
-`count_tokens` estimate rather than a provider's real tokenizer, and they are a per-script cost,
-not a per-unit one: once a draft runs clean, running it against the next board, and the one after
-that, and all 50 a day, costs no model call at all. The model is paid for once, when the script is
-written or the manual changes; the line is checked in code and run the same way forever after.
+`count_tokens` estimate rather than a provider's real tokenizer. It is a per-script cost in both
+settings, and the reader's own unit decides which line matters.
+
+**Per unit, in production:** zero. Once a draft runs clean, running it against the next board and
+all 50 a day costs no model call at all, so the model is paid for once and the comparison is
+against the seconds the test step itself takes.
+
+**Per session, at low volume:** those same 1,575 tokens are the whole model cost of the afternoon,
+because a characterization script runs five times and there is nothing to amortize over. The
+comparison is against the hour of manual-paging the draft replaced, and against the afternoon lost
+if the draft was wrong. That second cost is larger here, not smaller: in production a wrong keyword
+is caught by the golden run, and at five runs there is no golden run, so step 2 above is the only
+thing between a Maridun habit and a wasted afternoon.
 
 ## How this fails on a real bench
 
@@ -156,7 +165,7 @@ written or the manual changes; the line is checked in code and run the same way 
     {
       name: 'A reading taken before the board has settled',
       notice: 'Step 4 of the manual\'s own load sequence is "Wait 100 ms for the board and the load to settle". A drafted script that goes straight from INP 1 to MEAS:VOLT? still runs clean, because a simulated instrument settles instantly and the error queue has nothing to say about timing. The reading is a number, not a measurement.',
-      test: 'Nothing in the draft, check and revise loop catches this: the simulator is the wrong instrument to ask. It is one of the things the fourth step is for, with a person watching the first reading after the enable next to one taken a second later on the real load.',
+      test: 'Nothing in the draft-check-revise loop catches this; the simulator is the wrong instrument to ask. It is what the fourth step is for: a person comparing the first reading after the enable with one taken a second later on the real load.',
     },
     {
       name: 'An enable command with no approval, or the wrong one',
@@ -172,11 +181,17 @@ written or the manual changes; the line is checked in code and run the same way 
 
 Whether a drafted script is acceptable is a pass or fail a simulator already computes, never a
 model's opinion of its own work: did it run clean within the revision cap, and once run for real,
-did the reading land where the DUT model says it should. Collect one drafting task per production
-test step per instrument, eight steps across four manuals, each with a known-good script as the
-answer key, and measure how many of them converge within the cap and how many revisions each one
-took. A script that never converges is not a partial credit case; it is the "Stop: revision cap
-reached" step in the trace, and it means a person looks at the manual next, not the model again.
+did the reading land where the DUT model says it should. In production there is a set to collect:
+one drafting task per test step per instrument, eight steps across four manuals, each with a
+known-good script as the answer key, scored on how many converge within the cap and how many
+revisions each took. A script that never converges is not a partial credit case; it is the "Stop:
+revision cap reached" step in the trace, and it means a person looks at the manual next, not the
+model again.
+
+At low volume that set does not exist: one script, no answer key. The check to do first costs
+nothing and is mechanical. Every command in the final script appears in the instrument's own
+command table, and every reading lands where the datasheet says. A script that runs clean and
+measures the wrong node is the failure no simulator catches, in either setting.
 
 </HowToEval>
 
