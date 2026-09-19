@@ -244,8 +244,8 @@ chain<Cite n={4}/>.
 
 <TryIt items={[
   { lane: 'use', body: "Read MetaGPT's own documentation for the roles it assigns to a task. For one of those roles, write down what you would need to see in a log to trust that role's output without re-doing its work yourself." },
-  { lane: 'build', body: 'Run python -m examples.organizations_swarms --model stub --question "..." with a task of your own, then open tests/test_example_organizations_swarms.py and read test_a_task_cannot_be_claimed_twice_in_one_round to see a coordinator that actually tries to double-claim a task.' },
-  { lane: 'either', body: "Pick one of the failure modes above and try to cause it on purpose: for the over-budget failure, lower BUDGET_PER_ROLE in examples/organizations_swarms/run.py to 1 and rerun the tests to see which ones still pass." },
+  { lane: 'build', body: 'Run python -m examples.organizations_swarms --model stub:scripted from the repo root. The coordinator proposes five assignments in one call; the board claims four and refuses the fifth, which hands T1 to a second role after an earlier proposal took it.' },
+  { lane: 'either', body: "Cause the over-budget failure on purpose: lower BUDGET_PER_ROLE in examples/organizations_swarms/run.py to 1 and run the same command. The researcher's second task is refused for budget, and T4 is still open at the end." },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

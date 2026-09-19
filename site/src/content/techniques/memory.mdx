@@ -214,9 +214,9 @@ fact never reaches an answer again.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: 'Open a chat app\'s memory settings, if it has them, and look at what it says it has stored about you. Delete one entry, then start a new conversation and ask something that entry would have answered. Does the answer still reflect it?' },
-  { lane: 'build', body: 'Run python -m examples.memory --model stub with a question of your own, then edit SAMPLE_FACTS in examples/memory/__main__.py to add a fact that contradicts an existing one and run it again. The recalled: line shows which one ranks higher, by memory ID; the printed answer is only --model stub\'s placeholder text, not a real judgment, so read tests/test_example_memory.py to see a real, scripted answer built from whichever fact recall ranks first.' },
-  { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose using the synthetic facts in examples/memory/__main__.py.' },
+  { lane: 'use', body: 'Open a chat app\'s memory settings and read what it says it has stored about you. Delete one entry, start a new conversation, and ask something that entry would have answered. Does the answer still reflect it?' },
+  { lane: 'build', body: 'Run python -m examples.memory --model stub:scripted from the repo root. Recall returns m0, m1 and m2, and the answer says no: the dishwasher is in a rental property, which caps coverage at 90 days from a purchase date long past. Ask about the dryer instead (--question "Is my dryer still under warranty?") and the recalled line becomes m3, m0, m1 while the answer does not move. Recall is the only part of this run that responds to what you asked: the reply is a fixture for the first question.' },
+  { lane: 'either', body: 'Cause a failure mode above on purpose, using the synthetic facts in examples/memory/__main__.py.' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

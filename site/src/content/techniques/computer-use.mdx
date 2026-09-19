@@ -197,9 +197,9 @@ level-5 loop a real run actually is.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: 'Find an agent product that can operate a browser or a desktop on your behalf. Ask it to do something with a real consequence (send a message, make a purchase) and see whether it stops to confirm before doing it, or just does it.' },
-  { lane: 'build', body: 'Run python -m examples.computer_use --model stub with a task naming the delete-account link by name, then read what the run returns. Then edit ALLOWED_ELEMENT_IDS in examples/computer_use/run.py to include it and run the same task again.' },
-  { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose against the example, or describe how you would test for it in a product you use.' },
+  { lane: 'use', body: 'Find an agent product that can operate a browser or a desktop. Ask it to do something with a real consequence, like sending a message: does it stop to confirm first, or just do it?' },
+  { lane: 'build', body: 'Run python -m examples.computer_use --model stub:scripted from the repo root: the model types "warranty" into the search box and the code does it. Change that call in SCRIPTED (examples/computer_use/__main__.py) to click delete-account: the run prints Refused: the id is not on ALLOWED_ELEMENT_IDS. Add it there and the click runs. Only your code changed.' },
+  { lane: 'either', body: 'Take a failure mode above: how would you test for it in a product you use?' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

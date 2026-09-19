@@ -207,10 +207,10 @@ runner for the measures above exists yet.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: 'Find a project that ships an AGENTS.md, CLAUDE.md, or a skills directory. Read one skill\'s full body, not just its description: does what it actually says match what its description promised?' },
-  { lane: 'build', body: 'Run python -m examples.skills --model stub with a question of your own from the repo root, then read tests/test_example_skills.py to see a scripted model that chooses a skill, one that names a skill that does not exist, and one that never stops.' },
-  { lane: 'either', body: 'Write two skill descriptions for a task you do regularly, worded so that a person skimming them, not just a model, could tell which one applies to which situation. If you cannot tell them apart quickly, the model probably cannot either.' },
-  { lane: 'either', body: 'Write a SKILL.md-shaped body, a numbered procedure rather than prose, for a measurement you would otherwise explain out loud: the ripple on a switching regulator, say, taken on the oscilloscope with its 20 MHz bandwidth limit on, never on a bench multimeter whose AC volts function stops well below the frequencies that make the ripple. Then ask whether an engineer who had never watched you do it could follow it without you there, which is the actual test of a skill.' },
+  { lane: 'use', body: 'Find a project that ships an AGENTS.md, CLAUDE.md or a skills directory. Read one skill\'s body, not its description: does what it says match what the description promised?' },
+  { lane: 'build', body: 'Run python -m examples.skills --model stub:scripted from the repo root: three descriptions sit in context, the model loads warranty-checklist, and answers from its three steps. Change the name it loads in SCRIPTED (examples/skills/__main__.py) to one that does not exist: the loader reports unknown skill as text, the model answers anyway, and skills loaded reads none.' },
+  { lane: 'either', body: 'Write two skill descriptions for a task you do regularly, worded so a person skimming them, not just a model, could tell which applies when. If you cannot tell them apart quickly, a model will not either.' },
+  { lane: 'either', body: 'Write a SKILL.md-shaped body, a numbered procedure rather than prose, for a measurement you would otherwise explain aloud: the ripple on a switching regulator, on the oscilloscope with its 20 MHz bandwidth limit on, never on a multimeter whose AC volts function stops below the frequencies that make the ripple. Could an engineer who never watched you do it follow it? That is the test of a skill.' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

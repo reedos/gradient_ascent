@@ -225,9 +225,9 @@ exists yet.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: 'Start a conversation with a voice assistant you have access to and interrupt it mid-sentence on purpose. Does it stop immediately? Does anything at the start of the call tell you that you are talking to an AI?' },
-  { lane: 'build', body: 'Run python -m examples.voice_agents --model stub with a question of your own from the repo root, then read tests/test_example_voice_agents.py to see a scripted model that keeps talking across several chunks, one that gets interrupted mid-turn, and one that never yields.' },
-  { lane: 'either', body: 'Write the disclosure sentence you would want to hear at the start of a call with an AI agent. Then check whether the SYSTEM_PROMPT in examples/voice_agents/run.py does anything like it: it does not, on purpose, since this example is about turn control, not disclosure. Where would you actually add it?' },
+  { lane: 'use', body: 'Start a conversation with a voice assistant and interrupt it mid-sentence on purpose. Does it stop immediately? Does anything at the start of the call tell you it is an AI?' },
+  { lane: 'build', body: 'Run python -m examples.voice_agents --model stub:scripted from the repo root. The model speaks one chunk, keeps the floor, speaks a second, and yields on its own: two decisions, not one reply. Now give every entry in SCRIPTED (examples/voice_agents/__main__.py) a continue_speaking call and add a third. Nothing yields, so the code cuts the agent off at the cap.' },
+  { lane: 'either', body: 'Write the disclosure sentence you would want at the start of a call with an AI. Then check the SYSTEM_PROMPT in examples/voice_agents/run.py: it does nothing like it, on purpose, since this example is about turn control. Where would you add it?' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

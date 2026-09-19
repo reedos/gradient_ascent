@@ -224,8 +224,8 @@ whether that expectation holds. Run `python scripts/eval_run.py --example prompt
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: 'Find a multi-step automation you already use (an email rule, a form that files a ticket, a scheduled report) and write down its steps in order. Which step, if it silently got something wrong, would nobody downstream catch?' },
-  { lane: 'build', body: 'Run python -m examples.prompt_chaining --model stub with a question of your own from the repo root, then edit MAX_QUERIES in examples/prompt_chaining/run.py from 3 down to 1 and run it again. The output will not change: --model stub only ever emits one candidate query. Read tests/test_example_prompt_chaining.py, which scripts three real candidate queries, to see a single one actually miss the correcting document that three find.' },
+  { lane: 'use', body: 'Find a multi-step automation you use: an email rule, a form that files a ticket, a scheduled report. Write its steps down in order. Which one, if it silently got something wrong, would nobody downstream catch?' },
+  { lane: 'build', body: 'Run python -m examples.prompt_chaining --model stub:scripted from the repo root. The rewrite turns one question into three queries, retrieval brings back five sections, and the citation check keeps service-bulletin#2, the bulletin correcting the manual. Now set MAX_QUERIES in examples/prompt_chaining/run.py from 3 to 1: one query returns two sections, neither the bulletin, and the check drops the citation the draft still claims.' },
   { lane: 'either', body: 'Take the gate that never fails, above, and cause it on purpose: find a check in a process you run that has never once rejected anything, and work out whether that is because nothing bad has arrived or because the check cannot see the thing that would be bad.' },
   { lane: 'either', body: 'Take a short requirements list you actually have and chain it by hand: propose a test for each requirement, build the traceability table, then check that every requirement has a test and every test names a requirement. Where does the chain, not the requirements, turn out to be the hard part?' },
 ]} />

@@ -251,9 +251,9 @@ on one.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: 'Find a chat app feature that can take an action beyond answering (a connector, a plugin, a custom action). Ask it something the action does not cover and see whether it tells you it could not act, or quietly answers from memory instead.' },
-  { lane: 'build', body: 'Run python -m examples.function_calling --model stub with a question naming a part number not in the parts list (try "What does HLV-9999 cost?"), then one with no part number and no obvious search term at all. Which one calls a tool, and which one does not?' },
-  { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose against the example or a product you use, using only the synthetic documents in evals/corpus/.' },
+  { lane: 'use', body: 'Find a chat app feature that can act beyond answering: a connector, a plugin, a custom action. Ask it something the action does not cover: does it say it could not act, or quietly answer from memory?' },
+  { lane: 'build', body: 'Run python -m examples.function_calling --model stub:scripted from the repo root: the model calls lookup_part on HLV-2205, the code runs it, the answer cites parts-list#2. Change that part number in SCRIPTED (examples/function_calling/__main__.py) to HLV-9999: the tool reports it not found, the next reply still prices it at $52.00, and the citations line empties.' },
+  { lane: 'either', body: 'That is the first failure mode above; cause another the same way, from evals/corpus/ only.' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this

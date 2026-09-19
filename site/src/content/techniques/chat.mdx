@@ -240,10 +240,10 @@ run before spending anything on a real one.
 ## Try it
 
 <TryIt items={[
-  { lane: 'use', body: 'Open a chat app and check which model answered your last message, usually shown in a menu or settings panel. Ask it its own knowledge cutoff date and compare that against what the product\'s own documentation says.' },
-  { lane: 'build', body: 'Run python -m examples.one_call --model stub --question "What voltage does a DR-210 need?" from the repo root, then ask it something real and common instead, like the boiling point of water, and compare how the two replies differ.' },
-  { lane: 'either', body: 'Pick a name from the "Out there" list at the bottom of this page and say which of the four kinds it is: developer, model, product, or tool.' },
-  { lane: 'build', body: 'At a bench, paste a paragraph from an instrument programming manual into a chat app and ask it to summarize the paragraph: that is a safe use, since the text is right there for you to check. Then ask it, with nothing attached, to state a specific accuracy figure from memory, and notice that a fluent answer is not a reported measurement: a chat app never produces one.' },
+  { lane: 'use', body: 'Open a chat app and check which model answered your last message, usually in a menu or settings panel. Ask it its own knowledge cutoff date and compare that against the product\'s documentation.' },
+  { lane: 'build', body: 'Run python -m examples.one_call --model stub:scripted from the repo root. With no documents and no tools, the reply declines to give the DR-210\'s supply voltage and says where the number is: the best answer this level has. Run it again with --model stub: the echo prints the prompt back, the same shape, nothing in it.' },
+  { lane: 'either', body: 'Pick a name from the "Out there" list at the bottom of this page: which of the four kinds is it, developer, model, product or tool?' },
+  { lane: 'build', body: 'At a bench, paste a paragraph from an instrument programming manual into a chat app and ask for a summary: a safe use, since the text is right there to check. Then ask it, with nothing attached, for a specific accuracy figure from memory. A fluent answer is not a reported measurement, and never becomes one.' },
 ]} />
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
