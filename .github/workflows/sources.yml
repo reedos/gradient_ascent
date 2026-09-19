@@ -1,0 +1,51 @@
+# Check that every source this site cites is still there, and still the page we named.
+#
+# MANUAL ONLY, like pages.yml. Run it from the Actions tab, or with
+# `gh workflow run sources.yml`. To have it watch on its own, uncomment the `schedule` block
+# below: that is one line, and it is a decision rather than a default, because the job makes a
+# request to each of ~390 other people's servers every time it runs.
+#
+# What it does with what it finds: nothing automatic. It writes the report into the run's summary
+# and fails the run if a source is gone, so the failure is the notification. It does not open
+# issues and it does not edit any page: deciding what a moved or rewritten source means for the
+# sentence that cites it needs someone to read the page.
+
+name: sources
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "0 9 1 * *"   # 09:00 UTC on the first of each month
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check every cited source
+        id: check
+        # The script is standard library only, so there is nothing to install. It never calls a
+        # model. `--fail-on-dead` is what turns a dead source into a failed run.
+        run: python scripts/check_sources.py --workers 6 --fail-on-dead
+
+      - name: Put the report in the run summary
+        if: always()
+        run: cat .local/research/source-check.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the report as an artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-check
+          path: .local/research/source-check.md
+          if-no-files-found: error
