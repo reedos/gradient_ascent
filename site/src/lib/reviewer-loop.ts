@@ -1,13 +1,19 @@
 import { toMarkdown, type Block } from './agents';
 
-export const reviewTitle = 'Test a handoff with independent review';
-export const reviewIntro = 'Have one agent draft a brief, a fresh agent use it, and a separate reviewer check the result against what you actually wanted. Use the findings to improve the handoff, then test again.';
+export const reviewTitle = 'A team of agents that improves your project brief';
+export const reviewIntro = 'Describe what you want to accomplish. A lead agent coordinates a brief writer, independent receiving agents, and reviewers to uncover misunderstandings and return a better brief, candidate approaches, and the decisions that still need you.';
+export const teamRoles = [
+  { title: 'Lead agent', text: 'Owns the task record. Chooses which workers to involve, resolves evidence-backed findings, and decides whether to revise, ask you, or stop.' },
+  { title: 'Brief writer', text: 'Turns your goal and files into a versioned brief. Revises it when a review exposes missing or misleading instructions.' },
+  { title: 'Receiving agents · parallel', text: 'Independently attempt the requested proposal using the same brief and files. Different models or providers can reveal different interpretations.' },
+  { title: 'Reviewer agents · independent', text: 'Compare proposals with your original intent and evidence. Return cited findings and uncertainty without seeing provider labels.' },
+];
 export const reviewSteps = [
-  { title: 'Freeze the task', text: 'You or a coordinator record the real requirements, representative files, boundaries, and review criteria.' },
-  { title: 'Draft the brief', text: 'A drafting agent uses only the supplied facts. You confirm that the brief represents your intent.' },
-  { title: 'Hand it off', text: 'A fresh receiving agent gets the exact brief and designated files, then produces a proposal.' },
-  { title: 'Review independently', text: 'A separate reviewer compares the proposal with the original requirements and cites evidence for each finding.' },
-  { title: 'Adjudicate and revise', text: 'You check the findings, revise the responsible stage, and run a fresh trial within a preset budget.' },
+  { title: 'You describe the outcome', text: 'Provide your goal, current inputs and outputs, intended automation, and boundaries. The lead asks only about consequential gaps.' },
+  { title: 'Writer drafts version 1', text: 'The lead passes confirmed facts and unknowns to the writer, then freezes a brief version for this round.' },
+  { title: 'Workers try the brief', text: 'Fresh receiving agents independently propose how to accomplish the task. The application collects their outputs in parallel.' },
+  { title: 'Reviewers find mismatches', text: 'Independent reviewers identify omitted facts, extra human work, unsupported claims, and conflicting interpretations.' },
+  { title: 'Lead coordinates revision', text: 'The lead sends supported findings to the writer, requests another bounded round if useful, or returns the brief and open decisions to you.' },
 ];
 const p = (text: string): Block => ({ kind: 'p', text });
 const ul = (...items: string[]): Block => ({ kind: 'ul', items });
@@ -15,18 +21,29 @@ const code = (text: string): Block => ({ kind: 'code', text });
 export function reviewSections(abs: (path: string) => string): { id: string; title: string; blocks: Block[] }[] {
   const repo = 'https://github.com/reedos/gradient_ascent/blob/main/docs/evaluations/';
   return [
-    { id: 'start', title: 'Start with one useful question', blocks: [
-      p('Does this handoff help another agent deliver the outcome I want, with the amount of human work I intended? A polished brief is not evidence of a successful handoff. This guide is a proposed method with a scripted example, not an automated service or a measured benchmark.'),
-      p(`Use an existing brief or the [project brief builder](${abs('/apply/')}). If success is still vague, try the [definition-of-done builder](${abs('/tools/definition-of-done/')}). You can run each role in separate conversations with your own models; no custom multi-agent platform is required.`),
-      p('For a personal check, start with one receiving agent and one reviewer. For a comparison, freeze the cases and rubric before running any condition. Set a cost limit and a revision limit in advance; two revision cycles is a possible starting budget, not a validated optimum. Stop for unresolved serious failures, exhausted budget, or no meaningful improvement.'),
+    { id: 'start', title: 'The application: a brief improvement team', blocks: [
+      p('This is a worked application of a team of agents: a person describes a project, and the team tests how other agents interpret that description before returning an improved handoff. The person uses one interface; the lead handles delegation, context, reviews, and revisions behind it. This page illustrates the design with scripted material. It does not launch agents or call model providers.'),
+      p('The input is your goal, representative files, current workflow, intended human involvement, and boundaries. The output is a revised brief, candidate implementation approaches, a concise account of what changed and why, and unresolved decisions. You should not have to relay messages between agents or study a benchmark report to use the application.'),
+      p(`An existing brief or the [project brief builder](${abs('/apply/')}) can supply the starting point. If success is vague, the team can help draft observable acceptance criteria, as in the [definition-of-done builder](${abs('/tools/definition-of-done/')}). Proposed thresholds remain proposals until accepted.`),
+      p('The lead can choose an additional specialist, ask a targeted question, or stop when another round offers little value. A simpler version can run a fixed writer–receiver–reviewer sequence. Use the adaptive team when meaningful disagreement or task-specific investigation justifies the extra cost.'),
     ] },
-    { id: 'example', title: 'Worked example: a weekly status report', blocks: [
+    { id: 'coordination', title: 'What the lead controls—and what it cannot decide', blocks: [
+      ul('The application stores a versioned task record, briefs, designated attachments, proposals, findings, and decision log. Each finding names its brief version and supporting source so a late review cannot accidentally revise the wrong draft.', 'Receiving workers get the same brief version and designated files, not each other’s answers. Reviewers get the original requirements and evidence. Private scoring cards and provider mappings stay out of workers’ contexts and accessible filesystems.', 'The lead routes facts and questions between roles, consolidates duplicate findings, and requests focused revisions. It may resolve a factual dispute from available evidence; it must ask you about missing preferences or consequential tradeoffs rather than invent your intent.', 'The runtime enforces provider access, tool permissions, concurrency, cost, time, and revision limits. Prompts describe these boundaries but do not enforce them. Share only files permitted for each provider; a multi-provider design does not require sending every file everywhere.', 'On timeout or provider failure, preserve completed work and label missing contributions. Retry within the budget or return a partial result; do not claim independent review happened when no reviewer completed. Unresolved serious findings remain visible.'),
+      p('A proposed starting budget is two receiving workers, one independent reviewer, and at most two revision rounds. This is a design choice to test, not a measured optimum. Stop on budget exhaustion, lack of meaningful improvement, or a decision only the user can make. Extra reviewer models are optional; majority agreement cannot establish truth.'),
+    ] },
+    { id: 'user-view', title: 'What you see in the interface', blocks: [
+      code('YOUR REQUEST → “Prepare a weekly status report from my existing sources. I want to review it, not reconcile everything by hand.”\n\nTEAM ACTIVITY → Writer drafted v1 · 2 receiving agents completed · Reviewer found 3 mismatches · Lead requested v2\n\nREADY FOR YOU\n• Revised brief, with changes explained\n• Candidate approach and remaining human work\n• Evidence-backed concerns and unresolved disagreements\n• One question: Where is the current draft, or should the system create a new one?\n\nACTIONS → Inspect evidence · Answer question · Download brief · Request revision'),
+      p('This is an illustrative interface, not a completed model run. Reviewing a brief does not approve implementation, messages, publication, or equipment operation. The team’s deliverable here is a useful proposal and handoff; a separate authorized implementation phase would build and test the proposed system.'),
+    ] },
+    { id: 'example', title: 'One task through the team: weekly reporting', blocks: [
       p('Scripted teaching case: you want a review-ready weekly report across three projects. The system should read previous reports and current issue exports, identify changes and missing updates, and prepare a draft with links to evidence. You review the draft; it must not send anything. You do not want to rebuild a status spreadsheet each week.'),
       ul('Supplied facts: last week’s report, current issue exports, and a note that two sections depend on updates from Rosa and Tom. The current draft location is unknown.', 'Private review criteria: preserve both contributor dependencies; do not turn missing updates into green status; do not invent a draft location or a completed check; preserve review-only human effort and the no-send boundary. The receiver gets the original task facts through the tested handoff, not the private scoring card.'),
       { kind: 'h3', text: '1. A plausible handoff goes wrong' },
       code('Draft brief: Prepare this week’s report from the shared-drive draft and issue exports.\nReceiving proposal: Ask the user to reconcile every project in a spreadsheet, then produce the report. All sources verified.'),
+      p('In this scripted round, receiving agent A proposes that manual spreadsheet step. Receiving agent B instead proposes automatic reconciliation, but assumes every missing issue update means “no change.” Both outputs go to the reviewer independently. Two fluent proposals expose different problems; neither is accepted just because it completed.'),
       { kind: 'h3', text: '2. The reviewer explains the failure' },
       ul('Unsupported location: “shared-drive draft” is not in the source facts. Trace the problem to the draft before blaming the receiver.', 'Lost dependencies: Rosa and Tom disappeared from the handoff. The receiving agent cannot reliably recover facts it never received.', 'Extra recurring labor: the spreadsheet reconciliation contradicts the intended workflow. The system should reconcile available evidence and present exceptions.', 'False verification: “All sources verified” has no inspection record. A proposal cannot claim executed checks.'),
+      p('The reviewer also flags B’s missing-update assumption. The lead checks these findings against the task record, routes the omissions and unsupported assumptions to the writer, and asks the user where the current draft is only if reusing it is necessary. It does not ask the user to choose a winning model. The revised design retains B’s automatic reconciliation while requiring explicit unknown status for missing evidence.'),
       { kind: 'h3', text: '3. Revise the handoff and try again' },
       code('Use the supplied previous report and issue exports to draft the next report. Preserve source links and mark missing or conflicting updates. Rosa and Tom still owe two sections. Current draft location: UNRESOLVED. Automate reconciliation; ask me only about consequential exceptions and final review. Do not send. Distinguish checks proposed from checks actually executed.'),
       p('Expected behavior to test, not a result observed here: the fresh receiver proposes a sourced draft, keeps missing sections visible, and asks about the draft location only when it matters. Check that the actual reviewable report is the deliverable, not merely a manifest saying processing finished. Replay the original case and a held-out case with conflicting dates; fixing this wording alone does not establish general reliability.'),
@@ -72,6 +89,7 @@ export function reviewSections(abs: (path: string) => string): { id: string; tit
       p('All three motivate a better next test: matched frozen inputs, three conditions, blind review, repeated trials, explicit evidence, and a separate human usability check. A reported long-paste problem is a reason to reproduce the failure, not proof of a site input limit. Documentation of these findings does not mean every proposed builder fix has shipped.'),
     ] },
     { id: 'concepts', title: 'How this connects to the concepts', blocks: [
+      p(`The main pattern is [lead agent and workers](${abs('/techniques/orchestrator-workers/')}): the lead decides which tasks to delegate, which findings need follow-up, and when to involve the user. [Review and debate](${abs('/techniques/debate-review/')}) supplies independent critique. [Parallel calls](${abs('/techniques/parallelization/')}) let receiving agents attempt the same brief concurrently; adding providers changes the perspectives, not automatically the autonomy level.`),
       p(`A predetermined draft → receive → review → revise sequence fits [workflows](${abs('/techniques/prompt-chaining/')}) and [write and check](${abs('/techniques/evaluator-optimizer/')}) at level 3. Multiple model calls or providers do not by themselves make it level 6. When separate agents choose investigations, tool calls, and follow-up checks, [review and debate](${abs('/techniques/debate-review/')}) becomes relevant.`),
       p(`[Context engineering](${abs('/techniques/context-engineering/')}) determines what each role can see. [Evaluations](${abs('/techniques/evals/')}) supply cases and criteria. [Human approval](${abs('/techniques/human-in-the-loop/')}) governs consequential action; [guardrails](${abs('/techniques/guardrails/')}) and execution permissions enforce boundaries. In this proposal-only example, no external action is authorized.`),
       p('Reviewed 2026-09-20. Primary background: [Anthropic’s workflow and evaluator–optimizer discussion](https://www.anthropic.com/engineering/building-effective-agents) distinguishes predefined workflows from adaptive agents. [Judging LLM-as-a-Judge](https://arxiv.org/abs/2306.05685) documents judge limitations including position, verbosity, and self-enhancement biases. The concrete protocol and example here are our design recommendations, not guarantees from those sources.'),
@@ -79,5 +97,9 @@ export function reviewSections(abs: (path: string) => string): { id: string; tit
   ];
 }
 export function reviewMarkdown(abs: (path: string) => string): string {
-  return toMarkdown(reviewTitle, [p(reviewIntro), { kind: 'h2', text: 'The feedback loop' }, { kind: 'ol', items: reviewSteps.map(s => `${s.title}: ${s.text}`) }, ...reviewSections(abs).flatMap(s => [{ kind: 'h2', text: s.title } as Block, ...s.blocks])]);
+  const sections = reviewSections(abs);
+  const primaryIds = ['start', 'coordination', 'user-view', 'example', 'concepts'];
+  const primary = primaryIds.map(id => sections.find(s => s.id === id)!);
+  const supporting = sections.filter(s => !primaryIds.includes(s.id));
+  return toMarkdown(reviewTitle, [p(reviewIntro), { kind: 'h2', text: 'The application’s team' }, ul(...teamRoles.map(s => `${s.title}: ${s.text}`)), { kind: 'h2', text: 'How one round unfolds' }, { kind: 'ol', items: reviewSteps.map(s => `${s.title}: ${s.text}`) }, ...primary.flatMap(s => [{ kind: 'h2', text: s.title } as Block, ...s.blocks]), {kind:'h2', text:'Supporting evaluation method'}, ...supporting.flatMap(s => [{kind:'h2', text:s.title} as Block, ...s.blocks])]);
 }

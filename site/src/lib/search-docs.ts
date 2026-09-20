@@ -68,7 +68,7 @@ function formerNameOnly(formerly: string | undefined): string | undefined {
 
 export async function buildSearchDocs(): Promise<SearchDoc[]> {
   const docs: SearchDoc[] = [];
-  docs.push({ id: 'view:reviewer-feedback-loop', kind: 'view', title: 'Test a handoff with independent review', summary: 'Draft, receive, review, and revise. Parallel models and providers, blind evaluation, evidence tracking, and raw-description baselines.', url: url('/examples/reviewer-feedback-loop/') });
+  docs.push({ id: 'view:reviewer-feedback-loop', kind: 'view', title: 'A team of agents that improves your project brief', summary: 'Lead agent and workers: brief writing, parallel receiving agents, independent reviewers, and coordinated revision. Includes supporting evaluation methods.', url: url('/examples/reviewer-feedback-loop/') });
   docs.push({ id: "view:examples", kind: "view", title: "Worked examples", summary: "98 scripted examples across everyday life, engineering, and business.", url: url("/examples/") });
 
   // Every technique and topic: tier pages, track roots, and track pages (site/src/lib/content.ts
