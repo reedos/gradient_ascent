@@ -145,7 +145,7 @@ def _scan() -> tuple[list[str], list[str]]:
             # The owner explicitly requested this public attribution. Exempt only that exact
             # markup in the shared footer; other identifiers and lines remain checked.
             if rel == "site/src/components/Footer.astro":
-                credit = f'<p class="project-attribution">Put together by <strong>{_license_owner()}</strong>.</p>'
+                credit = f'<p class="project-attribution">Created and curated by <strong>{_license_owner()}</strong>.</p>'
                 line = line.replace(credit, "")
             for label, needle in needles.items():
                 m = needle.search(line)
