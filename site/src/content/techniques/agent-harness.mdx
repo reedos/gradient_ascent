@@ -202,13 +202,62 @@ those controls are already implemented.
 - **Validation record:** checks the agent actually ran, followed by hardware results the user supplies.
 - **Open questions, limitations, and approvals:** unresolved issues and any requested tool or framework changes.
 
-This example connects <Link href="/techniques/context-engineering/">context engineering</Link>,
-<Link href="/techniques/guardrails/">guardrails</Link>,
-<Link href="/techniques/human-in-the-loop/">human approval</Link>, and
-<Link href="/techniques/observability/">observability</Link> around the harness.
-To <Link href="/techniques/evals/">evaluate the agent</Link>, independently review whether the
-project implements the agreed requirements, reuses the framework appropriately, respects approvals,
-and accurately reports what was and was not tested.
+### How the concepts fit together
+
+The harness coordinates these concepts during one task: **turn a DUT brief into a reviewable
+project using an existing framework.** Some parts describe what the model sees, some decide
+what may happen, and others establish what actually happened. The controls below describe the
+intended setup; they are not a claim that custom checks or restrictions already exist.
+
+| Concept | Where it appears in this DUT workflow | What it contributes |
+| --- | --- | --- |
+| <Link href="/techniques/prompt-engineering/">Instructions and prompting</Link> | `CLAUDE.md` sets reusable rules; the request and `DUT_BRIEF.md` define the task. | Tell the agent to reuse framework functions, ask about unknowns, and deliver reviewable files. Instructions express policy; they do not enforce permissions. |
+| <Link href="/techniques/context-engineering/">Context engineering</Link> | Select the relevant API documentation, closest past project, DUT differences, approved plan, and latest feedback for the next model call. | Keep current requirements and approvals available as the conversation grows. Old project values are reference material, not automatically valid limits for this DUT. |
+| <Link href="/techniques/single-agent/">The agent loop</Link> | Read, propose, wait for approval, edit, check, inspect results, and revise. | The model chooses its next action within the allowed scope; the harness executes permitted actions and returns their results. Pause for missing requirements or an approval decision. |
+| <Link href="/techniques/function-calling/">Tools</Link> and <Link href="/techniques/code-execution/">code execution</Link> | File reads, edits, and approved non-hardware checks are actions available to the coding agent. Generated Python calls the framework APIs later when the user runs it. | Distinguish an agent tool from a Python function used by the resulting project. Writing an instrument call does not grant permission to execute it. |
+| <Link href="/techniques/guardrails/">Guardrails</Link> | Proposed checks inspect intended actions and generated files for disallowed paths, direct instrument access, missing required configuration, or unapproved helpers. | Reject a prohibited action or flag work for correction. Syntax and schema checks can be deterministic; judging whether an existing tool meets a requirement may still need human review. These checks must be implemented and tested. |
+| Permissions and sandboxing | Configure project-only writes, protected framework files, and an environment without live instrument access. | Bound what executed code can actually touch, even if the model proposes otherwise. Read-only framework access remains to be confirmed; a path check alone is not a complete sandbox. |
+| <Link href="/techniques/human-in-the-loop/">Human approval</Link> | The user approves `PROJECT_PLAN.md`, separately decides on any new helper or framework change, and controls hardware testing. | Resolve a decision the agent cannot authorize for itself. Approval is scoped to the stated change; a declined request leaves the boundary in place. |
+| <Link href="/techniques/observability/">Observability</Link> | Retain file diffs, commands, check results, approval decisions, and reasons for blocked actions; summarize progress in `PROJECT_STATUS.md`. | Explain why the run changed a file, stopped, or failed. The status document is a readable summary, not a substitute for the underlying execution record. |
+| <Link href="/techniques/evals/">Evaluation</Link> | Independently compare the output with the DUT requirements, framework conventions, approval record, and reported validation status. | Assess the agent's work. User-run hardware tests assess the resulting measurement behavior; passing syntax checks establishes neither of these on its own. |
+| <Link href="/techniques/cost-optimization/">Cost and stop controls</Link> | Set supported step, time, or spend limits, plus a policy for repeated failed checks and unresolved requirements. | Bound revision work and hand back a partial result with a clear reason for stopping. Exact budgets have not been selected for this example. |
+| <Link href="/techniques/memory/">Persistent task state</Link> | Save the approved plan, project status, and user feedback; explicitly load them when resuming. | Carry decisions between sessions without assuming the model remembers them. Saved files only help when their relevant contents reach the next request. |
+
+### One proposed helper, several different controls
+
+Suppose the agent believes it needs a new unit-conversion helper for the DUT:
+
+1. **Context and tools:** it reads the framework's existing conversion API and relevant past code.
+   If those already meet the requirement, it uses them in the generated project.
+2. **Guardrail and approval:** if it proposes a new helper, a configured policy check should pause
+   that creation until a specific approval exists. The agent explains the gap and asks the user.
+   Without an implemented check, this remains an instruction the agent is expected to follow.
+3. **Permissions:** approval for a helper in the project does not unlock the shared framework or
+   instrument access. A framework change would require its own authorization and scoped access.
+4. **Execution and observation:** after approval, it writes the helper within scope, runs only
+   approved non-hardware checks, and records the change, approval, and actual results.
+5. **Evaluation and feedback:** the reviewer checks the conversion against the agreed requirement.
+   The user performs any required hardware validation and returns findings. The agent revises
+   within scope or stops and reports the next decision it needs.
+
+**The guardrail checks the proposal; the person authorizes an exception; permissions constrain
+execution; logs record the outcome; evaluation judges whether the result meets the requirement.**
+The harness brings these together around the model's repeated calls.
+
+### Relating this to the code and run below
+
+The runnable demonstration below uses a document lookup task, not this DUT framework. Its
+`ContextPolicy` corresponds to selecting the documentation and decisions the model sees;
+`ToolRegistry` corresponds to the actions the coding agent can call; a `Hook` illustrates checking
+a proposed action before execution; and the caps bound the loop. A veto hook alone is not a human
+approval workflow: that also needs a pause, a recorded decision, and a way to resume within scope.
+The trace illustrates observability. The DUT diagram describes how these responsibilities would
+apply to your project workflow, without claiming the demonstration implements its controls.
+
+You do not need every technique on the site to start this workflow. Reading repository files does
+not by itself establish a RAG system, a Markdown instruction file is not automatically a packaged
+skill, and using Python APIs does not require MCP. Those are separate choices if retrieval,
+reusable procedures, or external tool connections become necessary.
 
 ## A run, step by step
 
@@ -258,7 +307,7 @@ model's fault.
 </Lane>
 <Lane name="build" title="Build it">
 
-The example is the same loop <Link href="/techniques/single-agent/">single agent</Link> runs —
+The document lookup demonstration is the same loop <Link href="/techniques/single-agent/">single agent</Link> runs —
 act, check a cap, repeat: rebuilt so four moving parts are arguments to `run` instead of fixed in
 the function body: a `ToolRegistry` (the definitions the model is shown, and the `allowed` set
 checked before any of them runs: the split

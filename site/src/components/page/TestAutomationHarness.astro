@@ -1,6 +1,9 @@
+---
+import Link from './Link.astro';
+---
 <figure class="test-harness" aria-labelledby="test-harness-caption">
   <div class="brief">
-    <span class="label">You provide the starting files</span>
+    <span class="label">Instructions + context · you provide the starting files</span>
     <div class="parts input-files">
       <div><strong>CLAUDE.md</strong><span>Reusable framework instructions: conventions, boundaries, approvals, and deliverables</span></div>
       <div><strong>DUT_BRIEF.md</strong><span>New for each DUT: requirements, differences from past projects, and known configuration</span></div>
@@ -11,23 +14,32 @@
   <div class="harness">
     <span class="label">Claude Code · agent harness</span>
     <div class="model"><strong>Claude · model</strong><span>Reads the context, asks about missing requirements, and proposes a project plan</span></div>
-    <div class="plan-gate"><span class="label">Agent drafts · you approve</span><strong>PROJECT_PLAN.md</strong><span>Reference project, proposed files, intended changes, reused tools, and non-hardware checks</span></div>
+    <div class="plan-gate"><span class="label">Human approval · agent drafts, you approve</span><strong>PROJECT_PLAN.md</strong><span>Reference project, proposed files, intended changes, reused tools, and non-hardware checks</span></div>
     <div class="loop">Wait for your approval → generate project files → check without hardware</div>
     <div class="harness-controls">Reuse the closest project, or a template. Framework changes and new project-local tools need separate approval.</div>
+    <div class="control-map">
+      <span class="label">Controls around each action · intended setup</span>
+      <div class="parts">
+        <div><strong><Link href="/techniques/guardrails/">Guardrails</Link></strong><span>Check proposed actions and generated files. Block or flag prohibited changes; pause for required approvals.</span></div>
+        <div><strong>Permissions + sandbox</strong><span>Restrict writes to the approved project and withhold live instrument access. Framework protection needs confirmation.</span></div>
+        <div><strong><Link href="/techniques/observability/">Observability</Link></strong><span>Record edits, commands, approvals, check results, and blocked actions with their reasons.</span></div>
+        <div><strong><Link href="/techniques/cost-optimization/">Stop controls</Link></strong><span>Pause for decisions; stop at configured limits or repeated failures and report unfinished work.</span></div>
+      </div>
+    </div>
   </div>
   <div class="flow"><span aria-hidden="true">↓</span> Generate project files using existing framework interfaces</div>
   <div class="framework">
     <span class="label">Shared framework + new DUT project</span>
     <div class="parts">
       <div><strong>Project conventions</strong><span>Templates, documentation, previous projects</span></div>
-      <div><strong>Established functions</strong><span>Measurements, units, CSV export; SCPI stays behind the instrument interfaces</span></div>
+      <div><strong>Tools + established functions</strong><span>The agent reads and edits files. Generated code reuses measurements, units, and CSV export; SCPI stays behind framework interfaces.</span></div>
       <div><strong>Agent-generated deliverables</strong><span>Python code + YAML/JSON configuration + Markdown documentation, including PROJECT_STATUS.md</span></div>
       <div><strong>Non-hardware checks</strong><span>Python syntax and configuration validity; no instrument connections</span></div>
     </div>
   </div>
   <div class="flow" aria-hidden="true">↓</div>
-  <div class="brief"><span class="label">You review and test</span><strong>Review files → test on real instruments → return logs and observations</strong><div class="harness-controls">The agent updates PROJECT_STATUS.md with completed work, actual checks, supplied hardware results, and unresolved issues.</div></div>
-  <div class="flow"><span aria-hidden="true">↺</span> Agent revises the project within the approved scope</div>
+  <div class="brief"><span class="label">Evaluation + human review</span><strong>Review against requirements → test on real instruments → return logs and observations</strong><div class="harness-controls">Evaluate requirements, framework reuse, and approval compliance. The agent updates PROJECT_STATUS.md with actual checks, supplied hardware results, and unresolved issues.</div></div>
+  <div class="flow"><span aria-hidden="true">↺</span> Context for the next call: approved plan + relevant files + feedback → revise within scope</div>
   <figcaption id="test-harness-caption">CLAUDE.md is reused across DUTs; DUT_BRIEF.md changes for each project. The plan, brief, and status filenames are conventions for this example. Permissions are configured separately: Markdown instructions do not enforce filesystem or instrument restrictions. This is a specified workflow, not a recorded run; read-only framework access remains to be confirmed.</figcaption>
 </figure>
 <style>
@@ -39,6 +51,7 @@
   .harness > .label { color: var(--o5); }
   .model { background: var(--panel2); border: 1px solid var(--line); border-radius: 6px; padding: 20px; }
   .input-files { text-align: left; }
+  .control-map { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
   .plan-gate { border-left: 3px solid var(--o5); background: var(--panel2); padding: 18px 20px; margin-top: 18px; }
   .plan-gate > span:last-child { display: block; color: var(--muted); font-size: 14px; line-height: 1.7; margin-top: 8px; }
   .model span, .parts span { display: block; color: var(--muted); font-size: 14px; line-height: 1.7; margin-top: 8px; }
