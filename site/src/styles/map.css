@@ -12,12 +12,12 @@ main:has(.map-wrap) { max-width: 1800px; padding-inline: 24px; }
   gap: 22px;
 }
 
-.map-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 22px; align-items: start; }
+.map-workspace { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; align-items: start; }
 
 .map-viewport { min-width: 0; border-radius: 10px; }
 .map-viewport:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .map-workspace .map-selection { padding: 22px; min-width: 0; }
-.map-workspace .map-selection-links { grid-template-columns: 1fr; margin-top: 18px; }
+.map-workspace .map-selection-links { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); margin-top: 18px; }
 .map-selection-links li { border-top: 1px solid var(--line); padding-top: 14px; }
 .map-connection-heading { line-height: 1.6; }
 .map-connection-heading .map-swatch { margin-right: 8px; }
