@@ -4,6 +4,23 @@
   "note": "What changed on this site, and why it matters to somebody reading it. Newest first. Entries are written for a reader, not for whoever made the change: they say what is different and what it is good for, never what a commit did. Every entry links the pages it touched. Several entries can share a date; within a date, file order is the order shown. docs/CHANGES.md says how to add one.",
   "changes": [
     {
+      "id": "a-quieter-map-with-focused-connections",
+      "date": "2026-09-19",
+      "title": "A cleaner map keeps the focus on the connections",
+      "what": "The concept map and home preview use clean lines without endpoint circles. Hovering or focusing a concept still hides unrelated connections, and the concept selector provides the same focused view on a phone. Passing lines keep their clearance around unrelated blocks.",
+      "why": "The connection circles added too much visual noise to the overview. Isolating one concept provides the useful clarity while keeping the full map lighter. The relationship list below the drawing continues to state each connection and its direction.",
+      "pages": [
+        {
+          "label": "Concept map",
+          "path": "/map/"
+        },
+        {
+          "label": "Home",
+          "path": "/"
+        }
+      ]
+    },
+    {
       "id": "map-connections-you-can-trace",
       "date": "2026-09-19",
       "title": "Connection dots make the concept map easier to trace",

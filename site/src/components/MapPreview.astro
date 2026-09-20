@@ -28,10 +28,6 @@ const edges = mapConnections({ ...mapLayout, nodes, edges: mapLayout.edges.filte
         <rect x={n.x} y={n.y} width={n.w} height={n.h} rx="7" fill="var(--panel2)" stroke={n.color} />
         <text x={n.x + n.w / 2} y={n.y + n.h / 2} fill="var(--text)" text-anchor="middle" dominant-baseline="central">{n.label}</text>
       </g>)}
-      {edges.map(e => <g stroke={e.type === 'upgrades_to' ? 'var(--accent)' : 'var(--muted)'} stroke-width="2">
-        <circle cx={e.geometry.x1} cy={e.geometry.y1} r="4" fill="var(--bg)" />
-        <circle cx={e.geometry.x2} cy={e.geometry.y2} r="4" fill={e.type === 'upgrades_to' ? 'var(--accent)' : 'var(--muted)'} />
-      </g>)}
     </svg>
     <span>A few connections from the full map <span aria-hidden="true">↗</span></span>
   </a>

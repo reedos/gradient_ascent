@@ -8,7 +8,7 @@
 // `requires` and `upgrades_to` draw by default; `combines_with` and `alternative_to` are frequent
 // enough to turn the drawing into a hairball, so they stay off until a reader turns on one of the
 // checkboxes below (pure CSS, :has()) or focuses a concept. The script isolates its connections;
-// the geometry, border ports, and full text list remain available without JavaScript.
+// the geometry and full text list remain available without JavaScript.
 import { url } from '../lib/url';
 import { mapLayout, mapConnections, edgesByBand, edgePathD, RELATION_LABEL, relationTypes, type RelationType } from '../lib/map';
 import '../styles/map.css';
@@ -65,7 +65,7 @@ const drawableEdges = mapConnections(layout)
   <p class="footnote">
     Turning on the other two kinds adds {edgeCount.combines_with + edgeCount.alternative_to} more
     lines, so they start off. Hover or tab to a concept to isolate all its connections, or choose
-    one below. A circle on a block marks a real connection; unmarked crossings do not.
+    one below. Passing lines leave a gap around unrelated blocks.
   </p>
   <label class="map-focus-label" for="map-focus">Focus on a concept</label>
   <select id="map-focus" disabled><option value="">All concepts</option>{[...layout.nodes].sort((a, b) => a.title.localeCompare(b.title)).map(n => <option value={n.slug}>{n.title}</option>)}</select>
@@ -161,18 +161,13 @@ const drawableEdges = mapConnections(layout)
           </a>
         ))
       }
-      {drawableEdges.map(e => <g class:list={['map-edge', 'map-endpoints', `map-edge-${e.type.replace(/_/g, '-')}`]}
-        data-from={e.from} data-to={e.to} data-type={e.type} aria-hidden="true">
-        <circle class="map-port" cx={e.geometry.x1} cy={e.geometry.y1} r="3.6" />
-        <circle class:list={['map-port', { 'map-port-target': e.type === 'requires' || e.type === 'upgrades_to' }]} cx={e.geometry.x2} cy={e.geometry.y2} r="3.6" />
-      </g>)}
     </svg>
   </div>
 </div>
 
 <div class="map-legend">
   <h3 class="map-legend-heading">What each line means</h3>
-  <p class="map-port-key"><span aria-hidden="true">○ → ●</span> For “requires” and “upgrades to,” read from the open circle to the filled circle. The other two relations connect both ways. Lines crossing without a circle are not joined.</p>
+  <p class="map-reading-key">Hover or focus a concept to trace its connections. Crossing lines are not joined. The relationship list below states the direction of each connection.</p>
   <dl class="map-legend-list">
     {
       RELATION_ORDER.map((type) => (
@@ -236,7 +231,7 @@ const drawableEdges = mapConnections(layout)
 </div>
 
 <script>
-  // Hover, keyboard focus, and the touch-friendly selector share the same edge/port highlighting.
+  // Hover, keyboard focus, and the touch-friendly selector share the same connection highlighting.
   // Leaving a transient focus restores the persistent selection, then the checkbox overview.
   const wrap = document.querySelector<HTMLElement>('.map-wrap');
   if (wrap) {
