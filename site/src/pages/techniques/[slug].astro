@@ -2,6 +2,7 @@
 import { usDate } from '../../lib/dates';
 import { getEntry, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import PageContents from '../../components/PageContents.astro';
 import Eyebrow from '../../components/Eyebrow.astro';
 import Pill from '../../components/Pill.astro';
 import ConceptDiagram from '../../components/ConceptDiagram.astro';
@@ -118,7 +119,15 @@ const nameGroups = [
     <p><Pill status={technique.status} /></p>
   </div>
 
-  <nav class="page-reading-order" aria-label="On this page"><p><strong>Start with the idea and example.</strong> Practical guidance and implementation details are there when you need them.</p><a href="#concept-overview">The idea</a><a href="#guided-example">Guided example</a><a href="#practical-guidance">Practical guidance</a><a href="#product-examples">Products and tools</a><a href="#primary-sources">Sources</a></nav>
+  <PageContents items={[
+    { id: 'concept-overview', label: 'The idea' },
+    { id: 'guided-example', label: 'Guided example' },
+    ...(Content ? [{ id: 'practical-guidance', label: 'Practical guidance' }] : []),
+    ...(relationBlocks.length ? [{ id: 'concept-connections', label: 'How it connects' }] : []),
+    { id: 'product-examples', label: 'Products and tools' },
+    ...(sources.length ? [{ id: 'primary-sources', label: 'Sources' }] : []),
+  ]}>
+
   <div id="concept-overview"></div>
   <ConceptDiagram slug={slug!} color={color} />
   {slug !== 'agent-harness' && <ConceptWalkthrough slug={slug!} />}
@@ -159,7 +168,7 @@ const nameGroups = [
 
   {
     relationBlocks.length > 0 && (
-      <section class="section">
+      <section class="section" id="concept-connections">
         <div class="section-top">
           <div>
             <div class="eyebrow muted">How it connects</div>
@@ -229,6 +238,7 @@ const nameGroups = [
   }
 
   {reviewedISO && <Reviewed date={reviewedISO} mdHref={url(`/techniques/${slug}.md`)} />}
+  </PageContents>
 </Base>
 <style>
 </style>

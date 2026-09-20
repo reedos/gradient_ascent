@@ -9,12 +9,8 @@ import MapPreview from '../components/MapPreview.astro';
 import RecipeRow from '../components/RecipeRow.astro';
 import LevelStack from '../components/islands/LevelStack';
 import LevelExplorer from '../components/islands/LevelExplorer';
-import RunDiagram from '../components/islands/RunDiagram';
-import type { RunData, RunDef } from '../components/islands/RunDiagram';
 import { url } from '../lib/url';
 import { levels, tracks, taxonomy, counts, asOf, recipes, recipeLevels, nameGroupsForLevel, namesChecked } from '../lib/content';
-import ragRun from '../data/runs/rag.json';
-import agenticRun from '../data/runs/agentic-rag.json';
 
 const levelStackItems = levels.map((t) => ({ order: t.order, title: t.title, short: t.short }));
 const levelDetails = levels.map((t) => ({
@@ -37,13 +33,14 @@ const tracksDetail = {
   names: nameGroupsForLevel('tracks'),
 };
 
-const runs: RunDef[] = [
-  { key: 'rag', label: 'Level 2 · RAG', data: ragRun as RunData },
-  { key: 'agentic-rag', label: 'Level 5 · Agentic RAG', data: agenticRun as RunData, accentPill: true },
-];
-
 // The four recipes the prototype shows on the home page. Everything about them, the running-task
 // flag included, comes from content/taxonomy.json.
+const homeRecipeSummaries: Record<string, string> = {
+  'document-qa': 'Retrieve relevant passages and answer with citations. This version uses a fixed retrieval workflow; check whether the evidence actually covers the question.',
+  'inbox-triage': 'Classify messages, route them through fixed steps, and draft replies for human approval. Unclear cases go to a person.',
+  'research-brief': 'This version lets an agent choose follow-up searches, then checks claims against sources. A fixed workflow can also suit a well-scoped brief.',
+  'document-extraction': 'Extract fields into a defined schema, validate them, and ask a person to confirm uncertain values before saving.',
+};
 const HOME_RECIPES = ['document-qa', 'inbox-triage', 'research-brief', 'document-extraction'];
 const homeRecipes = HOME_RECIPES.map((slug) => {
   const recipe = recipes.find((r) => r.slug === slug)!;
@@ -127,21 +124,51 @@ const homeRecipes = HOME_RECIPES.map((slug) => {
     <SectionTop
       eyebrow="Worked example"
       title="The same question at two levels"
-      aside="Step through each run. A solid line is a step your code chose. A dashed line is a step the model chose."
+      aside="One task, two designs. Start with the simpler one; add model-directed searching when the task benefits from it."
     />
-    <RunDiagram runs={runs} client:visible />
+    <p class="comparison-question"><strong>The question:</strong> “How long is the warranty on the DW-480, and what voids it?”</p>
+    <div class="home-comparison">
+      <article>
+        <div class="eyebrow" style="color:var(--o2)">Level 2 · RAG</div>
+        <h3>Search once, then answer</h3>
+        <ol class="mini-flow" aria-label="Fixed retrieval workflow"><li>Question</li><li>Retrieve passages</li><li>Draft answer</li></ol>
+        <p>Your code sets the search and passes the retrieved passages to the model.</p>
+        <div class="sample-result"><strong>In this illustration</strong><p>The answer gives a two-year warranty and two exclusions. A third exclusion is missing from the retrieved excerpts.</p></div>
+        <p class="comparison-tradeoff">A predictable sequence, but its answer depends on the evidence retrieved. RAG can also use richer retrieval and validation; one search is this design’s choice.</p>
+        <a href={url('/techniques/rag/#guided-example')}>Explore the RAG guided example &rarr;</a>
+      </article>
+      <article>
+        <div class="eyebrow" style="color:var(--o5)">Level 5 · Agentic RAG</div>
+        <h3>Search, inspect, and follow up</h3>
+        <ol class="mini-flow" aria-label="Model-directed retrieval workflow"><li>Search</li><li>Inspect evidence</li><li>Follow up or answer</li></ol>
+        <p>The model chooses follow-up searches and which documents to open, within tool permissions and run limits.</p>
+        <div class="sample-result"><strong>In this illustration</strong><p>Opening the full exclusions section reveals a third condition: service by an unlisted technician also voids the warranty.</p></div>
+        <p class="comparison-tradeoff">More chances to fill a gap, with extra calls and opportunities for error. The model can still stop too early; citations and coverage need checking.</p>
+        <a href={url('/techniques/agentic-rag/#guided-example')}>Explore the agentic RAG guided example &rarr;</a>
+      </article>
+    </div>
+    <p class="comparison-note">Fictional, scripted comparison—not a benchmark or a claim about every document-chat product. The linked examples explore these techniques in other scenarios.</p>
+  </section>
+
+  <section class="section" id="featured-examples">
+    <SectionTop eyebrow="Try a guided example" title="Start with a task you recognize" aside="Follow the evidence, inspect the result, and see where a person needs to decide. Adapt the choices to your own work." />
+    <div class="featured-examples">
+      <article><div class="eyebrow">Everyday</div><h3>Ask a question about your documents</h3><p>See how relevant passages become an answer, and why a citation alone does not prove that the answer is complete.</p><a href={url('/techniques/rag/?audience=everyday#guided-example')}>Explore document questions &rarr;</a></article>
+      <article><div class="eyebrow">Business</div><h3>Prepare the weekly project report</h3><p>Combine previous reports and current project evidence, surface gaps, and prepare a draft for human review before sending.</p><a href={url('/techniques/workflow-graphs/?audience=business#guided-example')}>Explore the status report &rarr;</a></article>
+      <article><div class="eyebrow">Engineering</div><h3>Turn a DUT brief into a project</h3><p>Generate a test project using a shared framework. Follow the permissions, approval decisions, checks, and handoff for review.</p><a href={url('/techniques/agent-harness/#guided-example')}>Explore the agent harness &rarr;</a></article>
+    </div>
   </section>
 
   <section class="section" id="recipes">
     <SectionTop
       eyebrow="Recipes"
-      title="Common tasks and the levels they need"
-      aside="Each recipe lists the techniques it uses and explains why it does not need a higher level."
+      title="Common tasks and possible starting points"
+      aside="These recipes show one way to approach each task. Your evidence, constraints, and review needs determine which techniques fit."
     />
     <div class="signal-list">
       {
         homeRecipes.map(({ recipe, meta, levels: lv }) => (
-          <RecipeRow slug={recipe.slug} title={recipe.title} summary={recipe.summary} levels={lv} meta={meta} />
+          <RecipeRow slug={recipe.slug} title={recipe.title} summary={homeRecipeSummaries[recipe.slug] ?? recipe.summary} levels={lv} meta={meta} />
         ))
       }
     </div>
@@ -157,3 +184,23 @@ const homeRecipes = HOME_RECIPES.map((slug) => {
     <Principles />
   </section>
 </Base>
+
+<style>
+  .comparison-question { padding: 20px 24px; background: var(--panel2); border-left: 3px solid var(--accent); margin-bottom: 20px; font-size: 17px }
+  .home-comparison, .featured-examples { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px }
+  .featured-examples { grid-template-columns: repeat(3, minmax(0, 1fr)) }
+  article { padding: clamp(20px, 2.5vw, 32px); background: var(--panel); border: 1px solid var(--line); border-radius: 12px; display: flex; flex-direction: column; gap: 16px; min-width: 0 }
+  h3 { font-size: 23px; line-height: 1.3; letter-spacing: -.5px }
+  article p { color: var(--muted); font-size: 15px }
+  article a { color: var(--accent); margin-top: auto; padding-top: 8px }
+  .mini-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; list-style: none; padding: 0; margin: 0; font-size: 13px }
+  .mini-flow li { padding: 8px 10px; background: var(--panel2); border: 1px solid var(--line); border-radius: 6px }
+  .mini-flow li:not(:last-child)::after { content: ' →'; color: var(--muted) }
+  .sample-result { padding: 16px 20px; border-left: 2px solid var(--o2); background: var(--bg) }
+  .home-comparison article:nth-child(2) .sample-result { border-color: var(--o5) }
+  .sample-result strong { font-size: 12px; color: var(--text) }
+  .sample-result p { margin-top: 6px }
+  .comparison-note { margin-top: 18px; color: var(--muted); font-size: 13px }
+  @media (max-width: 900px) { .featured-examples { grid-template-columns: 1fr } }
+  @media (max-width: 700px) { .home-comparison { grid-template-columns: 1fr } }
+</style>

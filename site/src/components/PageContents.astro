@@ -1,0 +1,83 @@
+---
+interface Props { items: { id: string; label: string }[] }
+const { items } = Astro.props;
+---
+<div class="contents-layout">
+  <aside class="contents-rail">
+    <details class="contents-menu" open>
+      <summary>On this page</summary>
+      <nav aria-label="On this page">
+        {items.map(item => <a href={`#${item.id}`}>{item.label}</a>)}
+      </nav>
+    </details>
+  </aside>
+  <div class="contents-body"><slot /></div>
+</div>
+<script>
+  document.querySelectorAll<HTMLDetailsElement>('.contents-menu').forEach(menu => {
+    const desktop = matchMedia('(min-width: 1440px)');
+    const adapt = () => { menu.open = desktop.matches; };
+    adapt();
+    desktop.addEventListener('change', adapt);
+    const links = [...menu.querySelectorAll<HTMLAnchorElement>('a')];
+    const offset = () => Math.max(
+      (document.querySelector('.site-header')?.getBoundingClientRect().height ?? 114) + 24,
+      (parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0) + 56,
+    );
+    let pending = false;
+    const highlight = () => {
+      pending = false;
+      let active = 0;
+      let closest = -Infinity;
+      links.forEach((link, i) => {
+        const target = document.getElementById(link.hash.slice(1));
+        if (!target) return;
+        const top = target.getBoundingClientRect().top;
+        if (top <= offset() + 16 && top >= closest) { active = i; closest = top; }
+      });
+      links.forEach((link, i) => {
+        if (i === active) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+    };
+    const schedule = () => { if (!pending) { pending = true; requestAnimationFrame(highlight); } };
+    links.forEach(link => link.addEventListener('click', () => {
+      const target = document.getElementById(link.hash.slice(1));
+      if (!target) return;
+      let parent: HTMLElement | null = target;
+      while (parent) {
+        if (parent instanceof HTMLDetailsElement) parent.open = true;
+        parent = parent.parentElement;
+      }
+      if (!desktop.matches) menu.open = false;
+      target.setAttribute('tabindex', '-1');
+      target.focus({ preventScroll: true });
+      schedule();
+    }));
+    addEventListener('scroll', schedule, { passive: true });
+    addEventListener('resize', schedule);
+    const body = menu.closest('.contents-layout')?.querySelector('.contents-body');
+    if (body) new ResizeObserver(schedule).observe(body);
+    highlight();
+  });
+</script>
+<style>
+  .contents-body { min-width: 0 }
+  .contents-menu { border: 1px solid var(--line); border-radius: 10px; padding: 16px 20px; margin-bottom: 28px; background: var(--panel) }
+  summary { cursor: pointer; font-weight: 600 }
+  nav { display: flex; flex-direction: column; gap: 4px; margin-top: 12px }
+  nav a { display: block; padding: 8px 12px; border-left: 2px solid transparent; color: var(--muted); font-size: 13px; border-radius: 0 5px 5px 0 }
+  nav a:hover { color: var(--text); background: var(--panel2) }
+  nav a[aria-current] { color: var(--text); border-color: var(--accent); background: var(--panel2) }
+  :global(.contents-body [id]) { scroll-margin-top: 56px }
+  @media (min-width: 1440px) {
+    :global(main:has(.contents-layout)) { max-width: 1680px }
+    .contents-layout { display: grid; grid-template-columns: minmax(0, 1fr) 190px; gap: 36px; align-items: start }
+    .contents-rail { grid-column: 2; grid-row: 1; position: sticky; top: 140px; max-height: calc(100vh - 160px); overflow-y: auto }
+    .contents-body { grid-column: 1; grid-row: 1 }
+    .contents-menu { border: 0; border-left: 1px solid var(--line); border-radius: 0; padding: 0 0 0 16px; background: transparent }
+    summary { font-size: 12px; color: var(--muted) }
+    summary::-webkit-details-marker { display: none }
+  }
+  @media print { .contents-rail { display: none } .contents-layout { display: block } }
+</style>
