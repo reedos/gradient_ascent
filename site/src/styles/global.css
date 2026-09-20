@@ -268,7 +268,7 @@ main { max-width: 1392px; margin: auto; padding: 0 48px; min-height: 60vh }
 .page-hero .hero-actions { margin-top: 26px }
 /* Rows of techniques read as a column, not as a band stretched across the whole window. */
 .panel.reading { max-width: 780px }
-.breadcrumb { display: flex; gap: 10px; flex-wrap: wrap; font-size: 11px; color: var(--muted); margin-bottom: 28px }
+.breadcrumb { padding-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; font-size: 11px; color: var(--muted); margin-bottom: 28px }
 .breadcrumb a:hover { color: var(--text) }
 .level-pager { display: flex; justify-content: space-between; gap: 16px; margin-top: 20px; font-size: 12px }
 .level-pager a { border: 1px solid var(--line-control); border-radius: 6px; padding: 10px 15px; color: var(--text); flex: 1; max-width: 280px }
