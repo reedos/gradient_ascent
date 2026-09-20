@@ -67,7 +67,7 @@ export function buildNav(levels: NavLevel[], tracks: NavTrack[], threads: NavThr
     {
       id: 'levels',
       label: 'Levels',
-      blurb: 'Eight levels, ordered by who decides the next step. Start at the lowest one that does the job.',
+      blurb: 'Eight levels, ordered by who decides the next step. Choose the approach that fits your outcome and desired automation.',
       sections: [
         {
           items: ordered.map((l) => ({ label: l.title, path: `/levels/${l.order}/`, hint: l.short, level: l.order })),
@@ -102,7 +102,7 @@ export function buildNav(levels: NavLevel[], tracks: NavTrack[], threads: NavThr
           items: [
             { label: 'Use this site with your AI', path: '/apply/', hint: 'Create a project brief for your own model' },
             { label: 'Worked examples', path: '/examples/', hint: 'Everyday, engineering, and business perspectives' },
-            { label: 'Find your level', path: '/worksheet/', hint: 'Seven questions, one recommendation' },
+            { label: 'Find your level', path: '/worksheet/', hint: 'Explore a candidate design, then check its fit' },
             { label: 'Job shapes', path: '/shapes/', hint: 'What kind of job is it? Match the work, not the subject' },
             { label: 'Recipes', path: '/recipes/', hint: 'Whole jobs, built from techniques' },
             { label: 'Teardowns', path: '/teardowns/', hint: 'Products you have used, taken apart' },

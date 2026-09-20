@@ -33,7 +33,7 @@ export const GET: APIRoute = ({ params, site }) => {
     };
   } else if (name === 'worksheet') {
     body = {
-      note: 'The worksheet decision tree. Ask core_questions in order starting at first_question; stop at the first answer whose action is "settle". Then ask every cross_question; a non-null caution is advice to pass on.',
+      note: 'The worksheet decision tree. Ask core_questions in order starting at first_question; the first answer whose action is "settle" gives a candidate classification, not a final recommendation. Compare the design with the requested automation, output quality, and human effort before choosing. Then ask every cross_question; a non-null caution is advice to pass on.',
       levels: agentLevels(),
       ...agentWorksheet(),
     };

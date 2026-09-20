@@ -20,7 +20,7 @@ import { recommendationInstructions } from './project-brief.ts';
 // tests hold (a) and (c) in place.
 
 export const GUIDE_TITLE = 'Gradient Ascent: a guide for an AI agent helping someone choose';
-export const WORKSHEET_TITLE = 'Find the lowest level that does the job';
+export const WORKSHEET_TITLE = 'Explore a candidate level for your workflow';
 export const SHAPES_TITLE = 'What kind of job is it?';
 
 export type Block =
@@ -178,8 +178,8 @@ export function agentGuide(input: GuideInput): Block[] {
     {
       kind: 'p',
       text:
-        'The rule the whole site is built on: **recommend the lowest level that does the job.** Each level up adds capability, and also cost, delay and new ways to fail. ' +
-        'A person who asks for an agent often needs a workflow, and a person who asks for a workflow sometimes needs a lookup table. Saying so is the most useful thing you can do for them.',
+        'The recommendation principle: **choose the approach that best delivers the user’s desired outcome and working experience.** Prefer simplicity among approaches that satisfy their automation, quality, and human-effort requirements, not at their expense. ' +
+        'Compare ordinary software, fixed workflows, and agents—including tool-building agents—on total user effort, quality, reliability, cost, and maintenance. Lower autonomy is not inherently a better recommendation. A technically possible manual process does not satisfy a request for automated results.',
     },
     { kind: 'h2', text: 'Project briefs and recommendation requirements' },
     { kind: 'p', text: `A reader can prepare a brief at ${abs('/apply/')} or provide their task directly. You can fetch the reusable template at ${abs('/project-brief.md')} yourself. Do not require a completed form before helping. If you cannot retrieve references, disclose that and ask for the relevant Markdown pages or export; do not claim to have read inaccessible material.` },
@@ -191,7 +191,7 @@ export function agentGuide(input: GuideInput): Block[] {
       items: [
         '**Get the job straight before recommending anything.** You need: what comes in (and how messy it is), what has to come out, how often it runs and how fast it must answer, who or what checks the result, what a wrong answer costs, what data it touches and where that data is allowed to go, what they have already tried, and whether they mean to build this or would rather use something that exists (many people asking have never written code and do not want to start). Ask for whatever is missing. If they cannot say what a correct result looks like, tell them that is the first thing to settle, because nothing at any level can be evaluated without it.',
         `**Name the shape of the job** (${abs('/shapes.md')}). Match on what the work is, not on what it is about: sorting tenant emails, support tickets and failed production units are one shape. Most real requests are two or three shapes joined together (a standing report, plus free-text notes to sort, plus a script to draft). Split them, and settle each part separately. A part that is a lookup or arithmetic stays at level 0 whatever the rest needs.`,
-        `**Walk the seven questions in order for each part** (${abs('/worksheet.md')}). Each question tests one level, lowest first. Stop at the first level whose test passes. The shape tells you where jobs like this usually settle; the questions decide where this one does, and what the shape says would move it lower is worth checking first. Do not skip ahead because a higher level sounds more capable, and do not let the word the person used ("agent", "RAG", "fine-tune") choose the level for you. When a question does not fit the shape of the job, the answer is no, and you go on. Say that you did.`,
+        `**Use the worksheet as a candidate classifier, not an optimization rule** (${abs('/worksheet.md')}). Its first matching branch describes one possible design. Do not stop considering alternatives merely because a low level is technically possible. Check whether it delivers the requested trigger-to-result workflow with the allowed human effort. Compare alternatives that meet those needs, and explain any compromises before recommending a design.`,
         '**Then ask the four cross-cutting questions.** They never change the level. They change the advice: what to check, what to log, what needs a person\u2019s approval, what must stay on the person\u2019s own hardware.',
         `**Use recipes as illustrations, not as the answer.** Each shape lists the recipes that work one instance of it through (${abs('/data/use-cases.json')} has them all).${engineeringAdvice} Take a recipe\u2019s reasoning (why this level, why not higher, what to measure, how it fails) and leave its subject behind. If no recipe under the shape is close, do not stretch one: compose the answer from the shape\u2019s techniques and say that is what you did. Either way, tell the person which parts of your answer the site works through and which you reasoned out yourself: an answer built by analogy from general pages should not read as though the site had covered their case.`,
         `**Read the pages you are about to recommend**, in their \`.md\` form, before you recommend them. Every technique page says when you do not need it, how it fails, what it costs and how to evaluate it. Use the relations in ${abs('/data/taxonomy.json')}: \`requires\` is what to read or build first, \`upgrades_to\` carries the condition under which moving up is justified, \`alternative_to\` carries the question that decides between two techniques.`,
@@ -214,10 +214,10 @@ export function agentGuide(input: GuideInput): Block[] {
       kind: 'ol',
       items: [
         '**The recommendation in one sentence**: the level and the technique or recipe, in plain words.',
-        '**Why this level.** Which question settled it, in terms of their job and not in the site’s vocabulary.',
-        '**Why not one level higher.** What it would add for them and what it would cost them. This is the part people most need and least expect.',
-        '**Why not one level lower**, if that is a fair question for their job.',
-        '**What to build first.** The smallest version that would tell them whether the approach works.',
+        '**Why this design.** How it meets the requested automation and user experience, how much recurring human work remains, and why it fits better than the alternatives. Explain its level as a description of who chooses actions.',
+        '**Alternatives and tradeoffs.** Compare lower- and higher-autonomy designs that meet the requested experience. Explain differences in user effort, quality, reliability, cost, and maintenance without preferring a level in advance.',
+        '**Manual-work accounting.** List each recurring user action and flag any conflict with the requested automation or review point.',
+        '**What to build first.** Separate development experiments from the first usable end-to-end release. Manual development shortcuts must not silently replace required automation.',
         '**How they will know it works.** Point them at the evals pages: a small set of real examples with known right answers comes before any prompt tuning.',
         '**How it fails.** The two or three failure modes from the technique pages that apply to their case, and what to watch for. If one kind of mistake costs them far more than the other (a missed emergency against a false alarm), say which way every threshold and every approval gate should lean, and that the examples on this site assume the two cost about the same.',
         '**Roughly what it costs to run.** This site has no measured costs, so work it out for them and label it an estimate: their volume, times the model calls per item at the level you recommend, times a plausible token count per call, at the price on the model maker’s own current pricing page. An order of magnitude is what they need: whether this is five dollars a month or five hundred.',
@@ -272,10 +272,10 @@ export function worksheetBlocks(sheet: AgentWorksheet, levels: AgentLevel[], abs
     {
       kind: 'p',
       text:
-        `The worksheet at ${abs('/worksheet/')}, as text. Seven questions, asked in order, each testing one level from the lowest up. Stop at the first answer that says "settle": that is the lowest level that does the job. ` +
+        `The worksheet at ${abs('/worksheet/')}, as text. Seven questions, asked in order, each testing one level from the lowest up. A "settle" answer produces a candidate classification, not a final recommendation. Compare it against the desired automation, final deliverables, and acceptable hands-on effort before choosing. A lower-level option that hands unwanted work back to the user does not satisfy the brief. ` +
         'Then ask all four cross-cutting questions. They do not change the level, they add cautions. A question that does not fit the shape of the job (the documents question, for a job that sorts messages and acts on them) is answered no.',
     },
-    { kind: 'h2', text: 'The seven questions that settle the level' },
+    { kind: 'h2', text: 'The seven questions that classify a candidate design' },
   ];
   ordered.forEach((q, i) => {
     blocks.push({ kind: 'h3', text: `${i + 1}. ${q.prompt}` });

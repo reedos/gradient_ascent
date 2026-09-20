@@ -190,7 +190,7 @@ export async function buildSearchDocs(): Promise<SearchDoc[]> {
     {
       id: 'worksheet',
       title: 'Worksheet',
-      summary: 'Answer a few questions about your own job and get the lowest level that passes.',
+      summary: 'Answer a few questions about your own job and explore a candidate level, then check automation and human effort.',
       path: '/worksheet/',
     },
     {
@@ -251,7 +251,7 @@ export async function buildSearchDocs(): Promise<SearchDoc[]> {
       id: 'agents',
       title: 'For your agent',
       summary:
-        "The procedure this site hands a reader's own AI assistant: what to ask, how to walk a job down to the lowest level that does it, and what not to claim.",
+        "The procedure this site hands a reader's own AI assistant: what to ask, how to choose a design that fits the desired outcome, automation, and user effort, and what not to claim.",
       path: '/agents/',
     },
   ];

@@ -235,6 +235,7 @@ function ResultView({
         </div>
         <h2 data-ws-focus tabIndex={-1}>{info.title}</h2>
         <p>{info.description}</p>
+        <p>This is a candidate classification, not a ranking of solutions. Check that the complete design delivers your desired automation, output quality, and acceptable hands-on effort. Compare alternatives before choosing.</p>
         <div className="connection" style={{ '--c': color } as React.CSSProperties}>
           <strong>Who decides the next step</strong>
           {info.who}

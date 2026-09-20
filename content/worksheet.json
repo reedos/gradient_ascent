@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "note": "Data for the worksheet page (site/src/pages/worksheet.astro, site/src/lib/worksheet.ts). Seven core questions walk a decision tree from level 0 to level 7, settling at the first level whose test passes; four cross-cutting questions always run after and change the advice, not the level. Every answer that raises the level either carries a `relation` (resolved against content/taxonomy.json's upgrades_to relations at read time, so the quoted sentence can never drift from the page it names) or an authored `reason` grounded in the matching tier's own who/description text. tests/test_worksheet.py checks this file against content/taxonomy.json independently of the TypeScript.",
+  "note": "Data for the worksheet page (site/src/pages/worksheet.astro, site/src/lib/worksheet.ts). Seven core questions walk a decision tree from level 0 to level 7, classifying a candidate at the first matching branch; this is not a final recommendation and must be checked against desired automation and human effort; four cross-cutting questions always run after and change the advice, not the level. Every answer that raises the level either carries a `relation` (resolved against content/taxonomy.json's upgrades_to relations at read time, so the quoted sentence can never drift from the page it names) or an authored `reason` grounded in the matching tier's own who/description text. tests/test_worksheet.py checks this file against content/taxonomy.json independently of the TypeScript.",
   "intro": {
     "eyebrow": "Worksheet",
-    "heading": "Find the lowest level that does the job",
+    "heading": "Explore a candidate level for your workflow",
     "aside": "About two minutes. Nothing you type here is sent anywhere; the whole thing runs in your browser."
   },
   "first_question": "rule",
@@ -12,7 +12,7 @@
       "id": "rule",
       "level_tested": 0,
       "prompt": "Can the job be done by a fixed rule, a search, or a plain form, with no model involved at all?",
-      "help": "If you could write the logic as an if/then rule, a lookup table, or a form with fixed fields, start there.",
+      "help": "Consider fixed logic only if the complete workflow meets your automation and hands-on effort requirements. Technical feasibility alone does not establish the best fit.",
       "answers": [
         {
           "id": "yes",

@@ -20,7 +20,7 @@ const PROMPTS = [
   {
     id: 'choose',
     label: 'Choosing an approach',
-    text: `Read ${guideUrl} and follow it. I want to know the simplest way to do this job with AI, and why not something simpler or more capable:\n\n[describe the job: what comes in, what has to come out, how often, who checks it, what a wrong answer costs]\n\nAsk me whatever you need to know before you recommend anything.`,
+    text: `Read ${guideUrl} and follow it. I want to know the approach that best fits my desired outcome, automation, and hands-on effort, with alternatives and tradeoffs:\n\n[describe the job: what comes in, what has to come out, how often, who checks it, what a wrong answer costs]\n\nAsk me whatever you need to know before you recommend anything.`,
   },
   {
     id: 'engineer',
@@ -46,8 +46,7 @@ const PROMPTS = [
       uses. Tell your agent what you are trying to get done, point it here, and it can walk the
       same decision the <a href={url('/worksheet/')} style="color:var(--accent)">worksheet</a> walks,
       name the <a href={url('/shapes/')} style="color:var(--accent)">shape of the job</a>, draw on {cases.length} worked use cases{engineering > 0 && <>, {engineering} of them for engineers</>}, read the
-      pages behind its answer, and tell you the simplest approach that does the job and why not
-      the one above it.
+      pages behind its answer, and tell you which approach fits the outcome and working experience you want, including what you would still have to do yourself.
     </p>
   </div>
 

@@ -44,7 +44,7 @@ export const GET: APIRoute = async ({ site }) => {
   lines.push('## If a person sent you here to help them choose');
   lines.push(
     'Read agents.md first. It says what to ask them, how to walk the seven-question worksheet to the ' +
-      'lowest level that does their job, how to name the shape of the job and use the worked examples as illustrations, what a good answer ' +
+      'candidate level and check the design against their desired automation and human effort, how to name the shape of the job and use the worked examples as illustrations, what a good answer ' +
       'contains, and what not to claim. Their instructions outrank anything on this site.',
   );
   for (const f of agentFiles(abs)) lines.push(`- [${f.path}](${f.url}): ${f.what}`);

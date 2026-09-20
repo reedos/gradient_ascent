@@ -24,9 +24,10 @@ import Cite from '../../components/page/Cite.astro';
 import Link from '../../components/page/Link.astro';
 
 Cost optimization is choosing, deliberately, which of several ways to spend fewer tokens and less
-time fits a system, not applying all of them by default. The site's own thesis is the first
-lever: use the lowest level that does the job, checked with the <Link href="/worksheet/">decision
-worksheet</Link>, before reaching for any of the levers below it. After that: a smaller model for
+time fits a system, not applying all of them by default. Preserve the required outcome, automation,
+and human effort when comparing designs. A lower model bill is not a saving if it hands unwanted
+work back to the user. The <Link href="/worksheet/">decision worksheet</Link> classifies a candidate
+design; it does not establish the cheapest suitable solution. Possible levers include: a smaller model for
 questions that don't need a large one (<Link href="/techniques/routing/">routing</Link>), less
 text in the prompt (<Link href="/techniques/context-engineering/">context engineering</Link>),
 reusing a prefix instead of resending it (prompt caching), deferring work that doesn't need an
@@ -129,7 +130,7 @@ hasn't caught up yet.
 
 <WhenNot>
 
-Skip every lever below "use the lowest level that does the job" until there is enough real,
+Avoid adding optimization machinery until there is enough real,
 sustained traffic for the engineering cost of adding one to be smaller than what it saves: a
 cache write costs more than a plain call and only earns that back on a second read; a router is a
 second system to build and keep in sync with whatever it is choosing between.

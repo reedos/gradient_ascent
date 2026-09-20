@@ -10,12 +10,13 @@ const concepts = [
 ];
 ---
 <Base title="Use this site with your AI · Gradient Ascent" description="Describe your project, copy a brief, and ask your own model to recommend fitting concepts and an implementation plan.">
-  <div class="page-hero"><div class="eyebrow muted">Apply it to your project</div><h1>Describe your task. Let your AI consult the guide.</h1><p>Use your own model to explore the simplest approach that fits your goals. Give it a brief, or ask it to fetch the reference directly. You do not need to choose a level first.</p></div>
+  <div class="page-hero"><div class="eyebrow muted">Apply it to your project</div><h1>Describe your task. Let your AI consult the guide.</h1><p>Use your own model to choose an approach that delivers your outcome and the amount of work you want to hand over. Give it a brief, or ask it to fetch the reference directly. You do not need to choose a level first.</p></div>
   <div class="apply-intro">
-    <section class="panel"><h2>1. Describe the work</h2><p>Start with your goal. Add what you know about inputs, constraints, and review needs. Leave unknowns blank so your model can ask.</p></section>
-    <section class="panel"><h2>2. Hand it to your model</h2><p>Copy or download the brief below. If your model can browse, it can fetch the guide and relevant concept pages itself.</p></section>
-    <section class="panel"><h2>3. Review the recommendation</h2><p>Look for clear reasons, alternatives, a small first version, and checks that would show whether it works.</p></section>
+    <section class="panel"><h2>1. Describe the work</h2><p>Describe what starts the process, what should be ready at the end, and what you want to do yourself. Leave unknowns blank so your model can ask.</p></section>
+    <section class="panel"><h2>2. Hand it to your model</h2><p>Copy or download the brief below and attach relevant workflow files in your own agent. If your model can browse, it can fetch the guide and relevant concept pages itself.</p></section>
+    <section class="panel"><h2>3. Review the recommendation</h2><p>Check every recurring manual step against the experience you asked for. The plan should explain alternatives, compromises, and how to test the complete workflow.</p></section>
   </div>
+  <p class="panel">Levels describe autonomy, not a ranking of solutions. Prefer simplicity among approaches that meet your needs—not by giving unwanted work back to you. A fixed workflow can be fully automated; an agent can be worthwhile when it removes substantial hands-on effort.</p>
   <section class="section"><h2>Build tools, then use them</h2><p class="apply-explainer">For tasks that need custom processing or connections between systems, ask your model to consider a coding agent that builds or adapts a tool, tests it, runs it, and inspects the result. For example, it might create a project-data collector and a report generator, then use them to prepare a weekly report for review. The resulting tools may later run as ordinary software; you do not necessarily need an agent in every recurring run. Compare reuse, development effort, validation, and execution permissions before choosing.</p><p><a href={url('/techniques/coding-agents/')}>Explore coding agents &rarr;</a> · <a href={url('/techniques/agent-harness/')}>See how a harness bounds their work &rarr;</a></p></section>
   <section class="section" id="brief-builder" data-brief-root={root} data-concepts={JSON.stringify(concepts)}>
     <h2>Make your project brief</h2><p class="brief-help">This builder makes text for you to review. It does not call a model or submit your answers. Copy or download before leaving; your entries are not saved by this site.</p>
@@ -24,12 +25,13 @@ const concepts = [
         <label for="brief-concept">Concept to consider <span>(optional)</span></label>
         <select id="brief-concept"><option value="">Let my model consider the full guide</option>{concepts.map(c => <option value={c.markdown}>{c.title}</option>)}</select>
         <p class="brief-help">A starting reference, not a commitment to use this concept.</p>
-        {briefFields.map(f => <div class="brief-field"><label for={`brief-${f.key}`}>{f.label}</label><p id={`hint-${f.key}`} class="brief-help">{f.hint}</p><textarea id={`brief-${f.key}`} data-brief-field={f.key} rows="3" aria-describedby={`hint-${f.key}`}></textarea></div>)}
+        {briefFields.map(f => <div class="brief-field"><label for={`brief-${f.key}`}>{f.label}</label><p id={`hint-${f.key}`} class="brief-help">{f.hint}</p>{f.key === 'automation' ? <><input id="brief-automation" data-brief-field="automation" list="automation-options" aria-describedby="hint-automation" placeholder="Choose or type your preference" /><datalist id="automation-options"><option value="Help me perform the steps."/><option value="Prepare the result automatically; I review it."/><option value="Complete the process automatically; involve me only for exceptions."/><option value="Help me decide."/></datalist></> : <textarea id={`brief-${f.key}`} data-brief-field={f.key} rows="3" aria-describedby={`hint-${f.key}`}></textarea>}</div>)}
       </div>
       <div class="brief-output"><h3>Your brief to copy or download</h3><p class="brief-help">The preview updates as you type. Your model will make the recommendation in your own conversation.</p><textarea id="brief-preview" aria-label="Generated project brief" readonly rows="24">{projectBrief({}, root)}</textarea><div class="brief-actions"><button class="button" type="button" id="copy-brief" disabled>Copy brief</button><button class="button secondary" type="button" id="download-brief" disabled>Download Markdown</button></div><p id="brief-status" role="status" aria-live="polite"></p></div>
     </div>
     <noscript><p>The interactive builder needs JavaScript. Copy the blank brief above or <a href={url('/project-brief.md')} download>download the template</a>, then fill it in yourself.</p></noscript>
   </section>
+  <section class="section" id="workflow-files"><h2>Bring examples of your current workflow</h2><p>Send your brief and relevant files to your own agent together. Text, Markdown, photos, spreadsheets, reports, and other files can show details that are hard to describe.</p><ul class="attachment-checklist"><li><strong>Current input:</strong> a representative file the process starts with.</li><li><strong>Current output:</strong> what you produce today, with what you like and what should improve.</li><li><strong>Desired output:</strong> a finished example or annotated mockup, if you have one.</li><li><strong>Exceptions and instructions:</strong> an awkward case, a failed result, or a format the system must follow.</li></ul><p>In the brief, name each file and its role. Attach those files separately in your agent, or give a local agent explicit access to the relevant folder. The brief download contains text only; this website does not upload or package your files. If a format is unsupported, provide an export or preview your model can inspect.</p></section>
   <section class="section" id="reference-access"><h2>Let your model fetch the reference</h2><p>Give your model your task and this address: <a href={url('/agents.md')}>{root}/agents.md</a>. The guide links to the index, concept definitions, relationships, worked examples, and sources. Models with browsing or retrieval tools can follow those links; fetching is not automatic in every chat app.</p><div class="brief-actions"><a href={url('/agents/')}>Read the model guide</a><a href={url('/llms.txt')}>Reference index</a><a href={url('/project-brief.md')} download>Blank brief</a><a href={url('/llms-full.txt')} download>Download reference text</a></div><p class="brief-help">If your model cannot browse, attach the relevant concept Markdown pages or the reference text along with your brief. The full export is large; individual pages may fit better. Ask the model to state what it actually read.</p></section>
 </Base>
 <script>
@@ -44,7 +46,7 @@ const concepts = [
   const status = document.querySelector<HTMLElement>('#brief-status')!;
   const update = () => {
     const values: BriefValues = {};
-    root.querySelectorAll<HTMLTextAreaElement>('[data-brief-field]').forEach(el => { values[el.dataset.briefField as keyof BriefValues] = el.value; });
+    root.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[data-brief-field]').forEach(el => { values[el.dataset.briefField as keyof BriefValues] = el.value; });
     preview.value = projectBrief(values, root.dataset.briefRoot!, concepts.find(c => c.markdown === select.value));
     status.textContent = '';
   };
@@ -66,6 +68,8 @@ const concepts = [
   });
 </script>
 <style>
+  .attachment-checklist { list-style:disc; padding-left:24px; margin:18px 0 }
+  .attachment-checklist li { margin:8px 0 }
   h2 { font-size:28px; line-height:1.3; letter-spacing:-.6px; margin-bottom:16px }
   h3 { font-size:22px; line-height:1.35; letter-spacing:-.4px; margin-bottom:12px }
   .apply-intro { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; margin-bottom:32px }
@@ -76,7 +80,7 @@ const concepts = [
   .brief-field { margin-top:22px }
   label { display:block; font-weight:600; margin-bottom:8px }
   .brief-help, label span { color:var(--muted); font-size:14px; margin:8px 0 14px }
-  textarea, select { width:100%; padding:12px 14px; background:var(--panel); color:var(--text); border:1px solid var(--line-control); border-radius:8px; font:inherit }
+  textarea, select, input { width:100%; padding:12px 14px; background:var(--panel); color:var(--text); border:1px solid var(--line-control); border-radius:8px; font:inherit }
   textarea { resize:vertical }
   #brief-preview { font-size:13px; line-height:1.65; min-height:300px; max-height:52vh }
   .brief-actions { display:flex; flex-wrap:wrap; align-items:center; gap:16px; margin:18px 0 }

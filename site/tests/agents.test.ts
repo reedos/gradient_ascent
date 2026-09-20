@@ -134,7 +134,7 @@ test('the guide tells the agent where a human can read the same words', () => {
 
 test('the rule the site is built on is stated, and level 0 is defended', () => {
   const text = guideText();
-  assert.match(text, /recommend the lowest level that does the job/);
+  assert.match(text, /choose the approach that best delivers/);
   assert.match(text, /If the honest answer is level 0/);
 });
 

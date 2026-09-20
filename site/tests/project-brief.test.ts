@@ -19,3 +19,18 @@ test('a linked concept is only a candidate, with a fetchable reference', () => {
   assert.match(result, /workflow-graphs.md/);
   assert.match(result, /Do not assume a concept fits/);
 });
+
+for (const scenario of [
+  { name:'Wildlife photos', trigger:'Select an outing folder', finished:'Ready-to-post carousels on my phone', humanRole:'Review finished carousels only', prohibited:'Never delete originals', examples:'input.jpg: current input; carousel.jpg: desired output' },
+  { name:'Weekly status report', trigger:'Every Friday', finished:'Complete report draft with source links', humanRole:'Approve final content and recipients', prohibited:'Never send before approval', examples:'last-week.md: current output; project.csv: current input' },
+  { name:'DUT project', trigger:'Provide a DUT brief', finished:'Reviewable project files and documentation', humanRole:'Review and perform hardware testing', prohibited:'Never modify the shared framework without authorization', examples:'DUT_BRIEF.md: instructions; prior-project/: current input' },
+]) test(`preserves desired experience and file roles: ${scenario.name}`, () => {
+  const text = projectBrief({...scenario, automation:'Prepare the result automatically; I review it.', priorities:'Reduce hands-on time'}, 'https://example.org/site');
+  for (const key of ['trigger','finished','humanRole','prohibited','examples'] as const) assert(text.includes(scenario[key]));
+  assert.match(text, /every recurring action I must do/);
+  assert.match(text, /not at their expense/);
+  assert.match(text, /first usable release must demonstrate/);
+  assert.match(text, /Current outputs show the baseline, not necessarily the target/);
+  assert.match(text, /does not embed files or grant access/);
+  assert.doesNotMatch(text, /recommend the lowest level|Consider ordinary software or no AI first/);
+});
