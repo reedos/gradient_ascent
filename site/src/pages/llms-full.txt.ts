@@ -1,4 +1,5 @@
 import { builders, buildArtifact } from '../lib/artifact-builders';
+import { reviewMarkdown } from '../lib/reviewer-loop';
 // /llms-full.txt: every written page as Markdown in one file, for an agent that would rather make
 // one request than seventy. Same text as the per-page .md twins, in the site's own order.
 import type { APIRoute } from 'astro';
@@ -9,6 +10,7 @@ import { guideInput, agentWorksheet, agentLevels, agentShapes, absFor } from '..
 
 export const GET: APIRoute = async ({ site }) => {
   const parts: string[] = [
+    reviewMarkdown(absFor(site)),
     toMarkdown(GUIDE_TITLE, agentGuide(guideInput(site))),
     toMarkdown(SHAPES_TITLE, shapesBlocks(agentShapes(site), absFor(site))),
     toMarkdown(WORKSHEET_TITLE, worksheetBlocks(agentWorksheet(), agentLevels(), absFor(site))),

@@ -1,0 +1,32 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageContents from '../../components/PageContents.astro';
+import { inlineHtml } from '../../lib/agents';
+import { absFor } from '../../lib/agents-data';
+import { url } from '../../lib/url';
+import { reviewTitle, reviewIntro, reviewSteps, reviewSections } from '../../lib/reviewer-loop';
+const sections = reviewSections(absFor(Astro.site));
+---
+<Base title={`${reviewTitle} · Gradient Ascent`} description={reviewIntro}>
+  <div class="page-hero"><div class="eyebrow">Practical guide · scripted example</div><h1>{reviewTitle}</h1><p>{reviewIntro}</p>
+    <div class="review-actions"><a class="button" href={url('/examples/reviewer-feedback-loop.md')} download>Download guide & prompts</a><a href="#example">See the worked example →</a></div>
+  </div>
+  <figure class="review-flow"><figcaption>One task, separate contexts, traceable feedback</figcaption><ol>{reviewSteps.map((step, i) => <li><span class="eyebrow">{String(i + 1).padStart(2, '0')}</span><h2>{step.title}</h2><p>{step.text}</p></li>)}</ol><p class="loop-return">↳ After revision, use a fresh receiving session. Keep the original evidence and stop at the agreed budget.</p></figure>
+  <PageContents items={sections.map(s => ({ id: s.id, label: s.title }))}>
+    <div class="review-guide">{sections.map(section => <section id={section.id}><h2>{section.title}</h2>{section.blocks.map(b => {
+      if (b.kind === 'h2') return <h2>{b.text}</h2>;
+      if (b.kind === 'h3') return <h3>{b.text}</h3>;
+      if (b.kind === 'p') return <p set:html={inlineHtml(b.text)} />;
+      if (b.kind === 'ul') return <ul>{b.items.map(t => <li set:html={inlineHtml(t)} />)}</ul>;
+      if (b.kind === 'ol') return <ol>{b.items.map(t => <li set:html={inlineHtml(t)} />)}</ol>;
+      return <pre tabindex="0">{b.text}</pre>;
+    })}</section>)}</div>
+  </PageContents>
+</Base>
+<style>
+ .review-actions{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-top:26px} a:not(.button){color:var(--accent)}
+ .review-flow{margin:0 0 48px}.review-flow figcaption{font-size:20px;margin-bottom:20px}.review-flow ol{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px;list-style:none;padding:0}.review-flow li{padding:22px;background:var(--panel);border:1px solid var(--line);border-radius:10px}.review-flow h2{font-size:20px;margin:14px 0}.review-flow p{font-size:15px;line-height:1.7;color:var(--muted)}.loop-return{border-left:3px solid var(--accent);padding:14px 20px}
+ .review-guide{min-width:0}.review-guide section{padding:28px clamp(20px,3vw,40px);margin-bottom:24px;background:var(--panel);border:1px solid var(--line);border-radius:10px;scroll-margin-top:180px}.review-guide h2{font-size:28px;margin:0 0 24px}.review-guide h3{font-size:21px;margin:30px 0 14px}.review-guide p,.review-guide li{line-height:1.8;color:var(--muted)}.review-guide p{margin:16px 0}.review-guide li{margin:12px 0}.review-guide ul,.review-guide ol{padding-left:24px}.review-guide pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:22px;background:var(--bg);border:1px solid var(--line);border-radius:8px;font-size:14px;line-height:1.7;margin:20px 0}.review-guide :global(a){color:var(--accent);overflow-wrap:anywhere}
+ @media(max-width:1100px){.review-flow ol{grid-template-columns:repeat(2,minmax(0,1fr))}}
+ @media(max-width:650px){.review-flow ol{grid-template-columns:1fr}.review-flow li{padding:18px}.review-guide h2{font-size:24px}}
+</style>

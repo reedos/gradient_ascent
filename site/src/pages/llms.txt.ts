@@ -17,6 +17,7 @@ export const GET: APIRoute = async ({ site }) => {
   const lines: string[] = [];
 
   lines.push('# Gradient Ascent');
+  lines.push(`Reviewer feedback loop: ${abs('/examples/reviewer-feedback-loop.md')} — separate drafting, receiving, and reviewing roles; parallel providers; blind comparisons and evidence discipline.`);
   lines.push(`Project tools and Markdown templates: ${abs('/tools.md')} — agent instructions, workflows, acceptance criteria, workflow audits, tool specifications, and project handoffs.`);
   lines.push(`Project brief builder: ${abs('/apply/')} — copy or download a brief for your own model. Blank template: ${abs('/project-brief.md')}.`);
   lines.push('');
