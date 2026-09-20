@@ -332,13 +332,13 @@ main { max-width: 1392px; margin: auto; padding: 0 48px; min-height: 60vh }
 /* The lane switch is the page's main control, so it reads at the weight of a section heading
    rather than as a row of small filter pills tucked under the diagram. */
 .lanes { margin: 34px 0 0 }
-.lanes > .filters { gap: 0; margin-bottom: 0; border: 1px solid var(--line-control); border-radius: 7px; display: inline-flex; overflow: hidden }
+.lanes > .filters { gap: 0; margin-bottom: 28px; border: 1px solid var(--line-control); border-radius: 7px; display: inline-flex; overflow: hidden }
 .lanes > .filters .filter { border: 0; border-right: 1px solid var(--line); border-radius: 0; padding: 11px 22px; font-size: 12px; background: transparent }
 .lanes > .filters .filter:last-child { border-right: 0 }
 .lanes > .filters .filter[aria-pressed="true"] { background: var(--panel2); color: var(--text); font-weight: 600; box-shadow: inset 0 2px 0 var(--accent) }
 .lane-panel[hidden] { display: none }
-.lane-panel + .lane-panel { margin-top: 30px }
-.lane-panel > h2 { font-size: 24px; margin: 20px 0 15px; letter-spacing: -.7px }
+.lane-panel:not([hidden]) + .lane-panel { margin-top: 30px }
+.lane-panel > h2 { font-size: 24px; margin: 0 0 16px; letter-spacing: -.7px }
 .lane-body > :first-child { margin-top: 0 }
 /* With the player's own lane panel off (Run.astro), the climb note sizes to its own content
    instead of stretching to the height of a panel that is no longer beside it. */
