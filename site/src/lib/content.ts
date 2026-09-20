@@ -97,6 +97,7 @@ export interface Relation {
   to: string;
   when?: string;
   question?: string;
+  note?: string;
 }
 
 /**

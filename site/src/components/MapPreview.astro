@@ -1,5 +1,5 @@
 ---
-import { mapLayout, mapConnections, edgePathD } from '../lib/map';
+import { mapLayout, mapConnections, upgradeCoveredRequirements, edgePathD } from '../lib/map';
 import { url } from '../lib/url';
 const positions = [
   { slug: 'chat', x: 15, y: 226, label: 'Chat' },
@@ -11,7 +11,8 @@ const positions = [
 ];
 const nodes = positions.map(p => ({ ...mapLayout.nodes.find(n => n.slug === p.slug)!, ...p, w: 255, h: 42 }));
 const slugs = new Set(nodes.map(n => n.slug));
-const edges = mapConnections({ ...mapLayout, nodes, edges: mapLayout.edges.filter(e => slugs.has(e.from) && slugs.has(e.to) && (e.type === 'requires' || e.type === 'upgrades_to')) });
+const coveredRequirements = upgradeCoveredRequirements(mapLayout.edges);
+const edges = mapConnections({ ...mapLayout, nodes, edges: mapLayout.edges.filter(e => slugs.has(e.from) && slugs.has(e.to) && !coveredRequirements.has(e.key) && (e.type === 'requires' || e.type === 'upgrades_to')) });
 ---
 <section class="home-map" aria-labelledby="home-map-title">
   <div>

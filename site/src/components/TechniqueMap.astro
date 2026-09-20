@@ -10,11 +10,12 @@
 // checkboxes below (pure CSS, :has()) or focuses a concept. The script isolates its connections;
 // the geometry and full text list remain available without JavaScript.
 import { url } from '../lib/url';
-import { mapLayout, mapConnections, edgesByBand, edgePathD, RELATION_LABEL, relationTypes, type RelationType } from '../lib/map';
+import { mapLayout, mapConnections, upgradeCoveredRequirements, edgesByBand, edgePathD, RELATION_LABEL, relationTypes, type RelationType } from '../lib/map';
 import '../styles/map.css';
 
 const layout = mapLayout;
 const grouped = edgesByBand(layout);
+const coveredRequirements = upgradeCoveredRequirements(layout.edges);
 
 const RELATION_ORDER: RelationType[] = ['requires', 'upgrades_to', 'combines_with', 'alternative_to'];
 const edgeCount: Record<RelationType, number> = { requires: 0, upgrades_to: 0, combines_with: 0, alternative_to: 0 };
@@ -57,19 +58,24 @@ const drawableEdges = mapConnections(layout)
         <label class="filter-check" data-type={type}>
           <input type="checkbox" id={FILTER_ID[type]} checked={CHECKED_BY_DEFAULT[type]} />
           <span class="map-swatch" data-type={type} aria-hidden="true" />
-          {RELATION_LABEL[type]} <span class="map-filter-count">({edgeCount[type]})</span>
+          {RELATION_LABEL[type]} <span class="map-filter-count">({edgeCount[type]} total)</span>
         </label>
       ))
     }
   </div>
   <p class="footnote">
-    Turning on the other two kinds adds {edgeCount.combines_with + edgeCount.alternative_to} more
-    lines, so they start off. Hover or tab to a concept to isolate all its connections, or choose
-    one below. Passing lines leave a gap around unrelated blocks.
+    {coveredRequirements.size} prerequisite connections also have an upgrade path, so they draw once as Upgrades to.
+    Turn off Upgrades to to see those Requires lines. Hover, tab, or choose a concept to reveal all its
+    connections, including supporting topics such as guardrails and evaluation.
   </p>
+  <p class="footnote">Combines with and Alternative to start off to keep the overview readable. Topics apply across levels;
+    the map highlights useful direct connections, not every possible combination. An upgrade is a next step when needed, not a universal prerequisite.</p>
   <label class="map-focus-label" for="map-focus">Focus on a concept</label>
   <select id="map-focus" disabled><option value="">All concepts</option>{[...layout.nodes].sort((a, b) => a.title.localeCompare(b.title)).map(n => <option value={n.slug}>{n.title}</option>)}</select>
-  <p class="map-focus-status" aria-live="polite">Choose a concept to trace its connections, including on a phone.</p>
+  <p class="map-focus-status" aria-live="polite">Hover to explore. Click a concept to lock its connections, then open its page below the chart.</p>
+  <button type="button" class="map-clear" hidden>Clear selection</button>
+  <a class="map-selection-jump" href="#map-selection" hidden>View selected concept below ↓</a>
+  <noscript><p class="footnote">JavaScript is off. Concept boxes open their pages directly; the filters and full connection list still work.</p></noscript>
 </div>
 
 <div class="map-row">
@@ -94,7 +100,7 @@ const drawableEdges = mapConnections(layout)
       width={layout.width}
       height={layout.height}
       viewBox={`0 0 ${layout.width} ${layout.height}`}
-      role="img"
+      role="group"
       aria-labelledby="map-svg-title map-svg-desc"
     >
       <title id="map-svg-title">The technique graph</title>
@@ -133,12 +139,15 @@ const drawableEdges = mapConnections(layout)
             data-from={e.from}
             data-to={e.to}
             data-type={e.type}
+            data-note={e.note || e.when || e.question}
+            data-covered-by-upgrade={coveredRequirements.has(e.key) ? 'true' : undefined}
           />
         ))
       }</g>
       {drawableEdges.map((e, i) => <path d={e.d} clip-path={`url(#map-terminal-${i})`}
         class:list={['map-edge', 'map-terminal', `map-edge-${e.type.replace(/_/g, '-')}`]}
-        data-from={e.from} data-to={e.to} data-type={e.type} />)}
+        data-from={e.from} data-to={e.to} data-type={e.type}
+        data-covered-by-upgrade={coveredRequirements.has(e.key) ? 'true' : undefined} />)}
 
       {
         layout.nodes.map((node) => (
@@ -146,6 +155,7 @@ const drawableEdges = mapConnections(layout)
             href={url(`/techniques/${node.slug}/`)}
             class="map-node"
             data-slug={node.slug}
+            data-summary={node.summary}
             aria-label={`${node.title}. ${node.levelLabel}.`}
           >
             <rect x={node.x} y={node.y} width={node.w} height={node.h} rx="6" class="map-node-body" style={`--c:${node.color}`} />
@@ -165,9 +175,18 @@ const drawableEdges = mapConnections(layout)
   </div>
 </div>
 
+<section id="map-selection" class="map-selection panel" aria-labelledby="map-selection-title" hidden>
+  <div class="eyebrow">Selected concept</div>
+  <h3 id="map-selection-title"></h3>
+  <p class="map-selection-summary"></p>
+  <a class="button map-open-concept" href={url('/map/')}>Open concept <span aria-hidden="true">→</span></a>
+  <h4>Connected concepts</h4>
+  <ul class="map-selection-links"></ul>
+</section>
+
 <div class="map-legend">
   <h3 class="map-legend-heading">What each line means</h3>
-  <p class="map-reading-key">Hover or focus a concept to trace its connections. Crossing lines are not joined. The relationship list below states the direction of each connection.</p>
+  <p class="map-reading-key">Hover or focus to trace connections. Click or press Enter to lock a selection; open its page in the panel above. Crossing lines are not joined. The relationship list below states the direction of each connection.</p>
   <dl class="map-legend-list">
     {
       RELATION_ORDER.map((type) => (
@@ -219,6 +238,7 @@ const drawableEdges = mapConnections(layout)
                   <a href={url(`/techniques/${e.to}/`)}>{e.toNode.title}</a>
                   {e.when && <small>Climb when: {e.when}</small>}
                   {e.question && <small>The question: {e.question}</small>}
+                  {e.note && <small>{e.note}</small>}
                 </li>
               ))}
             </ul>
@@ -231,17 +251,28 @@ const drawableEdges = mapConnections(layout)
 </div>
 
 <script>
-  // Hover, keyboard focus, and the touch-friendly selector share the same connection highlighting.
-  // Leaving a transient focus restores the persistent selection, then the checkbox overview.
+  // A selected concept stays locked until another click, selector change, or explicit clear.
+  // Native links remain usable without JavaScript and for modified clicks / open in new tab.
   const wrap = document.querySelector<HTMLElement>('.map-wrap');
   if (wrap) {
     const edges = [...wrap.querySelectorAll<SVGElement>('.map-edge')];
     const nodes = [...wrap.querySelectorAll<SVGAElement>('.map-node')];
     const select = wrap.querySelector<HTMLSelectElement>('#map-focus')!;
     const status = wrap.querySelector<HTMLElement>('.map-focus-status')!;
+    const clear = wrap.querySelector<HTMLButtonElement>('.map-clear')!;
+    const jump = wrap.querySelector<HTMLAnchorElement>('.map-selection-jump')!;
+    const panel = wrap.querySelector<HTMLElement>('.map-selection')!;
+    const open = panel.querySelector<HTMLAnchorElement>('.map-open-concept')!;
+    const title = panel.querySelector<HTMLElement>('h3')!;
+    const summary = panel.querySelector<HTMLElement>('.map-selection-summary')!;
+    const links = panel.querySelector<HTMLUListElement>('.map-selection-links')!;
+    const relations = [...wrap.querySelectorAll<SVGElement>('g[mask] .map-edge')];
+    const labels: Record<string, string> = { requires: 'Requires', upgrades_to: 'Upgrades to', combines_with: 'Combines with', alternative_to: 'Alternative to' };
+    const bySlug = new Map(nodes.map(n => [n.dataset.slug!, n]));
+    const name = (node: SVGAElement) => node.querySelector('text')!.textContent!.trim();
     let hovered = '', focused = '';
     function render() {
-      const slug = hovered || focused || select.value;
+      const slug = select.value || hovered || focused;
       const related = new Set([slug]);
       wrap!.classList.toggle('map-focusing', !!slug);
       for (const edge of edges) {
@@ -252,16 +283,60 @@ const drawableEdges = mapConnections(layout)
       for (const node of nodes) {
         node.classList.toggle('map-related', related.has(node.dataset.slug!));
         node.classList.toggle('map-selected', node.dataset.slug === slug);
+        node.setAttribute('aria-pressed', String(node.dataset.slug === select.value));
+      }
+    }
+    function selectConcept(slug: string) {
+      select.value = slug;
+      hovered = focused = '';
+      render();
+      const node = bySlug.get(slug);
+      clear.hidden = jump.hidden = panel.hidden = !node;
+      links.replaceChildren();
+      if (!node) {
+        status.textContent = 'Hover to explore. Click a concept to lock its connections, then open its page below the chart.';
+        return;
+      }
+      const nodeName = name(node);
+      status.textContent = `${nodeName} selected. Connections stay locked. Open concept below the chart, select another box, or clear selection.`;
+      title.textContent = nodeName;
+      summary.textContent = node.dataset.summary!;
+      open.href = node.getAttribute('href')!;
+      open.setAttribute('aria-label', `Open concept: ${nodeName}`);
+      for (const edge of relations) {
+        const { from, to, type, note } = edge.dataset;
+        if (from !== slug && to !== slug) continue;
+        const other = bySlug.get(from === slug ? to! : from!)!;
+        const li = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = other.getAttribute('href')!;
+        link.textContent = name(other);
+        const label = from === slug || type === 'combines_with' || type === 'alternative_to'
+          ? labels[type!] : type === 'requires' ? 'Required by' : 'Upgrade from';
+        li.append(`${label}: `, link);
+        if (note) { const detail = document.createElement('small'); detail.textContent = note; li.append(detail); }
+        links.append(li);
       }
     }
     select.disabled = false;
     select.addEventListener('change', () => {
-      hovered = focused = ''; render();
-      const node = nodes.find(n => n.dataset.slug === select.value);
-      status.textContent = node ? `Showing all connections for ${select.selectedOptions[0].text}. Choose All concepts to restore the overview.` : 'Showing the selected relation types for all concepts.';
-      node?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'instant' });
+      selectConcept(select.value);
+      bySlug.get(select.value)?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'instant' });
     });
+    clear.addEventListener('click', () => { selectConcept(''); select.focus(); });
     nodes.forEach(node => {
+      node.setAttribute('role', 'button');
+      node.setAttribute('aria-pressed', 'false');
+      node.setAttribute('aria-controls', 'map-selection');
+      node.addEventListener('keydown', event => {
+        if (event.key !== ' ') return;
+        event.preventDefault(); selectConcept(node.dataset.slug!);
+      });
+      node.addEventListener('click', event => {
+        if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) return;
+        event.preventDefault();
+        selectConcept(node.dataset.slug!);
+      });
       node.addEventListener('mouseenter', () => { hovered = node.dataset.slug!; render(); });
       node.addEventListener('mouseleave', () => { hovered = ''; render(); });
       node.addEventListener('focus', () => { focused = node.dataset.slug!; render(); });

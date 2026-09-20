@@ -4,6 +4,23 @@
   "note": "What changed on this site, and why it matters to somebody reading it. Newest first. Entries are written for a reader, not for whoever made the change: they say what is different and what it is good for, never what a commit did. Every entry links the pages it touched. Several entries can share a date; within a date, file order is the order shown. docs/CHANGES.md says how to add one.",
   "changes": [
     {
+      "id": "explore-supporting-concepts-on-the-map",
+      "date": "2026-09-19",
+      "title": "Select a concept to explore its supporting connections",
+      "what": "Clicking a concept locks its connections in place. A panel below the chart explains its connections and provides a link to open the concept. Agent concepts now connect to supporting topics such as guardrails, evaluation, observability, and cost controls. Overlapping prerequisite and upgrade paths draw once.",
+      "why": "The map made supporting topics look disconnected and sent readers away before they could explore. A persistent selection makes those connections easier to follow, while the overview stays readable. Supporting relationships describe useful combinations rather than universal prerequisites.",
+      "pages": [
+        {
+          "label": "Concept map",
+          "path": "/map/"
+        },
+        {
+          "label": "The agent harness",
+          "path": "/techniques/agent-harness/"
+        }
+      ]
+    },
+    {
       "id": "a-quieter-map-with-focused-connections",
       "date": "2026-09-19",
       "title": "A cleaner map keeps the focus on the connections",

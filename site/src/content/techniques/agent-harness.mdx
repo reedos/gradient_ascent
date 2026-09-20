@@ -66,6 +66,16 @@ Level 5 is where the harness first has real decisions to bound: the model decide
 and when to stop: see <Link href="/techniques/single-agent/">single agent</Link> for the loop
 itself.
 
+The harness is also where several supporting topics meet:
+<Link href="/techniques/guardrails/">guardrails</Link> check inputs, outputs, and proposed actions;
+<Link href="/techniques/human-in-the-loop/">human approval</Link> handles actions that need a person's decision;
+<Link href="/techniques/context-engineering/">context engineering</Link> shapes the next request;
+and <Link href="/techniques/observability/">observability</Link> records what happened.
+<Link href="/techniques/evals/">Evaluation</Link> checks the resulting system, while
+<Link href="/techniques/cost-optimization/">cost controls</Link> bound its work.
+These are design choices around the loop, not capabilities guaranteed by the word “harness.”
+Guardrail checks complement permission boundaries and sandboxing; they do not replace them.
+
 This page is sourced, not measured: what the harnesses below do comes from their makers' own
 documentation, and no run under one has been recorded and scored here. It is illustrated.
 

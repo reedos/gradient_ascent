@@ -44,6 +44,7 @@ export interface MapRelationIn {
   to: string;
   when?: string;
   question?: string;
+  note?: string;
 }
 
 export interface MapTaxonomyIn {
@@ -129,6 +130,7 @@ export interface MapEdge {
   to: string;
   when?: string;
   question?: string;
+  note?: string;
 }
 
 export interface MapBand {
@@ -390,6 +392,7 @@ export function computeMapLayout(tax: MapTaxonomyIn): MapLayout {
       to: rel.to,
       when: rel.when,
       question: rel.question,
+      note: rel.note,
     }));
 
   // A hard guarantee, not an assumption: every level-band node sits inside [0, CANVAS_LEVEL_W] by
@@ -458,6 +461,12 @@ export function computeEdgeGeometry(from: MapNode, to: MapNode, rowNodes: MapNod
   const arcHeight = Math.min(between ? 26 : 18, margin - 1);
   const cy = y1 - arcHeight; // y1 === y2 here, both endpoints share a row
   return { x1, y1, c1x: x1, c1y: cy, c2x: x2, c2y: cy, x2, y2, arcsOverIntervening: between };
+}
+
+/** Only collapse an explicitly recorded prerequisite with its reverse upgrade path. */
+export function upgradeCoveredRequirements(edges: MapEdge[]): Set<string> {
+  const upgrades = new Set(edges.filter(e => e.type === 'upgrades_to').map(e => `${e.from}:${e.to}`));
+  return new Set(edges.filter(e => e.type === 'requires' && upgrades.has(`${e.to}:${e.from}`)).map(e => e.key));
 }
 
 /** Distinct border ports prevent several unrelated relations merging at a node's center. */

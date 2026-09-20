@@ -1626,6 +1626,210 @@
       "from": "observability",
       "type": "combines_with",
       "to": "evals"
+    },
+    {
+      "type": "combines_with",
+      "to": "guardrails",
+      "note": "The harness can run input, output, and tool checks around each model step.",
+      "from": "agent-harness"
+    },
+    {
+      "type": "combines_with",
+      "to": "human-in-the-loop",
+      "note": "The harness enforces which actions pause for human approval.",
+      "from": "agent-harness"
+    },
+    {
+      "type": "combines_with",
+      "to": "context-engineering",
+      "note": "The harness assembles the next request and manages growing context.",
+      "from": "agent-harness"
+    },
+    {
+      "type": "combines_with",
+      "to": "observability",
+      "note": "Traces record model calls, tool results, refusals, and stop conditions.",
+      "from": "agent-harness"
+    },
+    {
+      "type": "combines_with",
+      "to": "evals",
+      "note": "Evaluate the whole model-and-harness system, including tool actions and final outcomes.",
+      "from": "agent-harness"
+    },
+    {
+      "type": "combines_with",
+      "to": "cost-optimization",
+      "note": "Step, token, and spending limits bound the cost of a run.",
+      "from": "agent-harness"
+    },
+    {
+      "type": "combines_with",
+      "to": "guardrails",
+      "note": "Check proposed actions before tool execution.",
+      "from": "single-agent"
+    },
+    {
+      "type": "combines_with",
+      "to": "evals",
+      "note": "Assess task outcomes and the sequence of actions, not only the final reply.",
+      "from": "single-agent"
+    },
+    {
+      "type": "combines_with",
+      "to": "evals",
+      "note": "Check retrieval coverage, source support, and when the search stops.",
+      "from": "agentic-rag"
+    },
+    {
+      "type": "combines_with",
+      "to": "observability",
+      "note": "Trace each query and retrieved result to understand the final answer.",
+      "from": "agentic-rag"
+    },
+    {
+      "type": "combines_with",
+      "to": "safety",
+      "note": "Sandbox execution and scope access to files, credentials, and networks.",
+      "from": "coding-agents"
+    },
+    {
+      "type": "combines_with",
+      "to": "reviewing",
+      "note": "Review the diff and test evidence before accepting the change.",
+      "from": "coding-agents"
+    },
+    {
+      "type": "combines_with",
+      "to": "safety",
+      "note": "Review skill instructions, bundled code, and requested permissions before trusting them.",
+      "from": "skills"
+    },
+    {
+      "type": "combines_with",
+      "to": "evals",
+      "note": "Test both whether a skill is selected appropriately and whether it completes its task.",
+      "from": "skills"
+    },
+    {
+      "type": "combines_with",
+      "to": "evals",
+      "note": "Test turn-taking, interruptions, task success, and recovery.",
+      "from": "voice-agents"
+    },
+    {
+      "type": "combines_with",
+      "to": "observability",
+      "note": "Track latency and interruption events as well as model calls.",
+      "from": "voice-agents"
+    },
+    {
+      "type": "combines_with",
+      "to": "delegating",
+      "note": "Define worker responsibilities, boundaries, and acceptance criteria.",
+      "from": "orchestrator-workers"
+    },
+    {
+      "type": "combines_with",
+      "to": "observability",
+      "note": "Trace the lead agent and worker runs together.",
+      "from": "orchestrator-workers"
+    },
+    {
+      "type": "combines_with",
+      "to": "cost-optimization",
+      "note": "Bound worker count and parallel calls against the task budget.",
+      "from": "orchestrator-workers"
+    },
+    {
+      "type": "combines_with",
+      "to": "observability",
+      "note": "Record handoffs, checkpoints, and the state at each decision.",
+      "from": "agent-graphs"
+    },
+    {
+      "type": "combines_with",
+      "to": "guardrails",
+      "note": "Validate state and permissions at handoffs between agents.",
+      "from": "agent-graphs"
+    },
+    {
+      "type": "combines_with",
+      "to": "evals",
+      "note": "Check whether review improves accuracy rather than just agreement.",
+      "from": "debate-review"
+    },
+    {
+      "type": "combines_with",
+      "to": "reviewing",
+      "note": "Review evidence independently; agreement among agents is not proof.",
+      "from": "debate-review"
+    },
+    {
+      "type": "combines_with",
+      "to": "observability",
+      "note": "Track progress, retries, and recovery across sessions.",
+      "from": "long-horizon"
+    },
+    {
+      "type": "combines_with",
+      "to": "cost-optimization",
+      "note": "Enforce a budget across the whole task, not just one call.",
+      "from": "long-horizon"
+    },
+    {
+      "type": "combines_with",
+      "to": "guardrails",
+      "note": "Check proposed actions on every scheduled run.",
+      "from": "agent-teammates"
+    },
+    {
+      "type": "combines_with",
+      "to": "observability",
+      "note": "Keep an activity log and track pending approvals.",
+      "from": "agent-teammates"
+    },
+    {
+      "type": "combines_with",
+      "to": "evals",
+      "note": "Test allowed, forbidden, and approval-required actions over repeated runs.",
+      "from": "agent-teammates"
+    },
+    {
+      "type": "combines_with",
+      "to": "delegating",
+      "note": "Make each role accountable for a defined part of the work.",
+      "from": "organizations-swarms"
+    },
+    {
+      "type": "combines_with",
+      "to": "observability",
+      "note": "Trace which role introduced or checked each claim and action.",
+      "from": "organizations-swarms"
+    },
+    {
+      "type": "combines_with",
+      "to": "cost-optimization",
+      "note": "Cap roster growth and coordination costs.",
+      "from": "organizations-swarms"
+    },
+    {
+      "type": "combines_with",
+      "to": "evals",
+      "note": "Test the complete team and whether additional roles improve outcomes.",
+      "from": "organizations-swarms"
+    },
+    {
+      "type": "combines_with",
+      "to": "safety",
+      "note": "Enforce physical operating limits independently of model proposals.",
+      "from": "embodied"
+    },
+    {
+      "type": "combines_with",
+      "to": "evals",
+      "note": "Evaluate control limits and real-world behavior as well as simulation outcomes.",
+      "from": "embodied"
     }
   ],
   "page_blocks": {

@@ -14,6 +14,7 @@ import {
   edgesByBand,
   computeEdgeGeometry,
   mapConnections,
+  upgradeCoveredRequirements,
   edgePathD,
   taxonomy as realTaxonomy,
   mapLayout as realLayout,
@@ -28,6 +29,31 @@ import {
 } from '../src/lib/map.ts';
 
 // -- Fixture ----------------------------------------------------------------------------------------
+
+test('only a reverse upgrade covers a recorded prerequisite, without changing the source relations', () => {
+  const edges = [
+    { key: 'prerequisite', from: 'advanced', to: 'basic', type: 'requires' as const },
+    { key: 'upgrade', from: 'basic', to: 'advanced', type: 'upgrades_to' as const },
+    { key: 'other', from: 'advanced', to: 'support', type: 'requires' as const },
+    { key: 'same-direction', from: 'advanced', to: 'support', type: 'upgrades_to' as const },
+    { key: 'support', from: 'advanced', to: 'basic', type: 'combines_with' as const },
+  ];
+  const original = structuredClone(edges);
+  assert.deepEqual([...upgradeCoveredRequirements(edges)], ['prerequisite']);
+  assert.deepEqual([...upgradeCoveredRequirements(edges.filter(e => e.type !== 'upgrades_to'))], []);
+  assert.deepEqual(edges, original);
+});
+
+test('each agent concept has a direct supporting topic and harness guardrails are explicit', () => {
+  const topics = new Set(realLayout.nodes.filter(n => n.level === 'tracks').map(n => n.slug));
+  for (const node of realLayout.nodes.filter(n => typeof n.level === 'number' && n.level >= 5)) {
+    assert.ok(realLayout.edges.some(e => e.type === 'combines_with' &&
+      (e.from === node.slug && topics.has(e.to) || e.to === node.slug && topics.has(e.from))), node.slug);
+  }
+  const guardrails = realLayout.edges.find(e => e.from === 'agent-harness' && e.to === 'guardrails');
+  assert.equal(guardrails?.type, 'combines_with');
+  assert.ok(guardrails?.note);
+});
 
 function fixture(): MapTaxonomyIn {
   return {
@@ -479,7 +505,8 @@ test('every relation attaches to distinct, visible border ports on its actual en
   }
   for (const [key, xs] of ports) {
     xs.sort((a, b) => a - b);
-    for (let i = 1; i < xs.length; i++) assert.ok(xs[i] - xs[i - 1] >= 9, `${key} connection dots overlap`);
+    // No endpoint circles: leave enough separation for the focused 2.2px strokes.
+    for (let i = 1; i < xs.length; i++) assert.ok(xs[i] - xs[i - 1] >= 3, `${key} connection lines overlap`);
   }
   assert.deepEqual(mapConnections(realLayout), connections, 'port allocation remains stable across builds');
 });
