@@ -1,0 +1,9 @@
+{
+  "slug": "project-handoff",
+  "values": {
+    "goal": "Prepare a factual continuation brief for a partially built report generator that combines synthetic issue data into Markdown. State what is complete, what remains, and the evidence. Deployment and external notification are out of scope.",
+    "state": "README says the parser and renderer checks passed. The change summary says headings were added and a date-filter branch was started, with no merge evidence. Checks recorded PASS parser_basic and PASS render_markdown, and FAIL missing_owner KeyError. Ownerless inputs fail and no fix was attempted. The date-filter change is pending. Branch existence, dependency installation, and whether the date-filter change will be reviewed are unknown. Behavior beyond the recorded checks is untested.",
+    "references": "Synthetic attachments: README.md, change-summary.md, checks.log, and known-failure.md. The workspace path and relevant access beyond these supplied materials are unknown.",
+    "next": "Proposals, pending workspace access: inspect the relevant branch and dependencies; reproduce the missing-owner failure; add or review the date-filter change; and run checks for ownerless inputs and the date filter. Keep the recorded failure visible, distinguish passing checks from untested behavior, and do not claim completion. Do not deploy or send external notifications."
+  }
+}

@@ -1,0 +1,223 @@
+[
+  {
+    "id": "AI-1",
+    "builder": {
+      "exists": true,
+      "words": 533
+    },
+    "baseline": {
+      "exists": true,
+      "words": 495
+    },
+    "stronger": {
+      "exists": false,
+      "words": null
+    },
+    "artifactSha256": "3827420b80b6002bdcb7894d7b6884541343b27dd8756af3766b259d75ddd3de",
+    "liveFormAndDownloadVerified": true
+  },
+  {
+    "id": "AI-2",
+    "builder": {
+      "exists": true,
+      "words": 557
+    },
+    "baseline": {
+      "exists": false,
+      "words": null
+    },
+    "stronger": {
+      "exists": true,
+      "words": 620
+    },
+    "artifactSha256": "3bf18889ba0bd61d1c5b3c218cb8bfe3a2d5cd18f9a0fb5db1f96b532e849abd",
+    "liveFormAndDownloadVerified": true
+  },
+  {
+    "id": "DD-1",
+    "builder": {
+      "exists": true,
+      "words": 902
+    },
+    "baseline": {
+      "exists": false,
+      "words": null
+    },
+    "stronger": {
+      "exists": false,
+      "words": null
+    },
+    "artifactSha256": "8a9927b1ea140c6e83ac11debbfa9318a4b6ec673a67447d11f14e1324846b58",
+    "liveFormAndDownloadVerified": true
+  },
+  {
+    "id": "DD-2",
+    "builder": {
+      "exists": true,
+      "words": 704
+    },
+    "baseline": {
+      "exists": false,
+      "words": null
+    },
+    "stronger": {
+      "exists": false,
+      "words": null
+    },
+    "artifactSha256": "915885c344eec6670ae9cdf18fa105995e361494a2fab860a58157777a16c079",
+    "liveFormAndDownloadVerified": true
+  },
+  {
+    "id": "PB-1",
+    "builder": {
+      "exists": true,
+      "words": 829
+    },
+    "baseline": {
+      "exists": false,
+      "words": null
+    },
+    "stronger": {
+      "exists": false,
+      "words": null
+    },
+    "artifactSha256": "a228416a43e37c04b50f4a667636188de750dfb9aa2f2fd0971c075fbb86da37",
+    "liveFormAndDownloadVerified": true
+  },
+  {
+    "id": "PH-1",
+    "builder": {
+      "exists": true,
+      "words": 767
+    },
+    "baseline": {
+      "exists": false,
+      "words": null
+    },
+    "stronger": {
+      "exists": false,
+      "words": null
+    },
+    "artifactSha256": "2d3bb5bd468dc9007681be7d9322addbd7d67ae9b1e55af6ece3fc1cc2cf4131",
+    "liveFormAndDownloadVerified": true
+  },
+  {
+    "id": "PH-2",
+    "builder": {
+      "exists": true,
+      "words": 519
+    },
+    "baseline": {
+      "exists": true,
+      "words": 426
+    },
+    "stronger": {
+      "exists": false,
+      "words": null
+    },
+    "artifactSha256": "a2f150839ae6e58bd1e9f0e50a9ab10f0dfcba11fdacd5144658bbc320904630",
+    "liveFormAndDownloadVerified": true
+  },
+  {
+    "id": "TS-1",
+    "builder": {
+      "exists": true,
+      "words": 721
+    },
+    "baseline": {
+      "exists": false,
+      "words": null
+    },
+    "stronger": {
+      "exists": false,
+      "words": null
+    },
+    "artifactSha256": "bd47a02c4095b4fac52300beb81023ac44f71f30e502228d15f205ae932466c5",
+    "liveFormAndDownloadVerified": true
+  },
+  {
+    "id": "TS-2",
+    "builder": {
+      "exists": true,
+      "words": 837
+    },
+    "baseline": {
+      "exists": false,
+      "words": null
+    },
+    "stronger": {
+      "exists": false,
+      "words": null
+    },
+    "artifactSha256": "5327a16193f999fdae1fb6f3ac8def4e0f8166616156d22763201d3c77549b83",
+    "liveFormAndDownloadVerified": true
+  },
+  {
+    "id": "WA-1",
+    "builder": {
+      "exists": true,
+      "words": 771
+    },
+    "baseline": {
+      "exists": false,
+      "words": null
+    },
+    "stronger": {
+      "exists": false,
+      "words": null
+    },
+    "artifactSha256": "3648835b1415f99d6e3a4409e465e248402db337f4dbabdf40a99932a6c43e58",
+    "liveFormAndDownloadVerified": true
+  },
+  {
+    "id": "WA-2",
+    "builder": {
+      "exists": true,
+      "words": 839
+    },
+    "baseline": {
+      "exists": true,
+      "words": 534
+    },
+    "stronger": {
+      "exists": false,
+      "words": null
+    },
+    "artifactSha256": "16b8c2686a8fb0ff2a5bf5c0a9a16667f1b4c9c393996aa05cc7689fa3f21760",
+    "liveFormAndDownloadVerified": true
+  },
+  {
+    "id": "WF-1",
+    "builder": {
+      "exists": true,
+      "words": 790
+    },
+    "baseline": {
+      "exists": false,
+      "words": null
+    },
+    "stronger": {
+      "exists": false,
+      "words": null
+    },
+    "artifactSha256": "6b8898d363b56e9c0de15a29f07887097014ca72ce20add2c6c14a592d90b75d",
+    "liveFormAndDownloadVerified": true
+  },
+  {
+    "id": "WF-2",
+    "builder": {
+      "exists": true,
+      "words": 641
+    },
+    "baseline": {
+      "exists": true,
+      "words": 569
+    },
+    "stronger": {
+      "exists": false,
+      "words": null
+    },
+    "artifactSha256": "1af84e09b35b30a61b12454a62c691b42522cdabe5b13a2fb5506a6639167291",
+    "liveFormAndDownloadVerified": true
+  }
+]

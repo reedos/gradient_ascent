@@ -1,0 +1,4 @@
+{
+  "sample-manifest.csv": "SYNTHETIC\noriginal,derivative\nwildlife-01.jpg,carousel-01/01.jpg\nwildlife-02.jpg,carousel-01/02.jpg",
+  "review-notes.md": "SYNTHETIC: Reject poor crop, duplicate subject, or exposed exact location."
+}

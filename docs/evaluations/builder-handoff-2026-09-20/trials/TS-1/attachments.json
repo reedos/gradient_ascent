@@ -1,0 +1,5 @@
+{
+  "conversion-utilities.md": "SYNTHETIC: Python package supports temperature, length, pressure; exact import/API undocumented.",
+  "measurements.csv": "SYNTHETIC\nsample,temp,temp_unit,length,length_unit\n1,21,C,2,m\n2,70,F,unknown,m\n3,5,,4,kg",
+  "tool-policy.md": "SYNTHETIC: Inputs unchanged; new units need maintainer review."
+}

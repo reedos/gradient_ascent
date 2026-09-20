@@ -1,0 +1,5 @@
+I maintain a small community website with two volunteers. Existing repository guidance says pages live under legacy-pages and only the release volunteer publishes. A newer note proposes moving content into content/ and assets/ but nobody confirmed it replaces the old rule. I want an agent to inspect and reconcile the guidance, then help plan a safe reorganization. Local editing and link checks are allowed; publishing is separate, and I do not know who owns hosting or whether the release volunteer is active. The site has event pages, accessibility notes, and a build script. Preserve links, avoid moving or deleting files before review, and ask focused questions about authoritative guidance and deployment ownership. Never claim deployment or assume credentials. I know requested folder names and the supplied instructions. Deadline, hosting provider, and external bookmarks are unknown. Files are synthetic.
+
+Please help produce the project instruction file.
+
+Reference links: https://reedos.github.io/gradient_ascent/agents.md and https://reedos.github.io/gradient_ascent/llms.txt

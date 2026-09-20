@@ -1,0 +1,9 @@
+{
+  "slug": "workflow-audit",
+  "values": {
+    "process": "One form feeds several spreadsheets for volunteer scheduling, accessibility needs, and attendance. Registrations are copied manually into the spreadsheets. A coordinator reviews assignments before volunteers see them.",
+    "pain": "Manual copying is repetitive. The same person can appear twice with different phone numbers, event names vary, and sample rows disagree about a shift. The source of truth, duplicate and conflict handling, and ways to reduce repetitive entry need an audit.",
+    "evidence": "Synthetic registration-export.csv: Ari Lee, ari@example.test, 555-0101, Harvest, 09:00; and Ari Lee, ari@example.test, 555-0199, Harvest, 10:00. Synthetic schedule-sheet.csv: Ari Lee, Harvest, 09:00. Synthetic access-notes.md: export and attendance are editable; scheduling permission and reminder authority are unknown.",
+    "preserve": "Keep coordinator review of assignments before volunteers see them. Do not merge records silently, send messages, or assume permission to connect automation to the scheduling workbook or send reminders. Preserve an audit trail for corrections and visible uncertainty. Accessibility information is sensitive. Event naming, retention, matching key, and schedule-change authority are unknown. Recommend a staged design and organizational questions before implementation."
+  }
+}

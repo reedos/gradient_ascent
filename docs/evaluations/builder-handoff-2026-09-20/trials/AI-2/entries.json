@@ -1,0 +1,9 @@
+{
+  "slug": "agent-instructions",
+  "values": {
+    "project": "Small community website with event pages and accessibility notes. Help inspect and reconcile the project guidance, then plan a safe reorganization.",
+    "reuse": "Follow the existing AGENTS.md guidance: pages stay in legacy-pages, the release volunteer publishes, and run the link check. A former note suggests content/ and assets/, but I don't know if it replaces the old rule.",
+    "boundaries": "Local edits and link checks are okay. Do not move or delete files before review. Ask focused questions about authoritative guidance and deployment ownership; publishing is separate. Don't assume hosting access or credentials.",
+    "done": "Compare the guidance and site tree, call out conflicts and unknowns, and return a cautious reorganization plan that preserves links. Include link-check results and what needs review. Don't claim deployment."
+  }
+}

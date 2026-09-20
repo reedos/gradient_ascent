@@ -1,0 +1,9 @@
+{
+  "slug": "tool-specification",
+  "values": {
+    "job": "Convert measurement CSVs with the existing unit-conversion utilities. Preserve originals, produce a clearly named converted file, report handled columns and units, and stop safely for missing, incompatible, or malformed units. The tool may be proposed but not run.",
+    "contract": "Input: measurement CSVs; temperatures, lengths, and pressures may appear, with headers and blank rows. Output: a clearly named converted CSV and a report of handled columns and units. Originals are read-only and unchanged. Exact destination, output naming, conversion interface/API, precision, unit catalog, and mixed-unit behavior are unknown.",
+    "reuse": "Inspect and reuse existing capability before proposing conversion logic. The existing synthetic package supports temperature, length, and pressure, but its exact import/API is undocumented.",
+    "limits": "Keep inputs and originals unchanged and read-only. Keep malformed rows and incompatible dimensions visible; do not turn them into plausible numbers. Stop safely for missing, incompatible, or malformed units. New units need maintainer review. Rounding, mixed-unit handling, approval workflow details, and command/library APIs are unknown."
+  }
+}

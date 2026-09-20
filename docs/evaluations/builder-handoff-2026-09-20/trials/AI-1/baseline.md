@@ -1,0 +1,5 @@
+I am starting a new device-under-test project for a sensor board. Our lab has a shared Python test framework and a past project showing our usual structure. The framework is read-only unless a maintainer approves changes. I want an agent to set up the new project, reuse the framework and useful patterns, and turn the DUT brief into an actionable test plan. It may inspect files and draft project files, but must ask before adding shared utilities, changing shared configuration, connecting to hardware, flashing firmware, or running board tests. It must never invent commands, instrument addresses, measurements, or test results. I know the board interfaces and required behaviors in the brief, but the bench address, firmware build identifier, and optional instruments are unknown. Instructions should separate proposals from approved operations. The supplied files are synthetic examples.
+
+Please help produce the project instruction file.
+
+Reference links: https://reedos.github.io/gradient_ascent/agents.md and https://reedos.github.io/gradient_ascent/llms.txt

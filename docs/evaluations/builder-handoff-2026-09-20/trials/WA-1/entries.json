@@ -1,0 +1,9 @@
+{
+  "slug": "workflow-audit",
+  "values": {
+    "process": "Inputs are an issue export, notes, and last week's report. The current sequence is: Monday collect; Wednesday chase; Thursday copy; Friday format; then the coordinator reviews.",
+    "pain": "Recurring labor includes copying updates into a status sheet, chasing owners, and formatting the report. Audit for weak handoffs, stale or contradictory information, and improvements. Formatting automation alone may reduce formatting work but does not remove collection, chasing, copying, or review. Unknowns: whether the export is fetchable, whether owners consent to reminders, what leadership considers stale, and the integration maintenance cost.",
+    "evidence": "Current process: Monday collect; Wednesday chase; Thursday copy; Friday format; coordinator reviews. Issue export: Pine is blocked, owned by Sam, updated 2026-09-15; River is in progress, has no owner in the export, and was updated 2026-09-10. Last week's report lists River's owner as Jo while the current export is blank. Inputs also include notes.",
+    "preserve": "Keep the current responsibilities and final human review. A person reviews wording and decides whether a risk is material before leadership receives it. Automated collection, reminders, normalization, and drafting are acceptable, but no messages or publication without an explicit decision."
+  }
+}

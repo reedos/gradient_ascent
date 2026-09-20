@@ -1,0 +1,5 @@
+{
+  "handoff-note.md": "SYNTHETIC: â€˜Done: cleaned duplicates and normalized dates.â€™ No commit, log, or reviewer. Original link unavailable.",
+  "mock-output.csv": "SYNTHETIC MOCK ONLY\nid,date\n1,2026-09-01\n2,2026-09-02",
+  "script-excerpt.py": "SYNTHETIC UNTESTED: reads input.csv, drops duplicate rows, writes cleaned.csv; date logic omitted."
+}

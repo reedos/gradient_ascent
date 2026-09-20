@@ -1,0 +1,5 @@
+I received a handoff saying a data-cleanup script is â€˜done,â€™ but the original workspace is unavailable. I only have a mock output and a script excerpt never tested against the stated input shape. The handoff claims duplicates were removed and dates normalized, with no run log, source sample, dependency list, commit, or review record. I need a continuation brief that challenges the status, lists missing evidence and files to request, and proposes safe validation. Treat mock output as an example, not proof. I know the desired result is a cleaned CSV with original rows traceable to outputs. Duplicate rule, production date formats, encoding, row count, and environment compatibility are unknown. The recipient cannot access the original workspace or private reference. Explicitly state that reference is unavailable; do not inspect or execute it in absentia, invent behavior, or perform cleanup. This exercise is synthetic.
+
+Please help produce the project handoff.
+
+Reference links: https://reedos.github.io/gradient_ascent/agents.md and https://reedos.github.io/gradient_ascent/llms.txt

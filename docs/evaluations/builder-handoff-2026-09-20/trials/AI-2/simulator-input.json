@@ -1,0 +1,40 @@
+{
+  "id": "AI-2",
+  "slug": "agent-instructions",
+  "scenario": "I maintain a small community website with two volunteers. Existing repository guidance says pages live under legacy-pages and only the release volunteer publishes. A newer note proposes moving content into content/ and assets/ but nobody confirmed it replaces the old rule. I want an agent to inspect and reconcile the guidance, then help plan a safe reorganization. Local editing and link checks are allowed; publishing is separate, and I do not know who owns hosting or whether the release volunteer is active. The site has event pages, accessibility notes, and a build script. Preserve links, avoid moving or deleting files before review, and ask focused questions about authoritative guidance and deployment ownership. Never claim deployment or assume credentials. I know requested folder names and the supplied instructions. Deadline, hosting provider, and external bookmarks are unknown. Files are synthetic.",
+  "attachments": {
+    "AGENTS.md": "SYNTHETIC: Keep pages in legacy-pages; release volunteer publishes; run link check.",
+    "former-note.md": "SYNTHETIC: Proposed content/ and assets/ layout; no approval or date.",
+    "site-tree.txt": "SYNTHETIC: legacy-pages/index.md; events/spring.md; assets/logo.svg; scripts/check-links.ps1"
+  },
+  "form": {
+    "url": "https://reedos.github.io/gradient_ascent/tools/agent-instructions/",
+    "text": "Home\n/\nTools\n/\nAgent instructions builder\nUSE WITH YOUR OWN AI\nAgent instructions builder\n\nDescribe how an agent should work in your project, then let it verify the details against your actual files.\n\nA rough description is enough. Leave unknowns blank; the exported instructions ask your agent to clarify or inspect them. Nothing here calls a model, uploads files, or saves your entries.\n\nTry an example\nDownload a blank template\n\nWhat is this project?\n\nA sentence about its purpose and the work the agent will do.\n\nWhat should it reuse or follow?\n\nMention existing projects, documentation, tools, and known commands. Unknowns can stay blank.\n\nWhat may it change, and when should it ask?\n\nSeparate project edits from shared code, external actions, and equipment access.\n\nWhat should it check and hand back?\n\nDescribe useful evidence and documentation, rather than assuming tests exist.\n\nInstruction filename\nAGENTS.md\nCLAUDE.md\n\nChoose the convention your agent supports. Review and merge with any existing instructions; do not blindly replace them. Written rules do not enforce filesystem or execution permissions.\n\nWhat this template helps your agent work out\nReview your draft\n\nCopy or download this draft and give it to your agent with relevant files. It contains your answers and instructions for refining them—not a verified implementation.\n\nCopy draft\nDownload Markdown\n\nWhat next?\n\nGive the draft and relevant workflow files to your agent. Ask it to separate confirmed facts, assumptions, and proposed choices, then review the result.\n\nNext: Definition-of-done builder →\nBrowse all tools\nModel reference guide",
+    "fields": [
+      {
+        "key": "project",
+        "id": "field-project",
+        "label": "What is this project?",
+        "placeholder": "Generate new DUT test projects using our existing Python framework."
+      },
+      {
+        "key": "reuse",
+        "id": "field-reuse",
+        "label": "What should it reuse or follow?",
+        "placeholder": "Start from the closest past project. Reuse instrument drivers and CSV utilities."
+      },
+      {
+        "key": "boundaries",
+        "id": "field-boundaries",
+        "label": "What may it change, and when should it ask?",
+        "placeholder": "Create project files for review. Never edit the shared framework without approval."
+      },
+      {
+        "key": "done",
+        "id": "field-done",
+        "label": "What should it check and hand back?",
+        "placeholder": "A change summary, known gaps, and results of available project checks."
+      }
+    ]
+  }
+}

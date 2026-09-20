@@ -1,0 +1,40 @@
+{
+  "id": "WF-2",
+  "slug": "workflow",
+  "scenario": "I photograph local wildlife and want a weekly process that turns original photos into suggested carousel packs for my phone. Each pack should have sensible grouping, carousel crops, resized exports, captions or metadata, and a map end card only when location is available and safe. Originals must never be deleted or overwritten. I want automatic processing after adding photos, with exceptions presented for review instead of requiring manual preparation for every image. I have not chosen square or portrait crops, pack size, or phone delivery method. Some files have GPS, some do not, and some are blurry or duplicates. I know sample folders, phone review, and approval before sharing. Cloud destination, export retention, and exact-coordinate privacy are unknown. Fixtures are synthetic. Keep uncertain crop and privacy decisions visible and do not claim delivery or quality checks occurred.",
+  "attachments": {
+    "wildlife-01.jpg": "SYNTHETIC IMAGE PLACEHOLDER: fox at dusk; GPS present; 4032x3024.",
+    "wildlife-02.jpg": "SYNTHETIC IMAGE PLACEHOLDER: heron; no GPS; blurry; 3024x4032.",
+    "photo-metadata.csv": "SYNTHETIC\nfilename,capture_time,lat,lon\nwildlife-01.jpg,2026-09-18T19:10Z,45.1,-122.7\nwildlife-02.jpg,2026-09-18T19:21Z,,"
+  },
+  "form": {
+    "url": "https://reedos.github.io/gradient_ascent/tools/workflow/",
+    "text": "Home\n/\nTools\n/\nWorkflow designer\nUSE WITH YOUR OWN AI\nWorkflow designer\n\nDefine the complete experience from trigger to delivered result, including your role and exceptions.\n\nA rough description is enough. Leave unknowns blank; the exported instructions ask your agent to clarify or inspect them. Nothing here calls a model, uploads files, or saves your entries.\n\nTry an example\nDownload a blank template\n\nWhat starts the process?\n\nAn event, schedule, request, or selected folder.\n\nWhat should be ready at the end?\n\nName the finished output and destination, not just intermediate files.\n\nWhat information or tools are available?\n\nCurrent inputs, prior outputs, and existing systems. You can attach samples to your agent later.\n\nWhat should you do, and what happens on exceptions?\n\nDistinguish final review from intermediate approvals and optional corrections.\n\nWhat this template helps your agent work out\nReview your draft\n\nCopy or download this draft and give it to your agent with relevant files. It contains your answers and instructions for refining them—not a verified implementation.\n\nCopy draft\nDownload Markdown\n\nWhat next?\n\nGive the draft and relevant workflow files to your agent. Ask it to separate confirmed facts, assumptions, and proposed choices, then review the result.\n\nNext: Definition-of-done builder →\nBrowse all tools\nModel reference guide",
+    "fields": [
+      {
+        "key": "trigger",
+        "id": "field-trigger",
+        "label": "What starts the process?",
+        "placeholder": "Every Friday, prepare a status report for active projects."
+      },
+      {
+        "key": "result",
+        "id": "field-result",
+        "label": "What should be ready at the end?",
+        "placeholder": "A source-linked report draft in our review folder."
+      },
+      {
+        "key": "sources",
+        "id": "field-sources",
+        "label": "What information or tools are available?",
+        "placeholder": "Previous reports, issue tracker updates, and project notes."
+      },
+      {
+        "key": "role",
+        "id": "field-role",
+        "label": "What should you do, and what happens on exceptions?",
+        "placeholder": "I review the finished report. Missing updates should be flagged, not invented."
+      }
+    ]
+  }
+}

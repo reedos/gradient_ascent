@@ -1,0 +1,40 @@
+{
+  "id": "WF-1",
+  "slug": "workflow",
+  "scenario": "Every Friday I prepare a report across three projects by collecting issue records, reading team notes, comparing last week's report, and drafting a combined report for a program manager. A person reviews the draft before sending; it must never send email or publish automatically. I want routine collection and synthesis automated while preserving source links and flagging stale, missing, or contradictory information. The prior report is only a format example and may contain old owners and dates. Exports have different columns and notes use informal project names. The agent may read these synthetic files and propose a repeatable workflow, but must not claim live tracker access, infer closure from silence, or resolve conflicts silently. I know the weekly cadence, projects, review gate, and supplied examples. Connected systems, recipients, and acceptable freshness are unknown. Minimize manual copying and make exceptions easy to review.",
+  "attachments": {
+    "previous-report.md": "SYNTHETIC: Weekly status sections Progress, Risks, Decisions, Next week; dated source links.",
+    "issues-alpha.csv": "SYNTHETIC\nid,title,status,updated\nA-7,Export timeout,open,2026-09-16\nA-8,Docs refresh,closed,2026-09-12",
+    "team-notes.txt": "SYNTHETIC: Alpha also A-team. Beta owner changed? Gamma milestone delayed; no date."
+  },
+  "form": {
+    "url": "https://reedos.github.io/gradient_ascent/tools/workflow/",
+    "text": "Home\n/\nTools\n/\nWorkflow designer\nUSE WITH YOUR OWN AI\nWorkflow designer\n\nDefine the complete experience from trigger to delivered result, including your role and exceptions.\n\nA rough description is enough. Leave unknowns blank; the exported instructions ask your agent to clarify or inspect them. Nothing here calls a model, uploads files, or saves your entries.\n\nTry an example\nDownload a blank template\n\nWhat starts the process?\n\nAn event, schedule, request, or selected folder.\n\nWhat should be ready at the end?\n\nName the finished output and destination, not just intermediate files.\n\nWhat information or tools are available?\n\nCurrent inputs, prior outputs, and existing systems. You can attach samples to your agent later.\n\nWhat should you do, and what happens on exceptions?\n\nDistinguish final review from intermediate approvals and optional corrections.\n\nWhat this template helps your agent work out\nReview your draft\n\nCopy or download this draft and give it to your agent with relevant files. It contains your answers and instructions for refining them—not a verified implementation.\n\nCopy draft\nDownload Markdown\n\nWhat next?\n\nGive the draft and relevant workflow files to your agent. Ask it to separate confirmed facts, assumptions, and proposed choices, then review the result.\n\nNext: Definition-of-done builder →\nBrowse all tools\nModel reference guide",
+    "fields": [
+      {
+        "key": "trigger",
+        "id": "field-trigger",
+        "label": "What starts the process?",
+        "placeholder": "Every Friday, prepare a status report for active projects."
+      },
+      {
+        "key": "result",
+        "id": "field-result",
+        "label": "What should be ready at the end?",
+        "placeholder": "A source-linked report draft in our review folder."
+      },
+      {
+        "key": "sources",
+        "id": "field-sources",
+        "label": "What information or tools are available?",
+        "placeholder": "Previous reports, issue tracker updates, and project notes."
+      },
+      {
+        "key": "role",
+        "id": "field-role",
+        "label": "What should you do, and what happens on exceptions?",
+        "placeholder": "I review the finished report. Missing updates should be flagged, not invented."
+      }
+    ]
+  }
+}

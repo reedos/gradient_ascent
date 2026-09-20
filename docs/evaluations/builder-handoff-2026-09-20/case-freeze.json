@@ -1,0 +1,6 @@
+{
+  "sha256": "3b36e27df7b61f96a938d5a8ed2d8d2db2a6bb4141f86038d01cfae279f779a7",
+  "cases": 13,
+  "canonicalLfSha256": "ad36eb3e69d7b9b3f54b6ad6987962a92e400336a802e42c999dd816c83f9de5",
+  "hashNote": "sha256 covers original ZIP bytes; canonicalLfSha256 normalizes CRLF to LF for Git checkouts."
+}

@@ -1,0 +1,5 @@
+I want a reusable tool specification for converting measurement CSVs with our existing unit-conversion utilities. It should preserve originals, produce a clearly named converted file, report handled columns and units, and stop safely for missing, incompatible, or malformed units. Inspect and reuse existing capability before proposing conversion logic. Define interface, inputs, outputs, validation, errors, and examples. Do not assume command names, library APIs, precision, or destination not established by the files. I know temperatures, lengths, and pressures may appear, with headers and blank rows; originals are read-only. Unit catalog, rounding, mixed units, and approval for new units are unknown. The tool may be proposed but not run. Fixtures are synthetic. Malformed rows and incompatible dimensions must remain visible rather than becoming plausible numbers.
+
+Please help produce the tool specification.
+
+Reference links: https://reedos.github.io/gradient_ascent/agents.md and https://reedos.github.io/gradient_ascent/llms.txt

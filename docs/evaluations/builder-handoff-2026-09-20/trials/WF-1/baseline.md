@@ -1,0 +1,5 @@
+Every Friday I prepare a report across three projects by collecting issue records, reading team notes, comparing last week's report, and drafting a combined report for a program manager. A person reviews the draft before sending; it must never send email or publish automatically. I want routine collection and synthesis automated while preserving source links and flagging stale, missing, or contradictory information. The prior report is only a format example and may contain old owners and dates. Exports have different columns and notes use informal project names. The agent may read these synthetic files and propose a repeatable workflow, but must not claim live tracker access, infer closure from silence, or resolve conflicts silently. I know the weekly cadence, projects, review gate, and supplied examples. Connected systems, recipients, and acceptable freshness are unknown. Minimize manual copying and make exceptions easy to review.
+
+Please help produce the workflow specification.
+
+Reference links: https://reedos.github.io/gradient_ascent/agents.md and https://reedos.github.io/gradient_ascent/llms.txt

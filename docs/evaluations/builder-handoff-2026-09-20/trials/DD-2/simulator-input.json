@@ -1,0 +1,40 @@
+{
+  "id": "DD-2",
+  "slug": "definition-of-done",
+  "scenario": "I am defining done for a household receipt organizer. Inputs include phone photos, PDFs, and scans in US dollars, Canadian dollars, and euros, with tips, taxes, refunds, handwritten notes, and unreadable or partial images. My request is only â€˜make it accurate.â€™ I have not defined acceptable extraction error, exchange-rate timing, tax and tip treatment, duplicate handling, or missing merchant/date behavior. I want testable criteria and questions, with representative success and failure cases and human review for uncertain records. Do not promise perfect OCR or invent an exchange-rate source. I know the input formats and defects described here, but whether totals or line items matter, the accounting period, and whether the organizer is shared are unknown. Examples are synthetic, not financial records. The definition must be testable without real household data.",
+  "attachments": {
+    "receipt-us.jpg": "SYNTHETIC IMAGE PLACEHOLDER: readable USD receipt with tax and tip.",
+    "receipt-eur.jpg": "SYNTHETIC IMAGE PLACEHOLDER: partial euro receipt; date and total obscured.",
+    "receipt-notes.txt": "SYNTHETIC: refund and handwritten Canadian-dollar tip appear later."
+  },
+  "form": {
+    "url": "https://reedos.github.io/gradient_ascent/tools/definition-of-done/",
+    "text": "Home\n/\nTools\n/\nDefinition-of-done builder\nUSE WITH YOUR OWN AI\nDefinition-of-done builder\n\nTurn “it works” into observable checks for quality, completion, and the effort still required from you.\n\nA rough description is enough. Leave unknowns blank; the exported instructions ask your agent to clarify or inspect them. Nothing here calls a model, uploads files, or saves your entries.\n\nTry an example\nDownload a blank template\n\nWhat result are you checking?\n\nDescribe a finished result and where you expect to find it.\n\nWhat makes a result good enough?\n\nMention examples, preferences, or requirements; numerical thresholds can be decided later.\n\nWhat must not go wrong?\n\nInclude unacceptable actions and realistic difficult inputs.\n\nWhat work should remain for you?\n\nIf you give a time target, say which actions it includes.\n\nWhat this template helps your agent work out\nReview your draft\n\nCopy or download this draft and give it to your agent with relevant files. It contains your answers and instructions for refining them—not a verified implementation.\n\nCopy draft\nDownload Markdown\n\nWhat next?\n\nGive the draft and relevant workflow files to your agent. Ask it to separate confirmed facts, assumptions, and proposed choices, then review the result.\n\nNext: Workflow designer →\nBrowse all tools\nModel reference guide",
+    "fields": [
+      {
+        "key": "result",
+        "id": "field-result",
+        "label": "What result are you checking?",
+        "placeholder": "Ready-to-review wildlife carousel packs available on my phone."
+      },
+      {
+        "key": "quality",
+        "id": "field-quality",
+        "label": "What makes a result good enough?",
+        "placeholder": "Sharp subjects, useful crops, varied photos, and a readable metadata card."
+      },
+      {
+        "key": "failures",
+        "id": "field-failures",
+        "label": "What must not go wrong?",
+        "placeholder": "Never delete originals. Do not invent missing GPS coordinates."
+      },
+      {
+        "key": "effort",
+        "id": "field-effort",
+        "label": "What work should remain for you?",
+        "placeholder": "Review completed packs only; no required selection, cropping, or transferring."
+      }
+    ]
+  }
+}

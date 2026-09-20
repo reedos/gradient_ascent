@@ -1,0 +1,9 @@
+{
+  "slug": "agent-instructions",
+  "values": {
+    "project": "Set up a new project for the Sable temperature logger sensor board and turn the DUT brief into an actionable test plan. The project uses USB serial and I2C and covers -10C to 60C behavior, including the 55C alarm.",
+    "reuse": "Inspect and reuse the shared, read-only Python test framework, including its pytest fixtures and report helpers. Follow the usual structure from the past project: tests/, configs/, reports/, and README.md. Reuse useful patterns from that project without assuming unknown commands or hardware details.",
+    "boundaries": "The agent may inspect the supplied files and draft project files for review. Treat the shared framework as read-only. Ask before adding shared utilities, changing shared configuration, connecting to hardware, flashing firmware, or running board tests. Separate proposals from approved operations and leave unknown bench address, firmware build identifier, and optional instruments for clarification.",
+    "done": "Hand back the drafted project structure and an actionable test plan tied to the DUT brief, plus a summary of reused patterns, assumptions or unknowns, and proposed versus approved operations. Report only checks or results that are actually available; do not invent commands, instrument addresses, measurements, firmware identifiers, or test results."
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "README.md": "SYNTHETIC: Parses issue CSV and renders Markdown; parser/render checks passed; date filter next.",
+  "change-summary.md": "SYNTHETIC: headings added; date-filter branch started; no merge evidence.",
+  "checks.log": "SYNTHETIC: PASS parser_basic; PASS render_markdown; FAIL missing_owner KeyError.",
+  "known-failure.md": "SYNTHETIC: ownerless inputs fail; no fix attempted."
+}

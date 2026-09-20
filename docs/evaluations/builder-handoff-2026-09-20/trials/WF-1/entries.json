@@ -1,0 +1,9 @@
+{
+  "slug": "workflow",
+  "values": {
+    "trigger": "Every Friday, prepare a combined report across three projects by collecting issue records, reading team notes, and comparing the previous report.",
+    "result": "A draft report for the program manager, using Progress, Risks, Decisions, and Next week sections with dated source links, ready for my review before sending. Never send email or publish automatically.",
+    "sources": "Issue records or exports, team notes, and the previous report as a format example. Exports may have different columns and notes may use informal project names. Connected systems are unknown; preserve source links and do not treat the previous report's old owners or dates as current facts.",
+    "role": "Automate routine collection and synthesis, then flag stale, missing, or contradictory information for review. Do not infer closure from silence or resolve conflicts silently. I review the draft before anything is sent; recipients, acceptable freshness, and other exceptions are still unknown."
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "slug": "project-brief",
+  "values": {
+    "goal": "Turn each new batch of wildlife photos into suggested social-media carousel packs: group related sightings, write useful carousel copy, suggest captions or metadata, and add a map card only when the location is safe. Deliver the suggestions to my phone for review before anything is shared. Keep the automatic flow clear, and call out blurry photos, duplicates, missing locations, and photos that do not fit instead of discarding them.",
+    "humanRole": "Review the suggested results weekly, help decide the unresolved choices, edit as needed, and approve anything before it is shared.",
+    "notes": "I am a wildlife photographer, not a programmer. My folders contain JPEG and HEIC files. Keep the original files untouched forever. Phone delivery could use a cloud album, messages, or another service. Ask me to decide square versus portrait, carousel size, and the exact-coordinate policy. Do not claim that processing or delivery has already occurred. Fixtures are synthetic.",
+    "process": "",
+    "examples": ""
+  }
+}

@@ -1,0 +1,5 @@
+I am taking over a partially built report generator. The handoff has a README, change summary, checks that actually passed, and one documented failure. I need a continuation brief stating what is complete, what remains, evidence, and safest next steps. The generator combines synthetic issue data into Markdown; no deployment or external notification is in scope. The README says parser and renderer checks pass; the summary mentions a pending date-filter change; the failure says missing owner causes an exception. I know these are the full materials. Whether the branch exists, dependencies are installed, or the date-filter change will be reviewed is unknown. Preserve the failure, distinguish passing from untested behavior, and do not claim completion. Propose commands or checks only when labeled proposals and identify missing workspace access. All attachments are synthetic.
+
+Please help produce the project handoff.
+
+Reference links: https://reedos.github.io/gradient_ascent/agents.md and https://reedos.github.io/gradient_ascent/llms.txt

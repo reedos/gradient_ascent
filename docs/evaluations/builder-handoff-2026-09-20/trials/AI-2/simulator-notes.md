@@ -1,0 +1,1 @@
+The form was clear. I left the deadline, hosting provider, deployment ownership, release-volunteer status, and external bookmarks unspecified because the case does not provide them. I treated the former note's content/ and assets/ layout as a proposal, not an approved replacement for the existing guidance. I did not use the site's example placeholder text as a user fact.

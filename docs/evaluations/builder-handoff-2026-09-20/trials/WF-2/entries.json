@@ -1,0 +1,9 @@
+{
+  "slug": "workflow",
+  "values": {
+    "trigger": "Automatically after I add a batch of original wildlife photos, with a weekly process in mind.",
+    "result": "Suggested carousel packs ready for phone review, with sensible grouping, crops, resized exports, captions or metadata, and a map end card only when location is available and safe. Keep originals untouched.",
+    "sources": "The original photo files, the attached photo metadata CSV, sample folders, and phone review. Some photos have GPS, some do not; some are blurry or duplicates.",
+    "role": "I review the suggested packs and approve before sharing. Flag blurry, duplicate, uncertain crop, missing-location, and privacy cases for review instead of requiring manual preparation or inventing details."
+  }
+}

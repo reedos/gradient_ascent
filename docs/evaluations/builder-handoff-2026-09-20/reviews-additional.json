@@ -1,0 +1,61 @@
+[
+  {
+    "id": "AI-2",
+    "condition": "builder",
+    "scores": {"outcome": 3, "automation": 3, "clarification": 1, "usefulness": 3, "evidence": 1, "authority": 4, "verification": 2, "proportionality": 3},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "major", "evidence": "attachments.json lists 'legacy-pages/index.md; events/spring.md; assets/logo.svg; scripts/check-links.ps1', but builder-final.md claims 'legacy-pages/events/spring.md', 'legacy-pages/assets/logo.svg', and 'legacy-pages/scripts/check-links.ps1'.", "explanation": "The receiver invented nesting that materially hides the observed conflict between the active legacy-pages rule and the event page's literal location, and points the link check to the wrong path.", "likelySource": "receiving-model behavior"},
+      {"severity": "major", "evidence": "builder-final.md asks no questions and merely lists deployment owner among items that must eventually be stated.", "explanation": "The case explicitly requests focused questions about authoritative guidance and deployment ownership. The receiver neither asks nor obtains answers about hosting ownership, publisher availability, deadline, or external bookmarks.", "likelySource": "receiving-model behavior"},
+      {"severity": "moderate", "evidence": "builder-final.md calls `legacy-pages/scripts/check-links.ps1` the 'expected link-check entry point'.", "explanation": "Because the literal fixture path is `scripts/check-links.ps1`, the proposed verification location is unsupported and could prevent the permitted check from running.", "likelySource": "receiving-model behavior"}
+    ],
+    "overall": "The artifact preserves publication and destructive-change boundaries, but its literal tree rewrite is a substantial evidence error and it omits the requested clarification. Mean 2.5; it does not meet the exploratory mean threshold.",
+    "baselineComparison": "The stronger replay is clearly better: it preserves the fixture paths, exposes the page-location conflict, asks three focused questions, and records deployment unknowns."
+  },
+  {
+    "id": "AI-2",
+    "condition": "stronger-final",
+    "scores": {"outcome": 4, "automation": 3, "clarification": 4, "usefulness": 4, "evidence": 4, "authority": 4, "verification": 3, "proportionality": 4},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "minor", "evidence": "stronger-final.md leaves the deadline and external-bookmark inventory implicit rather than naming them among unresolved details.", "explanation": "The core reorganization remains usable, but two case-card unknowns relevant to scheduling and link preservation should be visible.", "likelySource": "form-input loss and receiving-model behavior"}
+    ],
+    "overall": "Faithful, practical provisional instructions. They preserve the literal tree, identify the resulting guidance conflict, distinguish local validation from publishing, and retain all material authority boundaries. Mean 3.75; exploratory threshold met.",
+    "baselineComparison": "Materially stronger than the original builder final on evidence accuracy and clarification; the difference comes from receiver behavior because both received the same artifact and fixture summaries."
+  },
+  {
+    "id": "WF-1",
+    "condition": "builder",
+    "scores": {"outcome": 3, "automation": 4, "clarification": 1, "usefulness": 4, "evidence": 3, "authority": 4, "verification": 3, "proportionality": 2},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "major", "evidence": "builder-final.md asks no questions and instead proposes '09:00', 'fresh for seven days', and a local destination despite the known unknown connected systems, recipients, and acceptable freshness.", "explanation": "The defaults are labeled and require setup confirmation, so they are not fabricated facts, but the receiver fails the requested focused clarification and makes consequential choices without rationale.", "likelySource": "receiving-model behavior"},
+      {"severity": "moderate", "evidence": "builder-final.md requires approval for 'alias mappings, freshness threshold, and conflict resolutions' and per-item review of flagged mappings.", "explanation": "Conflict review is appropriate, but approval language and manual alias-map setup add burden where confirmation/configuration would suffice; the workflow could learn stable mappings after review.", "likelySource": "receiving-model behavior"},
+      {"severity": "minor", "evidence": "builder-final.md says 'The attached files are accessible', while builder-access.md records only artifact.md and attachments.json descriptions.", "explanation": "The following sentence calls them synthetic fixtures, limiting harm, but the underlying named files were not independently accessed.", "likelySource": "receiving-model behavior"}
+    ],
+    "overall": "A strong automated reporting design with provenance, exception handling, recovery, final human review, and no automatic sending. It is weakened by skipped clarification and arbitrary operational defaults. Mean 3.0; exploratory threshold met exactly.",
+    "baselineComparison": "No WF-1 baseline was assigned."
+  },
+  {
+    "id": "PH-2",
+    "condition": "builder",
+    "scores": {"outcome": 4, "automation": 3, "clarification": 3, "usefulness": 4, "evidence": 4, "authority": 4, "verification": 4, "proportionality": 4},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "minor", "evidence": "builder-response-1.md question 3 combines source sample, row-count/traceability, revision, environment, dependencies, and records.", "explanation": "It is answerable, but exceeds the requested one-main-decision-per-question pattern and repeats several facts already known to be unavailable.", "likelySource": "receiving-model behavior"}
+    ],
+    "overall": "Excellent continuation brief: it directly rejects the unsupported done claim, states the workspace and private reference are unavailable, inventories missing evidence, and proposes reversible validation without execution. Mean 3.75; exploratory threshold met.",
+    "baselineComparison": "Substantively tied with baseline. Builder provides clearer stop conditions and separates provisional defaults; baseline supplies a slightly richer edge-case and logging checklist."
+  },
+  {
+    "id": "PH-2",
+    "condition": "baseline",
+    "scores": {"outcome": 4, "automation": 3, "clarification": 3, "usefulness": 4, "evidence": 4, "authority": 4, "verification": 4, "proportionality": 4},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "minor", "evidence": "baseline-response-1.md uses four questions, several compound, to revisit unknowns already explicit in the raw scenario.", "explanation": "The answers usefully confirm the gaps, but the interview is less focused than necessary for a continuation brief whose immediate action is already clear.", "likelySource": "receiving-model behavior"}
+    ],
+    "overall": "Excellent evidence-conscious handoff. It challenges completion, requests every material missing artifact, preserves traceability, and defines safe validation and review. Mean 3.75; exploratory threshold met.",
+    "baselineComparison": "Substantively tied with builder. It is more detailed on reproducibility, hashes, and edge cases; builder is somewhat clearer about stop conditions and artifact status."
+  }
+]

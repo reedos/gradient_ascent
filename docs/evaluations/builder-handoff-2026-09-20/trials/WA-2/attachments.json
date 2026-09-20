@@ -1,0 +1,5 @@
+{
+  "registration-export.csv": "SYNTHETIC\nname,email,phone,event,shift\nAri Lee,ari@example.test,555-0101,Harvest,09:00\nAri Lee,ari@example.test,555-0199,Harvest,10:00",
+  "schedule-sheet.csv": "SYNTHETIC\nvolunteer,event,shift\nAri Lee,Harvest,09:00",
+  "access-notes.md": "SYNTHETIC: Export and attendance editable; scheduling permission and reminder authority unknown."
+}

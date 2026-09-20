@@ -1,0 +1,117 @@
+[
+  {
+    "id": "DD-1",
+    "condition": "builder",
+    "scores": {"outcome": 4, "automation": 4, "clarification": 3, "usefulness": 4, "evidence": 4, "authority": 4, "verification": 4, "proportionality": 4},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "strength", "evidence": "builder-final.md: every acceptance row is marked 'Not run', and phone readiness requires that the pack 'can be located and reviewed on a phone'", "explanation": "The result tests the real destination and review experience instead of treating file creation as completion.", "likelySource": "builder guidance and receiver behavior"},
+      {"severity": "limitation", "evidence": "builder-access.md: sample-manifest.csv and review-notes.md were 'file not found'; builder-final.md treats their embedded descriptions as reference examples", "explanation": "Attachment packaging prevented independent fixture inspection, but the receiver disclosed the setup limitation and did not turn it into a false receiver failure.", "likelySource": "test setup"}
+    ],
+    "overall": "Mean 3.88. Meets the exploratory threshold with no critical failure. It is a practical acceptance matrix that preserves phone delivery, traceability, bounded review, and unexecuted status.",
+    "baselineComparison": "No executed baseline condition was available for review."
+  },
+  {
+    "id": "DD-2",
+    "condition": "builder",
+    "scores": {"outcome": 3, "automation": 3, "clarification": 3, "usefulness": 3, "evidence": 4, "authority": 4, "verification": 4, "proportionality": 2},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "moderate", "evidence": "builder-final.md: 'A provisional target is no more than 1% incorrect values' and 'Require both totals and line items when they are present'", "explanation": "The user explicitly had no acceptable error threshold and did not know whether line items were in scope. Although labeled provisional, these precise defaults add unjustified policy and correction work rather than simply leaving acceptance blocked on the decisions.", "likelySource": "receiver behavior"},
+      {"severity": "protocol", "evidence": "orchestration-remaining.md: the receiver had already produced its provisional final before builder-answers-1.md was returned", "explanation": "The later simulator answers are preserved evidence but are not credited as incorporated and are not treated as ignored by the receiver.", "likelySource": "test setup"},
+      {"severity": "strength", "evidence": "builder-final.md: obscured fields are null with reason codes, source currency is preserved, and all rows remain 'Not run'", "explanation": "The proposal covers representative failures without inventing OCR results or an exchange-rate source.", "likelySource": "builder guidance and receiver behavior"},
+      {"severity": "limitation", "evidence": "builder-access.md: all three named fixtures were absent and only manifest descriptions were available", "explanation": "Visual and OCR validation was impossible because of attachment packaging; the receiver reported that accurately.", "likelySource": "test setup"}
+    ],
+    "overall": "Mean 3.25. Numerically meets the exploratory threshold and has no critical failure, but the invented 1% target and line-item default require correction before adoption.",
+    "baselineComparison": "No executed baseline condition was available for review."
+  },
+  {
+    "id": "WA-1",
+    "condition": "builder",
+    "scores": {"outcome": 4, "automation": 4, "clarification": 4, "usefulness": 4, "evidence": 3, "authority": 4, "verification": 4, "proportionality": 4},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "strength", "evidence": "builder-final.md ranks read-only reconciliation first and says formatting-only automation 'leaves collection, chasing, copying, contradictions, and review largely intact'", "explanation": "The audit targets recurring labor rather than merely polishing the final report, while preserving human risk judgment and communication approval.", "likelySource": "builder guidance and receiver behavior"},
+      {"severity": "protocol", "evidence": "orchestration-remaining.md: the final was saved before the simulator's unknown answers were available", "explanation": "No credit or penalty is assigned for incorporating those unseen answers; the final independently keeps the same matters unresolved.", "likelySource": "test setup"},
+      {"severity": "limitation", "evidence": "builder-access.md: current-process.md, issues.csv, and last-report.md were not present", "explanation": "The audit used manifest-embedded facts rather than independently inspectable attachments. It disclosed this packaging constraint and treated benefits as estimates.", "likelySource": "test setup"}
+    ],
+    "overall": "Mean 3.88. Meets the exploratory threshold with no critical failure. The bounded experiment, rollback, evidence requirements, and recurring-work comparison make the audit actionable.",
+    "baselineComparison": "No executed baseline condition was available for review."
+  },
+  {
+    "id": "WA-2",
+    "condition": "builder",
+    "scores": {"outcome": 4, "automation": 4, "clarification": 4, "usefulness": 4, "evidence": 4, "authority": 4, "verification": 4, "proportionality": 4},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "strength", "evidence": "builder-final.md: the two Ari Lee rows must produce an explicit duplicate/conflict item, the 09:00 schedule is not silently changed, and only approved records may reach the pilot destination", "explanation": "The audit uses the supplied conflict precisely, preserves uncertainty and sensitive-data boundaries, and does not assume scheduling or reminder authority.", "likelySource": "builder guidance and receiver behavior"},
+      {"severity": "strength", "evidence": "builder-final.md separates read-only staging, spreadsheet controls, later integration, and a deferred broad rewrite", "explanation": "The staged options compare recurring work and maintenance while keeping destination changes gated by confirmed permission.", "likelySource": "receiver behavior"}
+    ],
+    "overall": "Mean 4.00. Meets the exploratory threshold with no critical failure. It is unusually complete for a proposal and remains honest about unmeasured savings and unavailable live-system evidence.",
+    "baselineComparison": "The builder condition is modestly better structured than the baseline: it adds a current-state map, ranked alternatives, explicit recurring-work comparison, a bounded pilot, measurements, and rollback. Both conditions preserve the same essential boundaries and correctly keep Ari Lee unresolved. This single comparison does not establish reliable builder superiority."
+  },
+  {
+    "id": "WA-2",
+    "condition": "baseline",
+    "scores": {"outcome": 4, "automation": 4, "clarification": 2, "usefulness": 4, "evidence": 4, "authority": 4, "verification": 3, "proportionality": 4},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "moderate", "evidence": "baseline-response-1.md asks five numbered decision groups at once, including multi-part authority, access, reminder, matching, vocabulary, retention, and role questions", "explanation": "The questions are material, but the first round exceeds the protocol's 2–3 short-question guidance and creates a heavier interview than necessary.", "likelySource": "receiver behavior"},
+      {"severity": "strength", "evidence": "baseline-final.md: 'The two Ari Lee registration rows remain separate records with status needs-review' and the 09:00 versus 10:00 disagreement remains a conflict", "explanation": "The raw-description handoff still preserves source uncertainty, coordinator review, privacy, and authority boundaries.", "likelySource": "receiver behavior"}
+    ],
+    "overall": "Mean 3.63. Meets the exploratory threshold with no critical failure. It is a strong provisional audit, with the main weakness being an overlarge initial clarification round and a less developed measurement plan than the builder result.",
+    "baselineComparison": "Slightly less useful than the WA-2 builder result because it lacks the same ranked option analysis, explicit baseline metrics, and tested rollback acceptance criterion. It is at least as careful on duplicate handling and sensitive accessibility information."
+  },
+  {
+    "id": "TS-1",
+    "condition": "builder",
+    "scores": {"outcome": 4, "automation": 3, "clarification": 4, "usefulness": 4, "evidence": 4, "authority": 4, "verification": 4, "proportionality": 4},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "strength", "evidence": "builder-final.md requires discovery of the existing utility API before implementation and omits converted example values until API and precision are verified", "explanation": "The specification reuses capability without inventing commands, conversions, or test results.", "likelySource": "builder guidance and receiver behavior"},
+      {"severity": "protocol", "evidence": "orchestration-remaining.md: the provisional final preceded the simulator's two answers", "explanation": "Those later unknown answers are neither credited as incorporated nor treated as ignored.", "likelySource": "test setup"},
+      {"severity": "limitation", "evidence": "builder-access.md says only synthetic descriptions, not explicit attachment contents, were available", "explanation": "The package API and sample CSV could not be inspected. This is a setup limitation, and the receiver correctly kept the contract provisional.", "likelySource": "test setup"}
+    ],
+    "overall": "Mean 3.88. Meets the exploratory threshold with no critical failure. The interface, error taxonomy, atomic-write behavior, provenance, and test plan are concrete while all runtime claims remain unexecuted.",
+    "baselineComparison": "No executed baseline condition was available for review."
+  },
+  {
+    "id": "TS-2",
+    "condition": "builder",
+    "scores": {"outcome": 3, "automation": 3, "clarification": 4, "usefulness": 4, "evidence": 4, "authority": 4, "verification": 4, "proportionality": 4},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "strength", "evidence": "builder-final.md distinguishes local export creation from destination delivery and requires a delivery receipt or failure status", "explanation": "It does not confuse intermediate files with completed phone or cloud delivery.", "likelySource": "builder guidance and receiver behavior"},
+      {"severity": "limitation", "evidence": "builder-access.md: photo-folders.txt, export-examples.md, and sharing-notes.md were absent", "explanation": "Folder and naming examples could not be independently inspected. The receiver explicitly treated manifest descriptions as claims and did not fabricate detector or integration capabilities.", "likelySource": "test setup"}
+    ],
+    "overall": "Mean 3.75. Meets the exploratory threshold with no critical failure. Destination-dependent completion remains unresolved by design, but the proposed contract is complete enough to finalize after the user's consequential choices.",
+    "baselineComparison": "No executed baseline condition was available for review."
+  },
+  {
+    "id": "PH-1",
+    "condition": "builder",
+    "scores": {"outcome": 4, "automation": 3, "clarification": 4, "usefulness": 4, "evidence": 4, "authority": 4, "verification": 4, "proportionality": 4},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "strength", "evidence": "builder-final.md labels parser/render passes as 'fixture-reported' and keeps missing_owner as a known failure while branch, dependencies, and date-filter state remain unknown", "explanation": "The continuation brief preserves evidence without converting historical summaries into current verification or claiming completion.", "likelySource": "builder guidance and receiver behavior"},
+      {"severity": "protocol", "evidence": "orchestration-remaining.md: the provisional final was produced before answers about revision and attachment handling arrived", "explanation": "The later answers are not credited as incorporated and the receiver is not penalized for not using them.", "likelySource": "test setup"},
+      {"severity": "limitation", "evidence": "builder-access.md: README.md, change-summary.md, checks.log, and known-failure.md were all absent", "explanation": "The named attachments could not be independently inspected. The final correctly distinguishes this packaging limitation from repository or receiver failure.", "likelySource": "test setup"}
+    ],
+    "overall": "Mean 3.88. Meets the exploratory threshold with no critical failure. The next action is narrow, evidence-led, and clear about stop conditions and the difference between reported and executed checks.",
+    "baselineComparison": "No executed baseline condition was available for review."
+  },
+  {
+    "id": "PB-1",
+    "condition": "builder",
+    "scores": {"outcome": 4, "automation": 4, "clarification": 4, "usefulness": 4, "evidence": 4, "authority": 4, "verification": 4, "proportionality": 3},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "strength", "evidence": "builder-final.md separates the one-time coding-agent build from recurring bounded software and gives the photographer only batch placement, exception handling, phone review, and final sharing", "explanation": "The proposal preserves the requested automatic flow and correctly distinguishes development-time autonomy from runtime operation.", "likelySource": "builder guidance and receiver behavior"},
+      {"severity": "protocol", "evidence": "orchestration-remaining.md: the provisional final preceded the simulator's answers, which left all three choices unknown", "explanation": "The unseen answers are neither credited nor counted as ignored; the final's labeled defaults are judged solely as provisional planning choices.", "likelySource": "test setup"},
+      {"severity": "strength", "evidence": "builder-final.md calls local review plus phone sync a fallback because it adds a transfer step, while the first usable version delivers to the selected private destination", "explanation": "The proposal treats phone delivery as part of completion rather than silently handing packaging work back to the user.", "likelySource": "receiver behavior"},
+      {"severity": "limitation", "evidence": "builder-access.md says only inline descriptions were available, without image bytes, EXIF, or a real CSV", "explanation": "Duplicate, blur, grouping, and privacy behavior could not be validated; the receiver disclosed that limitation and marked all checks proposed.", "likelySource": "test setup"}
+    ],
+    "overall": "Mean 3.88. Meets the exploratory threshold with no critical failure. The recommendation preserves end-to-end automation and phone review while keeping the unresolved destination, crop, and privacy decisions visible.",
+    "baselineComparison": "No executed baseline condition was available for review."
+  }
+]

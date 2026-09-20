@@ -1,0 +1,39 @@
+{
+  "id": "DD-1",
+  "slug": "definition-of-done",
+  "scenario": "I need a definition of done for the wildlife photo packs in the sample files. The process should suggest coherent packs, create crops and resized exports, include metadata and an optional map end card, preserve every original, and place results where I can review them on my phone. I review before sharing. I have no agreed timing target, image-quality threshold, crop failure rate, missing-location rule, carousel dimensions, or delivery service. I want readiness criteria that are observable and identify which targets require approval rather than inventing guarantees. A pack is not complete merely because files exist: outputs should trace to originals, exceptions should be visible, and review should be practical. Fixtures are synthetic. I know destination, reviewer, and prohibition on deleting originals. Weekly volume and phone storage limits are unknown. The result should support a later workflow proposal without claiming the workflow ran.",
+  "attachments": {
+    "sample-manifest.csv": "SYNTHETIC\noriginal,derivative\nwildlife-01.jpg,carousel-01/01.jpg\nwildlife-02.jpg,carousel-01/02.jpg",
+    "review-notes.md": "SYNTHETIC: Reject poor crop, duplicate subject, or exposed exact location."
+  },
+  "form": {
+    "url": "https://reedos.github.io/gradient_ascent/tools/definition-of-done/",
+    "text": "Home\n/\nTools\n/\nDefinition-of-done builder\nUSE WITH YOUR OWN AI\nDefinition-of-done builder\n\nTurn “it works” into observable checks for quality, completion, and the effort still required from you.\n\nA rough description is enough. Leave unknowns blank; the exported instructions ask your agent to clarify or inspect them. Nothing here calls a model, uploads files, or saves your entries.\n\nTry an example\nDownload a blank template\n\nWhat result are you checking?\n\nDescribe a finished result and where you expect to find it.\n\nWhat makes a result good enough?\n\nMention examples, preferences, or requirements; numerical thresholds can be decided later.\n\nWhat must not go wrong?\n\nInclude unacceptable actions and realistic difficult inputs.\n\nWhat work should remain for you?\n\nIf you give a time target, say which actions it includes.\n\nWhat this template helps your agent work out\nReview your draft\n\nCopy or download this draft and give it to your agent with relevant files. It contains your answers and instructions for refining them—not a verified implementation.\n\nCopy draft\nDownload Markdown\n\nWhat next?\n\nGive the draft and relevant workflow files to your agent. Ask it to separate confirmed facts, assumptions, and proposed choices, then review the result.\n\nNext: Workflow designer →\nBrowse all tools\nModel reference guide",
+    "fields": [
+      {
+        "key": "result",
+        "id": "field-result",
+        "label": "What result are you checking?",
+        "placeholder": "Ready-to-review wildlife carousel packs available on my phone."
+      },
+      {
+        "key": "quality",
+        "id": "field-quality",
+        "label": "What makes a result good enough?",
+        "placeholder": "Sharp subjects, useful crops, varied photos, and a readable metadata card."
+      },
+      {
+        "key": "failures",
+        "id": "field-failures",
+        "label": "What must not go wrong?",
+        "placeholder": "Never delete originals. Do not invent missing GPS coordinates."
+      },
+      {
+        "key": "effort",
+        "id": "field-effort",
+        "label": "What work should remain for you?",
+        "placeholder": "Review completed packs only; no required selection, cropping, or transferring."
+      }
+    ]
+  }
+}

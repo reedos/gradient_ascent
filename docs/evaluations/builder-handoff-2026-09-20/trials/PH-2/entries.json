@@ -1,0 +1,9 @@
+{
+  "slug": "project-handoff",
+  "values": {
+    "goal": "Produce a cleaned CSV whose original rows remain traceable to the outputs. Confirm how duplicates and dates should be handled before treating the work as complete.",
+    "state": "The handoff says duplicates were removed and dates normalized, but this is unverified. There is only a synthetic mock output and an untested script excerpt; no run log, source sample, dependency list, commit, or review record. The original workspace is unavailable.",
+    "references": "The original workspace and private reference are unavailable. Available context is the handoff note, mock-output.csv (example only), and script-excerpt.py, which reads input.csv, drops duplicate rows, writes cleaned.csv, and omits date logic.",
+    "next": "Request the source sample, exact duplicate rule, production date formats, encoding, expected row count, environment/dependencies, commit, run log, and review record. Validate safely against representative input, compare input and output row counts and traceability, and inspect date handling and encoding. Do not inspect or execute the unavailable reference, invent behavior, or perform cleanup until these points are clarified."
+  }
+}

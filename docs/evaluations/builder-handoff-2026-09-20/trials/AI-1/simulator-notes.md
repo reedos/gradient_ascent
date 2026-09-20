@@ -1,0 +1,1 @@
+No fields were skipped. The scenario leaves the bench address, firmware build identifier, and optional instruments unknown; these should be clarified or inspected rather than filled in. No commands, instrument addresses, measurements, or test results were supplied.

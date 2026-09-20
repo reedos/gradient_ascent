@@ -1,0 +1,5 @@
+{
+  "AGENTS.md": "SYNTHETIC: Keep pages in legacy-pages; release volunteer publishes; run link check.",
+  "former-note.md": "SYNTHETIC: Proposed content/ and assets/ layout; no approval or date.",
+  "site-tree.txt": "SYNTHETIC: legacy-pages/index.md; events/spring.md; assets/logo.svg; scripts/check-links.ps1"
+}

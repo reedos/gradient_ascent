@@ -1,0 +1,5 @@
+I want a specification for a personal photo export helper. Given originals, it should organize photos for sharing, create resized copies, apply a crop policy, and preserve attribution metadata. I have folder and filename examples, but destination may be phone, cloud folder, or both. Square versus portrait, maximum size, naming, and location stripping are undecided. The helper must never delete originals and must show skipped, duplicate, or low-quality files. Identify consequential questions, use reversible defaults only when safe, and describe a complete reviewable deliverable. Do not invent cloud integrations, phone APIs, quality detectors, or publishing permission. I know folders contain JPEG and HEIC and that I review exports before sharing. Fixtures are synthetic. No implementation or export is needed in this trial; provide a scoped proposal with checks and failures that can be finalized after destination and crop decisions.
+
+Please help produce the tool specification.
+
+Reference links: https://reedos.github.io/gradient_ascent/agents.md and https://reedos.github.io/gradient_ascent/llms.txt

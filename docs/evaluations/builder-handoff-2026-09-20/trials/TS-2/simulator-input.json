@@ -1,0 +1,40 @@
+{
+  "id": "TS-2",
+  "slug": "tool-specification",
+  "scenario": "I want a specification for a personal photo export helper. Given originals, it should organize photos for sharing, create resized copies, apply a crop policy, and preserve attribution metadata. I have folder and filename examples, but destination may be phone, cloud folder, or both. Square versus portrait, maximum size, naming, and location stripping are undecided. The helper must never delete originals and must show skipped, duplicate, or low-quality files. Identify consequential questions, use reversible defaults only when safe, and describe a complete reviewable deliverable. Do not invent cloud integrations, phone APIs, quality detectors, or publishing permission. I know folders contain JPEG and HEIC and that I review exports before sharing. Fixtures are synthetic. No implementation or export is needed in this trial; provide a scoped proposal with checks and failures that can be finalized after destination and crop decisions.",
+  "attachments": {
+    "photo-folders.txt": "SYNTHETIC: originals/2026-09-trip, edited/, exports/old; JPG and HEIC examples.",
+    "export-examples.md": "SYNTHETIC: desired names trip-001 and trip-002; dimensions/destination unset.",
+    "sharing-notes.md": "SYNTHETIC: review every export; exact location may be sensitive."
+  },
+  "form": {
+    "url": "https://reedos.github.io/gradient_ascent/tools/tool-specification/",
+    "text": "Home\n/\nTools\n/\nTool specification builder\nUSE WITH YOUR OWN AI\nTool specification builder\n\nDescribe a reusable tool an agent can build or adapt, including its contract and how to verify it.\n\nA rough description is enough. Leave unknowns blank; the exported instructions ask your agent to clarify or inspect them. Nothing here calls a model, uploads files, or saves your entries.\n\nTry an example\nDownload a blank template\n\nWhat should the tool do?\n\nOne concrete responsibility, even if a larger workflow uses it.\n\nWhat goes in and what comes out?\n\nName file types, fields, destinations, or examples when you know them.\n\nWhat existing capabilities should it use?\n\nExisting libraries, project utilities, services, or say you need help choosing.\n\nWhat must it preserve or handle carefully?\n\nSide effects, permissions, invalid inputs, and error behavior.\n\nWhat this template helps your agent work out\nReview your draft\n\nCopy or download this draft and give it to your agent with relevant files. It contains your answers and instructions for refining them—not a verified implementation.\n\nCopy draft\nDownload Markdown\n\nWhat next?\n\nGive the draft and relevant workflow files to your agent. Ask it to separate confirmed facts, assumptions, and proposed choices, then review the result.\n\nNext: Definition-of-done builder →\nBrowse all tools\nModel reference guide",
+    "fields": [
+      {
+        "key": "job",
+        "id": "field-job",
+        "label": "What should the tool do?",
+        "placeholder": "Convert an outing folder into portable image copies and a manifest."
+      },
+      {
+        "key": "contract",
+        "id": "field-contract",
+        "label": "What goes in and what comes out?",
+        "placeholder": "Input: selected originals and crop settings. Output: JPEGs and a source mapping."
+      },
+      {
+        "key": "reuse",
+        "id": "field-reuse",
+        "label": "What existing capabilities should it use?",
+        "placeholder": "Reuse our existing image export utility if it supports the required metadata."
+      },
+      {
+        "key": "limits",
+        "id": "field-limits",
+        "label": "What must it preserve or handle carefully?",
+        "placeholder": "Preserve originals and report individual failures without pretending the batch succeeded."
+      }
+    ]
+  }
+}

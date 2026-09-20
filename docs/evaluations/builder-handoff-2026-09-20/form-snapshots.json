@@ -1,0 +1,218 @@
+{
+  "agent-instructions": {
+    "url": "https://reedos.github.io/gradient_ascent/tools/agent-instructions/",
+    "text": "Home\n/\nTools\n/\nAgent instructions builder\nUSE WITH YOUR OWN AI\nAgent instructions builder\n\nDescribe how an agent should work in your project, then let it verify the details against your actual files.\n\nA rough description is enough. Leave unknowns blank; the exported instructions ask your agent to clarify or inspect them. Nothing here calls a model, uploads files, or saves your entries.\n\nTry an example\nDownload a blank template\n\nWhat is this project?\n\nA sentence about its purpose and the work the agent will do.\n\nWhat should it reuse or follow?\n\nMention existing projects, documentation, tools, and known commands. Unknowns can stay blank.\n\nWhat may it change, and when should it ask?\n\nSeparate project edits from shared code, external actions, and equipment access.\n\nWhat should it check and hand back?\n\nDescribe useful evidence and documentation, rather than assuming tests exist.\n\nInstruction filename\nAGENTS.md\nCLAUDE.md\n\nChoose the convention your agent supports. Review and merge with any existing instructions; do not blindly replace them. Written rules do not enforce filesystem or execution permissions.\n\nWhat this template helps your agent work out\nReview your draft\n\nCopy or download this draft and give it to your agent with relevant files. It contains your answers and instructions for refining them—not a verified implementation.\n\nCopy draft\nDownload Markdown\n\nWhat next?\n\nGive the draft and relevant workflow files to your agent. Ask it to separate confirmed facts, assumptions, and proposed choices, then review the result.\n\nNext: Definition-of-done builder →\nBrowse all tools\nModel reference guide",
+    "fields": [
+      {
+        "key": "project",
+        "id": "field-project",
+        "label": "What is this project?",
+        "placeholder": "Generate new DUT test projects using our existing Python framework."
+      },
+      {
+        "key": "reuse",
+        "id": "field-reuse",
+        "label": "What should it reuse or follow?",
+        "placeholder": "Start from the closest past project. Reuse instrument drivers and CSV utilities."
+      },
+      {
+        "key": "boundaries",
+        "id": "field-boundaries",
+        "label": "What may it change, and when should it ask?",
+        "placeholder": "Create project files for review. Never edit the shared framework without approval."
+      },
+      {
+        "key": "done",
+        "id": "field-done",
+        "label": "What should it check and hand back?",
+        "placeholder": "A change summary, known gaps, and results of available project checks."
+      }
+    ]
+  },
+  "workflow": {
+    "url": "https://reedos.github.io/gradient_ascent/tools/workflow/",
+    "text": "Home\n/\nTools\n/\nWorkflow designer\nUSE WITH YOUR OWN AI\nWorkflow designer\n\nDefine the complete experience from trigger to delivered result, including your role and exceptions.\n\nA rough description is enough. Leave unknowns blank; the exported instructions ask your agent to clarify or inspect them. Nothing here calls a model, uploads files, or saves your entries.\n\nTry an example\nDownload a blank template\n\nWhat starts the process?\n\nAn event, schedule, request, or selected folder.\n\nWhat should be ready at the end?\n\nName the finished output and destination, not just intermediate files.\n\nWhat information or tools are available?\n\nCurrent inputs, prior outputs, and existing systems. You can attach samples to your agent later.\n\nWhat should you do, and what happens on exceptions?\n\nDistinguish final review from intermediate approvals and optional corrections.\n\nWhat this template helps your agent work out\nReview your draft\n\nCopy or download this draft and give it to your agent with relevant files. It contains your answers and instructions for refining them—not a verified implementation.\n\nCopy draft\nDownload Markdown\n\nWhat next?\n\nGive the draft and relevant workflow files to your agent. Ask it to separate confirmed facts, assumptions, and proposed choices, then review the result.\n\nNext: Definition-of-done builder →\nBrowse all tools\nModel reference guide",
+    "fields": [
+      {
+        "key": "trigger",
+        "id": "field-trigger",
+        "label": "What starts the process?",
+        "placeholder": "Every Friday, prepare a status report for active projects."
+      },
+      {
+        "key": "result",
+        "id": "field-result",
+        "label": "What should be ready at the end?",
+        "placeholder": "A source-linked report draft in our review folder."
+      },
+      {
+        "key": "sources",
+        "id": "field-sources",
+        "label": "What information or tools are available?",
+        "placeholder": "Previous reports, issue tracker updates, and project notes."
+      },
+      {
+        "key": "role",
+        "id": "field-role",
+        "label": "What should you do, and what happens on exceptions?",
+        "placeholder": "I review the finished report. Missing updates should be flagged, not invented."
+      }
+    ]
+  },
+  "definition-of-done": {
+    "url": "https://reedos.github.io/gradient_ascent/tools/definition-of-done/",
+    "text": "Home\n/\nTools\n/\nDefinition-of-done builder\nUSE WITH YOUR OWN AI\nDefinition-of-done builder\n\nTurn “it works” into observable checks for quality, completion, and the effort still required from you.\n\nA rough description is enough. Leave unknowns blank; the exported instructions ask your agent to clarify or inspect them. Nothing here calls a model, uploads files, or saves your entries.\n\nTry an example\nDownload a blank template\n\nWhat result are you checking?\n\nDescribe a finished result and where you expect to find it.\n\nWhat makes a result good enough?\n\nMention examples, preferences, or requirements; numerical thresholds can be decided later.\n\nWhat must not go wrong?\n\nInclude unacceptable actions and realistic difficult inputs.\n\nWhat work should remain for you?\n\nIf you give a time target, say which actions it includes.\n\nWhat this template helps your agent work out\nReview your draft\n\nCopy or download this draft and give it to your agent with relevant files. It contains your answers and instructions for refining them—not a verified implementation.\n\nCopy draft\nDownload Markdown\n\nWhat next?\n\nGive the draft and relevant workflow files to your agent. Ask it to separate confirmed facts, assumptions, and proposed choices, then review the result.\n\nNext: Workflow designer →\nBrowse all tools\nModel reference guide",
+    "fields": [
+      {
+        "key": "result",
+        "id": "field-result",
+        "label": "What result are you checking?",
+        "placeholder": "Ready-to-review wildlife carousel packs available on my phone."
+      },
+      {
+        "key": "quality",
+        "id": "field-quality",
+        "label": "What makes a result good enough?",
+        "placeholder": "Sharp subjects, useful crops, varied photos, and a readable metadata card."
+      },
+      {
+        "key": "failures",
+        "id": "field-failures",
+        "label": "What must not go wrong?",
+        "placeholder": "Never delete originals. Do not invent missing GPS coordinates."
+      },
+      {
+        "key": "effort",
+        "id": "field-effort",
+        "label": "What work should remain for you?",
+        "placeholder": "Review completed packs only; no required selection, cropping, or transferring."
+      }
+    ]
+  },
+  "workflow-audit": {
+    "url": "https://reedos.github.io/gradient_ascent/tools/workflow-audit/",
+    "text": "Home\n/\nTools\n/\nExisting-workflow audit\nUSE WITH YOUR OWN AI\nExisting-workflow audit\n\nFind where an existing process loses time or quality before deciding what to replace.\n\nA rough description is enough. Leave unknowns blank; the exported instructions ask your agent to clarify or inspect them. Nothing here calls a model, uploads files, or saves your entries.\n\nTry an example\nDownload a blank template\n\nHow does the work happen today?\n\nA rough sequence is enough. Name the tools you already use.\n\nWhat feels slow or unreliable?\n\nFocus on the work you want to stop doing or improve.\n\nWhat examples can your agent inspect?\n\nList current input, current output, and any desired output. Attach actual files separately.\n\nWhat should stay the same?\n\nWorking tools, responsibilities, boundaries, and required review.\n\nWhat this template helps your agent work out\nReview your draft\n\nCopy or download this draft and give it to your agent with relevant files. It contains your answers and instructions for refining them—not a verified implementation.\n\nCopy draft\nDownload Markdown\n\nWhat next?\n\nGive the draft and relevant workflow files to your agent. Ask it to separate confirmed facts, assumptions, and proposed choices, then review the result.\n\nNext: Workflow designer →\nBrowse all tools\nModel reference guide",
+    "fields": [
+      {
+        "key": "process",
+        "id": "field-process",
+        "label": "How does the work happen today?",
+        "placeholder": "Collect project updates, compare last week, write a report, then email it."
+      },
+      {
+        "key": "pain",
+        "id": "field-pain",
+        "label": "What feels slow or unreliable?",
+        "placeholder": "Chasing updates and copying the same information between tools."
+      },
+      {
+        "key": "evidence",
+        "id": "field-evidence",
+        "label": "What examples can your agent inspect?",
+        "placeholder": "Last week’s report and exports from two project trackers."
+      },
+      {
+        "key": "preserve",
+        "id": "field-preserve",
+        "label": "What should stay the same?",
+        "placeholder": "Keep our report format and final review; no automatic emails."
+      }
+    ]
+  },
+  "tool-specification": {
+    "url": "https://reedos.github.io/gradient_ascent/tools/tool-specification/",
+    "text": "Home\n/\nTools\n/\nTool specification builder\nUSE WITH YOUR OWN AI\nTool specification builder\n\nDescribe a reusable tool an agent can build or adapt, including its contract and how to verify it.\n\nA rough description is enough. Leave unknowns blank; the exported instructions ask your agent to clarify or inspect them. Nothing here calls a model, uploads files, or saves your entries.\n\nTry an example\nDownload a blank template\n\nWhat should the tool do?\n\nOne concrete responsibility, even if a larger workflow uses it.\n\nWhat goes in and what comes out?\n\nName file types, fields, destinations, or examples when you know them.\n\nWhat existing capabilities should it use?\n\nExisting libraries, project utilities, services, or say you need help choosing.\n\nWhat must it preserve or handle carefully?\n\nSide effects, permissions, invalid inputs, and error behavior.\n\nWhat this template helps your agent work out\nReview your draft\n\nCopy or download this draft and give it to your agent with relevant files. It contains your answers and instructions for refining them—not a verified implementation.\n\nCopy draft\nDownload Markdown\n\nWhat next?\n\nGive the draft and relevant workflow files to your agent. Ask it to separate confirmed facts, assumptions, and proposed choices, then review the result.\n\nNext: Definition-of-done builder →\nBrowse all tools\nModel reference guide",
+    "fields": [
+      {
+        "key": "job",
+        "id": "field-job",
+        "label": "What should the tool do?",
+        "placeholder": "Convert an outing folder into portable image copies and a manifest."
+      },
+      {
+        "key": "contract",
+        "id": "field-contract",
+        "label": "What goes in and what comes out?",
+        "placeholder": "Input: selected originals and crop settings. Output: JPEGs and a source mapping."
+      },
+      {
+        "key": "reuse",
+        "id": "field-reuse",
+        "label": "What existing capabilities should it use?",
+        "placeholder": "Reuse our existing image export utility if it supports the required metadata."
+      },
+      {
+        "key": "limits",
+        "id": "field-limits",
+        "label": "What must it preserve or handle carefully?",
+        "placeholder": "Preserve originals and report individual failures without pretending the batch succeeded."
+      }
+    ]
+  },
+  "project-handoff": {
+    "url": "https://reedos.github.io/gradient_ascent/tools/project-handoff/",
+    "text": "Home\n/\nTools\n/\nProject handoff builder\nUSE WITH YOUR OWN AI\nProject handoff builder\n\nGive the next person or agent a factual starting point, without confusing plans with completed work.\n\nA rough description is enough. Leave unknowns blank; the exported instructions ask your agent to clarify or inspect them. Nothing here calls a model, uploads files, or saves your entries.\n\nTry an example\nDownload a blank template\n\nWhat are we trying to accomplish?\n\nThe outcome and the important decisions already made.\n\nWhat exists and what has been verified?\n\nName artifacts, changes, and actual checks. “Not tested yet” is useful information.\n\nWhere is the relevant context?\n\nPaths, links, brief filenames, or attached examples. Do not include secrets.\n\nWhat should happen next, and what needs care?\n\nOpen questions, blockers, boundaries, and the next useful action.\n\nWhat this template helps your agent work out\nReview your draft\n\nCopy or download this draft and give it to your agent with relevant files. It contains your answers and instructions for refining them—not a verified implementation.\n\nCopy draft\nDownload Markdown\n\nWhat next?\n\nGive the draft and relevant workflow files to your agent. Ask it to separate confirmed facts, assumptions, and proposed choices, then review the result.\n\nNext: Existing-workflow audit →\nBrowse all tools\nModel reference guide",
+    "fields": [
+      {
+        "key": "goal",
+        "id": "field-goal",
+        "label": "What are we trying to accomplish?",
+        "placeholder": "Prepare weekly report drafts automatically, with final human approval."
+      },
+      {
+        "key": "state",
+        "id": "field-state",
+        "label": "What exists and what has been verified?",
+        "placeholder": "Collector prototype exists; output format checked manually, delivery untested."
+      },
+      {
+        "key": "references",
+        "id": "field-references",
+        "label": "Where is the relevant context?",
+        "placeholder": "Project brief, workflow spec, and sample report in the project folder."
+      },
+      {
+        "key": "next",
+        "id": "field-next",
+        "label": "What should happen next, and what needs care?",
+        "placeholder": "Verify tracker access. Do not send reports or rewrite source records."
+      }
+    ]
+  },
+  "project-brief": {
+    "url": "https://reedos.github.io/gradient_ascent/apply/",
+    "text": "APPLY IT TO YOUR PROJECT\nDescribe your task. Let your AI consult the guide.\n\nUse your own model to choose an approach that delivers your outcome and the amount of work you want to hand over. Give it a brief, or ask it to fetch the reference directly. You do not need to choose a level first.\n\nMake your project brief\n\nA rough description is enough. Your model will ask about important gaps.\n\nStart with your own words or try an example. Examples fill empty answers only, so your edits stay intact. Nothing is sent to a model here; copy or download before leaving.\n\nPhotography example\nWeekly report example\nEngineering example\n\n1. What do you want done?\n\nExample: “Turn an outing’s wildlife photos into ready-to-post carousels on my phone.”\n\n2. What should you still do yourself?\n\nChoose a starting point, edit it, or leave this blank if you are unsure.\n\nReview finished results.\nApprove important actions.\nWork alongside the AI.\nHelp me decide.\n3. Anything it should know or never do?\n\nExample: “My photos are on a Windows PC. I use an iPhone. Never delete originals.”\n\nAdd context or example files (optional)\nYour brief to copy or download\n\nThe preview updates as you type. Your model will make the recommendation in your own conversation.\n\nCopy brief\nDownload Markdown\n\n1. Describe the work\n\nDescribe what starts the process, what should be ready at the end, and what you want to do yourself. Leave unknowns blank so your model can ask.\n\n2. Hand it to your model\n\nCopy or download your brief and attach relevant workflow files in your own agent. Your model should ask a few short, numbered questions, with one main decision each, then provide a concise recommendation. If your model can browse, it can fetch the guide and relevant concept pages itself.\n\n3. Review the recommendation\n\nCheck every recurring manual step against the experience you asked for. The initial plan should be concise, distinguish confirmed requirements from untested assumptions, and explain alternatives and checks. Ask for deeper implementation detail when you need it.\n\nLevels describe autonomy, not a ranking of solutions. Prefer simplicity among approaches that meet your needs—not by giving unwanted work back to you. A fixed workflow can be fully automated; an agent can be worthwhile when it removes substantial hands-on effort.\n\nBuild tools, then use them\n\nFor tasks that need custom processing or connections between systems, ask your model to consider a coding agent that builds or adapts a tool, tests it, runs it, and inspects the result. For example, it might create a project-data collector and a report generator, then use them to prepare a weekly report for review. The resulting tools may later run as ordinary software; you do not necessarily need an agent in every recurring run. Compare reuse, development effort, validation, and execution permissions before choosing.\n\nExplore coding agents → · See how a harness bounds their work →\n\nReady to go further?\n\nOnce your approach is clear, create agent instructions, describe the workflow, or define how to check success. Use only the tools that help your project.\n\nBrowse all project tools →\nAgent instructions\nWorkflow designer\nDefinition of done\nBring examples of your current workflow\n\nSend your brief and relevant files to your own agent together. Text, Markdown, photos, spreadsheets, reports, and other files can show details that are hard to describe.\n\nCurrent input: a representative file the process starts with.\nCurrent output: what you produce today, with what you like and what should improve.\nDesired output: a finished example or annotated mockup, if you have one.\nExceptions and instructions: an awkward case, a failed result, or a format the system must follow.\n\nIn the brief, name each file and its role. Attach those files separately in your agent, or give a local agent explicit access to the relevant folder. The brief download contains text only; this website does not upload or package your files. If a format is unsupported, provide an export or preview your model can inspect.\n\nLet your model fetch the reference\n\nGive your model your task and this address: https://reedos.github.io/gradient_ascent/agents.md. The guide links to the index, concept definitions, relationships, worked examples, and sources. Models with browsing or retrieval tools can follow those links; fetching is not automatic in every chat app.\n\nRead the model guide\nReference index\nBlank brief\nDownload reference text\n\nIf your model cannot browse, attach the relevant concept Markdown pages or the reference text along with your brief. The full export is large; individual pages may fit better. Ask the model to state what it actually read.",
+    "fields": [
+      {
+        "key": "goal",
+        "id": "brief-goal",
+        "label": "1. What do you want done?",
+        "placeholder": "Describe the result you want, in your own words."
+      },
+      {
+        "key": "humanRole",
+        "id": "brief-humanRole",
+        "label": "2. What should you still do yourself?",
+        "placeholder": "For example: review completed drafts and choose what to publish."
+      },
+      {
+        "key": "notes",
+        "id": "brief-notes",
+        "label": "3. Anything it should know or never do?",
+        "placeholder": "Optional: existing tools, preferences, or boundaries."
+      },
+      {
+        "key": "process",
+        "id": "brief-process",
+        "label": "",
+        "placeholder": ""
+      },
+      {
+        "key": "examples",
+        "id": "brief-examples",
+        "label": "",
+        "placeholder": ""
+      }
+    ]
+  }
+}

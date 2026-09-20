@@ -1,0 +1,5 @@
+I need a definition of done for the wildlife photo packs in the sample files. The process should suggest coherent packs, create crops and resized exports, include metadata and an optional map end card, preserve every original, and place results where I can review them on my phone. I review before sharing. I have no agreed timing target, image-quality threshold, crop failure rate, missing-location rule, carousel dimensions, or delivery service. I want readiness criteria that are observable and identify which targets require approval rather than inventing guarantees. A pack is not complete merely because files exist: outputs should trace to originals, exceptions should be visible, and review should be practical. Fixtures are synthetic. I know destination, reviewer, and prohibition on deleting originals. Weekly volume and phone storage limits are unknown. The result should support a later workflow proposal without claiming the workflow ran.
+
+Please help produce the acceptance criteria.
+
+Reference links: https://reedos.github.io/gradient_ascent/agents.md and https://reedos.github.io/gradient_ascent/llms.txt

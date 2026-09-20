@@ -1,0 +1,5 @@
+I am a wildlife photographer, not a programmer, and want a project that sorts new wildlife photos into suggested social-media carousel packs. When I add a batch, group related sightings, make useful carousel copies, suggest captions or metadata, and add a map card only when location is safe. I want suggestions on my phone and approve before sharing. Keep originals untouched forever. Blurry photos, duplicates, missing locations, and photos that do not fit should be called out, not discarded. Phone delivery could use cloud album, messages, or another service. Square versus portrait, carousel size, and exact-coordinate policy are undecided. I know folders contain JPEG and HEIC and I can review weekly. I do not want to manually prepare every image. Fixtures are synthetic. Produce a clear brief preserving automatic flow, stating questions I must answer, and do not claim processing or delivery occurred.
+
+Please help produce the project recommendation and plan.
+
+Reference links: https://reedos.github.io/gradient_ascent/agents.md and https://reedos.github.io/gradient_ascent/llms.txt

@@ -1,0 +1,5 @@
+I photograph local wildlife and want a weekly process that turns original photos into suggested carousel packs for my phone. Each pack should have sensible grouping, carousel crops, resized exports, captions or metadata, and a map end card only when location is available and safe. Originals must never be deleted or overwritten. I want automatic processing after adding photos, with exceptions presented for review instead of requiring manual preparation for every image. I have not chosen square or portrait crops, pack size, or phone delivery method. Some files have GPS, some do not, and some are blurry or duplicates. I know sample folders, phone review, and approval before sharing. Cloud destination, export retention, and exact-coordinate privacy are unknown. Fixtures are synthetic. Keep uncertain crop and privacy decisions visible and do not claim delivery or quality checks occurred.
+
+Please help produce the workflow specification.
+
+Reference links: https://reedos.github.io/gradient_ascent/agents.md and https://reedos.github.io/gradient_ascent/llms.txt

@@ -1,0 +1,5 @@
+{
+  "wildlife-01.jpg": "SYNTHETIC IMAGE PLACEHOLDER: fox at dusk; GPS present; 4032x3024.",
+  "wildlife-02.jpg": "SYNTHETIC IMAGE PLACEHOLDER: heron; no GPS; blurry; 3024x4032.",
+  "photo-metadata.csv": "SYNTHETIC\nfilename,capture_time,lat,lon\nwildlife-01.jpg,2026-09-18T19:10Z,45.1,-122.7\nwildlife-02.jpg,2026-09-18T19:21Z,,"
+}

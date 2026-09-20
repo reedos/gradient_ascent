@@ -1,0 +1,40 @@
+{
+  "id": "PH-2",
+  "slug": "project-handoff",
+  "scenario": "I received a handoff saying a data-cleanup script is â€˜done,â€™ but the original workspace is unavailable. I only have a mock output and a script excerpt never tested against the stated input shape. The handoff claims duplicates were removed and dates normalized, with no run log, source sample, dependency list, commit, or review record. I need a continuation brief that challenges the status, lists missing evidence and files to request, and proposes safe validation. Treat mock output as an example, not proof. I know the desired result is a cleaned CSV with original rows traceable to outputs. Duplicate rule, production date formats, encoding, row count, and environment compatibility are unknown. The recipient cannot access the original workspace or private reference. Explicitly state that reference is unavailable; do not inspect or execute it in absentia, invent behavior, or perform cleanup. This exercise is synthetic.",
+  "attachments": {
+    "handoff-note.md": "SYNTHETIC: â€˜Done: cleaned duplicates and normalized dates.â€™ No commit, log, or reviewer. Original link unavailable.",
+    "mock-output.csv": "SYNTHETIC MOCK ONLY\nid,date\n1,2026-09-01\n2,2026-09-02",
+    "script-excerpt.py": "SYNTHETIC UNTESTED: reads input.csv, drops duplicate rows, writes cleaned.csv; date logic omitted."
+  },
+  "form": {
+    "url": "https://reedos.github.io/gradient_ascent/tools/project-handoff/",
+    "text": "Home\n/\nTools\n/\nProject handoff builder\nUSE WITH YOUR OWN AI\nProject handoff builder\n\nGive the next person or agent a factual starting point, without confusing plans with completed work.\n\nA rough description is enough. Leave unknowns blank; the exported instructions ask your agent to clarify or inspect them. Nothing here calls a model, uploads files, or saves your entries.\n\nTry an example\nDownload a blank template\n\nWhat are we trying to accomplish?\n\nThe outcome and the important decisions already made.\n\nWhat exists and what has been verified?\n\nName artifacts, changes, and actual checks. “Not tested yet” is useful information.\n\nWhere is the relevant context?\n\nPaths, links, brief filenames, or attached examples. Do not include secrets.\n\nWhat should happen next, and what needs care?\n\nOpen questions, blockers, boundaries, and the next useful action.\n\nWhat this template helps your agent work out\nReview your draft\n\nCopy or download this draft and give it to your agent with relevant files. It contains your answers and instructions for refining them—not a verified implementation.\n\nCopy draft\nDownload Markdown\n\nWhat next?\n\nGive the draft and relevant workflow files to your agent. Ask it to separate confirmed facts, assumptions, and proposed choices, then review the result.\n\nNext: Existing-workflow audit →\nBrowse all tools\nModel reference guide",
+    "fields": [
+      {
+        "key": "goal",
+        "id": "field-goal",
+        "label": "What are we trying to accomplish?",
+        "placeholder": "Prepare weekly report drafts automatically, with final human approval."
+      },
+      {
+        "key": "state",
+        "id": "field-state",
+        "label": "What exists and what has been verified?",
+        "placeholder": "Collector prototype exists; output format checked manually, delivery untested."
+      },
+      {
+        "key": "references",
+        "id": "field-references",
+        "label": "Where is the relevant context?",
+        "placeholder": "Project brief, workflow spec, and sample report in the project folder."
+      },
+      {
+        "key": "next",
+        "id": "field-next",
+        "label": "What should happen next, and what needs care?",
+        "placeholder": "Verify tracker access. Do not send reports or rewrite source records."
+      }
+    ]
+  }
+}

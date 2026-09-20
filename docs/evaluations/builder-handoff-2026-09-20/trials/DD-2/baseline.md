@@ -1,0 +1,5 @@
+I am defining done for a household receipt organizer. Inputs include phone photos, PDFs, and scans in US dollars, Canadian dollars, and euros, with tips, taxes, refunds, handwritten notes, and unreadable or partial images. My request is only â€˜make it accurate.â€™ I have not defined acceptable extraction error, exchange-rate timing, tax and tip treatment, duplicate handling, or missing merchant/date behavior. I want testable criteria and questions, with representative success and failure cases and human review for uncertain records. Do not promise perfect OCR or invent an exchange-rate source. I know the input formats and defects described here, but whether totals or line items matter, the accounting period, and whether the organizer is shared are unknown. Examples are synthetic, not financial records. The definition must be testable without real household data.
+
+Please help produce the acceptance criteria.
+
+Reference links: https://reedos.github.io/gradient_ascent/agents.md and https://reedos.github.io/gradient_ascent/llms.txt

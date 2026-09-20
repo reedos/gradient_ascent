@@ -1,0 +1,45 @@
+{
+  "id": "PB-1",
+  "slug": "project-brief",
+  "scenario": "I am a wildlife photographer, not a programmer, and want a project that sorts new wildlife photos into suggested social-media carousel packs. When I add a batch, group related sightings, make useful carousel copies, suggest captions or metadata, and add a map card only when location is safe. I want suggestions on my phone and approve before sharing. Keep originals untouched forever. Blurry photos, duplicates, missing locations, and photos that do not fit should be called out, not discarded. Phone delivery could use cloud album, messages, or another service. Square versus portrait, carousel size, and exact-coordinate policy are undecided. I know folders contain JPEG and HEIC and I can review weekly. I do not want to manually prepare every image. Fixtures are synthetic. Produce a clear brief preserving automatic flow, stating questions I must answer, and do not claim processing or delivery occurred.",
+  "attachments": {
+    "sample-wildlife-folder.txt": "SYNTHETIC: fox-01.jpg, heron-02.heic, fox-01-copy.jpg; duplicate and missing location.",
+    "sample-location.csv": "SYNTHETIC\nfile,location\nfox-01.jpg,45.1,-122.7\nheron-02.heic,,"
+  },
+  "form": {
+    "url": "https://reedos.github.io/gradient_ascent/apply/",
+    "text": "APPLY IT TO YOUR PROJECT\nDescribe your task. Let your AI consult the guide.\n\nUse your own model to choose an approach that delivers your outcome and the amount of work you want to hand over. Give it a brief, or ask it to fetch the reference directly. You do not need to choose a level first.\n\nMake your project brief\n\nA rough description is enough. Your model will ask about important gaps.\n\nStart with your own words or try an example. Examples fill empty answers only, so your edits stay intact. Nothing is sent to a model here; copy or download before leaving.\n\nPhotography example\nWeekly report example\nEngineering example\n\n1. What do you want done?\n\nExample: “Turn an outing’s wildlife photos into ready-to-post carousels on my phone.”\n\n2. What should you still do yourself?\n\nChoose a starting point, edit it, or leave this blank if you are unsure.\n\nReview finished results.\nApprove important actions.\nWork alongside the AI.\nHelp me decide.\n3. Anything it should know or never do?\n\nExample: “My photos are on a Windows PC. I use an iPhone. Never delete originals.”\n\nAdd context or example files (optional)\nYour brief to copy or download\n\nThe preview updates as you type. Your model will make the recommendation in your own conversation.\n\nCopy brief\nDownload Markdown\n\n1. Describe the work\n\nDescribe what starts the process, what should be ready at the end, and what you want to do yourself. Leave unknowns blank so your model can ask.\n\n2. Hand it to your model\n\nCopy or download your brief and attach relevant workflow files in your own agent. Your model should ask a few short, numbered questions, with one main decision each, then provide a concise recommendation. If your model can browse, it can fetch the guide and relevant concept pages itself.\n\n3. Review the recommendation\n\nCheck every recurring manual step against the experience you asked for. The initial plan should be concise, distinguish confirmed requirements from untested assumptions, and explain alternatives and checks. Ask for deeper implementation detail when you need it.\n\nLevels describe autonomy, not a ranking of solutions. Prefer simplicity among approaches that meet your needs—not by giving unwanted work back to you. A fixed workflow can be fully automated; an agent can be worthwhile when it removes substantial hands-on effort.\n\nBuild tools, then use them\n\nFor tasks that need custom processing or connections between systems, ask your model to consider a coding agent that builds or adapts a tool, tests it, runs it, and inspects the result. For example, it might create a project-data collector and a report generator, then use them to prepare a weekly report for review. The resulting tools may later run as ordinary software; you do not necessarily need an agent in every recurring run. Compare reuse, development effort, validation, and execution permissions before choosing.\n\nExplore coding agents → · See how a harness bounds their work →\n\nReady to go further?\n\nOnce your approach is clear, create agent instructions, describe the workflow, or define how to check success. Use only the tools that help your project.\n\nBrowse all project tools →\nAgent instructions\nWorkflow designer\nDefinition of done\nBring examples of your current workflow\n\nSend your brief and relevant files to your own agent together. Text, Markdown, photos, spreadsheets, reports, and other files can show details that are hard to describe.\n\nCurrent input: a representative file the process starts with.\nCurrent output: what you produce today, with what you like and what should improve.\nDesired output: a finished example or annotated mockup, if you have one.\nExceptions and instructions: an awkward case, a failed result, or a format the system must follow.\n\nIn the brief, name each file and its role. Attach those files separately in your agent, or give a local agent explicit access to the relevant folder. The brief download contains text only; this website does not upload or package your files. If a format is unsupported, provide an export or preview your model can inspect.\n\nLet your model fetch the reference\n\nGive your model your task and this address: https://reedos.github.io/gradient_ascent/agents.md. The guide links to the index, concept definitions, relationships, worked examples, and sources. Models with browsing or retrieval tools can follow those links; fetching is not automatic in every chat app.\n\nRead the model guide\nReference index\nBlank brief\nDownload reference text\n\nIf your model cannot browse, attach the relevant concept Markdown pages or the reference text along with your brief. The full export is large; individual pages may fit better. Ask the model to state what it actually read.",
+    "fields": [
+      {
+        "key": "goal",
+        "id": "brief-goal",
+        "label": "1. What do you want done?",
+        "placeholder": "Describe the result you want, in your own words."
+      },
+      {
+        "key": "humanRole",
+        "id": "brief-humanRole",
+        "label": "2. What should you still do yourself?",
+        "placeholder": "For example: review completed drafts and choose what to publish."
+      },
+      {
+        "key": "notes",
+        "id": "brief-notes",
+        "label": "3. Anything it should know or never do?",
+        "placeholder": "Optional: existing tools, preferences, or boundaries."
+      },
+      {
+        "key": "process",
+        "id": "brief-process",
+        "label": "",
+        "placeholder": ""
+      },
+      {
+        "key": "examples",
+        "id": "brief-examples",
+        "label": "",
+        "placeholder": ""
+      }
+    ]
+  }
+}

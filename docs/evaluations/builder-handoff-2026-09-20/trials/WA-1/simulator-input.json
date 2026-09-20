@@ -1,0 +1,40 @@
+{
+  "id": "WA-1",
+  "slug": "workflow-audit",
+  "scenario": "As a project coordinator, I spend hours weekly copying updates from notes into a status sheet, chasing owners, and formatting a report. Inputs are an issue export, notes, and last week's report. A person still reviews wording and decides whether a risk is material before leadership receives it. I want an audit of recurring labor, weak handoffs, stale or contradictory information, and improvements that preserve review. Automated collection, reminders, normalization, and drafting are acceptable, but no messages or publication without an explicit decision. I know the current sequence and roles in the synthetic files. I do not know whether the export is fetchable, whether owners consent to reminders, what leadership considers stale, or integration maintenance cost. Do not claim timing or contact. Address whether formatting automation alone reduces labor, and separate observed facts from recommendations and unmeasured estimates.",
+  "attachments": {
+    "current-process.md": "SYNTHETIC: Monday collect; Wednesday chase; Thursday copy; Friday format; coordinator reviews.",
+    "issues.csv": "SYNTHETIC\nproject,owner,status,updated\nPine,Sam,blocked,2026-09-15\nRiver,,in progress,2026-09-10",
+    "last-report.md": "SYNTHETIC: River owner listed as Jo, current export blank."
+  },
+  "form": {
+    "url": "https://reedos.github.io/gradient_ascent/tools/workflow-audit/",
+    "text": "Home\n/\nTools\n/\nExisting-workflow audit\nUSE WITH YOUR OWN AI\nExisting-workflow audit\n\nFind where an existing process loses time or quality before deciding what to replace.\n\nA rough description is enough. Leave unknowns blank; the exported instructions ask your agent to clarify or inspect them. Nothing here calls a model, uploads files, or saves your entries.\n\nTry an example\nDownload a blank template\n\nHow does the work happen today?\n\nA rough sequence is enough. Name the tools you already use.\n\nWhat feels slow or unreliable?\n\nFocus on the work you want to stop doing or improve.\n\nWhat examples can your agent inspect?\n\nList current input, current output, and any desired output. Attach actual files separately.\n\nWhat should stay the same?\n\nWorking tools, responsibilities, boundaries, and required review.\n\nWhat this template helps your agent work out\nReview your draft\n\nCopy or download this draft and give it to your agent with relevant files. It contains your answers and instructions for refining them—not a verified implementation.\n\nCopy draft\nDownload Markdown\n\nWhat next?\n\nGive the draft and relevant workflow files to your agent. Ask it to separate confirmed facts, assumptions, and proposed choices, then review the result.\n\nNext: Workflow designer →\nBrowse all tools\nModel reference guide",
+    "fields": [
+      {
+        "key": "process",
+        "id": "field-process",
+        "label": "How does the work happen today?",
+        "placeholder": "Collect project updates, compare last week, write a report, then email it."
+      },
+      {
+        "key": "pain",
+        "id": "field-pain",
+        "label": "What feels slow or unreliable?",
+        "placeholder": "Chasing updates and copying the same information between tools."
+      },
+      {
+        "key": "evidence",
+        "id": "field-evidence",
+        "label": "What examples can your agent inspect?",
+        "placeholder": "Last week’s report and exports from two project trackers."
+      },
+      {
+        "key": "preserve",
+        "id": "field-preserve",
+        "label": "What should stay the same?",
+        "placeholder": "Keep our report format and final review; no automatic emails."
+      }
+    ]
+  }
+}

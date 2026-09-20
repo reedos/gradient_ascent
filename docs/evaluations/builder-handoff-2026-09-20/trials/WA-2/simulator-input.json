@@ -1,0 +1,40 @@
+{
+  "id": "WA-2",
+  "slug": "workflow-audit",
+  "scenario": "I coordinate volunteers. One form feeds several spreadsheets for scheduling, accessibility needs, and attendance, so I copy registrations manually. The same person can appear twice with different phones, event names vary, and sample rows disagree about a shift. I want an audit identifying a source of truth, duplicate and conflict handling, and ways to reduce repetitive entry. I can edit the export and one spreadsheet, but do not know whether connecting automation to the scheduling workbook or sending reminders is allowed. A coordinator reviews assignments before volunteers see them. Recommend a staged design and organizational questions, but do not assume permission, merge silently, or send messages. The examples are synthetic and accessibility information is sensitive. Event naming, retention, matching key, and schedule-change authority are unknown. Preserve an audit trail for corrections and visible uncertainty.",
+  "attachments": {
+    "registration-export.csv": "SYNTHETIC\nname,email,phone,event,shift\nAri Lee,ari@example.test,555-0101,Harvest,09:00\nAri Lee,ari@example.test,555-0199,Harvest,10:00",
+    "schedule-sheet.csv": "SYNTHETIC\nvolunteer,event,shift\nAri Lee,Harvest,09:00",
+    "access-notes.md": "SYNTHETIC: Export and attendance editable; scheduling permission and reminder authority unknown."
+  },
+  "form": {
+    "url": "https://reedos.github.io/gradient_ascent/tools/workflow-audit/",
+    "text": "Home\n/\nTools\n/\nExisting-workflow audit\nUSE WITH YOUR OWN AI\nExisting-workflow audit\n\nFind where an existing process loses time or quality before deciding what to replace.\n\nA rough description is enough. Leave unknowns blank; the exported instructions ask your agent to clarify or inspect them. Nothing here calls a model, uploads files, or saves your entries.\n\nTry an example\nDownload a blank template\n\nHow does the work happen today?\n\nA rough sequence is enough. Name the tools you already use.\n\nWhat feels slow or unreliable?\n\nFocus on the work you want to stop doing or improve.\n\nWhat examples can your agent inspect?\n\nList current input, current output, and any desired output. Attach actual files separately.\n\nWhat should stay the same?\n\nWorking tools, responsibilities, boundaries, and required review.\n\nWhat this template helps your agent work out\nReview your draft\n\nCopy or download this draft and give it to your agent with relevant files. It contains your answers and instructions for refining them—not a verified implementation.\n\nCopy draft\nDownload Markdown\n\nWhat next?\n\nGive the draft and relevant workflow files to your agent. Ask it to separate confirmed facts, assumptions, and proposed choices, then review the result.\n\nNext: Workflow designer →\nBrowse all tools\nModel reference guide",
+    "fields": [
+      {
+        "key": "process",
+        "id": "field-process",
+        "label": "How does the work happen today?",
+        "placeholder": "Collect project updates, compare last week, write a report, then email it."
+      },
+      {
+        "key": "pain",
+        "id": "field-pain",
+        "label": "What feels slow or unreliable?",
+        "placeholder": "Chasing updates and copying the same information between tools."
+      },
+      {
+        "key": "evidence",
+        "id": "field-evidence",
+        "label": "What examples can your agent inspect?",
+        "placeholder": "Last week’s report and exports from two project trackers."
+      },
+      {
+        "key": "preserve",
+        "id": "field-preserve",
+        "label": "What should stay the same?",
+        "placeholder": "Keep our report format and final review; no automatic emails."
+      }
+    ]
+  }
+}

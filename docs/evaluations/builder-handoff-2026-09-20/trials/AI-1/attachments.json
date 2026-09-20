@@ -1,0 +1,5 @@
+{
+  "shared-framework.md": "SYNTHETIC: pytest lab framework; read-only; fixtures and report helpers; no hardware commands.",
+  "past-project-tree.txt": "SYNTHETIC: tests/, configs/, reports/, README.md; pytest fixtures and local config.",
+  "dut-brief.md": "SYNTHETIC: Sable temperature logger; USB serial and I2C; -10C to 60C; alarm 55C; build and bench TBD."
+}

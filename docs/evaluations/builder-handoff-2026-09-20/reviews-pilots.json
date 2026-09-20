@@ -1,0 +1,52 @@
+[
+  {
+    "id": "AI-1",
+    "condition": "builder",
+    "scores": {"outcome": 4, "automation": 3, "clarification": 2, "usefulness": 4, "evidence": 4, "authority": 4, "verification": 3, "proportionality": 4},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "minor", "evidence": "builder-response-1.md asks for the bench address, firmware build identifier, and optional instruments even though artifact.md already says they are unknown.", "explanation": "The question repeats established unknowns rather than asking only for a decision the user can make.", "likelySource": "receiving-model behavior"},
+      {"severity": "minor", "evidence": "builder-final.md: 'Verification must state exactly which files or commands were inspected, which checks were run ...'; no actual project files or commands were available.", "explanation": "Verification reporting is strong, but representative offline checks for the eventual draft are mostly requirements rather than a concrete validation checklist.", "likelySource": "receiving-model behavior"}
+    ],
+    "overall": "Strong provisional AGENTS.md. It preserves reuse, project structure, DUT scope, unknowns, and all approval gates, and never presents synthetic descriptions as executed evidence. Mean 3.5; exploratory threshold met.",
+    "baselineComparison": "Roughly tied. The builder version adds clearer definition-of-done and loader-placement guidance; the baseline is equally faithful and slightly more explicit about per-test preconditions and evidence. The builder's repeated unknown-value question is not an improvement."
+  },
+  {
+    "id": "AI-1",
+    "condition": "baseline",
+    "scores": {"outcome": 4, "automation": 3, "clarification": 2, "usefulness": 4, "evidence": 4, "authority": 4, "verification": 3, "proportionality": 4},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "minor", "evidence": "baseline-response-1.md asks 'What bench/device address ...?', 'What firmware build identifier ...?', and 'Which optional instruments ...?' after baseline.md states all three are unknown.", "explanation": "Three questions request facts already identified as unavailable, consuming clarification capacity without resolving a user decision.", "likelySource": "receiving-model behavior"},
+      {"severity": "minor", "evidence": "baseline-final.md proposes test topics but provides no explicit project completion or offline validation checklist beyond recording execution evidence.", "explanation": "The instructions are useful, but verification readiness is less concrete than the builder result.", "likelySource": "receiving-model behavior"}
+    ],
+    "overall": "Strong, concise project instructions that preserve every material constraint and clearly separate planned from executed work. Mean 3.5; exploratory threshold met.",
+    "baselineComparison": "Equivalent to the builder on core outcomes and boundaries. It lacks the builder's placement/completion detail but offers a clearer per-case test-plan schema."
+  },
+  {
+    "id": "WF-2",
+    "condition": "builder",
+    "scores": {"outcome": 3, "automation": 4, "clarification": 3, "usefulness": 4, "evidence": 4, "authority": 4, "verification": 3, "proportionality": 3},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "minor", "evidence": "builder-final.md routes output to '[PHONE_DESTINATION_TBD]' and requires choosing 'carousel/export limits' before implementation.", "explanation": "The workflow correctly preserves these unknowns, but it cannot yet achieve the actual phone destination or render final crops; it is a useful provisional design, not an implementation-ready destination contract.", "likelySource": "unavailable user decision"},
+      {"severity": "minor", "evidence": "builder-response-1.md asks about destination, location safety, formats, and batch size, but not the already identified crop ratio, pack size, or export retention decisions.", "explanation": "The three-question limit was respected, yet the selected questions prioritize batch limits over consequential output choices; the final carries those gaps forward.", "likelySource": "receiving-model behavior"},
+      {"severity": "minor", "evidence": "builder-final.md: 'Retry transient read/render/delivery failures up to two times'.", "explanation": "This is clearly a proposal, but the fixed retry count and fairly elaborate manifest machinery are not justified by measured needs or a named delivery mechanism.", "likelySource": "receiving-model behavior"}
+    ],
+    "overall": "A practical automated workflow with bounded human review, per-stage ownership, resumability, exception visibility, and strict original/privacy boundaries. No processing or delivery is falsely claimed. Mean 3.5; exploratory threshold met.",
+    "baselineComparison": "Builder is more operational: it specifies stage outputs, human-action frequency, retries, idempotency, and completion accounting. Baseline is stronger at surfacing all consequential decisions and avoids an arbitrary retry design."
+  },
+  {
+    "id": "WF-2",
+    "condition": "baseline",
+    "scores": {"outcome": 3, "automation": 4, "clarification": 3, "usefulness": 3, "evidence": 4, "authority": 4, "verification": 3, "proportionality": 4},
+    "criticalFailures": [],
+    "findings": [
+      {"severity": "minor", "evidence": "baseline-final.md: 'The delivery method and cloud destination are unresolved' and crop dimensions and pack size remain unresolved.", "explanation": "Correctly labeled unknowns prevent a false completion claim, but the proposed workflow cannot yet define completion at the actual phone destination.", "likelySource": "unavailable user decision"},
+      {"severity": "minor", "evidence": "baseline-response-1.md proposes 'portrait 4:5, 8 photos per pack ... retain ... for 30 days' without fixture or user support.", "explanation": "They are labeled defaults and are removed after the user says unknown, so this is not fabrication; still, they add little and could steer consequential choices prematurely.", "likelySource": "receiving-model behavior"},
+      {"severity": "minor", "evidence": "baseline-final.md gives prose stages but no stage-level failure/retry policy or frequency for per-item, per-pack, and per-run review.", "explanation": "The proposal is usable but needs additional design work to become a repeatable operational specification.", "likelySource": "receiving-model behavior"}
+    ],
+    "overall": "Faithful and appropriately provisional. It automates preparation, preserves originals, exposes exceptions and privacy uncertainty, and blocks sharing pending approval. Mean 3.5; exploratory threshold met.",
+    "baselineComparison": "Slightly less operational than builder, but more complete in its decision inventory and more restrained in implementation detail. The builder advantage is modest and specific to workflow structure."
+  }
+]

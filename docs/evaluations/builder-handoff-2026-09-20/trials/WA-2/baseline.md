@@ -1,0 +1,5 @@
+I coordinate volunteers. One form feeds several spreadsheets for scheduling, accessibility needs, and attendance, so I copy registrations manually. The same person can appear twice with different phones, event names vary, and sample rows disagree about a shift. I want an audit identifying a source of truth, duplicate and conflict handling, and ways to reduce repetitive entry. I can edit the export and one spreadsheet, but do not know whether connecting automation to the scheduling workbook or sending reminders is allowed. A coordinator reviews assignments before volunteers see them. Recommend a staged design and organizational questions, but do not assume permission, merge silently, or send messages. The examples are synthetic and accessibility information is sensitive. Event naming, retention, matching key, and schedule-change authority are unknown. Preserve an audit trail for corrections and visible uncertainty.
+
+Please help produce the workflow audit.
+
+Reference links: https://reedos.github.io/gradient_ascent/agents.md and https://reedos.github.io/gradient_ascent/llms.txt

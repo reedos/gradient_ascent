@@ -1,0 +1,5 @@
+As a project coordinator, I spend hours weekly copying updates from notes into a status sheet, chasing owners, and formatting a report. Inputs are an issue export, notes, and last week's report. A person still reviews wording and decides whether a risk is material before leadership receives it. I want an audit of recurring labor, weak handoffs, stale or contradictory information, and improvements that preserve review. Automated collection, reminders, normalization, and drafting are acceptable, but no messages or publication without an explicit decision. I know the current sequence and roles in the synthetic files. I do not know whether the export is fetchable, whether owners consent to reminders, what leadership considers stale, or integration maintenance cost. Do not claim timing or contact. Address whether formatting automation alone reduces labor, and separate observed facts from recommendations and unmeasured estimates.
+
+Please help produce the workflow audit.
+
+Reference links: https://reedos.github.io/gradient_ascent/agents.md and https://reedos.github.io/gradient_ascent/llms.txt
