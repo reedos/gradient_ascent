@@ -42,3 +42,7 @@ Taxonomy coverage and approval invariants have repository unit tests. Local brow
 ## Reader overviews and depth
 
 Every perspective now opens with an overview, its task, and what to look for. `walkthrough-guides.json` supplies concept-specific assumptions, design tradeoffs, recovery options, and transfer guidance for all 58 entries. These principles complement each audience case’s distinct evidence, actions, outcomes, and decision. They do not add universal approval requirements. The DUT overview explains its particular team policy separately from the reusable harness pattern. Markdown, non-JavaScript content, and case downloads include the expanded guidance.
+
+## Consolidation and record-based demonstrations
+
+Concept pages now provide section navigation. Historical implementation traces and named-product sections are optional. All shared variants show staged teaching records rather than repeating a narration and result card. The six priority default examples have custom artifact sequences; alternate audiences retain their own records and shared transfer guidance. See `EDITORIAL_REVIEW_2026-09-20.md` for source-review scope and the unperformed external reader study, and `CLAIM_REVIEW_INVENTORY.md` for per-concept audit status.

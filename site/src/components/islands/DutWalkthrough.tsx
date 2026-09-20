@@ -31,6 +31,8 @@ const artifacts = [
 ];
 
 export default function DutWalkthrough({ embedded = false }: { embedded?: boolean }) {
+  const [ready,setReady]=useState(false);
+  useEffect(()=>setReady(true),[]);
   const [mode, setMode] = useState('watch');
   const [step, setStep] = useState(0);
   const [started, setStarted] = useState(false);
@@ -66,7 +68,7 @@ export default function DutWalkthrough({ embedded = false }: { embedded?: boolea
     <div className="pilot-modes" role="group" aria-label="Learning mode">{[['watch','01','Watch it'],['change','02','Change something'],['try','03','Try a decision']].map(([key,num,label]) => <button aria-pressed={mode===key} onClick={()=>setMode(key)}><small>{num}</small>{label}</button>)}</div>
 
     {mode === 'watch' && <>
-      <section className="pilot-request"><label htmlFor="dut-request">Your request</label><div><textarea id="dut-request" value={prompt} readOnly={started} onChange={e=>setPrompt(e.currentTarget.value)} rows={3}/><button className="pilot-primary" disabled={!prompt.trim() || started} onClick={()=>setStarted(true)}>{started ? 'Request sent ✓' : 'Send request →'}</button></div><small>Prefilled English request. You can edit it; this walkthrough always demonstrates the same scripted workflow.</small></section>
+      <section className="pilot-request"><label htmlFor="dut-request">Your request</label><div><textarea id="dut-request" value={prompt} readOnly={started} onChange={e=>setPrompt(e.currentTarget.value)} rows={3}/><button className="pilot-primary" disabled={!ready || !prompt.trim() || started} onClick={()=>setStarted(true)}>{started ? 'Request sent ✓' : 'Send request →'}</button></div><small>Prefilled English request. You can edit it; this walkthrough always demonstrates the same scripted workflow.</small></section>
       <div className="pilot-workspace">
         <section className="pilot-map" aria-label="Workflow diagram"><div className="pilot-panel-head"><span>THE WORKFLOW</span><small>{started ? `Step ${step+1} of 6` : 'Ready when you are'}</small></div>
           <div className="pilot-context"><strong>Context</strong><span>Instructions + DUT brief + reference project</span></div>

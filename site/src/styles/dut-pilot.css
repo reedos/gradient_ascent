@@ -154,3 +154,5 @@
 .dut-pilot .walk-transfer h3 { font-size:20px; letter-spacing:normal; margin:0 0 12px; }
 .walk-transfer ul { padding-left:20px; }.walk-transfer button { margin-top:16px; }
 @media(max-width:650px) { .walk-overview-grid { grid-template-columns:1fr; gap:18px; } }
+
+.walk-record-label { font-size:10px; letter-spacing:.8px; padding:16px 18px 8px; color:var(--muted); }.walk-record>.pilot-quiet { margin:0 18px; }.walk-record pre { white-space:pre-wrap; overflow-wrap:anywhere; font-size:14px; line-height:1.8; }.dut-pilot .walk-record-change { padding:16px 18px; border-top:1px solid var(--line); color:var(--muted); font-size:14px; line-height:1.8; margin:0; }.walk-transfer .pilot-quiet { white-space:normal; }

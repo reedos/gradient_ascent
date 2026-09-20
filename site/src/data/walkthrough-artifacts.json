@@ -1,0 +1,194 @@
+{
+  "prompt-engineering:everyday": [
+    {
+      "name": "Brief · v1",
+      "body": "Facts = Oak Hall; Saturday 10 am; free; one item per person.\nAudience = first-time visitors.\nOpen question = repair success is not promised.",
+      "change": "The request is separated into supplied facts and an unsupported promise to watch for."
+    },
+    {
+      "name": "Prompt · v2",
+      "body": "Write a welcoming invitation under 45 words.\nUse only these facts: Oak Hall, Saturday 10 am, free, one item per person.\nDo not add a repair guarantee.",
+      "change": "The prompt makes audience, length, and factual boundaries explicit; it does not guarantee compliance."
+    },
+    {
+      "name": "Candidate comparison",
+      "body": "A: Expert repairs guaranteed at our free workshop!\nB: New to repair? Join us at Oak Hall this Saturday at 10 am. Admission is free; bring one item and we will explore how to fix it together.\nDifference: B removes the unsupported guarantee and restores the supplied details.",
+      "change": "Two authored outputs make the factual difference inspectable. They are not measured responses to a prompt experiment."
+    },
+    {
+      "name": "Selected draft · B",
+      "body": "New to repair? Join us at Oak Hall this Saturday at 10 am. Admission is free; bring one item and we will explore how to fix it together.",
+      "change": "The selected draft is ready for a human to check; nothing has been sent."
+    },
+    {
+      "name": "Review sheet",
+      "body": "Facts: all four supplied details retained.\nLength: below 45 words.\nPromise: no repair guarantee.\nAudience fit: editorial judgment, not an objective pass.\nGeneralization: untested on other events.",
+      "change": "A format check and an editorial judgment are separate kinds of evidence."
+    },
+    {
+      "name": "Reusable brief",
+      "body": "Replace: event, audience, facts, and desired length.\nKeep: separate facts from promises.\nTest next: a brief with an unknown venue and a conflicting date.\nAccept when: important facts remain correct and the wording fits the audience.",
+      "change": "The reusable output is a brief and review method, not a magic prompt."
+    }
+  ],
+  "rag:everyday": [
+    {
+      "name": "Source packet",
+      "body": "Manual v3 §2: Coverage lasts two years.\nManual v3 §4: Water damage is excluded.\nQuestion: Is water damage covered for the DW-480?\nProvenance: fictional manual passages supplied for this example.",
+      "change": "Duration and exclusions are distinct pieces of evidence."
+    },
+    {
+      "name": "Retrieval plan",
+      "body": "Query: DW-480 warranty water damage exclusions.\nRequired evidence: coverage terms and relevant exclusions.\nVersion constraint: use the same applicable revision.\nDo not infer coverage from duration alone.",
+      "change": "The query is designed around the claim the answer must support."
+    },
+    {
+      "name": "Selected passages",
+      "body": "Selected: v3 §2 and v3 §4.\nRejected shortcut: §2 by itself.\nClaim to support: water-damage coverage.\nSupporting passage: §4, not §2.",
+      "change": "Selecting a passage is not enough; its content must bear on the question."
+    },
+    {
+      "name": "Answer with support",
+      "body": "Water damage is excluded [v3 §4], even during the two-year period [v3 §2].\nClaim 1 → exclusion clause.\nClaim 2 → duration clause.",
+      "change": "Each claim is paired with the passage that supports it."
+    },
+    {
+      "name": "Missing-evidence review",
+      "body": "Remove §4 from the packet.\nStill established: duration is two years.\nNo longer established: whether water damage is covered.\nNext action: retrieve applicable exclusions or leave coverage unresolved.",
+      "change": "The changed result is caused by an evidence gap, not a different warranty fact."
+    },
+    {
+      "name": "Your source contract",
+      "body": "Replace: manual with your policies, notes, or records.\nSpecify: applicable version and freshness.\nCheck: each consequential claim against its supporting passage.\nEscalate: missing or conflicting terms that affect the answer.",
+      "change": "Your documents change; the claim-to-evidence relationship remains."
+    }
+  ],
+  "workflow-graphs:business": [
+    {
+      "name": "W12 evidence register",
+      "body": "Atlas tracker: delivery delayed to Friday.\nBeacon notes: work complete.\nCedar: no fresh evidence.\nPrevious report: continuity only, not proof of current status.\nProposed audience: project leads.",
+      "change": "The current period starts with two supported updates and one explicit gap."
+    },
+    {
+      "name": "State and transitions",
+      "body": "Collect → reconcile → draft → review → delivery.\nMissing update → retain an unknown status.\nEdited report or recipients → return to review.\nUncertain delivery → reconcile before retrying.\nPolicy in this example: human approves distribution.",
+      "change": "Branches distinguish missing evidence, changed approval scope, and uncertain external effects."
+    },
+    {
+      "name": "Reconciled working record",
+      "body": "Atlas: schedule risk; source = tracker.\nBeacon: complete; source = notes.\nCedar: unknown; source = missing.\nUnsupported inference removed: Cedar is green because no problem was reported.\nDraft state: ready for review, not approved.",
+      "change": "Collection has become a reportable status record without inventing Cedar's progress."
+    },
+    {
+      "name": "W12 report · v1",
+      "body": "Atlas schedule risk; Beacon complete; Cedar unknown.\nEvidence: Atlas tracker; Beacon notes; Cedar missing.\nRecipients: project leads.\nDistribution: pending approval of this content and audience.",
+      "change": "The controls below model approval and delivery separately. Editing either field invalidates approval."
+    },
+    {
+      "name": "Recovery record",
+      "body": "Illustrated alternate event: send times out after possible acceptance.\nKnown: a send was attempted.\nUnknown: whether the destination accepted it.\nRecovery: inspect delivery status using the same report identity before resending.\nProduction duplicate protection is not implemented by this page.",
+      "change": "The timeout branch is a written teaching record; the local send button only demonstrates an in-memory gate."
+    },
+    {
+      "name": "Adaptation plan",
+      "body": "Replace: projects, reporting period, connectors, and audience.\nChoose: which missing updates block a draft and which can be marked unknown.\nChoose: review rules for distribution in your organization.\nKeep: evidence freshness, explicit state, and safe handling of uncertain delivery.",
+      "change": "A personal draft may need no approval gate; a shared report may need one at distribution."
+    }
+  ],
+  "human-in-the-loop:business": [
+    {
+      "name": "Review request · v1",
+      "body": "Draft: Atlas delayed; Cedar unknown.\nRecipients: project leads.\nApproval: absent.\nDelivery: not attempted.",
+      "change": "The proposed content and the proposed audience are both part of the decision."
+    },
+    {
+      "name": "Decision scope",
+      "body": "A reviewer may approve, revise, or reject this version for project leads.\nApproval of a draft does not imply permission to add recipients.\nNo response leaves delivery pending.\nThis is a task policy, not a universal requirement for every draft.",
+      "change": "The reviewer sees the commitment being authorized rather than a vague request to continue."
+    },
+    {
+      "name": "Review packet",
+      "body": "Evidence: Atlas update supports delay; Cedar has no fresh update.\nOpen issue: Cedar's actual current status.\nAllowed draft wording: unknown.\nDecision requested: may this exact report go to project leads?",
+      "change": "The reviewer can approve an honest report with an explicit gap, or request the missing information first."
+    },
+    {
+      "name": "Approval workspace",
+      "body": "Use the controls below to approve, edit, or reject.\nVersion and audience form the approval scope.\nApproval alone does not record delivery.\nEdits return the current proposal to review.",
+      "change": "The live control state below is authoritative for this simulation; this record explains the rule."
+    },
+    {
+      "name": "Audience change · illustrated diff",
+      "body": "Before: project leads.\nAfter: project leads + external recipient.\nUnchanged: report text.\nChanged: disclosure scope.\nResult: prior approval no longer applies; review disclosure suitability and seek a new decision.",
+      "change": "A recipient-only change can be material even when the words are identical."
+    },
+    {
+      "name": "Your approval policy",
+      "body": "Specify: approver, action, content, audience, and expiry if needed.\nPreauthorize: low-risk routine work within a clear scope.\nRe-review: material changes outside that scope.\nRecord separately: decision and action outcome.",
+      "change": "Use meaningful commitment boundaries instead of asking permission for every preparatory step."
+    }
+  ],
+  "single-agent:business": [
+    {
+      "name": "Investigation state · opened",
+      "body": "Request: explain a failed booking.\nAvailable tools: check_room, read_policy.\nKnown initially: booking failed.\nUnknown initially: availability and applicable booking rules.\nNo booking-write tool is exposed in this fixture.",
+      "change": "The agent has an investigation task, not authority to confirm a booking."
+    },
+    {
+      "name": "First action · selected",
+      "body": "Proposed next call: check_room.\nPurpose: test whether room availability explains the failure.\nAlternative: inspect policy first.\nThis authored trace chooses availability; another valid investigation could start elsewhere.",
+      "change": "There is a concrete evidence question behind the action, not a claim about hidden model reasoning."
+    },
+    {
+      "name": "Observation and next choice",
+      "body": "check_room result: room is free.\nUpdated state: unavailability does not explain the failure.\nNext proposed call: read_policy.\nReturned policy: under two hours' notice requires staff review.\nStill missing: proof that this rule was the actual rejection reason.",
+      "change": "A tool observation changes the useful next step. The policy supplies a possible explanation, not the booking system's rejection log."
+    },
+    {
+      "name": "Finding · qualified",
+      "body": "Likely cause: short-notice review rule, if this request fell within that window.\nNext step: confirm request timing or obtain the rejection reason; ask staff to review if applicable.\nBooking status: not confirmed.\nNo bypass attempted.",
+      "change": "The finding is deliberately conditional because the fixture lacks request timing and a rejection log."
+    },
+    {
+      "name": "Bounded unsuccessful run",
+      "body": "Alternate run stops before policy lookup.\nCompleted: availability check.\nUnresolved: why the booking failed.\nHandoff: report partial findings and the next useful source to inspect.\nDo not replace missing observations with a guessed cause.",
+      "change": "A step budget bounds work; it does not establish completion."
+    },
+    {
+      "name": "Transfer the loop",
+      "body": "Replace: booking tools with your task's read or action tools.\nDefine: what counts as completion and when another lookup is useful.\nRecord: observation → proposed next action → result.\nUse a fixed workflow instead when the route is already predictable.",
+      "change": "The reusable pattern is choosing a next step from evidence, with a clear way to stop or hand back uncertainty."
+    }
+  ],
+  "evals:business": [
+    {
+      "name": "Toy review set · fixed",
+      "body": "R1: routine question.\nR2: routine question.\nM1: missing evidence.\nC1: conflicting source.\nRubric: 0 = incorrect/unsupported; 1 = correct but unclear; 2 = correct and clear.\nSeparate release rule: inspect unsupported claims regardless of average.",
+      "change": "These authored judgments are invented teaching data, not a benchmark or measured model run."
+    },
+    {
+      "name": "Comparison plan",
+      "body": "Compare A and B on the same four cases.\nKeep routine, missing-evidence, and conflict slices visible.\nTrack unsupported claims separately from clarity.\nDo not edit the evaluation set to favor the preferred candidate.",
+      "change": "The plan makes the acceptance criteria and coverage explicit before choosing a winner."
+    },
+    {
+      "name": "Case-level judgments",
+      "body": "R1: A=1, B=2; B is clearer.\nR2: A=1, B=2; B is clearer.\nM1: A=1, B=0; B invents an answer.\nC1: A=1, B=1; conflict remains qualified.\nToy total: A=4/8; B=5/8.\nUnsupported-claim count: A=0; B=1.",
+      "change": "B's higher total coexists with a new consequential failure."
+    },
+    {
+      "name": "Release decision · hold B",
+      "body": "Routine clarity improved.\nMissing-evidence behavior regressed.\nConflict handling unchanged in this toy set.\nDecision under the stated rule: investigate and repair B before release.\nNo conclusion about real-world quality follows from four invented cases.",
+      "change": "The release decision depends on failure consequences, not only the largest number."
+    },
+    {
+      "name": "Coverage change · do not hide it",
+      "body": "If M1 is removed: A=3/6; B=5/6.\nMissing-evidence coverage becomes zero.\nThe apparent advantage grows because the difficult case vanished.\nRecord any justified exclusion and evaluate that risk separately.",
+      "change": "The score changed without either candidate becoming better."
+    },
+    {
+      "name": "Your evaluation contract",
+      "body": "Replace toy cases with representative authorized tasks and reference judgments.\nChoose criteria and failure severity before comparing.\nKeep a held-out set separate from tuning.\nInspect grader disagreement and uncertainty.\nMake the release decision accountable to the task's actual consequences.",
+      "change": "Use the table format, not its invented scores or a universal pass threshold."
+    }
+  ]
+}

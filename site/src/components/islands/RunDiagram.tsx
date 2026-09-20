@@ -402,7 +402,7 @@ export default function RunDiagram({ runs, lanes = true }: Props) {
               <h3>The run, step by step</h3>
               <p>
                 {D.illustrative
-                  ? 'This trace is an illustration. On the finished site every trace will be a recording of a real run.'
+                  ? 'This is a scripted illustration, not a recorded model run. Its timing and token figures are not measured performance.'
                   : 'Recorded run.'}
               </p>
             </div>

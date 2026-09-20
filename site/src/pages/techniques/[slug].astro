@@ -118,9 +118,11 @@ const nameGroups = [
     <p><Pill status={technique.status} /></p>
   </div>
 
+  <nav class="page-reading-order" aria-label="On this page"><p><strong>Start with the idea and example.</strong> Practical guidance and implementation details are there when you need them.</p><a href="#concept-overview">The idea</a><a href="#guided-example">Guided example</a><a href="#practical-guidance">Practical guidance</a><a href="#product-examples">Products and tools</a><a href="#primary-sources">Sources</a></nav>
+  <div id="concept-overview"></div>
   <ConceptDiagram slug={slug!} color={color} />
   {slug !== 'agent-harness' && <ConceptWalkthrough slug={slug!} />}
-  <ConceptExamples slug={slug!} entries={[...names.product, ...names.tool, ...names.model]} color={color} />
+
 
   {
     subPages.length > 0 && (
@@ -143,7 +145,7 @@ const nameGroups = [
 
   {
     Content ? (
-      <div class="prose">
+      <div class="prose" id="practical-guidance">
         <Content />
       </div>
     ) : (
@@ -184,6 +186,8 @@ const nameGroups = [
     )
   }
 
+  <details class="optional-detail" id="product-examples"><summary>Optional: products, tools, and models</summary>
+  <ConceptExamples slug={slug!} entries={[...names.product, ...names.tool, ...names.model]} color={color} />
   <section class="section" id="named-examples">
     <div class="section-top">
       <div>
@@ -208,9 +212,11 @@ const nameGroups = [
     </p>
   </section>
 
+  </details>
+
   {
     sources.length > 0 && (
-      <section class="section">
+      <section class="section" id="primary-sources">
         <div class="section-top">
           <div>
             <div class="eyebrow muted">Where this comes from</div>

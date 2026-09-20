@@ -52,12 +52,13 @@ const reviewedISO = entry ? entry.data.reviewed.toISOString().slice(0, 10) : und
     <p>{thread.summary}</p>
   </div>
 
+  <nav class="page-reading-order" aria-label="On this page"><p><strong>Start with the organizing idea, then follow the example.</strong> Continue into the discussion when you want the broader connections.</p><a href="#guided-example">Guided example</a><a href="#practical-guidance">Discussion</a><a href="#primary-sources">Sources</a></nav>
   <Connection title="The organizing sentence" color="var(--ot)">{thread.line}</Connection>
   <ConceptWalkthrough slug={id!} />
 
   {
     Content ? (
-      <div class="prose">
+      <div class="prose" id="practical-guidance">
         <Content />
       </div>
     ) : (
@@ -86,7 +87,7 @@ const reviewedISO = entry ? entry.data.reviewed.toISOString().slice(0, 10) : und
 
   {
     sources.length > 0 && (
-      <section class="section">
+      <section class="section" id="primary-sources">
         <div class="section-top">
           <div>
             <div class="eyebrow muted">Where this comes from</div>

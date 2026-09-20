@@ -38,19 +38,21 @@ current state." Of state: "A shared data structure that represents the current s
 application"<Cite n={1}/>. State is passed from node to node rather than living in local
 variables.
 
-At this level every edge function is code your program wrote in advance, reading state a model
-call helped fill in. That is the whole difference from <Link
-href="/techniques/agent-graphs/">agent graphs</Link> at level 6, where a node can be an agent
-that picks its own edge. Here the graph is fixed control flow that happens to pass through some
-model calls, not a plan the model draws at run time. It is also the middle page of the site's
+The graph describes the available steps and transitions. A transition can use a deterministic
+condition or a model-produced classification; either way, the surrounding application defines
+how the result selects the next step. Persistence and checkpointing are additional capabilities,
+not requirements for something to be a workflow graph.
+
+The distinction from <Link href="/techniques/agent-graphs/">agent graphs</Link> is the work inside
+the nodes and who chooses subsequent actions, not simply the presence of edges. A node can run
+a fixed operation or an agent loop, and a system can combine both. The site's levels organize
+these patterns for explanation; they are not universal framework categories. It is also the middle page of the site's
 <Link href="/threads/graph-engineering/">graph engineering thread</Link>:
 <Link href="/techniques/knowledge-graphs/">knowledge graphs</Link> connect information, agent
 graphs connect work, and a workflow graph is what you draw when the work is settled in advance.
 
-This page is sourced, not measured: every claim about workflow graphs is checked against a
-primary source, and no graph has been run and scored here. It is illustrated.
+This page provides primary references and illustrative examples. The examples are scripted, not measured model runs; source references do not establish the correctness of every implementation or outcome.
 
-## A run, step by step
 
 <Run data={graphRun} label="Level 3 · Workflow graphs" runKey="workflow-graphs" />
 

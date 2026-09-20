@@ -138,7 +138,7 @@
     "slug": "workflow-graphs",
     "title": "Workflow graphs",
     "group": "Level 03 · Workflows",
-    "definition": "Representing a predetermined process as steps, transitions, branches, and persistent state.",
+    "definition": "Representing a process as steps, transitions, and branches over state. Persistence can support recovery but is not required for a workflow to be a graph.",
     "example": "Generate a weekly multi-project status report from prior reports and current trackers, notes, and milestones, then route the draft for human review.",
     "nuance": "Missing data, connector failures, edits after approval, and send retries need separate states; a scheduled fixed workflow is not automatically an autonomous agent.",
     "evidence": "A collection-to-review state graph, evidence links, unresolved-items queue, version-bound approval, and simulated duplicate-safe delivery."

@@ -13,6 +13,7 @@ const { useLabel = 'Use it', buildLabel = 'Build it' } = Astro.props;
 ---
 
 <div class="lanes" data-ga-lanes>
+  <p class="lane-purpose">Practical guidance: <strong>Use it</strong> covers applying the idea; <strong>Build it</strong> contains optional implementation details.</p>
   <div class="filters" role="group" aria-label="Reading lane">
     <button type="button" class="filter" data-lane-btn="use" aria-pressed="true">{useLabel}</button>
     <button type="button" class="filter" data-lane-btn="build" aria-pressed="true">{buildLabel}</button>

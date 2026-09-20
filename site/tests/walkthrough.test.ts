@@ -3,8 +3,23 @@ import assert from 'node:assert/strict';
 import cases from '../src/data/concept-walkthroughs.json' with {type:'json'};
 import perspectives from '../src/data/walkthrough-perspectives.json' with {type:'json'};
 import guides from '../src/data/walkthrough-guides.json' with {type:'json'};
+import artifacts from '../src/data/walkthrough-artifacts.json' with {type:'json'};
 import taxonomy from '../../content/taxonomy.json' with {type:'json'};
 import {approvalKey,canDeliver,audienceLabels} from '../src/lib/walkthrough.ts';
+
+test('priority records belong to real audience cases and cover the whole six-stage demonstration',()=>{
+ const available=new Set([...cases,...perspectives].map(e=>`${e.slug}:${e.audience}`));
+ assert.deepEqual(Object.keys(artifacts).map(k=>k.split(':')[0]).sort(),['evals','human-in-the-loop','prompt-engineering','rag','single-agent','workflow-graphs']);
+ for(const [key,records] of Object.entries(artifacts)){
+  assert.ok(available.has(key),`${key}: orphaned teaching records`);
+  assert.equal(records.length,6);
+  assert.equal(new Set(records.map(r=>r.body)).size,6,`${key}: repeated record instead of progressing work`);
+  assert.ok(records.every(r=>r.name&&r.change.length>20));
+ }
+ const booking=cases.find(c=>c.slug==='single-agent')!;
+ assert.match(booking.outcome,/if this request/);
+ assert.match(artifacts['single-agent:business'][3].body,/if this request/);
+});
 
 test('every concept has distinct overview, choices, recovery and transfer guidance',()=>{
  const slugs=new Set([...cases,...perspectives].map(c=>c.slug));
