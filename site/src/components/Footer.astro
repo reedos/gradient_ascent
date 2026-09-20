@@ -42,7 +42,7 @@ const groups = buildNav(navLevels, navTracks, threads.map((t) => ({ id: t.id, ti
   </nav>
 
   <div class="footer-bottom">
-    <p class="project-attribution">Created and curated by <strong>Reed Cameron Osaki</strong>.</p>
+    <p class="project-attribution"><strong>An independent project by Reed Cameron Osaki.</strong></p>
     <p>
       <a href={`${REPO_URL}/issues/new?template=feedback.yml`} rel="noopener">Give feedback</a>
       {' · '}
@@ -66,6 +66,7 @@ const groups = buildNav(navLevels, navTracks, threads.map((t) => ({ id: t.id, ti
   .footer-map a:hover { color: var(--text) }
   .footer-map-n { font: 600 11px var(--display); color: var(--c); font-variant-numeric: tabular-nums; min-width: 8px }
   .footer-bottom a { color: var(--accent) }
-  .project-attribution { color: var(--text); font-size: 14px; margin: 0 0 16px; line-height: 1.6 }
+  .project-attribution { margin: 24px 0; color: var(--muted); font-size: 12px; line-height: 1.9 }
+  .project-attribution strong { color: var(--text); font-weight: 600 }
   @media (max-width: 850px) { .footer-map { grid-template-columns: 1fr 1fr } }
 </style>
