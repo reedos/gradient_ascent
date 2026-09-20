@@ -1,6 +1,7 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import AcronymHints from '../components/AcronymHints.astro';
 import '../styles/global.css';
 import '../styles/print.css'; // finish-indexes: the print handout stylesheet, see its own file comment
 import { url } from '../lib/url';
@@ -65,5 +66,6 @@ const ogImage = new URL(url('/og.png'), Astro.site).toString();
       <a class="page-feedback-link" href={feedback} rel="noopener">Give feedback on this page <span aria-hidden="true">&rarr;</span></a>
     </aside>
     <Footer />
+    <AcronymHints />
   </body>
 </html>

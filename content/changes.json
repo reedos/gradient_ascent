@@ -4,6 +4,23 @@
   "note": "What changed on this site, and why it matters to somebody reading it. Newest first. Entries are written for a reader, not for whoever made the change: they say what is different and what it is good for, never what a commit did. Every entry links the pages it touched. Several entries can share a date; within a date, file order is the order shown. docs/CHANGES.md says how to add one.",
   "changes": [
     {
+      "id": "acronym-definitions-while-reading",
+      "date": "2026-09-19",
+      "title": "Look up acronyms without leaving the page",
+      "what": "Dotted-underlined acronyms in article text, tables, and the DUT figure reveal an expansion and short definition on hover or keyboard focus. On touchscreens, tap to open the definition and tap outside to dismiss it.",
+      "why": "Readers can understand terms such as DUT, SCPI, LLM, and RAG in context without interrupting their reading to search elsewhere.",
+      "pages": [
+        {
+          "label": "The agent harness",
+          "path": "/techniques/agent-harness/"
+        },
+        {
+          "label": "Retrieval-augmented generation",
+          "path": "/techniques/rag/"
+        }
+      ]
+    },
+    {
       "id": "dut-workflow-connects-harness-concepts",
       "date": "2026-09-19",
       "title": "See how harness concepts work together on a DUT project",

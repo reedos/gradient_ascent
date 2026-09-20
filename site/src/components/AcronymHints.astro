@@ -1,0 +1,112 @@
+<div id="acronym-tooltip" role="tooltip" hidden></div>
+<script>
+  import { acronyms, acronymMatches } from '../lib/acronyms';
+
+  const main = document.querySelector('main');
+  const tooltip = document.querySelector<HTMLElement>('#acronym-tooltip')!;
+  // Never rewrite code, links, form controls, or framework-managed interactive content.
+  const excluded = 'a,button,abbr,code,pre,kbd,samp,script,style,svg,math,textarea,input,select,summary,nav,astro-island,[contenteditable],[data-no-acronyms]';
+  if (main) {
+    const walker = document.createTreeWalker(main, NodeFilter.SHOW_TEXT);
+    const nodes: Text[] = [];
+    while (walker.nextNode()) {
+      const node = walker.currentNode as Text;
+      if (node.parentElement && !node.parentElement.closest(excluded) &&
+          node.parentElement.closest('p,li,td,th,dd,figcaption,.test-harness')) nodes.push(node);
+    }
+    for (const node of nodes) {
+      const text = node.data;
+      const matches = acronymMatches(text);
+      if (!matches.length) continue;
+      const fragment = document.createDocumentFragment();
+      let cursor = 0;
+      for (const match of matches) {
+        fragment.append(text.slice(cursor, match.index));
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'acronym-hint';
+        button.dataset.acronym = match.key;
+        button.textContent = match.text;
+        button.setAttribute('aria-label', `${match.text}: ${acronyms[match.key][0]}. Show definition`);
+        fragment.append(button);
+        cursor = match.index + match.text.length;
+      }
+      fragment.append(text.slice(cursor));
+      node.replaceWith(fragment);
+    }
+  }
+
+  let active: HTMLElement | null = null;
+  let pinned = false;
+  let timer: ReturnType<typeof setTimeout>;
+  function hide() {
+    clearTimeout(timer);
+    active?.removeAttribute('aria-describedby');
+    active = null;
+    pinned = false;
+    tooltip.hidden = true;
+  }
+  function show(target: HTMLElement) {
+    clearTimeout(timer);
+    if (active !== target) { hide(); active = target; }
+    const [expansion, definition] = acronyms[target.dataset.acronym!];
+    const title = document.createElement('strong');
+    title.textContent = expansion;
+    const body = document.createElement('span');
+    body.textContent = definition;
+    tooltip.replaceChildren(title, body);
+    tooltip.hidden = false;
+    target.setAttribute('aria-describedby', tooltip.id);
+    const rect = target.getBoundingClientRect();
+    const box = tooltip.getBoundingClientRect();
+    tooltip.style.left = `${Math.max(12, Math.min(rect.left, innerWidth - box.width - 12))}px`;
+    const top = rect.top - box.height - 8;
+    tooltip.style.top = `${Math.max(12, Math.min(top >= 12 ? top : rect.bottom + 8, innerHeight - box.height - 12))}px`;
+  }
+  function leave() {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      if (!pinned && document.activeElement !== active) hide();
+    }, 180);
+  }
+  document.querySelectorAll<HTMLElement>('.acronym-hint').forEach(target => {
+    target.addEventListener('pointerenter', event => { if (event.pointerType !== 'touch') show(target); });
+    target.addEventListener('pointerleave', leave);
+    target.addEventListener('focus', () => show(target));
+    target.addEventListener('blur', hide);
+    target.addEventListener('click', () => {
+      if (active === target && pinned) hide();
+      else { show(target); pinned = true; }
+    });
+  });
+  tooltip.addEventListener('pointerenter', () => clearTimeout(timer));
+  tooltip.addEventListener('pointerleave', leave);
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') hide(); });
+  document.addEventListener('pointerdown', event => {
+    if (event.target instanceof Node && !active?.contains(event.target) && !tooltip.contains(event.target)) hide();
+  });
+  window.addEventListener('resize', hide);
+  document.addEventListener('scroll', hide, true);
+</script>
+<style is:global>
+  button.acronym-hint {
+    display: inline; padding: 0; margin: 0; border: 0; border-radius: 0;
+    background: transparent; color: inherit; font: inherit; letter-spacing: inherit;
+    text-transform: inherit; line-height: inherit; cursor: help;
+    text-decoration: underline dotted; text-underline-offset: 4px;
+  }
+  button.acronym-hint:focus-visible { outline: 2px solid var(--accent, #4e7aff); outline-offset: 3px; }
+  #acronym-tooltip {
+    position: fixed; z-index: 1000; width: 300px; max-width: calc(100vw - 24px);
+    box-sizing: border-box; padding: 14px 16px; border: 1px solid var(--line);
+    border-radius: 8px; background: var(--panel2); color: var(--text);
+    box-shadow: 0 8px 28px #0006; font-size: 14px; line-height: 1.55;
+  }
+  #acronym-tooltip[hidden] { display: none; }
+  #acronym-tooltip strong { display: block; margin-bottom: 5px; }
+  #acronym-tooltip span { color: var(--muted); }
+  @media print {
+    #acronym-tooltip { display: none !important; }
+    button.acronym-hint { display: inline !important; color: inherit; text-decoration: none; }
+  }
+</style>
