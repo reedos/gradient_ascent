@@ -1,5 +1,6 @@
 export const briefFields = [
   { key: 'goal', label: 'What do you want to accomplish?', hint: 'Describe the task and the result you want.' },
+  { key: 'notes', label: 'Anything it should know or never do?', hint: 'Tools, preferences, constraints, and boundaries.' },
   { key: 'context', label: 'Are you creating, improving, or evaluating a workflow?', hint: 'Describe what already exists and whether you want a plan, a review, or implementation. Leave this blank if your goal already makes it clear.' },
   { key: 'trigger', label: 'What starts the process?', hint: 'For example: I select an outing folder, or a weekly schedule starts it.' },
   { key: 'finished', label: 'What should be ready when it finishes?', hint: 'Describe the complete result and where it should be delivered—not just intermediate files.' },
