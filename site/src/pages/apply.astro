@@ -14,13 +14,14 @@ const concepts = [
   <section class="section" id="brief-builder" data-brief-root={root} data-concepts={JSON.stringify(concepts)}>
     <h2>Make your project brief</h2>
     <p>A rough description is enough. Your model will ask about important gaps.</p>
-    <p class="brief-help">Start with your own words or try an example. Examples fill empty answers only, so your edits stay intact. Nothing is sent to a model here; copy or download before leaving.</p>
+    <p class="brief-help">Start with your own words or try an example. Choosing an example replaces all answers and clears optional context; Undo restores your previous form. Nothing is sent to a model here; copy or download before leaving.</p>
     <div class="brief-actions" aria-label="Try an example">
       <button type="button" class="button secondary" data-example="photos" disabled>Photography example</button>
       <button type="button" class="button secondary" data-example="reports" disabled>Weekly report example</button>
       <button type="button" class="button secondary" data-example="engineering" disabled>Engineering example</button>
     </div>
     <p id="example-status" role="status"></p>
+    <button type="button" class="button secondary" id="undo-example" hidden>Undo example</button>
     <div class="brief-grid">
       <div class="brief-fields">
         <div class="brief-field"><label for="brief-goal">1. What do you want done?</label><p id="hint-goal" class="brief-help">Example: “Turn an outing’s wildlife photos into ready-to-post carousels on my phone.”</p><textarea id="brief-goal" data-brief-field="goal" rows="3" aria-describedby="hint-goal" placeholder="Describe the result you want, in your own words."></textarea></div>
@@ -71,16 +72,31 @@ const concepts = [
     reports: {goal:'Prepare a weekly status report across my projects using current updates and previous reports, with links to the evidence.', humanRole:'Review the finished report and approve it before sending.', notes:'Flag missing or conflicting updates. Never invent project progress or send without approval.'},
     engineering: {goal:'Generate a new DUT test project using our Python framework, existing instrument interfaces, and a similar past project.', humanRole:'Review the generated files and perform hardware testing.', notes:'Do not modify the shared framework or create new tools without approval. Ask before operating instruments.'},
   };
+  const fields = [...root.querySelectorAll<HTMLTextAreaElement>('[data-brief-field]')];
+  const extraContext = document.querySelector<HTMLDetailsElement>('#extra-context')!;
+  const undoExample = document.querySelector<HTMLButtonElement>('#undo-example')!;
+  let previousForm: { values: string[]; concept: string; expanded: boolean } | undefined;
+  undoExample.addEventListener('click', () => {
+    if (!previousForm) return;
+    fields.forEach((field, i) => { field.value = previousForm!.values[i]; });
+    select.value = previousForm.concept;
+    extraContext.open = previousForm.expanded;
+    previousForm = undefined;
+    undoExample.hidden = true;
+    update();
+    document.querySelector('#example-status')!.textContent = 'Previous form restored.';
+  });
   root.querySelectorAll<HTMLButtonElement>('[data-example]').forEach(button => {
     button.disabled = false;
     button.addEventListener('click', () => {
-      let added = 0;
-      for (const [key, value] of Object.entries(presets[button.dataset.example!])) {
-        const field = root.querySelector<HTMLTextAreaElement>(`[data-brief-field="${key}"]`)!;
-        if (!field.value.trim()) { field.value = value; added++; }
-      }
+      previousForm = { values: fields.map(field => field.value), concept: select.value, expanded: extraContext.open };
+      const preset = presets[button.dataset.example!];
+      fields.forEach(field => { field.value = preset[field.dataset.briefField!] ?? ''; });
+      select.value = '';
+      extraContext.open = false;
+      undoExample.hidden = false;
       update();
-      document.querySelector('#example-status')!.textContent = added ? 'Example added to empty answers. Edit it to fit your task.' : 'Your answers were kept. Clear an answer first if you want to try an example there.';
+      document.querySelector('#example-status')!.textContent = `${button.textContent?.trim()} loaded. Edit it to fit your task, or undo to restore the previous form.`;
     });
   });
   root.querySelectorAll<HTMLButtonElement>('[data-role]').forEach(button => {
