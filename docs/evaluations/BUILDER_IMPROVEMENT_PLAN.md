@@ -1,6 +1,6 @@
 # Builder improvements: consolidated proposed work
 
-Updated 2026-09-20. Status: proposed, not implemented. Sources: [our executed evaluation](builder-handoff-2026-09-20/REPORT.md) and [user-supplied Muse evaluation feedback](MUSE_FEEDBACK_2026-09-20.md). Do not treat the external scores as independently verified or pool the different case sets.
+Updated 2026-09-20. Status: proposed, not implemented. Sources: [our executed evaluation](builder-handoff-2026-09-20/REPORT.md), [user-supplied Muse feedback](MUSE_FEEDBACK_2026-09-20.md), and [user-supplied Grok Bot feedback](GROK_FEEDBACK_2026-09-20.md). Do not treat the external scores as independently verified or pool the different case sets.
 
 ## Priority 1: preserve facts, unknowns, and their sources
 
@@ -45,9 +45,18 @@ Acceptance probes: ratio/dimension agreement; incompatible units remain errors; 
 
 1. Preserve current cases and outputs as the baseline; do not overwrite them with improved results.
 2. For the external PH-1, AI-2, PH-2, and PB-1 findings, obtain simulator entries, exact exports, receiving Q&A/output, and source cards before assigning failure to a particular stage.
-3. Run matched before/after trials with the same frozen inputs and model settings. Add messy novice descriptions, literal synthetic files, open decisions, contributor dependencies, and numeric traps.
+3. Run matched before/after trials with the same frozen inputs and model settings. Include three conditions: raw description, plain field answers, and full builder export. Add messy novice descriptions, literal synthetic files, open decisions, contributor dependencies, and numeric traps. Keep rich and thin briefs as separate groups; freeze the rubric before comparing conditions rather than tuning it to produce differences.
 4. Use blinded reviews and adjudicate concrete evidence errors. Treat claimed execution without evidence and proposal-only execution violations consistently with the critical-failure policy.
 5. Replay identical artifacts across providers for a controlled comparison; keep different scenarios separate. Repeat important cases before claiming reliable gains.
 6. Evaluate form comprehension with actual users separately from model handoff quality.
+
+## Focused UX candidates from the additional feedback
+
+- Preserve and make the definition-of-done tool easy to find for visitors who can describe a task but cannot yet say what observable success means. Grok Bot's three-condition DD-2 result supports testing this emphasis; it does not justify funneling every visitor through another form.
+- Make “May do” and “Ask first” visually distinct in agent instructions, initially through clearer wording or two answer cues within the existing field. Test whether separate fields help before lengthening the form.
+- Add a concise handoff hint showing the difference between “a prior agent says this passed” and “this check was run, with this evidence.”
+- Investigate the reported combined-paste failure before changing input limits: the inspected builder has no explicit maxlength or paste-size cap. Compare browser input with computer-use transport; consider optional import only if real entry friction warrants it.
+
+Preserve concrete acceptance matrices and Not-run status. Their value is helping users define and check an outcome, not guaranteeing higher model scores for already-complete briefs.
 
 Preserve the builders' useful structure: stage tables, acceptance matrices, explicit unknowns, reported-versus-executed checks, boundaries, and measurement of recurring human effort. The objective is better fidelity and traceability, not more confident or longer prose.
