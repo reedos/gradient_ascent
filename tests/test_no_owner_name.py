@@ -2,8 +2,8 @@
 
 A previous writer took the repository owner's name from git config and used it as an invented
 person's name in example code. It reached the built public site and had to be hotfixed. The
-owner's name has exactly one legitimate home: the `Copyright` line of `LICENSE`. Everywhere else,
-tracked, is public once the site builds.
+owner's name belongs in the `Copyright` line of `LICENSE` and the explicitly requested footer
+credit. Everywhere else tracked is public once the site builds and is checked for accidental use.
 
 This does two independent things:
 
@@ -142,6 +142,11 @@ def _scan() -> tuple[list[str], list[str]]:
         text = path.read_bytes().decode("utf-8", errors="ignore")
 
         for n, line in enumerate(text.split("\n"), start=1):
+            # The owner explicitly requested this public attribution. Exempt only that exact
+            # markup in the shared footer; other identifiers and lines remain checked.
+            if rel == "site/src/components/Footer.astro":
+                credit = f'<p class="project-attribution">Put together by <strong>{_license_owner()}</strong>.</p>'
+                line = line.replace(credit, "")
             for label, needle in needles.items():
                 m = needle.search(line)
                 if m and (rel, m.group(0)) not in ALLOWED_HITS:
@@ -161,12 +166,12 @@ class NoOwnerNameTest(unittest.TestCase):
     A bare `def test_...` here would be skipped in silence, which is the failure mode this whole
     file exists to prevent."""
 
-    def test_the_owner_name_and_configured_email_appear_only_in_license(self) -> None:
+    def test_owner_identifiers_appear_only_in_authorized_locations(self) -> None:
         known_offenders, _ = _scan()
         self.assertEqual(
             known_offenders,
             [],
-            "the LICENSE owner's name (or configured email) appears outside LICENSE:\n"
+            "the LICENSE owner's name (or configured email) appears outside authorized locations:\n"
             + "\n".join(known_offenders),
         )
 
