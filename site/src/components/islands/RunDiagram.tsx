@@ -24,6 +24,8 @@ export interface RunNode {
   y: number;
   l: string;
   k: NodeKind;
+  w?: number;
+  h?: number;
 }
 export interface RunEdge {
   id: string;
@@ -87,8 +89,8 @@ interface Props {
 type Pt = [number, number];
 
 function edgePoint(n: RunNode, tx: number, ty: number): Pt {
-  const w = 66,
-    h = 19,
+  const w = (n.w ?? 132) / 2,
+    h = (n.h ?? 38) / 2,
     dx = tx - n.x,
     dy = ty - n.y;
   const s = Math.min(w / Math.abs(dx || 1e-6), h / Math.abs(dy || 1e-6));
@@ -134,8 +136,8 @@ const CHAR_W = 5.95; // ~0.52em at 11.5px in the site's own face; checked agains
 const MIN_FONT = 9.5;
 
 /** One line, or the two-line split whose longer half is shortest. Splits on spaces only. */
-export function wrapLabel(l: string): string[] {
-  if (l.length * CHAR_W <= LINE_MAX) return [l];
+export function wrapLabel(l: string, maxWidth = LINE_MAX): string[] {
+  if (l.length * CHAR_W <= maxWidth) return [l];
   const words = l.split(' ');
   if (words.length < 2) return [l];
   let best: [string, string] | null = null;
@@ -150,26 +152,28 @@ export function wrapLabel(l: string): string[] {
 }
 
 /** 11.5, or smaller when even the wrapped lines overrun the box. Never below MIN_FONT. */
-export function labelFontSize(lines: string[]): number {
+export function labelFontSize(lines: string[], maxWidth = LINE_MAX): number {
   const widest = Math.max(...lines.map((s) => s.length)) * CHAR_W;
-  if (widest <= LINE_MAX) return 11.5;
-  return Math.max(MIN_FONT, Math.round((11.5 * LINE_MAX) / widest / 0.1) * 0.1);
+  if (widest <= maxWidth) return 11.5;
+  return Math.max(MIN_FONT, Math.round((11.5 * maxWidth) / widest / 0.1) * 0.1);
 }
 
 function NodeShape({ n }: { n: RunNode }) {
-  const x = n.x - 66,
-    y = n.y - 19;
+  const width = n.w ?? 132, height = n.h ?? 38;
+  const x = n.x - width / 2,
+    y = n.y - height / 2;
   const kick = n.k === 'model' ? 'MODEL' : n.k === 'tool' ? 'TOOL' : n.k === 'human' ? 'PERSON' : '';
-  const lines = wrapLabel(n.l);
-  const font = labelFontSize(lines);
+  const textWidth = n.w ? width - 28 : LINE_MAX;
+  const lines = wrapLabel(n.l, textWidth);
+  const font = labelFontSize(lines, textWidth);
   // Two lines straddle the single-line baseline so the block stays vertically centered in the box.
-  const lead = font * 0.96;
+  const lead = font * (n.h ? 1.2 : 0.96);
   return (
     <g className={`nd ${n.k}`} data-id={n.id}>
       {n.k === 'store' ? (
-        <path d={`M${x},${y + 6} v26 a66,7 0 0 0 132,0 v-26 a66,7 0 0 0 -132,0 a66,7 0 0 0 132,0`} />
+        <path d={`M${x},${y + 6} v${height - 12} a${width / 2},7 0 0 0 ${width},0 v-${height - 12} a${width / 2},7 0 0 0 -${width},0 a${width / 2},7 0 0 0 ${width},0`} />
       ) : (
-        <rect x={x} y={y} width={132} height={38} rx={n.k === 'io' || n.k === 'human' ? 19 : 6} />
+        <rect x={x} y={y} width={width} height={height} rx={n.k === 'io' || n.k === 'human' ? height / 2 : 6} />
       )}
       {n.k === 'human' && (
         // head and shoulders, inside the node's left edge, clear of the centered label
@@ -179,7 +183,7 @@ function NodeShape({ n }: { n: RunNode }) {
         </g>
       )}
       {kick && (
-        <text className="k" x={n.x} y={n.y - 8}>
+        <text className="k" x={n.x} y={n.y - (n.h ? 16 : 8)}>
           {kick}
         </text>
       )}
@@ -206,8 +210,8 @@ const pad = (n: number) => String(n).padStart(2, '0');
 function FlowSvg({ D, S, seen, markerPrefix, pulseT, className = '' }: {
   D: RunData; S: RunStep; seen: Set<string>; markerPrefix: string; pulseT: number; className?: string;
 }) {
-  const minX = Math.min(0, ...D.nodes.map(n => n.x - 68));
-  const maxX = Math.max(340, ...D.nodes.map(n => n.x + 68));
+  const minX = Math.min(0, ...D.nodes.map(n => n.x - (n.w ?? 132) / 2 - 12));
+  const maxX = Math.max(340, ...D.nodes.map(n => n.x + (n.w ?? 132) / 2 + 12));
   const E = D.edges.find(e => e.id === S.e)!;
   const geo = edgeGeometry(D, E);
   const pulse = bezierPoint(geo.p1, geo.c, geo.p2, pulseT);

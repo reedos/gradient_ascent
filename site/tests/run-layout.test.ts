@@ -9,12 +9,12 @@ test('a linear run reflows without changing its steps, edges, labels, or source 
   const original = structuredClone(harness);
   const layouts = responsiveRunLayouts(harness as RunData)!;
   assert.ok(layouts.wide.h < 400);
-  assert.ok(layouts.narrow.h < 600);
+  assert.ok(layouts.narrow.h < 700);
   for (const data of [layouts.wide, layouts.narrow]) {
     assert.deepEqual(data.edges, harness.edges);
     assert.deepEqual(data.steps, harness.steps);
     assert.deepEqual(data.nodes.map(({id,l,k}) => ({id,l,k})), harness.nodes.map(({id,l,k}) => ({id,l,k})));
-    for (const n of data.nodes) assert.ok(n.y - 19 >= 0 && n.y + 19 < data.h);
+    for (const n of data.nodes) assert.ok(n.y - n.h! / 2 >= 0 && n.y + n.h! / 2 < data.h);
     for (const [i, a] of data.nodes.entries()) for (const b of data.nodes.slice(i + 1)) {
       assert.ok(Math.abs(a.x - b.x) >= 150 || Math.abs(a.y - b.y) >= 60, 'nodes have clear separation');
     }

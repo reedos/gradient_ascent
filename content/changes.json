@@ -4,6 +4,19 @@
   "note": "What changed on this site, and why it matters to somebody reading it. Newest first. Entries are written for a reader, not for whoever made the change: they say what is different and what it is good for, never what a commit did. Every entry links the pages it touched. Several entries can share a date; within a date, file order is the order shown. docs/CHANGES.md says how to add one.",
   "changes": [
     {
+      "id": "room-for-labels-and-card-text",
+      "date": "2026-09-19",
+      "title": "More comfortable diagram labels and card spacing",
+      "what": "Run diagram boxes give labels more internal space, with clear separation between category labels and their descriptions. Step panels fit their content, and example cards and the test automation diagram use more consistent padding and text spacing.",
+      "why": "Text was crowded inside some boxes while other panels held unnecessary empty space. The revised sizing keeps labels readable and groups related information without making the surrounding panels larger than needed.",
+      "pages": [
+        {
+          "label": "The agent harness",
+          "path": "/techniques/agent-harness/"
+        }
+      ]
+    },
+    {
       "id": "more-room-for-desktop-reading",
       "date": "2026-09-19",
       "title": "Wider reading layouts and compact run diagrams",

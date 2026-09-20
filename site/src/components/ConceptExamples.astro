@@ -50,14 +50,14 @@ const kindLabel = { product: 'Product', tool: 'Tool or framework', model: 'Model
   .examples-heading > a { font-size: 12px; color: var(--muted); }
   .examples-heading > a:hover { color: var(--text); }
   .example-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
-  .example-cards > li { padding: 21px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); display: flex; flex-direction: column; align-items: start; }
+  .example-cards > li { padding: 24px; min-width: 0; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); display: flex; flex-direction: column; align-items: start; }
   .example-kind { color: var(--example-color); font-size: 10px; margin-bottom: 9px; }
   .example-kind span { color: var(--muted); }
-  h3 { font: 600 16px var(--font); letter-spacing: -.2px; }
+  h3 { font: 600 16px/1.45 var(--font); letter-spacing: -.2px; }
   h3 a { display: flex; gap: 10px; align-items: baseline; }
   h3 a span { color: var(--example-color); font-size: 13px; }
   h3 a:hover { text-decoration: underline; text-underline-offset: 4px; }
-  .example-cards p { color: var(--muted); font-size: 13px; line-height: 1.7; margin: 10px 0 17px; }
+  .example-cards p { color: var(--muted); font-size: 14px; line-height: 1.7; margin: 12px 0 20px; }
   .example-source { margin-top: auto; color: var(--example-color); font-size: 11px; }
   .example-source:hover { text-decoration: underline; }
   .example-cards small { color: var(--muted); font-size: 10px; margin-top: 6px; }
@@ -67,7 +67,7 @@ const kindLabel = { product: 'Product', tool: 'Tool or framework', model: 'Model
   .practice-example p { color: var(--muted); font-size: 13px; line-height: 1.7; margin-top: 5px; max-width: 900px; }
   .example-note { font-size: 11px; color: var(--muted); margin-top: 10px; }
   .examples-intro { margin: 0 0 16px; line-height: 1.7; }
-  .example-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .example-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
   .more-examples { margin-top: 14px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); }
   .more-examples summary { cursor: pointer; padding: 18px 21px; color: var(--example-color); font-size: 13px; }
   .example-directory { padding: 0 21px; }
