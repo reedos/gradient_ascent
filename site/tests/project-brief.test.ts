@@ -34,3 +34,14 @@ for (const scenario of [
   assert.match(text, /does not embed files or grant access/);
   assert.doesNotMatch(text, /recommend the lowest level|Consider ordinary software or no AI first/);
 });
+
+test('planning guidance limits question load and separates evidence from proposals', () => {
+  const text = projectBrief({context:'Evaluate my existing workflow'}, 'https://example.org');
+  assert.match(text, /Evaluate my existing workflow/);
+  assert.match(text, /one main decision per question/);
+  assert.match(text, /carry noncritical gaps forward/);
+  assert.match(text, /500–800 words or less/);
+  assert.match(text, /do not append a long appendix by default/);
+  assert.match(text, /Define the timing boundary explicitly/);
+  assert.match(text, /does not prove that the proposed integration works/);
+});
