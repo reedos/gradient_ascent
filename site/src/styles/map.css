@@ -4,13 +4,15 @@
    filter row, the two-column band-labels-plus-scrolling-drawing layout, the node and edge marks,
    the legend and the plain-text edge list. */
 
+main:has(.map-wrap) { max-width: 1800px; padding-inline: 24px; }
+
 .map-wrap {
   display: flex;
   flex-direction: column;
   gap: 22px;
 }
 
-.map-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; }
+.map-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 22px; align-items: start; }
 
 .map-viewport { min-width: 0; border-radius: 10px; }
 .map-viewport:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
@@ -91,8 +93,8 @@
 /* The SVG scales its nodes, band labels, and connections together to fit. */
 .map-row { width: 100%; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
 .map-scroll { min-width: 0; }
-.map-svg { display: block; width: 100%; height: auto; max-height: 72svh; }
-.map-band-heading text { font: 600 10px var(--font); }
+.map-svg { display: block; width: 100%; height: auto;  }
+.map-band-heading text { font: 600 13px var(--font); }
 .map-selection-empty { color: var(--muted); font-size: 14px; line-height: 1.7; padding: 22px; }
 .map-selection-empty h3 { color: var(--text); font-size: 20px; margin-bottom: 10px; }
 .map-workspace:has(.map-selection:not([hidden])) .map-selection-empty { display: none; }
@@ -210,7 +212,7 @@
   }
 }
 .map-node text {
-  font: 600 10px var(--font);
+  font: 600 14px var(--font);
   fill: var(--text);
   text-anchor: middle;
   dominant-baseline: central;

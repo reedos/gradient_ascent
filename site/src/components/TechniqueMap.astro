@@ -13,13 +13,40 @@ import { url } from '../lib/url';
 import { mapLayout, mapConnections, upgradeCoveredRequirements, edgePathD, RELATION_LABEL, type RelationType } from '../lib/map';
 import '../styles/map.css';
 
-// Tighten row spacing for the fit-to-view chart while preserving node sizes.
-const rowScale = 0.7;
+// Use compact rows and wrapped labels instead of shrinking the original drawing.
+const labels: Record<string, string> = {
+  'rag': 'RAG', 'agentic-rag': 'Agentic RAG', 'knowledge-graphs': 'Knowledge graphs',
+  'orchestrator-workers': 'Lead + workers', 'organizations-swarms': 'Agent teams',
+  'inference-time-reasoning': 'Reasoning', 'computer-use': 'Computer use',
+  'human-in-the-loop': 'Human approval', 'multimodal': 'Images, audio, video',
+  'order-zero': 'No model', 'operator-craft': 'Working with AI',
+  'briefing': 'Briefing', 'reviewing': 'Reviewing', 'delegating': 'Delegating',
+  'trust': 'Trust', 'safety': 'Safety', 'adaptation': 'Adaptation',
+  'local-inference': 'Local inference', 'fine-tuning': 'Fine-tuning',
+  'mcp': 'MCP', 'eval-frameworks': 'Eval frameworks',
+};
+const labelLines = (title: string) => {
+  const words = title.split(' ');
+  const lines: string[] = [''];
+  for (const word of words) {
+    const last = lines.length - 1;
+    if (lines[last] && (lines[last] + ' ' + word).length > 16) lines.push(word);
+    else lines[last] += (lines[last] ? ' ' : '') + word;
+  }
+  return lines;
+};
 const layout = {
   ...mapLayout,
-  height: mapLayout.height * rowScale,
-  nodes: mapLayout.nodes.map(n => ({ ...n, y: (n.y + n.h / 2) * rowScale - n.h / 2 })),
-  bands: mapLayout.bands.map(b => ({ ...b, y: b.y * rowScale, h: b.h * rowScale })),
+  width: 824,
+  height: 576,
+  nodes: mapLayout.nodes.map(n => {
+    const peers = mapLayout.nodes.filter(p => p.band === n.band && p.row === n.row).sort((a, b) => a.x - b.x);
+    const slot = 824 / Math.max(peers.length, 5);
+    return { ...n, x: peers.findIndex(p => p.slug === n.slug) * slot + 6,
+      y: n.level === 'tracks' ? 356 + (n.row ?? 0) * 43 : n.band * 44 + 5,
+      w: slot - 12, h: 34 };
+  }),
+  bands: mapLayout.bands.map(b => ({ ...b, y: b.kind === 'level' ? b.index * 44 : 352, h: b.kind === 'level' ? 44 : 224 })),
 };
 const coveredRequirements = upgradeCoveredRequirements(layout.edges);
 
@@ -108,9 +135,9 @@ const drawableEdges = mapConnections(layout)
   <div class="map-scroll">
     <svg
       class="map-svg"
-      width={layout.width}
+      width={layout.width + 90}
       height={layout.height}
-      viewBox={`-120 0 ${layout.width + 120} ${layout.height}`}
+      viewBox={`-90 0 ${layout.width + 90} ${layout.height}`}
       role="group"
       aria-labelledby="map-svg-title map-svg-desc"
     >
@@ -120,8 +147,7 @@ const drawableEdges = mapConnections(layout)
         Select a concept to read its relationships and explanations in the details panel.
       </desc>
       {layout.bands.map(band => <g class="map-band-heading">
-        <text x="-108" y={band.y + band.h / 2 - 8} fill={band.kind === 'level' ? `var(--o${band.level})` : 'var(--muted)'}>{band.kind === 'level' ? `0${band.level}` : 'Topics'}</text>
-        <text x="-108" y={band.y + band.h / 2 + 10} fill="var(--muted)">{band.kind === 'level' ? band.shortTitle : 'Across every level'}</text>
+        <text x="-82" y={band.y + band.h / 2 - 6} fill={band.kind === 'level' ? `var(--o${band.level})` : 'var(--muted)'}>{band.kind === 'level' ? `Level ${band.level}` : 'Topics'}</text>
       </g>)}
       <defs>
         <mask id="map-node-clearance" maskUnits="userSpaceOnUse" x="0" y="0" width={layout.width} height={layout.height} style="mask-type:luminance">
@@ -172,6 +198,7 @@ const drawableEdges = mapConnections(layout)
             href={url(`/techniques/${node.slug}/`)}
             class="map-node"
             data-slug={node.slug}
+            data-title={node.title}
             data-summary={node.summary}
             aria-label={`${node.title}. ${node.levelLabel}.`}
           >
@@ -182,8 +209,9 @@ const drawableEdges = mapConnections(layout)
                 way it does elsewhere on the site. Square corners: at this scale the sliver of
                 overlap past the rect's own 6px-radius corner is under a pixel and invisible. */}
             <rect x={node.x} y={node.y} width={node.w} height="3" class="map-node-accent" style={`--c:${node.color}`} />
+            <title>{node.title}</title>
             <text x={node.x + node.w / 2} y={node.y + node.h / 2}>
-              {node.title}
+              {labelLines(labels[node.slug] ?? node.title).map((line, i, lines) => <tspan x={node.x + node.w / 2} y={node.y + node.h / 2 + (i - (lines.length - 1) / 2) * 14}>{line}</tspan>)}
             </text>
           </a>
         ))
@@ -228,7 +256,7 @@ const drawableEdges = mapConnections(layout)
     const relations = [...wrap.querySelectorAll<SVGElement>('g[mask] .map-edge')];
     const labels: Record<string, string> = { requires: 'Requires', upgrades_to: 'Upgrades to', combines_with: 'Combines with', alternative_to: 'Alternative to' };
     const bySlug = new Map(nodes.map(n => [n.dataset.slug!, n]));
-    const name = (node: SVGAElement) => node.querySelector('text')!.textContent!.trim();
+    const name = (node: SVGAElement) => node.dataset.title!;
     let hovered = '', focused = '';
     function render() {
       const slug = select.value || hovered || focused;
