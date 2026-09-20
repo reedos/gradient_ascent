@@ -17,6 +17,7 @@ const sections = methodSections(absFor(Astro.site));
     <h1>Why this site exists and how it works</h1>
   </div>
 
+  <p class="panel">Help test the experience with real newcomers: <a href={absFor(Astro.site)('/usability/')}>open the usability session guide</a>. Human observations for the latest navigation and builder changes are pending.</p>
   <div class="prose-grid">
     <nav class="prose-nav" aria-label="On this page">
       {sections.map((s) => <a href={`#${s.id}`}>{s.nav}</a>)}

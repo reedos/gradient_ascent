@@ -55,24 +55,6 @@ const feedbackHref = `${REPO_URL}/issues/new?template=feedback.yml`;
               </button>
               <div class:list={['nav-panel', `nav-panel-${g.id}`]} id={`nav-panel-${g.id}`} role="group" aria-labelledby={`nav-trigger-${g.id}`}>
                 <p class="nav-blurb">{g.blurb}</p>
-                {g.id === 'levels' ? (
-                  <>
-                    <div class="nav-levels">
-                      {g.sections[0].items.map((it) => (
-                        <a class="nav-level" href={url(it.path)} style={`--c:var(--o${it.level})`} aria-current={isCurrent(it, path, ctx) ? 'true' : undefined}>
-                          <span class="nav-level-n">{it.level}</span>
-                          <span class="nav-level-t">{it.label}</span>
-                          {it.hint && <span class="nav-level-s">{it.hint}</span>}
-                        </a>
-                      ))}
-                    </div>
-                    <div class="nav-panel-foot">
-                      <a href={url('/techniques/')}>All techniques <span aria-hidden="true">&rarr;</span></a>
-                      <a href={url('/map/')}>The map <span aria-hidden="true">&rarr;</span></a>
-                      <a href={url('/apply/')}>Not sure which level? <span aria-hidden="true">&rarr;</span></a>
-                    </div>
-                  </>
-                ) : (
                   <div class:list={['nav-cols', g.sections.length > 1 && 'is-two']}>
                     {g.sections.map((s) => (
                       <div class="nav-col">
@@ -90,7 +72,7 @@ const feedbackHref = `${REPO_URL}/issues/new?template=feedback.yml`;
                       </div>
                     ))}
                   </div>
-                )}
+
                 {g.id === 'reference' && (
                   <div class="nav-panel-foot">
                     <a href={feedbackHref} rel="noopener">Give feedback <span aria-hidden="true">&rarr;</span></a>
@@ -126,19 +108,10 @@ const feedbackHref = `${REPO_URL}/issues/new?template=feedback.yml`;
       </a>
       {
         groups.map((g) => (
-          <section class="nav-sheet-group">
-            <h2>{g.label}</h2>
-            {g.id === 'levels' ? (
-              <div class="nav-sheet-levels">
-                {g.sections[0].items.map((it) => (
-                  <a href={url(it.path)} style={`--c:var(--o${it.level})`} aria-current={isCurrent(it, path, ctx) ? 'true' : undefined}>
-                    <span class="nav-level-n">{it.level}</span>
-                    <span>{it.label}</span>
-                  </a>
-                ))}
-              </div>
-            ) : (
-              g.sections.map((s) => (
+          <details class="nav-sheet-group">
+            <summary>{g.label}</summary>
+
+              {g.sections.map((s) => (
                 <>
                   {s.heading && g.sections.length > 1 && <p class="nav-heading">{s.heading}</p>}
                   <ul>
@@ -152,9 +125,9 @@ const feedbackHref = `${REPO_URL}/issues/new?template=feedback.yml`;
                     ))}
                   </ul>
                 </>
-              ))
-            )}
-          </section>
+              ))}
+
+          </details>
         ))
       }
       <section class="nav-sheet-group">

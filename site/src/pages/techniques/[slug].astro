@@ -158,9 +158,9 @@ const nameGroups = [
 
   {
     Content ? (
-      <div class="prose" id="practical-guidance">
+      <details class="optional-detail" id="practical-guidance" open={slug === 'agent-harness'}><summary>Go deeper: practical guidance, failure modes, and implementation</summary><div class="prose">
         <Content />
-      </div>
+      </div></details>
     ) : (
       <p class="status-note">
         This page is an outline. A run you can step through, runnable code, failure

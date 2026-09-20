@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import { featuredExamples } from '../lib/featured-examples';
 import entries from '../data/worked-example-proposals.json';
 import { walkthroughCases, audiencesFor, examplesFor } from '../lib/walkthrough-catalog';
 import { url } from '../lib/url';
@@ -10,14 +11,15 @@ const multiCount=entries.filter(e=>audiencesFor(e.slug).length>1).length;
 const exampleUrl=(entry:typeof entries[number],audience?:string)=>url(`/${entry.group==='Cross-cutting guides'?'threads':'techniques'}/${entry.slug}/${audience?'?audience='+audience:''}#${entry.slug==='agent-harness'?'worked-example-a-test-automation-framework':'guided-example'}`);
 ---
 <Base title="Worked examples · Gradient Ascent" description="Explore concepts through everyday, engineering, and business worked examples.">
-  <div class="page-hero"><div class="eyebrow">Worked examples · audience perspectives</div><h1>A worked example for every concept.</h1><p>{exampleCount} scripted examples cover 54 concepts and four cross-cutting guides. {multiCount} concepts offer all three perspectives; the rest retain a focused example. Each variation has its own task, evidence, failure case, and decision. These are teaching fixtures, not measured runs.</p></div>
-  <section class="proposal-feature"><h2>Featured workflow: the weekly project status report</h2><p>Use previous reports for continuity, collect current evidence across project sources, reconcile conflicting updates, draft a report, and send only the exact version and recipient list a human approves.</p><p><strong>Collect → reconcile → draft → compare → review → approved send → record.</strong></p><p>A missing update does not mean a project is on track. An edited draft needs renewed approval. A timed-out send needs duplicate protection. The example uses fictional sources and simulated delivery.</p></section>
-  <section class="proposal-feature" style="margin-top:24px"><h2>Team application: agents that improve your project brief</h2><p>A lead agent coordinates a writer, parallel receiving agents, and independent reviewers. Follow how the team finds misunderstandings, revises a brief, and returns candidate approaches and open decisions.</p><a href={url('/examples/reviewer-feedback-loop/')}>Explore the team of agents &rarr;</a></section>
-  <p class="proposal-contract"><strong>Every example:</strong> English request → synchronized workflow and visible work → why it matters → inspectable evidence → change a condition → make a decision. Scripted examples, actual checks, and measured model runs must be clearly distinguished.</p>
+  <div class="page-hero"><div class="eyebrow">Explore a task</div><h1>Start with work you recognize.</h1><p>Follow what goes in, what the system does, and what comes out. These examples are scripted teaching cases; no model calls or external actions run here.</p></div>
+  <div class="featured-grid">{featuredExamples.map(e=><article class="featured-task"><div class="eyebrow">{e.audience}</div><h2>{e.title}</h2><dl><dt>Input</dt><dd>{e.input}</dd><dt>What happens</dt><dd>{e.action}</dd><dt>Output</dt><dd>{e.output}</dd></dl><p>{e.learn}</p><a href={url(e.href)}>Follow this example →</a></article>)}</div>
+  <section class="section"><h2>Find another example</h2><p>The full catalogue contains {exampleCount} scripted examples across 54 concepts and four cross-cutting guides. {multiCount} concepts offer all three audience perspectives.</p>
   <label class="proposal-search">Find a concept or example <input id="proposal-search" type="search" placeholder="Try approval, status report, memory…" /></label>
-  <label class="proposal-search">Audience <select id="proposal-audience"><option value="">All available examples</option><option value="everyday">Everyday life</option><option value="engineering">Engineering & technical work</option><option value="business">Business & team operations</option></select></label><p id="proposal-count" role="status">58 concepts and guides · {exampleCount} examples</p>
+  <label class="proposal-search">Audience <select id="proposal-audience"><option value="">All available examples</option><option value="everyday">Everyday life</option><option value="engineering">Engineering & technical work</option><option value="business">Business & team operations</option></select></label><p id="proposal-count" role="status">Search or open the full catalogue below</p>
+  <details id="full-catalogue"><summary>Browse the full concept catalogue</summary>
   <nav class="proposal-nav" aria-label="Example groups">{groups.map((g,i)=><a href={`#proposal-group-${i}`}>{g}</a>)}</nav>
   {groups.map((g,i)=><section class="proposal-group" id={`proposal-group-${i}`}><h2>{g}</h2>{entries.filter(e=>e.group===g).map(e=><article class="proposal-card" data-audiences={audiencesFor(e.slug).join(' ')}><h3>{entries.indexOf(e)+1}. {e.title}</h3><div class="proposal-perspectives">{audiencesFor(e.slug).map(a=><div><a href={exampleUrl(e,a)}>{audienceLabels[a]} →</a><p>{e.slug==='agent-harness'&&a==='engineering'?'Generate a new DUT project using the shared test automation framework.':examplesFor(e.slug).find(c=>c.audience===a)!.prompt}</p></div>)}</div><dl><dt>Definition</dt><dd>{e.definition}</dd><dt>Scenario family</dt><dd>{e.example}</dd><dt>Nuance and contrasting case</dt><dd>{e.nuance}</dd><dt>Further evidence to collect</dt><dd>{e.evidence}</dd></dl></article>)}</section>)}
+  </details></section>
 </Base>
 <script>
  const input=document.querySelector<HTMLInputElement>('#proposal-search')!;
@@ -26,11 +28,16 @@ const exampleUrl=(entry:typeof entries[number],audience?:string)=>url(`/${entry.
    let count=0;const query=input.value.toLowerCase().trim();
    document.querySelectorAll<HTMLElement>('.proposal-card').forEach(card=>{card.hidden=!card.textContent?.toLowerCase().includes(query)||(Boolean(audience.value)&&!card.dataset.audiences?.split(' ').includes(audience.value));if(!card.hidden)count++;});
    document.querySelectorAll<HTMLElement>('.proposal-group').forEach(group=>{group.hidden=!group.querySelector('.proposal-card:not([hidden])');});
-   document.querySelector('#proposal-count')!.textContent=`${count} concepts and guides`;
+   document.querySelector('#proposal-count')!.textContent=`${count} matching concepts and guides`;
+   const catalogue=document.querySelector<HTMLDetailsElement>('#full-catalogue')!;
+   catalogue.open=Boolean(query || audience.value);
+   if (!count) document.querySelector('#proposal-count')!.textContent='No matches. Try a broader term or another audience.';
  }
  input.addEventListener('input',filter);audience.addEventListener('change',filter);
 </script>
 <style>
+ .featured-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.featured-task{padding:28px;background:var(--panel);border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;gap:18px}.featured-task h2{font-size:25px}.featured-task dl{display:grid;grid-template-columns:100px 1fr;gap:12px}.featured-task dt{color:var(--text);font-weight:600}.featured-task dd{margin:0;color:var(--muted);line-height:1.7}.featured-task p{color:var(--muted)}.featured-task a{margin-top:auto;color:var(--accent)}#full-catalogue>summary{cursor:pointer;padding:22px;background:var(--panel);border:1px solid var(--line);border-radius:8px;font-size:20px} @media(max-width:700px){.featured-grid{grid-template-columns:1fr}.featured-task{padding:22px}.featured-task dl{grid-template-columns:1fr;gap:6px}.featured-task dd{margin-bottom:12px}}
+
  .proposal-feature { padding:24px 28px; border:1px solid var(--o5); border-radius:10px; background:var(--panel); }
  .proposal-feature h2 { margin-top:0; }.proposal-feature p,.proposal-contract { color:var(--muted); line-height:1.8; }
  .proposal-contract { margin:26px 0; }.proposal-search { display:block; font-size:14px; }

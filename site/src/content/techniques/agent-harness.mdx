@@ -109,6 +109,9 @@ to follow the task, **Change something** to explore a missing requirement or new
 
 <DutHarnessLesson />
 
+<details className="optional-detail">
+<summary>Go deeper: instructions, approval boundaries, code, and evaluation</summary>
+
 ### Start with an ordinary request
 
 The user supplies two starting documents. **`CLAUDE.md` holds reusable framework instructions;
@@ -468,6 +471,8 @@ one is not model variance, it is what the harness cost the run.
   { lane: 'either', body: 'Pick one of the failure modes above and try to cause it on purpose, using the pattern in tests/test_example_agent_harness.py.' },
   { lane: 'build', body: 'Read READ_ONLY_HEADERS and is_read_only in examples/common/bench.py, then SafetyEnvelope and Approval right after them. That is the same allowlist-plus-hook shape this page\'s own ToolRegistry and Hook build, in a setting where the one class of command that actually energizes a board needs a person\'s approval naming the set point before it runs at all.' },
 ]} />
+
+</details>
 
 {/* Primary sources and the reviewed date are rendered by techniques/[slug].astro from this
     file's frontmatter, after the generated blocks, so they close the page and cannot drift

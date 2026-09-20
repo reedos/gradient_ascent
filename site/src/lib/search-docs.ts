@@ -68,6 +68,7 @@ function formerNameOnly(formerly: string | undefined): string | undefined {
 
 export async function buildSearchDocs(): Promise<SearchDoc[]> {
   const docs: SearchDoc[] = [];
+  docs.push({ id: 'view:usability', kind: 'view', title: 'Newcomer usability session', summary: 'Human observation guide and results template. Sessions pending.', url: url('/usability/') });
   docs.push({ id: 'view:reviewer-feedback-loop', kind: 'view', title: 'A team of agents that improves your project brief', summary: 'Lead agent and workers: brief writing, parallel receiving agents, independent reviewers, and coordinated revision. Includes supporting evaluation methods.', url: url('/examples/reviewer-feedback-loop/') });
   docs.push({ id: "view:examples", kind: "view", title: "Worked examples", summary: "98 scripted examples across everyday life, engineering, and business.", url: url("/examples/") });
 

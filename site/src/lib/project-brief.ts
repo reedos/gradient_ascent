@@ -37,8 +37,11 @@ export const recommendationInstructions = [
 ];
 export function projectBrief(values: BriefValues, base: string, concept?: ConceptReference): string {
   const root = base.replace(/\/$/, '');
+  const filled = briefFields.filter(f => values[f.key]?.trim());
+  const fields = filled.length ? filled : briefFields;
   return '# My project brief\n\nHelp me choose and plan an approach for this project using Gradient Ascent as a reference.\n\n'
-    + briefFields.map(f => '## ' + f.label + '\n' + (values[f.key]?.trim() || '[Not specified — ask me if needed.]')).join('\n\n')
+    + fields.map(f => '## ' + f.label + '\n' + (values[f.key]?.trim() || '[Your answer, if known.]')).join('\n\n')
+    + '\n\n## Reading my answers\nRead all answers together: a requirement may appear under any question. Omitted questions are not claims that the information is missing. Preserve my wording, named dependencies, paths, and open decisions. Attribute reported facts; do not convert them into checks you ran. Ask only about consequential information that remains unresolved after reading the entire brief.'
     + (concept ? '\n\n## Concept to consider, not a predetermined choice\n' + concept.title + '\n' + concept.markdown : '')
     + '\n\n## Workflow attachments\nI will attach or explicitly point you to the example files listed above in our conversation. This brief does not embed files or grant access to my computer. If files are missing or unreadable, tell me which ones and what you need instead.\n\n## Reference access\nStart with ' + root + '/agents.md and ' + root + '/llms.txt. Fetch relevant concept Markdown pages and their cited sources as needed. The reusable blank brief is at ' + root + '/project-brief.md.\nIf you cannot fetch these references, say so and ask me to attach relevant Markdown pages or the reference export. Do not imply you have read material you could not access.\n\n## Recommendation requested\n'
     + recommendationInstructions.map((s, i) => (i + 1) + '. ' + s).join('\n') + '\n';

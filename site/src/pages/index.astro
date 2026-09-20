@@ -2,57 +2,13 @@
 import { usDate } from '../lib/dates';
 import Base from '../layouts/Base.astro';
 import SectionTop from '../components/SectionTop.astro';
-import ClimbCurve from '../components/ClimbCurve.astro';
-import TimelineStrip from '../components/TimelineStrip.astro';
-import Principles from '../components/Principles.astro';
-import MapPreview from '../components/MapPreview.astro';
-import RecipeRow from '../components/RecipeRow.astro';
 import LevelStack from '../components/islands/LevelStack';
-import LevelExplorer from '../components/islands/LevelExplorer';
 import { url } from '../lib/url';
-import { levels, tracks, taxonomy, counts, asOf, recipes, recipeLevels, nameGroupsForLevel, namesChecked } from '../lib/content';
-
-const levelStackItems = levels.map((t) => ({ order: t.order, title: t.title, short: t.short }));
-const levelDetails = levels.map((t) => ({
-  order: t.order,
-  title: t.title,
-  who: t.who,
-  description: t.description,
-  pages: t.pages.map((p) => ({ slug: p.slug, title: p.title, summary: p.summary, status: p.status })),
-  names: nameGroupsForLevel(t.order),
-}));
-const tracksDetail = {
-  title: taxonomy.tracks_overview.title,
-  who: taxonomy.tracks_overview.who,
-  description: taxonomy.tracks_overview.description,
-  // Each topic, followed by its own pages, the same shape techniques/index.astro uses.
-  pages: tracks.flatMap((t) => [
-    { slug: t.id, title: t.title, summary: t.summary, status: t.status },
-    ...(t.pages ?? []).map((p) => ({ slug: p.slug, title: p.title, summary: p.summary, status: p.status })),
-  ]),
-  names: nameGroupsForLevel('tracks'),
-};
-
-// The four recipes the prototype shows on the home page. Everything about them, the running-task
-// flag included, comes from content/taxonomy.json.
-const homeRecipeSummaries: Record<string, string> = {
-  'document-qa': 'Retrieve relevant passages and answer with citations. This version uses a fixed retrieval workflow; check whether the evidence actually covers the question.',
-  'inbox-triage': 'Classify messages, route them through fixed steps, and draft replies for human approval. Unclear cases go to a person.',
-  'research-brief': 'This version lets an agent choose follow-up searches, then checks claims against sources. A fixed workflow can also suit a well-scoped brief.',
-  'document-extraction': 'Extract fields into a defined schema, validate them, and ask a person to confirm uncertain values before saving.',
-};
-const HOME_RECIPES = ['document-qa', 'inbox-triage', 'research-brief', 'document-extraction'];
-const homeRecipes = HOME_RECIPES.map((slug) => {
-  const recipe = recipes.find((r) => r.slug === slug)!;
-  return {
-    recipe,
-    meta: recipe.running_task ? 'Used as the running example' : undefined,
-    levels: recipeLevels(recipe),
-  };
-});
+import { levels, counts, asOf } from '../lib/content';
+const levelStackItems = levels.map(t => ({order:t.order,title:t.title,short:t.short}));
 ---
 <Base
-  title="Gradient Ascent: every way to work with AI, from a question to a workforce"
+  title="Gradient Ascent: understand AI and apply it to your work"
   description="A guide to the main ways of using a language model, from one chat message to agents that run on their own, grouped into eight levels ordered by how much the model decides for itself."
 >
   <section class="hero">
@@ -66,7 +22,7 @@ const homeRecipes = HOME_RECIPES.map((slug) => {
       </p>
       <div class="hero-actions">
         <a class="button" href={url('/apply/')}>Use this site with your AI <span aria-hidden="true">&rarr;</span></a>
-        <a class="text-link" href="#levels">Browse the levels <span aria-hidden="true">&rarr;</span></a>
+        <a class="text-link" href={url('/examples/')}>Explore a task <span aria-hidden="true">&rarr;</span></a>
         <a class="text-link" href={url('/map/')}>Explore the map <span aria-hidden="true">&rarr;</span></a>
       </div>
       <div class="hero-meta">
@@ -81,50 +37,13 @@ const homeRecipes = HOME_RECIPES.map((slug) => {
         <LevelStack levels={levelStackItems} client:load />
       </div>
       <div class="art-caption">
-        <span>Bottom: simplest</span>
-        <span>Top: most autonomous</span>
+        <span>Patterns can combine</span>
+        <span>Higher ≠ better</span>
       </div>
     </div>
   </section>
 
-  <section class="section" id="start-here"><SectionTop eyebrow="Start here" title="What brings you here?" aside="You do not need to study every level before applying an idea. Choose an entry point and follow the links that fit your task." /><div class="featured-examples"><article><h3>Understand an idea</h3><p>Browse concepts, see visual explanations, and explore how they connect.</p><a href={url('/techniques/')}>Explore concepts &rarr;</a></article><article><h3>See it in practice</h3><p>Follow an example with evidence, decisions, and tradeoffs.</p><a href={url('/examples/')}>Browse worked examples &rarr;</a></article><article><h3>Apply it to your work</h3><p>Create a brief or prepare instructions, a workflow, or checks for your own agent.</p><a href={url('/tools/')}>Find a project tool &rarr;</a></article></div></section>
-  <section class="section" id="apply-your-project">
-    <SectionTop eyebrow="From concept to your project" title="Bring your task. Let your model help choose the approach." aside="Describe what you need, then give your own model a brief or point it directly to the reference guide." />
-    <p>Ask it to compare existing tools, fixed workflows, and agents—including coding agents that build tools and then use them. Get a recommendation grounded in your constraints, with reasons, implementation steps, and ways to check the result.</p>
-    <div class="hero-actions"><a class="button" href={url('/apply/')}>Create your project brief &rarr;</a><a class="text-link" href={url('/agents.md')}>Reference guide for your model</a><a class="text-link" href={url('/examples/')}>Explore worked examples</a></div>
-  </section>
-  <MapPreview />
-
-  <section class="section" id="climb">
-    <SectionTop
-      eyebrow="The climb"
-      title="Four ways to work with AI, and the eight levels underneath"
-      aside="Each step hands more of the work to the model. Choose based on the outcome, automation, and human effort your task requires."
-    />
-    <ClimbCurve />
-  </section>
-
-  <section class="section" id="timeline">
-    <TimelineStrip variant="home" />
-  </section>
-
-  <p class="stack-thesis">
-    Levels describe how much the model decides. <strong>Choose the approach that delivers the outcome and working experience you want.</strong> Prefer simplicity among suitable solutions, not at the expense of automation or your time.
-  </p>
-
-  <section class="section" id="levels">
-    <SectionTop
-      eyebrow="Levels"
-      title="Eight levels, and what is in each"
-      aside="Choose a level, here or on the diagram above, to see its techniques and the products, tools and models that use them."
-    />
-    <LevelExplorer levels={levelDetails} tracksDetail={tracksDetail} initialLevel={1} client:load />
-    <p class="footnote">
-      Names listed {usDate(asOf)}. {namesChecked.verified} of {namesChecked.total} registry entries have
-      been checked against the maker's own page; the registry marks the rest as unchecked.
-    </p>
-  </section>
-
+  <section class="section" id="start-here"><SectionTop eyebrow="Start here" title="What brings you here?" aside="You do not need to study every level before applying an idea. Choose an entry point and follow the links that fit your task." /><div class="featured-examples"><article><h3>Understand</h3><p>Browse concepts, see visual explanations, and explore how they connect.</p><a href={url('/techniques/')}>Explore concepts &rarr;</a></article><article><h3>Explore a task</h3><p>Follow an example with evidence, decisions, and tradeoffs.</p><a href={url('/examples/')}>Browse worked examples &rarr;</a></article><article><h3>Apply</h3><p>Create a brief or prepare instructions, a workflow, or checks for your own agent.</p><a href={url('/tools/')}>Find a project tool &rarr;</a></article></div></section>
   <section class="section" id="example">
     <SectionTop
       eyebrow="Worked example"
@@ -155,39 +74,8 @@ const homeRecipes = HOME_RECIPES.map((slug) => {
     <p class="comparison-note">Fictional, scripted comparison—not a benchmark or a claim about every document-chat product. The linked examples explore these techniques in other scenarios.</p>
   </section>
 
-  <section class="section" id="featured-examples">
-    <SectionTop eyebrow="Try a guided example" title="Start with a task you recognize" aside="Follow the evidence, inspect the result, and see where a person needs to decide. Adapt the choices to your own work." />
-    <div class="featured-examples">
-      <article><div class="eyebrow">Everyday</div><h3>Ask a question about your documents</h3><p>See how relevant passages become an answer, and why a citation alone does not prove that the answer is complete.</p><a href={url('/techniques/rag/?audience=everyday#guided-example')}>Explore document questions &rarr;</a></article>
-      <article><div class="eyebrow">Business</div><h3>Prepare the weekly project report</h3><p>Combine previous reports and current project evidence, surface gaps, and prepare a draft for human review before sending.</p><a href={url('/techniques/workflow-graphs/?audience=business#guided-example')}>Explore the status report &rarr;</a></article>
-      <article><div class="eyebrow">Engineering</div><h3>Turn a DUT brief into a project</h3><p>Generate a test project using a shared framework. Follow the permissions, approval decisions, checks, and handoff for review.</p><a href={url('/techniques/agent-harness/#guided-example')}>Explore the agent harness &rarr;</a></article>
-    </div>
-  </section>
-
-  <section class="section" id="recipes">
-    <SectionTop
-      eyebrow="Recipes"
-      title="Common tasks and possible starting points"
-      aside="These recipes show one way to approach each task. Your evidence, constraints, and review needs determine which techniques fit."
-    />
-    <div class="signal-list">
-      {
-        homeRecipes.map(({ recipe, meta, levels: lv }) => (
-          <RecipeRow slug={recipe.slug} title={recipe.title} summary={homeRecipeSummaries[recipe.slug] ?? recipe.summary} levels={lv} meta={meta} />
-        ))
-      }
-    </div>
-    <a class="section-link" href={url('/recipes/')}>See all recipes &rarr;</a>
-  </section>
-
-  <section class="section" id="principles">
-    <SectionTop
-      eyebrow="Premise and principles"
-      title="Why this site exists and how it works"
-      aside="The full method page covers how levels are defined, how pages are written and how results are measured."
-    />
-    <Principles />
-  </section>
+  <section class="section" id="levels"><h2>A map, not a ladder you must climb</h2><p>Our eight levels organize patterns by the decisions a model can make. Higher does not mean better, and a system can combine several patterns. Start with your task, then explore the concepts it needs.</p><div class="hero-actions"><a class="text-link" href={url('/map/')}>Explore the concept map →</a><a class="text-link" href={url('/techniques/')}>Browse all concepts →</a><a class="text-link" href={url('/method/')}>How this guide is reviewed →</a></div></section>
+  <section class="section"><h2>Leave with something you can use</h2><p>Describe your task, prepare a brief, and give it to your own model with representative files. The model can consult this guide and recommend an approach; the site itself does not run it.</p><div class="hero-actions"><a class="button" href={url('/apply/')}>Create a project brief →</a><a class="text-link" href={url('/tools/')}>Other project tools →</a></div></section>
 </Base>
 
 <style>

@@ -1,0 +1,10 @@
+---
+import Base from '../layouts/Base.astro';
+import { url } from '../lib/url';
+---
+<Base title="Try the site with a newcomer · Gradient Ascent" description="A short human usability session for understanding a concept and preparing a useful handoff.">
+ <div class="page-hero"><div class="eyebrow">Human usability check · ready to run</div><h1>Can a newcomer leave with something useful?</h1><p>A short observation session checks whether people can understand one idea, prepare a useful request, and know what to do next. No human results have been collected for this revision.</p></div>
+ <section class="panel"><h2>For the person trying the site</h2><p>Start on the homepage and think aloud. You are testing the site, not being tested. Use a fictional or non-sensitive task; there is no need to share private files.</p><ol><li>Find something that explains how to answer questions using a set of documents. Explain it in your own words.</li><li>Prepare something you could give your own AI to plan a small task, such as a weekly report.</li><li>Explain what the site created, what you would do next, and whether anything has actually run.</li><li>Find another example you would use.</li></ol><a class="button" href={url('/')}>Start on the homepage →</a></section>
+ <section class="section"><h2>For the person observing</h2><p>Let the participant choose their route. Record confusion and any help you provide before explaining the interface. The kit includes a facilitator script, observation sheet, and guidance for interpreting and retesting findings.</p><a href={url('/usability-session.md')} download>Download the session kit and results template</a><p>Actual newcomer observations remain pending. Automated checks and agent evaluations are separate evidence.</p></section>
+</Base>
+<style>h2{font-size:26px;margin-bottom:20px}p,li{line-height:1.8;margin:14px 0}ol{padding-left:24px}a:not(.button){color:var(--accent)}</style>

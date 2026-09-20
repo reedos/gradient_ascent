@@ -5,13 +5,23 @@ test('brief preserves requirements and unknowns without choosing a concept or au
   const result = projectBrief({goal:'Collect α measurements', approval:'Never touch the shared framework'}, 'https://example.org/guide/');
   assert.match(result, /Collect α measurements/);
   assert.match(result, /Never touch the shared framework/);
-  assert.equal((result.match(/Not specified/g) || []).length, briefFields.length - 2);
+  assert.doesNotMatch(result, /Not specified/);
+  assert.doesNotMatch(result, /## What should be ready when it finishes/);
   assert.match(result, /https:\/\/example.org\/guide\/agents.md/);
   assert.match(result, /cannot fetch/);
   assert.match(result, /not a required progression|not quality or a required progression/);
   assert.match(result, /coding agent that builds or adapts tools/);
   assert.match(result, /authorization to send, change, or operate/);
   assert.doesNotMatch(result, /## Concept to consider/);
+});
+
+test('free-text facts are preserved without contradictory empty fields; blank templates retain questions', () => {
+  const brief = projectBrief({goal:'Finished carousels on my phone',notes:'Never delete originals; draft location unknown'},'https://example.org');
+  assert.match(brief,/Finished carousels on my phone/);
+  assert.match(brief,/Never delete originals; draft location unknown/);
+  assert.doesNotMatch(brief,/Not specified|## What must the system never do/);
+  const blank=projectBrief({},'https://example.org');
+  for(const field of briefFields) assert.ok(blank.includes(field.label));
 });
 test('a linked concept is only a candidate, with a fetchable reference', () => {
   const result = projectBrief({}, 'https://example.org/guide', { title:'Workflow graphs', markdown:'https://example.org/guide/techniques/workflow-graphs.md' });

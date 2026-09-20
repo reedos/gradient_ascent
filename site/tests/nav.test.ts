@@ -24,88 +24,38 @@ const threads = [
 ];
 const groups = buildNav(levels, tracks, threads);
 
-test('four groups, in the order the site reads', () => {
-  assert.deepEqual(groups.map((g) => g.id), ['levels', 'techniques', 'practice', 'reference']);
-  for (const g of groups) assert.ok(g.blurb.length > 10, `${g.id} has a blurb`);
+test('navigation follows visitor intent and keeps secondary references available', () => {
+ assert.deepEqual(groups.map(g=>g.label),['Understand','Explore','Apply','Reference']);
+ const paths=groups.flatMap(g=>g.sections.flatMap(s=>s.items.map(i=>i.path)));
+ assert.equal(new Set(paths).size,paths.length);
+ for(const path of ['/techniques/','/map/','/examples/','/apply/','/tools/','/agents/','/changes/','/techniques/evals/']) assert(paths.includes(path));
+ for(const path of paths) assert.match(path,/^\/.*\/$/);
 });
-
-test('levels are listed lowest first and carry their number', () => {
-  const items = groups[0].sections[0].items;
-  assert.deepEqual(items.map((i) => i.level), [0, 1, 5]);
-  assert.equal(items[1].path, '/levels/1/');
-  assert.equal(items[1].hint, 'One question, one answer');
+test('existing concept and level URLs retain level context while tasks and tools get their own destinations',()=>{
+ assert.deepEqual(navContext('/techniques/coding-agents/',levels,tracks),{group:'levels',level:5});
+ assert.deepEqual(navContext('/levels/1/',levels,tracks),{group:'levels',level:1});
+ for(const path of ['/techniques/','/map/','/worksheet/','/techniques/guardrails/']) assert.equal(navContext(path,levels,tracks).group,'levels');
+ for(const path of ['/examples/','/recipes/support-desk/','/shapes/','/threads/graph-engineering/','/teardowns/coding-agent/']) assert.equal(navContext(path,levels,tracks).group,'techniques');
+ for(const path of ['/apply/','/tools/','/tools/workflow/','/agents/']) assert.equal(navContext(path,levels,tracks).group,'practice');
+ for(const path of ['/names/','/glossary/','/changes/','/failures/']) assert.equal(navContext(path,levels,tracks).group,'reference');
+ for(const path of ['/','/search/','/unknown/']) assert.deepEqual(railItems(groups,navContext(path,levels,tracks)),[]);
 });
-
-test('every topic gets a menu entry under techniques', () => {
-  const topicItems = groups[1].sections[1].items;
-  assert.deepEqual(topicItems.map((i) => i.path), ['/techniques/evals/', '/techniques/safety/']);
+test('local rails stay compact and level order is preserved',()=>{
+ assert.deepEqual(railItems(groups,{group:'levels',level:5}).map(i=>i.level),[0,1,5]);
+ assert.deepEqual(railItems(groups,{group:'practice'}).map(i=>i.path),['/apply/','/tools/','/agents/']);
+ assert.equal(railItems(groups,{group:'levels'})[0].path,'/techniques/');
 });
-
-test('no path is listed twice, and every path is site-relative with a trailing slash', () => {
-  const paths = groups.flatMap((g) => g.sections.flatMap((s) => s.items.map((i) => i.path)));
-  assert.equal(new Set(paths).size, paths.length);
-  for (const p of paths) assert.match(p, /^\/.*\/$/);
+test('active links preserve child-page and level selection',()=>{
+ const items=groups.flatMap(g=>g.sections.flatMap(s=>s.items));
+ const level=items.find(i=>i.level===5)!;
+ assert(isCurrent(level,'/techniques/coding-agents/',{group:'levels',level:5}));
+ assert(!isCurrent(level,'/levels/1/',{group:'levels',level:1}));
+ assert(isCurrent(items.find(i=>i.path==='/recipes/')!,'/recipes/support-desk/',{group:'techniques'}));
 });
-
-test('a technique page at a level belongs to LEVELS and knows its level', () => {
-  assert.deepEqual(navContext('/techniques/coding-agents/', levels, tracks), { group: 'levels', level: 5 });
-  assert.deepEqual(navContext('/levels/1/', levels, tracks), { group: 'levels', level: 1 });
+test('all supplied threads remain discoverable, including unknown future threads',()=>{
+ const items=groups.flatMap(g=>g.sections.flatMap(s=>s.items));
+ for(const t of threads) assert(items.some(i=>i.path===`/threads/${t.id}/` && i.hint));
 });
-
-test('a topic page, the index, the map and a thread belong to TECHNIQUES', () => {
-  for (const p of ['/techniques/guardrails/', '/techniques/evals/', '/techniques/', '/map/', '/threads/graph-engineering/']) {
-    assert.deepEqual(navContext(p, levels, tracks), { group: 'techniques' }, p);
-  }
-});
-
-test('practice and reference pages resolve, including their children', () => {
-  for (const p of ['/worksheet/', '/shapes/', '/recipes/', '/recipes/support-desk/', '/teardowns/coding-agent/', '/failures/']) {
-    assert.equal(navContext(p, levels, tracks).group, 'practice', p);
-  }
-  for (const p of ['/timeline/', '/names/', '/glossary/', '/method/', '/changes/', '/agents/']) {
-    assert.equal(navContext(p, levels, tracks).group, 'reference', p);
-  }
-});
-
-test('the reference group lists the change log, so the footer sitemap carries it too', () => {
-  const reference = groups.find((g) => g.id === 'reference')!;
-  const paths = reference.sections.flatMap((s) => s.items.map((i) => i.path));
-  assert.ok(paths.includes('/changes/'), 'reference lists /changes/');
-  // It sits after Method and before the agent page: a reader looking for what is new reads the
-  // record of the site before the instructions for their own tooling.
-  assert.deepEqual(paths.slice(-3), ['/method/', '/changes/', '/agents/']);
-});
-
-test('home, search and unknown paths have no section, so no rail', () => {
-  for (const p of ['/', '/search/', '/nope/']) {
-    const ctx = navContext(p, levels, tracks);
-    assert.deepEqual(ctx, {});
-    assert.deepEqual(railItems(groups, ctx), []);
-  }
-});
-
-test('the rail shows the ladder on a level page and the group\'s own pages elsewhere', () => {
-  assert.deepEqual(railItems(groups, { group: 'levels', level: 5 }).map((i) => i.level), [0, 1, 5]);
-  assert.deepEqual(railItems(groups, { group: 'practice' }).map((i) => i.path), ['/tools/', '/apply/', '/examples/', '/worksheet/', '/shapes/', '/recipes/', '/teardowns/', '/failures/']);
-  // Techniques: the browse links only; five topics would not fit a rail and live in the menu.
-  assert.deepEqual(railItems(groups, { group: 'techniques' }).map((i) => i.path), ['/techniques/', '/map/', '/threads/graph-engineering/', '/threads/a-new-thread/']);
-});
-
-test('isCurrent: a level item follows the context, an index stays current on its children', () => {
-  const ctx = navContext('/techniques/coding-agents/', levels, tracks);
-  const lvl5 = groups[0].sections[0].items.find((i) => i.level === 5)!;
-  const lvl1 = groups[0].sections[0].items.find((i) => i.level === 1)!;
-  assert.equal(isCurrent(lvl5, '/techniques/coding-agents/', ctx), true);
-  assert.equal(isCurrent(lvl1, '/techniques/coding-agents/', ctx), false);
-
-  const recipes = groups[2].sections[0].items.find((i) => i.path === '/recipes/')!;
-  assert.equal(isCurrent(recipes, '/recipes/support-desk/', { group: 'practice' }), true);
-
-  const all = groups[1].sections[0].items.find((i) => i.path === '/techniques/')!;
-  assert.equal(isCurrent(all, '/techniques/', { group: 'techniques' }), true);
-  assert.equal(isCurrent(all, '/techniques/guardrails/', { group: 'techniques' }), false);
-});
-
 test('every fixed menu path is a real route in src/pages', () => {
   const pages = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'pages');
   const taxonomy = JSON.parse(readFileSync(join(pages, '..', '..', '..', 'content', 'taxonomy.json'), 'utf8'));
@@ -126,13 +76,4 @@ test('every fixed menu path is a real route in src/pages', () => {
     const file = join(pages, ...parts);
     assert.ok(existsSync(`${file}.astro`) || existsSync(join(file, 'index.astro')), `no page for ${item.path}`);
   }
-});
-
-test('every thread handed in gets a menu entry, and one with no written hint still gets a line', () => {
-  const browse = groups.find((g) => g.id === 'techniques')!.sections[0].items;
-  const added = browse.find((i) => i.path === '/threads/a-new-thread/');
-  assert.equal(added?.label, 'A new thread');
-  assert.ok(added?.hint && added.hint.length > 10);
-  assert.equal(browse.find((i) => i.path === '/threads/graph-engineering/')?.hint, 'One idea followed across three levels');
-  assert.deepEqual(buildNav(levels, tracks).find((g) => g.id === 'techniques')!.sections[0].items.map((i) => i.path), ['/techniques/', '/map/']);
 });

@@ -18,5 +18,8 @@ test('custom text survives export without substituting example facts',()=>{
   const text=buildArtifact(b,{[b.fields[0].key]:'My α requirement: never delete originals'},'https://example.org/site/');
   assert(text.includes('My α requirement: never delete originals'));
   assert(!text.includes(b.example[b.fields[0].key]));
+  assert(!text.includes('Not specified'));
+  assert(text.includes('not the final artifact itself'));
+  assert(!text.includes('## '+b.fields[1].label));
  }
 });

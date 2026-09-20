@@ -3,11 +3,8 @@
 // or where a page belongs. Pure: data comes in as arguments, which keeps it testable under plain
 // `node --test` without the real content/taxonomy.json.
 //
-// The structure follows the site, not the file tree:
-//   Levels       the ladder itself, eight rungs
-//   Techniques   every page, how they connect, and the topics that cut across the levels
-//   In practice  what to do with it: find your level, name the shape of the job, build a recipe, read a teardown
-//   Reference    when things arrived, who makes what, what the words mean, how the site works
+// Visitor-facing groups are Understand, Explore, Apply, and Reference.
+// Existing internal group IDs remain stable for header styles and level colors.
 
 export interface NavLevel {
   order: number;
@@ -62,73 +59,40 @@ const THREAD_HINTS: Record<string, string> = {
 };
 
 export function buildNav(levels: NavLevel[], tracks: NavTrack[], threads: NavThread[] = []): NavGroup[] {
-  const ordered = [...levels].sort((a, b) => a.order - b.order);
   return [
-    {
-      id: 'levels',
-      label: 'Levels',
-      blurb: 'Eight levels, ordered by who decides the next step. Choose the approach that fits your outcome and desired automation.',
-      sections: [
-        {
-          items: ordered.map((l) => ({ label: l.title, path: `/levels/${l.order}/`, hint: l.short, level: l.order })),
-        },
-      ],
-    },
-    {
-      id: 'techniques',
-      label: 'Techniques',
-      blurb: 'Every technique has a page: what it is, a run you can step through, when not to use it, how it fails.',
-      sections: [
-        {
-          heading: 'Browse',
-          items: [
-            { label: 'All techniques', path: '/techniques/', hint: 'Every page, grouped by level' },
-            { label: 'The map', path: '/map/', hint: 'How the techniques connect' },
-            ...threads.map((t) => ({ label: t.title, path: `/threads/${t.id}/`, hint: THREAD_HINTS[t.id] ?? 'A reading path across levels' })),
-          ],
-        },
-        {
-          heading: 'Topics across every level',
-          items: tracks.map((t) => ({ label: t.title, path: `/techniques/${t.id}/`, hint: `${t.slugs.length + 1} pages` })),
-        },
-      ],
-    },
-    {
-      id: 'practice',
-      label: 'Tools & examples',
-      blurb: 'Start from the job, not the technique.',
-      sections: [
-        {
-          items: [
-            { label: 'All project tools', path: '/tools/', hint: 'Instructions, workflows, checks, audits, and handoffs' },
-            { label: 'Use this site with your AI', path: '/apply/', hint: 'Create a project brief for your own model' },
-            { label: 'Worked examples', path: '/examples/', hint: 'Everyday, engineering, and business perspectives' },
-            { label: 'Find your level', path: '/worksheet/', hint: 'Explore a candidate design, then check its fit' },
-            { label: 'Job shapes', path: '/shapes/', hint: 'What kind of job is it? Match the work, not the subject' },
-            { label: 'Recipes', path: '/recipes/', hint: 'Whole jobs, built from techniques' },
-            { label: 'Teardowns', path: '/teardowns/', hint: 'Products you have used, taken apart' },
-            { label: 'Failure modes', path: '/failures/', hint: 'How each technique goes wrong' },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'reference',
-      label: 'Reference',
-      blurb: 'The record behind the pages.',
-      sections: [
-        {
-          items: [
-            { label: 'Timeline', path: '/timeline/', hint: 'When each level reached the public' },
-            { label: 'Names', path: '/names/', hint: 'Who makes what: models, products, tools' },
-            { label: 'Glossary', path: '/glossary/', hint: 'The words, defined from the pages' },
-            { label: 'Method', path: '/method/', hint: 'Premise, principles, how claims are checked' },
-            { label: 'What changed', path: '/changes/', hint: 'Dated corrections and additions, with a feed' },
-            { label: 'For your agent', path: '/agents/', hint: 'Point your own AI agent at this site' },
-          ],
-        },
-      ],
-    },
+    { id: 'levels', label: 'Understand', blurb: 'Explore an idea. Levels organize patterns; they are not a required progression.', sections: [
+      { heading: 'Browse concepts', items: [
+        {label:'All concepts',path:'/techniques/',hint:'Definitions, diagrams, and examples'},
+        {label:'Concept map',path:'/map/',hint:'See how ideas connect'},
+        {label:'Choose an approach',path:'/worksheet/',hint:'Explore a candidate design for your task'},
+      ]},
+      { heading: 'Browse by level', items: [...levels].sort((a,b)=>a.order-b.order).map(l=>({label:l.title,path:`/levels/${l.order}/`,hint:l.short,level:l.order})) },
+    ]},
+    { id:'techniques', label:'Explore', blurb:'Start with a recognizable task and see what goes in, what happens, and what comes out.', sections:[
+      { heading:'Tasks and applications', items:[
+        {label:'Worked examples',path:'/examples/',hint:'Four starting examples, then the full catalogue'},
+        {label:'Recipes',path:'/recipes/',hint:'Complete tasks assembled from concepts'},
+        {label:'Job shapes',path:'/shapes/',hint:'Recognize the structure of your work'},
+        {label:'Product teardowns',path:'/teardowns/',hint:'How familiar products work'},
+      ]},
+      {heading:'Follow an idea',items:threads.map(t=>({label:t.title,path:`/threads/${t.id}/`,hint:THREAD_HINTS[t.id]??'One idea across several concepts'}))},
+    ]},
+    {id:'practice',label:'Apply',blurb:'Prepare a useful request for your own model. You do not need to complete every tool.',sections:[{items:[
+      {label:'Create a project brief',path:'/apply/',hint:'Describe the outcome and human role you want'},
+      {label:'Project tools',path:'/tools/',hint:'Prepare requests for instructions, workflows, checks, and handoffs'},
+      {label:'Use the guide with your AI',path:'/agents/',hint:'Copy a prompt or share model-readable references'},
+    ]}]},
+    {id:'reference',label:'Reference',blurb:'Definitions, sources, limitations, and the record behind the guide.',sections:[
+      {items:[
+        {label:'Glossary',path:'/glossary/',hint:'Terms explained'},
+        {label:'Names',path:'/names/',hint:'Models, products, and tools'},
+        {label:'Timeline',path:'/timeline/',hint:'How the field developed'},
+        {label:'Failure modes',path:'/failures/',hint:'What can go wrong'},
+        {label:'Method',path:'/method/',hint:'How claims and levels are defined'},
+        {label:'What changed',path:'/changes/',hint:'Corrections and additions'},
+      ]},
+      {heading:'Topics across every level',items:tracks.map(t=>({label:t.title,path:`/techniques/${t.id}/`,hint:`${t.slugs.length+1} pages`}))},
+    ]},
   ];
 }
 
@@ -154,37 +118,26 @@ function norm(path: string): string {
 export function navContext(path: string, levels: NavLevel[], tracks: NavTrack[]): NavContext {
   const p = norm(path);
   const level = /^\/levels\/(\d+)\//.exec(p);
-  if (level) return { group: 'levels', level: Number(level[1]) };
+  if (level) return {group:'levels',level:Number(level[1])};
   const tech = /^\/techniques\/([^/]+)\//.exec(p);
   if (tech) {
-    const slug = tech[1];
-    const at = levels.find((l) => l.slugs.includes(slug));
-    if (at) return { group: 'levels', level: at.order };
-    return { group: 'techniques' };
+    const at=levels.find(l=>l.slugs.includes(tech[1]));
+    return at ? {group:'levels',level:at.order} : {group:'levels'};
   }
-  if (p === '/techniques/' || p.startsWith('/map/') || p.startsWith('/threads/')) return { group: 'techniques' };
-  if (p.startsWith('/tools/') || p.startsWith('/apply/') || p.startsWith('/examples/') || p.startsWith('/worksheet/') || p.startsWith('/shapes/') || p.startsWith('/recipes/') || p.startsWith('/teardowns/') || p.startsWith('/failures/')) return { group: 'practice' };
-  if (
-    p.startsWith('/timeline/') ||
-    p.startsWith('/names/') ||
-    p.startsWith('/glossary/') ||
-    p.startsWith('/method/') ||
-    p.startsWith('/changes/') ||
-    p.startsWith('/agents/')
-  ) {
-    return { group: 'reference' };
-  }
-  // tracks is accepted so a future rule can use it; topic pages already resolve above.
+  if (p === '/techniques/' || p.startsWith('/map/') || p.startsWith('/worksheet/')) return {group:'levels'};
+  if (['/examples/','/recipes/','/shapes/','/teardowns/','/threads/'].some(prefix=>p.startsWith(prefix))) return {group:'techniques'};
+  if (['/apply/','/tools/','/agents/'].some(prefix=>p.startsWith(prefix))) return {group:'practice'};
+  if (['/glossary/','/names/','/timeline/','/failures/','/method/','/changes/'].some(prefix=>p.startsWith(prefix))) return {group:'reference'};
   void tracks;
   return {};
 }
 
-/** The items the rail under the header shows for a context: the current group's own pages. */
+/** Compact local navigation; full catalogues remain in menus and the footer. */
 export function railItems(groups: NavGroup[], ctx: NavContext): NavItem[] {
-  const group = groups.find((g) => g.id === ctx.group);
+  const group=groups.find(g=>g.id===ctx.group);
   if (!group) return [];
-  if (group.id === 'techniques') return group.sections[0].items;
-  return group.sections.flatMap((s) => s.items);
+  if (ctx.group==='levels' && ctx.level!==undefined) return group.sections[1].items;
+  return group.sections[0].items;
 }
 
 /** True when `item` is the page at `path`, or (for a section index) an ancestor of it. */
