@@ -1,4 +1,8 @@
+export interface WalkthroughGuide {
+  overview: string; assumptions: string; choices: string; recovery: string; transfer: string;
+}
 export interface WalkthroughCase {
+  guide: WalkthroughGuide;
   slug: string; title: string; group: string; definition: string; audience: string;
   prompt: string; inputs: string; action: string; outcome: string; change: string;
   changedOutcome: string; question: string; correct: string; wrong: string;

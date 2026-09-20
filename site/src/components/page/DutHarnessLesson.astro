@@ -2,12 +2,14 @@
 import WalkthroughPerspectives from '../islands/WalkthroughPerspectives';
 import { examplesFor } from '../../lib/walkthrough-catalog';
 import { audienceLabels } from '../../lib/walkthrough';
+import { dutOverview } from '../../lib/dut-overview';
 import TestAutomationHarness from './TestAutomationHarness.astro';
 import '../../styles/dut-pilot.css';
 ---
 <WalkthroughPerspectives examples={examplesFor('agent-harness')} dedicatedDut client:visible />
 <noscript>
   <p>The interactive walkthrough needs JavaScript. This diagram and the written steps below cover the same workflow.</p>
+  <h3>From DUT brief to reviewable project</h3><p>{dutOverview.overview}</p><p>{dutOverview.task}</p><p>{dutOverview.outcome}</p><p>{dutOverview.transfer}</p>
   <TestAutomationHarness />
-  {examplesFor('agent-harness').map(e=><section><h3>{audienceLabels[e.audience]}</h3><p>{e.prompt}</p><p>{e.inputs}</p><p>{e.action}</p><p>{e.outcome}</p><h4>{e.change}</h4><p>{e.changedOutcome}</p><p>{e.question} {e.correct}</p><p>{e.explanation}</p></section>)}
+  {examplesFor('agent-harness').map(e=><section><h3>{audienceLabels[e.audience]}</h3><p>{e.guide.overview}</p><p>{e.prompt}</p><h3>Assumptions and design choices</h3><p>{e.guide.assumptions}</p><p>{e.guide.choices}</p><p>{e.inputs}</p><p>{e.action}</p><p>{e.outcome}</p><h4>{e.change}</h4><p>{e.changedOutcome}</p><h3>Recovery and adaptation</h3><p>{e.guide.recovery}</p><p>{e.guide.transfer}</p><p>{e.question} {e.correct}</p><p>{e.explanation}</p></section>)}
 </noscript>

@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import ExampleOverview from './ExampleOverview';
+import { dutOverview } from '../../lib/dut-overview';
 
 const initialPrompt = 'Create a project for the new DUT using our Python test framework. Read CLAUDE.md and DUT_BRIEF.md, start from the closest past project, and reuse existing tools. Show me the plan before creating files. Do not change the shared framework or connect to instruments.';
 const phases = ['Understand', 'Plan', 'Approval', 'Generate', 'Check', 'Hand over'];
@@ -58,6 +60,8 @@ export default function DutWalkthrough({ embedded = false }: { embedded?: boolea
   return <div className={'dut-pilot' + (embedded ? ' dut-embedded' : '')}>
     <div className="pilot-kicker">{embedded ? 'GUIDED WORKED EXAMPLE' : 'GUIDED WORKED EXAMPLE'} <span>Scripted simulation · no model calls or hardware access</span></div>
     <header className="pilot-intro"><div><Heading>From DUT brief to reviewable project.</Heading><p>Follow one task. See what the agent proposes, what the harness controls, and where you decide.</p></div><button className="pilot-quiet" onClick={restart}>Restart walkthrough ↺</button></header>
+    <ExampleOverview {...dutOverview} />
+    <details className="walk-adapt"><summary>How this applies beyond this test framework</summary><p>{dutOverview.transfer}</p></details>
     <div className="walk-audience"><span className="pilot-chip">Engineering &amp; technical work</span><small>Create a DUT project within the shared framework’s conventions and approval boundaries.</small></div>
     <div className="pilot-modes" role="group" aria-label="Learning mode">{[['watch','01','Watch it'],['change','02','Change something'],['try','03','Try a decision']].map(([key,num,label]) => <button aria-pressed={mode===key} onClick={()=>setMode(key)}><small>{num}</small>{label}</button>)}</div>
 

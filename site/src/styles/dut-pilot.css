@@ -141,3 +141,16 @@
  .pilot-message { gap:10px; }.pilot-message p { font-size:15px; }
  .pilot-experiment { padding:20px; }.pilot-experiment h2 { font-size:24px; }
 }
+.walk-overview { margin:24px 0 18px; padding:clamp(20px,3vw,32px); background:var(--panel); border:1px solid var(--line); border-radius:10px; }
+.dut-pilot .walk-overview h3 { font-size:21px; letter-spacing:normal; margin:0 0 12px; }
+.dut-pilot .walk-overview h4 { font-size:14px; letter-spacing:normal; margin:0 0 8px; color:var(--text); }
+.dut-pilot .walk-overview p,.dut-pilot .walk-adapt p,.dut-pilot .walk-transfer p,.dut-pilot .walk-transfer li { max-width:none; font-size:15px; line-height:1.8; color:var(--muted); margin:0; }
+.walk-overview-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin:24px 0; }
+.dut-pilot .walk-overview .walk-overview-note { border-top:1px solid var(--line); padding-top:16px; font-size:13px; }
+.walk-adapt { padding:16px 22px; border:1px solid var(--line); border-radius:8px; margin:0 0 24px; }
+.walk-adapt summary { cursor:pointer; color:var(--pilot-accent); font-size:14px; }
+.dut-pilot .walk-adapt p { margin-top:14px; }
+.walk-transfer { padding:20px; background:var(--panel2); border:1px solid var(--line); border-radius:8px; margin-top:24px; }
+.dut-pilot .walk-transfer h3 { font-size:20px; letter-spacing:normal; margin:0 0 12px; }
+.walk-transfer ul { padding-left:20px; }.walk-transfer button { margin-top:16px; }
+@media(max-width:650px) { .walk-overview-grid { grid-template-columns:1fr; gap:18px; } }

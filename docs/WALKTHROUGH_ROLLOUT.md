@@ -6,7 +6,7 @@ This rollout contains 98 authored examples across 58 concepts and guides. Twenty
 
 - 54 concepts and four cross-cutting guides.
 - Dedicated six-stage DUT harness walkthrough retained.
-- 57 additional authored cases share a four-stage reader: starting evidence, action/control, result, and review limits.
+- 57 additional authored cases share a six-stage reader: starting evidence, design choices, action/control, result, review/recovery, and adaptation.
 - Each case has a fixed English request, original/changed outcomes, a decision with explanatory feedback, and a downloadable text record.
 - Weekly-report examples have an interactive simulated delivery gate: exact content, recipients, and version require approval; edits invalidate approval; repeated delivery of the same version is blocked in this page session.
 - This is an in-memory teaching gate, not production authorization, durable idempotency, or a real mail integration.
@@ -38,3 +38,7 @@ Additional perspectives are included only where they change the task and consequ
 ## Verification
 
 Taxonomy coverage and approval invariants have repository unit tests. Local browser verification visits all 57 new examples, traverses original/changed/decision states, checks the report gates, and checks Markdown counterparts. Representative desktop/mobile screenshots, no-JavaScript fallback, and the existing DUT workflow are checked separately. Build, type checking, site tests, and content validation must pass before publication is considered. Release checks run before the authorized publication.
+
+## Reader overviews and depth
+
+Every perspective now opens with an overview, its task, and what to look for. `walkthrough-guides.json` supplies concept-specific assumptions, design tradeoffs, recovery options, and transfer guidance for all 58 entries. These principles complement each audience case’s distinct evidence, actions, outcomes, and decision. They do not add universal approval requirements. The DUT overview explains its particular team policy separately from the reusable harness pattern. Markdown, non-JavaScript content, and case downloads include the expanded guidance.

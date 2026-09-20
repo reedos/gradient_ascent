@@ -2,8 +2,19 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import cases from '../src/data/concept-walkthroughs.json' with {type:'json'};
 import perspectives from '../src/data/walkthrough-perspectives.json' with {type:'json'};
+import guides from '../src/data/walkthrough-guides.json' with {type:'json'};
 import taxonomy from '../../content/taxonomy.json' with {type:'json'};
 import {approvalKey,canDeliver,audienceLabels} from '../src/lib/walkthrough.ts';
+
+test('every concept has distinct overview, choices, recovery and transfer guidance',()=>{
+ const slugs=new Set([...cases,...perspectives].map(c=>c.slug));
+ assert.deepEqual(Object.keys(guides).sort(),[...slugs].sort());
+ for(const field of ['overview','assumptions','choices','recovery','transfer'] as const){
+   const entries=Object.values(guides).map(g=>g[field]);
+   assert.equal(new Set(entries).size,slugs.size,`${field}: generic duplicated guidance`);
+   assert.ok(entries.every(e=>e.trim().length>60),`${field}: missing explanation`);
+ }
+});
 
 test('every taxonomy concept and thread has an authored walkthrough, or the dedicated DUT lesson',()=>{
  const expected=[...taxonomy.tiers.flatMap(t=>t.pages.map(p=>p.slug)),...taxonomy.tracks.flatMap(t=>[t.id,...(t.pages??[]).map(p=>p.slug)]),...taxonomy.threads.map(t=>t.id)].filter(s=>s!=='agent-harness');

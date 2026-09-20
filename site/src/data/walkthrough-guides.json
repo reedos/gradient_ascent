@@ -1,0 +1,408 @@
+{
+  "order-zero": {
+    "overview": "Follow a policy decision from supplied facts to a reproducible answer. The interesting part is deciding whether the rule actually covers the case, including boundaries and missing information.",
+    "assumptions": "The policy and its effective date must be known. Missing evidence is a separate state from failing a rule.",
+    "choices": "Use ordinary code when conditions are explicit. Reserve interpretation or review for ambiguous wording; adding a model does not resolve who owns the policy.",
+    "recovery": "Return the unresolved condition with the relevant rule instead of inventing a value. A policy owner can clarify the rule and rerun the same input.",
+    "transfer": "Replace the reimbursement policy with eligibility, scheduling, validation, or pricing rules. Test the boundary values and exceptions your policy actually contains."
+  },
+  "chat": {
+    "overview": "Follow a request through a first response and a correction. Watch how a useful conversation separates supplied facts, proposed wording, and details that still need an answer.",
+    "assumptions": "A conversational reply may sound confident even when the request is incomplete. Decide which gaps affect correctness and which can remain editable suggestions.",
+    "choices": "Ask about consequential unknowns; make labeled, reversible suggestions for preferences. You do not need an approval workflow for every draft sentence.",
+    "recovery": "Correct a mistaken assumption explicitly and ask for a revised response. Recheck retained facts rather than assuming the correction fixed everything.",
+    "transfer": "Use the pattern for an explanation, plan, invitation, or brainstorming session. Choose what a helpful first draft should accomplish and what you will check yourself."
+  },
+  "prompt-engineering": {
+    "overview": "Compare how instructions shape a response to the same underlying task. Follow the constraints from the English request into the output, then examine what happens when they compete.",
+    "assumptions": "The examples assume the needed facts are available. A clearer prompt cannot supply missing evidence or grant access to a source.",
+    "choices": "Separate essential facts and success criteria from style preferences. Prioritize conflicting requirements rather than accumulating increasingly long instructions.",
+    "recovery": "Revise the specific instruction responsible for the failure, then try it on a different input. One polished response is weak evidence of a reusable prompt.",
+    "transfer": "Substitute your audience, source material, and output purpose. Keep only constraints that make the result more useful; a word limit or exact format is a local choice."
+  },
+  "structured-output": {
+    "overview": "Follow an unstructured message into fields another system can use. Inspect both whether the result fits the format and whether each value is supported by the source.",
+    "assumptions": "The receiving application needs a defined contract, including optional fields, units, and how unknowns are represented.",
+    "choices": "Choose a schema around the consumer's needs. Validate shape with code and meaning against evidence; syntactically valid output can still be wrong.",
+    "recovery": "Preserve the original input and identify the failed field. Retry a repair for a formatting issue; ask for evidence when the value itself is unknown.",
+    "transfer": "Adapt this to forms, tickets, inventory, or test configurations. Your schema and missing-value policy can differ without changing the distinction between structure and truth."
+  },
+  "inference-time-reasoning": {
+    "overview": "Work through a problem with interacting constraints and inspect the proposed answer against them. The goal is a checkable solution, not a persuasive explanation of how hard the model worked.",
+    "assumptions": "The constraints must be explicit enough to test. More computation does not establish that the model understood an omitted requirement.",
+    "choices": "Use a calculator, search, or solver for parts that have reliable external checks. Extra model effort is useful only if it improves the result enough for the task.",
+    "recovery": "When no valid answer is found, distinguish a contradictory specification from a failed attempt. Ask which constraint can change rather than silently relaxing one.",
+    "transfer": "Replace the schedule with a planning or analysis problem. Identify a way to check the answer independently, and compare the extra time against a simpler baseline."
+  },
+  "multimodal": {
+    "overview": "Follow information from different media into a combined interpretation. Notice where a label, image, or spoken observation supports a claim, and where combining them creates an apparent certainty the sources do not justify.",
+    "assumptions": "The walkthrough uses written descriptions of media. In a real system, image quality, transcription errors, and whether the sources describe the same item matter.",
+    "choices": "Retain which modality supplied each important fact. Use cross-checks for identifiers and measurements instead of treating agreement in a generated summary as evidence.",
+    "recovery": "Request a clearer image or confirmation of an uncertain transcription. Preserve disagreement between sources until it is resolved.",
+    "transfer": "Use your own photos, diagrams, recordings, or documents. Match verification to the consequence: organizing a personal album and identifying equipment need different checks."
+  },
+  "context-engineering": {
+    "overview": "Follow the selection of information for a particular request. Compare what is available with what is actually included, then see how source selection changes an otherwise similar response.",
+    "assumptions": "Some available material may be old, irrelevant, or untrusted. Including everything can bury the evidence needed for this decision.",
+    "choices": "Choose sources by authority, relevance, freshness, and size. Preserve unresolved questions and provenance when compressing information.",
+    "recovery": "If a response uses the wrong source, inspect the assembled request first. Restore the missing evidence or correct source precedence before rewriting the answer.",
+    "transfer": "Apply this to a project folder, personal research collection, or reporting workspace. Define which sources take precedence and what must survive summarization in your setting."
+  },
+  "embeddings-search": {
+    "overview": "Follow a meaning-based query into candidate results. Examine why a similar passage can be useful for discovery while still being the wrong item, revision, or answer.",
+    "assumptions": "Similarity scores rank candidates; they do not certify correctness. The collection and its metadata determine what can be found.",
+    "choices": "Combine semantic matching with exact identifiers and filters where appropriate. Tune the number of candidates against noise and the cost of missing a useful result.",
+    "recovery": "If retrieval fails, try alternate wording or an exact lookup and inspect collection coverage. A missing result does not show that the underlying fact is false.",
+    "transfer": "Use the pattern for documents, parts, notes, or support records. Decide which identifiers must match exactly and which wording differences should be tolerated."
+  },
+  "rag": {
+    "overview": "Follow a question through source retrieval into a grounded answer. Inspect whether the retrieved passages actually support the response, including exceptions and unanswered parts.",
+    "assumptions": "The collection may be incomplete or outdated. A citation is useful only when its passage supports the associated claim.",
+    "choices": "Separate retrieval quality from answer quality. Choose whether the evidence supports a direct answer, a qualified answer, or a request for more information.",
+    "recovery": "When evidence conflicts or does not cover the question, show the gap and search or escalate appropriately. Rewording a confident answer does not repair missing support.",
+    "transfer": "Replace the source collection with your manuals, notes, policies, or project records. Set freshness and citation expectations appropriate to the people relying on the answer."
+  },
+  "knowledge-graphs": {
+    "overview": "Follow a question across explicit relationships and inspect the path behind the answer. The example shows how a connected record can explain a dependency while an absent edge can leave the conclusion incomplete.",
+    "assumptions": "Entity identity, relationship meaning, and data coverage must be known. An absent relationship may mean unknown rather than no relationship.",
+    "choices": "Use graph traversal for relationships the data explicitly represents. Use text retrieval for evidence that has not been modeled, and preserve links back to source records.",
+    "recovery": "If a path stops, identify the missing join or stale record. Do not infer a clean bill of health from incomplete coverage.",
+    "transfer": "Apply this to dependencies, ownership, supply chains, or document relationships. Choose the smallest useful schema and define what completeness means for the question."
+  },
+  "memory": {
+    "overview": "Follow a preference or prior fact from one interaction into a later task. See when reusing it helps and when correction, expiry, or a different context should override it.",
+    "assumptions": "Stored information needs a scope and a way to correct it. A past preference is not necessarily a permanent rule or authorization.",
+    "choices": "Store information that will help later tasks, with provenance and appropriate retention. Keep task-specific details separate from broader preferences.",
+    "recovery": "When current instructions conflict with memory, make the conflict visible and update or ignore the old entry as appropriate. Support removal rather than repeated reappearance.",
+    "transfer": "Use memory for personal preferences, project conventions, or recurring reporting context. Decide what should persist, for whom, and how a person can inspect or change it."
+  },
+  "prompt-chaining": {
+    "overview": "Follow work through dependent stages, where each stage hands a specific result to the next. Inspect how an early evidence error can survive into a polished final draft.",
+    "assumptions": "Later stages depend on the quality and completeness of earlier outputs. A successful model response is not necessarily a successful handoff.",
+    "choices": "Use separate stages when they have distinct responsibilities or checks. Keep a single call when splitting adds overhead without improving control or quality.",
+    "recovery": "Stop or repair the affected stage when a required handoff is incomplete. Preserve accepted upstream work rather than rerunning every stage blindly.",
+    "transfer": "Adapt the sequence to research, writing, analysis, or reporting. Define each stage's inputs, output contract, and useful checks; the number of stages is not fixed."
+  },
+  "routing": {
+    "overview": "Follow an incoming request into one of several paths. Inspect the evidence for that choice, especially when the request fits more than one category or none clearly.",
+    "assumptions": "The available destinations must have meaningful responsibilities. A forced label can hide ambiguity or a missing route.",
+    "choices": "Use explicit rules for obvious cases and model classification for language variation when useful. Allow clarification, multiple labels, or an unresolved queue if the task needs them.",
+    "recovery": "When routing is uncertain or wrong, preserve the original request and offer a correction path. Track costly misroutes rather than accuracy alone.",
+    "transfer": "Apply this to personal inboxes, support, engineering triage, or choosing tools. Your categories and escalation threshold should reflect who handles the work next."
+  },
+  "parallelization": {
+    "overview": "Follow independent pieces of a task running alongside one another and then being combined. Watch how a missing branch or inconsistent time window affects the final result.",
+    "assumptions": "The branches must be sufficiently independent, and their results must refer to compatible versions or periods.",
+    "choices": "Parallelize work that can be combined without hidden ordering dependencies. Balance latency benefits against source load, duplication, and aggregation effort.",
+    "recovery": "Retry only the failed branch when safe. Report partial coverage or wait for required inputs according to the task, rather than silently substituting stale information.",
+    "transfer": "Use this for comparisons, checks, or collecting project updates. Define what all branches must share and whether an incomplete result is still useful."
+  },
+  "evaluator-optimizer": {
+    "overview": "Follow a draft through feedback and revision. Inspect whether the revision improves a stated criterion without losing facts or satisfying a weak reviewer through superficial changes.",
+    "assumptions": "The evaluator needs a meaningful rubric and enough evidence to judge it. Model-generated feedback can itself be mistaken.",
+    "choices": "Use automatic checks for measurable constraints and judgment for qualities that need it. Set a stopping condition so revisions do not continue without useful improvement.",
+    "recovery": "Keep the best acceptable version when a revision regresses. Resolve conflicting feedback against the task's priorities instead of repeatedly oscillating.",
+    "transfer": "Apply the loop to writing, code, plans, or analysis. Choose a small rubric, preserve required facts, and decide when a human review or simple first draft is sufficient."
+  },
+  "workflow-graphs": {
+    "overview": "Follow a task through explicit branches, handoffs, and a review point. The example makes the route visible so you can inspect what happens when information is missing or a step must be repeated.",
+    "assumptions": "Transitions need defined conditions and state. A diagram alone does not ensure that a resumed or retried run behaves correctly.",
+    "choices": "Use deterministic transitions for known business rules, and model calls for work needing language judgment. Include human review where the actual consequences justify it.",
+    "recovery": "Resume from a recorded state, invalidate downstream results when their inputs change, and distinguish safe retries from duplicate external actions.",
+    "transfer": "Replace report generation with another repeatable process. Choose your own sources, branches, review policy, and completion criteria; not every workflow needs every gate shown here."
+  },
+  "human-in-the-loop": {
+    "overview": "Follow a proposed action into a human decision and then inspect exactly what that decision permits. Compare accepting, editing, and rejecting the proposal.",
+    "assumptions": "Approval must identify what the person reviewed. Silence and a previous approval do not automatically cover a changed action.",
+    "choices": "Put review at a meaningful commitment boundary. Low-risk routine actions can be preauthorized within a defined scope; more consequential changes may need a fresh decision.",
+    "recovery": "When content, destination, or scope changes, determine whether the existing approval still applies. Preserve the rejection or revision request so execution does not bypass it.",
+    "transfer": "Use this for purchases, messages, test plans, or configuration changes. Define who can decide, what they need to see, and which changes require renewed review."
+  },
+  "function-calling": {
+    "overview": "Follow an English request into a proposed call to an application function, then inspect the result returned to the model. Distinguish choosing a function from the application actually executing it.",
+    "assumptions": "The function contract defines arguments and results. The application must still enforce access and handle invalid or failed calls.",
+    "choices": "Expose narrow, useful operations rather than forcing the model to assemble fragile low-level steps. Validate arguments and distinguish lookup operations from actions with side effects.",
+    "recovery": "Return a clear error or uncertain outcome. Retry only when the operation is safe to repeat; a timeout is not proof that a reservation or update failed.",
+    "transfer": "Use your existing APIs, business functions, or instrument abstractions. The tool schema should express the operation your application can reliably support."
+  },
+  "code-execution": {
+    "overview": "Follow a computation from supplied data through a small program into a checkable result. Inspect units, assumptions, and evidence of execution separately from generated code.",
+    "assumptions": "Inputs and units must be defined. Code that looks plausible may not have run, and running successfully does not prove the calculation is appropriate.",
+    "choices": "Use code for repeatable calculation and transformations. Choose libraries and an execution environment suited to the data and allowed side effects.",
+    "recovery": "If inputs are inconsistent or the result is implausible, inspect intermediate values and compare with a simple independent check. Do not hide a failed execution behind a predicted result.",
+    "transfer": "Apply this to analysis, conversions, parsing, or plotting. Specify allowed files and operations according to the task; an isolated calculator needs fewer controls than a system-changing script."
+  },
+  "mcp": {
+    "overview": "Follow access to a resource or tool through a common connection interface. Inspect what the server exposes, what the client is allowed to use, and how returned content enters the task.",
+    "assumptions": "A connected server may expose capabilities the user has not authorized for this task. Connection and authentication do not establish content trust.",
+    "choices": "Choose the resources and tools needed for the job and preserve their schemas and provenance. Use a direct integration when it is simpler for a single fixed capability.",
+    "recovery": "When a server is unavailable or returns untrusted instructions, separate the access failure or content from the user's request. Do not quietly substitute a different authority.",
+    "transfer": "Adapt the example to document stores, project systems, or engineering services. Specify the integration's actual read and write scope rather than assuming a standard protocol determines permissions."
+  },
+  "computer-use": {
+    "overview": "Follow a task through a visible interface, using observations to choose and check each interaction. Notice the difference between clicking a control and establishing that the intended operation succeeded.",
+    "assumptions": "Page state, labels, and session state can change. A remembered coordinate or previous screen is insufficient evidence for a consequential click.",
+    "choices": "Prefer a reliable API when available; use the interface when necessary. Observe results after actions and place review at the actual commitment point where appropriate.",
+    "recovery": "If the page changes or an action times out, inspect the new state before repeating it. Recover from the last confirmed state instead of blindly replaying clicks.",
+    "transfer": "Use this for a portal, desktop application, or browser workflow. Choose checkpoints according to reversibility and consequence, not a rule that every click needs permission."
+  },
+  "single-agent": {
+    "overview": "Follow one agent choosing its next action from the results it receives. Watch the loop gather information, revise its approach, and decide whether it has enough to finish.",
+    "assumptions": "The request needs a recognizable completion condition and available tools. Autonomy does not imply unrestricted access or unlimited attempts.",
+    "choices": "Let the model choose between useful next steps when the route is uncertain. Use a fixed workflow when the steps are already well known.",
+    "recovery": "When progress stalls, inspect the evidence gap and choose a different approach, ask a question, or return a partial result. Repeated identical calls are not progress.",
+    "transfer": "Apply the loop to investigation, planning, or bounded project work. Choose tools, budgets, and stopping conditions proportionate to the task rather than copying another agent's limits."
+  },
+  "agentic-rag": {
+    "overview": "Follow an investigation in which the model chooses follow-up searches as evidence arrives. Inspect how each new source changes the question and whether further searching is still useful.",
+    "assumptions": "Relevant evidence may span sources or contain contradictions. Search autonomy cannot compensate for missing access or a collection that lacks the answer.",
+    "choices": "Use a fixed retrieval pass for simple questions; allow iterative retrieval when the first result exposes a real gap. Record support for final claims rather than search volume.",
+    "recovery": "When sources disagree, identify the conflict and seek discriminating evidence. Stop with a qualified finding when the remaining uncertainty cannot be resolved within the task.",
+    "transfer": "Use this for technical investigation, policy research, or project analysis. Define acceptable sources, evidence freshness, and what counts as enough support for your decision."
+  },
+  "coding-agents": {
+    "overview": "Follow a code change from understanding the repository through a proposed edit and focused verification. Inspect whether the patch fixes the intended behavior without silently changing unrelated contracts.",
+    "assumptions": "Repository conventions and existing tests are context, not proof that the current behavior is correct. The issue needs a concrete expected outcome.",
+    "choices": "Use the smallest coherent change, reuse existing abstractions, and choose checks tied to the bug or feature. Refactoring may be justified when it removes the cause, not just because the agent prefers it.",
+    "recovery": "If a test fails, distinguish a patch defect from an unrelated baseline failure. Preserve the diff and explain remaining uncertainty before expanding scope.",
+    "transfer": "Apply this to a feature, bug, or migration. Agree on editable areas and review expectations appropriate to the repository rather than assuming every project has a protected shared framework."
+  },
+  "agent-harness": {
+    "overview": "Follow a task through the runtime surrounding the model: context assembly, tool access, execution, and stopping. The same model can behave differently when these surrounding choices change.",
+    "assumptions": "Instructions describe expected behavior; runtime permissions and checks determine which actions can actually execute. Their configuration must match the intended task.",
+    "choices": "Choose tools, persistence, limits, and review points for the consequences of the work. A read-only research assistant and a deployment agent need different boundaries.",
+    "recovery": "When a tool fails, evidence is missing, or a limit is reached, preserve useful state and report the open issue. Ask for expanded authority only when the task actually requires it.",
+    "transfer": "Reuse the pattern with your own sources and tools. Keep goal, context, execution authority, and verification distinct; the DUT-specific ban on shared-framework edits is one policy, not the definition of a harness."
+  },
+  "skills": {
+    "overview": "Follow a reusable procedure being selected and applied to a specific task. Inspect what the procedure contributes and where current context requires judgment rather than mechanical copying.",
+    "assumptions": "A procedure has a scope, prerequisites, and a version. Instructions inside a skill do not make its outputs correct or authorize unrelated actions.",
+    "choices": "Use a skill for recurring know-how; use tools to execute operations. Keep task-specific facts outside the reusable procedure and check whether its assumptions fit.",
+    "recovery": "If the skill conflicts with current requirements or lacks a necessary step, surface the mismatch and adapt within authority. Do not silently treat an old template as current policy.",
+    "transfer": "Apply this to reporting, analysis, design, or repository work. Keep procedures small enough to maintain and make their applicability clear."
+  },
+  "voice-agents": {
+    "overview": "Follow a spoken interaction through interpretation, clarification, and a response or action. Focus on names, quantities, interruptions, and corrections that can change the user's intent.",
+    "assumptions": "This walkthrough represents speech as text. A real voice system must handle audio uncertainty and turn-taking as well as the task itself.",
+    "choices": "Confirm consequential or easily misheard details, while letting ordinary conversation remain natural. Choose whether a correction replaces a draft or arrives after a commitment.",
+    "recovery": "If speech is unclear or the user interrupts, preserve the last confirmed intent and clarify the disputed part. Check action state before attempting a second submission.",
+    "transfer": "Use this for scheduling, assistance, or hands-free workflows. Adapt confirmation to the action's consequence; do not turn every spoken sentence into an approval ceremony."
+  },
+  "orchestrator-workers": {
+    "overview": "Follow a coordinator splitting a task into focused assignments and assembling their results. Inspect whether each worker had enough context and whether the combined answer resolves overlapping or conflicting findings.",
+    "assumptions": "Worker outputs are claims requiring integration, not independent proof merely because several agents produced them.",
+    "choices": "Delegate separable work with clear deliverables. Keep shared constraints in every assignment and retain synthesis responsibility with the coordinator.",
+    "recovery": "If a worker fails or results disagree, identify the missing evidence and reassign or investigate only the affected part. Do not average incompatible conclusions.",
+    "transfer": "Use this for comparisons, research, or implementation subtasks. A single agent is often preferable when the work shares too much state to divide cleanly."
+  },
+  "agent-graphs": {
+    "overview": "Follow a task through a network of agent roles and explicit handoffs. Inspect which state is shared, who chooses the next route, and how the system handles a return to an earlier stage.",
+    "assumptions": "A role diagram is not an execution policy. State ownership and transition conditions need to be specified separately.",
+    "choices": "Use agent nodes where adaptive reasoning helps and deterministic nodes for reliable checks. Add roles only when the division makes the work clearer or better.",
+    "recovery": "On a failed handoff, retain the originating evidence and return to the responsible node. Bound cycles so repeated review does not become endless work.",
+    "transfer": "Apply this to investigations or collaborative production. Choose topology around dependencies and authority rather than modeling an organization chart for its own sake."
+  },
+  "debate-review": {
+    "overview": "Follow a proposal through a second perspective and reconciliation. Inspect the reasons and evidence behind disagreements instead of treating the number of agreeing reviewers as confidence.",
+    "assumptions": "Reviewers can share blind spots, especially when they use the same sources or assumptions. Agreement alone is not an independent check.",
+    "choices": "Give reviewers distinct questions or evidence to examine. Use external tests or requirements to settle factual issues when possible.",
+    "recovery": "When disagreement persists, identify the specific unresolved claim and route it to evidence or a responsible person. Do not force consensus for presentation.",
+    "transfer": "Use this for design reviews, policy drafts, or plans. Choose reviewers whose perspective changes what gets checked, and keep the final decision accountable."
+  },
+  "long-horizon": {
+    "overview": "Follow a multi-step task across a pause and resumption. Inspect which completed work, open questions, and dependencies must survive outside the conversation.",
+    "assumptions": "Long tasks encounter changed inputs and partial completion. A saved summary may omit details required to resume safely.",
+    "choices": "Create checkpoints around coherent units of work and record evidence of completion. Decide what can be reused after a source or requirement changes.",
+    "recovery": "After interruption, reconcile recorded state with the actual workspace before continuing. Repeat only work whose result or completion status cannot be established.",
+    "transfer": "Use this for migrations, research, or large content projects. Match checkpoints and budgets to the work rather than assuming persistence means running continuously."
+  },
+  "agent-teammates": {
+    "overview": "Follow a recurring assistant from a trigger to a useful draft and a later human decision. Inspect what persists between runs and how new evidence replaces last week's assumptions.",
+    "assumptions": "A schedule starts work; it does not establish that inputs are fresh or that an earlier approval covers this run.",
+    "choices": "Define the recurring responsibility, evidence window, and conditions for notifying someone. Automate routine preparation while placing review where your task requires it.",
+    "recovery": "When a source is late or a run fails, report the gap and avoid duplicating external actions. Resume against the current period rather than replaying an old draft as new.",
+    "transfer": "Use this for reminders, summaries, monitoring, or maintenance. Set cadence and notification policy around usefulness, not constant activity."
+  },
+  "organizations-swarms": {
+    "overview": "Follow several groups coordinating related work and shared resources. Inspect how responsibilities, dependencies, and escalation affect the result when one group falls behind.",
+    "assumptions": "More agents increase coordination demands and can duplicate mistakes. Shared objectives and ownership need to be explicit.",
+    "choices": "Choose teams only when specialization or parallel capacity justifies communication overhead. Centralize decisions that affect shared resources or conflicting priorities.",
+    "recovery": "If ownership is unclear or work is duplicated, reconcile state and assign a single accountable owner for the decision. More delegation is not necessarily the remedy.",
+    "transfer": "Apply this to large simulated projects or organizational workflows. Start with the smallest team structure that improves the task and measure coordination cost as well as output."
+  },
+  "embodied": {
+    "overview": "Follow a physical task from observation through a proposed motion and a checked outcome. The example separates uncertain perception, planning, and the system that enforces physical limits.",
+    "assumptions": "The walkthrough is a text simulation, not a robot controller. Real systems require environment-specific safety engineering and validated low-level control.",
+    "choices": "Use high-level reasoning for task choices while bounded controllers handle motion. Select interventions according to physical risk and uncertainty.",
+    "recovery": "When observation or position is uncertain, use the system's validated safe behavior and obtain fresh state. A language response is not evidence that motion stopped safely.",
+    "transfer": "Generalize to sensing and physical assistance only with controls appropriate to the machine and environment. Do not copy a teaching fixture's thresholds into equipment."
+  },
+  "evals": {
+    "overview": "Follow a candidate change through a set of representative tasks and inspect how success is judged. Compare improvements, regressions, and cases the headline score hides.",
+    "assumptions": "The evaluation set and rubric define what the score means. A small or contaminated set can exaggerate improvement.",
+    "choices": "Include common cases, consequential failures, and a held-out comparison. Separate format checks, factual quality, and action correctness when they matter independently.",
+    "recovery": "If results are mixed, inspect failure slices and judge the tradeoff against the task. Do not repeatedly tune on the final test set and still call it held out.",
+    "transfer": "Use evaluation for prompts, models, retrieval, or complete workflows. Choose examples from the intended use and keep a simple baseline for comparison."
+  },
+  "eval-frameworks": {
+    "overview": "Follow an evaluation configuration into reproducible case results and a report. Inspect what the framework automates and what still depends on the quality of the cases and graders.",
+    "assumptions": "A runnable harness cannot make an unsuitable rubric meaningful. Versions, inputs, and grading configuration need to be recorded.",
+    "choices": "Use automation for repeatable execution and reporting, with human review where grading is uncertain. Keep errors distinct from scored failures.",
+    "recovery": "When a run is interrupted or a grader changes, preserve the records and compare only compatible results. Investigate missing cases instead of presenting an incomplete average.",
+    "transfer": "Adapt this to your preferred testing stack. The important contract is reproducible inputs, attributable outputs, explicit grading, and inspectable failures."
+  },
+  "adaptation": {
+    "overview": "Follow a recurring model failure into a choice of improvement method. Compare changing instructions, supplying better information, and changing model behavior before committing to training.",
+    "assumptions": "Different failures have different causes. Missing current facts, unclear labels, and inconsistent formatting should not automatically receive the same treatment.",
+    "choices": "Try the simplest intervention matched to the failure and compare on representative cases. Training is a candidate when the desired behavior is stable and adequate examples exist.",
+    "recovery": "If the improvement does not transfer to held-out cases, revisit the diagnosis. More examples or a larger model may not address the underlying issue.",
+    "transfer": "Use this decision process for classification, writing style, extraction, or assistance. Define the observed failure first and choose the intervention second."
+  },
+  "fine-tuning": {
+    "overview": "Follow a stable behavior requirement through training-data preparation and evaluation of a candidate model. Inspect label quality and generalization rather than assuming training guarantees learning the intended rule.",
+    "assumptions": "Training examples must represent the target behavior and be appropriate to use. A model can learn annotation inconsistencies or irrelevant cues.",
+    "choices": "Compare with prompting and retrieval first. Separate training, development, and final evaluation data, and keep a baseline that has not been adapted.",
+    "recovery": "If a class improves while others regress, examine label definitions and data balance. Retain the previous model until the tradeoff is acceptable for the task.",
+    "transfer": "Apply this to repeated, stable behavior patterns. Changing facts usually need maintained information sources; they are not automatically a reason to retrain."
+  },
+  "distillation": {
+    "overview": "Follow a larger system's outputs into a candidate smaller model and an independent check. Inspect which useful behavior survives and which teacher errors can be copied.",
+    "assumptions": "Teacher outputs are proposed training material, not ground truth. The student may operate with different capacity and context constraints.",
+    "choices": "Select examples that cover the intended workload, review consequential labels, and measure the student directly against requirements and a baseline.",
+    "recovery": "If the student copies a systematic error or loses rare-case performance, correct the dataset or narrow its role. Matching average teacher behavior may be insufficient.",
+    "transfer": "Use this for a bounded classifier or other repeated task. Decide which quality, latency, and resource tradeoffs are acceptable before judging the smaller model."
+  },
+  "synthetic-data": {
+    "overview": "Follow a gap in an example collection through generated candidates, filtering, and a check on independent data. Inspect whether the new examples add useful variation or repeat the generator's assumptions.",
+    "assumptions": "Generated cases can be repetitive, unrealistic, or mislabeled. They may miss precisely the unusual situations the real task contains.",
+    "choices": "Use synthetic data to complement evidence where justified, with review and clear provenance. Keep real or independently constructed evaluation cases separate.",
+    "recovery": "If apparent gains disappear on independent cases, inspect duplicates, leakage, and unrealistic patterns. Generate from a revised coverage plan rather than merely increasing volume.",
+    "transfer": "Apply this to practice cases, extraction variants, or rare categories. Define the missing coverage and how candidate examples will be accepted or rejected."
+  },
+  "prompt-optimization": {
+    "overview": "Follow a search over prompt candidates and compare their performance beyond the examples used to select them. Inspect the difference between improving a score and improving the actual task.",
+    "assumptions": "The objective and development set shape what gets optimized. A narrow score may reward behavior that is unhelpful elsewhere.",
+    "choices": "Use a limited candidate search, a meaningful baseline, and untouched evaluation cases. Include cost or complexity when they affect deployment value.",
+    "recovery": "If a winning prompt fails on new cases, inspect overfitting and hidden assumptions. Do not keep modifying the final test set to preserve the apparent win.",
+    "transfer": "Use this for extraction, classification, or other repeated prompts. A manually improved prompt may be sufficient when the task or dataset is still changing."
+  },
+  "safety": {
+    "overview": "Follow a useful task through decisions about sensitive information, affected people, and acceptable use. Inspect how the task can still be completed while reducing unnecessary exposure or harm.",
+    "assumptions": "Who can see the inputs and outputs matters as much as the wording. Small groups or contextual clues may reveal identities even after names are removed.",
+    "choices": "Collect and disclose only what the purpose needs, with appropriate access and retention. Match review to the sensitivity and consequences of the use.",
+    "recovery": "If the intended result would expose someone or exceed permitted use, change the aggregation, audience, or task scope. Explain what utility remains and what is being withheld.",
+    "transfer": "Apply the analysis to your information and stakeholders. Local policy and context determine the controls; a generic anonymization rule is not enough."
+  },
+  "guardrails": {
+    "overview": "Follow a proposed input, response, or action through checks that can accept, modify, or block it. Inspect both a harmful miss and an unnecessary block of legitimate work.",
+    "assumptions": "Checks have false positives and false negatives. Instructions, classifiers, schemas, and execution permissions address different failure modes.",
+    "choices": "Use layered checks where consequences warrant them and deterministic enforcement for hard boundaries. Allow normal work within the authorized scope.",
+    "recovery": "When a check blocks legitimate work, provide a correction or review path. When it misses a case, improve the relevant layer without assuming a stricter prompt fixes execution authority.",
+    "transfer": "Use guardrails around the specific risk in your application. A private drafting assistant may need fewer gates than a system that changes shared records."
+  },
+  "red-teaming": {
+    "overview": "Follow a targeted challenge against a system's claimed boundary and record what actually happened. The goal is a reproducible finding and a useful repair, not a collection of dramatic prompts.",
+    "assumptions": "Testing needs authorized scope and observable success criteria. A refusal message alone may not establish that no prohibited action occurred.",
+    "choices": "Choose probes from the system's real capabilities and risks. Vary conditions systematically and record the relevant environment and outcome.",
+    "recovery": "After a finding, repair the responsible control and retest the original case plus nearby variants. Preserve uncertainty when the action result cannot be observed.",
+    "transfer": "Adapt the exercise to your assistant's sources, tools, and trust boundaries. Keep testing within authorized systems and define what evidence would establish a failure."
+  },
+  "ops": {
+    "overview": "Follow a change from a candidate release into monitored use and a possible rollback. Inspect how operational decisions depend on user outcomes, not just whether the service responds.",
+    "assumptions": "Model, prompt, retrieval, and dependency changes can all alter behavior. Versions and rollback options must be known.",
+    "choices": "Roll out proportionately to risk, compare relevant quality and reliability signals, and retain a known working path. A small internal tool may need a simpler process.",
+    "recovery": "When outcomes regress, limit exposure, identify the changed component, and roll back or degrade gracefully. Retrying requests is not a cure for a systematic quality regression.",
+    "transfer": "Use this for any maintained AI feature. Choose release stages and response thresholds around your workload, users, and recovery cost."
+  },
+  "observability": {
+    "overview": "Follow an incorrect or unexpected outcome backward through recorded events. Inspect whether the problem came from input selection, model output, tool execution, or a later application step.",
+    "assumptions": "Useful records need identifiers and versions, but logs can contain sensitive data. Missing events constrain what can be concluded.",
+    "choices": "Record enough to reconstruct relevant decisions and external effects, with proportionate redaction and retention. Do not confuse a generated explanation with a trace of actual execution.",
+    "recovery": "When records are incomplete, mark the diagnosis as provisional and reproduce the case where possible. Add targeted instrumentation rather than logging everything indefinitely.",
+    "transfer": "Apply this to a personal automation or production service. Choose events around the questions you need to answer when something goes wrong."
+  },
+  "ai-gateways": {
+    "overview": "Follow a request through a shared access layer and a provider failure or fallback. Inspect which policies remain true when the destination or model changes.",
+    "assumptions": "Providers may differ in data handling, tool support, and output behavior. Successful routing does not guarantee equivalent results.",
+    "choices": "Centralize policies that benefit from consistent enforcement. Permit fallback only to destinations compatible with the request's requirements.",
+    "recovery": "When no compatible provider is available, return a useful failure or defer the work. Avoid changing privacy or capability assumptions merely to produce a response.",
+    "transfer": "Use a gateway when several applications or providers share policy needs. A single simple integration may not need an additional routing layer."
+  },
+  "cost-optimization": {
+    "overview": "Follow a proposed saving through a quality and validity check. Inspect whether reuse, a smaller model, or fewer calls reduces expense without changing the result people rely on.",
+    "assumptions": "A cheaper response is not a saving if it creates more correction work. Cached content may be invalid for another user, source version, or time.",
+    "choices": "Measure the full task cost and compare alternatives on representative outcomes. Cache only when the key covers the conditions that make reuse valid.",
+    "recovery": "When a saving introduces errors, narrow its scope or fall back to the reliable path. Reassess the assumptions rather than assuming every request needs the expensive route.",
+    "transfer": "Apply this to repeated answers, extraction, or agent loops. Optimize the dominant cost in your workload and define an acceptable quality floor first."
+  },
+  "local-inference": {
+    "overview": "Follow a proposed offline task through resource, quality, and privacy tradeoffs. Inspect whether a candidate local setup fits the actual workload instead of equating local execution with suitability.",
+    "assumptions": "Hardware capacity, model files, context length, and supporting software all matter. Local inference does not automatically mean every part of an application stays offline.",
+    "choices": "Test representative inputs on the intended device and inspect network behavior where offline operation matters. Compare usability and maintenance effort as well as response quality.",
+    "recovery": "If memory or performance is inadequate, reduce workload, choose a suitable model, or revise the deployment plan. Do not present an estimate as a measured device result.",
+    "transfer": "Use this for private drafting, field work, or offline assistance. Your device and workload determine the tradeoff; the example's resource assumptions are not universal specifications."
+  },
+  "operator-craft": {
+    "overview": "Follow a person shaping a task, inspecting a draft, and deciding what to accept or revise. The useful skill is directing attention toward the parts that need human judgment.",
+    "assumptions": "Fluent output can hide omissions, and the user may not initially know every requirement. The task can become clearer through iteration.",
+    "choices": "Start with an outcome and a checkable draft. Delegate routine preparation while retaining decisions that depend on your intent, knowledge, or commitments.",
+    "recovery": "When the draft misses the point, correct the goal or evidence rather than only polishing the wording. Keep useful work and revise the affected parts.",
+    "transfer": "Use this approach for planning, writing, learning, or technical work. The right collaboration depends on what you can check and which decisions you want to retain."
+  },
+  "briefing": {
+    "overview": "Follow a short task description into a usable working brief. Inspect which details constrain the work and which can remain open for proposals.",
+    "assumptions": "A brief should supply the goal, relevant context, and success criteria without pretending every preference is already decided.",
+    "choices": "State hard requirements separately from preferences and invite questions about consequential gaps. Allow the assistant to propose options for genuinely open choices.",
+    "recovery": "If requirements conflict, ask for a tradeoff rather than an impossible draft. Update the brief when a decision changes so later work uses the same understanding.",
+    "transfer": "Adapt this to a project, event, analysis, or document. The filename and template are optional; a shared understanding of outcome and constraints is what matters."
+  },
+  "reviewing": {
+    "overview": "Follow a generated artifact through checks targeted at its claims and consequences. Inspect why readable prose or plausible code should not receive the same review as an independently verified result.",
+    "assumptions": "Review effort is limited. The reviewer needs the source evidence or expected behavior for the parts they are asked to approve.",
+    "choices": "Check important facts, calculations, omissions, and commitments first. Use deterministic checks where available and judgment where purpose or ambiguity matters.",
+    "recovery": "When one claim fails, inspect related assumptions and correct the source of the error. Do not discard sound work automatically or approve the remainder without thought.",
+    "transfer": "Use this for reports, budgets, code, or plans. Scale review to consequence and uncertainty; a rough private draft needs less scrutiny than a shared operational decision."
+  },
+  "delegating": {
+    "overview": "Follow a task being divided between an assistant and a person. Inspect what can proceed independently and what should return as a proposal or question.",
+    "assumptions": "Capability and authority are separate. The assistant may be able to perform an action that the user only asked it to prepare.",
+    "choices": "Delegate coherent outcomes with clear boundaries and a way to recognize completion. Preauthorize routine reversible work where appropriate rather than requesting permission for every step.",
+    "recovery": "When the task exceeds the agreed scope or needs missing judgment, return the specific decision with options. Avoid both silent expansion and unnecessary interruptions.",
+    "transfer": "Apply this to research, administration, or engineering work. Choose boundaries based on reversibility, shared resources, and what the user wants to retain."
+  },
+  "trust": {
+    "overview": "Follow a sequence of outcomes into a decision about how much oversight to use next. Inspect whether evidence of reliability transfers to the task now being attempted.",
+    "assumptions": "Success on familiar easy cases may not transfer to new contexts. Confidence should concern a specific capability under specific conditions.",
+    "choices": "Increase autonomy gradually where observed performance and recoverability support it. Keep direct checks on consequential or unfamiliar outputs.",
+    "recovery": "When a new failure appears, narrow reliance and investigate its conditions. Neither one success nor one mistake establishes universal trustworthiness.",
+    "transfer": "Use this for your own assistant or a team service. Track the tasks it handles reliably and the situations that still need closer review."
+  },
+  "graph-engineering": {
+    "overview": "Compare different meanings of a graph within one task: relationships in information, transitions in a workflow, and coordination between agents. Follow what each representation helps explain.",
+    "assumptions": "Nodes and edges need an explicit meaning. A knowledge relationship is not an instruction to execute a step or delegate an action.",
+    "choices": "Choose the graph type for the question and combine representations only with clear interfaces. A simple list can be better when relationships add no useful structure.",
+    "recovery": "If a conclusion or transition is confusing, inspect edge semantics and missing data before adding more nodes. Distinguish a broken data join from a broken workflow.",
+    "transfer": "Apply this to dependencies, processes, or agent coordination. Name what every edge means and what it does not imply."
+  },
+  "who-approves-what": {
+    "overview": "Follow authority as a task moves from advice to bounded action. Compare a one-time decision with standing permission and inspect when a changed situation exceeds either.",
+    "assumptions": "Authority belongs to a defined person or policy and has a scope. A model's recommendation does not create that authority.",
+    "choices": "Use standing permission for predictable work inside explicit limits and fresh review for material exceptions. Make the commitment visible to the approver.",
+    "recovery": "If the request changes or ownership is unclear, pause the affected commitment and identify the decision needed. Unrelated authorized preparation can continue.",
+    "transfer": "Use this for orders, reporting, configuration, or project work. Choose review points according to consequences and organizational responsibility rather than a fixed number of approval steps."
+  },
+  "checking-the-work": {
+    "overview": "Follow a convincing result through different kinds of verification. Separate checking the format, the supporting evidence, and the effect of any action.",
+    "assumptions": "Each check establishes something specific. Valid formatting does not prove a factual claim, and an approved plan does not prove successful execution.",
+    "choices": "Choose independent checks for consequential claims and actions. Combine automated validation with source review instead of asking the same model only whether it was right.",
+    "recovery": "When checks disagree, identify which property failed and repair that layer. Preserve what was actually observed and label what remains unknown.",
+    "transfer": "Apply this to any generated artifact. Ask what evidence would convince you the result works for its intended purpose, not merely that it looks finished."
+  },
+  "what-the-model-sees": {
+    "overview": "Follow the information available at a particular step and compare it with the wider task history. Inspect what changes after truncation, retrieval, or summarization.",
+    "assumptions": "The model cannot rely on details that are absent from its current input unless another mechanism retrieves them. A summary may drop unresolved conditions.",
+    "choices": "Keep decision-critical constraints, provenance, and open questions when compressing context. Retrieve detailed evidence when a later step depends on it.",
+    "recovery": "If a resumed task contradicts prior decisions, inspect the assembled context and restore missing state. Do not assume the full conversation was available.",
+    "transfer": "Use this for long conversations, project assistance, or recurring work. Decide what must persist explicitly and what can be recovered on demand."
+  }
+}
