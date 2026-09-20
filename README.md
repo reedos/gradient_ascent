@@ -9,14 +9,19 @@ enough.
 
 **Read it: https://reedos.github.io/gradient_ascent/**
 
-**Status: live and in development.** Every page is `sourced`: written, with every factual claim
-checked against a primary source, and with no recorded run and no scored result file behind it.
+**Status: live and in development.** Concept pages are `sourced`: written with primary references,
+but not a guarantee of error-free content, and with no recorded run and scored result file behind them.
 Nothing in this repository has ever called a model. See
 [What is and is not real yet](#what-is-and-is-not-real-yet). Found something wrong? Every page has a feedback link, or open
 [the feedback form](https://github.com/reedos/gradient_ascent/issues/new?template=feedback.yml);
 see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Get it running
+
+For a guided introduction, start at [Learn step by step](https://reedos.github.io/gradient_ascent/learn/):
+18 lessons across six stages, with editable workspaces, deterministic simulations, explained checks,
+six projects, and ZIP downloads. Drafts and progress stay in the reader's browser. No API key or model
+call is needed. The teaching order is separate from the autonomy levels.
 
 Two toolchains, no shared setup. The Python side is stdlib only: there is nothing to install, no
 virtual environment, and no `requirements.txt`. Python 3.11 or newer; Node 22.12 or newer.

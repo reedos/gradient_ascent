@@ -1,0 +1,40 @@
+---
+import Base from '../../layouts/Base.astro';
+import LearningProgress from '../../components/LearningProgress.astro';
+import { lessons, learningStages } from '../../lib/learning';
+import { url } from '../../lib/url';
+import '../../styles/learning.css';
+---
+<Base title="Learn step by step · Gradient Ascent" description="An 18-lesson path from model basics to operating agents, with worked examples, exercises, explained answers, and six projects.">
+  <div class="page-hero">
+    <div class="eyebrow">Start here · No coding required to begin</div>
+    <h1>Learn step by step</h1>
+    <p>Build understanding before adding autonomy. Follow 18 lessons through six stages, with a worked example and a self-check in each lesson.</p>
+  </div>
+  <div class="learn-intro">
+    <p>Start at the beginning or revisit a stage. The sequence is a teaching order; the site's eight levels describe how much control a model has. Higher levels are not a score or a destination everyone needs to reach.</p>
+    <p>Allow roughly 4–5 hours for the lessons, plus time for the projects and optional reading. These are planning estimates. Every lesson has an editable workspace, a deterministic simulation, and downloadable files. All six projects can be constructed here in the browser. No installation, API key, or paid model is needed.</p>
+    <p>Read the lesson, try the exercise before opening its answer, then edit and run the simulation. Complete the stage project in its workspace. Mark completion yourself when you can explain the result; the checkmark is a bookmark, not a certification. Work is saved in this browser, with ZIP downloads for your own copy. Simulations use fixed teaching scenarios; they do not call or grade a model.</p>
+  </div>
+  <LearningProgress />
+  <nav aria-label="Learning stages" class="stage-jumps">
+    {learningStages.map((stage, i) => <a href={`#stage-${i + 1}`}>{i + 1}. {stage.title}</a>)}
+  </nav>
+  {learningStages.map((stage, i) => <section class="learn-stage" id={`stage-${i + 1}`}>
+    <div class="eyebrow">Stage {i + 1} of 6</div>
+    <h2>{stage.title}</h2><p>{stage.summary}</p>
+    <ol class="lesson-list" start={i * 3 + 1}>
+      {lessons.filter(l => l.stage === i).map(l => <li>
+        <div><a href={url(`/learn/${l.id}/`)}>{l.title}</a><p>{l.objective}</p></div>
+        <small>~{l.minutes} min <span data-lesson-badge={l.id}></span></small>
+      </li>)}
+    </ol>
+    <div class="stage-project">
+      <h3>Stage project: {stage.project}</h3>
+      <ul>{stage.deliverables.map(d => <li>{d}</li>)}</ul>
+      <p><strong>Ready to continue when:</strong> {stage.ready}</p>
+      <p><a href={url(`/learn/${lessons.filter(l => l.stage === i).at(-1)!.id}/#stage-project`)}>Open this project workspace →</a></p>
+    </div>
+  </section>)}
+  <p class="learn-intro">The path introduces the major ideas; the linked concept pages add diagrams, examples, limitations, and primary sources. It is not a complete machine-learning degree or a qualification for safety-critical deployment.</p>
+</Base>

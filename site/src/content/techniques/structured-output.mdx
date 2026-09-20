@@ -13,8 +13,8 @@ sources:
     url: "https://ai.google.dev/gemini-api/docs/structured-output"
     publisher: "Google"
     accessed: "2026-09-19"
-  - title: "Tool use with Claude"
-    url: "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview"
+  - title: "Structured outputs"
+    url: "https://platform.claude.com/docs/en/build-with-claude/structured-outputs"
     publisher: "Anthropic"
     accessed: "2026-09-19"
   - title: "Pydantic Validation"
@@ -47,9 +47,10 @@ not a paragraph your code has to parse by guessing. Makers reach it two ways. A 
 response format constrains which tokens the model may produce next, so OpenAI says a model given
 one "will always generate responses that adhere to" it, and lists among the benefits "No need to
 validate or retry incorrectly formatted responses"<Cite n={1}/>; Gemini takes the same approach
-through a schema in `response_format`<Cite n={2}/>. Anthropic gets there differently: define a
-tool with an input schema and have the model call it, adding `strict: true`<Cite n={3}/>. Either
-way it sits at level 1, one request and one response, in a shape your code chose first.
+through a schema in `response_format`<Cite n={2}/>. Anthropic supports schema-constrained JSON
+responses through `output_config.format`, and separately supports strict tool inputs through
+`strict: true`. These can be used independently or together<Cite n={3}/>. A direct structured reply
+without tool execution sits at level 1, one request and one response, in a shape your code chose first.
 
 OpenAI also lists cases where a reply still may not match: a refusal, or a response cut short by
 the token limit<Cite n={1}/>. And no schema check confirms the values are right. Validating your

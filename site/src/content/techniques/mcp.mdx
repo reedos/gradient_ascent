@@ -48,6 +48,10 @@ sources:
     url: "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization"
     publisher: "Model Context Protocol (specification)"
     accessed: "2026-09-19"
+  - title: "Resources: security considerations"
+    url: "https://modelcontextprotocol.io/specification/2026-07-28/server/resources#security-considerations"
+    publisher: "Model Context Protocol (specification)"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -102,7 +106,10 @@ only one of them can act on its own. "Tools" are "functions that your LLM can ac
 the model decides when to use them; "Resources" are "passive data sources that provide read-only
 access to information for context," fetched by the application rather than requested by the model;
 "Prompts" are "pre-built instruction templates," invoked by you<Cite n={2}/>. A server offering
-only resources is read-only and safe to add freely; one offering tools can take actions on your
+only resources exposes data through read operations, but that does not make it safe to add
+without review. Check the server's trustworthiness, what data it can access, and where that data
+is sent. Resource permissions and access controls still matter<Cite n={11}/>, and resource text
+must be treated as untrusted input rather than instructions. One offering tools can take actions on your
 behalf, described by whoever built the server, not by the app you are using, and the specification
 itself says "clients MUST consider tool annotations to be untrusted unless they come from trusted
 servers"<Cite n={3}/>.

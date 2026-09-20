@@ -72,10 +72,10 @@ export function methodSections(abs: (path: string) => string): MethodSection[] {
             '**Use the simplest approach that works.** Every page says when the technique is not needed and what to try first.',
             '**Measure before claiming.** A page may say a level helps only when a committed result file shows it. No result file exists yet, so nothing on the site reports a measured number.',
             '**Name real things.** Every technique is tied to the models, products and tools that use it. Names come from a dated registry with sources.',
-            '**Show how it works.** Each technique has a diagram, a recorded run the reader can step through, and code the reader can run.',
+            '**Show how it works.** Concept pages include diagrams and practical examples. Stepped traces are illustrations unless explicitly backed by a recorded run; runnable examples let readers inspect the mechanics.',
             '**State the costs and the failures.** Each page lists the cost in tokens and time, the common failure modes, and how to test for them.',
             '**Stay current and say how current.** Every page and every name carries the date it was last checked. Anything not checked in 90 days is flagged.',
-            '**One site for beginners and experts.** Each page has a version with no code and a version with code. Both describe the same technique.',
+            `**Build understanding gradually.** The [learning path](${abs('/learn/')}) introduces foundations, verification, and safety before tools and agents. Concept pages offer “Use it” and “Build it” reading lanes.`,
             '**Independent.** No rankings, no sponsorship, no affiliate links. Where several companies make something, the page names more than one.',
             '**Open.** MIT licensed. The taxonomy, the registry and the result files are served as data. Corrections are welcome.',
             '**Private data stays private.** Examples, traces and test documents are synthetic.',
@@ -142,7 +142,7 @@ export function methodSections(abs: (path: string) => string): MethodSection[] {
         {
           kind: 'p',
           text:
-            `Every technique, topic and recipe page is **sourced**: written, and every factual claim checked against a primary source, but with no recorded run and no scored result file behind it. A page becomes **measured** when it has both. The two words say which of those a reader is looking at, and nothing on this site is measured yet. Nothing on this site reports a measured number. Every cost-and-latency strip and every stepped trace is an illustration, labeled as one above its figures, and a page becomes **published** only once a real run and a real eval sit behind it. The [evals](${abs('/techniques/evals/')}) page describes how that measurement works and what it will record.`,
+            `The site is published and still being improved. Technique, topic, and recipe pages are **sourced** explanations: they provide primary references, but the label is not a guarantee that every sentence is correct. They have no recorded model run and scored result file behind them yet. A page becomes **measured** when it has both. Every cost-and-latency strip and stepped trace is an illustration, labeled as such. The [evals](${abs('/techniques/evals/')}) page describes the measurement process. The learning path adds self-check exercises and projects; completion is self-reported, not a certification.`,
         },
       ],
     },

@@ -34,19 +34,21 @@ import Cite from '../../components/page/Cite.astro';
 import Link from '../../components/page/Link.astro';
 import ragRun from '../../data/runs/rag.json';
 
-Retrieval-augmented generation, or RAG, answers a question by searching your own documents
-first. The documents are cut up in advance into chunks (passages of a few hundred words each)
-and every chunk is turned into an embedding, a list of numbers standing in for its meaning. That
-set of embeddings is the index. Your code embeds the question the same way, compares it against
-the index, keeps the closest few chunks, puts them in the prompt, and the model answers once,
-using only what it was given.
+Retrieval-augmented generation, or RAG, supplies retrieved information to a model when it
+generates an answer. Retrieval can use keywords, embeddings, or both; the sources may be your
+documents or another searchable collection. The 2020 RAG paper describes combining retrieval
+with generation so the model can draw on external information<Cite n={1}/>.
 
-RAG does not decide anything: your code always searches, always keeps a fixed number of chunks,
-and always asks the model exactly once. Researchers introduced the approach in 2020 to let a
-model answer from text it was never trained on<Cite n={1}/>.
+This page teaches a simple, fixed retrieval pipeline: split documents into passages, embed them,
+retrieve a few relevant passages for the question, and send those passages to one model call.
+The instruction is to answer from the evidence, but the model can still make unsupported claims.
+The fixed number of passages and single generation call are choices in this example, not rules
+that define all RAG systems. Other implementations rerank, rewrite queries, retrieve repeatedly,
+or combine evidence across documents.
 
-RAG sits at level 2, context. The model chooses nothing about how it gets its information; your
-code does all the deciding.
+The simple pipeline sits at level 2 because code determines how context is selected. If a model
+chooses successive searches, this site calls that <Link href="/techniques/agentic-rag/">agentic
+RAG</Link>. Both approaches augment generation with retrieved information.
 
 This page is sourced, not measured: every claim about RAG is checked against a primary source,
 and no retrieval run has been recorded and scored here. It is illustrated.
@@ -58,16 +60,15 @@ and no retrieval run has been recorded and scored here. It is illustrated.
 <Lanes>
 <Lane name="use" title="Use it">
 
-Upload files to a chat app's project or file feature and ask about them: that is RAG. The
-product searches your files for the passages closest to your question, puts those in front of
-the model, and asks once.
+Upload files to a chat app's project or file feature and ask about them. The product may put the
+files directly into context, retrieve selected passages, or combine both approaches. Uploading
+a file alone does not tell you which method it uses; check the product documentation.
 
 Ask questions a handful of passages can answer on their own. "What does the warranty cover"
-works well. "Summarize every change across all our contracts this year" does not, because no
-single search finds every relevant passage and the tool only searches once. If an answer comes
-back thin, vague, or off-topic, do not push it for more. Split the question into the several
-narrower ones a single search could actually catch, one document or one topic at a time, and ask
-them separately.
+is a focused lookup. "Summarize every change across all our contracts this year" requires much
+broader coverage: a few highly ranked passages may omit important changes. For that task, check
+whether the product can systematically cover the collection. Narrower questions and an explicit
+document checklist make omissions easier to notice.
 
 Anthropic's own documentation describes this directly: once a project's uploaded files approach
 what the context window can hold, Claude switches into what Anthropic calls RAG mode. Anthropic
@@ -79,15 +80,13 @@ used<Cite n={3}/>.
 
 Check the citations every time the product shows them. Open the source it names and confirm the
 sentence it cites is actually there. A citation that does not obviously support the sentence
-beside it, or an answer with none at all, means the search missed something and the model filled
-the gap on its own; treat that answer as unconfirmed rather than final.
+beside it, or an answer with none at all, is unconfirmed. It does not by itself tell you whether
+retrieval failed, the model ignored evidence, or the interface omitted the citation.
 
-RAG cannot join facts that live in different documents, a table in one file and a rule in
-another, because it only ever searches once, and it will not reliably tell you when it found
-nothing useful. When a question genuinely needs two documents joined, or a full sweep across
-many files, that is not this tool's job: ask it as separate, narrower questions and join the
-answers yourself, or use a tool built to search repeatedly, listed under Out there at the foot of
-this page.
+RAG can combine facts from multiple documents when the necessary evidence is retrieved and
+used correctly. A single search can return passages from several files, but questions whose
+second lookup depends on the first answer may need query decomposition or repeated retrieval.
+Inspect all required sources and compare a fixed pipeline with an agentic one on the same task.
 
 </Lane>
 <Lane name="build" title="Build it">
@@ -165,12 +164,12 @@ those to still make sense.
   {
     name: 'The right passage is not retrieved',
     notice: "The answer is generic, off-topic, or contradicts a document you know covers the question; a product that shows its sources shows ones that don't relate to what was asked.",
-    test: "Run questions where you already know which section holds the answer, and check whether that section is in the top-k. The site's own eval set scores exactly this as citation hit rate.",
+    test: "Run questions where you know which sections hold the answer. Check those sections against the retrieved chunk ids to measure retrieval coverage. Separately check the answer's citations; citation hit rate is not a retrieval metric.",
   },
   {
     name: 'The passage is retrieved but ignored',
     notice: "The correct source is visibly in the retrieved set, but the answer still doesn't use it, invents a different answer, or cites the wrong section.",
-    test: "Compare the retrieved chunk list against the final citations. A needed chunk that was retrieved but never cited is this failure, not a retrieval failure.",
+    test: "Compare retrieved passages, answer claims, and citations. Missing citations can flag a problem, but inspect the answer to distinguish ignored evidence from a citation omission.",
   },
   {
     name: 'Chunk boundaries split a fact',
@@ -180,7 +179,7 @@ those to still make sense.
   {
     name: 'Stale index',
     notice: 'The answer is correct for an old version of a document but wrong for the current one: a warranty length that changed, a part number that was superseded.',
-    test: 'Change a fact in the corpus without re-embedding. The retriever keeps returning the old text, because it was indexed at embed time, not at read time.',
+    test: 'In an index that stores a snapshot of passage text, change a source fact without refreshing the index. Check whether retrieval still returns the old passage. Other designs fetch current text separately; test the actual refresh path.',
   },
   {
     name: 'Conflicting sources',
@@ -235,7 +234,7 @@ cost of a real run before spending anything on one.
 
 <RunIt
   monitor="Citation hit rate on a sample of real questions, and how often a question comes back with zero retrieved chunks above a similarity floor. Watch retrieval latency and generation latency separately, since a slow answer can come from either half."
-  costAtVolume="One model call per question, so language-model cost tracks question count, not question difficulty. Embedding cost tracks document count instead, and usually dominates at high volume if it's billed per call to a hosted embedding API."
+  costAtVolume="This example makes one generation call per question. Cost depends on input and output tokens, model rates, query embeddings, retrieval infrastructure, and how often documents are indexed again. Document embeddings can be reused across questions; no component always dominates."
   failsInProduction="A document changes and the index isn't rebuilt, so the model confidently answers from stale text. Or a document containing an injected instruction gets indexed and later retrieved and followed."
   whatToLog="The question, the retrieved chunk ids with their similarity scores, the final citations, and the full prompt sent to the model, so a bad answer traces back to a retrieval failure or a generation failure without re-running anything."
 />

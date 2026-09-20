@@ -18,6 +18,7 @@ export const GET: APIRoute = async ({ site }) => {
 
   lines.push('# Gradient Ascent');
   lines.push('');
+  lines.push(`Guided learning path: ${abs('/learn/')} — 18 lessons, explained exercises, and six stage projects.`);
   lines.push(
     '> A manual for the main ways to use a language model, from one chat message to agents that ' +
       'run on their own, in eight levels ordered by how much the model decides for itself. Each ' +
@@ -31,7 +32,7 @@ export const GET: APIRoute = async ({ site }) => {
   lines.push(`> How a level is defined: ${taxonomy.level_rule}`);
   lines.push('');
   lines.push(
-    '> Status: every technique, topic and recipe page is SOURCED — written, and every factual claim checked against a primary source, ' +
+    '> Status: technique, topic and recipe pages are SOURCED — written with primary references, not guaranteed error-free, ' +
       'but with no recorded run and no scored result file behind it. No page on this site reports ' +
       'a measured number. Every cost strip and every stepped trace is an illustration and is ' +
       'labeled as one.',

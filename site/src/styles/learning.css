@@ -1,0 +1,70 @@
+.learn-intro { max-width: 850px; color: var(--muted); font-size: 15px; line-height: 1.85; margin: 22px 0; }
+.learn-intro p + p { margin-top: 14px; }
+.learning-lab { border: 1px solid var(--line-control); border-radius: 12px; padding: 25px; margin: 36px 0; background: var(--panel); min-width: 0; scroll-margin-top: 120px; }
+.learning-lab h2 { margin-top: 12px; }
+.learning-lab p { color: var(--muted); line-height: 1.75; }
+.learning-lab .lab-help { font-size: 13px; line-height: 1.75; margin: 14px 0; }
+.lab-scenario { padding: 18px; background: var(--bg); border-left: 3px solid var(--o4); margin: 20px 0; }
+.lab-scenario p { margin: 8px 0 0; font-size: 14px; }
+.learning-lab label { display: block; font-size: 14px; font-weight: 600; margin: 16px 0 10px; line-height: 1.7; }
+.learning-lab select, .learning-lab textarea { width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--line-control); border-radius: 6px; padding: 12px; font: inherit; font-size: 16px; }
+.learning-lab textarea { min-height: 190px; resize: vertical; line-height: 1.65; }
+.learning-lab .lab-editor { min-height: 290px; font-family: var(--mono, monospace); tab-size: 2; }
+.lab-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 17px 0; }
+.learning-lab button { border: 1px solid var(--line-control); border-radius: 6px; padding: 11px 16px; color: var(--text); background: var(--bg); cursor: pointer; font-size: 13px; min-height: 44px; }
+.lab-actions button:first-child { border-color: var(--accent); color: var(--accent); }
+.learning-lab button:hover { border-color: var(--accent); }
+.learning-lab button:disabled { opacity: .5; cursor: default; }
+.learning-lab :is(button, select, textarea):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.lab-checks { list-style: none; padding: 0; margin: 20px 0; }
+.lab-checks li { border-left: 3px solid var(--o2); padding: 12px 15px; margin: 12px 0; background: var(--bg); }
+.lab-checks .check-fail { border-color: var(--o5); }
+.lab-checks strong { font-size: 14px; }
+.lab-checks p { margin: 6px 0 0; font-size: 13px; }
+.learning-lab .lab-error { color: var(--o5); }
+.lab-output { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 430px; overflow: auto; padding: 18px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); font: 13px/1.7 var(--mono, monospace); margin: 15px 0; }
+.learning-lab .lab-summary { color: var(--text); font-weight: 600; margin-top: 20px; }
+.project-deliverable { margin: 22px 0; }
+@media (max-width: 600px) { .learning-lab { padding: 17px; } .learning-lab .lab-editor { font-size: 16px; } .lab-actions { flex-direction: column; } }
+.stage-jumps { display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0 40px; }
+.stage-jumps a { padding: 10px 14px; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); font-size: 13px; }
+.stage-jumps a:hover { color: var(--text); border-color: var(--accent); }
+.learn-stage { border-top: 1px solid var(--line); padding: 35px 0; scroll-margin-top: 150px; }
+.learn-stage h2 { font-size: 30px; margin: 12px 0; }
+.learn-stage > p { color: var(--muted); }
+.lesson-list { list-style: decimal; margin: 24px 0 24px 25px; }
+.lesson-list li { padding: 18px 12px; border-bottom: 1px solid var(--line); }
+.lesson-list li::marker { color: var(--accent); font-weight: 650; }
+.lesson-list a { font-size: 19px; color: var(--text); }
+.lesson-list a:hover { color: var(--accent); }
+.lesson-list p { color: var(--muted); font-size: 14px; margin: 8px 0; }
+.lesson-list small { font-size: 11px; color: var(--muted); }
+[data-lesson-badge] { margin-left: 12px; color: var(--o2); }
+.stage-project { background: var(--panel); border-left: 3px solid var(--o2); padding: 24px; margin: 26px 0; }
+.stage-project h3, .stage-project h2 { margin: 0 0 14px; font-size: 21px; }
+.stage-project ul { list-style: disc; padding-left: 22px; color: var(--muted); font-size: 14px; line-height: 1.8; }
+.stage-project p { color: var(--muted); font-size: 14px; line-height: 1.8; margin-top: 16px; }
+.stage-project strong { color: var(--text); }
+.learn-layout { display: grid; grid-template-columns: minmax(0, 760px) minmax(230px, 1fr); gap: 60px; }
+.lesson-body { min-width: 0; overflow-wrap: anywhere; }
+.lesson-body h2 { font-size: 25px; margin: 30px 0 15px; }
+.lesson-body > p, .lesson-body section > p, .worked-example > p, .lesson-before p { color: var(--muted); line-height: 1.85; font-size: 16px; margin-bottom: 16px; }
+.lesson-before { border-left: 2px solid var(--accent); padding: 12px 20px; background: var(--panel); }
+.lesson-before strong { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+.lesson-before p { margin: 8px 0 0; font-size: 14px; }
+.lesson-body a, .lesson-reading a { color: var(--accent); }
+.worked-example { margin: 28px 0; padding: 1px 24px 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+.lesson-check details { border: 1px solid var(--line-control); border-radius: 8px; margin: 18px 0; }
+.lesson-check summary { cursor: pointer; padding: 17px 20px; color: var(--o2); font-size: 14px; }
+.lesson-check details p { margin: 0; padding: 0 20px 20px; color: var(--muted); line-height: 1.8; font-size: 15px; }
+.lesson-pagination { display: flex; justify-content: space-between; gap: 24px; margin: 28px 0; font-size: 14px; line-height: 1.7; }
+.lesson-pagination a { max-width: 48%; }
+.lesson-reading { align-self: start; border: 1px solid var(--line); border-radius: 10px; padding: 24px; background: var(--panel); }
+.lesson-reading h2 { font-size: 18px; margin-bottom: 12px; }
+.lesson-reading p { font-size: 13px; line-height: 1.8; color: var(--muted); }
+.lesson-reading li { padding: 17px 0; border-bottom: 1px solid var(--line); }
+.lesson-reading li p { margin-top: 7px; }
+.lesson-reading > a { display: block; margin-top: 20px; font-size: 12px; }
+@media (max-width: 850px) { .learn-layout { grid-template-columns: 1fr; gap: 28px; } }
+@media (max-width: 600px) { .stage-project { padding: 20px; } .lesson-pagination { flex-direction: column; } .lesson-pagination a { max-width: 100%; } .learn-stage h2 { font-size: 25px; } }
+@media print { .learn-layout { display: block; } .lesson-pagination, .stage-jumps { display: none; } }

@@ -50,11 +50,11 @@ import Cite from '../../components/page/Cite.astro';
 import Link from '../../components/page/Link.astro';
 import chatRun from '../../data/runs/chat.json';
 
-Chat is level 1: one request, one response, and nothing in between decides anything. You, or the
-product you are using, send a question in a message, and the model returns an answer once. There
-is no search step, no tool call, and no second look at its own answer: whatever comes back on
-the first attempt is what you get. This is also what most people mean by "using AI": typing into
-a chat app and reading back a reply.
+This page's level 1 example is a plain model call: one request and one response, with no search
+or tool execution around it. You supply a message and inspect the reply. A chat interface does
+not guarantee that architecture: a modern chat product may search, run tools, use memory, or
+coordinate several model calls behind one visible reply. The level describes how the task runs,
+not the appearance of its message box.
 
 Because there is only one step, the whole outcome depends on what happens inside that one call:
 how the model was trained, and what you put in the request. Later levels add retrieval, tools and
