@@ -86,7 +86,7 @@ export const CANVAS_LEVEL_W = 1120;
 export const MAX_GAP = 90;
 /** One topic's row height inside the topics band (its node, centered, plus top/bottom margin) --
  *  tighter than ROW_GAP because these are wrapped rows inside one band, not separate bands. */
-export const TOPICS_ROW_GAP = 46;
+export const TOPICS_ROW_GAP = 64;
 /** Empty space above and below a topics-row node within its own TOPICS_ROW_GAP-tall row -- the
  *  topics-row equivalent of PAD_Y, and how far a same-row edge in that band may safely arc (see
  *  computeEdgeGeometry) before it would reach into the row above or below. */
@@ -403,7 +403,7 @@ export function computeMapLayout(tax: MapTaxonomyIn): MapLayout {
   return { nodes, edges, bands, width, height };
 }
 
-/** A node's center point -- every edge starts and ends here. */
+/** A node's center, used for ordering and choosing the facing borders. */
 function centerOf(n: MapNode): { cx: number; cy: number } {
   return { cx: n.x + n.w / 2, cy: n.y + n.h / 2 };
 }
@@ -436,10 +436,12 @@ export interface EdgeGeometry {
  * edge between different rows, or when the caller already knows there is nothing to check.
  */
 export function computeEdgeGeometry(from: MapNode, to: MapNode, rowNodes: MapNode[]): EdgeGeometry {
-  const { cx: x1, cy: y1 } = centerOf(from);
-  const { cx: x2, cy: y2 } = centerOf(to);
+  const { cx: x1 } = centerOf(from);
+  const { cx: x2 } = centerOf(to);
+  const y1 = from.y < to.y ? from.y + from.h : from.y;
+  const y2 = to.y < from.y ? to.y + to.h : to.y;
 
-  if (y1 !== y2) {
+  if (from.y !== to.y) {
     const my = (y1 + y2) / 2;
     return { x1, y1, c1x: x1, c1y: my, c2x: x2, c2y: my, x2, y2, arcsOverIntervening: false };
   }
@@ -449,14 +451,42 @@ export function computeEdgeGeometry(from: MapNode, to: MapNode, rowNodes: MapNod
   const between = rowNodes.some((n) => n.slug !== from.slug && n.slug !== to.slug && centerOf(n).cx > lo && centerOf(n).cx < hi);
 
   // Always upward (toward lower y): every row keeps at least PAD_Y (a level band) or
-  // TOPICS_ROW_MARGIN (a topics row -- much tighter, 6px, since those are wrapped rows inside one
-  // band, not separate bands) of empty space above and below its nodes. Capping the rise at just
+  // TOPICS_ROW_MARGIN (a wrapped topics row) of empty space above and below its nodes. Capping the rise at just
   // under that row's own margin keeps an arc from ever reaching into the row above, whichever kind
   // of row this is; the topmost band has nothing above it to reach into at all either way.
   const margin = from.level === 'tracks' ? TOPICS_ROW_MARGIN : PAD_Y;
-  const arcHeight = Math.min(NODE_H / 2 + (between ? 8 : 2), NODE_H / 2 + margin - 1);
+  const arcHeight = Math.min(between ? 26 : 18, margin - 1);
   const cy = y1 - arcHeight; // y1 === y2 here, both endpoints share a row
   return { x1, y1, c1x: x1, c1y: cy, c2x: x2, c2y: cy, x2, y2, arcsOverIntervening: between };
+}
+
+/** Distinct border ports prevent several unrelated relations merging at a node's center. */
+export function mapConnections(layout: MapLayout): (MapEdge & { geometry: EdgeGeometry })[] {
+  const bySlug = new Map(layout.nodes.map(n => [n.slug, n]));
+  const edges = layout.edges.map(edge => {
+    const from = bySlug.get(edge.from)!, to = bySlug.get(edge.to)!;
+    return { ...edge, geometry: computeEdgeGeometry(from, to, layout.nodes.filter(n => n.y === from.y)) };
+  });
+  const ports = new Map<string, { edge: typeof edges[number]; end: 'from' | 'to'; otherX: number }[]>();
+  for (const edge of edges) {
+    for (const end of ['from', 'to'] as const) {
+      const node = bySlug.get(edge[end])!;
+      const y = end === 'from' ? edge.geometry.y1 : edge.geometry.y2;
+      const key = `${node.slug}:${y === node.y ? 'top' : 'bottom'}`;
+      const other = bySlug.get(edge[end === 'from' ? 'to' : 'from'])!;
+      ports.set(key, [...(ports.get(key) ?? []), { edge, end, otherX: other.x + other.w / 2 }]);
+    }
+  }
+  for (const group of ports.values()) {
+    group.sort((a, b) => a.otherX - b.otherX || a.edge.key.localeCompare(b.edge.key));
+    group.forEach(({ edge, end }, i) => {
+      const node = bySlug.get(edge[end])!;
+      const x = group.length === 1 ? node.x + node.w / 2 : node.x + 8 + (node.w - 16) * i / (group.length - 1);
+      if (end === 'from') edge.geometry.x1 = edge.geometry.c1x = x;
+      else edge.geometry.x2 = edge.geometry.c2x = x;
+    });
+  }
+  return edges;
 }
 
 /** Renders an `EdgeGeometry` as an SVG cubic-bezier path's `d` attribute. */

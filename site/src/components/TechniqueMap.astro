@@ -7,11 +7,10 @@
 //
 // `requires` and `upgrades_to` draw by default; `combines_with` and `alternative_to` are frequent
 // enough to turn the drawing into a hairball, so they stay off until a reader turns on one of the
-// checkboxes below (pure CSS, :has()) or points at (or tabs to) a single node (the small script at
-// the foot of this file, which only ever toggles a class -- it adds no layout and reads no data
-// the markup does not already carry in `data-*` attributes).
+// checkboxes below (pure CSS, :has()) or focuses a concept. The script isolates its connections;
+// the geometry, border ports, and full text list remain available without JavaScript.
 import { url } from '../lib/url';
-import { mapLayout, edgesByBand, computeEdgeGeometry, edgePathD, RELATION_LABEL, relationTypes, type RelationType } from '../lib/map';
+import { mapLayout, mapConnections, edgesByBand, edgePathD, RELATION_LABEL, relationTypes, type RelationType } from '../lib/map';
 import '../styles/map.css';
 
 const layout = mapLayout;
@@ -36,21 +35,13 @@ const CHECKED_BY_DEFAULT: Record<RelationType, boolean> = {
 };
 
 const bySlug = new Map(layout.nodes.map((n) => [n.slug, n]));
-// Keyed by y, not band: two topics-band nodes can share a band index while sitting in different
-// track rows (see computeEdgeGeometry's own note on this), so "the row" a node shares with another
-// is whichever other nodes sit at exactly the same y, not merely the same band.
-const nodesByRowY = new Map<number, typeof layout.nodes>();
-for (const n of layout.nodes) nodesByRowY.set(n.y, [...(nodesByRowY.get(n.y) ?? []), n]);
-
-const drawableEdges = layout.edges
+const drawableEdges = mapConnections(layout)
   .map((e) => {
     const fromNode = bySlug.get(e.from)!;
     const toNode = bySlug.get(e.to)!;
     // A straight (or midpoint-only) line between two nodes in the same row would run right
     // through anything sitting between them -- computeEdgeGeometry arcs it clear instead.
-    const rowNodes = fromNode.y === toNode.y ? (nodesByRowY.get(fromNode.y) ?? []) : [];
-    const geometry = computeEdgeGeometry(fromNode, toNode, rowNodes);
-    return { ...e, fromNode, toNode, d: edgePathD(geometry) };
+    return { ...e, fromNode, toNode, d: edgePathD(e.geometry) };
   })
   // requires and upgrades_to first, so they sit under combines_with/alternative_to when a reader
   // turns those on -- the rarer, hover-revealed lines read as an overlay, not the base picture.
@@ -73,9 +64,12 @@ const drawableEdges = layout.edges
   </div>
   <p class="footnote">
     Turning on the other two kinds adds {edgeCount.combines_with + edgeCount.alternative_to} more
-    lines, so they start off. Turn one on above, or point at (or tab to) a single technique to see
-    just its own.
+    lines, so they start off. Hover or tab to a concept to isolate all its connections, or choose
+    one below. A circle on a block marks a real connection; unmarked crossings do not.
   </p>
+  <label class="map-focus-label" for="map-focus">Focus on a concept</label>
+  <select id="map-focus" disabled><option value="">All concepts</option>{[...layout.nodes].sort((a, b) => a.title.localeCompare(b.title)).map(n => <option value={n.slug}>{n.title}</option>)}</select>
+  <p class="map-focus-status" aria-live="polite">Choose a concept to trace its connections, including on a phone.</p>
 </div>
 
 <div class="map-row">
@@ -109,9 +103,13 @@ const drawableEdges = layout.edges
         The full list below the drawing has the same relations as text.
       </desc>
       <defs>
-        <marker id="map-arrow" viewBox="0 0 8 8" refX="6.4" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M0,0 L8,4 L0,8 Z" fill="var(--accent)" />
-        </marker>
+        <mask id="map-node-clearance" maskUnits="userSpaceOnUse" x="0" y="0" width={layout.width} height={layout.height} style="mask-type:luminance">
+          <rect width={layout.width} height={layout.height} fill="white" />
+          {layout.nodes.map(n => <rect x={n.x - 6} y={n.y - 6} width={n.w + 12} height={n.h + 12} rx="8" fill="black" />)}
+        </mask>
+        {drawableEdges.map((e, i) => <clipPath id={`map-terminal-${i}`} clipPathUnits="userSpaceOnUse">
+          {[e.fromNode, e.toNode].map(n => <rect x={n.x - 6} y={n.y - 6} width={n.w + 12} height={n.h + 12} />)}
+        </clipPath>)}
       </defs>
 
       {
@@ -127,7 +125,7 @@ const drawableEdges = layout.edges
         ))
       }
 
-      {
+      <g mask="url(#map-node-clearance)">{
         drawableEdges.map((e) => (
           <path
             d={e.d}
@@ -135,10 +133,12 @@ const drawableEdges = layout.edges
             data-from={e.from}
             data-to={e.to}
             data-type={e.type}
-            marker-end={e.type === 'upgrades_to' ? 'url(#map-arrow)' : undefined}
           />
         ))
-      }
+      }</g>
+      {drawableEdges.map((e, i) => <path d={e.d} clip-path={`url(#map-terminal-${i})`}
+        class:list={['map-edge', 'map-terminal', `map-edge-${e.type.replace(/_/g, '-')}`]}
+        data-from={e.from} data-to={e.to} data-type={e.type} />)}
 
       {
         layout.nodes.map((node) => (
@@ -161,12 +161,18 @@ const drawableEdges = layout.edges
           </a>
         ))
       }
+      {drawableEdges.map(e => <g class:list={['map-edge', 'map-endpoints', `map-edge-${e.type.replace(/_/g, '-')}`]}
+        data-from={e.from} data-to={e.to} data-type={e.type} aria-hidden="true">
+        <circle class="map-port" cx={e.geometry.x1} cy={e.geometry.y1} r="3.6" />
+        <circle class:list={['map-port', { 'map-port-target': e.type === 'requires' || e.type === 'upgrades_to' }]} cx={e.geometry.x2} cy={e.geometry.y2} r="3.6" />
+      </g>)}
     </svg>
   </div>
 </div>
 
 <div class="map-legend">
   <h3 class="map-legend-heading">What each line means</h3>
+  <p class="map-port-key"><span aria-hidden="true">○ → ●</span> For “requires” and “upgrades to,” read from the open circle to the filled circle. The other two relations connect both ways. Lines crossing without a circle are not joined.</p>
   <dl class="map-legend-list">
     {
       RELATION_ORDER.map((type) => (
@@ -230,23 +236,41 @@ const drawableEdges = layout.edges
 </div>
 
 <script>
-  // A node's combines-with and alternative-to edges light up while it is hovered or focused, even
-  // when their filter checkbox is off -- the other half of the brief's "hover or a filter"
-  // instruction, and independent of the CSS-only :has() filter above (see map.css): this script
-  // only ever adds or removes one class, and every edge and node already carries the data-*
-  // attributes it reads, so a build with JavaScript disabled loses nothing but this convenience.
-  const svg = document.querySelector<SVGSVGElement>('.map-svg');
-  if (svg) {
-    const edges = Array.from(svg.querySelectorAll<SVGPathElement>('.map-edge-combines-with, .map-edge-alternative-to'));
-    svg.querySelectorAll<SVGAElement>('.map-node').forEach((node) => {
-      const slug = node.dataset.slug;
-      const related = edges.filter((e) => e.dataset.from === slug || e.dataset.to === slug);
-      const show = () => related.forEach((e) => e.classList.add('hl'));
-      const hide = () => related.forEach((e) => e.classList.remove('hl'));
-      node.addEventListener('mouseenter', show);
-      node.addEventListener('mouseleave', hide);
-      node.addEventListener('focus', show);
-      node.addEventListener('blur', hide);
+  // Hover, keyboard focus, and the touch-friendly selector share the same edge/port highlighting.
+  // Leaving a transient focus restores the persistent selection, then the checkbox overview.
+  const wrap = document.querySelector<HTMLElement>('.map-wrap');
+  if (wrap) {
+    const edges = [...wrap.querySelectorAll<SVGElement>('.map-edge')];
+    const nodes = [...wrap.querySelectorAll<SVGAElement>('.map-node')];
+    const select = wrap.querySelector<HTMLSelectElement>('#map-focus')!;
+    const status = wrap.querySelector<HTMLElement>('.map-focus-status')!;
+    let hovered = '', focused = '';
+    function render() {
+      const slug = hovered || focused || select.value;
+      const related = new Set([slug]);
+      wrap!.classList.toggle('map-focusing', !!slug);
+      for (const edge of edges) {
+        const active = !!slug && (edge.dataset.from === slug || edge.dataset.to === slug);
+        edge.classList.toggle('hl', active);
+        if (active) { related.add(edge.dataset.from!); related.add(edge.dataset.to!); }
+      }
+      for (const node of nodes) {
+        node.classList.toggle('map-related', related.has(node.dataset.slug!));
+        node.classList.toggle('map-selected', node.dataset.slug === slug);
+      }
+    }
+    select.disabled = false;
+    select.addEventListener('change', () => {
+      hovered = focused = ''; render();
+      const node = nodes.find(n => n.dataset.slug === select.value);
+      status.textContent = node ? `Showing all connections for ${select.selectedOptions[0].text}. Choose All concepts to restore the overview.` : 'Showing the selected relation types for all concepts.';
+      node?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'instant' });
+    });
+    nodes.forEach(node => {
+      node.addEventListener('mouseenter', () => { hovered = node.dataset.slug!; render(); });
+      node.addEventListener('mouseleave', () => { hovered = ''; render(); });
+      node.addEventListener('focus', () => { focused = node.dataset.slug!; render(); });
+      node.addEventListener('blur', () => { focused = ''; render(); });
     });
   }
 </script>

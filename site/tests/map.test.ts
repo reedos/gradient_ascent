@@ -13,6 +13,7 @@ import {
   computeMapLayout,
   edgesByBand,
   computeEdgeGeometry,
+  mapConnections,
   edgePathD,
   taxonomy as realTaxonomy,
   mapLayout as realLayout,
@@ -425,8 +426,9 @@ test('a same-row edge between non-adjacent nodes arcs clear of the node between 
 
   const g = computeEdgeGeometry(first, last, rowNodes);
   assert.equal(g.arcsOverIntervening, true, 'a node sits between "first" and "last"; the edge must know that');
-  assert.ok(g.y1 - g.c1y > NODE_H / 2, `control point 1 only clears ${g.y1 - g.c1y}px, need more than ${NODE_H / 2}`);
-  assert.ok(g.y2 - g.c2y > NODE_H / 2, `control point 2 only clears ${g.y2 - g.c2y}px, need more than ${NODE_H / 2}`);
+  assert.equal(g.y1, first.y, 'source attaches at the top border');
+  assert.equal(g.y2, last.y, 'target attaches at the top border');
+  assert.ok(g.c1y < first.y - 6 && g.c2y < last.y - 6, 'arc clears node borders and their clearance gap');
   const neighbourGeometry = computeEdgeGeometry(first, middle, rowNodes);
   assert.ok(g.y1 - g.c1y > g.y1 - neighbourGeometry.c1y, 'a non-adjacent arc should rise higher than an adjacent one');
 
@@ -458,6 +460,28 @@ test('a same-row arc inside a topics row never rises high enough to reach the ro
 test('edgePathD renders a cubic bezier "d" string from an EdgeGeometry', () => {
   const g = { x1: 1, y1: 2, c1x: 3, c1y: 4, c2x: 5, c2y: 6, x2: 7, y2: 8, arcsOverIntervening: false };
   assert.equal(edgePathD(g), 'M1.0,2.0 C3.0,4.0 5.0,6.0 7.0,8.0');
+});
+
+test('every relation attaches to distinct, visible border ports on its actual endpoint nodes', () => {
+  const connections = mapConnections(realLayout);
+  assert.equal(connections.length, realLayout.edges.length);
+  const ports = new Map<string, number[]>();
+  for (const edge of connections) {
+    for (const end of ['from', 'to'] as const) {
+      const node = realLayout.nodes.find(n => n.slug === edge[end])!;
+      const x = end === 'from' ? edge.geometry.x1 : edge.geometry.x2;
+      const y = end === 'from' ? edge.geometry.y1 : edge.geometry.y2;
+      assert.ok(y === node.y || y === node.y + node.h, `${node.slug} port is hidden inside its block`);
+      assert.ok(x >= node.x + 8 && x <= node.x + node.w - 8, `${node.slug} port collides with a corner`);
+      const key = `${node.slug}:${y}`;
+      ports.set(key, [...(ports.get(key) ?? []), x]);
+    }
+  }
+  for (const [key, xs] of ports) {
+    xs.sort((a, b) => a - b);
+    for (let i = 1; i < xs.length; i++) assert.ok(xs[i] - xs[i - 1] >= 9, `${key} connection dots overlap`);
+  }
+  assert.deepEqual(mapConnections(realLayout), connections, 'port allocation remains stable across builds');
 });
 
 test('on the real taxonomy, at least one same-row edge arcs over an intervening node', () => {

@@ -1,0 +1,51 @@
+---
+import { mapLayout, mapConnections, edgePathD } from '../lib/map';
+import { url } from '../lib/url';
+const positions = [
+  { slug: 'chat', x: 15, y: 226, label: 'Chat' },
+  { slug: 'rag', x: 15, y: 126, label: 'RAG' },
+  { slug: 'agentic-rag', x: 15, y: 26, label: 'Agentic research' },
+  { slug: 'function-calling', x: 330, y: 226, label: 'Function calling' },
+  { slug: 'single-agent', x: 330, y: 126, label: 'Single agent' },
+  { slug: 'orchestrator-workers', x: 330, y: 26, label: 'Lead agent and workers' },
+];
+const nodes = positions.map(p => ({ ...mapLayout.nodes.find(n => n.slug === p.slug)!, ...p, w: 255, h: 42 }));
+const slugs = new Set(nodes.map(n => n.slug));
+const edges = mapConnections({ ...mapLayout, nodes, edges: mapLayout.edges.filter(e => slugs.has(e.from) && slugs.has(e.to) && (e.type === 'requires' || e.type === 'upgrades_to')) });
+---
+<section class="home-map" aria-labelledby="home-map-title">
+  <div>
+    <div class="eyebrow">Explore the connections</div>
+    <h2 id="home-map-title">See how the concepts fit together</h2>
+    <p>Find a concept, trace its prerequisites, and see what it can lead to. The full map connects {mapLayout.nodes.length} concepts across the eight levels and the topics that run through them.</p>
+    <a class="button" href={url('/map/')}>Explore the map <span aria-hidden="true">→</span></a>
+    <p class="home-map-note">Prefer a guided route? <a href={url('/learn/')}>Start with the lessons.</a></p>
+  </div>
+  <a class="home-map-preview" href={url('/map/')} aria-label="Open the full interactive concept map">
+    <svg viewBox="0 0 600 290" aria-hidden="true">
+      {edges.map(e => <path d={edgePathD(e.geometry)} fill="none" stroke={e.type === 'upgrades_to' ? 'var(--accent)' : 'var(--muted)'} stroke-width="2" />)}
+      {nodes.map(n => <g>
+        <rect x={n.x} y={n.y} width={n.w} height={n.h} rx="7" fill="var(--panel2)" stroke={n.color} />
+        <text x={n.x + n.w / 2} y={n.y + n.h / 2} fill="var(--text)" text-anchor="middle" dominant-baseline="central">{n.label}</text>
+      </g>)}
+      {edges.map(e => <g stroke={e.type === 'upgrades_to' ? 'var(--accent)' : 'var(--muted)'} stroke-width="2">
+        <circle cx={e.geometry.x1} cy={e.geometry.y1} r="4" fill="var(--bg)" />
+        <circle cx={e.geometry.x2} cy={e.geometry.y2} r="4" fill={e.type === 'upgrades_to' ? 'var(--accent)' : 'var(--muted)'} />
+      </g>)}
+    </svg>
+    <span>A few connections from the full map <span aria-hidden="true">↗</span></span>
+  </a>
+</section>
+<style>
+  .home-map { display: grid; grid-template-columns: minmax(240px, .8fr) minmax(0, 1.2fr); gap: 42px; align-items: center; padding: 30px; margin: 10px 0 50px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+  h2 { font-size: clamp(25px, 2.6vw, 36px); line-height: 1.25; margin: 15px 0; }
+  p { color: var(--muted); line-height: 1.8; font-size: 14px; margin-bottom: 22px; }
+  .home-map-note { font-size: 12px; margin: 17px 0 0; }
+  .home-map-note a { color: var(--accent); }
+  .home-map-preview { display: block; min-width: 0; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+  .home-map-preview:hover { border-color: var(--accent); }
+  svg { display: block; width: 100%; height: auto; }
+  text { font: 600 18px var(--font); }
+  .home-map-preview > span { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; padding: 5px 8px; }
+  @media (max-width: 800px) { .home-map { grid-template-columns: 1fr; gap: 25px; padding: 20px; } }
+</style>
