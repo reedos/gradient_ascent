@@ -1,3 +1,4 @@
+import { builders, buildArtifact } from '../lib/artifact-builders';
 // /llms-full.txt: every written page as Markdown in one file, for an agent that would rather make
 // one request than seventy. Same text as the per-page .md twins, in the site's own order.
 import type { APIRoute } from 'astro';
@@ -12,6 +13,7 @@ export const GET: APIRoute = async ({ site }) => {
     toMarkdown(SHAPES_TITLE, shapesBlocks(agentShapes(site), absFor(site))),
     toMarkdown(WORKSHEET_TITLE, worksheetBlocks(agentWorksheet(), agentLevels(), absFor(site))),
   ];
+  for (const builder of builders) parts.push(buildArtifact(builder, {}, absFor(site)('/')));
   const techniqueSlugs = [
     ...levels.flatMap((l) => l.pages.map((p) => p.slug)),
     ...tracks.flatMap((t) => [t.id, ...(t.pages ?? []).map((p) => p.slug)]),

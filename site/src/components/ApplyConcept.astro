@@ -4,7 +4,7 @@ interface Props { slug: string; title: string; kind?: 'techniques' | 'threads' }
 const { slug, title, kind = 'techniques' } = Astro.props;
 ---
 <section class="apply-concept" id="apply-to-project">
-  <div><h2>Apply this to your project</h2><p>Describe your task to your own model and use {title} as a reference. Ask whether it fits, what simpler alternatives exist, and how you would implement and check the result.</p></div>
+  <div><h2>Apply this to your project</h2><p>Describe your task to your own model and use {title} as a reference. Ask whether it fits, which alternatives meet the same automation needs, and how you would implement and check the result.</p></div>
   <div class="apply-links"><a class="button" href={url(`/apply/?concept=${encodeURIComponent(slug)}`)}>Create a project brief &rarr;</a><a href={url(`/${kind}/${slug}.md`)} download>Download this concept as Markdown</a><a href={url('/agents.md')}>Reference guide for your model</a></div>
 </section>
 <style>

@@ -1,0 +1,69 @@
+---
+import Base from '../../layouts/Base.astro';
+import { builders, buildArtifact } from '../../lib/artifact-builders';
+import { url } from '../../lib/url';
+export function getStaticPaths() { return builders.map(builder => ({params:{slug:builder.slug},props:{builder}})); }
+const { builder } = Astro.props;
+const base = new URL(url('/'), Astro.site).toString();
+const nextSlugs: Record<string,string> = { 'agent-instructions':'definition-of-done', workflow:'definition-of-done', 'definition-of-done':'workflow', 'workflow-audit':'workflow', 'tool-specification':'definition-of-done', 'project-handoff':'workflow-audit' };
+const next = builders.find(b => b.slug === nextSlugs[builder.slug]);
+---
+<Base title={`${builder.title} · Gradient Ascent`} description={builder.description}>
+  <nav class="breadcrumb" aria-label="Breadcrumb"><a href={url('/')}>Home</a><span>/</span><a href={url('/tools/')}>Tools</a><span>/</span><span>{builder.title}</span></nav>
+  <div class="page-hero"><div class="eyebrow muted">Use with your own AI</div><h1>{builder.title}</h1><p>{builder.description}</p></div>
+  <section class="artifact-builder" data-definition={JSON.stringify(builder)} data-base={base}>
+    <p>A rough description is enough. Leave unknowns blank; the exported instructions ask your agent to clarify or inspect them. Nothing here calls a model, uploads files, or saves your entries.</p>
+    <div class="artifact-actions"><button type="button" class="button secondary" id="example" disabled>Try an example</button><a href={url(`/tools/${builder.slug}.md`)} download>Download a blank template</a></div>
+    <p id="example-status" role="status"></p>
+    {builder.fields.map(field => <div class="artifact-field"><label for={`field-${field.key}`}>{field.label}</label><p id={`hint-${field.key}`}>{field.hint}</p><textarea id={`field-${field.key}`} data-key={field.key} rows="3" aria-describedby={`hint-${field.key}`} placeholder={field.example}></textarea></div>)}
+    {builder.slug === 'agent-instructions' && <div class="artifact-field"><label for="format">Instruction filename</label><select id="format"><option>AGENTS.md</option><option>CLAUDE.md</option></select><p>Choose the convention your agent supports. Review and merge with any existing instructions; do not blindly replace them. Written rules do not enforce filesystem or execution permissions.</p></div>}
+    <details class="optional-detail"><summary>What this template helps your agent work out</summary><ul>{builder.guidance.map(item=><li>{item}</li>)}</ul></details>
+    <div class="artifact-output"><h2>Review your draft</h2><p>Copy or download this draft and give it to your agent with relevant files. It contains your answers and instructions for refining them—not a verified implementation.</p><textarea id="artifact" aria-label="Generated artifact" readonly rows="14">{buildArtifact(builder,{},base)}</textarea><div class="artifact-actions"><button type="button" id="copy" class="button" disabled>Copy draft</button><button type="button" id="download" class="button secondary" disabled>Download Markdown</button></div><p id="artifact-status" role="status"></p></div>
+    <noscript><p>Use the blank template link above without JavaScript, and fill it in with your agent.</p></noscript>
+  </section>
+  <section class="section"><h2>What next?</h2><p>Give the draft and relevant workflow files to your agent. Ask it to separate confirmed facts, assumptions, and proposed choices, then review the result.</p><div class="artifact-actions">{next && <a href={url(`/tools/${next.slug}/`)}>Next: {next.title} &rarr;</a>}<a href={url('/tools/')}>Browse all tools</a><a href={url('/agents.md')}>Model reference guide</a></div></section>
+</Base>
+<script>
+  import { buildArtifact, type BuilderDefinition } from '../../lib/artifact-builders';
+  const root = document.querySelector<HTMLElement>('.artifact-builder')!;
+  const def: BuilderDefinition = JSON.parse(root.dataset.definition!);
+  const output = root.querySelector<HTMLTextAreaElement>('#artifact')!;
+  const status = root.querySelector<HTMLElement>('#artifact-status')!;
+  const format = root.querySelector<HTMLSelectElement>('#format');
+  const fields = [...root.querySelectorAll<HTMLTextAreaElement>('[data-key]')];
+  const update = () => {
+    output.value = buildArtifact(def,Object.fromEntries(fields.map(f=>[f.dataset.key!,f.value])),root.dataset.base!,format?.value);
+    status.textContent = '';
+  };
+  root.addEventListener('input',update); format?.addEventListener('change',update); update();
+  root.querySelectorAll<HTMLButtonElement>('button').forEach(b=>b.disabled=false);
+  root.querySelector('#example')!.addEventListener('click',()=>{
+    let added=0;
+    fields.forEach(f=>{if(!f.value.trim() && def.example[f.dataset.key!]) { f.value=def.example[f.dataset.key!];added++; }});
+    update(); root.querySelector('#example-status')!.textContent=added?'Example added to empty fields. Edit it to fit your work.':'Your answers were preserved. Clear a field to try its example.';
+  });
+  root.querySelector('#copy')!.addEventListener('click',async()=>{
+    try { await navigator.clipboard.writeText(output.value);status.textContent='Copied. Review it with your agent.'; }
+    catch { output.focus();output.select();status.textContent='Copy is unavailable. The draft is selected for manual copying.'; }
+  });
+  root.querySelector('#download')!.addEventListener('click',()=>{
+    const href=URL.createObjectURL(new Blob([output.value],{type:'text/markdown;charset=utf-8'}));
+    const a=document.createElement('a');a.href=href;a.download=format?.value ?? def.filename;a.click();
+    setTimeout(()=>URL.revokeObjectURL(href),1000);status.textContent='Draft downloaded. Review before adding it to your project.';
+  });
+</script>
+<style>
+  .artifact-builder { max-width:1000px; margin-bottom:48px }
+  .artifact-field { margin:26px 0 }
+  label { display:block; font-weight:600; margin-bottom:8px }
+  .artifact-field p,.artifact-output p { color:var(--muted); margin:8px 0 12px }
+  textarea,select { width:100%; padding:14px; font:inherit; border:1px solid var(--line-control); border-radius:8px; background:var(--panel); color:var(--text) }
+  textarea { resize:vertical }
+  .artifact-actions { display:flex; flex-wrap:wrap; gap:16px; align-items:center; margin:20px 0 }
+  .secondary { background:var(--panel2); color:var(--text); border:1px solid var(--line-control) }
+  .artifact-output { margin-top:32px; border-top:1px solid var(--line); padding-top:28px }
+  h2 { font-size:26px; letter-spacing:-.5px; margin-bottom:14px }
+  #artifact { font-size:14px; max-height:60vh }
+  a { color:var(--accent) }
+  ul { list-style:disc; padding-left:24px } li { margin:10px 0 }
+</style>

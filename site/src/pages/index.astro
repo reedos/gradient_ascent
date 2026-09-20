@@ -57,7 +57,7 @@ const homeRecipes = HOME_RECIPES.map((slug) => {
 >
   <section class="hero">
     <div class="hero-copy">
-      <div class="eyebrow"><span class="dot"></span>A guide to AI techniques, simplest first</div>
+      <div class="eyebrow"><span class="dot"></span>Concepts, examples, and tools for working with AI</div>
       <h1>Learn to work with AI, from a question to a <em>workforce</em>.</h1>
       <p class="hero-description">
         AI is changing how work gets done. Explore the main ways to use a language
@@ -87,6 +87,7 @@ const homeRecipes = HOME_RECIPES.map((slug) => {
     </div>
   </section>
 
+  <section class="section" id="start-here"><SectionTop eyebrow="Start here" title="What brings you here?" aside="You do not need to study every level before applying an idea. Choose an entry point and follow the links that fit your task." /><div class="featured-examples"><article><h3>Understand an idea</h3><p>Browse concepts, see visual explanations, and explore how they connect.</p><a href={url('/techniques/')}>Explore concepts &rarr;</a></article><article><h3>See it in practice</h3><p>Follow an example with evidence, decisions, and tradeoffs.</p><a href={url('/examples/')}>Browse worked examples &rarr;</a></article><article><h3>Apply it to your work</h3><p>Create a brief or prepare instructions, a workflow, or checks for your own agent.</p><a href={url('/tools/')}>Find a project tool &rarr;</a></article></div></section>
   <section class="section" id="apply-your-project">
     <SectionTop eyebrow="From concept to your project" title="Bring your task. Let your model help choose the approach." aside="Describe what you need, then give your own model a brief or point it directly to the reference guide." />
     <p>Ask it to compare existing tools, fixed workflows, and agents—including coding agents that build tools and then use them. Get a recommendation grounded in your constraints, with reasons, implementation steps, and ways to check the result.</p>

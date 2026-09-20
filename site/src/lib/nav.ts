@@ -95,11 +95,12 @@ export function buildNav(levels: NavLevel[], tracks: NavTrack[], threads: NavThr
     },
     {
       id: 'practice',
-      label: 'In practice',
+      label: 'Tools & examples',
       blurb: 'Start from the job, not the technique.',
       sections: [
         {
           items: [
+            { label: 'All project tools', path: '/tools/', hint: 'Instructions, workflows, checks, audits, and handoffs' },
             { label: 'Use this site with your AI', path: '/apply/', hint: 'Create a project brief for your own model' },
             { label: 'Worked examples', path: '/examples/', hint: 'Everyday, engineering, and business perspectives' },
             { label: 'Find your level', path: '/worksheet/', hint: 'Explore a candidate design, then check its fit' },
@@ -162,7 +163,7 @@ export function navContext(path: string, levels: NavLevel[], tracks: NavTrack[])
     return { group: 'techniques' };
   }
   if (p === '/techniques/' || p.startsWith('/map/') || p.startsWith('/threads/')) return { group: 'techniques' };
-  if (p.startsWith('/apply/') || p.startsWith('/examples/') || p.startsWith('/worksheet/') || p.startsWith('/shapes/') || p.startsWith('/recipes/') || p.startsWith('/teardowns/') || p.startsWith('/failures/')) return { group: 'practice' };
+  if (p.startsWith('/tools/') || p.startsWith('/apply/') || p.startsWith('/examples/') || p.startsWith('/worksheet/') || p.startsWith('/shapes/') || p.startsWith('/recipes/') || p.startsWith('/teardowns/') || p.startsWith('/failures/')) return { group: 'practice' };
   if (
     p.startsWith('/timeline/') ||
     p.startsWith('/names/') ||

@@ -69,7 +69,7 @@ const feedbackHref = `${REPO_URL}/issues/new?template=feedback.yml`;
                     <div class="nav-panel-foot">
                       <a href={url('/techniques/')}>All techniques <span aria-hidden="true">&rarr;</span></a>
                       <a href={url('/map/')}>The map <span aria-hidden="true">&rarr;</span></a>
-                      <a href={url('/worksheet/')}>Not sure which level? <span aria-hidden="true">&rarr;</span></a>
+                      <a href={url('/apply/')}>Not sure which level? <span aria-hidden="true">&rarr;</span></a>
                     </div>
                   </>
                 ) : (
@@ -110,7 +110,7 @@ const feedbackHref = `${REPO_URL}/issues/new?template=feedback.yml`;
         <span>Search</span>
         <kbd aria-hidden="true">/</kbd>
       </a>
-      <a class="nav-cta" href={url('/worksheet/')}>Find your level</a>
+      <a class="nav-cta" href={url('/apply/')}>Start your project</a>
       <a class="nav-burger" href="#sitemap" id="nav-burger" role="button" aria-expanded="false" aria-controls="nav-sheet">
         <span class="nav-burger-bars" aria-hidden="true"><i></i><i></i></span>
         <span class="nav-burger-label">Menu</span>
@@ -120,9 +120,9 @@ const feedbackHref = `${REPO_URL}/issues/new?template=feedback.yml`;
 
   <div class="nav-sheet" id="nav-sheet" tabindex="-1" hidden>
     <div class="nav-sheet-inner">
-      <a class="nav-sheet-cta" href={url('/worksheet/')}>
-        <b>Find your level</b>
-        <span>Seven questions, one recommendation <span aria-hidden="true">&rarr;</span></span>
+      <a class="nav-sheet-cta" href={url('/apply/')}>
+        <b>Start your project</b>
+        <span>Describe your task and create a brief <span aria-hidden="true">&rarr;</span></span>
       </a>
       {
         groups.map((g) => (

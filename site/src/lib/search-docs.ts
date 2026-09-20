@@ -1,3 +1,4 @@
+import { builders } from './artifact-builders';
 // Turns the site's own data into the flat SearchDoc[] both pages/search-index.json.ts (the
 // fetchable index) and pages/search.astro (the no-JavaScript fallback listing) render from --
 // one function, so the two can never list a different set of things. Heavy imports live here,
@@ -173,6 +174,9 @@ export async function buildSearchDocs(): Promise<SearchDoc[]> {
   // techniques that mention one, not the view itself. Listed here by hand because that is what
   // they are: a fixed set of views, each with a sentence saying what it shows.
   const views: { id: string; title: string; summary: string; path: string }[] = [
+    {id:'apply',title:'Project brief builder',summary:'Describe your task and desired automation for your own AI.',path:'/apply/'},
+    {id:'tools',title:'Tools for your project',summary:'Agent instructions, workflows, audits, tool specifications, checks and handoffs.',path:'/tools/'},
+    ...builders.map(b=>({id:'tool-'+b.slug,title:b.title,summary:b.description,path:'/tools/'+b.slug+'/'})),
     {
       id: 'map',
       title: 'Map',

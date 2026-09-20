@@ -8,7 +8,7 @@ import { recommendationInstructions } from './project-brief.ts';
 //                    read exactly what their agent will)
 //   the worksheet    the decision tree as text, because the interactive page is no use to a
 //                    program (/worksheet.md; /data/worksheet.json is the same thing as data)
-//   the use cases    every recipe and teardown with the level it needs and the techniques it is
+//   the use cases    every recipe and teardown with the levels used by its illustrated design and the techniques it is
 //                    made from (/data/use-cases.json)
 //
 // Pure: data comes in as arguments, so the tests run under plain `node --test`.
@@ -130,11 +130,12 @@ export function agentFiles(abs: (p: string) => string): { path: string; url: str
   const f = (path: string, what: string) => ({ path, url: abs(path), what });
   return [
     f('/agents.md', 'This guide: how to turn a person’s job into a recommendation.'),
+    f('/tools.md', 'Builder directory: choose a template for agent instructions, workflows, acceptance criteria, audits, tool specifications, or handoffs. Fetch its Markdown directly; completing the interactive form is not required.'),
     f('/project-brief.md', 'Reusable project brief template and recommendation requirements; fill unknowns with questions.'),
-    f('/worksheet.md', 'The decision tree as text: seven questions that settle the level, four that change the advice.'),
+    f('/worksheet.md', 'The decision tree as text: seven questions that classify a candidate design, four that change the advice.'),
     f('/shapes.md', 'The kinds of job, by the shape of the work and not its subject: how to recognize each, where it usually settles, what moves it lower or higher, and jobs from other fields with the same shape.'),
     f('/method.md', 'Why the site exists, its ten principles, how a level is defined, how a name is checked, and what the registry is not. Other pages cite it.'),
-    f('/data/use-cases.json', 'Every recipe and teardown: the shapes it illustrates, the level it needs, the techniques it is made from, and where to read it.'),
+    f('/data/use-cases.json', 'Every recipe and teardown: the shapes it illustrates, the levels used by its illustrated design, the techniques it is made from, and where to read it.'),
     f('/llms.txt', 'An index of every page with a one-line description.'),
     f('/llms-full.txt', 'Every technique, recipe, teardown and thread page as Markdown in one file. Large.'),
     f('/data/taxonomy.json', 'Levels, techniques, recipes and the typed relations between pages (requires, upgrades_to with its condition, combines_with, alternative_to with its question).'),

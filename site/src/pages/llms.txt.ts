@@ -17,6 +17,7 @@ export const GET: APIRoute = async ({ site }) => {
   const lines: string[] = [];
 
   lines.push('# Gradient Ascent');
+  lines.push(`Project tools and Markdown templates: ${abs('/tools.md')} — agent instructions, workflows, acceptance criteria, workflow audits, tool specifications, and project handoffs.`);
   lines.push(`Project brief builder: ${abs('/apply/')} — copy or download a brief for your own model. Blank template: ${abs('/project-brief.md')}.`);
   lines.push('');
   lines.push(`Worked examples: ${abs('/examples/')} — 98 authored, scripted cases with evidence, changed conditions, and review decisions.`);
@@ -24,7 +25,7 @@ export const GET: APIRoute = async ({ site }) => {
     '> A manual for the main ways to use a language model, from one chat message to agents that ' +
       'run on their own, in eight levels ordered by how much the model decides for itself. Each ' +
       `level's techniques (${counts.techniques} written or planned) show what it costs and how it ` +
-      'fails, not just how it works. Every page here also has a clean Markdown version at the ' +
+      'fails, not just how it works. Technique, topic, thread, recipe, teardown, level, and builder pages have a clean Markdown version at the ' +
       'same path with .md appended, for example /techniques/rag.md.',
   );
   lines.push('');
