@@ -1,0 +1,86 @@
+---
+import type { NamedEntry } from '../lib/content';
+import { concreteNames, practiceExamples } from '../lib/concept-examples';
+import { usDate } from '../lib/dates';
+interface Props { slug: string; entries: NamedEntry[]; color: string }
+const { slug, entries, color } = Astro.props;
+const examples = concreteNames(slug, entries);
+const moreExamples = examples.slice(6);
+const practice = practiceExamples[slug];
+if (!practice) throw new Error(`Missing practical example: ${slug}`);
+const kindLabel = { product: 'Product', tool: 'Tool or framework', model: 'Model' };
+---
+<section class="concept-examples" style={`--example-color:${color}`} aria-labelledby={`examples-heading-${slug}`}>
+  <div class="examples-heading">
+    <h2 id={`examples-heading-${slug}`}>{slug === 'agent-harness' ? 'Examples of agent harnesses' : 'Concrete examples'}</h2>
+    {examples.length > 0 && <a href="#named-examples">All names on this page <span aria-hidden="true">↗</span></a>}
+  </div>
+  {examples.length > 0 && <p class="example-note examples-intro">{examples.length} current examples · Products, tools, and models that demonstrate this concept. A selection, not a ranking.</p>}
+  {slug === 'agent-harness' && <p class="example-note examples-intro">Includes ready-made harnesses, frameworks and runtimes for building your own, and products with a harness inside.</p>}
+  {examples.length > 0 && <ul class="example-cards">
+    {examples.slice(0, 6).map((n) => <li>
+      <div class="example-kind">{kindLabel[n.kind]} <span>· {n.maker}</span></div>
+      <h3><a href={n.source}>{n.name}<span aria-hidden="true">↗</span></a></h3>
+      <p>{n.explanation ?? n.category.charAt(0).toUpperCase() + n.category.slice(1)}</p>
+      <a class="example-source" href={n.source}>Maker’s documentation <span aria-hidden="true">↗</span></a>
+      <small>Checked {usDate(n.checked)}</small>
+    </li>)}
+  </ul>}
+  {moreExamples.length > 0 && <details class="more-examples">
+    <summary>Explore {moreExamples.length} more examples</summary>
+    <ul class="example-directory">
+      {moreExamples.map((n) => <li>
+        <div><a href={n.source}>{n.name} <span aria-hidden="true">↗</span></a><small>{kindLabel[n.kind]} · {n.maker}</small></div>
+        <p>{n.explanation ?? n.category.charAt(0).toUpperCase() + n.category.slice(1)}</p>
+        <small>Checked {usDate(n.checked)}</small>
+      </li>)}
+    </ul>
+  </details>}
+  <div class="practice-example">
+    <span>In practice</span>
+    <div><h3>{practice[0]}</h3><p>{practice[1]}</p></div>
+  </div>
+  {examples.length === 0 && <p class="example-note">An illustrative task example. No verified product or tool is currently listed for this concept.</p>}
+</section>
+
+<style>
+  .concept-examples { margin: 0 0 52px; }
+  .examples-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 17px; }
+  .examples-heading h2 { font-size: 23px; letter-spacing: -.6px; }
+  .examples-heading > a { font-size: 12px; color: var(--muted); }
+  .examples-heading > a:hover { color: var(--text); }
+  .example-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+  .example-cards > li { padding: 21px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); display: flex; flex-direction: column; align-items: start; }
+  .example-kind { color: var(--example-color); font-size: 10px; margin-bottom: 9px; }
+  .example-kind span { color: var(--muted); }
+  h3 { font: 600 16px var(--font); letter-spacing: -.2px; }
+  h3 a { display: flex; gap: 10px; align-items: baseline; }
+  h3 a span { color: var(--example-color); font-size: 13px; }
+  h3 a:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .example-cards p { color: var(--muted); font-size: 13px; line-height: 1.7; margin: 10px 0 17px; }
+  .example-source { margin-top: auto; color: var(--example-color); font-size: 11px; }
+  .example-source:hover { text-decoration: underline; }
+  .example-cards small { color: var(--muted); font-size: 10px; margin-top: 6px; }
+  .practice-example { display: flex; gap: 24px; margin-top: 16px; padding: 21px 23px; border-left: 2px solid var(--example-color); background: color-mix(in srgb, var(--example-color) 4%, var(--bg)); }
+  .practice-example > span { flex-shrink: 0; color: var(--example-color); font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; padding-top: 3px; }
+  .practice-example h3 { font-size: 14px; }
+  .practice-example p { color: var(--muted); font-size: 13px; line-height: 1.7; margin-top: 5px; max-width: 900px; }
+  .example-note { font-size: 11px; color: var(--muted); margin-top: 10px; }
+  .examples-intro { margin: 0 0 16px; line-height: 1.7; }
+  .example-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .more-examples { margin-top: 14px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); }
+  .more-examples summary { cursor: pointer; padding: 18px 21px; color: var(--example-color); font-size: 13px; }
+  .example-directory { padding: 0 21px; }
+  .example-directory li { display: grid; grid-template-columns: minmax(140px, 1fr) 2fr auto; gap: 20px; padding: 17px 0; border-top: 1px solid var(--line); }
+  .example-directory a { font-size: 14px; color: var(--text); }
+  .example-directory a:hover { text-decoration: underline; }
+  .example-directory small { display: block; font-size: 10px; color: var(--muted); margin-top: 5px; }
+  .example-directory p { font-size: 12px; line-height: 1.7; color: var(--muted); }
+  @media (max-width: 900px) { .example-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 680px) {
+    .examples-heading { align-items: start; flex-direction: column; gap: 8px; }
+    .example-cards { grid-template-columns: 1fr; }
+    .example-directory li { grid-template-columns: 1fr; gap: 7px; }
+    .practice-example { flex-direction: column; gap: 10px; padding: 18px; }
+  }
+</style>

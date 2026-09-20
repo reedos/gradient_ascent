@@ -23,7 +23,7 @@ from evals.corpus import DEFAULT_CORPUS_DIR, Section, bm25_search, load_sections
 from examples.common.model import Embedder, Message, Model
 from examples.common.trace import Tracer
 from examples.common.types import Answer
-from examples.rag.run import CITE_RE
+from examples.common.types import cited_sources
 
 LEVEL = 3
 RETRIEVE_K = 4
@@ -150,5 +150,5 @@ def run(
         )
         node_id = next_id
 
-    citations = sorted(set(CITE_RE.findall(state["draft_text"].lower())))
-    return Answer(text=state["draft_text"], citations=citations)
+    citations = cited_sources(state["draft_text"])
+    return Answer(text=state["draft_text"], citations=citations, retrieved_sources=state["source_cites"])

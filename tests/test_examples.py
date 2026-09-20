@@ -449,7 +449,8 @@ class ExampleTraceTests(unittest.TestCase):
         self.assertEqual(len(model_decided), 1)
         self.assertEqual(model_decided[0].kind, "model")
         self.assertIn("lookup_part", model_decided[0].title)
-        self.assertIn("parts-list#2", answer.citations)
+        self.assertIn("parts-list#2", answer.retrieved_sources)
+        self.assertEqual(answer.citations, [])
         self.assertIn("52.00", answer.text)
 
     def test_function_calling_records_one_model_decided_step_when_it_declines_to_call_a_tool(self) -> None:
@@ -663,9 +664,11 @@ class BackendRequestShapeTests(unittest.TestCase):
     def test_claude_does_not_drop_a_requested_output_schema(self) -> None:
         model = model_mod.ClaudeModel("claude-sonnet-5", api_key="test-key-not-real")
         payload = model.build_payload(
-            [model_mod.Message(role="user", content="hi")], schema={"type": "json_schema"}
+            [model_mod.Message(role="user", content="hi")], schema={"type": "object", "properties": {"name": {"type": "string"}}}
         )
-        self.assertEqual(payload["output_config"], {"format": {"type": "json_schema"}})
+        self.assertEqual(payload["output_config"], {"format": {"type": "json_schema", "schema": {
+            "type": "object", "properties": {"name": {"type": "string"}}, "additionalProperties": False,
+        }}})
 
     def test_building_a_backend_reads_no_key_and_opens_no_socket(self) -> None:
         # importing and constructing must stay free of I/O, or the test suite would need a key

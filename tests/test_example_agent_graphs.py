@@ -54,7 +54,8 @@ class AgentGraphsExampleTests(unittest.TestCase):
         self.assertFalse(any(s.title in ("Hop cap reached", "Handoff blocked") for s in tracer.steps))
         # bm25 over the real corpus, excluding what was already found each hop, turns up these
         # three sections for this question, in this order (checked directly against evals/corpus).
-        self.assertEqual(answer.citations, ["dr520-manual#4", "service-bulletin#1", "service-bulletin#2"])
+        self.assertEqual(answer.retrieved_sources, ["dr520-manual#4", "service-bulletin#1", "service-bulletin#2"])
+        self.assertEqual(answer.citations, ["dr520-manual#4", "service-bulletin#2"])
 
     def test_the_hop_cap_stops_the_team_without_asking_the_model_again(self) -> None:
         def always_research(messages, tools):

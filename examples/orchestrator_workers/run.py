@@ -19,7 +19,6 @@ from evals.corpus import DEFAULT_CORPUS_DIR
 from examples.common.model import Embedder, Message, Model
 from examples.common.trace import Tracer
 from examples.common.types import Answer
-from examples.rag.run import CITE_RE
 from examples.rag.run import run as rag_worker
 
 LEVEL = 6
@@ -114,7 +113,5 @@ def run(
         return Answer(text="No worker returned an answer.", citations=[])
 
     combined_text = _combine(question, worker_answers, model, tracer)
-    citations = sorted(
-        {c for _, a in worker_answers for c in a.citations} | set(CITE_RE.findall(combined_text.lower()))
-    )
-    return Answer(text=combined_text, citations=citations)
+    retrieved = sorted({c for _, a in worker_answers for c in a.retrieved_sources})
+    return Answer.from_text(combined_text, retrieved_sources=retrieved)

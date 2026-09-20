@@ -268,7 +268,7 @@ main { max-width: 1392px; margin: auto; padding: 0 48px; min-height: 60vh }
 .prose-nav a:hover, .prose-nav a[aria-current="true"] { color: var(--text) }
 /* One reading measure for running prose; the display tracking of h1/h2/h3 is tuned for large
    sizes, so the smaller prose headings get their own. */
-.prose { max-width: 720px }
+.prose { max-width: 720px; overflow-wrap: anywhere }
 .prose h2 { font-size: 24px; margin: 34px 0 15px; letter-spacing: -.7px }
 .prose h2:first-child { margin-top: 0 }
 .prose h3 { font-size: 16px; margin: 22px 0 10px; letter-spacing: -.2px }

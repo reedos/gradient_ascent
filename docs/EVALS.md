@@ -42,9 +42,10 @@ the same questions is the cheapest way to see what the protocol layer itself cos
 
 The three level-6 examples are scored for the same reason, and they are the first entries on
 this table that let the set measure what a second model costs. `orchestrator_workers` splits the
-question, runs one `rag` worker per part and keeps every worker's citations in the combined
-answer. `agent_graphs` lets a supervisor call decide whether to research again or write, and the
-write node cites the sections the research node found. `debate_review` drafts an answer and then
+question, runs one `rag` worker per part and asks the lead to keep every worker's citations.
+Only citations present in the combined answer earn citation credit. `agent_graphs` lets a
+supervisor call decide whether to research again or write, and the write node is asked to cite
+the sections the research node found. `debate_review` drafts an answer and then
 has a reviewer with its own retrieval accept or reject it; the draft's citations are what the
 graders see. All three take the runner's `(question, model, embedder, tracer) -> Answer`
 signature, so the same grading contract applies without a special case.
@@ -109,7 +110,7 @@ Project a branching example from the branch you expect to be busiest instead: ru
 ## Set a budget
 
 ```
-python scripts/eval_run.py --example rag --model claude:claude-sonnet-5 --budget-tokens 100000
+python scripts/eval_run.py --example rag --model claude:claude-sonnet-5 --embedder ollama:nomic-embed-text --budget-tokens 100000
 ```
 
 `--budget-tokens` is a hard cap on tokens in plus out for one example's run. The runner adds one
@@ -132,7 +133,7 @@ prompt by design and is the one example that costs about 14,000 input tokens a q
 ## A live local run
 
 ```
-python scripts/eval_run.py --example rag --model ollama:llama3.1 --budget-tokens 100000
+python scripts/eval_run.py --example rag --model ollama:llama3.1 --embedder ollama:nomic-embed-text --budget-tokens 100000
 ```
 
 One example at a time, not `--example all`, at least until you have read a result. No
@@ -153,6 +154,17 @@ instead of this section.** It gives the order (one example and one question kind
 grader, then all 60 questions, then a recorded trace) and says what to look at between the
 steps. This page describes the runner; that one describes the sitting.
 
+## Choosing an embedder
+
+`--embedder stub|ollama:<embedding-tag>` is independent of `--model`. It defaults to the model
+specification for compatibility. Only `rag` and `orchestrator_workers` use embeddings; the other
+scored examples do not construct an embedder. A Claude run of either embedding example needs an
+explicit embedding choice and reports a setup error before reading an API key if none is given.
+Choose a pulled embedding model for live retrieval; the chat model need not support embeddings.
+`--embedder stub` is useful for testing the pipeline, but its retrieval is synthetic. Result
+files record `embedder_id` (null when unused), so that choice remains visible. `--dry` always
+uses the stub embedder and never constructs live backends.
+
 ## A metered run
 
 Same command with `--model claude:<id>`, reading the key from `.local/api-keys.json` (also
@@ -161,6 +173,14 @@ conflicting) need a grader model, passed as `--grader <spec>`; it defaults to `-
 leave it out. 10% of the grader's verdicts are written to
 `evals/results/<example>/<model-id>.review.json` for you to check by hand against its stated
 rubric.
+
+The live adapters translate the shared definitions into each provider's wire format: Ollama
+tools use a `type: function` wrapper, and Claude JSON outputs use `type: json_schema` with the
+schema nested inside. Claude requires closed object shapes, so its adapter adds
+`additionalProperties: false` where omitted and refuses explicitly open dictionaries. Other
+unsupported constraints are preserved for the API to reject, rather than silently removed.
+Extraction examples still validate the returned data locally, including non-object JSON and
+booleans in integer fields in the structured-output example.
 
 ## How a question is graded
 
@@ -194,6 +214,28 @@ question ungraded for the same reason.
 Citations are compared as normalized `file#section`: case, a `.md` suffix, a directory prefix
 and `section 3` / `§3` spellings all normalize to the same citation, so two models that cite the
 same section score the same.
+
+## Citation and retrieval metrics
+
+Results use `scoring_version: 2`. Files without a version used the older mixed citation
+semantics and should not be compared directly with version 2 citation scores. Re-run the
+examples to obtain comparable results; the new metric cannot be reconstructed from an old
+aggregate score alone.
+
+`Answer.citations` contains citations in the final answer, not every source encountered during
+tool calls or worker runs. Model answers share the parser in `examples/common/types.py`.
+Deterministic examples can attach citations directly to the excerpts or rows they return;
+`prompt_chaining` additionally filters out references that were not retrieved. The debate
+example scores the author's answer, not citations mentioned only in reviewer commentary.
+Citation coverage measures references, not whether a reference supports a claim.
+
+`Answer.retrieved_sources` separately lists source sections supplied to the answering workflow,
+including worker retrieval and full-context documents. Title-only search hits are not counted
+until their content is read. `retrieval_coverage` is the mean share of required source sections
+supplied, whether or not the final answer cites them. Each question stores `citations`,
+`retrieved_sources`, `citation_hit`, and `retrieval_hit`. Questions with no required sources are
+excluded from both coverage averages. Thus an uncited answer can have retrieval coverage 1 and
+citation coverage 0.
 
 ## Reading a result file
 

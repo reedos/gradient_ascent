@@ -19,7 +19,6 @@ from evals.corpus import DEFAULT_CORPUS_DIR, Section, bm25_search, load_sections
 from examples.common.model import Embedder, Message, Model
 from examples.common.trace import Tracer
 from examples.common.types import Answer
-from examples.rag.run import CITE_RE
 
 LEVEL = 3
 LOOKUP_K = 3
@@ -52,7 +51,7 @@ def _lookup_route(question: str, sections: dict[str, Section], model: Model, tra
         kind="model", decided_by="code", title="Answer with the lookup prompt", detail=completion.text[:200],
         tokens_in=completion.tokens_in, tokens_out=completion.tokens_out, ms=completion.ms,
     )
-    return Answer(text=completion.text, citations=sorted(set(CITE_RE.findall(completion.text.lower()))))
+    return Answer.from_text(completion.text, retrieved_sources=[s.cite for s in sources])
 
 
 def _numeric_route(question: str, sections: dict[str, Section], model: Model, tracer: Tracer) -> Answer:
@@ -65,7 +64,7 @@ def _numeric_route(question: str, sections: dict[str, Section], model: Model, tr
     if not line:
         return Answer(text=f"{match.group(0)} is not in the parts list.", citations=[])
     cite = next((c for c, s in sections.items() if c.startswith("parts-list") and match.group(0) in s.text), None)
-    return Answer(text=line, citations=[cite] if cite else [])
+    return Answer(text=line, citations=[cite] if cite else [], retrieved_sources=[cite] if cite else [])
 
 
 def _person_route(question: str, sections: dict[str, Section], model: Model, tracer: Tracer) -> Answer:

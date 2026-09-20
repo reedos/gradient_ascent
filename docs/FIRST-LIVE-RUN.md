@@ -54,7 +54,7 @@ written as `python` for short.
 the right first kind: 12 questions, all `exact`-graded, so no grader model is involved.
 
 ```
-python scripts/eval_run.py --example rag --model ollama:<your-tag> --kind lookup --budget-tokens 40000
+python scripts/eval_run.py --example rag --model ollama:<your-tag> --embedder ollama:<embedding-tag> --kind lookup --budget-tokens 40000
 ```
 
 Writes: `evals/results/rag/ollama_<your-tag>.json`.
@@ -68,8 +68,9 @@ Check, in this order:
    question is mis-tagged in `evals/questions.json`, not that the model did badly.
 4. `"model_decided_steps": 0`: `rag` is level 2. Nonzero means either the example changed or the
    rule in `examples/common/trace.py` broke; stop and find out which before reading further.
-5. `"citation_coverage"`: the share of `must_cite` sections the answers actually cited. Low here
-   with a decent `score_overall` means the model found the right answer from the wrong passage.
+5. `"citation_coverage"`: the share of `must_cite` sections the answers actually cited. Compare
+   with `"retrieval_coverage"`: high retrieval coverage and low citation coverage means
+   required sources reached the workflow but were not cited in its final answer.
 6. `"score_overall"`: read it last. It is the least informative number until you trust the five
    above it.
 
@@ -81,7 +82,7 @@ Eight of the twelve `multi_hop` questions are `rubric`-graded: a second model re
 against a checklist. The other four are `exact`, so this run exercises both paths at once.
 
 ```
-python scripts/eval_run.py --example rag --model ollama:<your-tag> --grader ollama:<your-tag> --kind multi_hop --budget-tokens 60000
+python scripts/eval_run.py --example rag --model ollama:<your-tag> --embedder ollama:<embedding-tag> --grader ollama:<your-tag> --kind multi_hop --budget-tokens 60000
 ```
 
 Writes: the result file above, plus `evals/results/rag/ollama_<your-tag>.review.json`, a
@@ -97,7 +98,7 @@ from an unchecked grader is worse than no score, because it looks like a measure
 ## Step 3: one example, all 60 questions
 
 ```
-python scripts/eval_run.py --example rag --model ollama:<your-tag> --grader ollama:<your-tag> --budget-tokens 100000
+python scripts/eval_run.py --example rag --model ollama:<your-tag> --embedder ollama:<embedding-tag> --grader ollama:<your-tag> --budget-tokens 100000
 ```
 
 Check the same six things, plus `score_by_kind.unanswerable`: it is gated in code before any
@@ -128,14 +129,14 @@ which those are; `examples/<name>/README.md` prints the command.
 **Then project the call before making it**, the same discipline as `eval_run.py --dry`:
 
 ```
-python scripts/record_trace.py --example rag --question "How long is the warranty on the DW-480, and what voids it?" --model ollama:<your-tag> --dry-run
+python scripts/record_trace.py --example rag --question "How long is the warranty on the DW-480, and what voids it?" --model ollama:<your-tag> --embedder ollama:<embedding-tag> --dry-run
 ```
 
 This prints the model id, the projected input and output tokens, and where the trace would be
 written. It calls no model. Then record it for real:
 
 ```
-python scripts/record_trace.py --example rag --question "How long is the warranty on the DW-480, and what voids it?" --model ollama:<your-tag>
+python scripts/record_trace.py --example rag --question "How long is the warranty on the DW-480, and what voids it?" --model ollama:<your-tag> --embedder ollama:<embedding-tag>
 ```
 
 Writes: `examples/rag/trace.json`.
@@ -143,9 +144,11 @@ Writes: `examples/rag/trace.json`.
 Open it and check `"stub": false`, that `commit` is the commit you ran at, and that every step's
 `decided_by` matches the rule in `examples/common/trace.py`: for `rag`, every step is `"code"`.
 
-Some examples need an `embedder` as well as a model; today's embedder support covers `stub` and
-`ollama:<tag>` only, so record those against your local model even when the chat answers come
-from the metered API. `--list` and `--dry-run` both tell you which shape an example expects.
+Some examples need an `embedder` as well as a model. Both scripts accept an independent
+`--embedder stub|ollama:<embedding-tag>`; pass a local embedding tag explicitly when using
+Claude for chat. The evaluation runner constructs one only for examples that use vectors.
+The trace recorder still expects one for any four-argument run signature; `--list` and
+`--dry-run` identify that shape. Check `scoring_version: 2` on new evaluation results.
 
 ## Step 5: the rest of the local run
 
@@ -189,7 +192,7 @@ Only after the local run is clean, and only for the pages you actually intend to
 4. Run one example, with a cap, and read the result before the next:
 
    ```
-   python scripts/eval_run.py --example rag --model claude:<id> --grader claude:<id> --budget-tokens 100000
+   python scripts/eval_run.py --example rag --model claude:<id> --embedder ollama:<embedding-tag> --grader claude:<id> --budget-tokens 100000
    ```
 5. Record its trace the same way as Step 4, with `--model claude:<id>` in place of `ollama:...`
    (subject to the embedder note above).

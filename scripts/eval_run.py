@@ -3,7 +3,7 @@
 Usage:
     python scripts/eval_run.py --example rag --model stub --dry
     python scripts/eval_run.py --example all --model ollama:llama3.1 --budget-tokens 2000000
-    python scripts/eval_run.py --example rag --model claude:claude-sonnet-5 --grader claude:claude-sonnet-5 \
+    python scripts/eval_run.py --example rag --model claude:claude-sonnet-5 --embedder ollama:nomic-embed-text --grader claude:claude-sonnet-5 \
         --budget-tokens 200000
 
 `--dry` never calls a model: it runs every example through `DryRunModel`, which counts prompt
@@ -38,7 +38,7 @@ import random
 import re
 import sys
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -397,6 +397,23 @@ DEFAULT_QUESTIONS = ROOT / "evals" / "questions.json"
 DEFAULT_OUT = ROOT / "evals" / "results"
 CACHE_DIR = ROOT / ".local" / "eval-cache"
 REVIEW_FRACTION = 0.10
+SCORING_VERSION = 2
+# Only these scored examples use vectors. The others keep an unused embedder parameter
+# for the uniform run signature; they must not require an embedding backend or model tag.
+EMBEDDING_EXAMPLES = frozenset({"rag", "orchestrator_workers"})
+
+
+def evaluation_embedder(names: list[str], model_spec: str, embedder_spec: str | None) -> Embedder | None:
+    if not EMBEDDING_EXAMPLES.intersection(names):
+        return None
+    spec = embedder_spec or model_spec
+    try:
+        return build_embedder(spec, stub=StubEmbedder())
+    except ValueError as exc:
+        raise ValueError(
+            f"These examples need embeddings. Pass --embedder ollama:<embedding-tag> "
+            f"or --embedder stub explicitly; {spec!r} is not an embedding backend."
+        ) from exc
 
 
 def load_questions(path: Path, *, kind: str | None = None, limit: int | None = None) -> list[dict]:
@@ -669,6 +686,11 @@ def citation_hit(question: dict, answer: Answer) -> float | None:
     return len(given & must) / len(must)
 
 
+def retrieval_hit(question: dict, answer: Answer) -> float | None:
+    """Coverage of required sources supplied to the workflow, not citations it produced."""
+    return citation_hit(question, Answer(text="", citations=answer.retrieved_sources))
+
+
 def sample_for_review(items: list[dict], frac: float = REVIEW_FRACTION, *, seed: int = 0) -> list[dict]:
     """A `frac` sample of the grader's verdicts to hand-check. Deterministic given `seed`: the
     same run re-sampled with the same seed picks the same questions, and a different seed picks
@@ -691,6 +713,9 @@ class QuestionResult:
     wall_s: float
     tool_calls: int
     model_decided_steps: int
+    retrieval_hit: float | None = None
+    citations: list[str] = field(default_factory=list)
+    retrieved_sources: list[str] = field(default_factory=list)
 
 
 def _tool_call_count(tracer: Tracer) -> int:
@@ -701,7 +726,7 @@ def run_example(
     name: str,
     *,
     model: Model,
-    embedder: Embedder,
+    embedder: Embedder | None,
     grader: Model | None,
     questions: list[dict],
     stub: bool,
@@ -750,6 +775,9 @@ def run_example(
                 wall_s=wall_s,
                 tool_calls=_tool_call_count(tracer),
                 model_decided_steps=tracer.model_decided_count(),
+                retrieval_hit=retrieval_hit(question, answer),
+                citations=answer.citations,
+                retrieved_sources=answer.retrieved_sources,
             )
         )
         if not dry and question["grading"] == "rubric":
@@ -778,6 +806,7 @@ def run_example(
         budget_tokens=budget_tokens,
     )
     summary["interrupted"] = interrupted
+    summary["embedder_id"] = embedder.model_id if embedder is not None and name in EMBEDDING_EXAMPLES else None
     # Kept separate from `tokens_in`/`tokens_out`, which are the technique's own cost and the only
     # ones a page may quote. The grader's cost is real money on a metered run and belongs on the
     # result file, but it is not part of what the technique cost to run.
@@ -816,7 +845,9 @@ def _summarize(
         by_kind[kind] = {"n": len(subset), "ungraded": ungraded(subset), "score": score(subset)}
 
     cites = [r.citation_hit for r in results if r.citation_hit is not None]
+    retrieved = [r.retrieval_hit for r in results if r.retrieval_hit is not None]
     return {
+        "scoring_version": SCORING_VERSION,
         "example": example,
         "model_id": model_id,
         "stub": stub,
@@ -831,6 +862,7 @@ def _summarize(
         "ungraded": ungraded(results),
         "score_by_kind": by_kind,
         "citation_coverage": round(sum(cites) / len(cites), 4) if cites else None,
+        "retrieval_coverage": round(sum(retrieved) / len(retrieved), 4) if retrieved else None,
         "citation_hit_rate": round(sum(1 for c in cites if c == 1.0) / len(cites), 4) if cites else None,
         "tokens_in": sum(r.tokens_in for r in results),
         "tokens_out": sum(r.tokens_out for r in results),
@@ -896,6 +928,7 @@ def build_args(argv: list[str]) -> argparse.Namespace:
         "asking for one prints why.",
     )
     parser.add_argument("--model", required=True, help="stub | ollama:<tag> | claude:<id>")
+    parser.add_argument("--embedder", default=None, help="stub | ollama:<embedding-tag>; defaults to --model when embeddings are needed")
     parser.add_argument("--questions", default=str(DEFAULT_QUESTIONS), type=Path)
     parser.add_argument("--kind", choices=KINDS, default=None)
     parser.add_argument("--limit", type=int, default=None)
@@ -945,9 +978,13 @@ def main(argv: list[str]) -> int:
         _print_dry_table(summaries)
         return 0
 
+    try:
+        embedder = evaluation_embedder(names, args.model, args.embedder)
+    except ValueError as exc:
+        print(f"Setup error: {exc}", file=sys.stderr)
+        return 2
     raw_model = build_model(args.model, stub=generic_stub_model())
     model = CachingModel(raw_model, args.cache_dir)
-    embedder = build_embedder(args.model, stub=StubEmbedder())
     grader: Model | None = None
     if any(q["grading"] == "rubric" for q in questions):
         grader_spec = args.grader or args.model

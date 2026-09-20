@@ -17,7 +17,7 @@ from evals.corpus import DEFAULT_CORPUS_DIR, Section, bm25_search, load_sections
 from examples.common.model import Embedder, Message, Model
 from examples.common.trace import Tracer
 from examples.common.types import Answer
-from examples.rag.run import CITE_RE
+from examples.common.types import cited_sources
 
 LEVEL = 6
 RETRIEVE_K = 4
@@ -148,5 +148,6 @@ def run(
         else:
             verdict = turn
 
-    citations = sorted(set(CITE_RE.findall(draft_text.lower())))
-    return Answer(text=f"{draft_text}\n\nReview: {verdict}", citations=citations)
+    citations = cited_sources(draft_text)
+    return Answer(text=f"{draft_text}\n\nReview: {verdict}", citations=citations,
+                  retrieved_sources=sorted({s.cite for s in author_sources} | {c for _, found in checked for c in cited_sources(found)}))

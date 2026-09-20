@@ -161,7 +161,7 @@ def run(
 
         if not completion.tool_calls:
             record_completion(tracer, decided_by="model", title="Model stops and answers", completion=completion)
-            return Answer(text=completion.text, citations=sorted(set(citations)))
+            return Answer.from_text(completion.text, retrieved_sources=citations)
 
         calls_desc = ", ".join(f"{c.name}({c.arguments})" for c in completion.tool_calls)
         record_completion(tracer, decided_by="model", title="Model picks an action", completion=completion, detail=calls_desc)
@@ -184,7 +184,7 @@ def run(
         if tokens_used >= max_tokens:
             reason = f"token budget reached: {tokens_used} >= {max_tokens}"
             final = force_final(context_policy(messages), model, tracer, reason=reason, max_tokens=400)
-            return Answer(text=final.text, citations=sorted(set(citations)))
+            return Answer.from_text(final.text, retrieved_sources=citations)
 
     final = force_final(context_policy(messages), model, tracer, reason=f"step cap reached: {max_steps} steps", max_tokens=400)
-    return Answer(text=final.text, citations=sorted(set(citations)))
+    return Answer.from_text(final.text, retrieved_sources=citations)

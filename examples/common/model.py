@@ -276,7 +276,7 @@ class OllamaModel:
             "options": options,
         }
         if tools is not None:
-            payload["tools"] = tools
+            payload["tools"] = [{"type": "function", "function": tool} for tool in tools]
         if schema is not None:
             payload["format"] = schema
         data = _post_json(f"{self._host}/api/chat", payload, timeout=120)
@@ -423,8 +423,34 @@ def _join_anthropic_content(first: str | list[dict], second: str | list[dict]) -
     return as_blocks(first) + as_blocks(second)
 
 
+def _anthropic_schema(schema: dict) -> dict:
+    """Copy a JSON schema and close object shapes as required by Claude JSON outputs.
+
+    Explicit open dictionaries cannot be represented; refuse them instead of silently
+    changing their contract. Other unsupported constraints are left for the API to reject,
+    never stripped. Walk schema positions only, not data in enum/default values.
+    """
+    from copy import deepcopy
+
+    result = deepcopy(schema)
+    if result.get("type") == "object" or "properties" in result:
+        if result.get("additionalProperties", False) is not False:
+            raise ValueError("Claude structured outputs require additionalProperties: false for objects")
+        result["additionalProperties"] = False
+    for key in ("properties", "$defs", "definitions", "patternProperties"):
+        if key in result:
+            result[key] = {name: _anthropic_schema(child) for name, child in result[key].items()}
+    for key in ("items", "not"):
+        if isinstance(result.get(key), dict):
+            result[key] = _anthropic_schema(result[key])
+    for key in ("anyOf", "allOf", "oneOf", "prefixItems"):
+        if key in result:
+            result[key] = [_anthropic_schema(child) for child in result[key]]
+    return result
+
+
 def _anthropic_tools(tools: list[dict]) -> list[dict]:
-    """The tool definitions in this repo use the `parameters` key, which is what Ollama takes.
+    """The shared definitions use `parameters` (wrapped inside `function` for Ollama).
     The Messages API calls the same field `input_schema` and rejects the request without it."""
     converted = []
     for tool in tools:
@@ -478,7 +504,7 @@ class ClaudeModel:
         if schema is not None:
             # structured output; dropping it silently would let a run score a free-text answer
             # against a question that asked for JSON
-            payload["output_config"] = {"format": schema}
+            payload["output_config"] = {"format": {"type": "json_schema", "schema": _anthropic_schema(schema)}}
         return payload
 
     def complete(

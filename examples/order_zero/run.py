@@ -51,4 +51,4 @@ def run(
         title="Return best section",
         detail=f"{best.cite} score={score:.2f}",
     )
-    return Answer(text=best.text, citations=[best.cite])
+    return Answer(text=best.text, citations=[best.cite], retrieved_sources=[best.cite])

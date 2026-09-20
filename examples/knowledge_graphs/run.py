@@ -99,4 +99,4 @@ def run(
         detail=f"{part_number} --fits--> {model_name} --warranty_class--> {warranty_class}",
     )
     text = f"{part_number} fits {model_name} [{cite1}], which carries warranty class: {warranty_class} [{cite2}]."
-    return Answer(text=text, citations=[cite1, cite2])
+    return Answer(text=text, citations=[cite1, cite2], retrieved_sources=[cite1, cite2])

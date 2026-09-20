@@ -9,17 +9,15 @@ a model-made choice, so every step is `decided_by: "code"`, same as levels 0 and
 """
 from __future__ import annotations
 
-import re
 from pathlib import Path
 
 from evals.corpus import DEFAULT_CORPUS_DIR, Section, load_sections
 from examples.common.model import Embedder, Message, Model
 from examples.common.trace import Tracer
-from examples.common.types import Answer
+from examples.common.types import Answer, CITE_RE, cited_sources
 
 LEVEL = 2
 TOP_K = 4
-CITE_RE = re.compile(r"[a-z0-9][a-z0-9_-]*#\d+")
 SYSTEM_PROMPT = (
     "You answer questions about Halvorsen appliances using only the numbered sources below. "
     "If the sources do not contain the answer, say so instead of guessing. End your answer with "
@@ -76,6 +74,6 @@ def run(
         tokens_out=completion.tokens_out,
         ms=completion.ms,
     )
-    citations = sorted(set(CITE_RE.findall(completion.text.lower())))
+    citations = cited_sources(completion.text)
     tracer.record(kind="code", decided_by="code", title="Parse citations", detail=", ".join(citations) or "none")
-    return Answer(text=completion.text, citations=citations)
+    return Answer(text=completion.text, citations=citations, retrieved_sources=[s.cite for s in sources])

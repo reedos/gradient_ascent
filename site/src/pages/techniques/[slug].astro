@@ -4,6 +4,8 @@ import { getEntry, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Eyebrow from '../../components/Eyebrow.astro';
 import Pill from '../../components/Pill.astro';
+import ConceptDiagram from '../../components/ConceptDiagram.astro';
+import ConceptExamples from '../../components/ConceptExamples.astro';
 import NameList from '../../components/NameList.astro';
 import Sources from '../../components/page/Sources.astro';
 import Reviewed from '../../components/page/Reviewed.astro';
@@ -115,6 +117,9 @@ const nameGroups = [
     <p><Pill status={technique.status} /></p>
   </div>
 
+  <ConceptDiagram slug={slug!} color={color} />
+  <ConceptExamples slug={slug!} entries={[...names.product, ...names.tool, ...names.model]} color={color} />
+
   {
     subPages.length > 0 && (
       <section class="section">
@@ -141,7 +146,7 @@ const nameGroups = [
       </div>
     ) : (
       <p class="status-note">
-        This page is an outline. The diagram, a run you can step through, runnable code, failure
+        This page is an outline. A run you can step through, runnable code, failure
         modes and an eval have not been written yet. The blocks below are generated from the
         taxonomy and the registry, not written by hand.
       </p>
@@ -177,7 +182,7 @@ const nameGroups = [
     )
   }
 
-  <section class="section">
+  <section class="section" id="named-examples">
     <div class="section-top">
       <div>
         <div class="eyebrow muted">Out there</div>

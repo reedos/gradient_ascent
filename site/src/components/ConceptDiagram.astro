@@ -1,0 +1,114 @@
+---
+import { conceptDiagrams, conceptEdges, conceptLayout, conceptPath } from '../lib/concept-diagrams';
+interface Props { slug: string; color: string }
+const { slug, color } = Astro.props;
+const diagram = conceptDiagrams[slug];
+if (!diagram) throw new Error(`Missing concept diagram: ${slug}`);
+const edges = conceptEdges(diagram.shape, diagram.nodes.length);
+const description = edges.map((e) => `${diagram.nodes[e.from].title} leads to ${diagram.nodes[e.to].title}${e.feedback ? ' as feedback' : ''}.`).join(' ');
+const shapeLabel = { flow: 'Sequence', loop: 'Feedback loop', fork: 'Parallel branches', choice: 'Decision paths', harness: 'Agent loop + controls', retrieval: 'Evidence into an answer' };
+const stopNotes: Record<string, string> = {
+  'evaluator-optimizer': 'Stop when the check passes or the revision limit is reached.',
+  'computer-use': 'Stop when the goal is reached, approval is needed, or a limit is hit.',
+  'single-agent': 'Stop when the model finishes or the harness ends the run.',
+  'agentic-rag': 'Answer when enough evidence is found; report gaps when the search budget runs out.',
+  'coding-agents': 'Return the diff and test results for review when the task is done or blocked.',
+  'voice-agents': 'Listen for a new turn; an interruption can stop the current response.',
+  'debate-review': 'Return the reviewed answer when it meets the criteria or the review cap is reached.',
+  'long-horizon': 'Resume from a checkpoint until the task finishes, needs help, or reaches a limit.',
+  'agent-teammates': 'Wait between events; act only when a trigger and its permissions allow it.',
+  embodied: 'Stop motion when the safety controller requires it, even if the model wants to continue.',
+  'prompt-optimization': 'Select using development cases, then measure once on held-out cases.',
+  'red-teaming': 'Keep a discovered failure as a regression test and retest the repair.',
+  ops: 'Monitoring continues after release; each change can be rolled back.',
+  trust: 'Revisit reliance when the task, model, or evidence changes.',
+};
+---
+<figure class="concept-diagram" style={`--concept-color:${color}`} aria-labelledby={`concept-heading-${slug}`}>
+  <div class="concept-heading">
+    <div>
+      <p class="eyebrow">Concept at a glance</p>
+      <h2 id={`concept-heading-${slug}`}>{diagram.headline}</h2>
+    </div>
+    <span class="concept-kind">{shapeLabel[diagram.shape]}<small>Conceptual illustration</small></span>
+  </div>
+  <div class:list={['concept-canvas', { 'is-harness': diagram.shape === 'harness' }]}>
+    {diagram.shape === 'harness' && <div class="harness-label"><span></span>The harness <small>Code around the model</small></div>}
+    {[false, true].map((mobile) => {
+      const layout = conceptLayout(diagram, mobile);
+      const id = `concept-${slug}-${mobile ? 'mobile' : 'wide'}`;
+      return (
+        <svg class={mobile ? 'concept-mobile' : 'concept-wide'} viewBox={`0 0 ${layout.width} ${layout.height}`} role="img" aria-labelledby={`${id}-title ${id}-desc`}>
+          <title id={`${id}-title`}>{diagram.headline}</title>
+          <desc id={`${id}-desc`}>{description} {diagram.takeaway}</desc>
+          <defs>
+            <marker id={`${id}-arrow`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="var(--concept-color)" stroke-width="1.5" /></marker>
+          </defs>
+          {edges.map((e) => (
+            <path class:list={['concept-edge', { 'is-feedback': e.feedback }]} d={conceptPath(layout.nodes[e.from], layout.nodes[e.to], mobile, e.feedback, diagram.shape === 'fork' ? (e.from === 0 ? 'split' : 'join') : diagram.shape === 'choice' ? 'split' : diagram.shape === 'retrieval' && e.to === 2 ? 'join' : undefined)} marker-end={`url(#${id}-arrow)`} />
+          ))}
+          {layout.nodes.map((node, i) => (
+            <g class:list={['concept-node', { 'is-core': ((diagram.shape === 'harness' || diagram.shape === 'loop') && i === 1) || (diagram.shape === 'retrieval' && i === 3) }]} transform={`translate(${node.x}, ${node.y})`}>
+              <rect width={node.width} height={node.height} rx="9" />
+              <path class="node-accent" d={`M 12 0 H ${node.width - 12}`} />
+              <text x="18" y="31" class="node-title">{node.title}</text>
+              <text x="18" y="55" class="node-detail">{node.detail}</text>
+            </g>
+          ))}
+          {!mobile && (diagram.shape === 'loop' || diagram.shape === 'harness') && <text class="feedback-label" x={diagram.shape === 'harness' ? 165 : 478} y={diagram.shape === 'harness' ? 321 : 280}>Next turn</text>}
+        </svg>
+      );
+    })}
+    {diagram.shape === 'harness' && <div class="harness-controls"><span>Step &amp; token budgets</span><span>Logs &amp; checkpoints</span><span>Stop or hand back to you</span></div>}
+  </div>
+  {stopNotes[slug] && <p class="stop-note"><span>Ending or continuing</span>{stopNotes[slug]}</p>}
+  <figcaption><span>Key idea</span><p>{diagram.takeaway}</p></figcaption>
+</figure>
+
+<style>
+  .concept-diagram { margin: 0 0 36px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); overflow: hidden; }
+  .concept-heading { padding: 25px 28px 0; display: flex; justify-content: space-between; align-items: start; gap: 24px; }
+  .concept-heading .eyebrow { color: var(--concept-color); font-size: 10px; }
+  .concept-heading h2 { margin-top: 10px; font-size: clamp(19px, 2vw, 25px); line-height: 1.35; letter-spacing: -.65px; text-wrap: balance; }
+  .concept-kind { color: var(--muted); font-size: 10px; white-space: nowrap; padding-top: 3px; }
+  .concept-kind small { display: block; font-size: 9px; margin-top: 5px; }
+  .stop-note { margin: 0 28px 20px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+  .stop-note span { display: block; color: var(--concept-color); font-size: 10px; margin-bottom: 4px; }
+  .concept-canvas { margin: 20px 24px; background-image: radial-gradient(var(--line) .7px, transparent .7px); background-size: 18px 18px; }
+  .concept-canvas.is-harness { border: 1px solid color-mix(in srgb, var(--concept-color) 40%, var(--line)); border-radius: 10px; background-color: color-mix(in srgb, var(--concept-color) 3%, var(--bg)); }
+  .harness-label { display: flex; align-items: center; gap: 9px; padding: 16px 20px 0; font-size: 12px; font-weight: 650; color: var(--concept-color); }
+  .harness-label > span { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .harness-label small { margin-left: auto; color: var(--muted); font-size: 11px; font-weight: 400; }
+  svg { width: 100%; height: auto; display: block; }
+  .concept-mobile { display: none; }
+  .concept-edge { stroke: var(--concept-color); opacity: .65; stroke-width: 1.6; fill: none; stroke-linejoin: round; }
+  .concept-edge.is-feedback { opacity: .9; }
+  .concept-node rect { fill: var(--panel2); stroke: var(--line-control); stroke-width: 1; }
+  .concept-node.is-core rect { fill: color-mix(in srgb, var(--concept-color) 13%, var(--panel)); stroke: var(--concept-color); stroke-width: 1.5; }
+  .node-accent { stroke: var(--concept-color); stroke-width: 2; opacity: .9; }
+  .node-title { fill: var(--text); font: 600 16px var(--font); }
+  .node-detail { fill: var(--muted); font: 400 12.5px var(--font); }
+  .feedback-label { fill: var(--concept-color); font: 500 11px var(--font); }
+  .harness-controls { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 24px; padding: 0 14px 16px; color: var(--muted); font-size: 11px; }
+  .harness-controls span::before { content: '•'; color: var(--concept-color); margin-right: 7px; }
+  figcaption { padding: 17px 28px; border-top: 1px solid var(--line); display: flex; gap: 22px; align-items: baseline; }
+  figcaption > span { color: var(--concept-color); text-transform: uppercase; letter-spacing: 1.4px; font-size: 9px; white-space: nowrap; font-weight: 650; }
+  figcaption p { color: var(--muted); font-size: 13px; max-width: 850px; line-height: 1.65; }
+  @media (max-width: 680px) {
+    .concept-wide { display: none; }
+    .concept-mobile { display: block; max-width: 380px; margin: auto; }
+    .concept-heading { padding: 21px 18px 0; display: block; }
+    .concept-kind { display: block; margin-top: 8px; }
+    .concept-canvas { margin: 16px 10px; }
+    .harness-label { padding: 15px 12px 0; flex-wrap: wrap; }
+    .harness-label small { width: 100%; margin-left: 15px; }
+    .harness-controls { justify-content: start; padding: 0 18px 18px; gap: 8px; flex-direction: column; }
+    figcaption { padding: 17px 18px; flex-direction: column; gap: 6px; }
+  }
+  @media print {
+    .concept-diagram { break-inside: avoid; background: white; }
+    .concept-canvas { background: transparent; }
+    .concept-node rect { fill: white; stroke: #444; }
+    .node-title, .node-detail, .feedback-label { fill: #222; }
+  }
+</style>

@@ -15,7 +15,7 @@ from evals.corpus import DEFAULT_CORPUS_DIR, Section, bm25_search, load_sections
 from examples.common.model import Embedder, Message, Model
 from examples.common.trace import Tracer
 from examples.common.types import Answer
-from examples.rag.run import CITE_RE
+from examples.common.types import cited_sources
 
 LEVEL = 3
 MAX_QUERIES = 3
@@ -75,7 +75,7 @@ def _draft(question: str, sources: list[Section], model: Model, tracer: Tracer):
 
 def _check_citations(draft_text: str, sources: list[Section], tracer: Tracer) -> list[str]:
     retrieved = {s.cite for s in sources}
-    claimed = set(CITE_RE.findall(draft_text.lower()))
+    claimed = set(cited_sources(draft_text))
     grounded = sorted(claimed & retrieved)
     dropped = sorted(claimed - retrieved)
     tracer.record(
@@ -94,4 +94,4 @@ def run(question: str, model: Model, embedder: Embedder | None, tracer: Tracer, 
     sources = _retrieve(queries, sections, tracer)
     completion = _draft(question, sources, model, tracer)
     citations = _check_citations(completion.text, sources, tracer)
-    return Answer(text=completion.text, citations=citations)
+    return Answer(text=completion.text, citations=citations, retrieved_sources=[s.cite for s in sources])

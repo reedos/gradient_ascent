@@ -71,7 +71,7 @@ def run(
                 tokens_out=completion.tokens_out,
                 ms=completion.ms,
             )
-            return Answer(text=completion.text, citations=sorted(set(citations)))
+            return Answer.from_text(completion.text, retrieved_sources=citations)
 
         calls_desc = ", ".join(f"{c.name}({json.dumps(c.arguments, sort_keys=True)})" for c in completion.tool_calls)
         tracer.record(
@@ -92,7 +92,7 @@ def run(
 
         if tokens_used >= max_tokens:
             final = force_final(messages, model, tracer, reason=f"token budget reached: {tokens_used} >= {max_tokens}", max_tokens=400)
-            return Answer(text=final.text, citations=sorted(set(citations)))
+            return Answer.from_text(final.text, retrieved_sources=citations)
 
     final = force_final(messages, model, tracer, reason=f"step cap reached: {max_steps} steps", max_tokens=400)
-    return Answer(text=final.text, citations=sorted(set(citations)))
+    return Answer.from_text(final.text, retrieved_sources=citations)

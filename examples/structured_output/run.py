@@ -28,6 +28,7 @@ SCHEMA = {
         "commercial_rental_days": {"type": "integer"},
     },
     "required": list(REQUIRED_FIELDS),
+    "additionalProperties": False,
 }
 SYSTEM_PROMPT = (
     "Extract a warranty record from the passage as JSON matching this schema, with no other "
@@ -35,14 +36,17 @@ SYSTEM_PROMPT = (
 )
 
 
-def _validate(record: dict, appliance: str) -> list[str]:
+def _validate(record: object, appliance: str) -> list[str]:
+    if not isinstance(record, dict):
+        return ["record must be a JSON object"]
     problems = [f"missing field: {f}" for f in REQUIRED_FIELDS if f not in record]
+    problems.extend(f"unexpected field: {f}" for f in record if f not in REQUIRED_FIELDS)
     if problems:
         return problems
     if record["model"] != appliance:
         problems.append(f"model should be {appliance!r}, got {record['model']!r}")
     for field in ("full_warranty_years", "limited_years", "commercial_rental_days"):
-        if not isinstance(record[field], int):
+        if type(record[field]) is not int:
             problems.append(f"{field} must be an integer")
     if not isinstance(record["limited_scope"], str) or not record["limited_scope"]:
         problems.append("limited_scope must be a non-empty string")
@@ -59,7 +63,7 @@ def run(question: str, model: Model, tracer: Tracer, *, corpus_dir=DEFAULT_CORPU
         Message(role="system", content=SYSTEM_PROMPT),
         Message(role="user", content=f"{passage}\n\nAppliance: {appliance}"),
     ]
-    record: dict = {}
+    record: object = {}
     for attempt in range(MAX_RETRIES + 1):
         completion = model.complete(messages, schema=SCHEMA, max_tokens=200)
         tracer.record(

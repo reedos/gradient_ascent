@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from evals.corpus import DEFAULT_CORPUS_DIR, load_documents
+from evals.corpus import DEFAULT_CORPUS_DIR, load_documents, load_sections
 from examples.common.model import Embedder, Message, Model, count_tokens
 from examples.common.trace import Tracer
 from examples.common.types import Answer
@@ -94,4 +94,4 @@ def run(
         tokens_out=completion.tokens_out,
         ms=completion.ms,
     )
-    return Answer(text=completion.text, citations=[])
+    return Answer.from_text(completion.text, retrieved_sources=list(load_sections(corpus_dir)))

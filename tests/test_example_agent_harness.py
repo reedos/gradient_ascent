@@ -66,7 +66,8 @@ class DefaultHarnessEndToEndTests(unittest.TestCase):
         tracer = Tracer(example="agent_harness", level=5, model_id="stub-1")
         answer = run(QUESTION, model, None, tracer, corpus_dir=CORPUS_DIR)
         self.assertEqual(tracer.model_decided_count(), 3)
-        self.assertIn("parts-list#2", answer.citations)
+        self.assertIn("parts-list#2", answer.retrieved_sources)
+        self.assertEqual(answer.citations, [], "retrieval must not supply missing answer citations")
         self.assertIn("46.00", answer.text)
 
 
@@ -95,8 +96,10 @@ class HarnessChangesTheOutcomeTests(unittest.TestCase):
         self.assertIn("could not confirm", tight.text)
         # the tool actually ran either way, so the mechanical citations do not change -- only
         # what the model, reading a trimmed context, chose to say about them
-        self.assertIn("parts-list#2", generous.citations)
-        self.assertIn("parts-list#2", tight.citations)
+        self.assertIn("parts-list#2", generous.retrieved_sources)
+        self.assertEqual(generous.citations, [])
+        self.assertIn("parts-list#2", tight.retrieved_sources)
+        self.assertEqual(tight.citations, [])
 
     def test_the_tight_policy_leaves_a_visible_placeholder_not_a_silent_gap(self) -> None:
         tracer = Tracer(example="agent_harness", level=5, model_id="stub-1")
@@ -207,7 +210,8 @@ class HookVetoTests(unittest.TestCase):
         )
         tracer = Tracer(example="agent_harness", level=5, model_id="stub-1")
         answer = run(QUESTION, model, None, tracer, corpus_dir=CORPUS_DIR)
-        self.assertIn("parts-list#2", answer.citations)
+        self.assertIn("parts-list#2", answer.retrieved_sources)
+        self.assertEqual(answer.citations, [], "retrieval must not supply missing answer citations")
         self.assertFalse([s for s in tracer.steps if s.title == "Hook vetoes the call"])
 
 

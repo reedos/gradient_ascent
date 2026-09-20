@@ -70,6 +70,6 @@ def run(
         detail=f"{len(used)} of {len(candidates)} sections answered part of the question",
     )
     if not used:
-        return Answer(text="None of the retrieved sections answered the question.", citations=[])
+        return Answer(text="None of the retrieved sections answered the question.", citations=[], retrieved_sources=[s.cite for s in candidates])
     combined = " ".join(c.text.strip() for _, c in used)
-    return Answer(text=combined, citations=sorted({s.cite for s, _ in used}))
+    return Answer(text=combined, citations=sorted({s.cite for s, _ in used}), retrieved_sources=[s.cite for s in candidates])

@@ -17,7 +17,7 @@ from evals.corpus import DEFAULT_CORPUS_DIR, Section, bm25_search, load_sections
 from examples.common.model import Embedder, Message, Model
 from examples.common.trace import Tracer
 from examples.common.types import Answer
-from examples.rag.run import CITE_RE
+from examples.common.types import cited_sources
 
 LEVEL = 3
 RETRIEVE_K = 4
@@ -103,5 +103,5 @@ def run(
             detail=f"shipping a draft that still fails its own check after {revisions} revision(s)",
         )
 
-    citations = sorted(set(CITE_RE.findall(draft_text.lower())))
-    return Answer(text=draft_text, citations=citations)
+    citations = cited_sources(draft_text)
+    return Answer(text=draft_text, citations=citations, retrieved_sources=[s.cite for s in sources])

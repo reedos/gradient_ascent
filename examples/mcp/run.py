@@ -142,7 +142,7 @@ def run(
             tokens_out=first.tokens_out,
             ms=first.ms,
         )
-        return Answer(text=first.text, citations=[])
+        return Answer.from_text(first.text)
 
     call = first.tool_calls[0]
     tracer.record(
@@ -173,4 +173,4 @@ def run(
         tokens_out=final.tokens_out,
         ms=final.ms,
     )
-    return Answer(text=final.text, citations=citations)
+    return Answer.from_text(final.text, retrieved_sources=citations)

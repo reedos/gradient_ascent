@@ -117,4 +117,4 @@ def run(
         _node_research(question, sections, findings, tracer)
 
     citations = sorted({cite for cite, _ in findings})
-    return Answer(text=answer_text, citations=citations)
+    return Answer.from_text(answer_text, retrieved_sources=citations)

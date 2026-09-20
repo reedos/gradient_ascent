@@ -36,4 +36,4 @@ def run(question: str, model: Model, embedder: Embedder | None, tracer: Tracer) 
         tokens_out=completion.tokens_out,
         ms=completion.ms,
     )
-    return Answer(text=completion.text, citations=[])
+    return Answer.from_text(completion.text)
