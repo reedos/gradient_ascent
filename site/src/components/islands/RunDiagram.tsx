@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { responsiveRunLayouts } from '../../lib/run-layout';
 
 /**
  * The diagram and the trace player as one component: nodes, edges, steps, scrubber, play,
@@ -202,6 +203,56 @@ function NodeShape({ n }: { n: RunNode }) {
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
+function FlowSvg({ D, S, seen, markerPrefix, pulseT, className = '' }: {
+  D: RunData; S: RunStep; seen: Set<string>; markerPrefix: string; pulseT: number; className?: string;
+}) {
+  const minX = Math.min(0, ...D.nodes.map(n => n.x - 68));
+  const maxX = Math.max(340, ...D.nodes.map(n => n.x + 68));
+  const E = D.edges.find(e => e.id === S.e)!;
+  const geo = edgeGeometry(D, E);
+  const pulse = bezierPoint(geo.p1, geo.c, geo.p2, pulseT);
+  return (
+          <svg className={className} viewBox={`${minX} 0 ${maxX - minX} ${D.h}`} role="img" aria-label={`Diagram of ${D.title}`}>
+            <defs>
+              {(['idle', 'code', 'model'] as const).map((kind) => (
+                <marker
+                  key={kind}
+                  id={`${markerPrefix}-${kind}`}
+                  viewBox="0 0 10 10"
+                  refX="8"
+                  refY="5"
+                  markerUnits="userSpaceOnUse"
+                  markerWidth="8"
+                  markerHeight="8"
+                  orient="auto-start-reverse"
+                >
+                  <path className={`mk-${kind}`} d="M0,1 L9,5 L0,9 z" />
+                </marker>
+              ))}
+            </defs>
+            {D.edges.map((e) => {
+              const now = e.id === S.e;
+              const was = seen.has(e.id);
+              const g = edgeGeometry(D, e);
+              const markerState = now || was ? e.by : 'idle';
+              return (
+                <path
+                  key={e.id}
+                  className={`ed ${e.by}${now ? ' now' : ''}${was && !now ? ' seen' : ''}`}
+                  data-id={e.id}
+                  d={pathString(g.p1, g.c, g.p2)}
+                  markerEnd={`url(#${markerPrefix}-${markerState})`}
+                />
+              );
+            })}
+            {D.nodes.map((n) => (
+              <NodeShape n={{ ...n }} key={n.id} />
+            ))}
+            <circle className={`pulse${E.by === 'model' ? ' model' : ''}`} r={3.5} cx={pulse[0]} cy={pulse[1]} />
+          </svg>
+  );
+}
+
 export default function RunDiagram({ runs, lanes = true }: Props) {
   const [runIndex, setRunIndex] = useState(0);
   const [step, setStepRaw] = useState(0);
@@ -295,15 +346,7 @@ export default function RunDiagram({ runs, lanes = true }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [runIndex, step]);
 
-  // The viewBox was a fixed `0 0 340 h`, which clipped the right edge off any node placed at
-  // x=290 -- the convention several run files use for a branch beside the main column, since a
-  // node is 132 wide and 290 + 66 overruns 340 by 16. Widen to fit instead of moving the nodes:
-  // a diagram that already fits keeps exactly the 340 it was drawn against and does not rescale.
-  const minX = Math.min(0, ...D.nodes.map((n) => n.x - 68));
-  const maxX = Math.max(340, ...D.nodes.map((n) => n.x + 68));
-
-  const geo = edgeGeometry(D, E);
-  const pulse = bezierPoint(geo.p1, geo.c, geo.p2, pulseT);
+  const layouts = responsiveRunLayouts(D);
   const laneData = D[lane];
 
   return (
@@ -317,7 +360,7 @@ export default function RunDiagram({ runs, lanes = true }: Props) {
           ))}
         </div>
       )}
-      <div className="outlook-grid">
+      <div className="outlook-grid run-player">
         <div className="panel dia">
           <div className="panel-heading">
             <div>
@@ -326,44 +369,11 @@ export default function RunDiagram({ runs, lanes = true }: Props) {
             </div>
             <span className={`pill${run.accentPill ? ' model' : ''}`}>{D.pill}</span>
           </div>
-          <svg viewBox={`${minX} 0 ${maxX - minX} ${D.h}`} role="img" aria-label={`Diagram of ${D.title}`}>
-            <defs>
-              {(['idle', 'code', 'model'] as const).map((kind) => (
-                <marker
-                  key={kind}
-                  id={`${markerPrefix}-${kind}`}
-                  viewBox="0 0 10 10"
-                  refX="8"
-                  refY="5"
-                  markerUnits="userSpaceOnUse"
-                  markerWidth="8"
-                  markerHeight="8"
-                  orient="auto-start-reverse"
-                >
-                  <path className={`mk-${kind}`} d="M0,1 L9,5 L0,9 z" />
-                </marker>
-              ))}
-            </defs>
-            {D.edges.map((e) => {
-              const now = e.id === S.e;
-              const was = seen.has(e.id);
-              const g = edgeGeometry(D, e);
-              const markerState = now || was ? e.by : 'idle';
-              return (
-                <path
-                  key={e.id}
-                  className={`ed ${e.by}${now ? ' now' : ''}${was && !now ? ' seen' : ''}`}
-                  data-id={e.id}
-                  d={pathString(g.p1, g.c, g.p2)}
-                  markerEnd={`url(#${markerPrefix}-${markerState})`}
-                />
-              );
-            })}
-            {D.nodes.map((n) => (
-              <NodeShape n={{ ...n }} key={n.id} />
-            ))}
-            <circle className={`pulse${E.by === 'model' ? ' model' : ''}`} r={3.5} cx={pulse[0]} cy={pulse[1]} />
-          </svg>
+          {layouts ? <>
+            <FlowSvg D={layouts.wide} S={S} seen={seen} markerPrefix={`${markerPrefix}-wide`} pulseT={pulseT} className="run-svg-wide" />
+            <FlowSvg D={layouts.narrow} S={S} seen={seen} markerPrefix={`${markerPrefix}-narrow`} pulseT={pulseT} className="run-svg-narrow" />
+          </> : <FlowSvg D={D} S={S} seen={seen} markerPrefix={markerPrefix} pulseT={pulseT} />}
+
           <div className="tally">
             <b className={mcount === 0 ? 'zero' : ''}>{mcount}</b>
             <span>
@@ -382,7 +392,7 @@ export default function RunDiagram({ runs, lanes = true }: Props) {
             </span>
           </div>
         </div>
-        <div className="panel">
+        <div className="panel run-trace">
           <div className="panel-heading">
             <div>
               <h3>The run, step by step</h3>

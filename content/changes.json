@@ -4,6 +4,23 @@
   "note": "What changed on this site, and why it matters to somebody reading it. Newest first. Entries are written for a reader, not for whoever made the change: they say what is different and what it is good for, never what a commit did. Every entry links the pages it touched. Several entries can share a date; within a date, file order is the order shown. docs/CHANGES.md says how to add one.",
   "changes": [
     {
+      "id": "more-room-for-desktop-reading",
+      "date": "2026-09-19",
+      "title": "Wider reading layouts and compact run diagrams",
+      "what": "Article text uses a wider reading area and larger type. Diagrams and tables can use the full article width. Simple run sequences flow across compact rows on desktop and down a shorter column on phones, with the step explanation beside the diagram when space allows.",
+      "why": "Narrow paragraphs and very tall run diagrams left much of a desktop page empty. The revised layout makes better use of the available space while preserving the order of the run and the structure of diagrams with multiple decision paths.",
+      "pages": [
+        {
+          "label": "The agent harness",
+          "path": "/techniques/agent-harness/"
+        },
+        {
+          "label": "Coding agents",
+          "path": "/techniques/coding-agents/"
+        }
+      ]
+    },
+    {
       "id": "test-automation-harness-example",
       "date": "2026-09-19",
       "title": "An agent harness explained through a test automation project",
