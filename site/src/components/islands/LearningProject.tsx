@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useState } from 'preact/hooks';
 import type { LearningStage } from '../../lib/learning';
-import { downloadFiles } from './LearningLab';
+import { downloadFiles } from '../../lib/download';
 
 export default function LearningProject({ stage, index }: { stage: LearningStage; index: number }) {
   const key = `ga:project:v1:${index}`;
@@ -28,7 +28,7 @@ export default function LearningProject({ stage, index }: { stage: LearningStage
   return <section class="stage-project learning-lab" id="stage-project" aria-labelledby="project-title">
     <div class="eyebrow">Stage {index + 1} project · Build it here</div>
     <h2 id="project-title">{stage.project}</h2>
-    <p>Construct your project in the files below. Use plain text, tables, JSON, or arrows for a workflow. Use invented or public data. Nothing is sent or executed.</p>
+    <p>Write your project in your own words below. You can use a table or arrows to explain a workflow. Use invented or public data. Nothing is sent or executed.</p>
     {stage.deliverables.map((task, i) => <div class="project-deliverable">
       <label for={`deliverable-${i}`}>{i + 1}. {task}</label>
       <textarea id={`deliverable-${i}`} disabled={!ready} maxLength={30000} value={answers[i]} placeholder="Build this part of your project here…"

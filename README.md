@@ -19,9 +19,10 @@ see [CONTRIBUTING.md](CONTRIBUTING.md).
 ## Get it running
 
 For a guided introduction, start at [Learn step by step](https://reedos.github.io/gradient_ascent/learn/):
-18 lessons across six stages, with editable workspaces, deterministic simulations, explained checks,
-six projects, and ZIP downloads. Drafts and progress stay in the reader's browser. No API key or model
-call is needed. The teaching order is separate from the autonomy levels.
+18 lessons across six stages, with prefilled English messages, progressively displayed scripted replies,
+follow-ups, six projects, and ZIP downloads. Configuration exercises are optional. Drafts and progress
+stay in the reader's browser. No live model is called; editing a message does not change its scripted
+reply. The teaching order is separate from the autonomy levels.
 
 Two toolchains, no shared setup. The Python side is stdlib only: there is nothing to install, no
 virtual environment, and no `requirements.txt`. Python 3.11 or newer; Node 22.12 or newer.

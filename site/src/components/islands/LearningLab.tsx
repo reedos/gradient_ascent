@@ -1,13 +1,6 @@
 import { useEffect, useLayoutEffect, useState } from 'preact/hooks';
-import { labSpecs, parseConfig, runLab, zipFiles, type LabResult } from '../../lib/learning-labs';
-
-export function downloadFiles(name: string, files: Record<string, string>) {
-  const bytes = zipFiles(files);
-  const link = document.createElement('a');
-  const objectUrl = URL.createObjectURL(new Blob([bytes.buffer as ArrayBuffer], { type: 'application/zip' }));
-  link.href = objectUrl; link.download = name; document.body.append(link); link.click(); link.remove();
-  setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-}
+import { labSpecs, parseConfig, runLab, type LabResult } from '../../lib/learning-labs';
+import { downloadFiles } from '../../lib/download';
 
 export default function LearningLab({ lesson }: { lesson: string }) {
   const spec = labSpecs[lesson];
@@ -52,7 +45,7 @@ export default function LearningLab({ lesson }: { lesson: string }) {
   };
   return <section class="learning-lab" aria-labelledby={`lab-${lesson}`}>
     <div class="eyebrow">Build it here · Deterministic simulation</div>
-    <h2 id={`lab-${lesson}`}>Your lesson workspace</h2>
+    <h2 id={`lab-${lesson}`}>Application configuration</h2>
     <p>{spec.brief}</p>
     <div class="lab-scenario"><strong>Scenario</strong><p>{spec.scenario}</p></div>
     <p class="lab-help">1. Edit the configuration. 2. Run the simulation. 3. Use the checks to revise it. The starter intentionally has problems; the working example shows one solution.</p>

@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import LearningProgress from '../../components/LearningProgress.astro';
 import LearningLab from '../../components/islands/LearningLab';
 import LearningProject from '../../components/islands/LearningProject';
+import ConversationPractice from '../../components/islands/ConversationPractice';
 import { lessons, learningStages } from '../../lib/learning';
 import { techniqueBySlug } from '../../lib/content';
 import { url } from '../../lib/url';
@@ -30,7 +31,11 @@ const lastInStage = !next || next.stage !== lesson.stage;
         <p class="footnote">Form an answer before opening the explanation. Nothing needs to be submitted.</p>
         <details><summary>Reveal the explained answer</summary><p>{lesson.answer}</p></details>
       </section>
-      <LearningLab lesson={lesson.id} client:load />
+      <ConversationPractice lesson={lesson.id} client:load />
+      <details class="technical-practice"><summary>Optional: explore the application configuration</summary>
+        <p>This separate exercise shows how an application enforces rules behind the conversation. You do not need it to follow the lesson. Earlier configuration drafts are preserved here.</p>
+        <LearningLab lesson={lesson.id} client:visible />
+      </details>
       <noscript><p>The workspace needs JavaScript to edit, simulate, save, and download. The lesson and explained answer remain readable.</p></noscript>
       {lastInStage && <LearningProject stage={stage} index={lesson.stage} client:load />}
       <LearningProgress lesson={lesson.id} />

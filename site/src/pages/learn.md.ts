@@ -3,7 +3,7 @@ import { lessons, learningStages } from '../lib/learning';
 import { url } from '../lib/url';
 export const GET: APIRoute = ({ site }) => new Response([
   '# Learn step by step',
-  '18 lessons in six stages. Each lesson has an editable browser workspace, a deterministic simulation, generated files, and explained checks. Each stage ends with a project you can author in the site. No API key or model call is needed. Progress and drafts are stored only in this browser; download files for your own copy.',
+  '18 lessons in six stages. Each lesson starts with a prefilled English message: press Send, review a scripted reply, then send a suggested follow-up. Replies appear progressively; no live model is called, and edited messages do not change the scripted output. Configuration exercises are optional. Each stage ends with a project you can write in the site. Progress and drafts stay in this browser; download files for your own copy.',
   ...learningStages.flatMap((s, i) => [
     `## Stage ${i + 1}: ${s.title}`, s.summary,
     ...lessons.filter(l => l.stage === i).map(l => `- [${l.title}](${new URL(url(`/learn/${l.id}.md`), site)}): ${l.objective}`),
