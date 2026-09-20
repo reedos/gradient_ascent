@@ -4,6 +4,19 @@
   "note": "What changed on this site, and why it matters to somebody reading it. Newest first. Entries are written for a reader, not for whoever made the change: they say what is different and what it is good for, never what a commit did. Every entry links the pages it touched. Several entries can share a date; within a date, file order is the order shown. docs/CHANGES.md says how to add one.",
   "changes": [
     {
+      "id": "dut-project-example-with-human-testing",
+      "date": "2026-09-19",
+      "title": "The test automation example follows an approved DUT project workflow",
+      "what": "The worked example starts from a past DUT project or template, asks about missing requirements, and waits for plan approval. It produces Python files, configuration, and Markdown documentation, then hands hardware testing to the user. Framework changes and new project-local tools require explicit approval.",
+      "why": "The earlier illustration assumed simulated instruments and did not fully describe the review boundaries. The revised example distinguishes non-hardware checks from user-run measurements and identifies read-only framework access as a proposed control still to confirm.",
+      "pages": [
+        {
+          "label": "The agent harness",
+          "path": "/techniques/agent-harness/"
+        }
+      ]
+    },
+    {
       "id": "room-for-labels-and-card-text",
       "date": "2026-09-19",
       "title": "More comfortable diagram labels and card spacing",

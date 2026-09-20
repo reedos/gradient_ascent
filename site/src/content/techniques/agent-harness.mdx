@@ -86,80 +86,107 @@ documentation, and no run under one has been recorded and scored here. It is ill
 
 ## Worked example: a test automation framework
 
-Suppose your team already has a well-defined test framework: instrument drivers, measurement
-methods, unit conversions, CSV export, a test runner, and a prescribed project structure.
-Documentation explains how to create a new project, and previous projects show the conventions
-in use. You ask Claude Code to write a new test using those existing pieces.
+A team uses a shared Python test automation framework. Each project represents a device under
+test (DUT), follows the same project-file conventions, and uses the same or similar instruments.
+The framework provides measurement methods, unit conversions, CSV export, and instrument drivers.
+The drivers use SCPI, but project code treats instruments as black boxes through the framework's
+interfaces. Python files contain project code; YAML/JSON files hold configuration such as instrument
+settings, test parameters, limits, and sequences, according to the framework's conventions.
 
-**Claude Code is the agent harness; your framework is its domain execution and validation
-environment.** Claude Code manages the loop around Claude, giving it tools to read files, edit
-code, run commands, and use the results to decide what to do next.<Cite n={8}/>
-Your documentation, examples, configured permissions, and framework checks specialize that
-environment for test automation. A test framework can also be called a “test harness,” but that
-is a different responsibility from running the model's agent loop.
+**Claude Code supplies the agent harness; the shared framework supplies the domain interfaces
+and conventions.** Claude Code provides the model's read, edit, and command-execution loop.<Cite n={8}/>
+The agent uses that loop to create and refine a DUT project. The user reviews the files, performs
+hardware testing, and returns logs and observations. The agent does not operate the instruments.
+
+This is a specified workflow, not a recorded implementation or hardware validation result.
+Simulation is not an established capability of this framework. Mocked function outputs could be
+considered later, but are not assumed here.
 
 <TestAutomationHarness />
 
 ### Start with an ordinary request
 
-“Create a test project for the new power supply using our standard project structure.
-Use the approved voltage sweep from the test specification, measure current with our existing
-driver, convert readings using our unit utilities, and export them using our CSV function.
-Follow the previous project's setup and cleanup conventions. Validate against simulated
-instruments first. Show me the test code, validation report, and sample CSV for review;
-do not connect to live instruments.”
-
-This is an illustrative workflow, not a recorded run or a claim that a particular framework
-already implements these controls.
+“Create a project for this new DUT using our shared Python test framework. Use the closest past
+project where one is suitable; otherwise use the standard template. Here is my description of how
+this DUT differs. Read the framework documentation and reuse its existing tools and instrument
+interfaces. Ask me about missing requirements before proceeding. Show me your proposed files and
+changes, and wait for my approval before generating the project. Produce Python code, YAML/JSON
+configuration, and Markdown documentation for my review. Do not modify the shared framework or
+connect to instruments.”
 
 ### What belongs where
 
 | Part | Role in this example |
 | --- | --- |
-| Claude | Interprets the request, chooses actions, and proposes revisions. |
-| Claude Code | Runs the agent loop and provides file editing, command execution, context management, and permission controls. |
-| Framework documentation and past projects | Explain the APIs, project layout, measurement conventions, and examples to follow. |
-| Drivers and utility functions | Perform established instrument operations, measurements, conversions, and CSV writing. |
-| Validators and simulated instruments | Check the generated project and return concrete failures for the agent to address. |
-| Access controls and execution limits | Enforce which interfaces can run and with which arguments. |
+| Claude | Interprets the DUT differences, asks questions, proposes a plan, and drafts revisions. |
+| Claude Code | Provides context management, file editing, command execution, and permission controls around the model. |
+| Past projects and documentation | Supply the closest starting point, APIs, file conventions, and established patterns. A template is the fallback. |
+| Shared Python framework | Provides reusable tools, measurement methods, unit conversion, CSV export, and instrument interfaces backed by SCPI drivers. |
+| New DUT project | Contains the generated Python files, YAML/JSON configuration, and Markdown documentation. |
+| Non-hardware checks | Check Python syntax and YAML/JSON validity without connecting to instruments. |
+| User | Approves the plan, reviews the files, tests with real instruments, and supplies feedback. |
 
-Framework functions do not each need their own model-tool definition. The agent can write code
-that imports your library and run it through your existing command-line test runner. A dedicated
-tool interface becomes useful when you want a narrower, explicitly controlled set of operations.
+The agent can generate code that imports existing framework functions. Each function does not
+need its own model-tool definition. The project's use of an instrument API does not authorize
+the agent to execute it against connected equipment.
 
 ### The feedback loop in practice
 
-1. **Inspect:** read the framework guide, relevant driver signatures, test specification, and a
-   similar project. Ask about missing measurement requirements instead of inventing them.
-2. **Construct:** create the prescribed files and reuse the established measurement, conversion,
-   export, setup, and cleanup functions.
-3. **Validate:** run project checks and the simulated test. For example, a validator might report
-   that the output column is labeled in amperes while its values are still in milliamperes.
-4. **Revise:** use the framework's conversion function, rerun the checks, and inspect the resulting
-   CSV. Keep the test specification and acceptance limits fixed unless a person authorizes a change.
-5. **Hand back:** present the code changes, validation results, unresolved issues, and sample output.
-   Label simulated measurements as simulated. Stop for review rather than treating a passing
-   simulation as evidence that the physical setup works.
+1. **Understand:** read the framework documentation, candidate reference projects, and the written
+   description of this DUT's differences. Ask about missing requirements before filling them in.
+2. **Plan and wait:** identify the closest suitable project or the standard template. Propose the
+   files, intended changes, framework tools to reuse, and non-hardware checks. Obtain the user's
+   approval before generating project files and code.
+3. **Generate:** create the approved Python files, YAML/JSON configuration, and Markdown documents
+   in the new project's folder. Reuse the framework's existing tools wherever applicable.
+4. **Check without hardware:** run approved syntax and configuration checks that cannot connect
+   to instruments. Do not import or execute project setup code unless its lack of hardware access
+   is established. Report the checks performed and their results; do not label the project as
+   hardware-tested.
+5. **Hand over:** the user reviews the project, runs it on real instruments, and supplies logs,
+   results, and observations. The documentation distinguishes generated work from verified behavior.
+6. **Refine:** use that feedback to revise the project within the approved scope. Ask about newly
+   missing requirements, and seek approval for changes that cross the boundaries below.
 
-The agent chooses how to investigate and revise the project. Once written, the test can execute
-as ordinary deterministic code without an LLM deciding each measurement step. Generating a test
-and operating an adaptive laboratory agent are separate uses of a model.
+The agent automates project creation and revision. Hardware testing remains a human-controlled
+step. A passing syntax or configuration check does not establish that a measurement is correct.
 
-### Guidance and enforcement are different parts of the setup
+### Approval boundaries and hard controls
 
-“Use our CSV exporter” is guidance. A project check that rejects a different export path enforces
-that convention within the cases it checks. Likewise, “do not energize an instrument” in a prompt
-does not remove instrument access. In this example, simulation-only execution should also be
-enforced by the available runner and environment, with live credentials or connections withheld.
-Controls that matter must remain outside files the agent can freely rewrite or bypass.
+**The shared framework must not be modified without explicit authorization.** If a new framework
+feature is absolutely required, the agent must explain the requirement, why existing capabilities
+cannot satisfy it, and the proposed change, then wait for the user's decision. Plan approval for a
+DUT project is not blanket permission to modify the framework.
 
-This connects the harness to <Link href="/techniques/context-engineering/">context engineering</Link>,
+**A new project-local tool also requires approval.** Before creating one, explain the gap, which
+framework tools were considered, and why a new tool is necessary. Placing a helper in the project
+folder does not bypass this rule. Missing requirements must be asked about first, rather than
+silently guessed or left as unapproved TODOs.
+
+These are required boundaries, but a written instruction alone is not a hard enforcement mechanism.
+Read-only access to the shared framework is a proposed control whose availability still needs to
+be confirmed. The intended setup gives the agent write access only to the approved DUT project,
+withholds live instrument access, and keeps permission controls outside files it can rewrite.
+Any authorized framework change would need a separately scoped exception. This page does not claim
+those controls are already implemented.
+
+### Markdown documentation to hand over
+
+- **Capabilities and created files:** supported tests, what was generated, and where each part lives.
+- **Differences from the reference:** what changed for this DUT and why.
+- **Configuration and operation:** parameters, limits, expected instruments, connections, setup,
+  cleanup, and instructions for the user to run the project through the framework.
+- **Requirements checklist:** each requested test mapped to its code, configuration, and validation status.
+- **Validation record:** checks the agent actually ran, followed by hardware results the user supplies.
+- **Open questions, limitations, and approvals:** unresolved issues and any requested tool or framework changes.
+
+This example connects <Link href="/techniques/context-engineering/">context engineering</Link>,
 <Link href="/techniques/guardrails/">guardrails</Link>,
 <Link href="/techniques/human-in-the-loop/">human approval</Link>, and
-<Link href="/techniques/observability/">observability</Link>.
-To <Link href="/techniques/evals/">evaluate the agent</Link>, use representative project requests
-and independently check whether the generated tests implement the specification, reuse the framework
-correctly, and respect execution boundaries. A passing framework test alone does not establish all three.
+<Link href="/techniques/observability/">observability</Link> around the harness.
+To <Link href="/techniques/evals/">evaluate the agent</Link>, independently review whether the
+project implements the agreed requirements, reuses the framework appropriately, respects approvals,
+and accurately reports what was and was not tested.
 
 ## A run, step by step
 
