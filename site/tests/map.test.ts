@@ -30,6 +30,17 @@ import {
 
 // -- Fixture ----------------------------------------------------------------------------------------
 
+test('every map relationship retains an explanation for either endpoint selection', () => {
+  for (const relation of realTaxonomy.relations) {
+    const edge = realLayout.edges.find(e => e.from === relation.from && e.to === relation.to && e.type === relation.type);
+    assert.ok(edge, `${relation.from} ${relation.type} ${relation.to}`);
+    assert.ok((edge.note || '').trim().length > 30, `Missing explanation: ${edge.key}`);
+    assert.equal(edge.note, relation.note);
+    assert.equal(edge.when, relation.when);
+    assert.equal(edge.question, relation.question);
+  }
+});
+
 test('only a reverse upgrade covers a recorded prerequisite, without changing the source relations', () => {
   const edges = [
     { key: 'prerequisite', from: 'advanced', to: 'basic', type: 'requires' as const },

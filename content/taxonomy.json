@@ -1070,562 +1070,668 @@
     {
       "from": "prompt-engineering",
       "type": "requires",
-      "to": "chat"
+      "to": "chat",
+      "note": "A chat message supplies the instructions and context; prompt engineering makes those instructions clearer and easier to check."
     },
     {
       "from": "structured-output",
       "type": "requires",
-      "to": "prompt-engineering"
+      "to": "prompt-engineering",
+      "note": "A schema controls the reply's shape, but the prompt still needs to define what each field means and what to do when information is missing."
     },
     {
       "from": "inference-time-reasoning",
       "type": "requires",
-      "to": "prompt-engineering"
+      "to": "prompt-engineering",
+      "note": "Extra reasoning works on the task you specify, so clear goals and constraints are needed before spending more computation on an answer."
     },
     {
       "from": "multimodal",
       "type": "requires",
-      "to": "chat"
+      "to": "chat",
+      "note": "Multimodal interaction extends the chat request with images, audio, or video while keeping the same instruction-and-response structure."
     },
     {
       "from": "context-engineering",
       "type": "requires",
-      "to": "prompt-engineering"
+      "to": "prompt-engineering",
+      "note": "Context engineering expands prompt design to choosing which documents, history, and tool results the model receives on each call."
     },
     {
       "from": "rag",
       "type": "requires",
-      "to": "embeddings-search"
+      "to": "embeddings-search",
+      "note": "Retrieval supplies relevant passages for the answer. Embeddings search explains a common way to find them, although RAG can also use keyword or hybrid search."
     },
     {
       "from": "rag",
       "type": "requires",
-      "to": "context-engineering"
+      "to": "context-engineering",
+      "note": "Retrieved passages must be selected, fitted into the request, and separated from instructions so the model can use them as evidence."
     },
     {
       "from": "knowledge-graphs",
       "type": "requires",
-      "to": "rag"
+      "to": "rag",
+      "note": "Graph-based retrieval extends document retrieval with entities and relationships, allowing evidence to be joined across sources."
     },
     {
       "from": "memory",
       "type": "requires",
-      "to": "context-engineering"
+      "to": "context-engineering",
+      "note": "Stored information helps only when the system selects and inserts the relevant memories into the model's current context."
     },
     {
       "from": "prompt-chaining",
       "type": "requires",
-      "to": "structured-output"
+      "to": "structured-output",
+      "note": "A chain passes one step's result to another. Structured outputs give those handoffs predictable fields that code can validate."
     },
     {
       "from": "routing",
       "type": "requires",
-      "to": "structured-output"
+      "to": "structured-output",
+      "note": "The routing decision needs a recognizable destination or label so application code can send the request down the intended branch."
     },
     {
       "from": "parallelization",
       "type": "requires",
-      "to": "prompt-chaining"
+      "to": "prompt-chaining",
+      "note": "Parallel work reuses the idea of staged calls, but runs independent steps together before collecting their results."
     },
     {
       "from": "evaluator-optimizer",
       "type": "requires",
-      "to": "prompt-chaining"
+      "to": "prompt-chaining",
+      "note": "The draft, evaluation, and revision are separate calls connected by explicit handoffs and a stopping rule."
     },
     {
       "from": "workflow-graphs",
       "type": "requires",
-      "to": "prompt-chaining"
+      "to": "prompt-chaining",
+      "note": "A workflow graph turns a sequence of calls into named steps with explicit transitions and shared state."
     },
     {
       "from": "workflow-graphs",
       "type": "requires",
-      "to": "routing"
+      "to": "routing",
+      "note": "Branches in a workflow need routing rules to choose which step receives the current state next."
     },
     {
       "from": "function-calling",
       "type": "requires",
-      "to": "structured-output"
+      "to": "structured-output",
+      "note": "A tool call carries a tool name and schema-shaped arguments that the application validates before execution."
     },
     {
       "from": "code-execution",
       "type": "requires",
-      "to": "function-calling"
+      "to": "function-calling",
+      "note": "Code execution is exposed as a tool: the model proposes code, and an external runtime executes it and returns results."
     },
     {
       "from": "mcp",
       "type": "requires",
-      "to": "function-calling"
+      "to": "function-calling",
+      "note": "MCP provides a standard way to discover and connect tools; function calling explains how the model requests a tool operation."
     },
     {
       "from": "computer-use",
       "type": "requires",
-      "to": "function-calling"
+      "to": "function-calling",
+      "note": "Clicks, typing, and other interface actions are tool requests executed by the surrounding application."
     },
     {
       "from": "computer-use",
       "type": "requires",
-      "to": "multimodal"
+      "to": "multimodal",
+      "note": "Screenshot-based computer use interprets visual state before proposing actions; accessibility-tree approaches can also use structured text."
     },
     {
       "from": "single-agent",
       "type": "requires",
-      "to": "function-calling"
+      "to": "function-calling",
+      "note": "An agent repeatedly requests tools, reads their results, and chooses the next action or a stopping point."
     },
     {
       "from": "agentic-rag",
       "type": "requires",
-      "to": "rag"
+      "to": "rag",
+      "note": "Agentic RAG keeps retrieval and evidence-grounded answering, while letting the model choose follow-up searches."
     },
     {
       "from": "agentic-rag",
       "type": "requires",
-      "to": "single-agent"
+      "to": "single-agent",
+      "note": "The agent loop makes it possible to inspect retrieved evidence, revise a query, and decide whether enough information has been found."
     },
     {
       "from": "coding-agents",
       "type": "requires",
-      "to": "single-agent"
+      "to": "single-agent",
+      "note": "A coding agent uses the tool-and-feedback loop to inspect files, make changes, and decide what to check next."
     },
     {
       "from": "coding-agents",
       "type": "requires",
-      "to": "code-execution"
+      "to": "code-execution",
+      "note": "Running tests or programs provides feedback about a code change that reading the proposed code alone cannot supply."
     },
     {
       "from": "skills",
       "type": "requires",
-      "to": "single-agent"
+      "to": "single-agent",
+      "note": "Skills give an agent reusable instructions and resources to load for a particular task within its existing execution loop."
     },
     {
       "from": "voice-agents",
       "type": "requires",
-      "to": "single-agent"
+      "to": "single-agent",
+      "note": "A task-oriented voice agent needs an action loop behind the conversation to use tools and track unfinished work."
     },
     {
       "from": "voice-agents",
       "type": "requires",
-      "to": "multimodal"
+      "to": "multimodal",
+      "note": "Voice interaction adds audio input and output, with timing and interruption handling around the conversation."
     },
     {
       "from": "orchestrator-workers",
       "type": "requires",
-      "to": "single-agent"
+      "to": "single-agent",
+      "note": "Each worker uses an agent loop on an assigned task, while the lead agent assigns work and integrates results."
     },
     {
       "from": "agent-graphs",
       "type": "requires",
-      "to": "workflow-graphs"
+      "to": "workflow-graphs",
+      "note": "Agent graphs use explicit nodes, transitions, and shared state to control how agent runs hand work to one another."
     },
     {
       "from": "agent-graphs",
       "type": "requires",
-      "to": "orchestrator-workers"
+      "to": "orchestrator-workers",
+      "note": "Coordinating multiple agents requires clear responsibilities and result handoffs; the graph makes those handoffs explicit."
     },
     {
       "from": "debate-review",
       "type": "requires",
-      "to": "evaluator-optimizer"
+      "to": "evaluator-optimizer",
+      "note": "Debate and review extend the draft-check-revise pattern with multiple perspectives on the same result."
     },
     {
       "from": "debate-review",
       "type": "requires",
-      "to": "orchestrator-workers"
+      "to": "orchestrator-workers",
+      "note": "Separate agents take author or reviewer roles, and their findings must be collected and resolved into a result."
     },
     {
       "from": "long-horizon",
       "type": "requires",
-      "to": "single-agent"
+      "to": "single-agent",
+      "note": "Long-running work extends an agent loop with checkpoints and recovery so it can resume after a session ends."
     },
     {
       "from": "long-horizon",
       "type": "requires",
-      "to": "memory"
+      "to": "memory",
+      "note": "Progress, decisions, and pending work must survive outside the current context window to support reliable resumption."
     },
     {
       "from": "agent-teammates",
       "type": "requires",
-      "to": "long-horizon"
+      "to": "long-horizon",
+      "note": "A standing assistant must preserve work and commitments across repeated sessions rather than finish everything in one run."
     },
     {
       "from": "agent-teammates",
       "type": "requires",
-      "to": "skills"
+      "to": "skills",
+      "note": "Reusable skills let a standing assistant perform recurring responsibilities with consistent procedures."
     },
     {
       "from": "agent-teammates",
       "type": "requires",
-      "to": "computer-use"
+      "to": "computer-use",
+      "note": "Computer use explains how a standing assistant can act in existing applications when a direct tool integration is unavailable."
     },
     {
       "from": "agent-teammates",
       "type": "combines_with",
-      "to": "safety"
+      "to": "safety",
+      "note": "A standing assistant needs scoped access and clear action boundaries because its permissions persist across repeated tasks."
     },
     {
       "from": "agent-teammates",
       "type": "combines_with",
-      "to": "human-in-the-loop"
+      "to": "human-in-the-loop",
+      "note": "Approval checkpoints let a person review consequential actions and resolve uncertainty during an assistant's ongoing work."
     },
     {
       "from": "organizations-swarms",
       "type": "requires",
-      "to": "agent-graphs"
+      "to": "agent-graphs",
+      "note": "Explicit handoffs and shared state provide a foundation for coordinating a changing collection of agent roles."
     },
     {
       "from": "organizations-swarms",
       "type": "requires",
-      "to": "long-horizon"
+      "to": "long-horizon",
+      "note": "A persistent team must retain assignments, progress, and unresolved issues across separate runs."
     },
     {
       "from": "embodied",
       "type": "requires",
-      "to": "single-agent"
+      "to": "single-agent",
+      "note": "An embodied agent repeatedly observes its environment, proposes an action, and uses new observations to choose what comes next."
     },
     {
       "from": "embodied",
       "type": "requires",
-      "to": "multimodal"
+      "to": "multimodal",
+      "note": "Physical interaction depends on interpreting sensor inputs such as camera images alongside task instructions."
     },
     {
       "from": "rag",
       "type": "upgrades_to",
       "to": "knowledge-graphs",
-      "when": "The answer needs facts joined across documents, or you must show where each fact came from."
+      "when": "The answer needs facts joined across documents, or you must show where each fact came from.",
+      "note": "A graph adds explicit entities and relationships to retrieval, so an answer can follow connections between facts in different sources."
     },
     {
       "from": "rag",
       "type": "upgrades_to",
       "to": "agentic-rag",
-      "when": "One retrieval is not enough and the next query depends on what the last one found."
+      "when": "One retrieval is not enough and the next query depends on what the last one found.",
+      "note": "An agent inspects search results and chooses follow-up queries instead of answering after a predetermined retrieval step."
     },
     {
       "from": "prompt-chaining",
       "type": "upgrades_to",
       "to": "single-agent",
-      "when": "The steps cannot be written down in advance."
+      "when": "The steps cannot be written down in advance.",
+      "note": "The model chooses the next tool or step from feedback instead of following a sequence fixed by your code."
     },
     {
       "from": "parallelization",
       "type": "upgrades_to",
       "to": "orchestrator-workers",
-      "when": "The subtasks cannot be known until the task is read."
+      "when": "The subtasks cannot be known until the task is read.",
+      "note": "A lead agent decomposes the request and assigns workers dynamically, rather than running a predefined batch of independent calls."
     },
     {
       "from": "evaluator-optimizer",
       "type": "upgrades_to",
       "to": "debate-review",
-      "when": "One reviewer shares the author's blind spots."
+      "when": "One reviewer shares the author's blind spots.",
+      "note": "Multiple reviewers contribute different critiques, which can expose errors missed by a single evaluation-and-revision loop."
     },
     {
       "from": "workflow-graphs",
       "type": "upgrades_to",
       "to": "agent-graphs",
-      "when": "A node needs its own loop and tools, not one call."
+      "when": "A node needs its own loop and tools, not one call.",
+      "note": "A graph node can run an agent's own tool-and-feedback loop before passing its result to the next node."
     },
     {
       "from": "function-calling",
       "type": "upgrades_to",
       "to": "single-agent",
-      "when": "The next action depends on what the last one returned, so the model has to choose again and decide when to stop."
+      "when": "The next action depends on what the last one returned, so the model has to choose again and decide when to stop.",
+      "note": "The application feeds tool results back into another model turn, creating a loop in which the model chooses successive actions."
     },
     {
       "from": "code-execution",
       "type": "upgrades_to",
       "to": "coding-agents",
-      "when": "The code has to be run, read and rewritten until it works, with the model deciding when it is done."
+      "when": "The code has to be run, read and rewritten until it works, with the model deciding when it is done.",
+      "note": "The model uses execution feedback to inspect and revise files over multiple steps, rather than stopping after one code run."
     },
     {
       "from": "computer-use",
       "type": "upgrades_to",
       "to": "single-agent",
-      "when": "One action is not enough: the task needs a sequence of reads and actions, which is what every real computer-use run does."
+      "when": "One action is not enough: the task needs a sequence of reads and actions, which is what every real computer-use run does.",
+      "note": "Interface actions become steps in a loop: observe the updated screen, choose another action, and stop when the task is complete."
     },
     {
       "from": "single-agent",
       "type": "upgrades_to",
       "to": "long-horizon",
-      "when": "The work outlives one context window or one sitting."
+      "when": "The work outlives one context window or one sitting.",
+      "note": "Checkpoints and persistent task state allow the agent to resume unfinished work across context windows and sessions."
     },
     {
       "from": "skills",
       "type": "combines_with",
-      "to": "memory"
+      "to": "memory",
+      "note": "Skills store reusable procedures; memory supplies task history or preferences that help apply those procedures to the current situation."
     },
     {
       "from": "human-in-the-loop",
       "type": "combines_with",
-      "to": "workflow-graphs"
+      "to": "workflow-graphs",
+      "note": "A workflow can include explicit pause, review, and resume steps so a person's decision becomes part of the execution path."
     },
     {
       "from": "human-in-the-loop",
       "type": "combines_with",
-      "to": "function-calling"
+      "to": "function-calling",
+      "note": "Tool calls provide a concrete approval boundary: show the proposed operation and arguments before allowing execution."
     },
     {
       "from": "evaluator-optimizer",
       "type": "combines_with",
-      "to": "evals"
+      "to": "evals",
+      "note": "Evaluation criteria guide revision, while held-out evaluations check whether the revision loop improves results beyond its own feedback."
     },
     {
       "from": "computer-use",
       "type": "combines_with",
-      "to": "safety"
+      "to": "safety",
+      "note": "Interface actions can change real accounts and files, so permissions and checks must limit what the automation may do."
     },
     {
       "from": "long-horizon",
       "type": "combines_with",
-      "to": "ops"
+      "to": "ops",
+      "note": "Persistent work needs scheduling, recovery, monitoring, and resource limits to keep running predictably across sessions."
     },
     {
       "from": "rag",
       "type": "alternative_to",
       "to": "context-engineering",
-      "question": "Retrieve, or put it all in the window?"
+      "question": "Retrieve, or put it all in the window?",
+      "note": "Retrieve a relevant subset when the source collection is too large or changes often; include the full relevant material when it fits and the task benefits from seeing it together."
     },
     {
       "from": "adaptation",
       "type": "alternative_to",
       "to": "prompt-engineering",
-      "question": "Train it in, or say it every time?"
+      "question": "Train it in, or say it every time?",
+      "note": "Prompting supplies instructions at request time; adaptation changes learned behavior. Compare maintenance effort and measured quality before choosing training."
     },
     {
       "from": "workflow-graphs",
       "type": "alternative_to",
       "to": "single-agent",
-      "question": "Draw the path, or let the model find it?"
+      "question": "Draw the path, or let the model find it?",
+      "note": "A fixed graph suits known steps and explicit control; an agent loop suits tasks whose next action depends on discoveries during execution."
     },
     {
       "from": "mcp",
       "type": "alternative_to",
       "to": "function-calling",
-      "question": "A protocol server, or tools defined inline?"
+      "question": "A protocol server, or tools defined inline?",
+      "note": "Inline tool definitions can suit one application; MCP standardizes tool discovery and access across clients. MCP tools can still be invoked through function calling."
     },
     {
       "from": "chat",
       "type": "requires",
-      "to": "order-zero"
+      "to": "order-zero",
+      "note": "Before adding a model, check whether rules, search, or a fixed template already solve the task more predictably. This is a design decision, not a runtime dependency."
     },
     {
       "from": "order-zero",
       "type": "upgrades_to",
       "to": "chat",
-      "when": "The input is language you cannot write rules for, and a wrong answer is cheap to catch."
+      "when": "The input is language you cannot write rules for, and a wrong answer is cheap to catch.",
+      "note": "A language model handles varied natural-language input that is difficult to cover with fixed rules, with output checks appropriate to the task."
     },
     {
       "from": "briefing",
       "type": "combines_with",
-      "to": "prompt-engineering"
+      "to": "prompt-engineering",
+      "note": "A brief supplies the goal, context, constraints, and acceptance criteria that the prompt communicates to the model."
     },
     {
       "from": "reviewing",
       "type": "combines_with",
-      "to": "human-in-the-loop"
+      "to": "human-in-the-loop",
+      "note": "Human checkpoints are useful when the reviewer knows what evidence to inspect and what would justify accepting or rejecting the result."
     },
     {
       "from": "delegating",
       "type": "combines_with",
-      "to": "single-agent"
+      "to": "single-agent",
+      "note": "Delegation defines the outcome, authority, and stopping conditions within which the agent may choose its own steps."
     },
     {
       "from": "trust",
       "type": "combines_with",
-      "to": "evals"
+      "to": "evals",
+      "note": "Representative evaluations provide evidence for deciding which tasks to delegate and how much review they still need."
     },
     {
       "from": "chat",
       "type": "upgrades_to",
       "to": "rag",
-      "when": "The answer needs facts the model was never trained on, not just what it already knows."
+      "when": "The answer needs facts the model was never trained on, not just what it already knows.",
+      "note": "Retrieval supplies relevant external passages alongside the question, giving the model evidence beyond the conversation and its learned parameters."
     },
     {
       "from": "prompt-engineering",
       "type": "upgrades_to",
       "to": "structured-output",
-      "when": "The reply's format has to be valid on every single call, not just usually valid."
+      "when": "The reply's format has to be valid on every single call, not just usually valid.",
+      "note": "A declared schema and supported output constraints make the reply machine-readable; validation still checks whether its values are correct."
     },
     {
       "from": "structured-output",
       "type": "upgrades_to",
       "to": "function-calling",
-      "when": "The model itself has to decide whether to use the schema-shaped output at all, not just fill in values for a shape your code already chose."
+      "when": "The model itself has to decide whether to use the schema-shaped output at all, not just fill in values for a shape your code already chose.",
+      "note": "The structured reply becomes a request for a named operation, which the application validates and executes before returning a result."
     },
     {
       "from": "inference-time-reasoning",
       "type": "upgrades_to",
       "to": "evaluator-optimizer",
-      "when": "The same mistake shows up across every sample or every extra round of thinking, so more computation on the same approach stops helping and the draft needs checking against a stated criterion instead."
+      "when": "The same mistake shows up across every sample or every extra round of thinking, so more computation on the same approach stops helping and the draft needs checking against a stated criterion instead.",
+      "note": "An explicit evaluator checks a draft against criteria and supplies feedback for revision, adding a check beyond more thinking on the initial attempt."
     },
     {
       "from": "multimodal",
       "type": "upgrades_to",
       "to": "human-in-the-loop",
-      "when": "The model is generating an image, audio or video rather than reading one, so there is no source to check the result against, and a wrong one is expensive or hard to undo where it is going."
+      "when": "The model is generating an image, audio or video rather than reading one, so there is no source to check the result against, and a wrong one is expensive or hard to undo where it is going.",
+      "note": "A person reviews generated media in its intended context before it is accepted or used for a consequential purpose."
     },
     {
       "from": "orchestrator-workers",
       "type": "upgrades_to",
       "to": "long-horizon",
-      "when": "The task cannot finish inside one bounded team run and has to pick up again across separate sessions."
+      "when": "The task cannot finish inside one bounded team run and has to pick up again across separate sessions.",
+      "note": "Persisting team results, pending assignments, and checkpoints lets coordinated work continue beyond one bounded run."
     },
     {
       "from": "agent-graphs",
       "type": "upgrades_to",
       "to": "organizations-swarms",
-      "when": "The roster of agents itself has to change while the work is in progress, not stay fixed for one run."
+      "when": "The roster of agents itself has to change while the work is in progress, not stay fixed for one run.",
+      "note": "Coordination expands from a fixed set of graph nodes to roles that can be created, reassigned, or retired as the work changes."
     },
     {
       "from": "debate-review",
       "type": "upgrades_to",
       "to": "agent-teammates",
-      "when": "The checking has to run continuously against everything a standing assistant does, not once against one finished draft."
+      "when": "The checking has to run continuously against everything a standing assistant does, not once against one finished draft.",
+      "note": "Review becomes part of an assistant's ongoing responsibilities, with stored commitments and repeated checks across separate tasks."
     },
     {
       "from": "embeddings-search",
       "type": "upgrades_to",
       "to": "rag",
-      "when": "The person asking wants an answer with the passages behind it, not a ranked list of passages to read themselves."
+      "when": "The person asking wants an answer with the passages behind it, not a ranked list of passages to read themselves.",
+      "note": "The retrieved passages become evidence for a generated answer, rather than only a ranked list for the user to read."
     },
     {
       "from": "knowledge-graphs",
       "type": "upgrades_to",
       "to": "agentic-rag",
-      "when": "Which entity to follow next depends on what the last hop returned, so the queries cannot be written in advance."
+      "when": "Which entity to follow next depends on what the last hop returned, so the queries cannot be written in advance.",
+      "note": "The agent chooses subsequent entity lookups or searches based on what each graph traversal reveals."
     },
     {
       "from": "memory",
       "type": "upgrades_to",
       "to": "long-horizon",
-      "when": "What has to survive between sessions is work still in progress, not facts about the person you are talking to."
+      "when": "What has to survive between sessions is work still in progress, not facts about the person you are talking to.",
+      "note": "Persistent storage expands from remembered facts to checkpoints, unfinished steps, and decisions needed to resume a task."
     },
     {
       "from": "routing",
       "type": "upgrades_to",
       "to": "function-calling",
-      "when": "The right destination depends on something the message does not say, so the choice needs a lookup before it can be made."
+      "when": "The right destination depends on something the message does not say, so the choice needs a lookup before it can be made.",
+      "note": "The model can request a lookup or other operation and use its result before deciding how to handle the request."
     },
     {
       "from": "mcp",
       "type": "upgrades_to",
       "to": "agent-harness",
-      "when": "The tools are connected and what is missing is everything around the model: the loop, the permissions, the caps and the sandbox."
+      "when": "The tools are connected and what is missing is everything around the model: the loop, the permissions, the caps and the sandbox.",
+      "note": "A harness surrounds connected tools with execution control, permissions, context handling, and run limits."
     },
     {
       "from": "agentic-rag",
       "type": "upgrades_to",
       "to": "orchestrator-workers",
-      "when": "The searches do not depend on each other and there are more of them than one agent's context can carry."
+      "when": "The searches do not depend on each other and there are more of them than one agent's context can carry.",
+      "note": "A lead agent splits independent research questions among workers and combines their evidence into one result."
     },
     {
       "from": "coding-agents",
       "type": "upgrades_to",
       "to": "orchestrator-workers",
-      "when": "The change is larger than one agent can hold at once and splits into parts that can be worked separately."
+      "when": "The change is larger than one agent can hold at once and splits into parts that can be worked separately.",
+      "note": "A lead agent assigns separable code changes to workers and coordinates integration and review of their results."
     },
     {
       "from": "agent-harness",
       "type": "requires",
-      "to": "single-agent"
+      "to": "single-agent",
+      "note": "The harness implements the surrounding agent loop, including tool execution, context management, limits, and stopping conditions."
     },
     {
       "from": "coding-agents",
       "type": "combines_with",
-      "to": "agent-harness"
+      "to": "agent-harness",
+      "note": "The harness gives the coding agent a controlled workspace, tool access, execution limits, and a way to collect test results."
     },
     {
       "from": "skills",
       "type": "combines_with",
-      "to": "agent-harness"
+      "to": "agent-harness",
+      "note": "The harness discovers and loads skill instructions and resources into the agent's context when they are relevant."
     },
     {
       "from": "long-horizon",
       "type": "combines_with",
-      "to": "agent-harness"
+      "to": "agent-harness",
+      "note": "The harness records checkpoints, restores task state, and enforces limits across resumed runs."
     },
     {
       "from": "fine-tuning",
       "type": "requires",
-      "to": "adaptation"
+      "to": "adaptation",
+      "note": "Fine-tuning is one form of adaptation: training on examples changes model behavior, so first decide what behavior needs to change and how to measure it."
     },
     {
       "from": "distillation",
       "type": "requires",
-      "to": "fine-tuning"
+      "to": "fine-tuning",
+      "note": "Distillation trains a student on a teacher's outputs or behavior, using the training-and-evaluation process introduced in fine-tuning."
     },
     {
       "from": "synthetic-data",
       "type": "requires",
-      "to": "adaptation"
+      "to": "adaptation",
+      "note": "Generated examples can supply adaptation data, but they need filtering and independent evaluation to avoid reinforcing errors."
     },
     {
       "from": "prompt-optimization",
       "type": "requires",
-      "to": "evals"
+      "to": "evals",
+      "note": "An optimizer needs a scoring method and held-out examples to distinguish a better prompt from one that merely fits the tuning set."
     },
     {
       "from": "prompt-optimization",
       "type": "combines_with",
-      "to": "prompt-engineering"
+      "to": "prompt-engineering",
+      "note": "Prompt engineering defines the instructions and constraints; optimization systematically compares candidate versions against a task score."
     },
     {
       "from": "observability",
       "type": "requires",
-      "to": "ops"
+      "to": "ops",
+      "note": "Observability supplies the traces and metrics used to diagnose and operate a model-backed system."
     },
     {
       "from": "ai-gateways",
       "type": "requires",
-      "to": "ops"
+      "to": "ops",
+      "note": "Gateways centralize operational controls such as provider routing, credentials, rate limits, and request logging."
     },
     {
       "from": "cost-optimization",
       "type": "requires",
-      "to": "ops"
+      "to": "ops",
+      "note": "Reducing cost requires measurements of usage, latency, and quality so savings do not silently degrade the service."
     },
     {
       "from": "local-inference",
       "type": "requires",
-      "to": "ops"
+      "to": "ops",
+      "note": "Running a model locally shifts capacity planning, serving, updates, and monitoring onto your own infrastructure."
     },
     {
       "from": "cost-optimization",
       "type": "combines_with",
-      "to": "routing"
+      "to": "routing",
+      "note": "Routing can send simpler requests to cheaper models while reserving more expensive paths for tasks that need them."
     },
     {
       "from": "cost-optimization",
       "type": "combines_with",
-      "to": "context-engineering"
+      "to": "context-engineering",
+      "note": "Selecting relevant context and reusing stable prefixes can reduce token costs while preserving the evidence needed for the task."
     },
     {
       "from": "guardrails",
       "type": "requires",
-      "to": "safety"
+      "to": "safety",
+      "note": "Safety analysis defines the unwanted behaviors and boundaries that guardrail checks attempt to enforce."
     },
     {
       "from": "red-teaming",
       "type": "requires",
-      "to": "safety"
+      "to": "safety",
+      "note": "Red-teaming starts from a threat model and probes where a system's safety boundaries can fail."
     },
     {
       "from": "red-teaming",
       "type": "combines_with",
-      "to": "evals"
+      "to": "evals",
+      "note": "Failures found during adversarial testing can become repeatable evaluation cases that check whether fixes hold."
     },
     {
       "from": "guardrails",
       "type": "combines_with",
-      "to": "human-in-the-loop"
+      "to": "human-in-the-loop",
+      "note": "A guardrail can pause ambiguous or consequential actions and route them to a person for a decision."
     },
     {
       "from": "eval-frameworks",
       "type": "requires",
-      "to": "evals"
+      "to": "evals",
+      "note": "Frameworks run datasets, scorers, and comparisons; evaluation design determines whether those measurements reflect useful task performance."
     },
     {
       "from": "observability",
       "type": "combines_with",
-      "to": "evals"
+      "to": "evals",
+      "note": "Traces expose the intermediate steps behind an evaluation result and help turn production failures into test cases."
     },
     {
       "type": "combines_with",
