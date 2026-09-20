@@ -13,14 +13,6 @@ const navTracks: NavTrack[] = tracks.map((t) => ({ id: t.id, title: t.title, slu
 const groups = buildNav(navLevels, navTracks, threads.map((t) => ({ id: t.id, title: t.title })));
 ---
 <footer class="site-footer">
-  <div class="footer-top">
-    <span class="brand">
-      <Logo id="footer" size={26} />
-      <span>gradient<span class="brand-light">ascent</span><span class="brand-dot">.</span></span>
-    </span>
-    <p>Every way to work with AI, from a question to a workforce.</p>
-  </div>
-
   <nav class="footer-map" id="sitemap" aria-label="Site map">
     {
       groups.map((g) => (
@@ -41,32 +33,56 @@ const groups = buildNav(navLevels, navTracks, threads.map((t) => ({ id: t.id, ti
     }
   </nav>
 
+  <div class="footer-top">
+    <span class="brand">
+      <Logo id="footer" size={26} />
+      <span>gradient<span class="brand-light">ascent</span><span class="brand-dot">.</span></span>
+    </span>
+    <p>Every way to work with AI, from a question to a workforce.</p>
+  </div>
+
+  <nav class="footer-links" aria-label="Project links">
+    <a href={url('/method/')}>Sources &amp; methodology</a>
+    <a href={REPO_URL} rel="noopener">Source on GitHub ↗</a>
+    <a href={url('/llms.txt')}>Use with your AI</a>
+    <a href={`${REPO_URL}/issues/new?template=feedback.yml`} rel="noopener">Suggest a correction ↗</a>
+  </nav>
+
+  <p class="project-attribution"><strong>An independent project by Reed Cameron Osaki.</strong></p>
+
+  <div class="project-details">
+    <p>Models, products and tools listed as of {usDate(asOf)}.</p>
+    <details>
+      <summary>Content sources &amp; verification</summary>
+      <p>Levels, topics, recipes and page relationships come from <code>content/taxonomy.json</code>.
+        Model and tool listings come from <code>content/landscape.json</code>.
+        Every page is marked sourced until a recorded run and a scored result stand behind it.</p>
+    </details>
+  </div>
   <div class="footer-bottom">
-    <p class="project-attribution"><strong>An independent project by Reed Cameron Osaki.</strong></p>
-    <p>
-      <a href={`${REPO_URL}/issues/new?template=feedback.yml`} rel="noopener">Give feedback</a>
-      {' · '}
-      <a href={REPO_URL} rel="noopener">Source on GitHub</a>
-      {' · '}
-      <a href={url('/search/')}>Search</a>
-      {' · '}
-      <a href={url('/llms.txt')}>llms.txt</a>
-    </p>
-    MIT licensed. Levels, topics, recipes and the links between pages come from{' '}
-    <code>content/taxonomy.json</code>; named models, products and tools come from{' '}
-    <code>content/landscape.json</code>, listed as of {usDate(asOf)}. Every page is marked sourced until a recorded run and a scored result stand behind it.
+    <p>Independent. Open source. MIT licensed.</p>
+    <a href={url('/search/')}>Search the guide</a>
   </div>
 </footer>
 
 <style>
-  .footer-map { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 32px; margin-top: 30px; padding-top: 26px; border-top: 1px solid var(--line) }
+  .site-footer { width: calc(100% - 96px); margin-left: auto; margin-right: auto }
+  .footer-map { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 32px; margin: 0 0 34px; padding-bottom: 34px; border-bottom: 1px solid var(--line) }
   .footer-map h2 { font: 600 10px/1 var(--font); letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); margin: 0 0 12px }
   .footer-map ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px }
   .footer-map a { font-size: 12.5px; color: var(--muted); display: inline-flex; align-items: baseline; gap: 8px; transition: color .15s }
   .footer-map a:hover { color: var(--text) }
   .footer-map-n { font: 600 11px var(--display); color: var(--c); font-variant-numeric: tabular-nums; min-width: 8px }
-  .footer-bottom a { color: var(--accent) }
+  .footer-top { flex-direction: column; align-items: flex-start; gap: 15px }
+  .footer-top p { font-size: 11px }
+  .footer-links { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 20px; font-size: 10px; color: var(--muted) }
+  .footer-links a:hover, .footer-bottom a:hover { color: var(--text) }
+  .project-details { border-top: 1px solid var(--line); padding: 20px 0; font-size: 10px; line-height: 1.9; color: var(--muted) }
+  .project-details summary { cursor: pointer; margin-top: 12px }
+  .project-details details p { max-width: 75ch; margin-top: 12px }
+  .footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 0; font-size: 9px }
+  .footer-bottom a { color: var(--muted) }
   .project-attribution { margin: 24px 0; color: var(--muted); font-size: 12px; line-height: 1.9 }
   .project-attribution strong { color: var(--text); font-weight: 600 }
-  @media (max-width: 850px) { .footer-map { grid-template-columns: 1fr 1fr } }
+  @media (max-width: 850px) { .site-footer { width: calc(100% - 40px) } .footer-map { grid-template-columns: 1fr 1fr } }
 </style>
