@@ -657,6 +657,7 @@ export function flattenMdxBody(rawBody: string, where: string): string {
   text = flattenLink(text, where);
   text = flattenCodeFile(text, where);
   text = flattenRun(text, where);
+  text = replaceAllTags(text, 'TestAutomationHarness', () => '\n**Architecture:** Your brief → Claude Code harness (Claude model; read, edit, run checks, inspect results) ↔ test framework (conventions, drivers, measurements, unit conversion, CSV export, validation, and enforced controls) → reviewable project, report, and sample CSV. Validation results feed back into the agent loop; live instrument execution is separate.\n', where);
   text = flattenFailureModes(text, where);
   text = flattenCostStrip(text, where);
   text = flattenRunIt(text, where);

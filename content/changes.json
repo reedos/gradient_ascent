@@ -4,6 +4,23 @@
   "note": "What changed on this site, and why it matters to somebody reading it. Newest first. Entries are written for a reader, not for whoever made the change: they say what is different and what it is good for, never what a commit did. Every entry links the pages it touched. Several entries can share a date; within a date, file order is the order shown. docs/CHANGES.md says how to add one.",
   "changes": [
     {
+      "id": "test-automation-harness-example",
+      "date": "2026-09-19",
+      "title": "An agent harness explained through a test automation project",
+      "what": "The agent harness page now walks through using a coding agent with an established test automation framework. A diagram separates the model, harness, framework functions, and validation feedback. An English brief leads through project creation, simulated checks, revision, and review.",
+      "why": "A familiar engineering task makes the boundary between an agent harness and a test framework concrete. The example also distinguishes written guidance from enforced controls, and generating a test from letting a model operate live instruments.",
+      "pages": [
+        {
+          "label": "The agent harness",
+          "path": "/techniques/agent-harness/"
+        },
+        {
+          "label": "Coding agents",
+          "path": "/techniques/coding-agents/"
+        }
+      ]
+    },
+    {
       "id": "explore-supporting-concepts-on-the-map",
       "date": "2026-09-19",
       "title": "Select a concept to explore its supporting connections",

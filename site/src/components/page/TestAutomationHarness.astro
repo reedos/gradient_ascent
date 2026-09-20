@@ -1,0 +1,42 @@
+<figure class="test-harness" aria-labelledby="test-harness-caption">
+  <div class="brief"><span class="label">You define the task</span><strong>Create a new test project using our framework</strong></div>
+  <div class="flow" aria-hidden="true">↓</div>
+  <div class="harness">
+    <span class="label">Claude Code · agent harness</span>
+    <div class="model"><strong>Claude · model</strong><span>Reads the brief, chooses the next action, interprets results</span></div>
+    <div class="loop">Read context → edit test code → run checks → inspect results ↺</div>
+    <div class="controls">Context management · tool access · configured permissions</div>
+  </div>
+  <div class="flow"><span aria-hidden="true">↓ ↑</span> Code and commands / results and failures</div>
+  <div class="framework">
+    <span class="label">Your test framework · execution and validation</span>
+    <div class="parts">
+      <div><strong>Project conventions</strong><span>Templates, documentation, previous projects</span></div>
+      <div><strong>Established functions</strong><span>Instrument drivers, measurements, units, CSV export</span></div>
+      <div><strong>Feedback</strong><span>Structure checks, simulated instruments, test reports</span></div>
+      <div><strong>Enforced controls</strong><span>Approved interfaces, argument checks, instrument limits</span></div>
+    </div>
+  </div>
+  <div class="flow" aria-hidden="true">↓</div>
+  <div class="brief"><span class="label">Reviewable result</span><strong>Test project + validation report + sample CSV</strong></div>
+  <figcaption id="test-harness-caption">Illustrative architecture. Claude Code supplies the agent loop; your framework supplies the domain functions and checks. Validation results feed back into the loop. Live instrument execution is a separate, controlled step.</figcaption>
+</figure>
+<style>
+  .test-harness { margin: 26px 0; padding: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+  .label { display: block; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .brief { padding: 14px; text-align: center; border: 1px solid var(--line); border-radius: 7px; }
+  .test-harness strong { display: block; font-size: 13px; line-height: 1.5; color: var(--text); }
+  .harness { border: 1px solid var(--o5); border-radius: 8px; padding: 18px; }
+  .harness > .label { color: var(--o5); }
+  .model { background: var(--panel2); border: 1px solid var(--line); border-radius: 6px; padding: 14px; }
+  .model span, .parts span { display: block; color: var(--muted); font-size: 12px; line-height: 1.6; margin-top: 5px; }
+  .loop { color: var(--text); font-size: 12px; line-height: 1.8; padding-top: 14px; }
+  .controls { color: var(--muted); font-size: 11px; line-height: 1.7; padding-top: 8px; }
+  .flow { color: var(--muted); text-align: center; padding: 10px 0; font-size: 11px; line-height: 1.6; }
+  .flow > span { color: var(--o5); margin-right: 6px; }
+  .framework { padding: 18px; border: 1px solid var(--o4); border-radius: 8px; }
+  .framework > .label { color: var(--o4); }
+  .parts { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  figcaption { color: var(--muted); font-size: 11px; line-height: 1.8; margin-top: 18px; }
+  @media (max-width: 550px) { .test-harness { padding: 12px; } .parts { grid-template-columns: 1fr; } .harness, .framework { padding: 13px; } }
+</style>

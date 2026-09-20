@@ -34,6 +34,10 @@ sources:
     url: "https://learn.chatgpt.com/docs/agent-approvals-security"
     publisher: "OpenAI (Codex documentation)"
     accessed: "2026-09-19"
+  - title: "How Claude Code works"
+    url: "https://code.claude.com/docs/en/how-claude-code-works"
+    publisher: "Anthropic (Claude Code documentation)"
+    accessed: "2026-09-19"
 ---
 
 import Run from '../../components/page/Run.astro';
@@ -49,6 +53,7 @@ import CodeFile from '../../components/page/CodeFile.astro';
 import Cite from '../../components/page/Cite.astro';
 import Link from '../../components/page/Link.astro';
 import agentHarnessRun from '../../data/runs/agent-harness.json';
+import TestAutomationHarness from '../../components/page/TestAutomationHarness.astro';
 
 An agent harness is everything around the model in an agent: the loop that calls it, the tool
 definitions it is shown and the code that runs them, what goes into its next request, whether an
@@ -78,6 +83,83 @@ Guardrail checks complement permission boundaries and sandboxing; they do not re
 
 This page is sourced, not measured: what the harnesses below do comes from their makers' own
 documentation, and no run under one has been recorded and scored here. It is illustrated.
+
+## Worked example: a test automation framework
+
+Suppose your team already has a well-defined test framework: instrument drivers, measurement
+methods, unit conversions, CSV export, a test runner, and a prescribed project structure.
+Documentation explains how to create a new project, and previous projects show the conventions
+in use. You ask Claude Code to write a new test using those existing pieces.
+
+**Claude Code is the agent harness; your framework is its domain execution and validation
+environment.** Claude Code manages the loop around Claude, giving it tools to read files, edit
+code, run commands, and use the results to decide what to do next.<Cite n={8}/>
+Your documentation, examples, configured permissions, and framework checks specialize that
+environment for test automation. A test framework can also be called a “test harness,” but that
+is a different responsibility from running the model's agent loop.
+
+<TestAutomationHarness />
+
+### Start with an ordinary request
+
+“Create a test project for the new power supply using our standard project structure.
+Use the approved voltage sweep from the test specification, measure current with our existing
+driver, convert readings using our unit utilities, and export them using our CSV function.
+Follow the previous project's setup and cleanup conventions. Validate against simulated
+instruments first. Show me the test code, validation report, and sample CSV for review;
+do not connect to live instruments.”
+
+This is an illustrative workflow, not a recorded run or a claim that a particular framework
+already implements these controls.
+
+### What belongs where
+
+| Part | Role in this example |
+| --- | --- |
+| Claude | Interprets the request, chooses actions, and proposes revisions. |
+| Claude Code | Runs the agent loop and provides file editing, command execution, context management, and permission controls. |
+| Framework documentation and past projects | Explain the APIs, project layout, measurement conventions, and examples to follow. |
+| Drivers and utility functions | Perform established instrument operations, measurements, conversions, and CSV writing. |
+| Validators and simulated instruments | Check the generated project and return concrete failures for the agent to address. |
+| Access controls and execution limits | Enforce which interfaces can run and with which arguments. |
+
+Framework functions do not each need their own model-tool definition. The agent can write code
+that imports your library and run it through your existing command-line test runner. A dedicated
+tool interface becomes useful when you want a narrower, explicitly controlled set of operations.
+
+### The feedback loop in practice
+
+1. **Inspect:** read the framework guide, relevant driver signatures, test specification, and a
+   similar project. Ask about missing measurement requirements instead of inventing them.
+2. **Construct:** create the prescribed files and reuse the established measurement, conversion,
+   export, setup, and cleanup functions.
+3. **Validate:** run project checks and the simulated test. For example, a validator might report
+   that the output column is labeled in amperes while its values are still in milliamperes.
+4. **Revise:** use the framework's conversion function, rerun the checks, and inspect the resulting
+   CSV. Keep the test specification and acceptance limits fixed unless a person authorizes a change.
+5. **Hand back:** present the code changes, validation results, unresolved issues, and sample output.
+   Label simulated measurements as simulated. Stop for review rather than treating a passing
+   simulation as evidence that the physical setup works.
+
+The agent chooses how to investigate and revise the project. Once written, the test can execute
+as ordinary deterministic code without an LLM deciding each measurement step. Generating a test
+and operating an adaptive laboratory agent are separate uses of a model.
+
+### Guidance and enforcement are different parts of the setup
+
+“Use our CSV exporter” is guidance. A project check that rejects a different export path enforces
+that convention within the cases it checks. Likewise, “do not energize an instrument” in a prompt
+does not remove instrument access. In this example, simulation-only execution should also be
+enforced by the available runner and environment, with live credentials or connections withheld.
+Controls that matter must remain outside files the agent can freely rewrite or bypass.
+
+This connects the harness to <Link href="/techniques/context-engineering/">context engineering</Link>,
+<Link href="/techniques/guardrails/">guardrails</Link>,
+<Link href="/techniques/human-in-the-loop/">human approval</Link>, and
+<Link href="/techniques/observability/">observability</Link>.
+To <Link href="/techniques/evals/">evaluate the agent</Link>, use representative project requests
+and independently check whether the generated tests implement the specification, reuse the framework
+correctly, and respect execution boundaries. A passing framework test alone does not establish all three.
 
 ## A run, step by step
 
