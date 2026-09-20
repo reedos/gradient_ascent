@@ -13,41 +13,7 @@ import { url } from '../lib/url';
 import { mapLayout, mapConnections, upgradeCoveredRequirements, edgePathD, RELATION_LABEL, type RelationType } from '../lib/map';
 import '../styles/map.css';
 
-// Use compact rows and wrapped labels instead of shrinking the original drawing.
-const labels: Record<string, string> = {
-  'rag': 'RAG', 'agentic-rag': 'Agentic RAG', 'knowledge-graphs': 'Knowledge graphs',
-  'orchestrator-workers': 'Lead + workers', 'organizations-swarms': 'Agent teams',
-  'inference-time-reasoning': 'Reasoning', 'computer-use': 'Computer use',
-  'human-in-the-loop': 'Human approval', 'multimodal': 'Images, audio, video',
-  'order-zero': 'No model', 'operator-craft': 'Working with AI',
-  'briefing': 'Briefing', 'reviewing': 'Reviewing', 'delegating': 'Delegating',
-  'trust': 'Trust', 'safety': 'Safety', 'adaptation': 'Adaptation',
-  'local-inference': 'Local inference', 'fine-tuning': 'Fine-tuning',
-  'mcp': 'MCP', 'eval-frameworks': 'Eval frameworks',
-};
-const labelLines = (title: string) => {
-  const words = title.split(' ');
-  const lines: string[] = [''];
-  for (const word of words) {
-    const last = lines.length - 1;
-    if (lines[last] && (lines[last] + ' ' + word).length > 16) lines.push(word);
-    else lines[last] += (lines[last] ? ' ' : '') + word;
-  }
-  return lines;
-};
-const layout = {
-  ...mapLayout,
-  width: 824,
-  height: 576,
-  nodes: mapLayout.nodes.map(n => {
-    const peers = mapLayout.nodes.filter(p => p.band === n.band && p.row === n.row).sort((a, b) => a.x - b.x);
-    const slot = 824 / Math.max(peers.length, 5);
-    return { ...n, x: peers.findIndex(p => p.slug === n.slug) * slot + 6,
-      y: n.level === 'tracks' ? 356 + (n.row ?? 0) * 43 : n.band * 44 + 5,
-      w: slot - 12, h: 34 };
-  }),
-  bands: mapLayout.bands.map(b => ({ ...b, y: b.kind === 'level' ? b.index * 44 : 352, h: b.kind === 'level' ? 44 : 224 })),
-};
+const layout = mapLayout;
 const coveredRequirements = upgradeCoveredRequirements(layout.edges);
 
 const RELATION_ORDER: RelationType[] = ['requires', 'upgrades_to', 'combines_with', 'alternative_to'];
@@ -130,25 +96,36 @@ const drawableEdges = mapConnections(layout)
 </div>
 
 <div class="map-workspace">
-<div class="map-viewport" role="region" aria-label="Technique map">
 <div class="map-row">
+  <div class="map-labels" style={`height:${layout.height}px`}>
+    {
+      layout.bands.map((band) => (
+        <div
+          class="map-band-label"
+          data-kind={band.kind}
+          style={`top:${band.y}px;height:${band.h}px;--c:${band.kind === 'level' ? `var(--o${band.level})` : 'var(--ot)'}`}
+        >
+          {band.kind === 'level' && <span class="map-band-num">{String(band.level).padStart(2, '0')}</span>}
+          <span class="map-band-title">{band.shortTitle}</span>
+        </div>
+      ))
+    }
+  </div>
+
   <div class="map-scroll">
     <svg
       class="map-svg"
-      width={layout.width + 90}
+      width={layout.width}
       height={layout.height}
-      viewBox={`-90 0 ${layout.width + 90} ${layout.height}`}
+      viewBox={`0 0 ${layout.width} ${layout.height}`}
       role="group"
       aria-labelledby="map-svg-title map-svg-desc"
     >
       <title id="map-svg-title">The technique graph</title>
       <desc id="map-svg-desc">
         {layout.nodes.length} techniques across eight levels and five wrapped topic rows, connected by {layout.edges.length} relations.
-        Select a concept to read its relationships and explanations in the details panel.
+        Select a concept to read its relationships in the panel below.
       </desc>
-      {layout.bands.map(band => <g class="map-band-heading">
-        <text x="-82" y={band.y + band.h / 2 - 6} fill={band.kind === 'level' ? `var(--o${band.level})` : 'var(--muted)'}>{band.kind === 'level' ? `Level ${band.level}` : 'Topics'}</text>
-      </g>)}
       <defs>
         <mask id="map-node-clearance" maskUnits="userSpaceOnUse" x="0" y="0" width={layout.width} height={layout.height} style="mask-type:luminance">
           <rect width={layout.width} height={layout.height} fill="white" />
@@ -209,9 +186,8 @@ const drawableEdges = mapConnections(layout)
                 way it does elsewhere on the site. Square corners: at this scale the sliver of
                 overlap past the rect's own 6px-radius corner is under a pixel and invisible. */}
             <rect x={node.x} y={node.y} width={node.w} height="3" class="map-node-accent" style={`--c:${node.color}`} />
-            <title>{node.title}</title>
             <text x={node.x + node.w / 2} y={node.y + node.h / 2}>
-              {labelLines(labels[node.slug] ?? node.title).map((line, i, lines) => <tspan x={node.x + node.w / 2} y={node.y + node.h / 2 + (i - (lines.length - 1) / 2) * 14}>{line}</tspan>)}
+              {node.title}
             </text>
           </a>
         ))
@@ -220,9 +196,6 @@ const drawableEdges = mapConnections(layout)
   </div>
 </div>
 
-</div>
-
-<aside class="map-selection-empty panel"><h3>Explore a concept</h3><p>Select a box in the map or choose a concept above to see what it requires, combines with, and upgrades to.</p></aside>
 <section id="map-selection" class="map-selection panel" aria-labelledby="map-selection-title" hidden>
   <div class="eyebrow">Selected concept</div>
   <h3 id="map-selection-title"></h3>
