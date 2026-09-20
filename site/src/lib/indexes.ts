@@ -657,7 +657,7 @@ export function flattenMdxBody(rawBody: string, where: string): string {
   text = flattenLink(text, where);
   text = flattenCodeFile(text, where);
   text = flattenRun(text, where);
-  text = replaceAllTags(text, 'TestAutomationHarness', () => '\n**Architecture:** Past projects, DUT differences, and framework documentation → Claude Code asks questions and proposes a plan → user approval → Python code, YAML/JSON configuration, Markdown documentation, and non-hardware checks → user review and hardware testing → logs and observations return to the agent for revision. Reuse framework tools; framework changes and new project-local tools require explicit approval. Simulation is not assumed; read-only framework access remains a proposed control to confirm.\n', where);
+  text = replaceAllTags(text, 'TestAutomationHarness', () => '\n**Architecture:** User supplies reusable CLAUDE.md instructions and a DUT-specific DUT_BRIEF.md, plus access to framework documentation, source, past projects, and a template → agent asks questions and drafts PROJECT_PLAN.md → user approval → agent produces Python files, YAML/JSON configuration, Markdown documentation including PROJECT_STATUS.md, and non-hardware check results → user reviews and tests on real instruments → logs and observations return to the agent for revision and status updates. Brief, plan, and status filenames are example conventions. Permissions are configured separately from Markdown. Framework changes and new project-local tools require explicit approval; read-only framework access remains to be confirmed.\n', where);
   text = flattenFailureModes(text, where);
   text = flattenCostStrip(text, where);
   text = flattenRunIt(text, where);

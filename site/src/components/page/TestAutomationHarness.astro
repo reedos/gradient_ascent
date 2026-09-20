@@ -1,10 +1,18 @@
 <figure class="test-harness" aria-labelledby="test-harness-caption">
-  <div class="brief"><span class="label">You define the DUT</span><strong>Past projects + written differences + framework documentation</strong></div>
+  <div class="brief">
+    <span class="label">You provide the starting files</span>
+    <div class="parts input-files">
+      <div><strong>CLAUDE.md</strong><span>Reusable framework instructions: conventions, boundaries, approvals, and deliverables</span></div>
+      <div><strong>DUT_BRIEF.md</strong><span>New for each DUT: requirements, differences from past projects, and known configuration</span></div>
+    </div>
+    <div class="harness-controls">Also provide access to framework documentation and source, past projects, and the standard template.</div>
+  </div>
   <div class="flow" aria-hidden="true">↓</div>
   <div class="harness">
     <span class="label">Claude Code · agent harness</span>
     <div class="model"><strong>Claude · model</strong><span>Reads the context, asks about missing requirements, and proposes a project plan</span></div>
-    <div class="loop">Ask → plan → wait for your approval → generate → check without hardware</div>
+    <div class="plan-gate"><span class="label">Agent drafts · you approve</span><strong>PROJECT_PLAN.md</strong><span>Reference project, proposed files, intended changes, reused tools, and non-hardware checks</span></div>
+    <div class="loop">Wait for your approval → generate project files → check without hardware</div>
     <div class="harness-controls">Reuse the closest project, or a template. Framework changes and new project-local tools need separate approval.</div>
   </div>
   <div class="flow"><span aria-hidden="true">↓</span> Generate project files using existing framework interfaces</div>
@@ -13,14 +21,14 @@
     <div class="parts">
       <div><strong>Project conventions</strong><span>Templates, documentation, previous projects</span></div>
       <div><strong>Established functions</strong><span>Measurements, units, CSV export; SCPI stays behind the instrument interfaces</span></div>
-      <div><strong>Project deliverables</strong><span>Python code, YAML/JSON configuration, Markdown documentation</span></div>
+      <div><strong>Agent-generated deliverables</strong><span>Python code + YAML/JSON configuration + Markdown documentation, including PROJECT_STATUS.md</span></div>
       <div><strong>Non-hardware checks</strong><span>Python syntax and configuration validity; no instrument connections</span></div>
     </div>
   </div>
   <div class="flow" aria-hidden="true">↓</div>
-  <div class="brief"><span class="label">You review and test</span><strong>Review files → test on real instruments → return logs and observations</strong></div>
+  <div class="brief"><span class="label">You review and test</span><strong>Review files → test on real instruments → return logs and observations</strong><div class="harness-controls">The agent updates PROJECT_STATUS.md with completed work, actual checks, supplied hardware results, and unresolved issues.</div></div>
   <div class="flow"><span aria-hidden="true">↺</span> Agent revises the project within the approved scope</div>
-  <figcaption id="test-harness-caption">Specified workflow, not a recorded run. The agent generates and checks project files; the user performs hardware testing. Simulation is not assumed. Read-only framework access is a proposed enforcement control still to confirm.</figcaption>
+  <figcaption id="test-harness-caption">CLAUDE.md is reused across DUTs; DUT_BRIEF.md changes for each project. The plan, brief, and status filenames are conventions for this example. Permissions are configured separately: Markdown instructions do not enforce filesystem or instrument restrictions. This is a specified workflow, not a recorded run; read-only framework access remains to be confirmed.</figcaption>
 </figure>
 <style>
   .test-harness { margin: 26px 0; padding: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
@@ -30,6 +38,9 @@
   .harness { border: 1px solid var(--o5); border-radius: 8px; padding: 18px; }
   .harness > .label { color: var(--o5); }
   .model { background: var(--panel2); border: 1px solid var(--line); border-radius: 6px; padding: 20px; }
+  .input-files { text-align: left; }
+  .plan-gate { border-left: 3px solid var(--o5); background: var(--panel2); padding: 18px 20px; margin-top: 18px; }
+  .plan-gate > span:last-child { display: block; color: var(--muted); font-size: 14px; line-height: 1.7; margin-top: 8px; }
   .model span, .parts span { display: block; color: var(--muted); font-size: 14px; line-height: 1.7; margin-top: 8px; }
   .loop { color: var(--text); font-size: 12px; line-height: 1.8; padding-top: 14px; }
   .harness-controls { color: var(--muted); font-size: 12px; line-height: 1.7; padding-top: 8px; }

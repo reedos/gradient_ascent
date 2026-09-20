@@ -4,6 +4,19 @@
   "note": "What changed on this site, and why it matters to somebody reading it. Newest first. Entries are written for a reader, not for whoever made the change: they say what is different and what it is good for, never what a commit did. Every entry links the pages it touched. Several entries can share a date; within a date, file order is the order shown. docs/CHANGES.md says how to add one.",
   "changes": [
     {
+      "id": "dut-example-inputs-and-deliverables",
+      "date": "2026-09-19",
+      "title": "The DUT example shows which files to provide and expect",
+      "what": "The diagram and worked example distinguish reusable framework instructions, a DUT-specific brief, an agent-drafted plan for approval, and a project status document delivered with the code and configuration.",
+      "why": "The file handoff makes the workflow easier to reproduce and clarifies who supplies each document. Written instructions are kept distinct from separately configured permissions.",
+      "pages": [
+        {
+          "label": "The agent harness",
+          "path": "/techniques/agent-harness/"
+        }
+      ]
+    },
+    {
       "id": "dut-project-example-with-human-testing",
       "date": "2026-09-19",
       "title": "The test automation example follows an approved DUT project workflow",

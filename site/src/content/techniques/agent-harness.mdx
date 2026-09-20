@@ -106,12 +106,34 @@ considered later, but are not assumed here.
 
 ### Start with an ordinary request
 
-“Create a project for this new DUT using our shared Python test framework. Use the closest past
+The user supplies two starting documents. **`CLAUDE.md` holds reusable framework instructions;
+`DUT_BRIEF.md` describes this particular DUT.** Establish the framework instructions once and
+maintain them as conventions evolve. Write a new brief for each DUT.
+
+| Document | Who provides it | What it contains |
+| --- | --- | --- |
+| `CLAUDE.md` | User or framework maintainer; reused across DUT projects | Framework reference paths, project conventions, reuse rules, approval boundaries, permitted checks, and required deliverables. |
+| `DUT_BRIEF.md` | User; specific to the new DUT | Required tests, differences from past DUTs, candidate reference projects, known instruments and configuration, and questions still to resolve. |
+| `PROJECT_PLAN.md` | Agent drafts; user approves before implementation | Selected reference or template, proposed files and changes, framework tools to reuse, non-hardware checks, and approval requests. |
+| `PROJECT_STATUS.md` | Agent creates and maintains from actual work and user feedback | Files created, capabilities, checks performed, hardware-validation status, limitations, and unresolved issues. |
+
+The agent also needs access to framework documentation, framework source, previous projects,
+and the standard template. These remain the reference material; the two starting files do not
+replace them. Point to their actual locations in `CLAUDE.md`, and ask the agent to read
+`DUT_BRIEF.md` when starting the task. The brief, plan, and status filenames are conventions for
+this example, not special files automatically understood by every agent.
+
+Configure permissions separately. Instructions in Markdown describe the boundaries; they do
+not themselves make the framework read-only or prevent instrument access.
+
+With those files in place, the user can give this request:
+
+“Read CLAUDE.md and DUT_BRIEF.md, then create a project for this new DUT using our shared Python test framework. Use the closest past
 project where one is suitable; otherwise use the standard template. Here is my description of how
 this DUT differs. Read the framework documentation and reuse its existing tools and instrument
 interfaces. Ask me about missing requirements before proceeding. Show me your proposed files and
-changes, and wait for my approval before generating the project. Produce Python code, YAML/JSON
-configuration, and Markdown documentation for my review. Do not modify the shared framework or
+changes in PROJECT_PLAN.md, and wait for my approval before generating the project. Produce Python code, YAML/JSON
+configuration, and Markdown documentation, including PROJECT_STATUS.md, for my review. Obtain separate approval before creating any new project-local tool. Do not modify the shared framework or
 connect to instruments.”
 
 ### What belongs where
