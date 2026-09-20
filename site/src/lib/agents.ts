@@ -170,7 +170,7 @@ export function agentGuide(input: GuideInput): Block[] {
         `It holds ${counts.techniques} techniques and ${counts.topics} topics that run across every level, which together are the ${counts.techniques + counts.topics} pages under \`/techniques/\`; ` +
         `${counts.threads} threads, each following one question up the ladder; ${counts.recipes} recipes (whole jobs built from techniques); ${counts.teardowns} teardowns of products people already use; ` +
         `a registry of ${counts.names} named models, products and tools; and ${counts.terms} glossary terms. ` +
-        `Every technique, topic, thread, recipe, teardown and level page has a Markdown twin at the same address with \`.md\` appended. The index and tool pages do not: read \`/llms.txt\` instead of \`/techniques/\`, \`/recipes/\`, \`/teardowns/\`, \`/glossary/\`, \`/failures/\`, \`/map/\`, \`/names/\`, \`/timeline/\`, \`/search/\` and the home page.`,
+        `Every technique, topic, thread, recipe, teardown and level page has a Markdown twin at the same address with \`.md\` appended. The index and tool pages do not: read \`/llms.txt\` instead of \`/examples/\`, \`/techniques/\`, \`/recipes/\`, \`/teardowns/\`, \`/glossary/\`, \`/failures/\`, \`/map/\`, \`/names/\`, \`/timeline/\`, \`/search/\` and the home page.`,
     },
     { kind: 'ul', items: ladder },
     {

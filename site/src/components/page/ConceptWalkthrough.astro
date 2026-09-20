@@ -1,0 +1,12 @@
+---
+import WalkthroughPerspectives from '../islands/WalkthroughPerspectives';
+import { examplesFor } from '../../lib/walkthrough-catalog';
+import { audienceLabels } from '../../lib/walkthrough';
+import '../../styles/dut-pilot.css';
+interface Props { slug:string }
+const examples=examplesFor(Astro.props.slug);
+---
+{examples.length>0&&<>
+  <WalkthroughPerspectives examples={examples} client:visible />
+  <noscript>{examples.map(lesson=><section class="panel"><h2>Worked example: {lesson.title} · {audienceLabels[lesson.audience]}</h2><p>{lesson.prompt}</p><h3>Starting evidence</h3><p>{lesson.inputs}</p><h3>Action and control</h3><p>{lesson.action}</p><h3>Sample result</h3><p>{lesson.outcome}</p><h3>{lesson.change}</h3><p>{lesson.changedOutcome}</p><h3>Check your understanding</h3><p>{lesson.question}</p><p>{lesson.correct} {lesson.explanation}</p><p>Fictional scripted example. No model or external actions execute.</p></section>)}</noscript>
+</>}

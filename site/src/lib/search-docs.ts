@@ -3,7 +3,6 @@
 // one function, so the two can never list a different set of things. Heavy imports live here,
 // not in search.ts: this module runs at build time only and is never bundled to the client.
 import { usDate } from './dates';
-import { lessons, learningStages } from './learning';
 import { getEntry } from 'astro:content';
 import {
   levels,
@@ -68,8 +67,7 @@ function formerNameOnly(formerly: string | undefined): string | undefined {
 
 export async function buildSearchDocs(): Promise<SearchDoc[]> {
   const docs: SearchDoc[] = [];
-  docs.push({ id: 'view:learn', kind: 'view', title: 'Learn step by step', summary: 'Guided learning path: foundations, verification, context, tools, agents, and operations.', url: url('/learn/') });
-  for (const lesson of lessons) docs.push({ id: `lesson:${lesson.id}`, kind: 'lesson', title: lesson.title, meta: learningStages[lesson.stage].title, summary: lesson.objective, body: lesson.teaching.join(' ').slice(0, 600), url: url(`/learn/${lesson.id}/`) });
+  docs.push({ id: "view:examples", kind: "view", title: "Worked examples", summary: "98 scripted examples across everyday life, engineering, and business.", url: url("/examples/") });
 
   // Every technique and topic: tier pages, track roots, and track pages (site/src/lib/content.ts
   // enumerates all three as one list already, since /techniques/<slug>/ treats them alike).

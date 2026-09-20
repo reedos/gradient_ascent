@@ -45,6 +45,7 @@ FENCE_RE = re.compile(r"```[\s\S]*?```")
 # twin at /method.md the same way /agents/ and /shapes/ do.
 NO_TWIN = {
     "",  # the home page
+    "examples",
     "failures",
     "glossary",
     "map",
@@ -189,6 +190,9 @@ class MarkdownTwinTests(unittest.TestCase):
             rel = index.relative_to(DIST).parent.as_posix()
             rel = "" if rel == "." else rel
             twin = DIST / (f"{rel}.md" if rel else "index.md")
+            if rel in {"learn", "pilot/example-proposals", "pilot/dut-harness"}:
+                self.assertIn('http-equiv="refresh"', index.read_text(encoding="utf-8"))
+                continue
             if not twin.is_file():
                 without.add(rel)
         self.assertEqual(

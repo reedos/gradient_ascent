@@ -18,7 +18,7 @@ export const GET: APIRoute = async ({ site }) => {
 
   lines.push('# Gradient Ascent');
   lines.push('');
-  lines.push(`Guided learning path: ${abs('/learn/')} — 18 lessons, explained exercises, and six stage projects.`);
+  lines.push(`Worked examples: ${abs('/examples/')} — 98 authored, scripted cases with evidence, changed conditions, and review decisions.`);
   lines.push(
     '> A manual for the main ways to use a language model, from one chat message to agents that ' +
       'run on their own, in eight levels ordered by how much the model decides for itself. Each ' +

@@ -6,12 +6,12 @@ import Eyebrow from '../../components/Eyebrow.astro';
 import Pill from '../../components/Pill.astro';
 import ConceptDiagram from '../../components/ConceptDiagram.astro';
 import ConceptExamples from '../../components/ConceptExamples.astro';
+import ConceptWalkthrough from '../../components/page/ConceptWalkthrough.astro';
 import NameList from '../../components/NameList.astro';
 import Sources from '../../components/page/Sources.astro';
 import Reviewed from '../../components/page/Reviewed.astro';
 import TechniqueRow from '../../components/TechniqueRow.astro';
 import { url } from '../../lib/url';
-import { lessons } from '../../lib/learning';
 import {
   allTechniqueSlugs,
   techniqueBySlug,
@@ -29,7 +29,6 @@ export function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const learningLesson = lessons.find(lesson => lesson.concepts.includes(slug!));
 const technique = techniqueBySlug(slug!)!;
 const rel = relationsFor(slug!);
 const names = namesFor([slug!]);
@@ -119,8 +118,8 @@ const nameGroups = [
     <p><Pill status={technique.status} /></p>
   </div>
 
-  {learningLesson && <p class="learning-entry">Learning this for the first time? <a href={url(`/learn/${learningLesson.id}/`)}>Start with the lesson: {learningLesson.title} →</a></p>}
   <ConceptDiagram slug={slug!} color={color} />
+  {slug !== 'agent-harness' && <ConceptWalkthrough slug={slug!} />}
   <ConceptExamples slug={slug!} entries={[...names.product, ...names.tool, ...names.model]} color={color} />
 
   {
@@ -226,6 +225,4 @@ const nameGroups = [
   {reviewedISO && <Reviewed date={reviewedISO} mdHref={url(`/techniques/${slug}.md`)} />}
 </Base>
 <style>
-  .learning-entry { padding: 15px 20px; border-left: 2px solid var(--accent); background: var(--panel); color: var(--muted); font-size: 13px; line-height: 1.8; margin: 0 0 25px; }
-  .learning-entry a { color: var(--accent); }
 </style>

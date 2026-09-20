@@ -1,0 +1,54 @@
+import { useEffect, useState } from 'react';
+import { audienceLabels, approvalKey, canDeliver, type WalkthroughCase } from '../../lib/walkthrough';
+
+export default function ConceptWalkthrough({lesson}: {lesson:WalkthroughCase}) {
+  const actionGate=lesson.approvalKind==='action';
+  const initialScope=lesson.approvalScope??'Project leads';
+  const [mode,setMode]=useState('watch');
+  const [started,setStarted]=useState(false);
+  const [step,setStep]=useState(0);
+  const [changed,setChanged]=useState(false);
+  const [answer,setAnswer]=useState<string|null>(null);
+  const [visible,setVisible]=useState(0);
+  const [draft,setDraft]=useState(lesson.outcome);
+  const [recipients,setRecipients]=useState(initialScope);
+  const [version,setVersion]=useState(1);
+  const [approved,setApproved]=useState<string|null>(null);
+  const [sent,setSent]=useState<string[]>([]);
+  const [decision,setDecision]=useState('Draft awaiting review.');
+  const stages=['Starting evidence','Action and control','Visible result','Review and limits'];
+  const texts=[lesson.inputs,lesson.action,lesson.outcome,lesson.verify];
+  const text=texts[step];
+  const key=approvalKey(version,draft,recipients);
+  const eligible=canDeliver(key,approved,sent)&&Boolean(draft.trim()&&recipients.trim());
+  useEffect(()=>{
+    setVisible(0);
+    if(!started||mode!=='watch')return;
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches){setVisible(text.length);return;}
+    const id=setInterval(()=>setVisible(n=>{const next=Math.min(text.length,n+3);if(next===text.length)clearInterval(id);return next;}),24);
+    return()=>clearInterval(id);
+  },[step,started,mode,text]);
+  function reset(){setStep(0);setStarted(false);setChanged(false);setAnswer(null);setApproved(null);setSent([]);setVersion(1);setDraft(lesson.outcome);setRecipients(initialScope);setDecision('Draft awaiting review.');setMode('watch');}
+  function edit(field:'draft'|'recipients',value:string){field==='draft'?setDraft(value):setRecipients(value);setVersion(v=>v+1);setApproved(null);setDecision('Draft changed. Earlier approval does not apply; review this version again.');}
+  function download(){const data=`${lesson.title}\nAudience: ${audienceLabels[lesson.audience]}\nFictional, scripted teaching case; no live model or external actions.\n\nRequest\n${lesson.prompt}\n\nEvidence\n${lesson.inputs}\n\nAction\n${lesson.action}\n\nResult\n${lesson.outcome}\n\nChanged condition: ${lesson.change}\n${lesson.changedOutcome}\n\nReview limits\n${lesson.explanation}\n`;const blob=new Blob([data],{type:'text/plain;charset=utf-8'});const href=URL.createObjectURL(blob);const a=document.createElement('a');a.href=href;a.download=`${lesson.slug}-${lesson.audience}-worked-example.txt`;a.click();setTimeout(()=>URL.revokeObjectURL(href),1000);}
+  const options=lesson.slug.length%2 ? [['correct',lesson.correct],['wrong',lesson.wrong]] : [['wrong',lesson.wrong],['correct',lesson.correct]];
+  return <div className="dut-pilot concept-walkthrough">
+    <div className="pilot-kicker">GUIDED WORKED EXAMPLE <span>Fictional fixtures · scripted outputs · no live model or external actions</span></div>
+    <header className="pilot-intro"><div><h2>{lesson.title}: see it in practice.</h2><p>{lesson.definition}</p></div><button className="pilot-quiet" onClick={reset}>Restart ↺</button></header>
+    <div className="walk-audience"><span className="pilot-chip">{audienceLabels[lesson.audience]}</span><small>An authored case with its own evidence, changed condition, and decision.</small></div>
+    <div className="pilot-modes" role="group" aria-label="Learning mode">{[['watch','01','Watch it'],['change','02','Change something'],['try','03','Try a decision']].map(([id,n,label])=><button key={id} aria-pressed={mode===id} onClick={()=>setMode(id)}><small>{n}</small>{label}</button>)}</div>
+    {mode==='watch'&&<>
+      <section className="pilot-request"><label htmlFor={`${lesson.slug}-request`}>{lesson.slug==='order-zero'?'Task for the rules engine':'Your request'}</label><div><textarea id={`${lesson.slug}-request`} value={lesson.prompt} readOnly rows={3}/><button className="pilot-primary" disabled={started} onClick={()=>setStarted(true)}>{started?'Started ✓':lesson.slug==='order-zero'?'Run example →':'Send request →'}</button></div><small>This prefilled request is fixed so its evidence and outcomes can be inspected consistently.</small></section>
+      <div className="pilot-workspace"><section className="pilot-map" aria-label="Example stages"><div className="pilot-panel-head"><span>FOLLOW THE EXAMPLE</span><small>{started?`${step+1} / 4`:'Ready to start'}</small></div><ol className="pilot-stages">{stages.map((s,i)=><li key={s} className={started&&step===i?'current':started&&i<step?'complete':''}><button disabled={!started} aria-current={started&&step===i?'step':undefined} onClick={()=>setStep(i)}><span>{String(i+1).padStart(2,'0')}</span><div><strong>{s}</strong></div></button></li>)}</ol><div className="pilot-boundary"><strong>Interpret this honestly</strong><span>Sample evidence, not your actual data.</span><span>No real messages, tools, training, or hardware operations run.</span><span>The sequence illustrates the concept; it is not a recorded agent trace.</span></div></section>
+      <section className="pilot-work"><div className="pilot-panel-head"><span>THE VISIBLE WORK</span><span className="pilot-chip">{stages[step]}</span></div>{!started?<div className="pilot-empty"><span>01 → 04</span><h3>A concrete task, with evidence you can inspect.</h3><p>Start the request, follow the example, then change a condition and decide what should happen.</p></div>:<>
+        <div className="pilot-message"><span className="pilot-avatar">{lesson.slug==='order-zero'?'R':'•'}</span><div><small>{step===0?'INPUT FIXTURE':step===3?'WHAT TO VERIFY':'ILLUSTRATED WORK'}</small><div><button className="pilot-quiet" onClick={()=>setVisible(text.length)}>Show full text</button></div><p aria-hidden="true" style={{whiteSpace:'pre-wrap'}}>{text.slice(0,visible)}{visible<text.length&&<span className="pilot-caret">▍</span>}</p><span className="pilot-sr" role="status">{visible>=text.length?text:'Example text appearing.'}</span></div></div>
+        {step===2&&<div className="pilot-artifact"><div className="pilot-artifact-title"><span>▤ Inspectable result · sample</span><button className="pilot-quiet" onClick={download}>Download case</button></div><pre>{lesson.outcome}</pre></div>}
+        {step===2&&lesson.approval&&<div className="pilot-approval"><strong>Review before simulated {actionGate?'action':'delivery'} · version {version}</strong><p>{actionGate?'Only the approval gate is simulated here. Editing the proposal or scope invalidates approval. This does not validate safety or execute an external action.':'Edit the report or recipients to invalidate the current approval. No email service is connected.'}</p><label>{actionGate?'Action proposal':'Report'}<textarea aria-label={actionGate?'Action proposal':'Report draft'} value={draft} onChange={e=>edit('draft',e.currentTarget.value)} rows={4}/></label><label>{actionGate?'Scope / destination':'Recipients'}<input aria-label={actionGate?'Action scope':'Report recipients'} value={recipients} onChange={e=>edit('recipients',e.currentTarget.value)}/></label><div><button disabled={!draft.trim()||!recipients.trim()||sent.includes(key)} onClick={()=>{setApproved(key);setDecision(`Version ${version} approved for ${recipients}. ${actionGate?'Not executed.':'Still not sent.'}`);}}>Approve this version</button><button onClick={()=>{setApproved(null);setDecision('Rejected. No new action will occur. Revise the proposal before another review.');}}>Reject / request changes</button><button className="pilot-primary" disabled={!eligible} onClick={()=>{if(eligible){setSent(s=>[...s,key]);setDecision(`Simulated ${actionGate?'action':'delivery'} recorded for version ${version}, scope: ${recipients}. Repeating this approved version is disabled.`);}}}>{actionGate?'Simulate action':'Simulate send'}</button></div><p role="status">{decision}</p><small>{sent.length} simulated {actionGate?'action':'delivery'} record(s). All state resets when you leave or restart.</small></div>}
+        <div className="pilot-explanation"><small>WHY THIS MATTERS</small><h3>{step===0?'What is actually known':step===1?'Who decides, and what is allowed':step===2?'What the result establishes':'What remains unproven'}</h3><p>{step===0?'These are the facts available in this fixture. Do not silently add knowledge, permissions, or missing requirements.':step===1?lesson.definition:lesson.explanation}</p></div>
+        <div className="pilot-controls"><button disabled={step===0} onClick={()=>setStep(s=>s-1)}>← Back</button><span>{step+1} / 4</span>{step<3?<button className="pilot-primary" onClick={()=>setStep(s=>s+1)}>Next: {stages[step+1]} →</button>:<button className="pilot-primary" onClick={()=>setMode('change')}>Change something →</button>}</div>
+      </>}</section></div>
+    </>}
+    {mode==='change'&&<section className="pilot-experiment"><span className="pilot-chip">A controlled contrast</span><h3>Change one condition.</h3><div className="pilot-choices"><button aria-pressed={!changed} onClick={()=>setChanged(false)}>Original case</button><button aria-pressed={changed} onClick={()=>setChanged(true)}>{lesson.change}</button></div><div className="walk-contrast"><div><small>STARTING EVIDENCE</small><p>{lesson.inputs}</p></div><div><small>{changed?'CHANGED OUTCOME':'ORIGINAL OUTCOME'}</small><p>{changed?lesson.changedOutcome:lesson.outcome}</p></div></div><div className="pilot-explanation"><small>THE DISTINCTION</small><p>{lesson.explanation}</p></div><p className="pilot-note">This contrast is authored, not a prediction of how every model will behave.</p><button className="pilot-primary" onClick={()=>setMode('try')}>Try a decision →</button></section>}
+    {mode==='try'&&<section className="pilot-experiment"><span className="pilot-chip">Apply the concept</span><h3>{lesson.question}</h3><div className="pilot-answer-options">{options.map(([id,label])=><button key={id} aria-pressed={answer===id} onClick={()=>setAnswer(id)}>{label}</button>)}</div>{answer&&<div className={'pilot-feedback '+(answer==='correct'?'correct':'')} role="status"><strong>{answer==='correct'?'That preserves the distinction.':'Reconsider what the evidence or approval actually covers.'}</strong><p>{lesson.correct} {lesson.explanation}</p><p><strong>Explain it yourself:</strong> What would you need to observe or verify before accepting the result?</p></div>}<button className="pilot-quiet" onClick={()=>setMode('watch')}>Return to walkthrough</button></section>}
+  </div>;
+}

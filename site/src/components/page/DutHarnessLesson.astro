@@ -1,0 +1,13 @@
+---
+import WalkthroughPerspectives from '../islands/WalkthroughPerspectives';
+import { examplesFor } from '../../lib/walkthrough-catalog';
+import { audienceLabels } from '../../lib/walkthrough';
+import TestAutomationHarness from './TestAutomationHarness.astro';
+import '../../styles/dut-pilot.css';
+---
+<WalkthroughPerspectives examples={examplesFor('agent-harness')} dedicatedDut client:visible />
+<noscript>
+  <p>The interactive walkthrough needs JavaScript. This diagram and the written steps below cover the same workflow.</p>
+  <TestAutomationHarness />
+  {examplesFor('agent-harness').map(e=><section><h3>{audienceLabels[e.audience]}</h3><p>{e.prompt}</p><p>{e.inputs}</p><p>{e.action}</p><p>{e.outcome}</p><h4>{e.change}</h4><p>{e.changedOutcome}</p><p>{e.question} {e.correct}</p><p>{e.explanation}</p></section>)}
+</noscript>

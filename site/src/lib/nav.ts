@@ -100,7 +100,7 @@ export function buildNav(levels: NavLevel[], tracks: NavTrack[], threads: NavThr
       sections: [
         {
           items: [
-            { label: 'Learn step by step', path: '/learn/', hint: '18 lessons, six stages, exercises and projects' },
+            { label: 'Worked examples', path: '/examples/', hint: 'Everyday, engineering, and business perspectives' },
             { label: 'Find your level', path: '/worksheet/', hint: 'Seven questions, one recommendation' },
             { label: 'Job shapes', path: '/shapes/', hint: 'What kind of job is it? Match the work, not the subject' },
             { label: 'Recipes', path: '/recipes/', hint: 'Whole jobs, built from techniques' },
@@ -161,7 +161,7 @@ export function navContext(path: string, levels: NavLevel[], tracks: NavTrack[])
     return { group: 'techniques' };
   }
   if (p === '/techniques/' || p.startsWith('/map/') || p.startsWith('/threads/')) return { group: 'techniques' };
-  if (p.startsWith('/learn/') || p.startsWith('/worksheet/') || p.startsWith('/shapes/') || p.startsWith('/recipes/') || p.startsWith('/teardowns/') || p.startsWith('/failures/')) return { group: 'practice' };
+  if (p.startsWith('/examples/') || p.startsWith('/worksheet/') || p.startsWith('/shapes/') || p.startsWith('/recipes/') || p.startsWith('/teardowns/') || p.startsWith('/failures/')) return { group: 'practice' };
   if (
     p.startsWith('/timeline/') ||
     p.startsWith('/names/') ||

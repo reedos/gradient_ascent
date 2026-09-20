@@ -1,0 +1,524 @@
+[
+  {
+    "slug": "order-zero",
+    "title": "When not to use a model",
+    "group": "Level 00 · No model",
+    "definition": "Solving a task with explicit rules, forms, search, or conventional software when generative output is unnecessary.",
+    "example": "Validate an expense claim against a published reimbursement policy using a form and deterministic rules.",
+    "nuance": "Compare an exact allowance calculation with an ambiguous business-purpose description; only the latter may need interpretation.",
+    "evidence": "Boundary-value tests and an explicit needs-review result for ambiguous cases; compare with a scripted model mistake."
+  },
+  {
+    "slug": "chat",
+    "title": "Chat",
+    "group": "Level 01 · One call",
+    "definition": "A conversational interface in which a person supplies messages and decides what to do with the replies.",
+    "example": "Ask for help drafting an invitation to a neighborhood repair workshop.",
+    "nuance": "Contrast a useful draft with an invented venue detail; the conversation has no implicit access to your calendar or facts.",
+    "evidence": "A checked facts list and a revised draft grounded in information the user actually provided."
+  },
+  {
+    "slug": "prompt-engineering",
+    "title": "Prompt engineering",
+    "group": "Level 01 · One call",
+    "definition": "Designing instructions, examples, and output expectations to steer a model's response.",
+    "example": "Turn a vague request for a workshop announcement into a brief with audience, facts, tone, and length.",
+    "nuance": "Change one instruction at a time; stronger wording cannot supply absent facts or guarantee compliance.",
+    "evidence": "A rubric comparing factual fidelity, audience fit, and constraints across clearly labeled sample outputs."
+  },
+  {
+    "slug": "structured-output",
+    "title": "Structured output",
+    "group": "Level 01 · One call",
+    "definition": "Constraining an answer to a defined data structure so software can validate and consume it.",
+    "example": "Extract an event date, venue, and accessibility information from an organizer's email into a registration form.",
+    "nuance": "A valid structure may contain wrong facts; missing values need an explicit unknown state instead of invention.",
+    "evidence": "Show the friendly form first, optional JSON second, schema validation, and field-by-field source evidence."
+  },
+  {
+    "slug": "inference-time-reasoning",
+    "title": "Reasoning at answer time",
+    "group": "Level 01 · One call",
+    "definition": "Allocating additional inference computation to work through a problem before returning an answer.",
+    "example": "Schedule workshop sessions around room, trainer, and equipment constraints.",
+    "nuance": "More computation does not ensure correctness; do not present invented hidden reasoning as a real model trace.",
+    "evidence": "An observable candidate schedule, constraint checker, counterexample, and labeled illustrative cost/quality comparison."
+  },
+  {
+    "slug": "multimodal",
+    "title": "Images, audio and video",
+    "group": "Level 01 · One call",
+    "definition": "Working with inputs or outputs across text, images, audio, or video.",
+    "example": "Create an equipment intake record from a label photo and a technician's voice note.",
+    "nuance": "Blur a serial number and introduce disagreement between image and audio; ask for confirmation instead of asserting certainty.",
+    "evidence": "Highlighted source regions, transcript excerpts, uncertain fields, and a corrected intake record."
+  },
+  {
+    "slug": "context-engineering",
+    "title": "Context engineering",
+    "group": "Level 02 · Context",
+    "definition": "Selecting and arranging the instructions, reference material, and history included in each model request.",
+    "example": "Prepare a support reply using the current product manual, customer question, and relevant case history.",
+    "nuance": "Compare a relevant excerpt with a stale manual and distracting history; context size is not context quality.",
+    "evidence": "A visible request-context tray, version labels, included/excluded evidence, and answer differences."
+  },
+  {
+    "slug": "embeddings-search",
+    "title": "Embeddings and search",
+    "group": "Level 02 · Context",
+    "definition": "Representing content numerically and retrieving similar items, often combined with keyword or metadata search.",
+    "example": "Find the right troubleshooting article for a customer who says the machine makes a knocking sound.",
+    "nuance": "Contrast semantic similarity with an exact model-number lookup; a similar passage may refer to the wrong product.",
+    "evidence": "Ranked snippets, model filters, relevance judgments, and a case where hybrid search is preferable."
+  },
+  {
+    "slug": "rag",
+    "title": "Retrieval-augmented generation (RAG)",
+    "group": "Level 02 · Context",
+    "definition": "Retrieving external information and placing it in the model's context to support an answer.",
+    "example": "Answer an appliance warranty question from a small versioned document collection.",
+    "nuance": "Include a missing exclusion clause and conflicting revisions; retrieval and generation can fail separately.",
+    "evidence": "Visible query, retrieved passages, grounded answer, source links, and an abstention when evidence is insufficient."
+  },
+  {
+    "slug": "knowledge-graphs",
+    "title": "Knowledge graphs and GraphRAG",
+    "group": "Level 02 · Context",
+    "definition": "Representing entities and relationships explicitly; GraphRAG uses graph-based retrieval or summaries to support generation.",
+    "example": "Trace which shipped products depend on a recalled supplier component across purchase and assembly records.",
+    "nuance": "Contrast an ordinary document search with a multi-hop dependency question; uncertain or missing edges must remain visible.",
+    "evidence": "A provenance-linked path from supplier to lot to product, a missing-edge case, and a checked affected-product list."
+  },
+  {
+    "slug": "memory",
+    "title": "Memory",
+    "group": "Level 02 · Context",
+    "definition": "Persisting selected information across interactions and retrieving it when relevant.",
+    "example": "A workshop planning assistant remembers the user's preferred meeting times between sessions.",
+    "nuance": "Separate an explicit preference from a one-time exception; stale memories must be editable or deletable.",
+    "evidence": "A memory card with origin, update, removal, and a new-session test showing what was actually loaded."
+  },
+  {
+    "slug": "prompt-chaining",
+    "title": "Prompt chaining",
+    "group": "Level 03 · Workflows",
+    "definition": "Running model calls in a predetermined sequence where one step's output feeds the next.",
+    "example": "Draft a weekly portfolio status report through fixed stages: collect current evidence, reconcile it, build project summaries, then assemble the report.",
+    "nuance": "An extraction error can become a polished false claim downstream; previous reports supply continuity, not proof of current status.",
+    "evidence": "A source-linked evidence sheet, intermediate project summaries, report diff, and a corrected unsupported claim."
+  },
+  {
+    "slug": "routing",
+    "title": "Routing",
+    "group": "Level 03 · Workflows",
+    "definition": "Selecting a handler or workflow based on an input's category, rules, or classification.",
+    "example": "Send incoming support messages to billing, troubleshooting, or a human escalation queue.",
+    "nuance": "Mixed intent and low confidence require explicit handling; a route choice does not resolve the underlying issue.",
+    "evidence": "A routing decision, confidence limitation, mixed-intent case, and a confusion matrix on labeled sample messages."
+  },
+  {
+    "slug": "parallelization",
+    "title": "Parallel calls",
+    "group": "Level 03 · Workflows",
+    "definition": "Running independent tasks concurrently and combining their outputs.",
+    "example": "Collect and summarize current status for several projects independently before composing one weekly portfolio report.",
+    "nuance": "Project-specific work can run concurrently, but stale sources and inconsistent milestone dates require reconciliation before aggregation.",
+    "evidence": "Per-project evidence cards, timestamps, conflicting-source flags, and a combined report with no invented update for silent projects."
+  },
+  {
+    "slug": "evaluator-optimizer",
+    "title": "Write and check",
+    "group": "Level 03 · Workflows",
+    "definition": "Iterating between generating a candidate and evaluating it against criteria until it passes or a limit stops the loop.",
+    "example": "Revise an onboarding article against a factual and readability checklist.",
+    "nuance": "A reviewer can miss errors or reward superficial fixes; repeated polishing may never converge.",
+    "evidence": "Draft diffs, criterion-level feedback, a maximum-attempt stop, and an independent source check."
+  },
+  {
+    "slug": "workflow-graphs",
+    "title": "Workflow graphs",
+    "group": "Level 03 · Workflows",
+    "definition": "Representing a predetermined process as steps, transitions, branches, and persistent state.",
+    "example": "Generate a weekly multi-project status report from prior reports and current trackers, notes, and milestones, then route the draft for human review.",
+    "nuance": "Missing data, connector failures, edits after approval, and send retries need separate states; a scheduled fixed workflow is not automatically an autonomous agent.",
+    "evidence": "A collection-to-review state graph, evidence links, unresolved-items queue, version-bound approval, and simulated duplicate-safe delivery."
+  },
+  {
+    "slug": "human-in-the-loop",
+    "title": "Human approval",
+    "group": "Level 03 · Workflows",
+    "definition": "Pausing a process for a person's scoped approval, correction, or decision.",
+    "example": "Review and approve the exact weekly status report and recipient list before the application sends it.",
+    "nuance": "Reject or edit the draft; any change to approved content or recipients requires renewed approval. No response means no send.",
+    "evidence": "A previous-versus-current diff, evidence inspection, approve/edit/reject decisions, and a clearly simulated delivery record."
+  },
+  {
+    "slug": "function-calling",
+    "title": "Function calling",
+    "group": "Level 04 · Tools",
+    "definition": "A model proposing a named tool and structured arguments that application code validates and executes.",
+    "example": "Ask an assistant to check stock and prepare a reservation for replacement parts.",
+    "nuance": "A tool call is a proposal, not authorization; handle invalid arguments, absent stock, and tool failure.",
+    "evidence": "English request, optional argument view, validation result, read-only lookup, and a separately approved reservation."
+  },
+  {
+    "slug": "code-execution",
+    "title": "Code execution",
+    "group": "Level 04 · Tools",
+    "definition": "Running generated code in a constrained environment to perform computation or transform data.",
+    "example": "Analyze a CSV of energy readings and produce daily totals and a chart.",
+    "nuance": "Malformed timestamps, missing rows, and unit mismatches affect results; a sandbox bounds access but does not ensure correct math.",
+    "evidence": "Input preview, inspectable Python, deterministic totals, a planted unit error, and denied file/network access in a mock boundary demonstration."
+  },
+  {
+    "slug": "mcp",
+    "title": "Model Context Protocol",
+    "group": "Level 04 · Tools",
+    "definition": "A protocol for exposing tools, resources, and other capabilities to compatible AI applications.",
+    "example": "Connect an assistant to a mock inventory service and an internal manual resource.",
+    "nuance": "Discovery is not permission; tool descriptions can be misleading and services can be unavailable.",
+    "evidence": "Capability discovery, a tool request/result, access refusal, and an outage, clearly separated from transport details."
+  },
+  {
+    "slug": "computer-use",
+    "title": "Computer and browser use",
+    "group": "Level 04 · Tools",
+    "definition": "An agent observing and interacting with a graphical interface through actions such as clicks and typing.",
+    "example": "Complete a mock equipment return form in a browser portal with no API.",
+    "nuance": "A layout change or stale screen can invalidate a click; submission requires a final review.",
+    "evidence": "Screen/action/result sequence, mistaken-field recovery, and a simulated confirmation with no external transaction."
+  },
+  {
+    "slug": "single-agent",
+    "title": "Single agent",
+    "group": "Level 05 · Agents",
+    "definition": "A model choosing successive actions and when to stop within a tool-enabled loop.",
+    "example": "Investigate why a room-booking request failed using policy and availability tools.",
+    "nuance": "Distinguish model-chosen next actions from a fixed chain; stop on insufficient evidence or a step cap.",
+    "evidence": "Tool observations, changing next-step choices, a supported answer, and a bounded unsuccessful run."
+  },
+  {
+    "slug": "agent-harness",
+    "title": "The agent harness",
+    "group": "Level 05 · Agents",
+    "definition": "The runtime around an agent's model that manages tools, context, execution boundaries, approvals, limits, and records.",
+    "example": "Generate a new DUT project using the shared Python test framework and the approved workflow.",
+    "nuance": "Preserve separate approval for helpers and framework edits; no agent-operated instruments; syntax checks are not hardware validation.",
+    "evidence": "The integrated DUT walkthrough, approved plan, file list, evidence/status record, missing-requirement case, and approval exercise."
+  },
+  {
+    "slug": "agentic-rag",
+    "title": "Agentic RAG and deep research",
+    "group": "Level 05 · Agents",
+    "definition": "Retrieval where an agent chooses follow-up searches and reads until it can answer or must stop.",
+    "example": "Investigate the same appliance warranty question when exclusions are split across documents.",
+    "nuance": "Compare against one-pass RAG on the same evidence; repeated search can still miss facts or exceed its budget.",
+    "evidence": "Search trajectory, evidence accumulated per step, citations, conflicts, and a stop/abstain case."
+  },
+  {
+    "slug": "coding-agents",
+    "title": "Coding agents",
+    "group": "Level 05 · Agents",
+    "definition": "Agents that inspect, edit, execute, and test code to complete a software task.",
+    "example": "Fix a date-filter bug in a small event-registration application.",
+    "nuance": "A passing test can miss regressions; keep edits scoped and distinguish simulated test logs from actually executed tests.",
+    "evidence": "A reproducible failing case, reviewed patch, deterministic tests, edge-case regression, and change summary."
+  },
+  {
+    "slug": "skills",
+    "title": "Skills",
+    "group": "Level 05 · Agents",
+    "definition": "Reusable task instructions and supporting resources loaded when an agent needs a particular procedure.",
+    "example": "Produce a release note using an organization's writing and verification procedure.",
+    "nuance": "A skill provides guidance rather than new permissions or guaranteed correctness; stale instructions can conflict with current policy.",
+    "evidence": "Selected skill, loaded resources, draft release note, verification checklist, and outdated-skill handling."
+  },
+  {
+    "slug": "voice-agents",
+    "title": "Voice agents",
+    "group": "Level 05 · Agents",
+    "definition": "Agents that conduct spoken interactions while handling audio, timing, interruptions, and tool use.",
+    "example": "Book a workshop place in a simulated spoken conversation.",
+    "nuance": "Handle interruptions, an ambiguous date, and a misunderstood name; confirm before committing the booking.",
+    "evidence": "Transcript/audio controls, turn state, correction, scoped confirmation, and a clearly simulated booking result."
+  },
+  {
+    "slug": "orchestrator-workers",
+    "title": "Lead agent and workers",
+    "group": "Level 06 · Teams of agents",
+    "definition": "A lead agent delegating bounded subtasks to workers and combining their results.",
+    "example": "Prepare a venue comparison by assigning cost, transport, and accessibility research to separate workers.",
+    "nuance": "Workers may duplicate work or return incompatible assumptions; delegation must have clear scope and evidence.",
+    "evidence": "Task briefs, worker findings with sources, conflict resolution, and a consolidated recommendation without automatic purchase."
+  },
+  {
+    "slug": "agent-graphs",
+    "title": "Agent graphs",
+    "group": "Level 06 · Teams of agents",
+    "definition": "Representing agent roles and the permitted handoffs or transitions between them.",
+    "example": "Triage a mock service incident through investigator, remediation planner, and reviewer roles.",
+    "nuance": "A handoff carries state and authority boundaries; prevent endless cycles and uncontrolled privilege transfer.",
+    "evidence": "Role graph, handoff packet, reviewer rejection, bounded retry, and a human-approved remediation plan."
+  },
+  {
+    "slug": "debate-review",
+    "title": "Review and debate",
+    "group": "Level 06 · Teams of agents",
+    "definition": "Using multiple model perspectives to critique or compare candidate answers before a decision.",
+    "example": "Review two proposed data-retention policies for a fictional application against stated requirements.",
+    "nuance": "Agreement is not independent evidence; reviewers can share errors or favor persuasive wording.",
+    "evidence": "Claims linked to the supplied requirements, disagreements, adjudication, and a planted error both reviewers initially miss."
+  },
+  {
+    "slug": "long-horizon",
+    "title": "Long-running tasks",
+    "group": "Level 07 · Always-on agents",
+    "definition": "Maintaining progress, state, and limits across an extended task or multiple sessions.",
+    "example": "Migrate a fictional documentation site in batches with checkpoints.",
+    "nuance": "A restart must preserve completed work and constraints; summaries can omit crucial decisions.",
+    "evidence": "Task ledger, checkpoint, interrupted/resumed batch, stale-context case, and a budget-based partial handoff."
+  },
+  {
+    "slug": "agent-teammates",
+    "title": "Always-on assistants",
+    "group": "Level 07 · Always-on agents",
+    "definition": "Persistent assistants that act on configured triggers within ongoing responsibilities and permissions.",
+    "example": "Prepare a weekly status-report draft on a schedule across active projects, then notify the responsible reviewer.",
+    "nuance": "A trigger authorizes collection and drafting, not automatic distribution; handle time zones, missed runs, access limits, and duplicate drafts.",
+    "evidence": "A simulated weekly trigger, run identifier, per-source collection record, waiting-for-review state, and one delivery only after explicit approval."
+  },
+  {
+    "slug": "organizations-swarms",
+    "title": "Organizations of agents",
+    "group": "Level 07 · Always-on agents",
+    "definition": "Coordinating many agents with distinct responsibilities, shared resources, and organizational constraints.",
+    "example": "Run a simulated product-launch preparation across research, documentation, support, and review teams.",
+    "nuance": "More agents increase coordination costs and can spread bad assumptions; compare a smaller team baseline.",
+    "evidence": "Dependency board, ownership, conflicting updates, shared budget, escalation, and an evidence-based launch readiness report."
+  },
+  {
+    "slug": "embodied",
+    "title": "Robots and machines",
+    "group": "Level 07 · Always-on agents",
+    "definition": "Connecting model decisions to physical sensing and action through robot or machine control systems.",
+    "example": "A simulated robot sorts labeled packages into bins.",
+    "nuance": "Uncertain perception, unreachable objects, and emergency stops require explicit handling; simulation does not certify physical safety.",
+    "evidence": "A 2D simulated scene, proposed action, constrained controller decision, uncertain-object stop, and a sim-to-real limitations note."
+  },
+  {
+    "slug": "evals",
+    "title": "Evals",
+    "group": "Topics · Evals",
+    "definition": "Systematic measurement of performance against defined tasks, criteria, and reference judgments.",
+    "example": "Compare two versions of a support assistant on a held-out set of customer questions.",
+    "nuance": "Aggregate scores can hide critical failures; do not tune against the final test set or treat a model grader as ground truth.",
+    "evidence": "Per-case outcomes, sliced metrics, disagreement review, uncertainty, and a documented ship/hold decision."
+  },
+  {
+    "slug": "eval-frameworks",
+    "title": "Evaluation frameworks",
+    "group": "Topics · Evals",
+    "definition": "Infrastructure for organizing datasets, executing runs, applying graders, and reporting evaluation results.",
+    "example": "Build a small evaluation run for the same support assistant using recorded responses.",
+    "nuance": "Missing cases, grading bugs, and inconsistent configurations can inflate scores.",
+    "evidence": "Dataset version, reproducible run manifest, grader spot checks, failed-run accounting, and inspectable results."
+  },
+  {
+    "slug": "adaptation",
+    "title": "Changing the model",
+    "group": "Topics · Changing the model",
+    "definition": "Choosing how to improve task performance through context, prompts, data, or changes to model weights.",
+    "example": "Improve a support-message classifier that confuses two product categories.",
+    "nuance": "Start with error analysis; distinguish retrieval/prompt changes from actual weight training and avoid assuming training is necessary.",
+    "evidence": "A baseline error set, intervention comparison, held-out evaluation plan, and a justified choice of the simplest adequate method."
+  },
+  {
+    "slug": "fine-tuning",
+    "title": "Fine-tuning and adapters",
+    "group": "Topics · Changing the model",
+    "definition": "Further training model weights, fully or through adapters, on task-specific examples.",
+    "example": "Teach a classifier a stable internal support taxonomy using labeled historical messages.",
+    "nuance": "Prevent train/test leakage and preserve rare categories; training is not a reliable store for frequently changing facts.",
+    "evidence": "Dataset split, label audit, a clearly illustrative training artifact, and held-out before/after results only when real measurements exist."
+  },
+  {
+    "slug": "distillation",
+    "title": "Distillation",
+    "group": "Topics · Changing the model",
+    "definition": "Training a student model to approximate selected behavior of a teacher model.",
+    "example": "Create a smaller support-label classifier from reviewed teacher-generated examples.",
+    "nuance": "Teacher errors transfer to the student; lower cost can come with reduced coverage or calibration.",
+    "evidence": "Teacher labels, human corrections, separate evaluation set, and a labeled illustrative quality/resource tradeoff."
+  },
+  {
+    "slug": "synthetic-data",
+    "title": "Synthetic data",
+    "group": "Topics · Changing the model",
+    "definition": "Generating artificial examples for training or testing and checking their fitness for the intended use.",
+    "example": "Expand rare support-message categories with generated examples.",
+    "nuance": "Duplicates, unrealistic language, and label errors can make a dataset look larger without adding useful coverage.",
+    "evidence": "Generation brief, accepted/rejected examples, diversity checks, and evaluation on independently collected real cases."
+  },
+  {
+    "slug": "prompt-optimization",
+    "title": "Prompt optimization",
+    "group": "Topics · Changing the model",
+    "definition": "Searching prompt variants against an objective using a development set.",
+    "example": "Find a better extraction prompt for workshop registration emails.",
+    "nuance": "Optimization can exploit the grader or overfit development examples; preserve an untouched test set.",
+    "evidence": "Candidate prompts, development scores, a grader loophole, and final held-out comparison with versioned prompts."
+  },
+  {
+    "slug": "safety",
+    "title": "Safety, privacy and governance",
+    "group": "Topics · Safety, privacy and governance",
+    "definition": "Managing risks through data handling, permissions, consent, oversight, and accountable system design.",
+    "example": "Design an assistant that summarizes confidential employee feedback for a fictional organization.",
+    "nuance": "Useful summaries can still leak identity; access controls and retention obligations cannot be replaced by an instruction.",
+    "evidence": "Data-flow map, minimization choices, access matrix, consent/retention assumptions, and an incident response exercise."
+  },
+  {
+    "slug": "guardrails",
+    "title": "Guardrails",
+    "group": "Topics · Safety, privacy and governance",
+    "definition": "Checks on inputs, outputs, or proposed actions that flag, block, or route problematic behavior.",
+    "example": "An internal helpdesk assistant encounters a document requesting credential disclosure.",
+    "nuance": "Separate untrusted content from instructions; classifiers can miss attacks or block legitimate requests, and filters are not sandboxes.",
+    "evidence": "Input/action/output checks, a blocked request, false-positive review, and a permission boundary that remains independent."
+  },
+  {
+    "slug": "red-teaming",
+    "title": "Red teaming",
+    "group": "Topics · Safety, privacy and governance",
+    "definition": "Deliberately probing a system for failures and turning findings into defenses and regression cases.",
+    "example": "Attack the same mock helpdesk assistant with conflicting document instructions and unauthorized-data requests.",
+    "nuance": "A finite set of attacks does not establish safety; retest defenses against variations and legitimate inputs.",
+    "evidence": "Attack objective, observed failure, trace, mitigation, and a regression case with explicit scope."
+  },
+  {
+    "slug": "ops",
+    "title": "Operations",
+    "group": "Topics · Operations",
+    "definition": "Deploying and maintaining an AI system with monitoring, versioning, incident response, and recovery.",
+    "example": "Release a new support-assistant version to a simulated small traffic segment.",
+    "nuance": "A quality regression can occur without a server error; plan rollback, capacity limits, and degraded operation.",
+    "evidence": "Release manifest, staged rollout, quality alert, rollback event, and incident record."
+  },
+  {
+    "slug": "observability",
+    "title": "Observability",
+    "group": "Topics · Operations",
+    "definition": "Recording the inputs, actions, decisions, and outcomes needed to understand a system's behavior.",
+    "example": "Diagnose a wrong warranty answer caused by retrieval of an outdated manual.",
+    "nuance": "Final-answer logs alone cannot identify the cause; logging also needs privacy controls.",
+    "evidence": "Linked retrieval and model spans, document version, approval/stop records, redacted data, and a supported root-cause finding."
+  },
+  {
+    "slug": "ai-gateways",
+    "title": "AI gateways",
+    "group": "Topics · Operations",
+    "definition": "A shared layer managing access, routing, policy, budgets, and telemetry across model services.",
+    "example": "Route a helpdesk application's requests through a mock gateway when one provider times out.",
+    "nuance": "Fallback can change behavior, privacy assumptions, and duplicate-request risk; compatibility is not guaranteed.",
+    "evidence": "Route decision, timeout, allowed fallback, budget refusal, request identifier, and resulting quality check."
+  },
+  {
+    "slug": "cost-optimization",
+    "title": "Cost optimization",
+    "group": "Topics · Operations",
+    "definition": "Reducing resource use or latency while preserving an explicitly defined level of quality.",
+    "example": "Compare caching, shorter context, batching, and a smaller model for repeated support questions.",
+    "nuance": "A cache can serve stale or unauthorized content; lower average cost can hide worse tail latency or errors.",
+    "evidence": "Cache-hit/miss cases, scope/version keys, labeled sample costs, latency distribution, and a quality floor."
+  },
+  {
+    "slug": "local-inference",
+    "title": "Running models locally",
+    "group": "Topics · Operations",
+    "definition": "Executing model inference on locally controlled hardware rather than a hosted model endpoint.",
+    "example": "Choose a local document-summarization setup for an offline field laptop.",
+    "nuance": "Model weights, context, and runtime overhead all consume memory; local execution alone does not guarantee private handling.",
+    "evidence": "Clearly estimated memory budget, quantization comparison, offline data-flow review, and a benchmark plan without fabricated throughput."
+  },
+  {
+    "slug": "operator-craft",
+    "title": "Working with a model",
+    "group": "Topics · Working with a model",
+    "definition": "Practices for specifying, delegating, reviewing, and evaluating work done with a model.",
+    "example": "Prepare an event proposal with the model as a drafting assistant and the organizer as accountable reviewer.",
+    "nuance": "Quality depends on the entire collaboration cycle; confident prose is not verified work.",
+    "evidence": "Task brief, delegation boundary, draft, independent checks, and a recorded acceptance decision."
+  },
+  {
+    "slug": "briefing",
+    "title": "Briefing: saying what you want",
+    "group": "Topics · Working with a model",
+    "definition": "Describing the goal, context, constraints, deliverables, and uncertainties so work can proceed without unnecessary guessing.",
+    "example": "Ask for a community workshop plan with a budget, audience, venue constraints, and success criteria.",
+    "nuance": "Show an incomplete brief, a clarification question, and a resolved assumption; avoid turning every detail into a rigid prescription.",
+    "evidence": "Brief before/after, explicit unknowns, acceptance criteria, and a plan checked against them."
+  },
+  {
+    "slug": "reviewing",
+    "title": "Reviewing work you did not do",
+    "group": "Topics · Working with a model",
+    "definition": "Independently checking another party's work before relying on or releasing it.",
+    "example": "Review a model-written workshop budget and announcement.",
+    "nuance": "Fluent writing can hide bad totals and invented facts; prioritize consequential errors rather than cosmetic edits.",
+    "evidence": "Source-backed fact checks, recomputed totals, marked corrections, and a final review decision."
+  },
+  {
+    "slug": "delegating",
+    "title": "Deciding what to hand over",
+    "group": "Topics · Working with a model",
+    "definition": "Choosing which work a model may perform and which decisions or actions a person retains.",
+    "example": "Split an event-organizing task into drafting, supplier comparison, booking, and payment.",
+    "nuance": "Distinguish ability from authority; reversible drafts and consequential commitments need different boundaries.",
+    "evidence": "Delegation matrix, permitted drafts, withheld transaction, and a change-of-scope approval case."
+  },
+  {
+    "slug": "trust",
+    "title": "Calibrating trust",
+    "group": "Topics · Working with a model",
+    "definition": "Calibrating reliance on a model from observed performance in a particular task and context.",
+    "example": "Track a drafting assistant across repeated event-planning tasks with varying difficulty.",
+    "nuance": "Success on routine cases does not establish reliability on unusual ones; confidence and polished language are weak evidence.",
+    "evidence": "A small labeled performance history, per-task review policy, a novel-case failure, and a justified change in oversight."
+  },
+  {
+    "slug": "graph-engineering",
+    "title": "Graph engineering",
+    "group": "Cross-cutting guides",
+    "definition": "Distinguishing graphs of information from graphs that control workflows or agent handoffs.",
+    "example": "Trace an equipment recall through a dependency graph, then process notifications through a workflow and agent review.",
+    "nuance": "An edge meaning depends on the graph; knowing a dependency does not authorize a workflow action.",
+    "evidence": "Three small linked graphs with explicit node/edge meanings and the same case followed across them."
+  },
+  {
+    "slug": "who-approves-what",
+    "title": "Who approves what",
+    "group": "Cross-cutting guides",
+    "definition": "Tracing how human decision authority changes as more work becomes automated.",
+    "example": "Follow a purchase from manually reviewed draft to bounded recurring replenishment.",
+    "nuance": "Approval must attach to a specific action or policy; a past approval cannot silently expand scope.",
+    "evidence": "An authority ladder, versioned approval records, an out-of-policy order, and an escalation decision."
+  },
+  {
+    "slug": "checking-the-work",
+    "title": "Checking the work",
+    "group": "Cross-cutting guides",
+    "definition": "Matching verification methods to the kinds of errors a system can make.",
+    "example": "Follow one wrong support answer from schema validation through evidence review and evaluation.",
+    "nuance": "A well-formed answer can still be false; multiple agreeing agents can still repeat the same error.",
+    "evidence": "Layered checks with the exact defect each detects, a remaining blind spot, and an appropriate human escalation."
+  },
+  {
+    "slug": "what-the-model-sees",
+    "title": "What the model sees",
+    "group": "Cross-cutting guides",
+    "definition": "Tracing which information reaches each model request and why it was included.",
+    "example": "Resume a support investigation after context compaction and a new conversation.",
+    "nuance": "Saved memory or files do nothing unless loaded; instructions, retrieved documents, and tool results have different roles.",
+    "evidence": "Before/after context trays, omitted evidence, restored constraints, and a corrected supported answer."
+  }
+]

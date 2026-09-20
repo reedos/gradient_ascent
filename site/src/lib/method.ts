@@ -75,7 +75,7 @@ export function methodSections(abs: (path: string) => string): MethodSection[] {
             '**Show how it works.** Concept pages include diagrams and practical examples. Stepped traces are illustrations unless explicitly backed by a recorded run; runnable examples let readers inspect the mechanics.',
             '**State the costs and the failures.** Each page lists the cost in tokens and time, the common failure modes, and how to test for them.',
             '**Stay current and say how current.** Every page and every name carries the date it was last checked. Anything not checked in 90 days is flagged.',
-            `**Build understanding gradually.** The [learning path](${abs('/learn/')}) introduces foundations, verification, and safety before tools and agents. Concept pages offer “Use it” and “Build it” reading lanes.`,
+            `**Build understanding gradually.** The [worked examples](${abs('/examples/')}) connect concepts to concrete tasks, evidence, and review decisions. Concept pages offer “Use it” and “Build it” reading lanes.`,
             '**Independent.** No rankings, no sponsorship, no affiliate links. Where several companies make something, the page names more than one.',
             '**Open.** MIT licensed. The taxonomy, the registry and the result files are served as data. Corrections are welcome.',
             '**Private data stays private.** Examples, traces and test documents are synthetic.',
@@ -142,7 +142,7 @@ export function methodSections(abs: (path: string) => string): MethodSection[] {
         {
           kind: 'p',
           text:
-            `The site is published and still being improved. Technique, topic, and recipe pages are **sourced** explanations: they provide primary references, but the label is not a guarantee that every sentence is correct. They have no recorded model run and scored result file behind them yet. A page becomes **measured** when it has both. Every cost-and-latency strip and stepped trace is an illustration, labeled as such. The [evals](${abs('/techniques/evals/')}) page describes the measurement process. The learning path adds self-check exercises and projects; completion is self-reported, not a certification.`,
+            `The site is published and still being improved. Technique, topic, and recipe pages are **sourced** explanations: they provide primary references, but the label is not a guarantee that every sentence is correct. They have no recorded model run and scored result file behind them yet. A page becomes **measured** when it has both. Every cost-and-latency strip and stepped trace is an illustration, labeled as such. The [evals](${abs('/techniques/evals/')}) page describes the measurement process. Worked examples are scripted teaching cases, not recorded model runs or certifications.`,
         },
       ],
     },

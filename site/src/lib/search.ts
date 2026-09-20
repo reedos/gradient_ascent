@@ -14,7 +14,6 @@
 // match to complete a tier sorts after every doc that did not need one, at the same tier.
 
 export type SearchKind =
-  | 'lesson'
   | 'technique'
   | 'recipe'
   | 'teardown'
@@ -59,7 +58,6 @@ export interface ScoredDoc extends SearchDoc {
 }
 
 export const KIND_ORDER: SearchKind[] = [
-  'lesson',
   'technique',
   'recipe',
   'teardown',
@@ -73,7 +71,6 @@ export const KIND_ORDER: SearchKind[] = [
 ];
 
 export const KIND_LABEL: Record<SearchKind, string> = {
-  lesson: 'Lessons',
   technique: 'Techniques and topics',
   recipe: 'Recipes',
   teardown: 'Teardowns',

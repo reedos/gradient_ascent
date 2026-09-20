@@ -86,7 +86,7 @@ test('home, search and unknown paths have no section, so no rail', () => {
 
 test('the rail shows the ladder on a level page and the group\'s own pages elsewhere', () => {
   assert.deepEqual(railItems(groups, { group: 'levels', level: 5 }).map((i) => i.level), [0, 1, 5]);
-  assert.deepEqual(railItems(groups, { group: 'practice' }).map((i) => i.path), ['/learn/', '/worksheet/', '/shapes/', '/recipes/', '/teardowns/', '/failures/']);
+  assert.deepEqual(railItems(groups, { group: 'practice' }).map((i) => i.path), ['/examples/', '/worksheet/', '/shapes/', '/recipes/', '/teardowns/', '/failures/']);
   // Techniques: the browse links only; five topics would not fit a rail and live in the menu.
   assert.deepEqual(railItems(groups, { group: 'techniques' }).map((i) => i.path), ['/techniques/', '/map/', '/threads/graph-engineering/', '/threads/a-new-thread/']);
 });

@@ -53,7 +53,7 @@ import CodeFile from '../../components/page/CodeFile.astro';
 import Cite from '../../components/page/Cite.astro';
 import Link from '../../components/page/Link.astro';
 import agentHarnessRun from '../../data/runs/agent-harness.json';
-import TestAutomationHarness from '../../components/page/TestAutomationHarness.astro';
+import DutHarnessLesson from '../../components/page/DutHarnessLesson.astro';
 
 An agent harness is everything around the model in an agent: the loop that calls it, the tool
 definitions it is shown and the code that runs them, what goes into its next request, whether an
@@ -102,7 +102,12 @@ This is a specified workflow, not a recorded implementation or hardware validati
 Simulation is not an established capability of this framework. Mocked function outputs could be
 considered later, but are not assumed here.
 
-<TestAutomationHarness />
+The walkthrough below illustrates the agent workflow with scripted responses and sample artifacts.
+It does not simulate instrument physics, execute project code, or call a model. Use **Watch it**
+to follow the task, **Change something** to explore a missing requirement or new helper, and
+**Try a decision** to check your understanding. The detailed reference follows the walkthrough.
+
+<DutHarnessLesson />
 
 ### Start with an ordinary request
 

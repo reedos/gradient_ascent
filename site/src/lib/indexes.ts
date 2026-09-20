@@ -30,6 +30,7 @@ import {
   namesForLevel,
 } from './content';
 import glossaryData from '../../../content/glossary.json';
+import { walkthroughMarkdown } from './walkthrough-markdown';
 
 // ---------------------------------------------------------------------------------------------
 // Glossary: content/glossary.json, typed and color-linked the same way content.ts links a
@@ -657,6 +658,7 @@ export function flattenMdxBody(rawBody: string, where: string): string {
   text = flattenLink(text, where);
   text = flattenCodeFile(text, where);
   text = flattenRun(text, where);
+  text = replaceAllTags(text, 'DutHarnessLesson', () => '\n**Guided walkthrough:** Follow the DUT project through context, plan, approval, generation, non-hardware checks, and human handoff. Change a missing requirement or new-helper condition, then decide whether a new helper needs separate approval. Responses and check results are scripted illustrations, not model calls or executed validation.\n', where);
   text = replaceAllTags(text, 'TestAutomationHarness', () => '\n**Architecture:** User supplies reusable CLAUDE.md instructions and a DUT-specific DUT_BRIEF.md, plus access to framework documentation, source, past projects, and a template → agent asks questions and drafts PROJECT_PLAN.md → user approval → agent produces Python files, YAML/JSON configuration, Markdown documentation including PROJECT_STATUS.md, and non-hardware check results → user reviews and tests on real instruments → logs and observations return to the agent for revision and status updates. Brief, plan, and status filenames are example conventions. Permissions are configured separately from Markdown. Framework changes and new project-local tools require explicit approval; read-only framework access remains to be confirmed. Intended controls around each action: guardrails inspect proposed actions and generated files; permissions and sandboxing restrict execution; observability records edits, commands, approvals, check results, and blocked actions; stop controls bound revision work. Human review evaluates requirements, framework reuse, and approval compliance. The approved plan, relevant files, and feedback become context for the next call.\n', where);
   text = flattenFailureModes(text, where);
   text = flattenCostStrip(text, where);
@@ -698,6 +700,7 @@ export async function techniqueMarkdown(slug: string): Promise<string | undefine
   parts.push(`# ${technique.title}\n`);
   parts.push(`_${technique.levelLabel} · ${technique.status}_\n`);
   parts.push(`${technique.summary}\n`);
+  parts.push(walkthroughMarkdown(slug));
   if (entry) {
     const where = `site/src/content/techniques/${slug}.mdx`;
     parts.push(flattenMdxBody(entry.body ?? '', where));
@@ -720,6 +723,7 @@ export async function threadMarkdown(id: string): Promise<string | undefined> {
   parts.push(`# ${thread.title}\n`);
   parts.push(`_Thread · ${thread.status}_\n`);
   parts.push(`${thread.summary}\n`);
+  parts.push(walkthroughMarkdown(id));
   parts.push(`\n> ${thread.line}\n`);
   if (entry) {
     parts.push(flattenMdxBody(entry.body ?? '', `site/src/content/threads/${id}.mdx`));
