@@ -655,6 +655,8 @@ function flattenLanes(text: string, where: string): string {
 /** Flatten one technique or recipe MDX body into plain Markdown: no JSX, no HTML tags. */
 export function flattenMdxBody(rawBody: string, where: string): string {
   let text = stripImportsAndTrailingComment(rawBody);
+  // Legacy web bookmarks carry no content in the plain Markdown export.
+  text = text.replace(/^<span id="how-to-eval-it"><\/span>\s*$/gm, '');
   text = flattenCite(text);
   text = flattenLink(text, where);
   text = flattenCodeFile(text, where);
