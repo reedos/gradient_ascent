@@ -10,11 +10,11 @@
   gap: 22px;
 }
 
-.map-workspace { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; align-items: start; }
-.map-workspace:has(.map-selection:not([hidden])) { grid-template-columns: minmax(0, 1fr) 340px; }
-.map-viewport { max-height: 68vh; overflow: auto; min-width: 0; border-radius: 10px; }
+.map-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; }
+
+.map-viewport { min-width: 0; border-radius: 10px; }
 .map-viewport:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.map-workspace .map-selection { max-height: 68vh; overflow: auto; padding: 22px; }
+.map-workspace .map-selection { padding: 22px; min-width: 0; }
 .map-workspace .map-selection-links { grid-template-columns: 1fr; margin-top: 18px; }
 .map-selection-links li { border-top: 1px solid var(--line); padding-top: 14px; }
 .map-connection-heading { line-height: 1.6; }
@@ -22,7 +22,7 @@
 .map-legend { padding: 18px 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
 .map-legend .map-reading-key { margin: 0 0 14px; }
 @media (max-width: 1000px) {
-  .map-workspace:has(.map-selection:not([hidden])) { grid-template-columns: minmax(0, 1fr); }
+  .map-workspace { grid-template-columns: minmax(0, 1fr); }
   .map-workspace .map-selection { max-height: none; }
 }
 
@@ -88,64 +88,15 @@
   border-top-width: 2px;
 }
 
-/* -- The drawing: a fixed label sidebar beside a horizontally-scrolling SVG at its natural pixel
-   size. The label column is a plain sibling of the scroll box, not part of it, so it never
-   scrolls out of view; only .map-scroll gets overflow-x, per the brief ("the drawing may scroll
-   sideways inside its own overflow-x:auto box, the page body must not"). -- */
-.map-row {
-  display: flex;
-  align-items: stretch;
-  width: 100%;
-  max-width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--panel);
-  overflow: hidden;
-}
-.map-labels {
-  position: relative;
-  flex: 0 0 132px;
-  background: var(--panel2);
-  border-right: 1px solid var(--line);
-}
-.map-band-label {
-  position: absolute;
-  left: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 2px;
-  padding: 0 12px;
-  border-top: 1px solid var(--line);
-}
-.map-band-label:first-child {
-  border-top: none;
-}
-.map-band-label[data-kind='topics'] {
-  border-top-style: dashed;
-}
-.map-band-num {
-  font: 700 10px var(--font);
-  color: var(--c);
-  letter-spacing: 0.5px;
-}
-.map-band-title {
-  font-size: 10.5px;
-  color: var(--muted);
-  line-height: 1.35;
-}
+/* The SVG scales its nodes, band labels, and connections together to fit. */
+.map-row { width: 100%; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+.map-scroll { min-width: 0; }
+.map-svg { display: block; width: 100%; height: auto; max-height: 72svh; }
+.map-band-heading text { font: 600 10px var(--font); }
+.map-selection-empty { color: var(--muted); font-size: 14px; line-height: 1.7; padding: 22px; }
+.map-selection-empty h3 { color: var(--text); font-size: 20px; margin-bottom: 10px; }
+.map-workspace:has(.map-selection:not([hidden])) .map-selection-empty { display: none; }
 
-.map-scroll {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  background: var(--bg);
-}
-.map-svg {
-  display: block;
-}
 .map-row-rule {
   stroke: var(--line);
   stroke-width: 1;
@@ -310,79 +261,4 @@
   line-height: 1.65;
 }
 
-/* -- The full graph as text, grouped by level: the phone experience and the screen-reader
-   fallback both live here, not only in the drawing above. -- */
-.map-edge-list {
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-}
-.map-band-group h3 {
-  display: flex;
-  align-items: center;
-  font: 600 11px var(--font);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--text);
-  margin: 0 0 9px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--line);
-}
-.map-band-pages {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.85;
-  margin: 0 0 12px;
-}
-.map-band-pages a {
-  color: var(--text);
-}
-.map-band-pages a:hover {
-  color: var(--accent);
-}
-.map-edge-items {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-}
-.map-edge-items li {
-  font-size: 13px;
-  color: var(--text);
-  line-height: 1.7;
-  padding-bottom: 9px;
-  border-bottom: 1px solid var(--line);
-}
-.map-edge-items li:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-.map-edge-items a {
-  color: var(--accent);
-}
-.map-rel-label {
-  color: var(--muted);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-}
-.map-edge-items small {
-  display: block;
-  color: var(--muted);
-  font-size: 11.5px;
-  margin-top: 3px;
-}
-
-@media (max-width: 600px) {
-  .map-labels {
-    flex-basis: 92px;
-  }
-  .map-band-title {
-    font-size: 9.5px;
-  }
-  .map-legend-list {
-    grid-template-columns: 1fr;
-  }
-}
+@media (max-width: 600px) { .map-legend-list { grid-template-columns: 1fr; } }
