@@ -65,7 +65,7 @@ const homeRecipes = HOME_RECIPES.map((slug) => {
         eight levels by how much the model decides for itself.
       </p>
       <div class="hero-actions">
-        <a class="button" href={url('/examples/')}>Explore worked examples <span aria-hidden="true">&rarr;</span></a>
+        <a class="button" href={url('/apply/')}>Use this site with your AI <span aria-hidden="true">&rarr;</span></a>
         <a class="text-link" href="#levels">Browse the levels <span aria-hidden="true">&rarr;</span></a>
         <a class="text-link" href={url('/map/')}>Explore the map <span aria-hidden="true">&rarr;</span></a>
       </div>
@@ -87,6 +87,11 @@ const homeRecipes = HOME_RECIPES.map((slug) => {
     </div>
   </section>
 
+  <section class="section" id="apply-your-project">
+    <SectionTop eyebrow="From concept to your project" title="Bring your task. Let your model help choose the approach." aside="Describe what you need, then give your own model a brief or point it directly to the reference guide." />
+    <p>Ask it to compare existing tools, fixed workflows, and agents—including coding agents that build tools and then use them. Get a recommendation grounded in your constraints, with reasons, implementation steps, and ways to check the result.</p>
+    <div class="hero-actions"><a class="button" href={url('/apply/')}>Create your project brief &rarr;</a><a class="text-link" href={url('/agents.md')}>Reference guide for your model</a><a class="text-link" href={url('/examples/')}>Explore worked examples</a></div>
+  </section>
   <MapPreview />
 
   <section class="section" id="climb">

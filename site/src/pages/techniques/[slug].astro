@@ -2,6 +2,7 @@
 import { usDate } from '../../lib/dates';
 import { getEntry, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import ApplyConcept from '../../components/ApplyConcept.astro';
 import PageContents from '../../components/PageContents.astro';
 import Eyebrow from '../../components/Eyebrow.astro';
 import Pill from '../../components/Pill.astro';
@@ -122,6 +123,7 @@ const nameGroups = [
   <PageContents items={[
     { id: 'concept-overview', label: 'The idea' },
     { id: 'guided-example', label: 'Guided example' },
+    { id: 'apply-to-project', label: 'Apply to your project' },
     ...(Content ? [{ id: 'practical-guidance', label: 'Practical guidance' }] : []),
     ...(relationBlocks.length ? [{ id: 'concept-connections', label: 'How it connects' }] : []),
     { id: 'product-examples', label: 'Products and tools' },
@@ -151,6 +153,8 @@ const nameGroups = [
       </section>
     )
   }
+
+  <ApplyConcept slug={slug!} title={technique.title} kind="techniques" />
 
   {
     Content ? (

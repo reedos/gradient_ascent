@@ -165,7 +165,7 @@ class LlmsTxtTests(unittest.TestCase):
 
     def test_every_technique_and_topic_listed_exactly_once(self) -> None:
         for slug in self._technique_slugs():
-            hits = len(re.findall(rf"\(https?://[^)]*?/techniques/{re.escape(slug)}/\)", self.text))
+            hits = len(re.findall(rf"\(https?://[^)]*?/techniques/{re.escape(slug)}\.md\)", self.text))
             self.assertEqual(hits, 1, f"technique/topic {slug!r} listed {hits} times in llms.txt, expected exactly 1")
 
     def test_every_recipe_listed_exactly_once(self) -> None:

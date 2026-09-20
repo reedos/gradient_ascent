@@ -64,6 +64,31 @@ For a worked example using an established engineering framework, see
 It follows an English request through project structure, existing instrument drivers, unit conversion,
 CSV output, plan approval, non-hardware checks, and user-led hardware testing.
 
+## Build tools, then use them
+
+A coding agent can help accomplish a task by creating or adapting a tool and then using it.
+For example, to prepare a weekly project report, it could reuse existing connectors, write a
+small collector for a missing source, validate the combined records, and run a report generator.
+The deliverables are both the report draft and reusable tools, with evidence of what was checked.
+This is an illustrative design pattern, not a claim that custom code is always the best choice.
+
+The loop is **inspect existing capabilities → propose a tool or adaptation → obtain required
+approval → build and test → execute within permissions → inspect the output → revise or hand off**.
+A successful command is not enough: check source coverage, missing records, calculations, and the
+result against the actual task. Generated code needs review; shared frameworks and external
+systems remain subject to the same boundaries as any other action.
+
+Distinguish **building the tool** from **running the finished tool**. The agent may choose its
+own actions during development, while the resulting collector or report generator later runs
+as ordinary software without a model. Keep an agent in the recurring process only where its
+judgment or adaptation is useful. Compare development and maintenance effort with using an
+existing product or a fixed workflow.
+
+This pattern connects <Link href="/techniques/code-execution/">code execution</Link>,
+<Link href="/techniques/function-calling/">tool calls</Link>,
+<Link href="/techniques/agent-harness/">the agent harness</Link>, and
+<Link href="/techniques/human-in-the-loop/">human approval</Link>.
+
 <Run data={codingAgentsRun} label="Level 5 · Coding agents" runKey="coding-agents" />
 
 <Lanes>

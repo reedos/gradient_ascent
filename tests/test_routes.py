@@ -44,6 +44,7 @@ FENCE_RE = re.compile(r"```[\s\S]*?```")
 # principles are cited from other pages, and it now renders from site/src/lib/method.ts with a
 # twin at /method.md the same way /agents/ and /shapes/ do.
 NO_TWIN = {
+    "apply",
     "",  # the home page
     "examples",
     "failures",

@@ -1,0 +1,17 @@
+---
+import { url } from '../lib/url';
+interface Props { slug: string; title: string; kind?: 'techniques' | 'threads' }
+const { slug, title, kind = 'techniques' } = Astro.props;
+---
+<section class="apply-concept" id="apply-to-project">
+  <div><h2>Apply this to your project</h2><p>Describe your task to your own model and use {title} as a reference. Ask whether it fits, what simpler alternatives exist, and how you would implement and check the result.</p></div>
+  <div class="apply-links"><a class="button" href={url(`/apply/?concept=${encodeURIComponent(slug)}`)}>Create a project brief &rarr;</a><a href={url(`/${kind}/${slug}.md`)} download>Download this concept as Markdown</a><a href={url('/agents.md')}>Reference guide for your model</a></div>
+</section>
+<style>
+  .apply-concept { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:28px; padding:28px; margin:32px 0; border:1px solid var(--line); border-radius:12px; background:var(--panel) }
+  h2 { font-size:25px; margin-bottom:12px }
+  p { color:var(--muted); max-width:80ch }
+  .apply-links { display:flex; flex-direction:column; align-items:start; gap:12px; font-size:13px }
+  a:not(.button) { color:var(--accent) }
+  @media(max-width:1100px) { .apply-concept { grid-template-columns:1fr } }
+</style>

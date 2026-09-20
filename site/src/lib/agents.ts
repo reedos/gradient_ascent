@@ -1,3 +1,4 @@
+import { recommendationInstructions } from './project-brief.ts';
 // The site for a reader's own AI agent. A person describes a job, points their agent here, and the
 // agent recommends the simplest way to do it and says why. Everything an agent needs for that is
 // built in this module from the same data the human pages use, as three things:
@@ -129,6 +130,7 @@ export function agentFiles(abs: (p: string) => string): { path: string; url: str
   const f = (path: string, what: string) => ({ path, url: abs(path), what });
   return [
     f('/agents.md', 'This guide: how to turn a person’s job into a recommendation.'),
+    f('/project-brief.md', 'Reusable project brief template and recommendation requirements; fill unknowns with questions.'),
     f('/worksheet.md', 'The decision tree as text: seven questions that settle the level, four that change the advice.'),
     f('/shapes.md', 'The kinds of job, by the shape of the work and not its subject: how to recognize each, where it usually settles, what moves it lower or higher, and jobs from other fields with the same shape.'),
     f('/method.md', 'Why the site exists, its ten principles, how a level is defined, how a name is checked, and what the registry is not. Other pages cite it.'),
@@ -170,7 +172,7 @@ export function agentGuide(input: GuideInput): Block[] {
         `It holds ${counts.techniques} techniques and ${counts.topics} topics that run across every level, which together are the ${counts.techniques + counts.topics} pages under \`/techniques/\`; ` +
         `${counts.threads} threads, each following one question up the ladder; ${counts.recipes} recipes (whole jobs built from techniques); ${counts.teardowns} teardowns of products people already use; ` +
         `a registry of ${counts.names} named models, products and tools; and ${counts.terms} glossary terms. ` +
-        `Every technique, topic, thread, recipe, teardown and level page has a Markdown twin at the same address with \`.md\` appended. The index and tool pages do not: read \`/llms.txt\` instead of \`/examples/\`, \`/techniques/\`, \`/recipes/\`, \`/teardowns/\`, \`/glossary/\`, \`/failures/\`, \`/map/\`, \`/names/\`, \`/timeline/\`, \`/search/\` and the home page.`,
+        `Every technique, topic, thread, recipe, teardown and level page has a Markdown twin at the same address with \`.md\` appended. The index and tool pages do not: read \`/llms.txt\` instead of \`/apply/\`, \`/examples/\`, \`/techniques/\`, \`/recipes/\`, \`/teardowns/\`, \`/glossary/\`, \`/failures/\`, \`/map/\`, \`/names/\`, \`/timeline/\`, \`/search/\` and the home page.`,
     },
     { kind: 'ul', items: ladder },
     {
@@ -179,6 +181,10 @@ export function agentGuide(input: GuideInput): Block[] {
         'The rule the whole site is built on: **recommend the lowest level that does the job.** Each level up adds capability, and also cost, delay and new ways to fail. ' +
         'A person who asks for an agent often needs a workflow, and a person who asks for a workflow sometimes needs a lookup table. Saying so is the most useful thing you can do for them.',
     },
+    { kind: 'h2', text: 'Project briefs and recommendation requirements' },
+    { kind: 'p', text: `A reader can prepare a brief at ${abs('/apply/')} or provide their task directly. You can fetch the reusable template at ${abs('/project-brief.md')} yourself. Do not require a completed form before helping. If you cannot retrieve references, disclose that and ask for the relevant Markdown pages or export; do not claim to have read inaccessible material.` },
+    { kind: 'ol', items: recommendationInstructions },
+    { kind: 'p', text: 'Build tools, then use them is a practical pattern under coding agents, not a separate mandatory level. Distinguish a model choosing actions during tool development from the resulting deterministic tool running later. The level of the recurring system can differ from the level used to create it. A recipe’s needs_level field describes the illustrated design, not a universal requirement for every task with the same name.' },
     { kind: 'h2', text: 'What to do' },
     {
       kind: 'ol',

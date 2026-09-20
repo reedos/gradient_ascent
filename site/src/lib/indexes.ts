@@ -642,7 +642,7 @@ function flattenLanes(text: string, where: string): string {
     'Lane',
     (m) => {
       const attrs = parseAttrs(m.attrsRaw);
-      const title = attrString(attrs, 'title') ?? attrString(attrs, 'name') ?? 'Lane';
+      const title = attrString(attrs, 'name') === 'build' ? 'Implementation details' : 'Practical guidance';
       const inner = (m.inner ?? '').trim();
       return `\n## ${title}\n\n${inner}\n`;
     },

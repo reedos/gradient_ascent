@@ -17,6 +17,7 @@ export const GET: APIRoute = async ({ site }) => {
   const lines: string[] = [];
 
   lines.push('# Gradient Ascent');
+  lines.push(`Project brief builder: ${abs('/apply/')} — copy or download a brief for your own model. Blank template: ${abs('/project-brief.md')}.`);
   lines.push('');
   lines.push(`Worked examples: ${abs('/examples/')} — 98 authored, scripted cases with evidence, changed conditions, and review decisions.`);
   lines.push(
@@ -58,7 +59,7 @@ export const GET: APIRoute = async ({ site }) => {
   lines.push('## Techniques by level');
   for (const tier of levels) {
     for (const p of tier.pages) {
-      lines.push(`- [${p.title}](${abs(`/techniques/${p.slug}/`)}): ${p.summary}`);
+      lines.push(`- [${p.title}](${abs(`/techniques/${p.slug}.md`)}): ${p.summary}`);
     }
   }
   lines.push('');
@@ -66,23 +67,23 @@ export const GET: APIRoute = async ({ site }) => {
   lines.push('## Topics');
   lines.push(`- [Topics at every level](${abs('/levels/tracks/')}): Five topics that apply whichever level you use.`);
   for (const track of tracks) {
-    lines.push(`- [${track.title}](${abs(`/techniques/${track.id}/`)}): ${track.summary}`);
+    lines.push(`- [${track.title}](${abs(`/techniques/${track.id}.md`)}): ${track.summary}`);
     for (const p of track.pages ?? []) {
-      lines.push(`- [${p.title}](${abs(`/techniques/${p.slug}/`)}): ${p.summary}`);
+      lines.push(`- [${p.title}](${abs(`/techniques/${p.slug}.md`)}): ${p.summary}`);
     }
   }
   lines.push('');
 
   lines.push('## Threads');
   for (const thread of taxonomy.threads) {
-    lines.push(`- [${thread.title}](${abs(`/threads/${thread.id}/`)}): ${thread.summary} ${thread.line}`);
+    lines.push(`- [${thread.title}](${abs(`/threads/${thread.id}.md`)}): ${thread.summary} ${thread.line}`);
   }
   lines.push('');
 
   lines.push('## Recipes');
   for (const r of recipes) {
     const lv = recipeLevels(r);
-    const highest = lv.length ? ` (needs level ${Math.max(...lv)})` : '';
+    const highest = lv.length ? ` (this example uses level ${Math.max(...lv)})` : '';
     lines.push(`- [${r.title}](${abs(`/recipes/${r.slug}/`)}): ${r.summary}${highest}`);
   }
   lines.push('');
