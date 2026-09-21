@@ -76,3 +76,10 @@ test('the real snapshot is well formed, dated and credited', () => {
   }
   assert.ok(frontier(snap.points).length >= 5);
 });
+
+test('priority callouts preserve genuine records even near the latest label, without promoting other models', () => {
+  const points = [p('first', '2023-01-01', 100), p('ordinary', '2024-01-01', 120), p('priority', '2024-01-02', 130), p('not a record', '2024-01-03', 125), p('latest', '2024-01-04', 140)];
+  const s = makeScale(points, {startISO:'2023-01-01', endISO:'2024-02-01', width:440, height:370, pad:{l:38,r:14,t:36,b:78}});
+  const named = labeledFrontier(s, frontier(points), 125, ['priority', 'not a record']);
+  assert.deepEqual(named.map(p => p.name), ['first', 'priority', 'latest']);
+});

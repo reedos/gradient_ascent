@@ -112,17 +112,21 @@ export function frontierPath(s: Scale, front: CapabilityPoint[], endISO: string)
  * it sits at least `minGap` SVG units to the right of the last kept one; the first and the last
  * are always kept. Deterministic.
  */
-export function labeledFrontier(s: Scale, front: CapabilityPoint[], minGap: number): CapabilityPoint[] {
+export function labeledFrontier(s: Scale, front: CapabilityPoint[], minGap: number, priorityNames: string[] = []): CapabilityPoint[] {
   if (front.length <= 2) return [...front];
+  // Editorial callouts must still be actual record holders. Nearby ordinary names yield
+  // space; close priority/end labels need separate vertical positions in the chart.
+  const priority = front.filter(p => priorityNames.includes(p.name));
   const keep: CapabilityPoint[] = [front[0]];
   const lastX = sx(s, yearOf(front[front.length - 1].date));
   for (let i = 1; i < front.length - 1; i++) {
     const x = sx(s, yearOf(front[i].date));
     const prev = sx(s, yearOf(keep[keep.length - 1].date));
-    if (x - prev >= minGap && lastX - x >= minGap) keep.push(front[i]);
+    if (x - prev >= minGap && lastX - x >= minGap &&
+        !priority.some(p => Math.abs(sx(s, yearOf(p.date)) - x) < minGap)) keep.push(front[i]);
   }
   keep.push(front[front.length - 1]);
-  return keep;
+  return [...new Set([...keep, ...priority])].sort((a,b) => a.date.localeCompare(b.date));
 }
 
 export interface FrontierChange {

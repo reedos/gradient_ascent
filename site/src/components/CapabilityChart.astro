@@ -1,7 +1,7 @@
 ---
 // Epoch AI's Epoch Capabilities Index by model release date, the frontier over it, and this
 // site's level dates and the reasoning-models shift marked against it. Static SVG built at build
-// time from content/capability.json (scripts/import_eci.py refreshes it). No client JavaScript.
+// time from content/capability.json (scripts/import_eci.py refreshes it). A small script selects records.
 //
 // The scores are Epoch's, reused under CC BY 4.0 and credited under the chart. This site draws
 // them, draws their running maximum, and does one subtraction for the caption, labeled as its own.
@@ -31,7 +31,7 @@ const START = '2022-10-01';
 const scale = makeScale(snap.points, { startISO: START, endISO: asOf, width: W, height: H, pad: { l: 44, r: 18, t: 30, b: 112 } });
 const front = frontier(snap.points);
 const path = frontierPath(scale, front, asOf);
-const named = labeledFrontier(scale, front, 92);
+const named = labeledFrontier(scale, front, 92, ['Claude 3 Opus', 'Claude Fable 5']);
 const r1 = (n: number) => Math.round(n * 10) / 10;
 
 const yTicks: number[] = [];
@@ -69,6 +69,8 @@ const before = reasoningM ? frontierChange(front, gpt4.date, dayBefore(reasoning
 const after = reasoningM ? frontierChange(front, dayBefore(reasoningM.date), asOf) : null;
 const top = front[front.length - 1];
 const longDate = (iso: string) => formatDate(iso, 'day');
+const initialRecord = Math.max(0, front.findIndex(p => p.name === 'Claude Fable 5'));
+const recordDetails = front.map((p, i) => `${p.org ?? 'Unknown maker'} · ECI ${p.eci} · Highest score ${longDate(p.date)}–${longDate(front[i+1] ? dayBefore(front[i+1].date) : snap.retrieved)}`);
 // Mobile gets its own plot coordinates, not a scaled-down copy of desktop's tiny labels.
 const mobileScale = makeScale(snap.points, { startISO: START, endISO: asOf, width: 440, height: 370, pad: { l: 38, r: 14, t: 36, b: 78 } });
 const mobileMarks = levelMarks.map(m => ({ ...m, x: r1(sx(mobileScale, yearOf(m.date))), row: 0 }));
@@ -81,14 +83,14 @@ for (const m of [...mobileMarks].sort((a,b)=>a.x-b.x)) {
 }
 const charts = [
   {mobile:false, W, H, scale, path, named, levelMarks, shiftX, suffix:''},
-  {mobile:true, W:440, H:370, scale:mobileScale, path:frontierPath(mobileScale,front,asOf), named:labeledFrontier(mobileScale,front,125), levelMarks:mobileMarks, shiftX:reasoningM?r1(sx(mobileScale,yearOf(reasoningM.date))):undefined, suffix:'-mobile'},
+  {mobile:true, W:440, H:370, scale:mobileScale, path:frontierPath(mobileScale,front,asOf), named:labeledFrontier(mobileScale,front,125,['Claude Fable 5']), levelMarks:mobileMarks, shiftX:reasoningM?r1(sx(mobileScale,yearOf(reasoningM.date))):undefined, suffix:'-mobile'},
 ];
 ---
 
 <figure class="cap">
   <div class="cap-scroll">
     {charts.map(({mobile,W,H,scale,path,named,levelMarks,shiftX,suffix}) => (
-    <svg class:list={['cap-svg', mobile ? 'cap-svg-mobile' : 'cap-svg-desktop']} viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby={`cap-title${suffix} cap-desc${suffix}`}>
+    <svg class:list={['cap-svg', mobile ? 'cap-svg-mobile' : 'cap-svg-desktop']} viewBox={`0 0 ${W} ${H}`} role="group" aria-labelledby={`cap-title${suffix} cap-desc${suffix}`}>
       <title id={`cap-title${suffix}`}>Epoch Capabilities Index by model release date, {Math.ceil(scale.x0)} to {usDate(asOf)}</title>
       <desc id={`cap-desc${suffix}`}>
         {snap.points.length} models scored by Epoch AI, plotted by release date. A stepped line follows the best score to date, from {front[0].eci} to {top.eci}. Markers under the axis show selected milestones for this site's levels, and a vertical line marks the first reasoning model.
@@ -132,14 +134,23 @@ const charts = [
       </g>
 
       <path class="cap-frontier" d={path} stroke={`url(#cap-grad${suffix})`} fill="none" />
-      {front.map((p) => (
+      {front.map((p, i) => (
+        <g class="cap-record" role="button" tabindex="0" data-record-index={i} aria-pressed={i === initialRecord ? 'true' : 'false'} aria-label={`${p.name}, ECI ${p.eci}. Show record details`}>
+        <circle class="cap-record-hit" cx={r1(sx(scale, yearOf(p.date)))} cy={r1(sy(scale, p.eci))} r="12" />
         <circle class="cap-front-dot" cx={r1(sx(scale, yearOf(p.date)))} cy={r1(sy(scale, p.eci))} r="3.4">
           <title>{`New high: ${p.name}${p.org ? `, ${p.org}` : ''} · ${p.eci} · ${usDate(p.date)}`}</title>
         </circle>
+        </g>
       ))}
-      {named.map((p,i) => (
-        <text class="cap-name" x={r1(sx(scale, yearOf(p.date))) + (mobile && i===0 ? 6 : -6)} y={r1(sy(scale, p.eci)) - 8} text-anchor={mobile && i===0?'start':'end'}>{p.name.replace(/ \(.*\)$/, '')}</text>
-      ))}
+      {named.map((p,i) => {
+        const x = r1(sx(scale, yearOf(p.date)));
+        const y = r1(sy(scale, p.eci));
+        const below = p.name === 'Claude Fable 5';
+        return <g class="cap-callout">
+          {below && <line class="cap-label-leader" x1={x} x2={x-6} y1={y+7} y2={y+24} />}
+          <text class="cap-name" x={x + (mobile && i===0 ? 6 : -6)} y={y + (below ? 38 : -8)} text-anchor={mobile && i===0?'start':'end'}>{p.name.replace(/ \(.*\)$/, '')}</text>
+        </g>;
+      })}
 
       {levelMarks.map((m) => (
         <a href={url(`/levels/${m.level}/`)} class="cap-level" style={`--c:var(--o${m.level})`} aria-label={`Level ${m.level}, ${m.title}: ${m.product}, ${longDate(m.date)}`}>
@@ -160,12 +171,21 @@ const charts = [
     <li><span class="cap-key is-line" /> Best score to date</li>
     <li><span class="cap-key is-level" /> A selected milestone for a level</li>
   </ul>
+  <div class="cap-inspector">
+    <label>Explore a record
+      <select class="cap-record-select" aria-label="Explore a capability record">
+        {front.map((p,i) => <option value={i} selected={i === initialRecord} data-detail={recordDetails[i]}>{p.name}</option>)}
+      </select>
+    </label>
+    <p class="cap-record-detail" aria-live="polite">{recordDetails[initialRecord]}</p>
+  </div>
 
   <figcaption>
     <p>
       {snap.what_it_is.replace(/^The Epoch Capabilities Index \(ECI\)/, 'Epoch AI’s Capabilities Index')} Epoch adds that
       “Absolute ECI values are meaningless by themselves, but meaningful comparisons can be made between models.”
       So read the shape, not the numbers.
+      Record periods are reconstructed from this snapshot’s scores and release dates, not historical leaderboard snapshots. Highest ECI does not mean best at every task.
     </p>
     {before && after && reasoningM && (
       <p>
@@ -197,3 +217,26 @@ const charts = [
     </p>
   </figcaption>
 </figure>
+<script>
+  document.querySelectorAll<HTMLElement>('.cap').forEach(chart => {
+    const select = chart.querySelector<HTMLSelectElement>('.cap-record-select');
+    const detail = chart.querySelector<HTMLElement>('.cap-record-detail');
+    if (!select || !detail) return;
+    const records = chart.querySelectorAll<SVGGElement>('[data-record-index]');
+    const show = (index: string) => {
+      select.value = index;
+      detail.textContent = select.selectedOptions[0]?.dataset.detail ?? '';
+      records.forEach(record => record.setAttribute('aria-pressed', String(record.dataset.recordIndex === index)));
+    };
+    select.addEventListener('change', () => show(select.value));
+    records.forEach(record => {
+      record.addEventListener('click', () => show(record.dataset.recordIndex!));
+      record.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          show(record.dataset.recordIndex!);
+        }
+      });
+    });
+  });
+</script>

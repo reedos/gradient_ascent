@@ -12,6 +12,16 @@
 .cap-dot.is-open { fill: var(--panel); stroke: var(--muted); stroke-width: 1.1; opacity: .75 }
 .cap-frontier { stroke-width: 2.2; stroke-linejoin: round }
 .cap-front-dot { fill: var(--text) }
+.cap-record { cursor: pointer; outline: none }
+.cap-record-hit { fill: transparent }
+.cap-record:hover .cap-record-hit, .cap-record:focus-visible .cap-record-hit, .cap-record[aria-pressed="true"] .cap-record-hit { stroke: var(--accent); stroke-width: 1.5; fill: var(--panel); fill-opacity: .35 }
+.cap-callout { pointer-events: none }
+.cap-label-leader { stroke: var(--muted); stroke-width: 1 }
+.cap-inspector { margin-top: 14px; display: flex; align-items: center; gap: 18px; border-top: 1px solid var(--line); padding-top: 12px }
+.cap-inspector label { display: grid; gap: 5px; flex-shrink: 0; font-size: 11px; color: var(--muted) }
+.cap-record-select { max-width: 100%; padding: 7px 28px 7px 9px; background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 6px; font: 500 13px var(--font) }
+.cap-record-select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.cap-record-detail { font-size: 12px; line-height: 1.6; color: var(--muted) }
 .cap-name { fill: var(--text); font: 500 10.5px var(--font); paint-order: stroke; stroke: var(--panel); stroke-width: 4px; stroke-linejoin: round }
 .cap-shift { stroke: var(--text); stroke-width: 1; opacity: .35 }
 .cap-shift-label { fill: var(--text); font: 500 10.5px var(--font) }
@@ -51,6 +61,9 @@
   .cap-legend li { align-items: flex-start; line-height: 1.5; }
   .cap-key { flex-shrink: 0; margin-top: 3px; }
   .cap-key.is-line { margin-top: 7px; }
+  .cap-inspector { display: grid; gap: 8px; }
+  .cap-inspector label { grid-template-columns: auto 1fr; align-items: center; gap: 10px; }
+  .cap-record-select { min-width: 0; }
   #capability .section-top { gap: 12px; margin-bottom: 18px; }
   #capability .section-top h2 { font-size: 25px; line-height: 1.25; }
   #capability .section-top > p { font-size: 12px; line-height: 1.6; }
