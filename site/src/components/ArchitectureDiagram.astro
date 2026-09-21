@@ -1,0 +1,33 @@
+---
+import { architectures, edgeGeometry } from '../lib/architecture-models';
+interface Props { slug:string; color:string }
+const {slug,color}=Astro.props;
+const d=architectures[slug];
+const height=Math.max(...d.nodes.map(n=>n.y))+145;
+const wrap=(text:string,limit:number)=>{const lines:string[]=[];for(const word of text.split(' ')){if(!lines.length||lines[lines.length-1].length+word.length+1>limit)lines.push(word);else lines[lines.length-1]+=' '+word;}return lines;};
+---
+<figure class="architecture" style={`--diagram-color:${color}`} aria-labelledby={`architecture-${slug}`}>
+  <header><p class="eyebrow">How it works · conceptual architecture</p><h2 id={`architecture-${slug}`}>{d.title}</h2><p>{d.subtitle}</p></header>
+  <div class="architecture-legend">{d.edges.some(e=>!e.kind)&&<span><i></i>Step / condition</span>}{d.edges.some(e=>e.kind==='data')&&<span><i class="data"></i>Information / relationship</span>}{d.edges.some(e=>e.kind==='return')&&<span><i class="return"></i>Return / repeat</span>}{d.nodes.some(n=>n.kind==='model')&&<span class="model-key">Highlighted box: model</span>}</div>
+  <svg class="architecture-wide" viewBox={`0 0 980 ${height}`} role="img" aria-labelledby={`architecture-${slug}-title architecture-${slug}-desc`}>
+    <title id={`architecture-${slug}-title`}>{d.title}</title>
+    <desc id={`architecture-${slug}-desc`}>{d.edges.map(e=>`${d.nodes[e.from].title} → ${e.label} → ${d.nodes[e.to].title}.`).join(' ')}</desc>
+    <defs><marker id={`arch-arrow-${slug}`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="currentColor" stroke-width="1.6" /></marker></defs>
+    {d.edges.map(e=>{const g=edgeGeometry(d.nodes[e.from],d.nodes[e.to],e);return <g class:list={['arch-edge',e.kind]}><path d={g.path} marker-end={`url(#arch-arrow-${slug})`}/><text x={g.x} y={g.y} text-anchor="middle" transform={g.vertical?`rotate(90 ${g.x} ${g.y})`:undefined}>{e.label}</text></g>;})}
+    {d.nodes.map((n,i)=><g class:list={['arch-node',n.kind]} transform={`translate(${n.x},${n.y})`}><rect width="246" height="86" rx="12"/><text class="arch-number" x="14" y="22">{String.fromCharCode(65+i)}</text><text class="arch-title" x="35" y="29">{n.title}</text><text class="arch-detail" x="35" y="51">{wrap(n.detail,30).map((line,j)=><tspan x="35" dy={j?17:0}>{line}</tspan>)}</text></g>)}
+  </svg>
+  <div class="architecture-mobile" aria-label="Architecture in reading order">
+    {d.nodes.map((n,i)=><div class:list={['mobile-node',n.kind]}><span>{String.fromCharCode(65+i)}</span><div><strong>{n.title}</strong><p>{n.detail}</p><ul>{d.edges.filter(e=>e.from===i).map(e=><li>{e.label} <b aria-hidden="true">→</b> <b>{String.fromCharCode(65+e.to)} · {d.nodes[e.to].title}</b></li>)}</ul></div></div>)}
+  </div>
+  <figcaption>{d.distinction}</figcaption>
+  <details class="architecture-notes"><summary>The details that change the design</summary><div>{d.checks.map(([title,body])=><section><h3>{title}</h3><p>{body}</p></section>)}</div></details>
+</figure>
+<style>
+ .architecture{--diagram-color:var(--accent);margin:0 0 36px;border:1px solid var(--line);border-radius:18px;background:var(--panel);overflow:hidden}
+ header{padding:28px 30px 0}header .eyebrow{color:var(--diagram-color);font-size:10px}h2{font-size:clamp(22px,2.7vw,30px);line-height:1.22;letter-spacing:-.7px;margin:10px 0}header>p:last-child{color:var(--muted);font-size:15px;line-height:1.65;max-width:760px}
+ .architecture-legend{display:flex;flex-wrap:wrap;gap:12px 22px;padding:22px 30px 10px;font-size:11px;color:var(--muted)}.architecture-legend span{display:flex;align-items:center;gap:8px}.architecture-legend i{display:inline-block;width:20px;border-top:2px solid var(--diagram-color)}.architecture-legend i.data{border-top-style:dashed}.architecture-legend i.return{border-top-style:dotted}.model-key{margin-left:auto}
+ svg{display:block;width:100%;height:auto;padding:10px 18px 0;color:var(--diagram-color)}.arch-edge path{fill:none;stroke:var(--diagram-color);stroke-width:1.6;opacity:.8}.arch-edge.data path{stroke-dasharray:6 4}.arch-edge.return path{stroke-dasharray:2 4}.arch-edge text{fill:var(--muted);font:11px var(--font);paint-order:stroke;stroke:var(--panel);stroke-width:5px;stroke-linejoin:round}.arch-node rect{fill:var(--panel2);stroke:var(--line-control)}.arch-node.model rect{fill:color-mix(in srgb,var(--diagram-color) 13%,var(--panel));stroke:var(--diagram-color)}.arch-node.end rect{stroke-dasharray:4 3}.arch-number{fill:var(--diagram-color);font:600 10px var(--font)}.arch-title{fill:var(--text);font:600 16px var(--font)}.arch-detail{fill:var(--muted);font:13px var(--font)}
+ figcaption{font-size:15px;line-height:1.75;padding:20px 30px;border-top:1px solid var(--line);max-width:none;color:var(--text)}.architecture-notes{border-top:1px solid var(--line)}summary{padding:18px 30px;cursor:pointer;font-size:13px;font-weight:600}.architecture-notes>div{padding:0 30px 24px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px}.architecture-notes h3{font-size:13px;margin:0 0 7px;color:var(--diagram-color)}.architecture-notes p{font-size:13px;line-height:1.75;color:var(--muted)}.architecture-mobile{display:none}
+ @media(max-width:760px){header{padding:22px 20px 0}.architecture-legend{display:none}.architecture-wide{display:none}.architecture-mobile{display:grid;gap:10px;padding:20px}.mobile-node{display:flex;gap:12px;padding:14px;background:var(--panel2);border:1px solid var(--line);border-radius:10px}.mobile-node>span{font-size:11px;color:var(--diagram-color);padding-top:3px}.mobile-node strong{font-size:15px}.mobile-node p{font-size:13px;color:var(--muted);line-height:1.6;margin:4px 0}.mobile-node ul{padding:7px 0 0;list-style:none;border-top:1px solid var(--line);margin-top:9px}.mobile-node li{font-size:11px;color:var(--muted);line-height:1.8}.mobile-node b{font-weight:500;color:var(--diagram-color)}.mobile-node.model{border-color:var(--diagram-color)}figcaption{padding:18px 20px;font-size:14px}summary{padding:18px 20px}.architecture-notes>div{padding:0 20px 20px;grid-template-columns:1fr;gap:16px}}
+ @media print{.architecture-mobile{display:none}.architecture-wide{display:block}.architecture-notes>div{display:grid}}
+</style>

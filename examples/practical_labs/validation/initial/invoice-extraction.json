@@ -1,0 +1,21 @@
+{
+  "case": "invoice-extraction",
+  "timestamp_utc": "2026-09-21T06:37:15.528293+00:00",
+  "model": "muse-glimmer:30b-q4_K_M-dflash",
+  "backend": "ollama",
+  "mode": "live",
+  "synthetic_inputs": true,
+  "trials": 1,
+  "request_metrics": [
+    {
+      "call": 1,
+      "elapsed_seconds": 2.989,
+      "usage": {
+        "prompt_eval_count": 688,
+        "eval_count": 3
+      }
+    }
+  ],
+  "status": "stopped",
+  "error": "Missing required output fields."
+}

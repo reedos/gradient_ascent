@@ -65,6 +65,7 @@ export function buildNav(levels: NavLevel[], tracks: NavTrack[], threads: NavThr
         {label:'All concepts',path:'/techniques/',hint:'Definitions, diagrams, and examples'},
         {label:'From chatbot to agent',path:'/chatbot-to-agent/',hint:'Seven steps through the basics'},
         {label:'Concept map',path:'/map/',hint:'See how ideas connect'},
+        {label:'Design decisions',path:'/design-decisions/',hint:'The distinctions that change an architecture'},
         {label:'Choose an approach',path:'/worksheet/',hint:'Explore a candidate design for your task'},
       ]},
       { heading: 'Browse by level', items: [...levels].sort((a,b)=>a.order-b.order).map(l=>({label:l.title,path:`/levels/${l.order}/`,hint:l.short,level:l.order})) },
@@ -125,7 +126,7 @@ export function navContext(path: string, levels: NavLevel[], tracks: NavTrack[])
     const at=levels.find(l=>l.slugs.includes(tech[1]));
     return at ? {group:'levels',level:at.order} : {group:'levels'};
   }
-  if (p === '/chatbot-to-agent/' || p === '/techniques/' || p.startsWith('/map/') || p.startsWith('/worksheet/')) return {group:'levels'};
+  if (p === '/design-decisions/' || p === '/chatbot-to-agent/' || p === '/techniques/' || p.startsWith('/map/') || p.startsWith('/worksheet/')) return {group:'levels'};
   if (['/examples/','/recipes/','/shapes/','/teardowns/','/threads/'].some(prefix=>p.startsWith(prefix))) return {group:'techniques'};
   if (['/apply/','/tools/','/agents/'].some(prefix=>p.startsWith(prefix))) return {group:'practice'};
   if (['/glossary/','/names/','/timeline/','/failures/','/method/','/changes/'].some(prefix=>p.startsWith(prefix))) return {group:'reference'};

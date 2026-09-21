@@ -1,0 +1,34 @@
+{
+  "case": "durable-watch",
+  "timestamp_utc": "2026-09-21T06:41:59.809800+00:00",
+  "model": "muse-glimmer:30b-q4_K_M-dflash",
+  "backend": "ollama",
+  "mode": "live",
+  "synthetic_inputs": true,
+  "trials": 1,
+  "prompt_sha256": "854e0bafd47a9892cc08a1d321c1d679161c8ddabbb8d18f4d72154b21710dfb",
+  "runner_sha256": "7cc5ead57e8e17869e380bc58b462f4ee2d0aa594abfbfa65d5338352bab1221",
+  "request_metrics": [
+    {
+      "call": 1,
+      "elapsed_seconds": 3.144,
+      "usage": {
+        "prompt_eval_count": 569,
+        "eval_count": 68
+      }
+    }
+  ],
+  "returned_objects": [
+    {
+      "event_id": "stock-006",
+      "draft": "Stock alert for event stock-006: SKU BR-17 observed at 2026-09-20T08:00:00Z. On-hand 8 is below reorder threshold 12. Incoming 0. Recommend human review before any action.",
+      "requires_review": true
+    }
+  ],
+  "status": "pending_review",
+  "output": {
+    "event_id": "stock-006",
+    "draft": "Stock alert for event stock-006: SKU BR-17 observed at 2026-09-20T08:00:00Z. On-hand 8 is below reorder threshold 12. Incoming 0. Recommend human review before any action.",
+    "requires_review": true
+  }
+}

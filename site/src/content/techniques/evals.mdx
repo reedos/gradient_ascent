@@ -33,10 +33,7 @@ import Link from '../../components/page/Link.astro';
 
 Evals are how a claim that a change made things better gets checked instead of assumed. A
 golden set is a fixed list of questions with a known right answer, or a rubric for judging one,
-run the same way before and after a change so the two runs can be compared. Grading is either
-exact (the answer must match a pattern, the way a test asserts a return value) or done by
-another model reading the answer against a rubric, for answers too open-ended to match with a
-pattern. A rubric grader is itself a model call and can be wrong, so some share of its verdicts
+run under defined conditions. It can support a comparison before and after a change, but evaluations can also grade a single run or estimate performance across a dataset. Grading can use deterministic code, people, models, or a combination. A rubric grader is itself a model call and can be wrong, so some share of its verdicts
 needs checking by a person. None of this belongs to one level: a single prompt, a fixed workflow
 and an agent that runs for hours all make claims only an eval can check.
 

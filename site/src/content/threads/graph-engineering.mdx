@@ -1,70 +1,44 @@
 ---
 id: graph-engineering
-reviewed: 2026-09-18
+reviewed: 2026-09-20
+sources:
+  - title: "Graph API overview"
+    url: "https://docs.langchain.com/oss/python/langgraph/graph-api"
+    publisher: "LangChain"
+    accessed: "2026-09-20"
 ---
 
 import Link from '../../components/page/Link.astro';
 
-"Graph engineering" is not one thing. Two kinds of graph on this site share the same underlying
-data structure (nodes and edges) but connect completely different kinds of thing, are built by
-completely different means, and sit at different levels. The confusion is reasonable: draw either
-one and you get a picture with boxes and arrows, and the picture alone does not say which you are
-looking at.
+Graphs describe connections. First ask what the connections mean: relationships between facts, or transitions between pieces of work.
 
-One kind of graph is a map of facts: entities and the relationships between them, built once, or
-rebuilt periodically, so a later question can walk from one fact to a connected one. The other
-kind is a map of a process: steps and the transitions between them, walked once per run, in
-whatever order a particular question actually needs.
-<Link href="/techniques/knowledge-graphs/">Knowledge graphs</Link> is the first kind.
-<Link href="/techniques/workflow-graphs/">Workflow graphs</Link> and
-<Link href="/techniques/agent-graphs/">agent graphs</Link> are the second kind, and differ from
-each other only in who picks the edge: your code, in advance, for a workflow graph; the model, at
-run time, for an agent graph.
+A knowledge graph is a data model. Workflow and agent graphs describe execution. An application can combine them: an agent can query a knowledge graph during a workflow step.
 
-Someone who has read only one of the three pages here usually generalizes from it. A person who
-has built a knowledge graph pictures entity extraction and a query language. A person who has
-built a supervisor pattern pictures handoffs and a checkpoint after every node. Both are right
-about the piece they have seen, and wrong to assume the other piece works the same way: the data
-structure is shared, almost nothing else is.
+## Three meanings of an arrow
 
-## Side by side
-
-| | Knowledge graphs | Workflow graphs | Agent graphs |
+| | Knowledge graph | Workflow graph | Agent graph |
 |---|---|---|---|
-| **Nodes are** | an entity: a person, a part, a place, a claim | one step of a process your code wrote in advance | an agent, not a fixed step: it brings its own tools and its own context |
-| **Edges are** | a stated relationship between two entities | a fixed rule: given this state, go here | a choice a model makes among a fixed list of named destinations |
-| **Created by** | extraction over documents: usually a model reading text and proposing entities and relationships, checked afterward | the person who designed the process, in code, before any run happens | the same code a workflow graph runs on, plus one node whose own output is the routing decision |
-| **Answers the question** | how are these things related, and what connects A to B? | what happens next, given this state: always the same answer for the same state | who should handle this next, given what the run has found so far |
-| **Level** | Level 2 · Context: your code decides to extract, and how to walk what comes back | Level 3 · Workflows: your code decides every transition in advance | Level 6 · Teams of agents: a model decides some transitions at run time |
-| **Costs to build and keep current** | extraction cost up front, and re-extraction whenever a source document changes; a graph nobody rebuilds goes stale the way an unindexed search does | cheap to write once; cheap to keep current only if the process itself does not change often | nothing to build ahead of the first run (the routing is decided live) but every run pays for the model call that decides it, and a supervisor that never converges pays for that call repeatedly |
-| **Fails by** | a missed or invented relationship, two names for one entity that never get merged, a stale edge joining two facts that used to both be true | a buggy edge function routing to the wrong node silently, or a node nothing ever reaches | a handoff to a destination outside the allowed list, or a supervisor that keeps sending work back to the same node without making progress |
+| A node represents | An entity, concept, or claim | An operation or subworkflow | An agent or another operation in a composed system |
+| An edge represents | A named relationship | An allowed transition or dependency | A handoff or another allowed transition |
+| A useful question | Which parts fit this model? | What runs after validation fails? | Which specialist handles the next subtask? |
+| What you design | Identity, relationships, provenance, updates | Steps, state contracts, branch policy, recovery | Roles, tools, context, handoffs, authority, limits |
 
-## When you want one, the other, both, or neither
+## The boundary is about control
 
-Want a knowledge graph alone when questions need facts joined across documents and nothing about
-acting on the answer is automated: a research assistant that answers from a joined chain of
-facts, with no agent deciding what to do next.
+A conditional edge is not automatically agentic. A workflow can use a model to classify an input and route to a predefined handler. An agent can choose a next action based on what it discovers. A mixed system can do both.
 
-Want a workflow graph alone when the process itself has more than one path worth drawing, but
-every branch can be written down in advance. Most processes can.
+This guide places common knowledge-graph applications at level 2, workflows at level 3, and teams at level 6. These are teaching groupings, not framework requirements. Several nodes do not necessarily make a team.
 
-Want an agent graph when a node's own output has to pick which agent handles the next part, not
-just which step runs, because the right specialist depends on what an earlier step actually
-found.
+## What the picture leaves out
 
-Want both a knowledge graph and a process graph when an agent's own next step depends on facts a
-knowledge graph is better at joining than a single retrieval step would be. An agent-graph node
-that consults a knowledge graph instead of running its own search is composing the two kinds of
-graph, not confusing them.
+**Dynamic routing still needs design.** Define destinations, handoff data, permissions, and termination behavior before allowing a model to choose between them.
 
-Want neither when a single retrieval step answers the question, or the process has one path and
-nothing to route: see <Link href="/techniques/rag/">RAG</Link> and
-<Link href="/techniques/prompt-chaining/">prompt chaining</Link> for what each of these graphs
-would otherwise be replacing.
+**Checkpointing is an implementation choice.** A graph does not inherently save after every node. Configure persistence deliberately and check the framework’s recovery semantics.
 
-None of the comparison above introduces a new sourced claim about the world. See
-<Link href="/techniques/knowledge-graphs/">knowledge graphs</Link>,
-<Link href="/techniques/workflow-graphs/">workflow graphs</Link> and
-<Link href="/techniques/agent-graphs/">agent graphs</Link> for the primary sources behind each
-mechanism described here. This page is the site's own comparison, built from what those three
-pages already establish, not a new primary source of its own.
+**Relationships need evidence.** Knowledge graphs can be authored manually, imported from structured systems, or extracted from text. Entity identity, incorrect edges, stale facts, and missing relationships still need attention.
+
+## Choose a representation for the task
+
+Use a knowledge graph when explicit relationships help answer your questions. Use a workflow graph when branches, dependencies, or recovery paths are worth making explicit. Use an agent graph when delegating decisions across agents has a concrete advantage over one agent or a fixed process.
+
+Start with <Link href="/techniques/rag/">retrieval</Link> or <Link href="/techniques/prompt-chaining/">a sequential workflow</Link> when it already meets the task. Draw exits, errors, retries, and handoffs as well as the happy path.

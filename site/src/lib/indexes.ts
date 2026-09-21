@@ -1,4 +1,6 @@
 import { dutOverview } from './dut-overview';
+import { architectures } from './architecture-models';
+import { examplesForTechnique, recipeExampleMarkdown } from './recipe-examples';
 // Shared machinery for finish-indexes' generated pages: the failure gallery, the glossary's page
 // links, the /llms.txt index, and every /*.md endpoint. Everything here reads MDX **source
 // text** at build time (the same way CodeFile.astro reads example source), rather than rendering
@@ -707,6 +709,15 @@ export async function techniqueMarkdown(slug: string): Promise<string | undefine
   parts.push(`# ${technique.title}\n`);
   parts.push(`_${technique.levelLabel} · ${technique.status}_\n`);
   parts.push(`${technique.summary}\n`);
+  const architecture=architectures[slug];
+  if(architecture){
+    parts.push(`## Conceptual architecture: ${architecture.title}\n\n${architecture.subtitle}\n`);
+    parts.push(architecture.nodes.map(n=>`- **${n.title}:** ${n.detail}`).join('\n'));
+    parts.push('\nConnections:\n'+architecture.edges.map(e=>`- ${architecture.nodes[e.from].title} → ${e.label} → ${architecture.nodes[e.to].title}`).join('\n'));
+    parts.push('\n'+architecture.distinction+'\n'+architecture.checks.map(([label,body])=>`- **${label}:** ${body}`).join('\n'));
+  }
+  const labs=examplesForTechnique(slug);
+  if(labs.length)parts.push('\n## Try this in a recipe\n'+labs.map(l=>`- [${l.title}](${url(`/recipes/${l.recipe}.md`)}): ${l.summary}`).join('\n'));
   parts.push(walkthroughMarkdown(slug));
   if (entry) {
     const where = `site/src/content/techniques/${slug}.mdx`;
@@ -758,6 +769,7 @@ export async function recipeMarkdown(slug: string): Promise<string | undefined> 
   parts.push(`# ${recipe.title}\n`);
   parts.push(`_Recipe${highest !== undefined ? ` · needs level ${highest}` : ''}_\n`);
   parts.push(`${recipe.summary}\n`);
+  parts.push(recipeExampleMarkdown(slug));
   if (entry) {
     const where = `site/src/content/recipes/${slug}.mdx`;
     parts.push(flattenMdxBody(entry.body ?? '', where));

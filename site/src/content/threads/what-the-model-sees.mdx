@@ -1,71 +1,42 @@
 ---
 id: what-the-model-sees
-reviewed: 2026-09-19
-sources: []
+reviewed: 2026-09-20
+sources:
+  - title: "Effective harnesses for long-running agents"
+    url: "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents"
+    publisher: "Anthropic"
+    accessed: "2026-09-20"
 ---
 
 import Link from '../../components/page/Link.astro';
 
-A model knows two things: what it was trained on, and what is in the request in front of it.
-Everything else a system appears to know, the document, the policy, the conversation from last
-week, the procedure for this particular task, got there because something put it there. Most of
-what the levels add is another answer to the question of what goes in, who chooses it, and when.
+For a normal inference request, a language model works from learned parameters and the supplied context. Files, past conversations, and tool results become available through the surrounding system.
 
-These six pages are that question followed from a written instruction to a note one session
-leaves for the next. They are also the pages people most often confuse with each other, because
-from the outside all six look like "the model remembered something".
+Ask what is stored, who selects it, and what is actually included now.
 
-## Six answers to one question
+## Choose information at the right boundary
 
-| Level | Page | What goes in | Who chooses it, and when |
-|---|---|---|---|
-| 1 | <Link href="/techniques/prompt-engineering/">Prompt engineering</Link> | the instruction itself, written to get a consistent result | you, once, before any run |
-| 2 | <Link href="/techniques/context-engineering/">Context engineering</Link> | the whole request: which instructions, which examples, which documents, how much of the conversation | your code, on every call |
-| 2 | <Link href="/techniques/rag/">RAG</Link> | passages found by searching your documents for this question | a retrieval step your code runs before the call |
-| 2 | <Link href="/techniques/memory/">Memory</Link> | facts written down in an earlier conversation and read back into a later one | your code, by writing on the way out and reading on the way in |
-| 5 | <Link href="/techniques/skills/">Skills</Link> | a procedure kept on the shelf until it is needed | the agent, which loads a skill's body when the task triggers it |
-| 7 | <Link href="/techniques/long-horizon/">Long-running tasks</Link> | a written record a fresh session reads, because no session sees the one before it | the running agent, which takes notes for whoever runs next |
+| Mechanism | What it contributes | What you still decide |
+|---|---|---|
+| Prompting | Instructions, examples, output contract | What success means |
+| Context assembly | Material supplied for this call | Relevance, order, access, budget |
+| Retrieval | Selected material from a collection | Search, source identity, evidence coverage |
+| Memory | Information retained for later use | What to store, update, expire, or delete |
+| Skills | Reusable procedures and resources | When to load them and their authority |
+| Checkpoints | State across sessions | What is durable and how to resume |
 
-## The distinctions worth keeping straight
+## Four distinctions to keep straight
 
-**Retrieval fetches facts; a skill supplies a procedure.** Both put text in front of the model
-that was not there a moment ago, and that is where the similarity ends. Skills' own page draws the
-line against RAG in exactly those terms, and describes the loading as progressive disclosure: a
-skill's name and description are in context from the start, its instructions load when it is
-triggered, and anything else it bundles costs nothing until it is read.
+**Retrieval selects material, not necessarily truth.** Sources can contain instructions, errors, obsolete policy, or malicious text. Distinguish source material from instructions that govern the task.
 
-**A summary and a record are both called memory and behave differently.** The memory page
-separates them: a summary is a compressed account, cheap to reread, and whatever it left out is
-gone; a record keeps the fact itself to be searched later. A product that "remembers you" is doing
-one or the other, and which one decides what it will be unable to tell you next year.
+**A summary can lose a qualification.** Keep a route back to original records when omitted detail could change the answer. Summaries and structured records can coexist.
 
-**More is not free.** Context engineering's page carries two costs that are easy to miss. Order
-affects price, because a matching prefix can be cached and billed at a lower rate, which is why
-the advice is to put what never changes first and what changes every call last. And length
-affects quality on its own: the research that page cites across eighteen models reports that
-models do not use their context uniformly and grow less reliable as the input grows, even on
-simple tasks. A page that treats a big context window as a reason to stop choosing has not read
-the second half of that.
+**Memory is useful within sessions too.** A long conversation can use external state. Applications can save task records deterministically, and agents at several levels can select what to remember. Model-directed memory is not exclusive to level 7.
 
-**At level 7 the model is writing the context, for itself.** A long-running task runs across
-separate sessions with separate context windows, so nothing carries over except what was written
-down. That page describes structured note-taking, notes persisted outside the context window, as
-what a new session starts from, and it is the only case in this thread where the thing choosing
-what goes in is the model rather than your code.
+**A note is not the whole environment.** Resuming work can require files, tool state, action receipts, permissions, and unfinished-task records. Restore and inspect them before relying on the last summary.
 
-## How to use this thread
+## Try a revealing case
 
-Work down the table and stop at the first row that answers your question. A system that needs one
-document in the prompt does not need retrieval. A system that needs the same procedure in every
-run does not need a skill, it needs the instruction. A system whose sessions never outlive a
-conversation does not need memory, and one whose work never outlives a session does not need
-notes on disk.
+Supply a current policy and a conflicting remembered fact. Does the system notice the conflict and preserve provenance? Remove the relevant source. Does it admit the gap?
 
-Climbing this thread has a distinctive cost: each row adds something that can be stale. A
-retrieved passage can be from a superseded document. A remembered fact can have been true once. A
-skill can describe a procedure that has changed. A note from last night's session can describe a
-system that has since been restarted. None of those is a wrong answer by the model, and all of
-them look like one.
-
-This page introduces no claim of its own. Every mechanism above is described on one of the six
-pages it links, each with its own primary sources.
+Relevant, sufficient context is the target. More tokens can add cost and distractions; a large context window does not guarantee useful attention to every fact. Caching behavior and pricing vary by provider.

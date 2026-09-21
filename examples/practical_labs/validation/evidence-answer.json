@@ -1,0 +1,76 @@
+{
+  "case": "evidence-answer",
+  "timestamp_utc": "2026-09-21T06:38:57.242499+00:00",
+  "model": "muse-glimmer:30b-q4_K_M-dflash",
+  "backend": "ollama",
+  "mode": "live",
+  "synthetic_inputs": true,
+  "trials": 1,
+  "prompt_sha256": "aad220ce9402f9f3af47230f330789398e6ac81ebb9d5cb15cc2ae360641f0e0",
+  "runner_sha256": "3ccf5c17375be2bdeb34fc52516db4860534f8863f21e8325a1cc0964f69649e",
+  "request_metrics": [
+    {
+      "call": 1,
+      "elapsed_seconds": 5.097,
+      "usage": {
+        "prompt_eval_count": 796,
+        "eval_count": 178
+      }
+    }
+  ],
+  "returned_objects": [
+    {
+      "answer": "The DW-480 purchased on 2026-08-01 is covered by a 24-month warranty under the 2026 policy. Coverage is void after unauthorized repair or removal of the serial label, and accidental damage is excluded.",
+      "claims": [
+        {
+          "text": "DW-480 purchases from 2026-07-01 have a 24-month warranty.",
+          "source_ids": [
+            "policy-2026"
+          ]
+        },
+        {
+          "text": "Coverage is void after unauthorized repair or removal of the serial label.",
+          "source_ids": [
+            "policy-2026"
+          ]
+        },
+        {
+          "text": "Accidental damage is excluded.",
+          "source_ids": [
+            "policy-2026"
+          ]
+        }
+      ],
+      "unknowns": []
+    }
+  ],
+  "status": "structural_checks_passed",
+  "output": {
+    "answer": "The DW-480 purchased on 2026-08-01 is covered by a 24-month warranty under the 2026 policy. Coverage is void after unauthorized repair or removal of the serial label, and accidental damage is excluded.",
+    "claims": [
+      {
+        "text": "DW-480 purchases from 2026-07-01 have a 24-month warranty.",
+        "source_ids": [
+          "policy-2026"
+        ]
+      },
+      {
+        "text": "Coverage is void after unauthorized repair or removal of the serial label.",
+        "source_ids": [
+          "policy-2026"
+        ]
+      },
+      {
+        "text": "Accidental damage is excluded.",
+        "source_ids": [
+          "policy-2026"
+        ]
+      }
+    ],
+    "unknowns": []
+  },
+  "evidence_ids": [
+    "policy-2026",
+    "policy-old"
+  ]
+}

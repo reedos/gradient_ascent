@@ -1,0 +1,43 @@
+{
+  "case": "approval-gate",
+  "timestamp_utc": "2026-09-21T06:41:45.940931+00:00",
+  "model": "muse-glimmer:30b-q4_K_M-dflash",
+  "backend": "ollama",
+  "mode": "live",
+  "synthetic_inputs": true,
+  "trials": 1,
+  "prompt_sha256": "5d31f5b51e56fd87389a0c28cbf0745129dea28c0d6675e88fac56d535fe7ddc",
+  "runner_sha256": "7cc5ead57e8e17869e380bc58b462f4ee2d0aa594abfbfa65d5338352bab1221",
+  "request_metrics": [
+    {
+      "call": 1,
+      "elapsed_seconds": 3.613,
+      "usage": {
+        "prompt_eval_count": 703,
+        "eval_count": 56
+      }
+    }
+  ],
+  "returned_objects": [
+    {
+      "appointment_id": "appt-82",
+      "expected_version": 4,
+      "new_start": "2026-10-03T15:00:00-07:00",
+      "duration_minutes": 30,
+      "participant": "alex@example.test"
+    }
+  ],
+  "status": "awaiting_review",
+  "output": {
+    "appointment_id": "appt-82",
+    "expected_version": 4,
+    "new_start": "2026-10-03T15:00:00-07:00",
+    "duration_minutes": 30,
+    "participant": "alex@example.test"
+  },
+  "evidence_ids": [
+    "appointment"
+  ],
+  "proposal_digest": "78bdbc1137db28c35a7d24a7b26b71d404cfd98f4aa1518eb4b05a1195d840ba",
+  "external_action": false
+}

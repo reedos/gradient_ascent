@@ -1,0 +1,26 @@
+{
+  "case": "approval-gate",
+  "timestamp_utc": "2026-09-21T06:39:11.739204+00:00",
+  "model": "muse-glimmer:30b-q4_K_M-dflash",
+  "backend": "ollama",
+  "mode": "live",
+  "synthetic_inputs": true,
+  "trials": 1,
+  "prompt_sha256": "5d31f5b51e56fd87389a0c28cbf0745129dea28c0d6675e88fac56d535fe7ddc",
+  "runner_sha256": "3ccf5c17375be2bdeb34fc52516db4860534f8863f21e8325a1cc0964f69649e",
+  "request_metrics": [
+    {
+      "call": 1,
+      "elapsed_seconds": 2.382,
+      "usage": {
+        "prompt_eval_count": 567,
+        "eval_count": 3
+      }
+    }
+  ],
+  "returned_objects": [
+    {}
+  ],
+  "status": "stopped",
+  "error": "Missing required output fields."
+}

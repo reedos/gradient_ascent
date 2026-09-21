@@ -1,0 +1,72 @@
+{
+  "case": "incident-agent",
+  "timestamp_utc": "2026-09-21T06:37:37.502487+00:00",
+  "model": "muse-glimmer:30b-q4_K_M-dflash",
+  "backend": "ollama",
+  "mode": "live",
+  "synthetic_inputs": true,
+  "trials": 1,
+  "request_metrics": [
+    {
+      "call": 1,
+      "elapsed_seconds": 1.74,
+      "usage": {
+        "prompt_eval_count": 433,
+        "eval_count": 17
+      }
+    },
+    {
+      "call": 2,
+      "elapsed_seconds": 0.223,
+      "usage": {
+        "prompt_eval_count": 321,
+        "eval_count": 17
+      }
+    },
+    {
+      "call": 3,
+      "elapsed_seconds": 0.219,
+      "usage": {
+        "prompt_eval_count": 385,
+        "eval_count": 17
+      }
+    },
+    {
+      "call": 4,
+      "elapsed_seconds": 7.843,
+      "usage": {
+        "prompt_eval_count": 1204,
+        "eval_count": 218
+      }
+    }
+  ],
+  "status": "finished",
+  "output": {
+    "decision": "finish",
+    "tool": "",
+    "answer": "Hypothesis: Elevated checkout failures are likely a regression introduced by the checkout service deployment at 09:10, not a payments dependency issue.\n\nCited observations:\n- Metrics show checkout error rate increased from 1% at 09:00 to 18% at 09:12, and p95 latency degraded from 240 ms to 1800 ms. \n- Deployments show checkout build 8f21 deployed at 09:10; payments service last deployed two days ago with no rollback.\n- Metrics show payments API error rate remained ~1% throughout the window, indicating payments is stable.\n\nRecommended next step, per runbook: Do not change production. Compare the changed code and database migration status for checkout build 8f21 against the prior release, and collect detailed checkout error logs/traces to confirm root cause. Correlation alone is insufficient for root cause; obtain incident commander approval before any rollback.",
+    "source_ids": [
+      "metrics",
+      "deployments",
+      "runbook"
+    ]
+  },
+  "steps": [
+    {
+      "step": 1,
+      "tool": "metrics",
+      "observation": "checkout error rate: 1% at 09:00, 18% at 09:12. Latency p95: 240 ms → 1800 ms. payments API error rate: 1% throughout."
+    },
+    {
+      "step": 2,
+      "tool": "deployments",
+      "observation": "checkout build 8f21 deployed at 09:10. payments service last deployed two days ago. No rollback has occurred."
+    },
+    {
+      "step": 3,
+      "tool": "runbook",
+      "observation": "If errors rise after a deploy, compare the changed code and database migration status. Rollback needs incident commander approval. Correlation alone does not identify a root cause."
+    }
+  ],
+  "model_calls": 4
+}

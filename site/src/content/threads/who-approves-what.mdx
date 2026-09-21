@@ -1,83 +1,46 @@
 ---
 id: who-approves-what
-reviewed: 2026-09-19
-sources: []
+reviewed: 2026-09-20
+sources:
+  - title: "Tools specification"
+    url: "https://modelcontextprotocol.io/specification/2025-11-25/server/tools"
+    publisher: "Model Context Protocol"
+    accessed: "2026-09-20"
 ---
 
 import Link from '../../components/page/Link.astro';
 
-The usual way to picture the climb is that a person does less at every level, until at the top
-they do nothing. That is not what the pages here describe. A person is present at every level of
-this site, including the last one. What changes is the thing they hold: at first the answer
-itself, then each action before it happens, then the rules a whole run happens inside, then only
-the exceptions a run decided to raise.
+Higher autonomy changes where people intervene; it does not require removing them. An agent can pause before consequential actions. An always-on service can prepare drafts while leaving execution to a person.
 
-Reading these six pages in order follows that one decision as it moves. None of it is new here:
-each page below makes its own case with its own sources, and this thread only puts them in the
-order the question actually travels in.
+Separate who proposes an action, who authorizes it, and what code executes it.
 
-## Before anything is handed over
+## Match review to consequences
 
-<Link href="/techniques/delegating/">Deciding what to hand over</Link> comes before any of the
-levels, because it is a question about the task rather than about the model. Its four questions
-are what a wrong answer would cost, how easily the result could be checked, how reversible the
-action is, and whether the task needs context only you have. A system perfectly able to draft
-something can still be the wrong thing to let send it.
+| Situation | Useful review boundary | Enforce outside the model |
+|---|---|---|
+| Drafting an answer | Before relying on or publishing it | Source and output checks |
+| Changing a record | Before the exact mutation | Identity, scope, version, allowed fields |
+| Running a tool loop | At sensitive actions or blockers | Tool allowlist, budgets, approval policy |
+| Working after you leave | At exceptions and reserved actions | Durable authority, expiry, pause, audit trail |
 
-That page belongs at the front of this thread for a practical reason: every design below is an
-answer to it. A gate at level 3 and an allowlist at level 5 are the same decision written into
-different parts of the system.
+These boundaries can coexist. Bounded read-only work can continue while a proposed write waits for review.
 
-## The climb, page by page
+## Make approval concrete
 
-| Level | Page | What a person holds | What decides that they are needed |
-|---|---|---|---|
-| Topic | <Link href="/techniques/delegating/">Deciding what to hand over</Link> | the task itself: which parts are handed over at all | four questions about cost, checkability, reversibility and context |
-| 3 | <Link href="/techniques/human-in-the-loop/">Human approval</Link> | one draft, before it goes anywhere | your code, against a fixed rule; the model is never asked whether a person should look |
-| 4 | <Link href="/techniques/function-calling/">Function calling</Link> | which actions exist at all, and what your code does with a chosen one | you decide the list; the model chooses among it, and your code runs whatever comes back |
-| 5 | <Link href="/techniques/agent-harness/">The agent harness</Link> | the limits: which tools, which approvals, the caps, the sandbox, the log | the harness, which is code you wrote, not the model |
-| 7 | <Link href="/techniques/agent-teammates/">Always-on assistants</Link> | the exceptions, plus whatever the design holds back | a schedule or an event starts the session, and the model decides what to do once it is running |
-| Topic | <Link href="/techniques/trust/">Calibrating trust</Link> | how much of the above to keep holding | the record of what has actually been right, kept one checked result at a time |
+Show the action, destination, consequences, and relevant evidence. Bind approval to the reviewed payload and scope. If a change falls outside that authorization, require another review.
 
-## What moves, and what does not
+Recheck current state before execution. Record the outcome and handle duplicates. If a network failure leaves the outcome uncertain, reconcile it before repeating the action.
 
-Three things change across that table.
+A model may ask for help or flag uncertainty. Mandatory review gates should also be enforced independently by the application.
 
-**The unit gets bigger.** At level 3 a person sees one draft. At level 5 they do not see the
-individual steps at all; they set what the loop may do and read the log afterward. The harness
-page is blunt about how much of an agent is not the model: the loop, the tool definitions, what
-goes into the next request, whether an action needs approval, the caps, the sandbox and the
-logging all sit outside it, and changing any one of them changes how the same model behaves.
+## Avoid the extremes
 
-**The moment moves earlier.** Approval at level 3 happens after the draft exists. An allowlist
-happens before the run starts. The later the level, the more of the reviewing is done in advance,
-as design, and the less of it is done in the moment, as reading.
+**Approving everything becomes a reflex.** Match review to consequences and provide enough context for a meaningful decision.
 
-**The trigger stops being a person.** At level 7 a schedule or an event starts the session, which
-is ordinary code, and then the model decides whether anything needs attention and what to do
-about it. That is the decision that actually moved, and it is worth separating from the timer: a
-cron job that runs fixed steps is a level-3 workflow whatever time it fires at.
+**Preapproval is not unlimited authority.** Bound actions, data, destinations, and duration. Provide a way to pause work and revoke access.
 
-One thing does not change. Somebody still has to be able to tell whether the result was right,
-and <Link href="/techniques/reviewing/">reviewing work you did not do</Link> gets harder rather
-than easier as more of the work happens where nobody was watching. Two conditions have to hold
-for a result to be reviewable at all: there has to be something to check it against, and enough
-of the work has to be visible to check rather than just its conclusion. A design that removes
-both has not reduced the reviewing, it has removed the possibility of it.
+Tool calling does not mean executing whatever the model returns. Parse, validate, and authorize requests. A tool schema or protocol is not a substitute for business rules.
 
-## Where a reader usually goes wrong
+## Exercise the boundary
 
-Treating the gate as the safety feature. The gate is a place to put a decision; the rule that
-decides when it fires is what does the work. Human approval's own page says both ways of getting
-the threshold wrong cost something: too loose and it waves through what most needed a second
-look, too strict and approving becomes a reflex.
-
-Reading the top of the climb as unattended. An always-on assistant's design question is what it
-may do without asking, which is a question with an answer, not an absence of one.
-
-Trusting a model rather than a task. Calibrating trust makes the point directly: the unit is a
-task type, not a model, and reliably right at one thing says nothing about another. A single
-global judgment hides which specific things have actually been earned.
-
-This page introduces no claim of its own. Each of the six pages carries its own primary sources,
-and the comparison above is the site's reading of what they already say.
+<Link href="/recipes/assistant-team/#try-with-your-ai">The scheduling approval example</Link> includes optional implementation checks for changed payloads, stale state, expired approval, and duplicates. Its local receipt is a teaching simulation, not an authenticated approval service or a calendar action.

@@ -11,7 +11,7 @@ enough.
 
 **Status: live and in development.** Concept pages are `sourced`: written with primary references,
 but not a guarantee of error-free content, and with no recorded run and scored result file behind them.
-Nothing in this repository has ever called a model. See
+The isolated quality prototype adds six practical recipe examples and recorded local-model smoke trials under `examples/practical_labs/validation/`. These are synthetic implementation checks, not a benchmark or evidence that all technique pages are measured. See
 [What is and is not real yet](#what-is-and-is-not-real-yet). Found something wrong? Every page has a feedback link, or open
 [the feedback form](https://github.com/reedos/gradient_ascent/issues/new?template=feedback.yml);
 see [CONTRIBUTING.md](CONTRIBUTING.md).

@@ -1,5 +1,7 @@
 ---
 import { getEntry, render } from 'astro:content';
+import RecipeExample from '../../components/RecipeExample.astro';
+import { exampleForRecipe } from '../../lib/recipe-examples';
 import PageContents from '../../components/PageContents.astro';
 import Base from '../../layouts/Base.astro';
 import Eyebrow from '../../components/Eyebrow.astro';
@@ -18,6 +20,7 @@ export function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
+const example = exampleForRecipe(slug!);
 const recipe = recipes.find((r) => r.slug === slug)!;
 const techniques = techniquesForRecipe(recipe);
 const lv = recipeLevels(recipe);
@@ -59,7 +62,8 @@ const reviewedISO = entry ? entry.data.reviewed.toISOString().slice(0, 10) : und
 
   {
     Content ? (
-      <PageContents items={(rendered?.headings ?? []).filter(h => h.depth === 2).map(h => ({ id: h.slug, label: h.text }))}>
+      <PageContents items={[...(example ? [{id:'try-with-your-ai',label:'Try this with your AI'}] : []), ...(rendered?.headings ?? []).filter(h => h.depth === 2).map(h => ({ id: h.slug, label: h.text }))]}>
+        {example && <RecipeExample example={example} />}
         <div class="prose recipe-prose">
           <Content />
         </div>

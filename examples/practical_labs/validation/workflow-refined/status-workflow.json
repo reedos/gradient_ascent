@@ -1,0 +1,98 @@
+{
+  "case": "status-workflow",
+  "timestamp_utc": "2026-09-21T06:44:12.311013+00:00",
+  "model": "muse-glimmer:30b-q4_K_M-dflash",
+  "backend": "ollama",
+  "mode": "live",
+  "synthetic_inputs": true,
+  "trials": 1,
+  "prompt_sha256": "7ccfb5b16245e2bbea55060450a4cc692b5ce7e3a7abd44d5f8cf9a1306343dd",
+  "runner_sha256": "7cc5ead57e8e17869e380bc58b462f4ee2d0aa594abfbfa65d5338352bab1221",
+  "request_metrics": [
+    {
+      "call": 1,
+      "elapsed_seconds": 10.996,
+      "usage": {
+        "prompt_eval_count": 1612,
+        "eval_count": 238
+      }
+    },
+    {
+      "call": 2,
+      "elapsed_seconds": 4.274,
+      "usage": {
+        "prompt_eval_count": 682,
+        "eval_count": 137
+      }
+    }
+  ],
+  "returned_objects": [
+    {
+      "summary": "Checkout QA passed staging on Sep 18 owned by Mei with production smoke test still open; Analytics consent review is blocked awaiting legal input with no owner assigned and a Sep 23 proposal that is not approved; Design has navigation approved by Omar with accessibility keyboard review pending and no launch date confirmed.",
+      "items": [
+        {
+          "source_id": "ticket-17",
+          "status": "passed staging checks on Sep 18; production smoke test remains open",
+          "owner": "Mei",
+          "next_step": "complete production smoke test"
+        },
+        {
+          "source_id": "ticket-21",
+          "status": "blocked, waiting for legal input",
+          "owner": null,
+          "next_step": "await legal input"
+        },
+        {
+          "source_id": "note-8",
+          "status": "navigation approved by Omar; accessibility keyboard review still pending; no launch date confirmed",
+          "owner": null,
+          "next_step": "complete accessibility keyboard review"
+        }
+      ],
+      "unknowns": [
+        "launch date not confirmed",
+        "owner not assigned for Analytics consent review",
+        "owner not assigned for Design",
+        "Sep 23 is a proposed date, not approved"
+      ]
+    },
+    {
+      "summary": "Weekly update from checked table:\n- ticket-17: passed staging checks on Sep 18; production smoke test remains open. Owner: Mei. Next step: complete production smoke test.\n- ticket-21: blocked, waiting for legal input. Owner: unassigned. Next step: await legal input.\n- note-8: navigation approved by Omar; accessibility keyboard review still pending; no launch date confirmed. Owner: unassigned. Next step: complete accessibility keyboard review.\nUnknowns: launch date not confirmed; owner not assigned for Analytics consent review; owner not assigned for Design; Sep 23 is a proposed date, not approved."
+    }
+  ],
+  "status": "structural_checks_passed",
+  "output": {
+    "summary": "Weekly update from checked table:\n- ticket-17: passed staging checks on Sep 18; production smoke test remains open. Owner: Mei. Next step: complete production smoke test.\n- ticket-21: blocked, waiting for legal input. Owner: unassigned. Next step: await legal input.\n- note-8: navigation approved by Omar; accessibility keyboard review still pending; no launch date confirmed. Owner: unassigned. Next step: complete accessibility keyboard review.\nUnknowns: launch date not confirmed; owner not assigned for Analytics consent review; owner not assigned for Design; Sep 23 is a proposed date, not approved.",
+    "items": [
+      {
+        "source_id": "ticket-17",
+        "status": "passed staging checks on Sep 18; production smoke test remains open",
+        "owner": "Mei",
+        "next_step": "complete production smoke test"
+      },
+      {
+        "source_id": "ticket-21",
+        "status": "blocked, waiting for legal input",
+        "owner": null,
+        "next_step": "await legal input"
+      },
+      {
+        "source_id": "note-8",
+        "status": "navigation approved by Omar; accessibility keyboard review still pending; no launch date confirmed",
+        "owner": null,
+        "next_step": "complete accessibility keyboard review"
+      }
+    ],
+    "unknowns": [
+      "launch date not confirmed",
+      "owner not assigned for Analytics consent review",
+      "owner not assigned for Design",
+      "Sep 23 is a proposed date, not approved"
+    ]
+  },
+  "evidence_ids": [
+    "ticket-17",
+    "ticket-21",
+    "note-8"
+  ]
+}

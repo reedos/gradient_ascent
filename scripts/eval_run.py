@@ -95,6 +95,13 @@ EXAMPLE_NAMES = [
 # scored: a meaningless score is worse than no score. Each page's "How to eval it" section says
 # what would be measured for that technique instead.
 NOT_SCORED = {
+    "practical_labs": (
+        "six separate synthetic tasks with their own runner, acceptance criteria, and boundary "
+        "tests; they do not answer the shared evaluation corpus questions. Local-model smoke "
+        "records live beside the labs and are not comparative quality scores. Measure each "
+        "task's acceptance criteria, rejected unsafe or invalid actions, latency, and model "
+        "usage on repeated held-out cases instead."
+    ),
     "embeddings_search": (
         "it ranks the corpus against a query and reports where embedding search and keyword "
         "search agree. It calls no model and returns no answer, so there is nothing for the "

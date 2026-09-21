@@ -1,3 +1,4 @@
+import { recipeExamples, exampleHref } from './recipe-examples';
 import { builders } from './artifact-builders';
 // Turns the site's own data into the flat SearchDoc[] both pages/search-index.json.ts (the
 // fetchable index) and pages/search.astro (the no-JavaScript fallback listing) render from --
@@ -68,6 +69,8 @@ function formerNameOnly(formerly: string | undefined): string | undefined {
 
 export async function buildSearchDocs(): Promise<SearchDoc[]> {
   const docs: SearchDoc[] = [];
+  docs.push({id:"view:design-decisions",kind:"view",title:"Design decisions",summary:"Context, workflows, reasoning, agents, tools, persistence, and evaluation tradeoffs",url:url("/design-decisions/")});
+  for(const lab of recipeExamples) docs.push({id:`view:recipe-example:${lab.id}`,kind:"view",title:lab.title,summary:lab.summary,body:lab.use+" "+lab.nuance,url:url(exampleHref(lab))});
   docs.push({ id: 'view:usability', kind: 'view', title: 'Newcomer usability session', summary: 'Human observation guide and results template. Sessions pending.', url: url('/usability/') });
   docs.push({ id: 'view:reviewer-feedback-loop', kind: 'view', title: 'A team of agents that improves your project brief', summary: 'Lead agent and workers: brief writing, parallel receiving agents, independent reviewers, and coordinated revision. Includes supporting evaluation methods.', url: url('/examples/reviewer-feedback-loop/') });
   docs.push({ id: "view:examples", kind: "view", title: "Worked examples", summary: "98 scripted examples across everyday life, engineering, and business.", url: url("/examples/") });

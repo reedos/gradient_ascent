@@ -1,0 +1,25 @@
+{
+  "case": "durable-watch",
+  "timestamp_utc": "2026-09-21T06:37:41.614716+00:00",
+  "model": "muse-glimmer:30b-q4_K_M-dflash",
+  "backend": "ollama",
+  "mode": "live",
+  "synthetic_inputs": true,
+  "trials": 1,
+  "request_metrics": [
+    {
+      "call": 1,
+      "elapsed_seconds": 4.102,
+      "usage": {
+        "prompt_eval_count": 664,
+        "eval_count": 73
+      }
+    }
+  ],
+  "status": "pending_review",
+  "output": {
+    "event_id": "stock-006",
+    "draft": "Stock alert for event stock-006, SKU BR-17 observed at 2026-09-20T08:00:00Z. On hand 8 is below reorder threshold 12. Incoming 0. Recommend human review before any action.",
+    "requires_review": true
+  }
+}

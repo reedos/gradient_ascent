@@ -1,0 +1,53 @@
+{
+  "case": "invoice-extraction",
+  "timestamp_utc": "2026-09-21T06:41:34.441861+00:00",
+  "model": "muse-glimmer:30b-q4_K_M-dflash",
+  "backend": "ollama",
+  "mode": "live",
+  "synthetic_inputs": true,
+  "trials": 1,
+  "prompt_sha256": "83115bedaa5b38f06a5beef8aaaa89b0d933748daa031ea6b5379e29aa4090cf",
+  "runner_sha256": "7cc5ead57e8e17869e380bc58b462f4ee2d0aa594abfbfa65d5338352bab1221",
+  "request_metrics": [
+    {
+      "call": 1,
+      "elapsed_seconds": 4.367,
+      "usage": {
+        "prompt_eval_count": 805,
+        "eval_count": 84
+      }
+    }
+  ],
+  "returned_objects": [
+    {
+      "invoice_id": "INV-1042",
+      "currency": "USD",
+      "line_totals_cents": [
+        30000,
+        20000
+      ],
+      "tax_cents": 4000,
+      "stated_total_cents": 55000,
+      "computed_total_cents": 54000,
+      "due_date": null,
+      "needs_review": true
+    }
+  ],
+  "status": "structural_checks_passed",
+  "output": {
+    "invoice_id": "INV-1042",
+    "currency": "USD",
+    "line_totals_cents": [
+      30000,
+      20000
+    ],
+    "tax_cents": 4000,
+    "stated_total_cents": 55000,
+    "computed_total_cents": 54000,
+    "due_date": null,
+    "needs_review": true
+  },
+  "evidence_ids": [
+    "invoice"
+  ]
+}

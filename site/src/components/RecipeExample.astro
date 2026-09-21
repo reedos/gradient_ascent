@@ -1,0 +1,44 @@
+---
+import { chatBrief, type recipeExamples } from '../lib/recipe-examples';
+import { url } from '../lib/url';
+interface Props { example: typeof recipeExamples[number] }
+const {example:e}=Astro.props;
+const brief=chatBrief(e);
+const output=e.expected as Record<string,unknown>;
+const result=output.answer??output.summary??output.draft??(e.id==='invoice-extraction'?'Stated total: $550.00. Recomputed total: $540.00. Difference: $10.00. Due date: not supplied. Route the invoice to review.':'Propose moving appt-82 to 15:00, preserving the 30-minute duration and participant. Wait for approval of this exact proposal.');
+---
+<section class="recipe-example" id="try-with-your-ai" aria-labelledby="try-heading">
+ <div class="example-heading"><div><span class="eyebrow">A practical starting point</span><h2 id="try-heading">Try this with your AI</h2></div><button type="button" data-example-copy>Copy brief + sample inputs</button></div>
+ <p class="example-context">{e.context}</p>
+ <div class="example-overview"><div><h3>Your task</h3><p>{e.task}</p><p class="example-note">Paste the brief into your model. The sample records and review criteria are included; no setup is needed.</p></div><div><h3>Check the result</h3><ul>{e.rubric.map(r=><li>{r}</li>)}</ul></div></div>
+ <p class="example-note">This tries the reasoning task. A chat does not implement retrieval, tool execution, approval enforcement, or persistence.</p>
+ <span class="copy-status" role="status" aria-live="polite"></span>
+ <details class="example-brief"><summary>Read or select the complete brief and sample inputs</summary><textarea aria-label="Brief and sample inputs" readonly rows="15">{brief}</textarea></details>
+ <details><summary>Compare with a reference answer</summary><div class="example-detail"><p class="example-note">Authored reference · not a measured model response</p><p>{String(result)}</p><details><summary>Complete reference record</summary><pre>{JSON.stringify(e.expected,null,2)}</pre></details></div></details>
+ <details><summary>Understand the design and adapt it</summary><div class="example-detail"><ol>{e.steps.map(([title,body])=><li><strong>{title}.</strong> {body}</li>)}</ol><h3>The distinction that matters</h3><p>{e.nuance}</p><h3>Test a failure case</h3><p>{e.failure}</p><h3>Use your own material</h3><p>{e.adapt}</p></div></details>
+ <details><summary>Optional: run the Python implementation</summary><div class="example-detail"><p>The starter includes editable records, prompts, a runner, tests, and a README. It includes all six cases because they share the same runner. Requires Python 3.10+; no extra Python packages.</p><a class="example-download" href={url(`/downloads/practical-labs/${e.id}.zip`)} download>Download implementation ↓</a><p>Start with offline replay (authored responses, no model calls):</p><pre>{`python run.py ${e.id} --mode replay\npython -m unittest discover -s . -p test_labs.py`}</pre><p>For a live run, install an Ollama model and use its exact name:</p><pre>{`python run.py ${e.id} --mode live --backend ollama --model YOUR_MODEL`}</pre><p>The README also covers compatible hosted endpoints. Live mode sends the records to the selected provider and may incur charges.</p><h3>Implementation limits</h3><p>{e.limits}</p><p>The Python checks cover structure and selected rules. Review the content against the criteria above too.</p><details><summary>Runner-specific prompt</summary><pre>{e.prompt}</pre></details></div></details>
+</section>
+<script>
+ document.querySelectorAll<HTMLElement>('.recipe-example').forEach(section=>{
+  const button=section.querySelector<HTMLButtonElement>('[data-example-copy]')!;
+  const field=section.querySelector<HTMLTextAreaElement>('textarea')!;
+  const status=section.querySelector<HTMLElement>('.copy-status')!;
+  button.addEventListener('click',async()=>{
+   try {
+    if(!navigator.clipboard) throw new Error('Clipboard unavailable');
+    await navigator.clipboard.writeText(field.value);
+    status.textContent='Copied. Paste into your model to try the task.';
+   } catch {
+    const disclosure=field.closest('details')!;
+    disclosure.open=true;field.focus();field.select();
+    const copied=document.execCommand('copy');
+    status.textContent=copied?'Copied. Paste into your model to try the task.':'The complete brief is selected. Copy it, then paste it into your model.';
+    if(copied){disclosure.open=false;button.focus();}
+   }
+  });
+ });
+</script>
+<style>
+ .recipe-example{margin:0 0 36px;padding:26px;border:1px solid var(--line);border-radius:12px;background:var(--panel);scroll-margin-top:150px}
+ .example-heading{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}.eyebrow{font-size:10px;color:var(--accent)}h2{font-size:26px;letter-spacing:-.5px;margin:8px 0 0}h3{font-size:15px;margin:0 0 10px}p,li{font-size:14px;line-height:1.8}p{margin:10px 0}li{margin-bottom:8px}ul,ol{padding-left:20px;margin:0}.example-context{color:var(--muted);max-width:90ch;margin:20px 0}.example-overview{display:grid;grid-template-columns:1fr 1fr;gap:36px;padding:18px 0}.example-note{font-size:12px;color:var(--muted)}button{background:var(--accent);color:white;border:0;border-radius:7px;padding:12px 16px;font:600 12px var(--font);cursor:pointer}button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}details{border-top:1px solid var(--line);margin-top:8px}summary{cursor:pointer;padding:14px 0;font-size:13px;font-weight:600}.example-detail{padding:4px 0 16px;max-width:90ch}.example-detail h3{margin-top:22px}textarea{width:100%;box-sizing:border-box;resize:vertical;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:16px;font:13px/1.8 var(--font);margin:4px 0 16px}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:16px;background:var(--bg);font-size:12px;line-height:1.8}.example-download{display:inline-block;color:var(--accent);font-size:14px;margin:10px 0}.copy-status{display:block;color:var(--accent);font-size:12px;line-height:1.8}.copy-status:empty{display:none}@media(max-width:700px){.recipe-example{padding:20px}.example-overview{grid-template-columns:1fr;gap:24px}.example-heading{gap:16px}h2{font-size:24px}}
+</style>

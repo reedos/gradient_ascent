@@ -1,0 +1,28 @@
+{
+  "case": "status-workflow",
+  "timestamp_utc": "2026-09-21T06:39:09.356243+00:00",
+  "model": "muse-glimmer:30b-q4_K_M-dflash",
+  "backend": "ollama",
+  "mode": "live",
+  "synthetic_inputs": true,
+  "trials": 1,
+  "prompt_sha256": "d259e6b236e7bb4f51c685cb0471e1cb83618960d2fc6a10e75afc1494e32426",
+  "runner_sha256": "3ccf5c17375be2bdeb34fc52516db4860534f8863f21e8325a1cc0964f69649e",
+  "request_metrics": [
+    {
+      "call": 1,
+      "elapsed_seconds": 7.914,
+      "usage": {
+        "prompt_eval_count": 1312,
+        "eval_count": 6
+      }
+    }
+  ],
+  "returned_objects": [
+    {
+      "user": null
+    }
+  ],
+  "status": "stopped",
+  "error": "Missing required output fields."
+}

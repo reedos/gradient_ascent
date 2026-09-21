@@ -1,0 +1,39 @@
+{
+  "case": "status-workflow",
+  "timestamp_utc": "2026-09-21T06:41:42.324797+00:00",
+  "model": "muse-glimmer:30b-q4_K_M-dflash",
+  "backend": "ollama",
+  "mode": "live",
+  "synthetic_inputs": true,
+  "trials": 1,
+  "prompt_sha256": "d259e6b236e7bb4f51c685cb0471e1cb83618960d2fc6a10e75afc1494e32426",
+  "runner_sha256": "7cc5ead57e8e17869e380bc58b462f4ee2d0aa594abfbfa65d5338352bab1221",
+  "request_metrics": [
+    {
+      "call": 1,
+      "elapsed_seconds": 7.882,
+      "usage": {
+        "prompt_eval_count": 1324,
+        "eval_count": 47
+      }
+    }
+  ],
+  "returned_objects": [
+    {
+      "summary": "...",
+      "items": [
+        {
+          "source_id": "...",
+          "status": "...",
+          "owner": "...",
+          "next_step": "..."
+        }
+      ],
+      "unknowns": [
+        "..."
+      ]
+    }
+  ],
+  "status": "stopped",
+  "error": "One record per source is required."
+}

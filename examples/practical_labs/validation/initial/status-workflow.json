@@ -1,0 +1,21 @@
+{
+  "case": "status-workflow",
+  "timestamp_utc": "2026-09-21T06:37:24.166625+00:00",
+  "model": "muse-glimmer:30b-q4_K_M-dflash",
+  "backend": "ollama",
+  "mode": "live",
+  "synthetic_inputs": true,
+  "trials": 1,
+  "request_metrics": [
+    {
+      "call": 1,
+      "elapsed_seconds": 8.638,
+      "usage": {
+        "prompt_eval_count": 1412,
+        "eval_count": 2
+      }
+    }
+  ],
+  "status": "stopped",
+  "error": "Missing required output fields."
+}

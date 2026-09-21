@@ -4,6 +4,7 @@ interface Props { slug: string; color: string }
 const { slug, color } = Astro.props;
 const diagram = conceptDiagrams[slug];
 if (!diagram) throw new Error(`Missing concept diagram: ${slug}`);
+const wrapDetail = (text:string) => { const lines:string[]=[]; for(const word of text.split(' ')){if(!lines.length||lines[lines.length-1].length+word.length+1>29)lines.push(word);else lines[lines.length-1]+=' '+word;}return lines; };
 const edges = conceptEdges(diagram.shape, diagram.nodes.length);
 const description = edges.map((e) => `${diagram.nodes[e.from].title} leads to ${diagram.nodes[e.to].title}${e.feedback ? ' as feedback' : ''}.`).join(' ');
 const shapeLabel = { flow: 'Sequence', loop: 'Feedback loop', fork: 'Parallel branches', choice: 'Decision paths', harness: 'Agent loop + controls', retrieval: 'Evidence into an answer' };
@@ -52,7 +53,7 @@ const stopNotes: Record<string, string> = {
               <rect width={node.width} height={node.height} rx="9" />
               <path class="node-accent" d={`M 12 0 H ${node.width - 12}`} />
               <text x="18" y="31" class="node-title">{node.title}</text>
-              <text x="18" y="55" class="node-detail">{node.detail}</text>
+              <text x="18" y="51" class="node-detail">{wrapDetail(node.detail).map((line,j)=><tspan x="18" dy={j?16:0}>{line}</tspan>)}</text>
             </g>
           ))}
           {!mobile && (diagram.shape === 'loop' || diagram.shape === 'harness') && <text class="feedback-label" x={diagram.shape === 'harness' ? 165 : 478} y={diagram.shape === 'harness' ? 321 : 280}>Next turn</text>}
@@ -62,14 +63,17 @@ const stopNotes: Record<string, string> = {
     {diagram.shape === 'harness' && <div class="harness-controls"><span>Step &amp; token budgets</span><span>Logs &amp; checkpoints</span><span>Stop or hand back to you</span></div>}
   </div>
   {stopNotes[slug] && <p class="stop-note"><span>Ending or continuing</span>{stopNotes[slug]}</p>}
+  <details class="diagram-reading"><summary>Read the connections in words</summary><ul>{edges.map(e=><li><strong>{diagram.nodes[e.from].title}</strong> → <strong>{diagram.nodes[e.to].title}</strong>{e.feedback ? ": feedback informs another turn." : ": " + diagram.nodes[e.to].detail + "."}</li>)}</ul></details>
   <figcaption><span>Key idea</span><p>{diagram.takeaway}</p></figcaption>
 </figure>
 
 <style>
-  .concept-diagram { margin: 0 0 36px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); overflow: hidden; }
+  .diagram-reading {border-top:1px solid var(--line);padding:14px 28px;font-size:12px;color:var(--muted)}.diagram-reading summary{cursor:pointer}.diagram-reading ul{padding:14px 20px 0;line-height:1.8}.diagram-reading strong{color:var(--text);font-weight:500}
+
+  .concept-diagram { margin: 0 0 36px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); overflow: hidden; }
   .concept-heading { padding: 25px 28px 0; display: flex; justify-content: space-between; align-items: start; gap: 24px; }
   .concept-heading .eyebrow { color: var(--concept-color); font-size: 10px; }
-  .concept-heading h2 { margin-top: 10px; font-size: clamp(19px, 2vw, 25px); line-height: 1.35; letter-spacing: -.65px; text-wrap: balance; }
+  .concept-heading h2 { margin-top: 10px; font-size: clamp(22px, 2.5vw, 29px); line-height: 1.35; letter-spacing: -.65px; text-wrap: balance; }
   .concept-kind { color: var(--muted); font-size: 10px; white-space: nowrap; padding-top: 3px; }
   .concept-kind small { display: block; font-size: 9px; margin-top: 5px; }
   .stop-note { margin: 0 28px 20px; color: var(--muted); font-size: 12px; line-height: 1.7; }

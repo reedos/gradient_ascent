@@ -1,0 +1,32 @@
+{
+  "case": "approval-gate",
+  "timestamp_utc": "2026-09-21T06:37:27.476171+00:00",
+  "model": "muse-glimmer:30b-q4_K_M-dflash",
+  "backend": "ollama",
+  "mode": "live",
+  "synthetic_inputs": true,
+  "trials": 1,
+  "request_metrics": [
+    {
+      "call": 1,
+      "elapsed_seconds": 3.308,
+      "usage": {
+        "prompt_eval_count": 655,
+        "eval_count": 56
+      }
+    }
+  ],
+  "status": "awaiting_review",
+  "output": {
+    "appointment_id": "appt-82",
+    "expected_version": 4,
+    "new_start": "2026-10-03T15:00:00-07:00",
+    "duration_minutes": 30,
+    "participant": "alex@example.test"
+  },
+  "evidence_ids": [
+    "appointment"
+  ],
+  "proposal_digest": "78bdbc1137db28c35a7d24a7b26b71d404cfd98f4aa1518eb4b05a1195d840ba",
+  "external_action": false
+}

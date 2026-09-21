@@ -1,0 +1,7 @@
+---
+import { examplesForTechnique, exampleHref } from '../lib/recipe-examples';
+import { url } from '../lib/url';
+const labs=examplesForTechnique(Astro.props.slug);
+---
+{labs.length>0&&<aside class="practical-link"><div><span class="eyebrow">Related recipes</span><h2>Try the idea with your AI</h2><p>Copy a brief with sample inputs, then compare the result with clear review criteria.</p></div><div>{labs.map(lab=><a href={url(exampleHref(lab))}><strong>{lab.title} <span aria-hidden="true">↗</span></strong><small>{lab.summary}</small></a>)}</div></aside>}
+<style>.practical-link{display:grid;grid-template-columns:1fr 1.6fr;gap:26px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;padding:24px;margin:24px 0 36px;background:var(--panel)}.eyebrow{color:var(--accent);font-size:10px}h2{font-size:20px;margin:8px 0}p,small{font-size:13px;line-height:1.7;color:var(--muted)}a{display:block;padding:10px 0;text-decoration:none}a+a{border-top:1px solid var(--line)}a strong{font-size:15px;line-height:1.5}a span{color:var(--accent)}small{display:block;margin-top:5px}@media(max-width:680px){.practical-link{grid-template-columns:1fr;gap:10px;padding:20px}}</style>

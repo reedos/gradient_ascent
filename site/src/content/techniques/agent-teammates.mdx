@@ -48,8 +48,7 @@ import Cite from '../../components/page/Cite.astro';
 import Link from '../../components/page/Link.astro';
 import agentTeammatesRun from '../../data/runs/agent-teammates.json';
 
-An always-on assistant is built around a computer of its own, so it can keep existing between
-the moments you talk to it. xAI describes Grok Bot's version of this plainly: "Bots share a
+An always-on assistant has triggers and durable state so work can continue between the moments you talk to it. A dedicated computer is one deployment choice, not a requirement; workers can also start on demand. xAI describes Grok Bot's version of this plainly: "Bots share a
 computer of their own in the cloud, so jobs do not stall when you step away"<Cite n={1}/>. Meta
 says the same thing about Muse: it "runs on its own dedicated computer in the cloud, contained so
 no one else's agent can reach it"<Cite n={2}/>.
@@ -221,7 +220,7 @@ sentence as "nothing stops it."
   ]}
   comparedTo={{
     label: 'a single agent (level 5) asked to do the same three things in one sitting',
-    note: 'Close to the same model cost per action proposed. What a single sitting does not pay for is the ticks that find nothing to do: an always-on assistant spends a model call on every scheduled check, whether or not anything comes of it, which a single agent never runs at all unless asked.',
+    note: 'Similar model work can have similar per-run cost, but schedules may add unnecessary calls. Event filters, ordinary rules, and deduplication can skip model calls when there is no useful work. Measure the actual trigger policy and workload.',
   }}
   level={7}
 />

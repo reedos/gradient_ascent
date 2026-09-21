@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+import { url } from '../lib/url';
+import '../styles/practical-labs.css';
+import { designDecisions as decisions } from '../lib/design-decisions';
+---
+<Base title="Design decisions · Gradient Ascent" description="Eight architectural distinctions that matter when building reliable AI systems.">
+ <nav class="breadcrumb" aria-label="Breadcrumb"><a href={url('/')}>Home</a><span>/</span><span>Design decisions</span></nav>
+ <div class="page-hero lab-hero"><div class="eyebrow">Beyond the labels</div><h1>The distinctions that change the design.</h1><p>The levels are this guide’s teaching framework, not an industry standard or a mandatory ladder. Real systems combine patterns. Choose the capability that solves a demonstrated problem.</p></div>
+ <div class="decisions">{decisions.map((d,i)=><article id={`decision-${i+1}`}><div class="decision-number">{String(i+1).padStart(2,'0')}</div><div><h2>{d.title}</h2><p class="decision-question">{d.question}</p><p>{d.baseline}</p><div class="decision-distinction">{d.distinction}</div><details><summary>Tradeoffs and what to measure</summary><p>{d.depth}</p><p><b>Check it:</b> {d.measure}</p></details><footer><a href={url(`/techniques/${d.link}/`)}>Explore the concept →</a><a href={d.source}>{d.sourceName} ↗</a></footer></div></article>)}</div>
+ <section class="lab-section"><h2>Try the idea with your AI.</h2><p>The practical recipe examples include a copyable brief, sample inputs, and review criteria. Start with a small case whose correct behavior you can explain before adapting it to your own material.</p><a href={url('/recipes/document-qa/#try-with-your-ai')}>Try a recipe →</a></section>
+</Base>
+<style>.decisions{max-width:1000px}.decisions article{display:grid;grid-template-columns:50px 1fr;gap:20px;padding:32px 0;border-top:1px solid var(--line);scroll-margin-top:130px}.decision-number{font-size:13px;color:var(--accent);padding-top:9px}.decisions h2{font-size:27px;letter-spacing:-.5px;line-height:1.3;margin-bottom:12px}.decisions p{font-size:15px;color:var(--muted);line-height:1.85;margin-bottom:15px;max-width:790px}.decision-question{color:var(--text)!important;font-weight:600}.decision-distinction{padding:18px 22px;border-left:2px solid var(--accent);background:var(--panel);font-size:15px;line-height:1.8;margin:20px 0}.decisions summary{cursor:pointer;font-size:13px;font-weight:600;padding:6px 0 16px}.decisions footer{display:flex;flex-wrap:wrap;gap:12px 24px;font-size:12px;margin-top:8px;color:var(--accent)}@media(max-width:600px){.decisions article{grid-template-columns:1fr;gap:9px}.decisions h2{font-size:23px}.decision-distinction{padding:16px}.decisions p{font-size:14px}}</style>

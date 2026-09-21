@@ -6,7 +6,10 @@ import ApplyConcept from '../../components/ApplyConcept.astro';
 import PageContents from '../../components/PageContents.astro';
 import Eyebrow from '../../components/Eyebrow.astro';
 import Pill from '../../components/Pill.astro';
+import PracticalLabLink from '../../components/PracticalLabLink.astro';
 import ConceptDiagram from '../../components/ConceptDiagram.astro';
+import ArchitectureDiagram from '../../components/ArchitectureDiagram.astro';
+import { architectures } from '../../lib/architecture-models';
 import ConceptExamples from '../../components/ConceptExamples.astro';
 import ConceptWalkthrough from '../../components/page/ConceptWalkthrough.astro';
 import NameList from '../../components/NameList.astro';
@@ -131,7 +134,8 @@ const nameGroups = [
   ]}>
 
   <div id="concept-overview"></div>
-  <ConceptDiagram slug={slug!} color={color} />
+  {architectures[slug!] ? <ArchitectureDiagram slug={slug!} color={color} /> : <ConceptDiagram slug={slug!} color={color} />}
+  <PracticalLabLink slug={slug!} />
   {slug !== 'agent-harness' && <ConceptWalkthrough slug={slug!} />}
 
 

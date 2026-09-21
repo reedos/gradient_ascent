@@ -1,71 +1,47 @@
 ---
 id: checking-the-work
-reviewed: 2026-09-19
-sources: []
+reviewed: 2026-09-20
+sources:
+  - title: "Demystifying evals for AI agents"
+    url: "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents"
+    publisher: "Anthropic"
+    accessed: "2026-09-20"
 ---
 
 import Link from '../../components/page/Link.astro';
 
-"How do you know it worked" has a different answer at every level, and the answers are not
-replacements for each other. A schema check does not tell you an answer is true. A second model's
-verdict does not tell you the system got better this month. A score on a fixed set does not tell
-you which step produced a bad answer yesterday. Each of the five pages here answers one of those
-questions, and a system that has climbed a few levels usually needs several of them at once.
+A convincing response is not the same as a successful task. Check the returned record, the meaning of the answer, and—when tools act—the state left in the environment.
 
-The order below is the order the checks appear as you climb, not an order of importance.
+## Keep the checks distinct
 
-## Five checks, and the question each one answers
+| Check | What it can establish | What it cannot establish alone |
+|---|---|---|
+| Schema and deterministic rules | Required fields, types, arithmetic, allowed values | Truth or completeness of arbitrary prose |
+| Source review | Whether evidence supports a claim | Whether retrieval found every relevant source |
+| A model reviewer | A rubric-based judgment or proposed critique | Correctness merely because it is another call |
+| An evaluation | Performance under defined task conditions | Performance outside those conditions |
+| Tracing | Recorded calls, evidence, actions, and errors | A quality judgment without a criterion |
 
-| Level | Page | The check | What it cannot tell you |
-|---|---|---|---|
-| 1 | <Link href="/techniques/structured-output/">Structured output</Link> | the reply has the fields your code expects, and your own side validates and retries once | whether the values are right: a validly typed number can still be wrong |
-| 3 | <Link href="/techniques/evaluator-optimizer/">Write and check</Link> | a second prompt tests the draft against criteria written in advance, and the loop repeats until it passes | anything the criteria do not state; a checker asked whether an answer is "good" just drafts again with extra steps |
-| 6 | <Link href="/techniques/debate-review/">Review and debate</Link> | a separate agent, with its own context and often its own retrieval, decides what to check and whether to accept | whether the reviewer is right: it is another model call, and it costs a run of its own |
-| Topic | <Link href="/techniques/evals/">Evals</Link> | a fixed set with known answers, run the same way before and after a change | which step caused any individual failure |
-| Topic | <Link href="/techniques/observability/">Observability</Link> | a record of what each step actually did: the passages retrieved, the tool called, the branch taken, the tokens and the time | whether the result was right, which is what the other four are for |
+## Check the actual outcome
 
-## What changes as you climb
+Inspect the artifact or external state that should result from the task. A success message can be wrong. Refusal or clarification can be the correct outcome when evidence or authority is missing.
 
-**The check moves from the shape of the answer to its content.** At level 1 the thing you can
-check cheaply is the shape. Structured output's page is direct about the limit: a schema
-constrains the form, not the facts, and a reply can still fail to match at all, on a refusal or a
-response cut short by the token limit. The validate-and-retry-once pattern exists because of that
-gap, not in spite of it.
+Evaluations can grade one run, estimate performance across cases, or compare versions. Graders can be code, people, models, or a combination.
 
-**A criterion has to be checkable to be worth anything.** Write and check is the first level where
-a check runs inside the system, and the phrase its page leans on is "clear evaluation criteria".
-A specific, checkable question, such as whether every citation appears in the sources it names,
-answers the same way every time. A vague one drifts between calls, which is a checker that costs a
-call and settles nothing.
+## Make comparisons meaningful
 
-**Independence is what level 6 buys, and it is not free.** The difference between write and check
-at level 3 and review and debate at level 6 is not that one is stricter. At level 3 the loop and
-the criterion are both your code's: a fixed loop, one narrow test written in advance. At level 6
-the reviewer is itself an agent deciding what to check and whether to accept, with its own
-retrieval, and your code's job shrinks to running that loop and those searches faithfully. You
-pay for an agent to get a reviewer that can notice something your criteria did not anticipate.
+Separate prompt-development cases from held-out evaluation. Repeat tasks when variation matters. Inspect failures as well as averages, and record model, configuration, prompts, tools, data, and harness version.
 
-**A score is about a change, not about an answer.** Evals is the only one of the five that
-compares two runs rather than judging one, which is why the site treats it as a topic rather than
-a level: a single prompt, a fixed workflow and an agent that runs for hours all make claims only
-a fixed set can check. It also comes with its own soft spot, stated on its page: a rubric grader
-is itself a model call and can be wrong, so some share of its verdicts needs a person's reading.
+If several things change together, an improved score does not identify which change helped.
 
-**You cannot check what you did not record.** Observability is last here because it is what makes
-the other four investigable after the fact. A score that fell tells you something changed; a trace
-tells you which step. What is worth recording changes by level, which is why that page keeps its
-own list per level rather than one for the whole site.
+## Reviewers can share blind spots
 
-## Reading it as one argument
+A reviewer using the same incorrect source can reinforce a mistake. Separate agents may have separate context without statistically independent errors. Complement model review with checkable constraints and independently verified evidence.
 
-Each check is cheapest at the level it appears, and each is a poor substitute for the next one
-along. A schema is free and shallow. A checker prompt costs one call and can only test what you
-wrote down. An independent reviewer costs a run and can look for what you did not think of. An
-eval set costs the work of building it once and is the only thing that can say a change helped. A
-trace costs storage and tells you where something happened, never whether it was right.
+Calibrate model graders against human judgments. Disagreements are cases to inspect, not just scores to combine.
 
-None of that is an argument for having all five. It is an argument for knowing which question you
-are actually asking before you pay for an answer to a different one.
+## Diagnose the failure you have
 
-This page introduces no claim of its own. Every mechanism described above is stated on one of the
-five pages it links, each with its own primary sources.
+If the needed passage never entered context, inspect retrieval and access. If it was present but contradicted, inspect generation. If the proposed action was correct but the tool failed, inspect execution and recovery.
+
+Record useful events and artifacts with appropriate redaction and retention. Observability helps locate a failure; evaluation defines why it counts as one.

@@ -10,7 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "node --test \"tests/*.test.ts\""
+    "test": "node --test \"tests/*.test.ts\"",
+    "prebuild": "python ../scripts/package_practical_labs.py"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "^0.4.1",

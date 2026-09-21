@@ -1,0 +1,48 @@
+{
+  "case": "evidence-answer",
+  "timestamp_utc": "2026-09-21T06:37:12.538618+00:00",
+  "model": "muse-glimmer:30b-q4_K_M-dflash",
+  "backend": "ollama",
+  "mode": "live",
+  "synthetic_inputs": true,
+  "trials": 1,
+  "request_metrics": [
+    {
+      "call": 1,
+      "elapsed_seconds": 6.118,
+      "usage": {
+        "prompt_eval_count": 929,
+        "eval_count": 178
+      }
+    }
+  ],
+  "status": "structural_checks_passed",
+  "output": {
+    "answer": "The DW-480 bought on 2026-08-01 falls under the 2026-07-01 onward policy. Warranty length is 24 months. Coverage is void after unauthorized repair or removal of the serial label. Accidental damage is excluded, so it is not covered.",
+    "claims": [
+      {
+        "text": "DW-480 purchases from 2026-07-01 have a 24-month warranty.",
+        "source_ids": [
+          "policy-2026"
+        ]
+      },
+      {
+        "text": "Coverage is void after unauthorized repair or removal of the serial label.",
+        "source_ids": [
+          "policy-2026"
+        ]
+      },
+      {
+        "text": "Accidental damage is excluded.",
+        "source_ids": [
+          "policy-2026"
+        ]
+      }
+    ],
+    "unknowns": []
+  },
+  "evidence_ids": [
+    "policy-2026",
+    "policy-old"
+  ]
+}

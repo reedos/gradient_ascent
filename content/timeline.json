@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "as_of": "2026-09-19",
+  "as_of": "2026-09-20",
   "criteria": {
     "described": "A selected foundational publication describing the level’s defining idea. This is a reference point, not a claim to the first invention or use. Paper dates use the arXiv v1 submission where applicable.",
     "buildable": "The earliest release the site could verify of a widely used open framework, library or API that a developer could build the level with instead of writing it from scratch. A developer still has to build something; this is not a product an ordinary customer can use.",

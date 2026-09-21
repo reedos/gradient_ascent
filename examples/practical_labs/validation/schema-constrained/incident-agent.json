@@ -1,0 +1,98 @@
+{
+  "case": "incident-agent",
+  "timestamp_utc": "2026-09-21T06:41:56.647622+00:00",
+  "model": "muse-glimmer:30b-q4_K_M-dflash",
+  "backend": "ollama",
+  "mode": "live",
+  "synthetic_inputs": true,
+  "trials": 1,
+  "prompt_sha256": "0b0e435dc23a9aedb3e91e559b393a3fc8a3158c1b7527049b10b06be7b57f3a",
+  "runner_sha256": "7cc5ead57e8e17869e380bc58b462f4ee2d0aa594abfbfa65d5338352bab1221",
+  "request_metrics": [
+    {
+      "call": 1,
+      "elapsed_seconds": 1.791,
+      "usage": {
+        "prompt_eval_count": 405,
+        "eval_count": 10
+      }
+    },
+    {
+      "call": 2,
+      "elapsed_seconds": 1.397,
+      "usage": {
+        "prompt_eval_count": 449,
+        "eval_count": 11
+      }
+    },
+    {
+      "call": 3,
+      "elapsed_seconds": 0.246,
+      "usage": {
+        "prompt_eval_count": 392,
+        "eval_count": 17
+      }
+    },
+    {
+      "call": 4,
+      "elapsed_seconds": 7.271,
+      "usage": {
+        "prompt_eval_count": 1154,
+        "eval_count": 196
+      }
+    }
+  ],
+  "returned_objects": [
+    {
+      "decision": "tool",
+      "tool": "metrics"
+    },
+    {
+      "decision": "tool",
+      "tool": "deployments"
+    },
+    {
+      "decision": "tool",
+      "tool": "runbook"
+    },
+    {
+      "decision": "finish",
+      "answer": "Hypothesis: Elevated checkout failures are likely a regression introduced by the recent checkout deployment, not a payments dependency issue. Cited observations: checkout error rate rose from 1% at 09:00 to 18% at 09:12 and p95 latency increased from 240 ms to 1800 ms, while payments API error rate remained at ~1% throughout. Checkout build 8f21 was deployed at 09:10, immediately before the error spike; payments service last deployed two days ago and no rollback has occurred. Recommended next step: per runbook, compare the changed code in checkout build 8f21 and verify database migration status for checkout, and collect additional service logs/traces to confirm root cause before any remediation. Rollback requires incident commander approval and no production changes should be made now. Correlation alone does not identify root cause.",
+      "source_ids": [
+        "metrics",
+        "deployments",
+        "runbook"
+      ],
+      "tool": ""
+    }
+  ],
+  "status": "finished",
+  "output": {
+    "decision": "finish",
+    "answer": "Hypothesis: Elevated checkout failures are likely a regression introduced by the recent checkout deployment, not a payments dependency issue. Cited observations: checkout error rate rose from 1% at 09:00 to 18% at 09:12 and p95 latency increased from 240 ms to 1800 ms, while payments API error rate remained at ~1% throughout. Checkout build 8f21 was deployed at 09:10, immediately before the error spike; payments service last deployed two days ago and no rollback has occurred. Recommended next step: per runbook, compare the changed code in checkout build 8f21 and verify database migration status for checkout, and collect additional service logs/traces to confirm root cause before any remediation. Rollback requires incident commander approval and no production changes should be made now. Correlation alone does not identify root cause.",
+    "source_ids": [
+      "metrics",
+      "deployments",
+      "runbook"
+    ],
+    "tool": ""
+  },
+  "steps": [
+    {
+      "step": 1,
+      "tool": "metrics",
+      "observation": "checkout error rate: 1% at 09:00, 18% at 09:12. Latency p95: 240 ms → 1800 ms. payments API error rate: 1% throughout."
+    },
+    {
+      "step": 2,
+      "tool": "deployments",
+      "observation": "checkout build 8f21 deployed at 09:10. payments service last deployed two days ago. No rollback has occurred."
+    },
+    {
+      "step": 3,
+      "tool": "runbook",
+      "observation": "If errors rise after a deploy, compare the changed code and database migration status. Rollback needs incident commander approval. Correlation alone does not identify a root cause."
+    }
+  ],
+  "model_calls": 4
+}

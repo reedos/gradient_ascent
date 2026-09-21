@@ -13,3 +13,9 @@ site/dist/
 site/.astro/
 site/node_modules/
 site/.shots/
+
+# Generated practical teaching kits and local run state
+site/public/downloads/practical-labs/
+site/public/downloads/quality-validation.json
+site/public/downloads/quality-prototype-notes.md
+lab-state-*.sqlite

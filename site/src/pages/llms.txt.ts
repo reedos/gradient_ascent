@@ -17,6 +17,7 @@ export const GET: APIRoute = async ({ site }) => {
   const lines: string[] = [];
 
   lines.push('# Gradient Ascent');
+  lines.push(`Quality prototype additions: six practical examples within the existing recipe Markdown pages, starting at ${abs('/recipes/document-qa.md')}, and ${abs('/design-decisions.md')}. The examples have local-model smoke records, not a quality benchmark. See ${abs('/prototype-review/')} for scope and limitations.`);
   lines.push(`Brief improvement team application: ${abs('/examples/reviewer-feedback-loop.md')} — a lead agent coordinates a writer, parallel receiving agents, independent reviewers, and revisions; includes supporting evaluation methods.`);
   lines.push(`Project tools and Markdown templates: ${abs('/tools.md')} — agent instructions, workflows, acceptance criteria, workflow audits, tool specifications, and project handoffs.`);
   lines.push(`Project brief builder: ${abs('/apply/')} — copy or download a brief for your own model. Blank template: ${abs('/project-brief.md')}.`);
@@ -36,7 +37,7 @@ export const GET: APIRoute = async ({ site }) => {
   lines.push('');
   lines.push(
     '> Status: technique, topic and recipe pages are SOURCED — written with primary references, not guaranteed error-free, ' +
-      'but with no recorded run and no scored result file behind it. No page on this site reports ' +
+      'but with no recorded run and no scored result file behind those legacy pages. Outside the prototype validation records, the guide does not report ' +
       'a measured number. Every cost strip and every stepped trace is an illustration and is ' +
       'labeled as one.',
   );

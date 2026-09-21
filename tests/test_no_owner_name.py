@@ -48,6 +48,14 @@ UNIX_HOME_PATH = re.compile(r"(?:/home|/Users)/[^/\s\"'<>]+")
 # has real hits) but it holds zero tracked files today -- `git ls-files` returns nothing under it
 # -- so there is nothing to exempt.
 ALLOWED_HITS: set[tuple[str, str]] = set()
+# These exact addresses are authored synthetic fixtures on the reserved .test domain,
+# not personal contact details. Keep the allowance file-specific; real addresses still fail.
+ALLOWED_HITS |= {(path, 'alex' + '@example.test') for path in (
+    'examples/practical_labs/cases.json',
+    'examples/practical_labs/validation/initial/approval-gate.json',
+    'examples/practical_labs/validation/schema-constrained/approval-gate.json',
+)}
+ALLOWED_HITS.add(('examples/practical_labs/test_labs.py', 'someone-else' + '@example.test'))
 
 
 def _tracked_files() -> list[Path]:

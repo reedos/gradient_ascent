@@ -34,14 +34,12 @@ import Link from '../../components/page/Link.astro';
 import agentGraphsRun from '../../data/runs/agent-graphs.json';
 
 Agent graphs is level 6 read as a graph: nodes are agents, not fixed steps; edges are handoffs
-between them; and the graph keeps shared state and a checkpoint after every node. It is the third
+between them. State sharing and checkpointing depend on the implementation; they are not automatic properties of an agent graph. It is the third
 page in the site's <Link href="/threads/graph-engineering/">graph engineering thread</Link>, after
 <Link href="/techniques/knowledge-graphs/">knowledge graphs</Link>, which connect information, and
 <Link href="/techniques/workflow-graphs/">workflow graphs</Link>, which connect work in code.
 
-The one thing that changes from workflow graphs, level 3, is who picks the edge. There, every
-transition rule is written in code before the graph ever runs: given this state, go here, always.
-Here, one node (usually called a supervisor) is itself a model call, and its own output selects
+The useful distinction is how work is delegated and who chooses subsequent actions. A workflow can also use model-based classification or contain an agent. In the supervisor example here, one node uses a model, and its output selects
 which node runs next from an explicit list of names. OpenAI's Agents SDK documents the same
 arrangement: "If you have multiple possible destinations, register one handoff per destination and
 let the model choose among them."<Cite n={1}/>
