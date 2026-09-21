@@ -149,7 +149,7 @@ const MARK_KEY_ORDER = ['described', 'buildable', 'available'];
 const MARK_KEY_LABEL: Record<string, string> = {
   described: 'Described',
   buildable: 'Buildable',
-  available: 'Reached the public',
+  available: 'Selected milestone',
 };
 // Keys on a `levels[]` entry that are not marked dates. `candidates` is the audit trail behind
 // the marks (what else was considered, and why it was not chosen), not a mark of its own.

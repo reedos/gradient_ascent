@@ -1,0 +1,145 @@
+---
+import { timeline, milestone, formatDate, decimalYear, shifts, asOf } from '../lib/timeline';
+import { levels } from '../lib/content';
+import { selections } from '../lib/timeline-selections';
+import { url } from '../lib/url';
+interface Props { variant?: 'home' | 'page' }
+const { variant = 'home' } = Astro.props;
+const Heading = variant === 'page' ? 'h1' : 'h2';
+const rows = timeline.levels.filter(x => x.level > 0).map(x => {
+  const pick = selections[x.level];
+  const event = milestone(pick.id ?? String(x.available))!;
+  const paper = milestone(String(x.described))!;
+  return { ...pick, level: x.level, name: levels.find(l => l.order === x.level)!.title, eventDate: event, paper };
+}).reverse();
+const start = 2019;
+const end = 2027;
+const pct = (m: typeof rows[number]['paper']) => (decimalYear(m.date, m.precision) - start) / (end - start) * 100;
+const ticks = [2019, 2021, 2023, 2025, 2027];
+---
+<section class="review-timeline" aria-labelledby="milestones-title">
+  <div class="intro">
+    <p class="eyebrow">The timeline</p>
+    <Heading id="milestones-title">Selected milestones in how people use AI</Heading>
+    <p>Selected publications and public milestones, not dates of invention. Select a product for the event, date and evidence.</p>
+  </div>
+  <div class="review-legend" aria-label="Timeline legend">
+    <span><i class="hollow"></i> Foundational publication</span>
+    <span><i></i> Product / architecture milestone</span>
+  </div>
+  <div class="chart">
+    <div class="axis"><span>Level</span><div>{ticks.map(year => <span style={`left:${(year-start)/(end-start)*100}%`}>{year}</span>)}</div></div>
+    {rows.map(r => (
+      <div class="lane" style={`--c:var(--o${r.level})`}>
+        <div class="level"><b>{r.level}</b><span>{r.name}</span></div>
+        <div class="event">
+          <div class="track">
+            <span class="review-connection" aria-hidden="true" style={`left:${pct(r.paper)}%;width:${pct(r.eventDate)-pct(r.paper)}%`}></span>
+            <span class="paper-dot" aria-hidden="true" style={`left:${pct(r.paper)}%`}></span>
+            <a class="event-link" href={`#milestone-level-${r.level}`} aria-label={`${r.title}: ${r.event}, ${formatDate(r.eventDate.date,r.eventDate.precision)}. Show details`} style={`left:${pct(r.eventDate)}%`}>
+              <span class="event-label">{r.level === 3 ? 'Zapier + OpenAI' : r.title}{r.level === 6 && <small>Subagents documented · Jun 2025</small>}</span><span class="event-dot" aria-hidden="true"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    ))}
+    <p class="baseline"><b>0 · No model</b> Rules, search and conventional software have no single arrival date.</p>
+  </div>
+  <p class="snapshot">Lines connect selected dates, not development time. Sources checked through {formatDate(asOf, 'day')}.</p>
+  <section class="model-shifts" aria-labelledby="model-shifts-title">
+    <h2 id="model-shifts-title">Across all levels · changes in the models</h2>
+    <div class="shift-grid">{shifts.map(s => {
+      const m = milestone(s.milestone)!;
+      const label = s.id === 'system-one-models' ? 'Typed decision models (Jev)' : s.title;
+      const summary = s.id === 'system-one-models' ? 'TypeSafe introduced Jev in early access on September 15, 2026: a model that returns typed decisions with probabilities rather than generated text. “System One” is TypeSafe’s name for its proposed model category.' : s.summary;
+      return <details class="shift-detail" id={s.id}><summary>{label} <span>· {formatDate(m.date.slice(0,7),'month')}</span></summary><p>{summary} <a href={m.source.url}>Source ↗</a></p></details>;
+    })}</div>
+  </section>
+</section>
+<section class="source-notes" aria-labelledby="source-notes-title">
+  <h2 id="source-notes-title">Selected milestone</h2>
+  {rows.map(r => <details id={`milestone-level-${r.level}`} style={`--c:var(--o${r.level})`}>
+    <summary><span class="note-level">{r.level} · {r.name}</span><span>{r.title}</span><span class="note-event">{r.event}</span></summary>
+    <div class="note-body"><p>{r.note}</p>
+      <p><strong>Marked event:</strong> {r.level === 3 ? 'Available by ' : ''}{formatDate(r.eventDate.date,r.eventDate.precision)} · <a href={r.eventDate.source.archive_url ?? r.eventDate.source.url}>{r.eventDate.source.title} ↗</a></p>
+      {r.level === 2 && <p><strong>Early behavior:</strong> <a href="https://www.cognitiverevolution.ai/in-search-of-truth-w-aravind-srinivas-of-perplexity-ai/">Founder interview describing the first Perplexity Ask ↗</a>.</p>}
+      <p><strong>Foundational publication:</strong> <a href={r.paper.source.url}>{r.paper.title} ↗</a> · {formatDate(r.paper.date,r.paper.precision)}. This is a reference point, not a claim to the first use of the idea.</p>
+      {r.eventDate.opened && <p><strong>Later access:</strong> {r.eventDate.opened.text}, {formatDate(r.eventDate.opened.date,r.eventDate.opened.precision)}.</p>}
+    </div>
+  </details>)}
+</section>
+{variant === 'home' && <p class="timeline-more"><a href={url('/timeline/')}>Explore the full timeline and sources →</a></p>}
+<noscript><style is:global>.source-notes, .source-notes details { display: block !important }</style></noscript>
+<script>
+  function revealNote() {
+    const el = document.getElementById(location.hash.slice(1));
+    if (el instanceof HTMLDetailsElement) {
+      el.open = true;
+      if (el.closest('.source-notes')) document.querySelectorAll('.source-notes details').forEach(note => { if (note instanceof HTMLDetailsElement) note.open = note === el; });
+      el.scrollIntoView({ block: 'nearest' });
+    }
+  }
+  document.querySelectorAll<HTMLAnchorElement>('.event-link').forEach(link => {
+    link.addEventListener('click', event => {
+      event.preventDefault();
+      history.replaceState(null, '', link.hash);
+      revealNote();
+    });
+  });
+  window.addEventListener('hashchange', revealNote);
+  revealNote();
+</script>
+<style>
+  .timeline-more { margin-top: 16px; font-size: 12px; color: var(--accent) }
+  .intro { max-width: 850px }
+  .intro :is(h1, h2) { margin: 10px 0; font-size: clamp(23px, 3vw, 32px); letter-spacing: -1px; line-height: 1.3 }
+  .intro > p:last-child { color: var(--muted); font-size: 12px; line-height: 1.7 }
+  .review-legend { display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 16px 0 10px; font-size: 10px; color: var(--muted) }
+  .review-legend span { display: flex; align-items: center; gap: 6px }
+  .review-legend i { width: 7px; height: 7px; border: 1px solid var(--text); background: var(--text); border-radius: 50%; flex-shrink: 0 }
+  .review-legend i.hollow { background: transparent }
+  .chart { padding: 16px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel) }
+  .axis, .lane { display: grid; grid-template-columns: 115px minmax(0,1fr); column-gap: 12px }
+  .axis { font-size: 9px; color: var(--muted); margin-bottom: 4px }
+  .axis > div { position: relative; height: 18px; margin: 0 6px }
+  .axis > div > span { position: absolute; transform: translateX(-50%) }
+  .lane { height: 30px }
+  .level { display: flex; gap: 7px; font-size: 10px; align-items: center; line-height: 1.2 }
+  .level b { color: var(--c) }
+  .track { position: relative; height: 30px; margin: 0 6px }
+  .review-connection { position: absolute; top: 15px; height: 1px; background: var(--c); opacity: .4 }
+  .paper-dot { position: absolute; top: 12px; width: 6px; height: 6px; transform: translateX(-50%); border: 1px solid var(--c); border-radius: 50%; background: var(--panel) }
+  .event-link { position: absolute; top: 0; height: 30px; display: flex; align-items: center; transform: translateX(-100%); padding-right: 9px; white-space: nowrap; font-size: 10px }
+  .event-label small { display: block; font-size: 8px; line-height: 10px; color: var(--muted) }
+  .event-label { background: var(--panel); padding: 3px }
+  .event-link:hover .event-label, .event-link:focus-visible .event-label { color: var(--c); text-decoration: underline }
+  .event-dot { position: absolute; right: -4px; width: 8px; height: 8px; border-radius: 50%; background: var(--c) }
+  .baseline { font-size: 10px; color: var(--muted); margin-top: 8px; padding-top: 9px; border-top: 1px solid var(--line); line-height: 1.5 }
+  .baseline b { color: var(--text); margin-right: 12px }
+  .snapshot { font-size: 10px; color: var(--muted); margin: 8px 0 }
+  .model-shifts { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 12px }
+  .model-shifts h2 { font: 600 10px var(--font); letter-spacing: .5px; color: var(--muted); margin: 0 0 6px }
+  .shift-grid { display: flex; flex-wrap: wrap; gap: 6px 30px }
+  .shift-detail { flex: 1 1 220px }
+  .shift-detail summary { padding: 6px 0; font-size: 12px; cursor: pointer }
+  .shift-detail summary span { color: var(--muted); font-size: 10px }
+  .shift-detail p { font-size: 12px; color: var(--muted); line-height: 1.7; max-width: 65ch }
+  .source-notes { margin: 24px 0 }
+  .source-notes:not(:has(details[open])) { display: none }
+  .source-notes h2 { font-size: 18px; margin-bottom: 10px }
+  .source-notes details { border: 1px solid var(--line); border-radius: 8px; padding: 14px; scroll-margin-top: 95px }
+  .source-notes details:not([open]) { display: none }
+  .source-notes summary { cursor: pointer; font-size: 12px; line-height: 1.8 }
+  .note-level { color: var(--c); margin-right: 14px }
+  .note-event { color: var(--muted); margin-left: 14px; font-size: 11px }
+  .note-body { max-width: 85ch; font-size: 12px; color: var(--muted); padding-top: 12px }
+  .note-body p + p { margin-top: 10px }
+  .note-body a, .shift-detail a { color: var(--accent) }
+  @media(max-width:600px) {
+    .chart { padding: 12px 10px }
+    .axis, .lane { grid-template-columns: 78px minmax(0,1fr); gap: 8px }
+    .level { gap: 5px; font-size: 9px }
+    .event-link { font-size: 9px }
+    .note-event { display: block; margin-left: 0 }
+  }
+</style>

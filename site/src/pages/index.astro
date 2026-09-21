@@ -3,7 +3,7 @@ import { usDate } from '../lib/dates';
 import Base from '../layouts/Base.astro';
 import SectionTop from '../components/SectionTop.astro';
 import MapPreview from '../components/MapPreview.astro';
-import TimelineStrip from '../components/TimelineStrip.astro';
+import SelectedTimeline from '../components/SelectedTimeline.astro';
 import CapabilityChart from '../components/CapabilityChart.astro';
 import LevelStack from '../components/islands/LevelStack';
 import { url } from '../lib/url';
@@ -79,7 +79,7 @@ const levelStackItems = levels.map(t => ({order:t.order,title:t.title,short:t.sh
   </section>
 
   <section class="section" id="timeline">
-    <TimelineStrip variant="home" />
+    <SelectedTimeline variant="home" />
   </section>
 
   <section class="section" id="capability">

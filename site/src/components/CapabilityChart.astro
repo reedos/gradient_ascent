@@ -39,7 +39,7 @@ for (let v = scale.y0; v <= scale.y1; v += 20) yTicks.push(v);
 const years: number[] = [];
 for (let y = Math.ceil(scale.x0); y <= Math.floor(scale.x1); y++) years.push(y);
 
-// This site's own dates, along the bottom: when each level reached the public.
+// This site's own dates, along the bottom: selected milestones for each level.
 const levelMarks = levelSeries()
   .map((s) => ({ level: s.level, mark: s.marks.find((m) => m.key === 'available') }))
   .filter((x) => x.mark && x.mark.milestone.date >= START)
@@ -76,7 +76,7 @@ const longDate = (iso: string) => formatDate(iso, 'day');
     <svg class="cap-svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby="cap-title cap-desc">
       <title id="cap-title">Epoch Capabilities Index by model release date, {Math.ceil(scale.x0)} to {usDate(asOf)}</title>
       <desc id="cap-desc">
-        {snap.points.length} models scored by Epoch AI, plotted by release date. A stepped line follows the best score to date, from {front[0].eci} to {top.eci}. Markers under the axis show when each of this site's levels reached the public, and a vertical line marks the first reasoning model.
+        {snap.points.length} models scored by Epoch AI, plotted by release date. A stepped line follows the best score to date, from {front[0].eci} to {top.eci}. Markers under the axis show selected milestones for this site's levels, and a vertical line marks the first reasoning model.
       </desc>
       <defs>
         <linearGradient id="cap-grad" x1="0" y1="0" x2="1" y2="0">
@@ -134,7 +134,7 @@ const longDate = (iso: string) => formatDate(iso, 'day');
           <title>{`Level ${m.level}, ${m.title}: ${m.product}, ${longDate(m.date)}`}</title>
         </a>
       ))}
-      <text class="cap-axis is-halo" x={scale.right} y={scale.bottom + 38} text-anchor="end">When each level reached the public</text>
+      <text class="cap-axis is-halo" x={scale.right} y={scale.bottom + 38} text-anchor="end">Selected milestones by level</text>
     </svg>
   </div>
 
@@ -142,7 +142,7 @@ const longDate = (iso: string) => formatDate(iso, 'day');
     <li><span class="cap-key is-closed" /> A model, closed weights</li>
     <li><span class="cap-key is-open" /> A model, open weights</li>
     <li><span class="cap-key is-line" /> Best score to date</li>
-    <li><span class="cap-key is-level" /> A level of this site reaching the public</li>
+    <li><span class="cap-key is-level" /> A selected milestone for a level</li>
   </ul>
 
   <figcaption>
@@ -155,8 +155,8 @@ const longDate = (iso: string) => formatDate(iso, 'day');
       <p>
         The shape has a bend in it. From {gpt4.name.replace(/ \(.*\)$/, '')} on {longDate(gpt4.date)} to the day before the first
         reasoning model, {before.months} months, the best score rose {before.points} points, from {before.from} to {before.to}. In the {after.months} months
-        since, it has risen {after.points}, to {top.eci} ({top.name}, {longDate(top.date)}). Levels 1 to 4 reached the public
-        before the bend; agents, teams of agents and always-on products all arrived after it. Both figures are this
+        since, it has risen {after.points}, to {top.eci} ({top.name}, {longDate(top.date)}). The selected milestones for levels 1 to 4 fall
+        before the bend; the selected milestones for levels 5 to 7 fall after it. This reflects the editorial selection, not the first emergence of those patterns. Both figures are this
         site’s subtraction over Epoch’s scores. The index starts in early 2023, so it says nothing about what came before.
       </p>
     )}

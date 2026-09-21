@@ -2,9 +2,9 @@
   "version": 1,
   "as_of": "2026-09-19",
   "criteria": {
-    "described": "The earliest publication the site could verify that describes the level's defining idea itself, in a form recognizable today: a paper, or a maker's own technical post. A paper about an enabling architecture does not count; the page has to describe what the level does. For papers the date is the arXiv v1 submission date, not the date of later revision or conference publication.",
+    "described": "A selected foundational publication describing the level’s defining idea. This is a reference point, not a claim to the first invention or use. Paper dates use the arXiv v1 submission where applicable.",
     "buildable": "The earliest release the site could verify of a widely used open framework, library or API that a developer could build the level with instead of writing it from scratch. A developer still has to build something; this is not a product an ordinary customer can use.",
-    "available": "The day the level reached the public: the launch of the widely known product that first put it in front of ordinary people, as its maker's own page dates it. This is an editorial choice and the site says so. Earlier, little-known products often exist (a text game before ChatGPT, a looping web demo before any agent product); each level's `candidates` list names them, with dates and sources, and says why the mark is the product people know. The marked date is the launch date. Where the launch was a waitlist, a preview or an announcement, the milestone says so in `availability`, and `opened` records the day an ordinary customer could actually get in. What the product did is quoted from the maker's page of that date, not from what it became later. Where a maker's page will not open from here, the site reads the Internet Archive's capture of that same page and records it in `source.archive_url`. See docs/TIMELINE-METHOD.md."
+    "available": "A selected product or documented architecture illustrating the level. Each label identifies the event: release, preview, archived availability, or architecture documentation. These are not universal arrival dates. Documentation and archive dates must not be read as exact deployment or launch dates."
   },
   "levels": [
     {
@@ -95,8 +95,8 @@
       "level": 2,
       "described": "rag-paper-2020",
       "buildable": "llamaindex-2022",
-      "available": "bing-ai-search-2023",
-      "note": "'buildable' is now the first open library built for this level's job rather than the oldest library involved in it. FAISS (2017) is vector similarity search, published three years before anyone retrieved with it for a language model, and OpenAI's embeddings endpoint (January 2022) returns vectors but retrieves nothing; both are kept as milestones. Perplexity, live from December 2022, would be an earlier 'available' if it could be dated: no Perplexity-owned page states a launch date.",
+      "available": "perplexity-ask-2022",
+      "note": "Perplexity illustrates retrieval followed by a cited answer. The December 7, 2022 launch date comes from retrospective founder testimony, not a contemporaneous announcement.",
       "candidates": [
         {
           "mark": "described",
@@ -126,25 +126,31 @@
           "mark": "available",
           "id": "bing-open-preview-2023",
           "chosen": false,
-          "why": "May 4, 2023: the day the waitlist ended. Recorded as the launch's `opened` date."
+          "why": "Related search milestone; Perplexity is selected for its explicit retrieved-answer pattern."
         },
         {
           "mark": "available",
           "id": "bing-ai-search-2023",
-          "chosen": true,
-          "why": "February 7, 2023: the launch that put answers built from search results in front of the public. Waitlisted at first; open to everyone on May 4, 2023."
+          "chosen": false,
+          "why": "Related search milestone; Perplexity is selected for its explicit retrieved-answer pattern."
         },
         {
           "mark": "available",
           "id": "gemini-notebook-rename-2026",
           "chosen": false,
-          "why": "2026; the clearest consumer example of the level today, not the earliest."
+          "why": "Related search milestone; Perplexity is selected for its explicit retrieved-answer pattern."
         },
         {
           "mark": "available",
           "id": "neeva-ai-2023",
           "chosen": false,
-          "why": "January 6, 2023: a month earlier and open at once, from a search engine few people used and that closed the same year."
+          "why": "Related search milestone; Perplexity is selected for its explicit retrieved-answer pattern."
+        },
+        {
+          "mark": "available",
+          "id": "perplexity-ask-2022",
+          "chosen": true,
+          "why": "Perplexity illustrates retrieval followed by a cited answer. The December 7, 2022 launch date comes from retrospective founder testimony, not a contemporaneous announcement."
         }
       ]
     },
@@ -152,8 +158,8 @@
       "level": 3,
       "described": "ai-chains-paper-2021",
       "buildable": "langchain-release-2022",
-      "available": "m365-copilot-2023",
-      "note": "The 'available' date is the earliest capture this site could read of Zapier's own OpenAI page, not a date Zapier announces: the feature was live by December 9, 2022 and may have shipped earlier. It replaces a Microsoft general-availability announcement a year later, which was the earliest date this site had previously looked for rather than the earliest it could show. The marked product, Microsoft 365 Copilot, was unveiled on March 16, 2023 and could not be bought until November 1, 2023; the mark is the unveiling because that is when the public met the idea. Zapier's OpenAI step was usable by December 9, 2022 and is the earlier, lesser-known product.",
+      "available": "zapier-openai-2022",
+      "note": "Zapier illustrates a model call inside predefined software steps. December 9, 2022 is archive evidence of availability by that date, not a confirmed launch date.",
       "candidates": [
         {
           "mark": "described",
@@ -176,26 +182,26 @@
         {
           "mark": "available",
           "id": "zapier-openai-2022",
-          "chosen": false,
-          "why": "Live by December 9, 2022 and usable by any Zapier customer, so it is the earlier product. But it is a thin connector: it passes text to OpenAI's model inside Zapier's ordinary automation, and few people know it."
+          "chosen": true,
+          "why": "Zapier illustrates a model call inside predefined software steps. December 9, 2022 is archive evidence of availability by that date, not a confirmed launch date."
         },
         {
           "mark": "available",
           "id": "power-automate-gpt-prompts-2023",
           "chosen": false,
-          "why": "Generally available December 19, 2023, a year later, though with a dated announcement of its own."
+          "why": "Related workplace-AI milestone; Zapier more directly illustrates predefined workflows."
         },
         {
           "mark": "available",
           "id": "m365-copilot-2023",
-          "chosen": true,
-          "why": "March 16, 2023: the product through which most people first met a model working inside fixed, software-run steps. Unveiled that day; on sale November 1, 2023."
+          "chosen": false,
+          "why": "Related workplace-AI milestone; Zapier more directly illustrates predefined workflows."
         },
         {
           "mark": "available",
           "id": "m365-copilot-ga-2023",
           "chosen": false,
-          "why": "November 1, 2023: the day it went on sale. Recorded as the launch's `opened` date."
+          "why": "Related workplace-AI milestone; Zapier more directly illustrates predefined workflows."
         }
       ]
     },
@@ -341,8 +347,8 @@
       "level": 6,
       "described": "camel-paper-2023",
       "buildable": "autogen-release-2023",
-      "available": "claude-research-launch-2025",
-      "note": "The level has two forms, and they arrived at different times. Subagents: one agent spawns temporary copies of itself for parts of a job, they report back and they are gone. That is what Anthropic's June 2025 post describes for Claude Research, and it arrived first. Teams: standing agents with their own roles that persist and check one another; Muse's separate Sentinel agent (September 2026) is an example. Claude Research is marked at its launch, April 15, 2025. The launch page itself describes one Claude searching repeatedly; the page that says a lead agent delegates to subagents is dated June 13, 2025, and neither says whether the design changed in between.",
+      "available": "anthropic-multiagent-research-2025",
+      "note": "June 13, 2025 documents Claude Research delegating to parallel subagents. The April 15 launch announcement does not establish the architecture at launch; this marker dates documentation, not deployment.",
       "candidates": [
         {
           "mark": "described",
@@ -365,20 +371,20 @@
         {
           "mark": "available",
           "id": "claude-research-launch-2025",
-          "chosen": true,
-          "why": "April 15, 2025: the launch of the widely known product. Anthropic's launch page describes one Claude searching repeatedly; its engineering post of June 13, 2025 is the page that says a lead agent delegates to subagents."
+          "chosen": false,
+          "why": "Earlier product launch; its announcement does not establish the multi-agent architecture."
         },
         {
           "mark": "available",
           "id": "anthropic-multiagent-research-2025",
-          "chosen": false,
-          "why": "June 13, 2025: the page that proves the architecture, published two months after the product went on sale."
+          "chosen": true,
+          "why": "June 13, 2025 documents Claude Research delegating to parallel subagents. The April 15 launch announcement does not establish the architecture at launch; this marker dates documentation, not deployment."
         },
         {
           "mark": "available",
           "id": "grok-4-heavy-2025",
           "chosen": false,
-          "why": "July 9, 2025, after the marked date. xAI's page shows \"Agent 1\", \"Agent 2\", \"Agent 3\" in its demo but does not say how they share the work."
+          "why": "Earlier product launch; its announcement does not establish the multi-agent architecture."
         },
         {
           "mark": "described",
@@ -390,7 +396,7 @@
           "mark": "available",
           "id": "genspark-2024",
           "chosen": false,
-          "why": "June 18, 2024: the earliest product whose own launch page says several agents share a job. It gives no mechanism, and few people know the product."
+          "why": "Earlier product launch; its announcement does not establish the multi-agent architecture."
         }
       ]
     },
@@ -893,7 +899,7 @@
       "precision": "day",
       "level": 1,
       "kind": "model",
-      "title": "Jev, a System One model",
+      "title": "Jev, a typed decision model (early access)",
       "maker": "TypeSafe AI",
       "what": "TypeSafe's founder, Diogo Almeida, announces \"a new class of frontier models built to make fast, structured decisions that software can use directly\": \"unstructured state in, typed probabilistic decisions out.\" Jev writes no text. Its possible outputs are defined in advance, every answer carries a probability, and all of it comes back in one parallel pass, not word by word. TypeSafe quotes \"70ms-500ms\" a call and \"$0.042 / MTok\" of input. Its own list of uses is this site's level 3: \"classify, route, score, extract, or branch where hand-written logic is too brittle.\"",
       "technique": "structured-output",
@@ -2037,12 +2043,12 @@
       "short": "Claude Research",
       "date": "2025-04-15",
       "precision": "day",
-      "level": 6,
+      "level": 5,
       "kind": "product",
       "title": "Claude Research reaches customers",
       "maker": "Anthropic",
       "what": "Anthropic's launch post of April 15, 2025 says Claude “operates agentically, conducting multiple searches that build on each other while determining exactly what to investigate next”, and that “Research is now available in early beta for Max, Team, and Enterprise plans in the United States, Japan, and Brazil.” Anthropic's engineering post two months later says of the same feature: “Our Research system uses a multi-agent architecture with an orchestrator-worker pattern, where a lead agent coordinates the process while delegating to specialized subagents that operate in parallel.” The launch post itself does not say several agents run on one request.",
-      "technique": "orchestrator-workers",
+      "technique": "agentic-rag",
       "registry_id": "claude-research",
       "source": {
         "title": "Claude takes research to new places",
@@ -2052,7 +2058,7 @@
       "checked": "2026-09-18",
       "verified": true,
       "availability": "preview",
-      "note": "Marked as this level's available date because it is when customers could first use the product Anthropic later documented as multi-agent (anthropic-multiagent-research-2025, June 13, 2025). Reading the two posts together is this site's inference, not Anthropic's statement; a reader who wants only what a single page says should take June 13, 2025."
+      "note": "Product launch; the announcement does not establish whether the later documented multi-agent architecture was already in use."
     },
     {
       "id": "anthropic-multiagent-research-2025",
@@ -2072,7 +2078,7 @@
       },
       "checked": "2026-09-18",
       "verified": true,
-      "note": "Anthropic published this two months after the feature went on sale. It is the first page from a maker this site could open that says a product customers were already buying ran several agents on one request; the level marks the sale date instead, and says why."
+      "note": "June 13, 2025 documents Claude Research delegating to parallel subagents. The April 15 launch announcement does not establish the architecture at launch; this marker dates documentation, not deployment."
     },
     {
       "id": "grok-4-heavy-2025",
@@ -2393,6 +2399,25 @@
       },
       "checked": "2026-09-18",
       "verified": true
+    },
+    {
+      "id": "perplexity-ask-2022",
+      "date": "2022-12-07",
+      "precision": "day",
+      "level": 2,
+      "kind": "product",
+      "title": "Perplexity Ask",
+      "short": "Perplexity",
+      "maker": "Perplexity",
+      "what": "The early Perplexity Ask generated answers from retrieved search results with citations. Cofounder Aravind Srinivas retrospectively dates its launch to December 7, 2022 at Stripe Sessions 2024.",
+      "source": {
+        "title": "Aravind Srinivas on the launch date · Stripe Sessions 2024",
+        "url": "https://stripe.com/sessions/2024/a-blueprint-for-ai-acceleration",
+        "publisher": "Stripe"
+      },
+      "checked": "2026-09-20",
+      "verified": true,
+      "technique": "rag"
     }
   ],
   "measures": [
@@ -2445,7 +2470,7 @@
     },
     {
       "id": "system-one-models",
-      "title": "System One models",
+      "title": "Typed decision models (Jev)",
       "milestone": "jev-2026",
       "strip": false,
       "technique": "structured-output",
