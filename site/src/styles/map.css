@@ -42,7 +42,7 @@
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
-.map-filters > .footnote {
+.map-filters > .footnote, .map-options > .footnote {
   margin-top: 14px;
 }
 
@@ -374,3 +374,42 @@
 .map-workspace { display: flex; flex-direction: column; gap: 22px; }
 .map-connection-heading { line-height: 1.6; }
 .map-connection-heading .map-swatch { margin-right: 8px; }
+
+/* Desktop keeps its existing geometry and fully expanded controls. */
+.map-options > summary, .map-legend > summary { display: none; }
+.map-focus-controls { display: contents; }
+
+/* Phone overview: fit the entire graph, keep details readable through the concept picker,
+   and leave browser pinch zoom available. No nested scrolling surface. */
+@media (max-width: 600px) {
+  .map-wrap { gap: 10px; }
+  .map-filters { display: contents; }
+  .map-focus-controls { display: block; order: 0; }
+  .map-focus-label { margin: 0 0 6px; font-size: 12px; }
+  #map-focus { max-width: none; min-height: 44px; padding: 9px 11px; }
+  .map-focus-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); }
+  .map-clear { margin-top: 10px; min-height: 44px; }
+  .map-selection-jump { display: inline-block; margin: 10px 0 0 12px; font-size: 12px; }
+  .map-selection-jump[hidden] { display: none; }
+  .map-legend { order: 1; }
+  .map-legend > summary, .map-options > summary { display: list-item; cursor: pointer; font-size: 12px; color: var(--text); padding: 10px 0; }
+  .map-mobile-key { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; margin-top: 10px; }
+  .map-mobile-key > span { display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--muted); }
+  .map-mobile-key .map-swatch { width: 18px; flex: 0 0 18px; }
+  .map-legend-heading { display: none; }
+  .map-reading-key { margin: 8px 0 16px; }
+  .map-workspace { order: 2; gap: 14px; }
+  .map-options { order: 3; border-top: 1px solid var(--line); }
+  .map-options[open] { padding-bottom: 16px; }
+  .map-options .filter-check { min-height: 44px; }
+  .map-options .map-filters-row { gap: 0 16px; }
+  .map-labels { flex: 0 0 27px; height: auto !important; }
+  .map-band-label { top: var(--map-band-top) !important; height: var(--map-band-height) !important; padding: 0 3px; align-items: center; gap: 0; }
+  .map-band-num { font-size: 9px; }
+  .map-band-label[data-kind='level'] .map-band-title { display: none; }
+  .map-band-label[data-kind='topics'] .map-band-title { writing-mode: vertical-rl; font-size: 8px; }
+  .map-scroll { overflow: visible; }
+  .map-svg { width: 100%; height: auto; }
+  .map-selection { padding: 18px; }
+  .map-selection h3 { font-size: 22px; }
+}

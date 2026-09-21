@@ -22,16 +22,17 @@ const topicNodeCount = mapLayout.nodes.length - tierNodeCount;
     <span>Map</span>
   </nav>
 
-  <div class="page-hero">
+  <div class="page-hero map-page-hero">
     <div class="eyebrow"><span class="dot"></span>Map</div>
     <h1>The whole technique graph, at a glance</h1>
-    <p>
+    <p class="map-desktop-intro">
       Every concept page is one node, in the level it belongs to. Level 7 is at the top and
       level 0 at the bottom, the same order as the climb curve on the home page. Below them, five
       short rows hold the topics that cut across every level, one row per topic. The taxonomy's
       typed relations connect them: what to read first, when to climb, what is commonly used
       together, and what solves the same problem a different way.
     </p>
+    <p class="map-mobile-intro">Explore the connections. Pinch to zoom, or choose a concept for readable details.</p>
     <div class="hero-meta">
       <span>{mapLayout.nodes.length} pages</span>
       <span>{tierNodeCount} across the eight levels</span>
@@ -40,7 +41,7 @@ const topicNodeCount = mapLayout.nodes.length - tierNodeCount;
     </div>
   </div>
 
-  <section class="section">
+  <section class="section map-page-section">
     <SectionTop
       eyebrow="The graph"
       title="Every technique, where it sits and what it connects to"
@@ -49,3 +50,14 @@ const topicNodeCount = mapLayout.nodes.length - tierNodeCount;
     <TechniqueMap />
   </section>
 </Base>
+<style>
+ .map-mobile-intro { display: none; }
+ @media (max-width: 600px) {
+  .map-page-hero { padding: 16px 0 20px; }
+  .map-page-hero h1 { font-size: 25px; line-height: 1.2; margin-bottom: 10px; }
+  .map-desktop-intro, .map-page-hero .hero-meta, .map-page-hero .eyebrow { display: none; }
+  .map-mobile-intro { display: block; font-size: 13px; line-height: 1.6; margin: 0; }
+  .map-page-section { padding-top: 0; margin-top: 0; }
+  .map-page-section :global(.section-top) { display: none; }
+ }
+</style>

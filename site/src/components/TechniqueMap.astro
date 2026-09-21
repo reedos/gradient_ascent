@@ -50,6 +50,8 @@ const drawableEdges = mapConnections(layout)
 
 <div class="map-wrap">
 <div class="map-filters panel" role="group" aria-label="Which relations to draw">
+  <details class="map-options" open>
+  <summary>Filters &amp; reading tips</summary>
   <p class="map-filters-label">Relations to draw</p>
   <div class="map-filters-row">
     {
@@ -69,15 +71,19 @@ const drawableEdges = mapConnections(layout)
   </p>
   <p class="footnote">Combines with and Alternative to start off to keep the overview readable. Topics apply across levels;
     the map highlights useful direct connections, not every possible combination. An upgrade is a next step when needed, not a universal prerequisite.</p>
+  </details>
+  <div class="map-focus-controls">
   <label class="map-focus-label" for="map-focus">Focus on a concept</label>
   <select id="map-focus" disabled><option value="">All concepts</option>{[...layout.nodes].sort((a, b) => a.title.localeCompare(b.title)).map(n => <option value={n.slug}>{n.title}</option>)}</select>
   <p class="map-focus-status" aria-live="polite">Hover to explore. Click a concept to lock its connections, then open its page in the selection panel.</p>
   <button type="button" class="map-clear" hidden>Clear selection</button>
   <a class="map-selection-jump" href="#map-selection" hidden>Read why these concepts connect →</a>
+  </div>
   <noscript><p class="footnote">JavaScript is off. Concept boxes open their pages directly; the relationship filters still work.</p></noscript>
 </div>
 
-<div class="map-legend">
+<details class="map-legend" open>
+  <summary><span>Line meanings</span><span class="map-mobile-key">{RELATION_ORDER.map(type=><span><i class="map-swatch" data-type={type} aria-hidden="true" />{RELATION_LABEL[type]}</span>)}</span></summary>
   <h3 class="map-legend-heading">What each line means</h3>
   <p class="map-reading-key">Hover or focus to trace connections. Click or press Enter to lock a selection; read why each concept connects in the selection panel. Crossing lines are not joined. Select a concept to see the direction and explanation of each connection.</p>
   <dl class="map-legend-list">
@@ -93,7 +99,7 @@ const drawableEdges = mapConnections(layout)
       ))
     }
   </dl>
-</div>
+</details>
 
 <div class="map-workspace">
 <div class="map-row">
@@ -103,7 +109,8 @@ const drawableEdges = mapConnections(layout)
         <div
           class="map-band-label"
           data-kind={band.kind}
-          style={`top:${band.y}px;height:${band.h}px;--c:${band.kind === 'level' ? `var(--o${band.level})` : 'var(--ot)'}`}
+          style={`top:${band.y}px;height:${band.h}px;--map-band-top:${band.y / layout.height * 100}%;--map-band-height:${band.h / layout.height * 100}%;--c:${band.kind === 'level' ? `var(--o${band.level})` : 'var(--ot)'}`}
+          title={band.shortTitle}
         >
           {band.kind === 'level' && <span class="map-band-num">{String(band.level).padStart(2, '0')}</span>}
           <span class="map-band-title">{band.shortTitle}</span>
@@ -215,6 +222,11 @@ const drawableEdges = mapConnections(layout)
   // Native links remain usable without JavaScript and for modified clicks / open in new tab.
   const wrap = document.querySelector<HTMLElement>('.map-wrap');
   if (wrap) {
+    // Native disclosures preserve every control; only phones start with the long guidance closed.
+    const mobileMap = matchMedia('(max-width: 600px)');
+    const adaptMap = () => wrap.querySelectorAll<HTMLDetailsElement>('.map-options, .map-legend').forEach(detail => { detail.open = !mobileMap.matches; });
+    adaptMap();
+    mobileMap.addEventListener('change', adaptMap);
     const edges = [...wrap.querySelectorAll<SVGElement>('.map-edge')];
     const nodes = [...wrap.querySelectorAll<SVGAElement>('.map-node')];
     const select = wrap.querySelector<HTMLSelectElement>('#map-focus')!;
