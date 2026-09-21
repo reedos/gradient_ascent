@@ -186,20 +186,20 @@ correct; being small did not make any of them safe to leave untested.
 
 ## At each level
 
-- <Link href="/levels/1/">One call</Link>: attacking the prompt itself (the input a person can
+- <Link href="/levels/1/">Direct prompting</Link>: attacking the prompt itself (the input a person can
   type directly) is the whole scope, since there is no retrieved content and no tool call yet
   for an attack to reach.
-- <Link href="/levels/2/">Context</Link>: retrieved content is now something to attack, not just
+- <Link href="/levels/2/">Added context</Link>: retrieved content is now something to attack, not just
   the user's own message. This is the same expansion <Link href="/techniques/safety/">safety</Link>'s
   own "at each level" section names for prompt injection generally.
-- <Link href="/levels/4/">Tools</Link>: an attack that used to only produce a bad sentence can
+- <Link href="/levels/4/">Tool use</Link>: an attack that used to only produce a bad sentence can
   now attempt a real action, so this is the level where the highest-value finding usually lives
   : a permission check that fails is exactly the shape of bug this page's own safety example
   narrates.
-- <Link href="/levels/5/">Agents</Link>: an attack does not have to work on the first turn; a
+- <Link href="/levels/5/">Agent loops</Link>: an attack does not have to work on the first turn; a
   long loop gives it many chances, so testing has to include multi-turn attempts, not just single
   malicious inputs.
-- <Link href="/levels/6/">Teams of agents</Link>: a handoff between agents is its own attack
+- <Link href="/levels/6/">Teams of Agents</Link>: a handoff between agents is its own attack
   surface: content that one agent only reads can carry an instruction for the next agent, which
   may hold permissions the first never had, the exact shape
   <Link href="/techniques/debate-review/">review and debate</Link>'s fence was built to break

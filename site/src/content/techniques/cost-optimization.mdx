@@ -180,22 +180,22 @@ for hardware and the upkeep of a service you now operate.
 Each level has one lever that pays before any of the others. The list below is that lever, not a
 catalog; <Link href="/techniques/ops/">ops</Link> covers what each level costs to run.
 
-- <Link href="/levels/0/">No model</Link>: nothing is billed per token, so no lever below
+- <Link href="/levels/0/">Conventional software</Link>: nothing is billed per token, so no lever below
   applies. Worth listing because it is the cheapest answer the worksheet can reach.
-- <Link href="/levels/1/">One call</Link>: model choice, and nothing else. Nothing repeats yet,
+- <Link href="/levels/1/">Direct prompting</Link>: model choice, and nothing else. Nothing repeats yet,
   so there is nothing to cache; nothing is deferred, so there is nothing to batch.
-- <Link href="/levels/2/">Context</Link>: what you put in the window, because you pay for it on
+- <Link href="/levels/2/">Added context</Link>: what you put in the window, because you pay for it on
   every single call. Cutting it and caching the part that cannot be cut are the same lever seen
   from two sides: see <Link href="/techniques/context-engineering/">context engineering</Link>.
 - <Link href="/levels/3/">Workflows</Link>: the step that runs on every question whether it
   needs to or not. Find it first, and only then ask whether it could be batched or skipped.
-- <Link href="/levels/4/">Tools</Link>: not a lever but a budgeting rule. The model decides
+- <Link href="/levels/4/">Tool use</Link>: not a lever but a budgeting rule. The model decides
   whether a tool call happens, so the same question costs one call or two, and an estimate that
   assumes the cheaper case is wrong for some fraction of traffic you do not control.
-- <Link href="/levels/5/">Agents</Link>: the ceiling, before anything else. A loop with no fixed
+- <Link href="/levels/5/">Agent loops</Link>: the ceiling, before anything else. A loop with no fixed
   length has no natural stopping cost, which is what
   <Link href="/techniques/single-agent/">a single agent</Link>'s `max_steps` exists for.
-- <Link href="/levels/6/">Teams of agents</Link>: seat assignment. Every lever multiplies by the
+- <Link href="/levels/6/">Teams of Agents</Link>: seat assignment. Every lever multiplies by the
   number of agents, so the largest single saving is which model sits in which seat.
 - <Link href="/levels/7/">Always-on agents</Link>: how often it wakes up. A system that runs
   whether or not there is anything to do spends most of its budget deciding there is nothing to

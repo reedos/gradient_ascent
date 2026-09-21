@@ -3,7 +3,7 @@
   "h": 420,
   "title": "Context engineering",
   "sub": "Assemble one request from fixed parts, cache-friendly order first, and ask once.",
-  "pill": "Level 2 · Context",
+  "pill": "Level 2 · Added context",
   "nodes": [
     { "id": "q", "x": 170, "y": 34, "l": "Question + history", "k": "io" },
     { "id": "static", "x": 170, "y": 104, "l": "Build the static block", "k": "code" },

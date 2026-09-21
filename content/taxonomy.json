@@ -25,8 +25,8 @@
     {
       "id": "no-model",
       "order": 0,
-      "title": "No model",
-      "control": "Your code, entirely. The lowest order that passes is sometimes none.",
+      "title": "Conventional software",
+      "control": "Your software applies rules, lookups, or established algorithms.",
       "pages": [
         {
           "slug": "order-zero",
@@ -42,15 +42,15 @@
           "status": "sourced"
         }
       ],
-      "short": "Rules, search, forms",
-      "who": "Your code. No model is involved.",
-      "description": "Some tasks do not need a model. If you can write the rule down, or a search or a form does the job, that is cheaper, faster and easier to test."
+      "short": "Rules, search, and automation",
+      "who": "Your software applies rules, lookups, or established algorithms.",
+      "description": "Use ordinary code, search, forms, or a task-specific statistical model when they solve the problem. No generative model is required; classical machine learning can belong here too."
     },
     {
       "id": "one-call",
       "order": 1,
-      "title": "One call",
-      "control": "Nobody. One request, one response.",
+      "title": "Direct prompting",
+      "control": "You choose the request; the model generates a response.",
       "pages": [
         {
           "slug": "chat",
@@ -95,15 +95,15 @@
           "status": "sourced"
         }
       ],
-      "short": "One question, one answer",
-      "who": "Nobody. There is only one step.",
-      "description": "You send one request and get one response. Most everyday use of chat apps is at this level. What you write in the request has a large effect on the result."
+      "short": "Ask for a response",
+      "who": "You choose the request; the model generates a response.",
+      "description": "Give the model instructions and receive a response. A conversation repeats this interaction, with a person directing each turn. Prompting, structured output, reasoning, and multimodal inputs can all fit this pattern."
     },
     {
       "id": "context",
       "order": 2,
-      "title": "Context",
-      "control": "You, through what you put in the window.",
+      "title": "Added context",
+      "control": "You or your software select the information supplied to the model.",
       "pages": [
         {
           "slug": "context-engineering",
@@ -142,15 +142,15 @@
           "status": "sourced"
         }
       ],
-      "short": "You pick what it sees",
-      "who": "You. You decide what information the model is given.",
-      "description": "The model only knows what is in its training data and what you put in the request. These techniques find the right information and put it in front of the model."
+      "short": "Supply relevant information",
+      "who": "You or your software select the information supplied to the model.",
+      "description": "Add relevant documents, retrieved passages, or stored information to the current request. This supplies context beyond the model’s training without retraining it. Missing, stale, or misleading material can still produce a poor answer."
     },
     {
       "id": "workflows",
       "order": 3,
       "title": "Workflows",
-      "control": "Your code. The model fills in steps; it never chooses the next one.",
+      "control": "Software defines the steps and allowed branches; model outputs can select among them.",
       "pages": [
         {
           "slug": "prompt-chaining",
@@ -200,15 +200,15 @@
           "status": "sourced"
         }
       ],
-      "short": "Your code runs the steps",
-      "who": "Your code. The model fills in each step and never chooses the next one.",
-      "description": "A task is split into fixed steps, and code decides the order. This is predictable and easy to test, and it covers a large share of real business use."
+      "short": "Software organizes the steps",
+      "who": "Software defines the steps and allowed branches; model outputs can select among them.",
+      "description": "Connect model calls through predefined steps, branches, checks, and retries. A model can classify an input or evaluate a result to route the workflow; software still defines the available paths."
     },
     {
       "id": "tools",
       "order": 4,
-      "title": "Tools",
-      "control": "The model picks an action; your code runs it.",
+      "title": "Tool use",
+      "control": "The model requests an action; software checks and executes it.",
       "pages": [
         {
           "slug": "function-calling",
@@ -238,15 +238,15 @@
           "status": "sourced"
         }
       ],
-      "short": "It picks, your code acts",
-      "who": "The model picks an action. Your code carries it out.",
-      "description": "The model can ask for an action, such as looking something up, running code or clicking a button. Your code performs the action and returns the result."
+      "short": "The model requests an action",
+      "who": "The model requests an action; software checks and executes it.",
+      "description": "The model can request a search, calculation, code execution, or an action in another application. Software enforces permissions, performs the action, and returns the result. Tool use alone does not create an ongoing agent loop."
     },
     {
       "id": "agents",
       "order": 5,
-      "title": "Agents",
-      "control": "The model, in a loop, until it decides it is done.",
+      "title": "Agent loops",
+      "control": "The model chooses the next step within limits enforced by software.",
       "pages": [
         {
           "slug": "single-agent",
@@ -289,15 +289,15 @@
           "status": "sourced"
         }
       ],
-      "short": "It repeats until done",
-      "who": "The model. It chooses each step and decides when the task is finished.",
-      "description": "The model works in a loop: it plans, takes an action, looks at the result and decides what to do next. This handles tasks where the steps cannot be known in advance. It costs more and is harder to predict."
+      "short": "Observe, decide, act, repeat",
+      "who": "The model chooses the next step within limits enforced by software.",
+      "description": "The model uses the goal and observed results to choose an action, revise its approach, or finish. Software executes tools and enforces permissions, approvals, and stopping limits. A run can stop because it is complete, blocked, or out of budget."
     },
     {
       "id": "teams",
       "order": 6,
-      "title": "Teams of agents",
-      "control": "Several models. One usually divides the work among the others.",
+      "title": "Teams of Agents",
+      "control": "Several agents coordinate, delegate, or review work; they can use the same underlying model.",
       "pages": [
         {
           "slug": "orchestrator-workers",
@@ -326,15 +326,15 @@
           "status": "sourced"
         }
       ],
-      "short": "Agents split the work",
-      "who": "Several models. One usually divides the work among the others.",
-      "description": "A lead agent splits a task and gives the parts to other agents, or several agents check each other's work. This helps when a task is too large for one context window or benefits from a second opinion."
+      "short": "Agents coordinate work",
+      "who": "Several agents coordinate, delegate, or review work; they can use the same underlying model.",
+      "description": "Agents divide, coordinate, or review work across separate contexts. A coordinator can combine their findings, and the agents may use the same model or different models. Coordination adds overhead, and separate reviewers can still make correlated mistakes."
     },
     {
       "id": "always-on",
       "order": 7,
       "title": "Always-on agents",
-      "control": "The models, including when to start work.",
+      "control": "Software triggers and resumes runs; agents decide what to do within their standing instructions.",
       "pages": [
         {
           "slug": "long-horizon",
@@ -368,7 +368,7 @@
             "OpenClaw (self-hosted)"
           ],
           "note": "The capstone page: nearly every lower level composes here (model, computer, storage, tools, memory, routines).",
-          "summary": "Agents with their own computer that work without being asked.",
+          "summary": "Agents that resume work across sessions, schedules, and events.",
           "status": "sourced"
         },
         {
@@ -384,9 +384,9 @@
           "status": "sourced"
         }
       ],
-      "short": "It runs on its own",
-      "who": "The models, including when to start work.",
-      "description": "These agents keep running. They have their own computer, remember past work, follow schedules and start tasks without being asked. They check in with a person when approval is needed. Robots that act in the physical world belong here too."
+      "short": "Resume across sessions and events",
+      "who": "Software triggers and resumes runs; agents decide what to do within their standing instructions.",
+      "description": "Saved state, schedules, and events let an agent start or resume work without a fresh chat message each time. The model need not run continuously, and a dedicated computer or agent team is optional. Permissions, human approvals, monitoring, and stop controls still apply."
     }
   ],
   "stages": [

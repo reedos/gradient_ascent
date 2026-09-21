@@ -3,7 +3,7 @@
   "h": 720,
   "title": "Structured output: extract, validate, retry once",
   "sub": "Ask for JSON matching a fixed schema, validate the reply, and retry once if it fails.",
-  "pill": "Level 1 · One call",
+  "pill": "Level 1 · Direct prompting",
   "nodes": [
     { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
     { "id": "find", "x": 170, "y": 130, "l": "Find appliance, load passage", "k": "code" },

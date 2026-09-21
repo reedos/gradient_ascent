@@ -77,15 +77,15 @@
     {
       "id": "workflow",
       "level_tested": 3,
-      "prompt": "Can every step be written down in advance, so your code decides what happens next and only asks the model to fill in each step?",
-      "help": "This covers sorting things into fixed categories, chaining a few prompts, or checking one draft against another, as long as the model never chooses which step comes next.",
+      "prompt": "Can you define the steps and allowed branches in advance, including how model outputs choose among those branches?",
+      "help": "This covers sorting inputs into categories, chaining prompts, and checking drafts. A model can select a predefined branch; software owns the available paths and stopping rules.",
       "answers": [
         {
           "id": "yes",
-          "label": "Yes. The steps are known ahead of time; code decides what happens next, never the model.",
+          "label": "Yes. Software defines the steps and branches, even if a model helps choose a branch.",
           "action": "settle",
           "level": 3,
-          "reason": "Every step can be written down ahead of time. Code decides the order and calls the model to fill in each step; the model never chooses which step comes next."
+          "reason": "Software defines the steps, routing rules, and stopping conditions. Model outputs can select among those predefined paths without creating an open-ended agent loop."
         },
         {
           "id": "no",

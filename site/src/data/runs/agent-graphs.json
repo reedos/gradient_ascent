@@ -3,7 +3,7 @@
   "h": 650,
   "title": "Agent graphs",
   "sub": "A supervisor's own output picks the next agent from an allowlist, hop by hop, until it has enough to write.",
-  "pill": "Level 6 · Teams of agents",
+  "pill": "Level 6 · Teams of Agents",
   "nodes": [
     { "id": "q", "x": 170, "y": 30, "l": "Question", "k": "io" },
     { "id": "sup", "x": 170, "y": 172, "l": "Supervisor picks the next agent", "k": "model" },

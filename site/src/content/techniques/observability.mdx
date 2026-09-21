@@ -198,25 +198,25 @@ retrieval, the tool result, the branch your own code took), which is the part a 
 
 ## At each level
 
-- <Link href="/levels/0/">No model</Link>: there is nothing to trace that a normal application
+- <Link href="/levels/0/">Conventional software</Link>: there is nothing to trace that a normal application
   log does not already cover: this topic's own concerns start at level 1.
-- <Link href="/levels/1/">One call</Link>: one span, the way
+- <Link href="/levels/1/">Direct prompting</Link>: one span, the way
   <Link href="/techniques/chat/">chat</Link>'s own trace is a single model step; the whole
   question is whether that one call's tokens, time and outcome are recorded at all.
-- <Link href="/levels/2/">Context</Link>: what got retrieved is now part of the trace, not just
+- <Link href="/levels/2/">Added context</Link>: what got retrieved is now part of the trace, not just
   the model call: <Link href="/techniques/rag/">RAG</Link>'s own citations are exactly the
   record a reviewer needs to check an answer against its sources.
 - <Link href="/levels/3/">Workflows</Link>: a fixed number of steps means a trace can be
   compared against the pipeline's own diagram directly: a step that is missing or repeated is
   visible without reading a single token of content.
-- <Link href="/levels/4/">Tools</Link>: a tool call's arguments and result belong in the trace
+- <Link href="/levels/4/">Tool use</Link>: a tool call's arguments and result belong in the trace
   as their own step, not folded into the model step around them, since a wrong argument and a
   wrong model answer are different failures that need different fixes.
-- <Link href="/levels/5/">Agents</Link>: the number of steps is no longer fixed, so a trace is
+- <Link href="/levels/5/">Agent loops</Link>: the number of steps is no longer fixed, so a trace is
   the only way to know how many turns a run actually took and where it stopped, the same
   uncertainty <Link href="/techniques/single-agent/">a single agent</Link>'s own `max_steps` is
   built to cap.
-- <Link href="/levels/6/">Teams of agents</Link>: several agents produce interleaved traces, so
+- <Link href="/levels/6/">Teams of Agents</Link>: several agents produce interleaved traces, so
   which agent decided what has to survive being merged into one timeline, the way
   <Link href="/techniques/agent-graphs/">agent graphs</Link>' own handoffs need to be
   attributable to a specific agent after the fact.

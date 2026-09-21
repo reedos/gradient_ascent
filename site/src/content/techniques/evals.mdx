@@ -214,16 +214,16 @@ first.
 
 ## At each level
 
-- <Link href="/levels/0/">No model</Link>: there is no model call to grade, so this is ordinary
+- <Link href="/levels/0/">Conventional software</Link>: there is no model call to grade, so this is ordinary
   software testing: fixed inputs, known outputs, run exhaustively rather than sampled, the way
   <Link href="/techniques/order-zero/">level 0</Link>'s own search can be tested exhaustively
   rather than sampled.
-- <Link href="/levels/1/">One call</Link>: grading one prompt's answer is the simplest case;
+- <Link href="/levels/1/">Direct prompting</Link>: grading one prompt's answer is the simplest case;
   exact match works when a task has one right phrasing, the way
   <Link href="/techniques/structured-output/">structured output</Link> can be scored on whether
   the reply is valid at all, separately from whether its values are right, and a rubric grader is
   needed as soon as a task has no one right phrasing.
-- <Link href="/levels/2/">Context</Link>: what got retrieved changes the answer, so grading has
+- <Link href="/levels/2/">Added context</Link>: what got retrieved changes the answer, so grading has
   to check citations as well as the final text: whether
   <Link href="/techniques/rag/">RAG</Link>'s answer used the passage that actually holds the
   fact, not merely a plausible one.
@@ -231,15 +231,15 @@ first.
   not only on the final output: <Link href="/techniques/prompt-chaining/">prompt chaining</Link>'s
   own citation check is exactly this, so a wrong route or a dropped step shows up even when a
   later step happens to recover.
-- <Link href="/levels/4/">Tools</Link>: grading has to check whether the right tool was called
+- <Link href="/levels/4/">Tool use</Link>: grading has to check whether the right tool was called
   with the right arguments, since <Link href="/techniques/function-calling/">function
   calling</Link>'s own failure modes show a wrong tool call can still produce an answer that
   reads fine.
-- <Link href="/levels/5/">Agents</Link>: the model decides when to stop, so an eval has to weigh
+- <Link href="/levels/5/">Agent loops</Link>: the model decides when to stop, so an eval has to weigh
   how many steps and tool calls <Link href="/techniques/single-agent/">a single agent</Link> took,
   and whether it stopped too early or kept going too long, alongside whether the final answer is
   right.
-- <Link href="/levels/6/">Teams of agents</Link>: one agent's output being graded correct is not
+- <Link href="/levels/6/">Teams of Agents</Link>: one agent's output being graded correct is not
   enough for a <Link href="/techniques/debate-review/">review or debate</Link> setup: the
   agreement between the agents needs measuring too, since two agents can share a blind spot and
   agree while both are wrong.

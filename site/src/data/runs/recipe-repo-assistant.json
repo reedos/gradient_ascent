@@ -3,7 +3,7 @@
   "h": 660,
   "title": "Coding assistant on your own repo",
   "sub": "Propose, test and load a skill in a loop; a code-side check gates the branch it opens.",
-  "pill": "Level 5 · Agents",
+  "pill": "Level 5 · Agent loops",
   "nodes": [
     { "id": "issue", "x": 170, "y": 34, "l": "Issue", "k": "io" },
     { "id": "agent", "x": 170, "y": 180, "l": "Agent plans and acts", "k": "model" },

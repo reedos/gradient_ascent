@@ -3,7 +3,7 @@
   "h": 1180,
   "title": "The agent harness",
   "sub": "The model picks each action; the harness around it decides what the model can see, what may run, and when to stop.",
-  "pill": "Level 5 · Agents",
+  "pill": "Level 5 · Agent loops",
   "nodes": [
     { "id": "q", "x": 170, "y": 30, "l": "Question", "k": "io" },
     { "id": "act1", "x": 170, "y": 190, "l": "model picks an action", "k": "model" },

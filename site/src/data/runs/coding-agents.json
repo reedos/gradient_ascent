@@ -3,7 +3,7 @@
   "h": 610,
   "title": "Coding agents",
   "sub": "The model proposes an edit, your code runs the test, and the model decides whether to try again.",
-  "pill": "Level 5 · Agents",
+  "pill": "Level 5 · Agent loops",
   "nodes": [
     { "id": "q", "x": 170, "y": 30, "l": "Task + buggy function", "k": "io" },
     { "id": "runtest", "x": 170, "y": 170, "l": "run the failing test", "k": "code" },

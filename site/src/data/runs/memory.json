@@ -3,7 +3,7 @@
   "h": 420,
   "title": "Memory",
   "sub": "Write facts across conversations, recall the relevant ones, forget on request.",
-  "pill": "Level 2 · Context",
+  "pill": "Level 2 · Added context",
   "nodes": [
     { "id": "facts", "x": 170, "y": 34, "l": "Facts from earlier turns", "k": "io" },
     { "id": "write", "x": 170, "y": 104, "l": "Write to memory", "k": "code" },

@@ -181,13 +181,13 @@ just as well as the expensive one.
 
 ## At each level
 
-- <Link href="/levels/0/">No model</Link>: there are no tokens and no per-call bill, the same
+- <Link href="/levels/0/">Conventional software</Link>: there are no tokens and no per-call bill, the same
   zero row <Link href="/techniques/order-zero/">level 0</Link>'s own cost strip reports; cost is
   the compute you already pay for, and the ops questions below don't really start yet.
-- <Link href="/levels/1/">One call</Link>: one question's cost and latency is the floor every
+- <Link href="/levels/1/">Direct prompting</Link>: one question's cost and latency is the floor every
   model-calling level's cost strip on this site compares against, the baseline
   <Link href="/techniques/chat/">chat</Link>'s own page shows.
-- <Link href="/levels/2/">Context</Link>: how much you put in the window can cost more than the
+- <Link href="/levels/2/">Added context</Link>: how much you put in the window can cost more than the
   question itself does; caching the part that repeats across questions is where the first real
   savings show up, which is the whole subject of
   <Link href="/techniques/context-engineering/">context engineering</Link>.
@@ -195,15 +195,15 @@ just as well as the expensive one.
   with no need for an answer inside the next minute (one step of
   <Link href="/techniques/prompt-chaining/">prompt chaining</Link>, run unconditionally on every
   question) is exactly the case batching was built for.
-- <Link href="/levels/4/">Tools</Link>: whether a question needs a tool at all is the model's own
+- <Link href="/levels/4/">Tool use</Link>: whether a question needs a tool at all is the model's own
   call, so cost swings between one call and two for the same kind of question
   (<Link href="/techniques/function-calling/">function calling</Link>'s own cost strip shows that
   split directly) and a cost estimate here has to budget for both, not just the typical case.
-- <Link href="/levels/5/">Agents</Link>: a loop with no fixed number of steps is the hardest
+- <Link href="/levels/5/">Agent loops</Link>: a loop with no fixed number of steps is the hardest
   thing on the ladder to put a ceiling on; a hard cap on steps or tokens matters here the way it
   matters to <Link href="/techniques/single-agent/">a single agent</Link>'s own `max_steps` and
   `max_tokens`, or to `--budget-tokens` on this site's own eval runner.
-- <Link href="/levels/6/">Teams of agents</Link>: several models working one task multiplies
+- <Link href="/levels/6/">Teams of Agents</Link>: several models working one task multiplies
   every per-call number by however many agents are in the team, the way
   <Link href="/techniques/orchestrator-workers/">a lead and its workers</Link> cost several times
   a single call for the same question. This is exactly where routing a smaller model to the

@@ -3,7 +3,7 @@
   "h": 374,
   "title": "Grade against a rubric, assembled",
   "sub": "An independent reviewer, who never sees the grader's reasoning, catches a misread rubric line before it becomes a grade.",
-  "pill": "Level 6 · Teams of agents",
+  "pill": "Level 6 · Teams of Agents",
   "nodes": [
     { "id": "sub", "x": 170, "y": 30, "l": "Submission arrives", "k": "io" },
     { "id": "grade", "x": 170, "y": 106, "l": "Grader scores each criterion", "k": "model" },

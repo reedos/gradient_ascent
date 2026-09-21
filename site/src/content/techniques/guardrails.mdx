@@ -203,23 +203,23 @@ replace it.
 
 ## At each level
 
-- <Link href="/levels/1/">One call</Link>: an input filter on the user's message and an output
+- <Link href="/levels/1/">Direct prompting</Link>: an input filter on the user's message and an output
   check on the answer are the only two points that exist yet. These are the same two halves
   <Link href="/techniques/chat/">chat</Link>'s single call has.
-- <Link href="/levels/2/">Context</Link>: a retrieval rail becomes relevant for the first time,
+- <Link href="/levels/2/">Added context</Link>: a retrieval rail becomes relevant for the first time,
   since retrieved content is now something a check can inspect before it reaches the model. That
   is exactly the failure mode <Link href="/techniques/rag/">RAG</Link> names for prompt injection
   through retrieved text.
-- <Link href="/levels/4/">Tools</Link>: an execution rail (a check on what a tool call is about
+- <Link href="/levels/4/">Tool use</Link>: an execution rail (a check on what a tool call is about
   to do, before it runs) is where the code-side permission check
   <Link href="/techniques/safety/">safety</Link>'s own example builds actually lives; this is the
   level where a guardrail stops being advisory and starts standing in front of a real action.
-- <Link href="/levels/5/">Agents</Link>: checks that ran once per exchange at lower levels now
+- <Link href="/levels/5/">Agent loops</Link>: checks that ran once per exchange at lower levels now
   need to run on every step of a loop with no fixed length, the same shift
   <Link href="/techniques/single-agent/">a single agent</Link>'s own step cap responds to for
   cost: a guardrail evaluated only at the start of a run cannot catch what the run drifts into
   by its twentieth step.
-- <Link href="/levels/6/">Teams of agents</Link>: one agent's output becomes another agent's
+- <Link href="/levels/6/">Teams of Agents</Link>: one agent's output becomes another agent's
   input, so a check placed only at the system's outer boundary misses content moving between
   agents entirely: the reason <Link href="/techniques/agent-graphs/">agent graphs</Link> checks
   a handoff against an allowlist before acting on it.

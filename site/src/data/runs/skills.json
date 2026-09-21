@@ -3,7 +3,7 @@
   "h": 630,
   "title": "Skills",
   "sub": "A short description is always in context; the model chooses one and the body loads only then.",
-  "pill": "Level 5 · Agents",
+  "pill": "Level 5 · Agent loops",
   "nodes": [
     { "id": "q", "x": 170, "y": 30, "l": "Question", "k": "io" },
     { "id": "list", "x": 170, "y": 170, "l": "list descriptions only", "k": "code" },

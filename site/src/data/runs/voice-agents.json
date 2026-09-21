@@ -3,7 +3,7 @@
   "h": 490,
   "title": "Voice agents",
   "sub": "The model decides whether to keep talking; an interruption or a latency cap can cut it off first, and that part is never the model's choice.",
-  "pill": "Level 5 · Agents",
+  "pill": "Level 5 · Agent loops",
   "nodes": [
     { "id": "q", "x": 170, "y": 30, "l": "Caller speaks (audio)", "k": "io" },
     { "id": "act", "x": 170, "y": 170, "l": "keep talking, or yield", "k": "model" },

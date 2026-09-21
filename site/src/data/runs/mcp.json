@@ -3,7 +3,7 @@
   "h": 766,
   "title": "Model Context Protocol",
   "sub": "The model picks a tool listed by a server; a stand-in client and server carry the call.",
-  "pill": "Level 4 · Tools",
+  "pill": "Level 4 · Tool use",
   "nodes": [
     { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
     { "id": "list", "x": 170, "y": 174, "l": "list tools (tools/list)", "k": "code" },

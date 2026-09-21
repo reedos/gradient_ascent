@@ -4,7 +4,7 @@
   "h": 650,
   "title": "Lead agent and workers",
   "sub": "A lead splits the question into sub-questions no code could predict in advance, each worker answers from its own document, and the lead combines the results with citations.",
-  "pill": "Level 6 · Teams of agents",
+  "pill": "Level 6 · Teams of Agents",
   "nodes": [
     {
       "id": "q",

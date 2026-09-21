@@ -11,7 +11,7 @@ const sections = primaryIds.map(id => allSections.find(s => s.id === id)!);
 const supporting = allSections.filter(s => !primaryIds.includes(s.id));
 ---
 <Base title={`${reviewTitle} · Gradient Ascent`} description={reviewIntro}>
-  <div class="page-hero"><div class="eyebrow">Teams of agents · application example</div><h1>{reviewTitle}</h1><p>{reviewIntro}</p>
+  <div class="page-hero"><div class="eyebrow">Teams of Agents · application example</div><h1>{reviewTitle}</h1><p>{reviewIntro}</p>
     <div class="review-actions"><a class="button" href={url('/examples/reviewer-feedback-loop.md')} download>Download example & role prompts</a><a href="#example">Follow a task through the team →</a></div>
   </div>
   <figure class="team-map"><figcaption>The application’s team</figcaption><div class="team-user">You: describe the goal · answer consequential questions · review the result</div><div class="team-connection" aria-hidden="true">↕</div><article class="team-lead"><h2>{teamRoles[0].title}</h2><p>{teamRoles[0].text}</p></article><p class="team-routing">↓ Delegates tasks and context · receives proposals and findings ↑</p><div class="team-workers">{teamRoles.slice(1).map(role => <article><h2>{role.title}</h2><p>{role.text}</p></article>)}</div><p class="loop-return">Brief → parallel proposals → independent findings → lead → targeted revision or result for you</p></figure>

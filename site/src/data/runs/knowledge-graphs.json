@@ -3,7 +3,7 @@
   "h": 420,
   "title": "Knowledge graphs",
   "sub": "Extract triples from two documents, build a small graph, and walk two hops for one answer.",
-  "pill": "Level 2 · Context",
+  "pill": "Level 2 · Added context",
   "nodes": [
     { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
     { "id": "e1", "x": 170, "y": 104, "l": "Extract triples: parts list", "k": "model" },

@@ -3,7 +3,7 @@
   "h": 434,
   "title": "Household paperwork, assembled",
   "sub": "Sort by date, subtract, sum by category, and check the folder. No model is called at any step.",
-  "pill": "Level 0 · No model",
+  "pill": "Level 0 · Conventional software",
   "nodes": [
     { "id": "records", "x": 170, "y": 34, "l": "Records and folder", "k": "store" },
     { "id": "window", "x": 170, "y": 110, "l": "Dates against a window", "k": "code" },

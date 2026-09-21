@@ -3,7 +3,7 @@
   "h": 640,
   "title": "Write a research brief with citations",
   "sub": "An agent searches and drafts; a fixed check asks one question of every citation before it ships.",
-  "pill": "Level 5 · Agents",
+  "pill": "Level 5 · Agent loops",
   "nodes": [
     { "id": "topic", "x": 170, "y": 34, "l": "Topic", "k": "io" },
     { "id": "lead", "x": 170, "y": 174, "l": "Agent searches and drafts", "k": "model" },

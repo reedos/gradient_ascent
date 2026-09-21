@@ -3,7 +3,7 @@
   "h": 626,
   "title": "Computer use",
   "sub": "The model picks one action on a screen; code checks it against an allowlist, then runs it or refuses it.",
-  "pill": "Level 4 · Tools",
+  "pill": "Level 4 · Tool use",
   "nodes": [
     { "id": "screen", "x": 170, "y": 34, "l": "Screen", "k": "io" },
     { "id": "decide", "x": 170, "y": 174, "l": "picks one action", "k": "model" },

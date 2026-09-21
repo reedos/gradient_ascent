@@ -3,7 +3,7 @@
   "h": 626,
   "title": "Function calling",
   "sub": "The model picks one action and its arguments; your code runs it and asks once more.",
-  "pill": "Level 4 · Tools",
+  "pill": "Level 4 · Tool use",
   "nodes": [
     { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
     { "id": "decide", "x": 170, "y": 174, "l": "picks a tool, or answers", "k": "model" },

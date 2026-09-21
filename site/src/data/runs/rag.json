@@ -3,7 +3,7 @@
   "h": 420,
   "title": "Retrieval-augmented generation (RAG)",
   "sub": "Search the documents, give the closest passages to the model, and ask once.",
-  "pill": "Level 2 · Context",
+  "pill": "Level 2 · Added context",
   "nodes": [
     { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
     { "id": "emb", "x": 170, "y": 104, "l": "Embed the question", "k": "code" },

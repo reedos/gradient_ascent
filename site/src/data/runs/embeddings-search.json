@@ -3,7 +3,7 @@
   "h": 420,
   "title": "Embeddings and search",
   "sub": "Index the corpus once, then rank it two ways for the same query: by embedding, and by keyword.",
-  "pill": "Level 2 · Context",
+  "pill": "Level 2 · Added context",
   "nodes": [
     { "id": "q", "x": 170, "y": 34, "l": "Query", "k": "io" },
     { "id": "chunk", "x": 170, "y": 104, "l": "Chunk the corpus", "k": "code" },

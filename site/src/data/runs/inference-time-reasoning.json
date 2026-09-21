@@ -3,7 +3,7 @@
   "h": 520,
   "title": "Self-consistency: sample five times, vote",
   "sub": "Ask the same numeric question five independent times and keep the answer most samples agree on.",
-  "pill": "Level 1 · One call, sampled 5×",
+  "pill": "Level 1 · Direct prompting, sampled 5×",
   "nodes": [
     { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
     { "id": "build", "x": 170, "y": 140, "l": "Build one fixed prompt", "k": "code" },

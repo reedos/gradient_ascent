@@ -1,8 +1,49 @@
 {
   "version": 1,
-  "as_of": "2026-09-19",
+  "as_of": "2026-09-21",
   "note": "What changed on this site, and why it matters to somebody reading it. Newest first. Entries are written for a reader, not for whoever made the change: they say what is different and what it is good for, never what a commit did. Every entry links the pages it touched. Several entries can share a date; within a date, file order is the order shown. docs/CHANGES.md says how to add one.",
   "changes": [
+    {
+      "id": "clearer-level-names",
+      "date": "2026-09-21",
+      "title": "Clearer names for the levels",
+      "what": "The levels now read Conventional software, Direct prompting, Added context, Workflows, Tool use, Agent loops, Teams of Agents, and Always-on agents. Labels agree across navigation, diagrams, and examples.",
+      "why": "The names describe the capability more directly. Updated definitions clarify that workflow branches can depend on model outputs, teams can share one model, and always-on systems need neither continuous generation nor a dedicated computer.",
+      "pages": [
+        {
+          "label": "Conventional software",
+          "path": "/levels/0/"
+        },
+        {
+          "label": "Direct prompting",
+          "path": "/levels/1/"
+        },
+        {
+          "label": "Added context",
+          "path": "/levels/2/"
+        },
+        {
+          "label": "Workflows",
+          "path": "/levels/3/"
+        },
+        {
+          "label": "Tool use",
+          "path": "/levels/4/"
+        },
+        {
+          "label": "Agent loops",
+          "path": "/levels/5/"
+        },
+        {
+          "label": "Teams of Agents",
+          "path": "/levels/6/"
+        },
+        {
+          "label": "Always-on agents",
+          "path": "/levels/7/"
+        }
+      ]
+    },
     {
       "id": "acronym-definitions-while-reading",
       "date": "2026-09-19",

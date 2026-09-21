@@ -196,15 +196,15 @@ about the shape and volume of the calls.
 
 ## At each level
 
-- <Link href="/levels/0/">No model</Link>: a classical model such as the ones on the
+- <Link href="/levels/0/">Conventional software</Link>: a classical model such as the ones on the
   <Link href="/techniques/order-zero/">level 0 page</Link> is, by definition, already fit to your
   data every time it is trained: the questions this page raises about adaptation do not arise
   until there is a language model to adapt.
-- <Link href="/levels/1/">One call</Link>: a fine-tuned model can replace a long, repeated
+- <Link href="/levels/1/">Direct prompting</Link>: a fine-tuned model can replace a long, repeated
   <Link href="/techniques/prompt-engineering/">prompt-engineered</Link> system prompt with a
   shorter call that already behaves the trained way, at the cost of retraining whenever the
   instructions change.
-- <Link href="/levels/2/">Context</Link>: adaptation does not substitute for
+- <Link href="/levels/2/">Added context</Link>: adaptation does not substitute for
   <Link href="/techniques/rag/">retrieval</Link>: training a model further changes how it
   behaves, not what current facts it can reliably recall, so a fine-tuned model still needs
   documents in front of it for anything that changes after training.
@@ -212,15 +212,15 @@ about the shape and volume of the calls.
   times, with the same instructions and shape of input every time (one step of
   <Link href="/techniques/prompt-chaining/">prompt chaining</Link>, say) is the cheapest place
   to swap a small adapted model in for a large general one.
-- <Link href="/levels/4/">Tools</Link>: a model fine-tuned on your own tool set can produce fewer
+- <Link href="/levels/4/">Tool use</Link>: a model fine-tuned on your own tool set can produce fewer
   malformed <Link href="/techniques/function-calling/">function calls</Link> than a general model
   prompted with the same tool definitions, since it has seen your schemas specifically rather
   than schemas in general.
-- <Link href="/levels/5/">Agents</Link>: reinforcement fine-tuning fits
+- <Link href="/levels/5/">Agent loops</Link>: reinforcement fine-tuning fits
   <Link href="/techniques/single-agent/">a single agent</Link>'s loop especially well, because it
   trains directly against whether the task got done, the same thing the loop's own stop decision
   is trying to get right, instead of imitating example transcripts.
-- <Link href="/levels/6/">Teams of agents</Link>: a fixed role played by one agent every time (an
+- <Link href="/levels/6/">Teams of Agents</Link>: a fixed role played by one agent every time (an
   author, a <Link href="/techniques/debate-review/">reviewer</Link>) is a narrow, repeated task,
   the case adaptation is built for; each seat could run its own smaller adapted model instead of
   every seat running the same large one.

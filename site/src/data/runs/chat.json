@@ -3,7 +3,7 @@
   "h": 400,
   "title": "Chat: one call, no documents",
   "sub": "Send the question straight to the model, with no retrieval and no tools, and return whatever comes back.",
-  "pill": "Level 1 · One call",
+  "pill": "Level 1 · Direct prompting",
   "nodes": [
     { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
     { "id": "build", "x": 170, "y": 150, "l": "Build the prompt", "k": "code" },

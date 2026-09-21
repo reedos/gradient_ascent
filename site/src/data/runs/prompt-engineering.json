@@ -3,7 +3,7 @@
   "h": 460,
   "title": "Prompt engineering: same facts, a structured ask",
   "sub": "Add a role, a fixed format and one worked example to the same question and source passage.",
-  "pill": "Level 1 · One call",
+  "pill": "Level 1 · Direct prompting",
   "nodes": [
     { "id": "q", "x": 170, "y": 34, "l": "Question + source passage", "k": "io" },
     { "id": "build", "x": 170, "y": 140, "l": "Add role, format, one example", "k": "code" },

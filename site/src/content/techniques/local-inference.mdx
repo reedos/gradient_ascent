@@ -220,22 +220,22 @@ after, rather than assumed.
 
 ## At each level
 
-- <Link href="/levels/0/">No model</Link>: nothing to run locally: this topic's own concerns
+- <Link href="/levels/0/">Conventional software</Link>: nothing to run locally: this topic's own concerns
   start at level 1.
-- <Link href="/levels/1/">One call</Link>: the smallest case (one short prompt, one short
+- <Link href="/levels/1/">Direct prompting</Link>: the smallest case (one short prompt, one short
   answer), the least memory this page's own estimator will ever report for a given model.
-- <Link href="/levels/2/">Context</Link>: a retrieved passage set or a large pasted document
+- <Link href="/levels/2/">Added context</Link>: a retrieved passage set or a large pasted document
   fills the context window before the model answers at all, so context length, not just model
   size, starts to drive the memory number. This is the same window
   <Link href="/techniques/rag/">RAG</Link>'s own prompt assembly fills.
-- <Link href="/levels/4/">Tools</Link>: tool definitions and their results are extra tokens in
+- <Link href="/levels/4/">Tool use</Link>: tool definitions and their results are extra tokens in
   the same context window, so a tool-heavy <Link href="/techniques/function-calling/">function
   calling</Link> run costs more context, and so more KV cache, than the same question answered
   with no tools at all.
-- <Link href="/levels/5/">Agents</Link>: a long-running loop's transcript keeps growing across
+- <Link href="/levels/5/">Agent loops</Link>: a long-running loop's transcript keeps growing across
   turns, so the KV cache a <Link href="/techniques/single-agent/">single agent</Link> run needs
   grows with it: a context budget sized for one exchange is not sized for a whole run.
-- <Link href="/levels/6/">Teams of agents</Link>: several agents worked at once on one machine
+- <Link href="/levels/6/">Teams of Agents</Link>: several agents worked at once on one machine
   are exactly the "several sequences" case this page's own `num_sequences` parameter counts:
   <Link href="/techniques/orchestrator-workers/">a lead and its workers</Link> running locally
   multiplies the KV cache cost by however many are active together, not just by one.

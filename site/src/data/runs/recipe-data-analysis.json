@@ -3,7 +3,7 @@
   "h": 630,
   "title": "Data analysis by conversation, assembled",
   "sub": "The model writes a plan, then writes and runs code against the dataset, deciding after each result whether it needs another pass.",
-  "pill": "Level 5 · Agents",
+  "pill": "Level 5 · Agent loops",
   "nodes": [
     { "id": "q", "x": 170, "y": 30, "l": "Question about the dataset", "k": "io" },
     { "id": "plan", "x": 170, "y": 170, "l": "writes a short plan", "k": "model" },

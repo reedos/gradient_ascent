@@ -2,7 +2,7 @@
   {
     "slug": "order-zero",
     "title": "When not to use a model",
-    "group": "Level 00 · No model",
+    "group": "Level 00 · Conventional software",
     "definition": "Solving a task with explicit rules, forms, search, or conventional software when generative output is unnecessary.",
     "audience": "business",
     "prompt": "Check whether this expense can be reimbursed.",
@@ -21,7 +21,7 @@
   {
     "slug": "chat",
     "title": "Chat",
-    "group": "Level 01 · One call",
+    "group": "Level 01 · Direct prompting",
     "definition": "A conversational interface in which a person supplies messages and decides what to do with the replies.",
     "audience": "everyday",
     "prompt": "Draft an invitation for our repair workshop. Ask before filling in missing facts.",
@@ -40,7 +40,7 @@
   {
     "slug": "prompt-engineering",
     "title": "Prompt engineering",
-    "group": "Level 01 · One call",
+    "group": "Level 01 · Direct prompting",
     "definition": "Designing instructions, examples, and output expectations to steer a model's response.",
     "audience": "everyday",
     "prompt": "Write a welcoming workshop invitation under 45 words using only the facts below.",
@@ -59,7 +59,7 @@
   {
     "slug": "structured-output",
     "title": "Structured output",
-    "group": "Level 01 · One call",
+    "group": "Level 01 · Direct prompting",
     "definition": "Constraining an answer to a defined data structure so software can validate and consume it.",
     "audience": "everyday",
     "prompt": "Turn this event email into registration fields. Mark missing facts as unknown.",
@@ -78,7 +78,7 @@
   {
     "slug": "inference-time-reasoning",
     "title": "Reasoning at answer time",
-    "group": "Level 01 · One call",
+    "group": "Level 01 · Direct prompting",
     "definition": "Allocating additional inference computation to work through a problem before returning an answer.",
     "audience": "everyday",
     "prompt": "Schedule two 45-minute sessions in one room without overlap.",
@@ -97,7 +97,7 @@
   {
     "slug": "multimodal",
     "title": "Images, audio and video",
-    "group": "Level 01 · One call",
+    "group": "Level 01 · Direct prompting",
     "definition": "Working with inputs or outputs across text, images, audio, or video.",
     "audience": "engineering",
     "prompt": "Prepare an intake record from an equipment label and voice note.",
@@ -116,7 +116,7 @@
   {
     "slug": "context-engineering",
     "title": "Context engineering",
-    "group": "Level 02 · Context",
+    "group": "Level 02 · Added context",
     "definition": "Selecting and arranging the instructions, reference material, and history included in each model request.",
     "audience": "business",
     "prompt": "Reply about warranty coverage using the current manual, not old case notes.",
@@ -135,7 +135,7 @@
   {
     "slug": "embeddings-search",
     "title": "Embeddings and search",
-    "group": "Level 02 · Context",
+    "group": "Level 02 · Added context",
     "definition": "Representing content numerically and retrieving similar items, often combined with keyword or metadata search.",
     "audience": "engineering",
     "prompt": "Find troubleshooting guidance for a knocking sound in pump AX-20.",
@@ -154,7 +154,7 @@
   {
     "slug": "rag",
     "title": "Retrieval-augmented generation (RAG)",
-    "group": "Level 02 · Context",
+    "group": "Level 02 · Added context",
     "definition": "Retrieving external information and placing it in the model's context to support an answer.",
     "audience": "everyday",
     "prompt": "Is water damage covered by the DW-480 warranty?",
@@ -173,7 +173,7 @@
   {
     "slug": "knowledge-graphs",
     "title": "Knowledge graphs and GraphRAG",
-    "group": "Level 02 · Context",
+    "group": "Level 02 · Added context",
     "definition": "Representing entities and relationships explicitly; GraphRAG uses graph-based retrieval or summaries to support generation.",
     "audience": "engineering",
     "prompt": "Which shipped products contain recalled lot L7?",
@@ -192,7 +192,7 @@
   {
     "slug": "memory",
     "title": "Memory",
-    "group": "Level 02 · Context",
+    "group": "Level 02 · Added context",
     "definition": "Persisting selected information across interactions and retrieving it when relevant.",
     "audience": "everyday",
     "prompt": "Remember that I prefer planning calls after 3 pm.",
@@ -326,7 +326,7 @@
   {
     "slug": "function-calling",
     "title": "Function calling",
-    "group": "Level 04 · Tools",
+    "group": "Level 04 · Tool use",
     "definition": "A model proposing a named tool and structured arguments that application code validates and executes.",
     "audience": "business",
     "prompt": "Check whether three replacement filters can be reserved.",
@@ -345,7 +345,7 @@
   {
     "slug": "code-execution",
     "title": "Code execution",
-    "group": "Level 04 · Tools",
+    "group": "Level 04 · Tool use",
     "definition": "Running generated code in a constrained environment to perform computation or transform data.",
     "audience": "engineering",
     "prompt": "Compute total energy from these readings and show the units.",
@@ -364,7 +364,7 @@
   {
     "slug": "mcp",
     "title": "Model Context Protocol",
-    "group": "Level 04 · Tools",
+    "group": "Level 04 · Tool use",
     "definition": "A protocol for exposing tools, resources, and other capabilities to compatible AI applications.",
     "audience": "engineering",
     "prompt": "Look up the AX-20 manual through a connected resource service.",
@@ -383,7 +383,7 @@
   {
     "slug": "computer-use",
     "title": "Computer and browser use",
-    "group": "Level 04 · Tools",
+    "group": "Level 04 · Tool use",
     "definition": "An agent observing and interacting with a graphical interface through actions such as clicks and typing.",
     "audience": "everyday",
     "prompt": "Prepare a return in a mock store portal; let me review before submission.",
@@ -402,7 +402,7 @@
   {
     "slug": "single-agent",
     "title": "Single agent",
-    "group": "Level 05 · Agents",
+    "group": "Level 05 · Agent loops",
     "definition": "A model choosing successive actions and when to stop within a tool-enabled loop.",
     "audience": "business",
     "prompt": "Find why our booking failed and explain the next step.",
@@ -421,7 +421,7 @@
   {
     "slug": "agentic-rag",
     "title": "Agentic RAG and deep research",
-    "group": "Level 05 · Agents",
+    "group": "Level 05 · Agent loops",
     "definition": "Retrieval where an agent chooses follow-up searches and reads until it can answer or must stop.",
     "audience": "everyday",
     "prompt": "Investigate whether this DW-480 water-damage repair is covered.",
@@ -440,7 +440,7 @@
   {
     "slug": "coding-agents",
     "title": "Coding agents",
-    "group": "Level 05 · Agents",
+    "group": "Level 05 · Agent loops",
     "definition": "Agents that inspect, edit, execute, and test code to complete a software task.",
     "audience": "engineering",
     "prompt": "Fix the inclusive end-date filter without unrelated changes.",
@@ -459,7 +459,7 @@
   {
     "slug": "skills",
     "title": "Skills",
-    "group": "Level 05 · Agents",
+    "group": "Level 05 · Agent loops",
     "definition": "Reusable task instructions and supporting resources loaded when an agent needs a particular procedure.",
     "audience": "business",
     "prompt": "Create a release note using our writing procedure.",
@@ -478,7 +478,7 @@
   {
     "slug": "voice-agents",
     "title": "Voice agents",
-    "group": "Level 05 · Agents",
+    "group": "Level 05 · Agent loops",
     "definition": "Agents that conduct spoken interactions while handling audio, timing, interruptions, and tool use.",
     "audience": "everyday",
     "prompt": "Book a workshop place and confirm details first.",
@@ -497,7 +497,7 @@
   {
     "slug": "orchestrator-workers",
     "title": "Lead agent and workers",
-    "group": "Level 06 · Teams of agents",
+    "group": "Level 06 · Teams of Agents",
     "definition": "A lead agent delegating bounded subtasks to workers and combining their results.",
     "audience": "business",
     "prompt": "Compare venues for cost and accessibility with sources.",
@@ -516,7 +516,7 @@
   {
     "slug": "agent-graphs",
     "title": "Agent graphs",
-    "group": "Level 06 · Teams of agents",
+    "group": "Level 06 · Teams of Agents",
     "definition": "Representing agent roles and the permitted handoffs or transitions between them.",
     "audience": "engineering",
     "prompt": "Investigate an incident and prepare a reviewed remediation plan.",
@@ -535,7 +535,7 @@
   {
     "slug": "debate-review",
     "title": "Review and debate",
-    "group": "Level 06 · Teams of agents",
+    "group": "Level 06 · Teams of Agents",
     "definition": "Using multiple model perspectives to critique or compare candidate answers before a decision.",
     "audience": "business",
     "prompt": "Review a fictional retention policy against its requirements.",

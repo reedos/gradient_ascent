@@ -3,7 +3,7 @@
   "h": 440,
   "title": "Agentic RAG",
   "sub": "The model runs its own searches and decides when it has enough.",
-  "pill": "Level 5 · Agents",
+  "pill": "Level 5 · Agent loops",
   "nodes": [
     { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
     { "id": "llm", "x": 170, "y": 150, "l": "picks the next step", "k": "model" },

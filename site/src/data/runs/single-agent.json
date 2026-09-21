@@ -3,7 +3,7 @@
   "h": 630,
   "title": "Single agent",
   "sub": "The model writes a short plan, then picks each action itself and decides when to stop.",
-  "pill": "Level 5 · Agents",
+  "pill": "Level 5 · Agent loops",
   "nodes": [
     { "id": "q", "x": 170, "y": 30, "l": "Question", "k": "io" },
     { "id": "plan", "x": 170, "y": 170, "l": "writes a plan", "k": "model" },

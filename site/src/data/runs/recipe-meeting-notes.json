@@ -3,7 +3,7 @@
   "h": 434,
   "title": "Meeting notes, assembled",
   "sub": "Ask for decisions in a fixed shape, then check every quote against the transcript before a person reads it.",
-  "pill": "Level 1 · One call",
+  "pill": "Level 1 · Direct prompting",
   "nodes": [
     { "id": "transcript", "x": 170, "y": 34, "l": "Transcript arrives", "k": "io" },
     { "id": "ask", "x": 170, "y": 110, "l": "Ask the model for JSON", "k": "model" },

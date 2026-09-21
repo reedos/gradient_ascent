@@ -2,7 +2,7 @@
   {
     "slug": "order-zero",
     "title": "When not to use a model",
-    "group": "Level 00 · No model",
+    "group": "Level 00 · Conventional software",
     "definition": "Solving a task with explicit rules, forms, search, or conventional software when generative output is unnecessary.",
     "example": "Validate an expense claim against a published reimbursement policy using a form and deterministic rules.",
     "nuance": "Compare an exact allowance calculation with an ambiguous business-purpose description; only the latter may need interpretation.",
@@ -11,7 +11,7 @@
   {
     "slug": "chat",
     "title": "Chat",
-    "group": "Level 01 · One call",
+    "group": "Level 01 · Direct prompting",
     "definition": "A conversational interface in which a person supplies messages and decides what to do with the replies.",
     "example": "Ask for help drafting an invitation to a neighborhood repair workshop.",
     "nuance": "Contrast a useful draft with an invented venue detail; the conversation has no implicit access to your calendar or facts.",
@@ -20,7 +20,7 @@
   {
     "slug": "prompt-engineering",
     "title": "Prompt engineering",
-    "group": "Level 01 · One call",
+    "group": "Level 01 · Direct prompting",
     "definition": "Designing instructions, examples, and output expectations to steer a model's response.",
     "example": "Turn a vague request for a workshop announcement into a brief with audience, facts, tone, and length.",
     "nuance": "Change one instruction at a time; stronger wording cannot supply absent facts or guarantee compliance.",
@@ -29,7 +29,7 @@
   {
     "slug": "structured-output",
     "title": "Structured output",
-    "group": "Level 01 · One call",
+    "group": "Level 01 · Direct prompting",
     "definition": "Constraining an answer to a defined data structure so software can validate and consume it.",
     "example": "Extract an event date, venue, and accessibility information from an organizer's email into a registration form.",
     "nuance": "A valid structure may contain wrong facts; missing values need an explicit unknown state instead of invention.",
@@ -38,7 +38,7 @@
   {
     "slug": "inference-time-reasoning",
     "title": "Reasoning at answer time",
-    "group": "Level 01 · One call",
+    "group": "Level 01 · Direct prompting",
     "definition": "Allocating additional inference computation to work through a problem before returning an answer.",
     "example": "Schedule workshop sessions around room, trainer, and equipment constraints.",
     "nuance": "More computation does not ensure correctness; do not present invented hidden reasoning as a real model trace.",
@@ -47,7 +47,7 @@
   {
     "slug": "multimodal",
     "title": "Images, audio and video",
-    "group": "Level 01 · One call",
+    "group": "Level 01 · Direct prompting",
     "definition": "Working with inputs or outputs across text, images, audio, or video.",
     "example": "Create an equipment intake record from a label photo and a technician's voice note.",
     "nuance": "Blur a serial number and introduce disagreement between image and audio; ask for confirmation instead of asserting certainty.",
@@ -56,7 +56,7 @@
   {
     "slug": "context-engineering",
     "title": "Context engineering",
-    "group": "Level 02 · Context",
+    "group": "Level 02 · Added context",
     "definition": "Selecting and arranging the instructions, reference material, and history included in each model request.",
     "example": "Prepare a support reply using the current product manual, customer question, and relevant case history.",
     "nuance": "Compare a relevant excerpt with a stale manual and distracting history; context size is not context quality.",
@@ -65,7 +65,7 @@
   {
     "slug": "embeddings-search",
     "title": "Embeddings and search",
-    "group": "Level 02 · Context",
+    "group": "Level 02 · Added context",
     "definition": "Representing content numerically and retrieving similar items, often combined with keyword or metadata search.",
     "example": "Find the right troubleshooting article for a customer who says the machine makes a knocking sound.",
     "nuance": "Contrast semantic similarity with an exact model-number lookup; a similar passage may refer to the wrong product.",
@@ -74,7 +74,7 @@
   {
     "slug": "rag",
     "title": "Retrieval-augmented generation (RAG)",
-    "group": "Level 02 · Context",
+    "group": "Level 02 · Added context",
     "definition": "Retrieving external information and placing it in the model's context to support an answer.",
     "example": "Answer an appliance warranty question from a small versioned document collection.",
     "nuance": "Include a missing exclusion clause and conflicting revisions; retrieval and generation can fail separately.",
@@ -83,7 +83,7 @@
   {
     "slug": "knowledge-graphs",
     "title": "Knowledge graphs and GraphRAG",
-    "group": "Level 02 · Context",
+    "group": "Level 02 · Added context",
     "definition": "Representing entities and relationships explicitly; GraphRAG uses graph-based retrieval or summaries to support generation.",
     "example": "Trace which shipped products depend on a recalled supplier component across purchase and assembly records.",
     "nuance": "Contrast an ordinary document search with a multi-hop dependency question; uncertain or missing edges must remain visible.",
@@ -92,7 +92,7 @@
   {
     "slug": "memory",
     "title": "Memory",
-    "group": "Level 02 · Context",
+    "group": "Level 02 · Added context",
     "definition": "Persisting selected information across interactions and retrieving it when relevant.",
     "example": "A workshop planning assistant remembers the user's preferred meeting times between sessions.",
     "nuance": "Separate an explicit preference from a one-time exception; stale memories must be editable or deletable.",
@@ -155,7 +155,7 @@
   {
     "slug": "function-calling",
     "title": "Function calling",
-    "group": "Level 04 · Tools",
+    "group": "Level 04 · Tool use",
     "definition": "A model proposing a named tool and structured arguments that application code validates and executes.",
     "example": "Ask an assistant to check stock and prepare a reservation for replacement parts.",
     "nuance": "A tool call is a proposal, not authorization; handle invalid arguments, absent stock, and tool failure.",
@@ -164,7 +164,7 @@
   {
     "slug": "code-execution",
     "title": "Code execution",
-    "group": "Level 04 · Tools",
+    "group": "Level 04 · Tool use",
     "definition": "Running generated code in a constrained environment to perform computation or transform data.",
     "example": "Analyze a CSV of energy readings and produce daily totals and a chart.",
     "nuance": "Malformed timestamps, missing rows, and unit mismatches affect results; a sandbox bounds access but does not ensure correct math.",
@@ -173,7 +173,7 @@
   {
     "slug": "mcp",
     "title": "Model Context Protocol",
-    "group": "Level 04 · Tools",
+    "group": "Level 04 · Tool use",
     "definition": "A protocol for exposing tools, resources, and other capabilities to compatible AI applications.",
     "example": "Connect an assistant to a mock inventory service and an internal manual resource.",
     "nuance": "Discovery is not permission; tool descriptions can be misleading and services can be unavailable.",
@@ -182,7 +182,7 @@
   {
     "slug": "computer-use",
     "title": "Computer and browser use",
-    "group": "Level 04 · Tools",
+    "group": "Level 04 · Tool use",
     "definition": "An agent observing and interacting with a graphical interface through actions such as clicks and typing.",
     "example": "Complete a mock equipment return form in a browser portal with no API.",
     "nuance": "A layout change or stale screen can invalidate a click; submission requires a final review.",
@@ -191,7 +191,7 @@
   {
     "slug": "single-agent",
     "title": "Single agent",
-    "group": "Level 05 · Agents",
+    "group": "Level 05 · Agent loops",
     "definition": "A model choosing successive actions and when to stop within a tool-enabled loop.",
     "example": "Investigate why a room-booking request failed using policy and availability tools.",
     "nuance": "Distinguish model-chosen next actions from a fixed chain; stop on insufficient evidence or a step cap.",
@@ -200,7 +200,7 @@
   {
     "slug": "agent-harness",
     "title": "The agent harness",
-    "group": "Level 05 · Agents",
+    "group": "Level 05 · Agent loops",
     "definition": "The runtime around an agent's model that manages tools, context, execution boundaries, approvals, limits, and records.",
     "example": "Generate a new DUT project using the shared Python test framework and the approved workflow.",
     "nuance": "Preserve separate approval for helpers and framework edits; no agent-operated instruments; syntax checks are not hardware validation.",
@@ -209,7 +209,7 @@
   {
     "slug": "agentic-rag",
     "title": "Agentic RAG and deep research",
-    "group": "Level 05 · Agents",
+    "group": "Level 05 · Agent loops",
     "definition": "Retrieval where an agent chooses follow-up searches and reads until it can answer or must stop.",
     "example": "Investigate the same appliance warranty question when exclusions are split across documents.",
     "nuance": "Compare against one-pass RAG on the same evidence; repeated search can still miss facts or exceed its budget.",
@@ -218,7 +218,7 @@
   {
     "slug": "coding-agents",
     "title": "Coding agents",
-    "group": "Level 05 · Agents",
+    "group": "Level 05 · Agent loops",
     "definition": "Agents that inspect, edit, execute, and test code to complete a software task.",
     "example": "Fix a date-filter bug in a small event-registration application.",
     "nuance": "A passing test can miss regressions; keep edits scoped and distinguish simulated test logs from actually executed tests.",
@@ -227,7 +227,7 @@
   {
     "slug": "skills",
     "title": "Skills",
-    "group": "Level 05 · Agents",
+    "group": "Level 05 · Agent loops",
     "definition": "Reusable task instructions and supporting resources loaded when an agent needs a particular procedure.",
     "example": "Produce a release note using an organization's writing and verification procedure.",
     "nuance": "A skill provides guidance rather than new permissions or guaranteed correctness; stale instructions can conflict with current policy.",
@@ -236,7 +236,7 @@
   {
     "slug": "voice-agents",
     "title": "Voice agents",
-    "group": "Level 05 · Agents",
+    "group": "Level 05 · Agent loops",
     "definition": "Agents that conduct spoken interactions while handling audio, timing, interruptions, and tool use.",
     "example": "Book a workshop place in a simulated spoken conversation.",
     "nuance": "Handle interruptions, an ambiguous date, and a misunderstood name; confirm before committing the booking.",
@@ -245,7 +245,7 @@
   {
     "slug": "orchestrator-workers",
     "title": "Lead agent and workers",
-    "group": "Level 06 · Teams of agents",
+    "group": "Level 06 · Teams of Agents",
     "definition": "A lead agent delegating bounded subtasks to workers and combining their results.",
     "example": "Prepare a venue comparison by assigning cost, transport, and accessibility research to separate workers.",
     "nuance": "Workers may duplicate work or return incompatible assumptions; delegation must have clear scope and evidence.",
@@ -254,7 +254,7 @@
   {
     "slug": "agent-graphs",
     "title": "Agent graphs",
-    "group": "Level 06 · Teams of agents",
+    "group": "Level 06 · Teams of Agents",
     "definition": "Representing agent roles and the permitted handoffs or transitions between them.",
     "example": "Triage a mock service incident through investigator, remediation planner, and reviewer roles.",
     "nuance": "A handoff carries state and authority boundaries; prevent endless cycles and uncontrolled privilege transfer.",
@@ -263,7 +263,7 @@
   {
     "slug": "debate-review",
     "title": "Review and debate",
-    "group": "Level 06 · Teams of agents",
+    "group": "Level 06 · Teams of Agents",
     "definition": "Using multiple model perspectives to critique or compare candidate answers before a decision.",
     "example": "Review two proposed data-retention policies for a fictional application against stated requirements.",
     "nuance": "Agreement is not independent evidence; reviewers can share errors or favor persuasive wording.",

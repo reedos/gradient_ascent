@@ -152,7 +152,7 @@
       "definition": "A step in a recorded run where the model's own output chose what happened next (which tool, which query, whether to stop), as opposed to a step your code decided regardless of what the model said.",
       "see": ["trace", "cap"] },
     { "term": "multi-agent system", "page": "orchestrator-workers",
-      "definition": "Several models working one task instead of one model: a lead agent splitting the work among others, agents handing work to each other across a graph, or two agents checking each other's output. That is level 6 on this site.",
+      "definition": "Several agents working on a task, using the same underlying model or different models: a lead agent splitting the work among others, agents handing work to each other across a graph, or two agents checking each other's output. That is level 6 on this site.",
       "see": ["orchestrator", "agent graph", "review and debate"] },
     { "term": "multimodal", "page": "multimodal",
       "definition": "A model that takes or produces more than text (images, audio, video and documents) inside the same one-call request and response shape as an ordinary chat message." },

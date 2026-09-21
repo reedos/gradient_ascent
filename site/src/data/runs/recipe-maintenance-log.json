@@ -3,7 +3,7 @@
   "h": 490,
   "title": "Plain-language maintenance log, assembled",
   "sub": "Extract a fixed record, walk the graph to the equipment it concerns, and let the model decide between logging it and flagging it.",
-  "pill": "Level 4 · Tools",
+  "pill": "Level 4 · Tool use",
   "nodes": [
     { "id": "note", "x": 170, "y": 30, "l": "Note arrives", "k": "io" },
     { "id": "extract", "x": 170, "y": 100, "l": "Extract a fixed record", "k": "model" },

@@ -3,7 +3,7 @@
   "h": 400,
   "title": "Level 0: keyword search, no model",
   "sub": "Score every section against the question with BM25 and return the best match, verbatim.",
-  "pill": "Level 0 · No model",
+  "pill": "Level 0 · Conventional software",
   "nodes": [
     { "id": "q", "x": 170, "y": 34, "l": "Question", "k": "io" },
     { "id": "score", "x": 170, "y": 150, "l": "Score every section (BM25)", "k": "code" },

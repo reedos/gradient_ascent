@@ -189,20 +189,20 @@ everything rather than reimplemented in each application that calls a model.
 
 ## At each level
 
-- <Link href="/levels/1/">One call</Link>: a gateway is one extra hop in front of the single
+- <Link href="/levels/1/">Direct prompting</Link>: a gateway is one extra hop in front of the single
   call <Link href="/techniques/chat/">chat</Link> makes; whether it earns its place here depends
   entirely on whether more than one provider or key is already in the picture.
 - <Link href="/levels/3/">Workflows</Link>: your own code already decided which step calls which
   model, so the gateway's routing is redundant with that decision: what it adds here is one
   budget and one log across every step, not new fallback logic your code didn't already have.
-- <Link href="/levels/4/">Tools</Link>: a tool definition passes through the gateway unchanged
+- <Link href="/levels/4/">Tool use</Link>: a tool definition passes through the gateway unchanged
   in either direction, so nothing about <Link href="/techniques/function-calling/">function
   calling</Link> is this layer's concern: only the token accounting around the call is.
-- <Link href="/levels/5/">Agents</Link>: the number of calls a run makes is not fixed in advance,
+- <Link href="/levels/5/">Agent loops</Link>: the number of calls a run makes is not fixed in advance,
   so a gateway's per-key budget is a real backstop here, not just bookkeeping. This is the same ceiling
   <Link href="/techniques/single-agent/">a single agent</Link>'s own `max_tokens` cap is meant to
   provide, enforced one layer further out in case the cap inside the loop fails to hold.
-- <Link href="/levels/6/">Teams of agents</Link>: several agents can share one gateway key or
+- <Link href="/levels/6/">Teams of Agents</Link>: several agents can share one gateway key or
   each hold their own, which is exactly the choice that decides whether
   <Link href="/techniques/orchestrator-workers/">a lead and its workers</Link> show up as one
   line in a cost report or several.

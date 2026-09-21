@@ -3,7 +3,7 @@
   "h": 650,
   "title": "Review and debate",
   "sub": "An independent reviewer, with its own retrieval, decides what to check and rejects a draft it did not verify.",
-  "pill": "Level 6 · Teams of agents",
+  "pill": "Level 6 · Teams of Agents",
   "nodes": [
     { "id": "q", "x": 170, "y": 30, "l": "Question", "k": "io" },
     { "id": "retrieve", "x": 170, "y": 172, "l": "Author retrieves sources", "k": "code" },

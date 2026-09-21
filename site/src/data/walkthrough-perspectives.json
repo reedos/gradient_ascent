@@ -2,7 +2,7 @@
   {
     "slug": "prompt-engineering",
     "title": "Prompt engineering",
-    "group": "Level 01 · One call",
+    "group": "Level 01 · Direct prompting",
     "definition": "Designing instructions, examples, and output expectations to steer a model's response.",
     "audience": "engineering",
     "prompt": "Draft a test procedure using only the approved limits and named framework functions.",
@@ -23,7 +23,7 @@
   {
     "slug": "prompt-engineering",
     "title": "Prompt engineering",
-    "group": "Level 01 · One call",
+    "group": "Level 01 · Direct prompting",
     "definition": "Designing instructions, examples, and output expectations to steer a model's response.",
     "audience": "business",
     "prompt": "Draft a client update from these notes, separating confirmed dates from estimates.",
@@ -44,7 +44,7 @@
   {
     "slug": "structured-output",
     "title": "Structured output",
-    "group": "Level 01 · One call",
+    "group": "Level 01 · Direct prompting",
     "definition": "Constraining an answer to a defined data structure so software can validate and consume it.",
     "audience": "engineering",
     "prompt": "Extract acceptance criteria into a reviewable test matrix.",
@@ -65,7 +65,7 @@
   {
     "slug": "structured-output",
     "title": "Structured output",
-    "group": "Level 01 · One call",
+    "group": "Level 01 · Direct prompting",
     "definition": "Constraining an answer to a defined data structure so software can validate and consume it.",
     "audience": "business",
     "prompt": "Extract action items from these meeting notes into a tracker draft.",
@@ -86,7 +86,7 @@
   {
     "slug": "context-engineering",
     "title": "Context engineering",
-    "group": "Level 02 · Context",
+    "group": "Level 02 · Added context",
     "definition": "Selecting and arranging the instructions, reference material, and history included in each model request.",
     "audience": "everyday",
     "prompt": "Plan a weekend trip using my current preferences and the latest opening hours.",
@@ -107,7 +107,7 @@
   {
     "slug": "context-engineering",
     "title": "Context engineering",
-    "group": "Level 02 · Context",
+    "group": "Level 02 · Added context",
     "definition": "Selecting and arranging the instructions, reference material, and history included in each model request.",
     "audience": "engineering",
     "prompt": "Prepare a patch against the installed driver API, not a newer release.",
@@ -128,7 +128,7 @@
   {
     "slug": "rag",
     "title": "Retrieval-augmented generation (RAG)",
-    "group": "Level 02 · Context",
+    "group": "Level 02 · Added context",
     "definition": "Retrieving external information and placing it in the model's context to support an answer.",
     "audience": "engineering",
     "prompt": "Which settling time applies before measuring this board revision?",
@@ -149,7 +149,7 @@
   {
     "slug": "rag",
     "title": "Retrieval-augmented generation (RAG)",
-    "group": "Level 02 · Context",
+    "group": "Level 02 · Added context",
     "definition": "Retrieving external information and placing it in the model's context to support an answer.",
     "audience": "business",
     "prompt": "Summarize current risks for Atlas in this week's status report.",
@@ -170,7 +170,7 @@
   {
     "slug": "memory",
     "title": "Memory",
-    "group": "Level 02 · Context",
+    "group": "Level 02 · Added context",
     "definition": "Persisting selected information across interactions and retrieving it when relevant.",
     "audience": "engineering",
     "prompt": "Remember the preferred CSV column order for this test project.",
@@ -191,7 +191,7 @@
   {
     "slug": "memory",
     "title": "Memory",
-    "group": "Level 02 · Context",
+    "group": "Level 02 · Added context",
     "definition": "Persisting selected information across interactions and retrieving it when relevant.",
     "audience": "business",
     "prompt": "Carry forward approved wording for our customer updates.",
@@ -338,7 +338,7 @@
   {
     "slug": "function-calling",
     "title": "Function calling",
-    "group": "Level 04 · Tools",
+    "group": "Level 04 · Tool use",
     "definition": "A model proposing a named tool and structured arguments that application code validates and executes.",
     "audience": "everyday",
     "prompt": "Check whether the library has this book, without placing a hold.",
@@ -359,7 +359,7 @@
   {
     "slug": "function-calling",
     "title": "Function calling",
-    "group": "Level 04 · Tools",
+    "group": "Level 04 · Tool use",
     "definition": "A model proposing a named tool and structured arguments that application code validates and executes.",
     "audience": "engineering",
     "prompt": "Read the latest archived temperature measurement for channel C.",
@@ -380,7 +380,7 @@
   {
     "slug": "code-execution",
     "title": "Code execution",
-    "group": "Level 04 · Tools",
+    "group": "Level 04 · Tool use",
     "definition": "Running generated code in a constrained environment to perform computation or transform data.",
     "audience": "everyday",
     "prompt": "Compare unit prices from these grocery package sizes.",
@@ -401,7 +401,7 @@
   {
     "slug": "code-execution",
     "title": "Code execution",
-    "group": "Level 04 · Tools",
+    "group": "Level 04 · Tool use",
     "definition": "Running generated code in a constrained environment to perform computation or transform data.",
     "audience": "business",
     "prompt": "Calculate the portfolio's total approved budget from a CSV.",
@@ -422,7 +422,7 @@
   {
     "slug": "agent-harness",
     "title": "The agent harness",
-    "group": "Level 05 · Agents",
+    "group": "Level 05 · Agent loops",
     "definition": "The runtime around an agent's model that manages tools, context, execution boundaries, approvals, limits, and records.",
     "audience": "everyday",
     "prompt": "Help plan a weekend trip, but do not book or pay for anything.",
@@ -443,7 +443,7 @@
   {
     "slug": "agent-harness",
     "title": "The agent harness",
-    "group": "Level 05 · Agents",
+    "group": "Level 05 · Agent loops",
     "definition": "The runtime around an agent's model that manages tools, context, execution boundaries, approvals, limits, and records.",
     "audience": "business",
     "prompt": "Prepare a weekly portfolio report using approved project sources, and wait for review before distribution.",
@@ -716,7 +716,7 @@
   {
     "slug": "single-agent",
     "title": "Single agent",
-    "group": "Level 05 · Agents",
+    "group": "Level 05 · Agent loops",
     "definition": "A model choosing successive actions and when to stop within a tool-enabled loop.",
     "audience": "everyday",
     "prompt": "Find a workable library visit time using the supplied tools.",
@@ -737,7 +737,7 @@
   {
     "slug": "single-agent",
     "title": "Single agent",
-    "group": "Level 05 · Agents",
+    "group": "Level 05 · Agent loops",
     "definition": "A model choosing successive actions and when to stop within a tool-enabled loop.",
     "audience": "engineering",
     "prompt": "Investigate a failed archived test run without operating hardware.",
@@ -758,7 +758,7 @@
   {
     "slug": "multimodal",
     "title": "Images, audio and video",
-    "group": "Level 01 · One call",
+    "group": "Level 01 · Direct prompting",
     "definition": "Working with inputs or outputs across text, images, audio, or video.",
     "audience": "everyday",
     "prompt": "Make a packing checklist from a photographed school notice and a voice reminder.",
@@ -779,7 +779,7 @@
   {
     "slug": "multimodal",
     "title": "Images, audio and video",
-    "group": "Level 01 · One call",
+    "group": "Level 01 · Direct prompting",
     "definition": "Working with inputs or outputs across text, images, audio, or video.",
     "audience": "business",
     "prompt": "Draft meeting actions from a whiteboard photo and recording transcript.",
@@ -800,7 +800,7 @@
   {
     "slug": "voice-agents",
     "title": "Voice agents",
-    "group": "Level 05 · Agents",
+    "group": "Level 05 · Agent loops",
     "definition": "Agents that conduct spoken interactions while handling audio, timing, interruptions, and tool use.",
     "audience": "engineering",
     "prompt": "Read back a proposed configuration while the engineer works hands-free.",
@@ -821,7 +821,7 @@
   {
     "slug": "voice-agents",
     "title": "Voice agents",
-    "group": "Level 05 · Agents",
+    "group": "Level 05 · Agent loops",
     "definition": "Agents that conduct spoken interactions while handling audio, timing, interruptions, and tool use.",
     "audience": "business",
     "prompt": "Collect a spoken project update and draft it for the weekly report.",

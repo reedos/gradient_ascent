@@ -264,7 +264,7 @@ export interface TechniqueRef {
   status: Status;
   /** The tier order (0..7) this page belongs to, or "tracks" for anything under Topics. */
   level: number | 'tracks';
-  /** Human label for the level, e.g. "Level 02 · Context" or "Topics at every level". */
+  /** Human label for the level, e.g. "Level 02 · Added context" or "Topics at every level". */
   levelLabel: string;
   covers?: string[];
 }

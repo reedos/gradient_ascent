@@ -3,7 +3,7 @@
   "h": 400,
   "title": "Multimodal: an image and a question, one call",
   "sub": "Attach an image as its own content block next to the text, ask once, check the reply.",
-  "pill": "Level 1 · One call",
+  "pill": "Level 1 · Direct prompting",
   "nodes": [
     { "id": "in", "x": 170, "y": 26, "l": "Photo + question", "k": "io" },
     { "id": "attach", "x": 170, "y": 110, "l": "Attach the image, before the text", "k": "code" },

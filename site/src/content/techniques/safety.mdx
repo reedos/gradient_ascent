@@ -278,15 +278,15 @@ not a reason to leave them out.
 
 ## At each level
 
-- <Link href="/levels/0/">No model</Link>: there is no model to redirect, so the risks here are
+- <Link href="/levels/0/">Conventional software</Link>: there is no model to redirect, so the risks here are
   ordinary software security (input validation, access control), the same ground
   <Link href="/techniques/order-zero/">level 0</Link>'s own page already covers, not this topic's
   own concerns.
-- <Link href="/levels/1/">One call</Link>: the user's own message is the only input in play, the
+- <Link href="/levels/1/">Direct prompting</Link>: the user's own message is the only input in play, the
   way <Link href="/techniques/chat/">chat</Link>'s one call has no search step and no tool call,
   so direct prompt injection is the whole risk; there is no retrieved or tool-returned content yet
   to carry an indirect one.
-- <Link href="/levels/2/">Context</Link>: retrieved text can carry instructions of its own, which
+- <Link href="/levels/2/">Added context</Link>: retrieved text can carry instructions of its own, which
   is why <Link href="/techniques/rag/">RAG</Link> lists prompt injection through retrieved text
   among its own failure modes. The model reads whatever the retrieval step handed it exactly the
   way it reads the user's message, with nothing marking one as more trustworthy than the other
@@ -295,16 +295,16 @@ not a reason to leave them out.
   a check between steps (the gate in <Link href="/techniques/prompt-chaining/">prompt
   chaining</Link>'s own example is exactly that), but a compromised step's output still moves on
   to the next step by default unless something explicitly stops it there.
-- <Link href="/levels/4/">Tools</Link>: a tool call can act on the world, not just produce a
+- <Link href="/levels/4/">Tool use</Link>: a tool call can act on the world, not just produce a
   sentence, so the same injected instruction that used to produce a wrong answer can now attempt
   a real action, the risk <Link href="/techniques/function-calling/">function calling</Link>'s
   own failure modes name directly: this is where a permission check like this page's example
   earns its place.
-- <Link href="/levels/5/">Agents</Link>: the model chooses its own next step across many turns
+- <Link href="/levels/5/">Agent loops</Link>: the model chooses its own next step across many turns
   with nobody reading each one, so a single injected instruction early in
   <Link href="/techniques/single-agent/">a single agent</Link>'s long loop can steer several later
   actions before a person sees any of them.
-- <Link href="/levels/6/">Teams of agents</Link>: one agent's output becomes another agent's
+- <Link href="/levels/6/">Teams of Agents</Link>: one agent's output becomes another agent's
   input, so an injected instruction can move from an agent that only reads content to one that
   holds permissions the first agent never had: the reason
   <Link href="/techniques/agent-graphs/">agent graphs</Link> checks a handoff against an allowlist

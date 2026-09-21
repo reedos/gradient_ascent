@@ -3,7 +3,7 @@
   "h": 692,
   "title": "Support desk, assembled",
   "sub": "Route the ticket, search the docs, let the model reach for a tool if it needs one, and pause before anything costly goes out.",
-  "pill": "Level 4 · Tools",
+  "pill": "Level 4 · Tool use",
   "nodes": [
     { "id": "ticket", "x": 170, "y": 34, "l": "Ticket arrives", "k": "io" },
     { "id": "classify", "x": 170, "y": 100, "l": "Classify the ticket", "k": "model" },
