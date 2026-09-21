@@ -63,7 +63,7 @@ const feedbackHref = `${REPO_URL}/issues/new?template=feedback.yml`;
                           {s.items.map((it) => (
                             <li>
                               <a class="nav-link" href={url(it.path)} aria-current={isCurrent(it, path, ctx) ? 'page' : undefined}>
-                                <span class="nav-link-t">{it.label}</span>
+                                <span class="nav-link-t">{it.level !== undefined ? `Level ${it.level}: ${it.label}` : it.label}</span>
                                 {it.hint && <span class="nav-link-s">{it.hint}</span>}
                               </a>
                             </li>
@@ -118,7 +118,7 @@ const feedbackHref = `${REPO_URL}/issues/new?template=feedback.yml`;
                     {s.items.map((it) => (
                       <li>
                         <a href={url(it.path)} aria-current={isCurrent(it, path, ctx) ? 'page' : undefined}>
-                          <span>{it.label}</span>
+                          <span>{it.level !== undefined ? `Level ${it.level}: ${it.label}` : it.label}</span>
                           {it.hint && <small>{it.hint}</small>}
                         </a>
                       </li>

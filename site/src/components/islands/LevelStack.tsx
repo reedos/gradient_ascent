@@ -6,9 +6,7 @@ import { url } from '../../lib/url';
  * of what happens at that level. Ported line-for-line from prototype/look.src.html's iso/tile/
  * cube/node/ring/GLYPHS/renderArt functions, from string-building to React.
  *
- * Each slab is a real link to /levels/<n>/ (works with JavaScript off). With JS on, clicking a
- * slab also tells LevelExplorer to select that level in place and scrolls the levels section
- * into view, via a small window CustomEvent ("ga:selectLevel") LevelExplorer listens for.
+ * Each slab links directly to its level page, with or without JavaScript.
  */
 
 type Point = [number, number];
@@ -150,12 +148,6 @@ const INSET = 'm91 56 123-69 126 69-126 70z';
 const GAP = 63;
 const Y0 = 478;
 
-function selectLevel(order: number) {
-  window.dispatchEvent(new CustomEvent('ga:selectLevel', { detail: { level: order } }));
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  document.getElementById('levels')?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-}
-
 export default function LevelStack({ levels }: Props) {
   const grid = useMemo(() => {
     let g = '';
@@ -204,11 +196,6 @@ export default function LevelStack({ levels }: Props) {
             href={url(`/levels/${o.order}/`)}
             aria-label={`Level ${o.order}: ${o.title}`}
             style={{ color: c }}
-            onClick={(e) => {
-              if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-              e.preventDefault();
-              selectLevel(o.order);
-            }}
           >
             <g transform={`translate(0 ${Y})`}>
               <g transform={`translate(214 57) scale(${s.toFixed(3)}) translate(-214 -57)`}>
