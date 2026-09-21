@@ -5,7 +5,7 @@ import { url } from '../lib/url';
 ---
 <section class="journey-intro" aria-labelledby="journey-intro-title">
   <div><div class="eyebrow muted">Start with the basics</div><h2 id="journey-intro-title">From a chatbot to an always-on agent</h2>
-  <p>See how conversational AI expanded through retrieval, workflows, tools, agent loops, and systems that keep working across sessions.</p></div>
+  <p>See how conversational AI expanded through stronger reasoning, retrieval, workflows, tools, agent loops, and systems that keep working across sessions.</p></div>
   <a class="text-link" href={url('/chatbot-to-agent/')}>See the technology evolve <span aria-hidden="true">→</span></a>
   <ol aria-label="Capabilities covered">{agentJourney.map((step,i) => <li><a href={url(`/chatbot-to-agent/#step-${i+1}`)}><span>{i+1}</span> {levels.find(level => level.order === i+1)?.title}</a></li>)}</ol>
   <p class="note">Overlapping developments, explained through seven levels. Teams are optional.</p>

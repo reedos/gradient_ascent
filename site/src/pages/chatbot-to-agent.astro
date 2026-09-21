@@ -3,10 +3,10 @@ import Base from '../layouts/Base.astro';
 import { levels } from '../lib/content';
 import { agentJourney } from '../lib/agent-journey';
 import { url } from '../lib/url';
-const bridges = ['Add relevant information', 'Organize the work into steps', 'Let the model request actions', 'Let results guide the next action', 'Optional: add specialists', 'Add continuity across sessions'];
+const bridges = ['Add relevant information', 'Organize the work into steps', 'Let the model request actions', 'Reasoning connects actions to outcomes', 'Optional: add specialists', 'Add continuity across sessions'];
 ---
 <Base title="From a chatbot to an always-on agent · Gradient Ascent" description="How conversational language models expanded into systems with retrieval, workflows, tools, agent loops, coordination, and persistent operation.">
-  <div class="page-hero"><div class="eyebrow muted">Start with the basics</div><h1>From a chatbot to an always-on agent</h1><p>Modern AI chatbots put language models inside a conversation. Retrieval, workflows, tool interfaces, agent loops, and persistent infrastructure expanded what these systems could do—from generating a reply to carrying out work across sessions.</p><p>These developments overlapped and still coexist; they were not seven clean historical eras. The levels below explain the architectural changes. For dated milestones, see the <a href={url('/timeline/')}>timeline</a>.</p></div>
+  <div class="page-hero"><div class="eyebrow muted">Start with the basics</div><h1>From a chatbot to an always-on agent</h1><p>Modern AI chatbots put language models inside a conversation. Stronger reasoning, retrieval, workflows, tool interfaces, agent loops, and persistent infrastructure expanded what these systems could do—from generating a reply to carrying out work across sessions.</p><p>These developments overlapped and still coexist; they were not seven clean historical eras. The levels below explain the architectural changes. For dated milestones, see the <a href={url('/timeline/')}>timeline</a>.</p></div>
   <div class="journey-steps">
     {agentJourney.map((step,i) => <><section class="journey-step" id={`step-${i+1}`} style={`--step-color:var(--o${i+1})`}>
       <header class="step-header"><a class="step-label" href={url(`/levels/${i+1}/`)}>Level {i+1} · {levels.find(level => level.order === i+1)?.title} <span aria-hidden="true">↗</span></a><h2 class="step-heading">{step.title}</h2></header>
@@ -21,6 +21,20 @@ const bridges = ['Add relevant information', 'Organize the work into steps', 'Le
       <span class="bridge-arrow" aria-hidden="true">↓</span>
       <div><strong>{bridges[i]}</strong><p>{step.next}</p></div>
     </div>}
+    {i===3 && <section class="reasoning-development" aria-labelledby="reasoning-development-title">
+      <div class="eyebrow muted">Across the levels · model capability</div>
+      <h2 id="reasoning-development-title">Reasoning guides the work</h2>
+      <p>Tool access makes an action possible. Reasoning helps a model interpret the goal, decide which action is useful, assess the result, and change approach. That ability is central to useful agentic work.</p>
+      <ol class="reasoning-connections" aria-label="How reasoning supports agentic systems">
+        <li><strong>Tools</strong><span>Enable actions</span></li>
+        <li><strong>Reasoning</strong><span>Guides decisions</span></li>
+        <li><strong>Agent loop</strong><span>Connects decisions, actions, and feedback</span></li>
+        <li><strong>Persistence</strong><span>Carries work across sessions</span></li>
+      </ol>
+      <p><strong>Reasoning models strengthen this capability.</strong> They can spend additional computation working through a problem before answering or requesting a tool. This can improve planning and problem solving, with added time and cost; it does not guarantee correct decisions.</p>
+      <p>Reasoning did not begin with dedicated “thinking” modes. Earlier agents also relied on models’ reasoning abilities. A reasoning model can power a chatbot or an agent: the model’s capability and the system’s autonomy are different dimensions.</p>
+      <a href={url('/techniques/inference-time-reasoning/')}>Explore reasoning at answer time →</a>
+    </section>}
     </>)}
   </div>
   <section class="journey-ending"><h2>The evolution is in the whole system</h2><p>More capable models are part of the story. The other part is the software around them: information access, action interfaces, control loops, coordination, and persistence. Together, these turn conversational output into work that can continue over time.</p><p>These capabilities can combine in different ways. Teams are optional: one agent can also keep working over time.</p></section>
@@ -46,6 +60,15 @@ dt { font-weight: 600; font-size: 14px; } dd { margin: 0; font-size: 14px; line-
 .bridge-arrow { color: var(--accent); font-size: 26px; }
 .stage-bridge strong { font-size: 14px; }
 .stage-bridge p { font-size: 14px; line-height: 1.65; margin: 6px 0 0; }
+.reasoning-development { padding: 24px; margin: 12px 0 28px; border-left: 3px solid var(--accent); background: var(--panel); border-radius: 0 12px 12px 0; }
+.reasoning-development h2 { margin: 10px 0 14px; font-size: 24px; }
+.reasoning-development p { max-width: 78ch; font-size: 14px; line-height: 1.75; margin: 14px 0; }
+.reasoning-development > a { font-size: 14px; }
+.reasoning-connections { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; padding: 0; margin: 22px 0; list-style: none; }
+.reasoning-connections li { padding: 14px; border: 1px solid var(--line); border-radius: 8px; }
+.reasoning-connections strong { display:block; font-size:14px; }
+.reasoning-connections span { display:block; color:var(--muted); font-size:13px; line-height:1.5; margin-top:6px; }
+@media(max-width:650px) { .reasoning-development { padding: 18px 16px; } .reasoning-connections { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 .journey-ending h2 { font-size: 25px; }
 @media(max-width:650px) { .step-header { padding: 18px 16px; } .step-heading { font-size: 20px; } .step-body { padding:0 16px 20px; } dl > div { grid-template-columns:1fr; gap:5px; } .journey-flow { flex-direction:column; } .journey-flow li { flex-direction:column; } .journey-flow span { width:100%; box-sizing:border-box; } .journey-flow b { transform:rotate(90deg); } }
 

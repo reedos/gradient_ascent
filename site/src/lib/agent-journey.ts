@@ -54,11 +54,11 @@ export const agentJourney = [
   {
     "title": "Tool use becomes an agent loop",
     "short": "Agent",
-    "added": "The system repeatedly gives the model the current goal, context, and action results. The model chooses another action, revises its approach, or signals that it is finished.",
+    "added": "The system repeatedly gives the model the current goal, context, and action results. Reasoning guides its next decision: choose an action, revise the approach, or signal that the work is finished.",
     "shift": "Control over the next step shifts from a fully prescribed sequence toward decisions made during the run. The surrounding software still enforces limits and executes tools.",
     "limit": "Agents can repeat mistakes or stop too early. Their reliability depends on the model, available evidence, tools, checks, and stopping rules.",
     "flow": [
-      "Choose an action",
+      "Reason about the next action",
       "Execute through tools",
       "Observe → choose again"
     ],
