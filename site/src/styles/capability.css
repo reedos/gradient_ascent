@@ -36,3 +36,22 @@
 .cap-table th, .cap-table td { text-align: left; padding: 6px 18px 6px 0; border-bottom: 1px solid var(--line); color: var(--muted); font-variant-numeric: tabular-nums }
 .cap-table th { font: 600 10px var(--font); letter-spacing: 1.2px; text-transform: uppercase }
 .cap-table td:nth-child(2) { color: var(--text) }
+
+/* The desktop SVG retains its original dimensions and label placement. */
+.cap-svg-mobile { display: none; }
+@media (max-width: 600px) {
+  .cap-scroll { overflow: visible; padding: 10px 6px 6px; }
+  .cap-svg-desktop { display: none; }
+  .cap-svg-mobile { display: block; width: 100%; min-width: 0; }
+  .cap-svg-mobile .cap-tick { font-size: 13px; }
+  .cap-svg-mobile .cap-axis { font-size: 11px; letter-spacing: .6px; }
+  .cap-svg-mobile .cap-name, .cap-svg-mobile .cap-shift-label { font-size: 13px; }
+  .cap-svg-mobile .cap-level text { font-size: 14px; }
+  .cap-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; font-size: 10.5px; }
+  .cap-legend li { align-items: flex-start; line-height: 1.5; }
+  .cap-key { flex-shrink: 0; margin-top: 3px; }
+  .cap-key.is-line { margin-top: 7px; }
+  #capability .section-top { gap: 12px; margin-bottom: 18px; }
+  #capability .section-top h2 { font-size: 25px; line-height: 1.25; }
+  #capability .section-top > p { font-size: 12px; line-height: 1.6; }
+}

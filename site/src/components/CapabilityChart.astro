@@ -69,17 +69,32 @@ const before = reasoningM ? frontierChange(front, gpt4.date, dayBefore(reasoning
 const after = reasoningM ? frontierChange(front, dayBefore(reasoningM.date), asOf) : null;
 const top = front[front.length - 1];
 const longDate = (iso: string) => formatDate(iso, 'day');
+// Mobile gets its own plot coordinates, not a scaled-down copy of desktop's tiny labels.
+const mobileScale = makeScale(snap.points, { startISO: START, endISO: asOf, width: 440, height: 370, pad: { l: 38, r: 14, t: 36, b: 78 } });
+const mobileMarks = levelMarks.map(m => ({ ...m, x: r1(sx(mobileScale, yearOf(m.date))), row: 0 }));
+const mobileLabelX = new Map<number, number>();
+let previousLabelX = mobileScale.left - 28;
+for (const m of [...mobileMarks].sort((a,b)=>a.x-b.x)) {
+  const labelX = Math.max(m.x, previousLabelX + 28);
+  mobileLabelX.set(m.level, labelX);
+  previousLabelX = labelX;
+}
+const charts = [
+  {mobile:false, W, H, scale, path, named, levelMarks, shiftX, suffix:''},
+  {mobile:true, W:440, H:370, scale:mobileScale, path:frontierPath(mobileScale,front,asOf), named:labeledFrontier(mobileScale,front,125), levelMarks:mobileMarks, shiftX:reasoningM?r1(sx(mobileScale,yearOf(reasoningM.date))):undefined, suffix:'-mobile'},
+];
 ---
 
 <figure class="cap">
   <div class="cap-scroll">
-    <svg class="cap-svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby="cap-title cap-desc">
-      <title id="cap-title">Epoch Capabilities Index by model release date, {Math.ceil(scale.x0)} to {usDate(asOf)}</title>
-      <desc id="cap-desc">
+    {charts.map(({mobile,W,H,scale,path,named,levelMarks,shiftX,suffix}) => (
+    <svg class:list={['cap-svg', mobile ? 'cap-svg-mobile' : 'cap-svg-desktop']} viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby={`cap-title${suffix} cap-desc${suffix}`}>
+      <title id={`cap-title${suffix}`}>Epoch Capabilities Index by model release date, {Math.ceil(scale.x0)} to {usDate(asOf)}</title>
+      <desc id={`cap-desc${suffix}`}>
         {snap.points.length} models scored by Epoch AI, plotted by release date. A stepped line follows the best score to date, from {front[0].eci} to {top.eci}. Markers under the axis show selected milestones for this site's levels, and a vertical line marks the first reasoning model.
       </desc>
       <defs>
-        <linearGradient id="cap-grad" x1="0" y1="0" x2="1" y2="0">
+        <linearGradient id={`cap-grad${suffix}`} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stop-color="var(--mk1)" />
           <stop offset=".4" stop-color="var(--mk2)" />
           <stop offset=".75" stop-color="var(--mk3)" />
@@ -104,7 +119,7 @@ const longDate = (iso: string) => formatDate(iso, 'day');
       {shiftX !== undefined && reasoningM && (
         <g>
           <line class="cap-shift" x1={shiftX} x2={shiftX} y1={scale.top - 6} y2={scale.bottom} />
-          <text class="cap-shift-label" x={shiftX - 7} y={scale.top + 4} text-anchor="end">First reasoning model · {formatDate(reasoningM.date.slice(0, 7), 'month')}</text>
+          <text class="cap-shift-label" x={shiftX - 7} y={scale.top + 4} text-anchor="end">{mobile?'Reasoning':'First reasoning model'} · {formatDate(reasoningM.date.slice(0, 7), 'month')}</text>
         </g>
       )}
 
@@ -116,26 +131,27 @@ const longDate = (iso: string) => formatDate(iso, 'day');
         ))}
       </g>
 
-      <path class="cap-frontier" d={path} stroke="url(#cap-grad)" fill="none" />
+      <path class="cap-frontier" d={path} stroke={`url(#cap-grad${suffix})`} fill="none" />
       {front.map((p) => (
         <circle class="cap-front-dot" cx={r1(sx(scale, yearOf(p.date)))} cy={r1(sy(scale, p.eci))} r="3.4">
           <title>{`New high: ${p.name}${p.org ? `, ${p.org}` : ''} · ${p.eci} · ${usDate(p.date)}`}</title>
         </circle>
       ))}
-      {named.map((p) => (
-        <text class="cap-name" x={r1(sx(scale, yearOf(p.date))) - 6} y={r1(sy(scale, p.eci)) - 8} text-anchor="end">{p.name.replace(/ \(.*\)$/, '')}</text>
+      {named.map((p,i) => (
+        <text class="cap-name" x={r1(sx(scale, yearOf(p.date))) + (mobile && i===0 ? 6 : -6)} y={r1(sy(scale, p.eci)) - 8} text-anchor={mobile && i===0?'start':'end'}>{p.name.replace(/ \(.*\)$/, '')}</text>
       ))}
 
       {levelMarks.map((m) => (
         <a href={url(`/levels/${m.level}/`)} class="cap-level" style={`--c:var(--o${m.level})`} aria-label={`Level ${m.level}, ${m.title}: ${m.product}, ${longDate(m.date)}`}>
-          <line x1={m.x} x2={m.x} y1={scale.bottom} y2={scale.bottom + 52 + m.row * 24} />
-          <circle cx={m.x} cy={scale.bottom + 62 + m.row * 24} r="9" />
-          <text x={m.x} y={scale.bottom + 66 + m.row * 24} text-anchor="middle">{m.level}</text>
+          <line x1={m.x} x2={mobile?mobileLabelX.get(m.level):m.x} y1={scale.bottom} y2={scale.bottom + (mobile?39:52) + m.row * 24} />
+          <circle cx={mobile?mobileLabelX.get(m.level):m.x} cy={scale.bottom + (mobile?50:62) + m.row * 24} r={mobile?11:9} />
+          <text x={mobile?mobileLabelX.get(m.level):m.x} y={scale.bottom + (mobile?54:66) + m.row * 24} text-anchor="middle">{m.level}</text>
           <title>{`Level ${m.level}, ${m.title}: ${m.product}, ${longDate(m.date)}`}</title>
         </a>
       ))}
-      <text class="cap-axis is-halo" x={scale.right} y={scale.bottom + 38} text-anchor="end">Selected milestones by level</text>
+      <text class="cap-axis is-halo" x={scale.right} y={scale.bottom + (mobile?76:38)} text-anchor="end">Selected milestones by level</text>
     </svg>
+    ))}
   </div>
 
   <ul class="cap-legend">
