@@ -12,7 +12,7 @@
     while (walker.nextNode()) {
       const node = walker.currentNode as Text;
       if (node.parentElement && !node.parentElement.closest(excluded) &&
-          node.parentElement.closest('p,li,td,th,dd,figcaption,.test-harness')) nodes.push(node);
+          node.parentElement.closest('p,li,td,th,dd,figcaption,h1,h2,h3,h4,h5,h6,.test-harness')) nodes.push(node);
     }
     for (const node of nodes) {
       const text = node.data;
@@ -36,6 +36,24 @@
     }
   }
 
+  // Keep links as links; a separate button supplies touch and keyboard access to the definition.
+  main?.querySelectorAll<HTMLAnchorElement>('a').forEach(link => {
+    if (link.closest('nav,astro-island,[data-no-acronyms]') || !link.closest('p,li,td,th,h1,h2,h3,h4,figcaption')) return;
+    const matches = acronymMatches(link.textContent ?? '');
+    const primary = matches.find(m => m.key === 'GraphRAG' || m.key === 'RAG') ?? matches[0];
+    const unique = primary ? [primary.key] : [];
+    unique.forEach(key => {
+      const hint = document.createElement('button');
+      hint.type = 'button';
+      hint.className = 'acronym-hint definition-help';
+      hint.dataset.acronym = key;
+      hint.textContent = '?';
+      hint.setAttribute('aria-label', `${key}: ${acronyms[key][0]}. Show definition`);
+      link.after(hint);
+    });
+    if (unique.length === 1) link.dataset.definitionKey = unique[0];
+  });
+
   let active: HTMLElement | null = null;
   let pinned = false;
   let timer: ReturnType<typeof setTimeout>;
@@ -49,7 +67,7 @@
   function show(target: HTMLElement) {
     clearTimeout(timer);
     if (active !== target) { hide(); active = target; }
-    const [expansion, definition] = acronyms[target.dataset.acronym!];
+    const [expansion, definition] = acronyms[target.dataset.acronym ?? target.dataset.definitionKey!];
     const title = document.createElement('strong');
     title.textContent = expansion;
     const body = document.createElement('span');
@@ -79,6 +97,12 @@
       else { show(target); pinned = true; }
     });
   });
+  main?.querySelectorAll<HTMLElement>('a[data-definition-key]').forEach(link => {
+    link.addEventListener('pointerenter', () => show(link));
+    link.addEventListener('pointerleave', leave);
+    link.addEventListener('focus', () => show(link));
+    link.addEventListener('blur', hide);
+  });
   tooltip.addEventListener('pointerenter', () => clearTimeout(timer));
   tooltip.addEventListener('pointerleave', leave);
   document.addEventListener('keydown', event => { if (event.key === 'Escape') hide(); });
@@ -95,6 +119,7 @@
     text-transform: inherit; line-height: inherit; cursor: help;
     text-decoration: underline dotted; text-underline-offset: 4px;
   }
+  button.definition-help { margin-left: .35em; font-size: 12px; vertical-align: middle; border: 1px solid var(--line); border-radius: 50%; width: 18px; height: 18px; line-height: 16px; text-align: center; text-decoration: none; color: var(--muted); }
   button.acronym-hint:focus-visible { outline: 2px solid var(--accent, #4e7aff); outline-offset: 3px; }
   #acronym-tooltip {
     position: fixed; z-index: 1000; width: 300px; max-width: calc(100vw - 24px);
