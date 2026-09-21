@@ -66,6 +66,9 @@ jobs:
         # Reads site/src, not site/dist, so it does not depend on the build above.
         run: python scripts/validate.py
 
+      - name: Test the practical recipe implementations
+        run: python -m unittest discover -s examples/practical_labs -p test_labs.py --verbose
+
       - name: Run the Python tests
         # Reads site/dist for the generated-index tests, which is why the build is above this.
         run: python -m unittest discover -s tests --verbose

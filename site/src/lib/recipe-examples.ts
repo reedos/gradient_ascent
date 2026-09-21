@@ -23,5 +23,5 @@ export function chatBrief(example:typeof recipeExamples[number]) {
 }
 export function recipeExampleMarkdown(slug:string) {
  const example=exampleForRecipe(slug);
- return example ? `\n## Try this with your AI\n\n${example.context}\n\nPaste the brief and records below into your model. This tries the reasoning task; a chat does not implement retrieval, tool execution, approval enforcement, or persistence.\n\n### Copyable brief and source records\n\n${chatBrief(example)}\n\n<details><summary>Design, reference answer, adaptation, and optional implementation</summary>\n\n${labMarkdown(example.id).replace(/^# /,'### ')}\n\n[Optional Python starter](${url(`/downloads/practical-labs/${example.id}.zip`)})\n\n</details>\n` : '';
+ return example ? `\n## Try this with your AI\n\n${example.context}\n\nPaste the brief and records below into your model. This tries the reasoning task; a chat does not implement retrieval, tool execution, approval enforcement, or persistence.\n\n### Copyable brief and source records\n\n${chatBrief(example)}\n\n### Design, reference answer, adaptation, and optional implementation\n\n${labMarkdown(example.id).replace(/^# /,'### ')}\n\n[Optional Python starter](${url(`/downloads/practical-labs/${example.id}.zip`)})\n\n\n` : '';
 }

@@ -39,6 +39,11 @@ jobs:
           cache: npm
           cache-dependency-path: site/package-lock.json
 
+      - name: Set up Python for example downloads
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
       - name: Configure Pages
         # Exposes the base URL Pages will serve from. It does not override astro.config.mjs,
         # which is the source of truth for `site` and `base`.

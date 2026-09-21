@@ -1,6 +1,6 @@
-# Gradient Ascent — resource quality prototype
+# Gradient Ascent — resource quality update
 
-Prepared September 20, 2026; revised September 21 after review. This is an isolated review prototype, based on commit `3043640`. Nothing has been pushed or deployed to the live site.
+Prepared as an isolated prototype on September 20, 2026, based on commit `3043640`. Revised and approved for publication on September 21. The separate Labs section was removed after review; practical examples now live within Recipes.
 
 ## Assessment
 
@@ -25,12 +25,12 @@ The prototype improves those foundations. It does **not** establish that this is
 13. **Boundary tests:** failures cover unsupported citations, invalid totals, invented due dates, incomplete workflow handoffs, changed/expired/stale approvals, duplicate receipts, forbidden tools, unread citations, exhausted call budgets, durable restart behavior, and failed generation. Local HTTP fixtures exercise both API adapters.
 14. **Shared walkthrough readability:** removed the pretend “Send request” gate and typewriter animation. The first record is immediately readable; every stage can be selected directly. Existing alternate scenarios and approval exercises remain.
 15. **Connected discovery:** search and concept-page links lead into the existing recipes. Removed the separate Labs destination, navigation item, and homepage promotion. Recipe Markdown exports include the practical material. The primary action copies a complete brief and sample inputs; Python downloads and setup are optional, collapsed details.
-16. **Review and provenance:** a prototype banner, review hub, complete change log, reproducible smoke-test script, and downloadable records of successful and rejected local-model trials. README language now scopes the new observed runs separately from legacy scripted content.
+16. **Review and provenance:** a private prototype banner and review hub supported approval; both are removed from the public build. Retained the complete change log, reproducible smoke-test script, and downloadable records of successful and rejected local-model trials. README language now scopes the new observed runs separately from legacy scripted content.
 17. **Repository integration checks:** integrated practical examples into recipe Markdown exports and registered the new runner with the evaluation harness’s explicit not-scored list. Added exact allowances for reserved-domain synthetic email fixtures. Corrected the timeline’s aggregate `as_of` date to match its already-recorded September 20 source check; no milestone assignment or date was changed.
 
 ## Final implementation validation
 
-- Static build: passed, 140 HTML pages after folding the examples into Recipes.
+- Static build: passed, 139 HTML pages after folding the examples into Recipes and removing the private review page.
 - Astro/TypeScript: zero errors and warnings; 47 informational hints remain.
 - Site tests: 264 passed (259 existing plus five prototype checks).
 - New example tests: 16 passed, including local HTTP transport tests for both adapters.
@@ -87,4 +87,4 @@ These references support mechanisms and implementation choices. They do not cert
 
 Start with the RAG diagram, the incident companion example, the scheduling approval example, and the design-decision guide. Compare phone and desktop. The useful review questions are whether the diagrams explain control clearly, whether the examples feel directly useful, and whether the optional detail is in the right place.
 
-The live homepage map, timeline, capability chart, branding, and deployment remain unchanged by this prototype.
+The homepage map, timeline milestones, capability chart, and branding retain their existing design. Publication includes the approved diagrams, explanations, recipe examples, and design guide; it excludes the private review banner and review-only page.

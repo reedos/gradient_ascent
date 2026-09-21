@@ -54,7 +54,6 @@ const ogImage = new URL(url('/og.png'), Astro.site).toString();
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    <div class="prototype-banner"><span>Review prototype · September 21</span><a href={url('/prototype-review/')}>See all changes ↗</a></div>
     <Header />
     <main id="main">
       <slot />
@@ -70,7 +69,3 @@ const ogImage = new URL(url('/og.png'), Astro.site).toString();
     <AcronymHints />
   </body>
 </html>
-
-<style>
-.prototype-banner{display:flex;justify-content:center;gap:20px;padding:9px 20px;background:#19202e;border-bottom:1px solid #344057;font-size:11px;color:#b7c4db}.prototype-banner a{color:#d5e2ff;text-decoration:underline;text-underline-offset:3px}@media(max-width:480px){.prototype-banner{font-size:10px;gap:12px}}@media print{.prototype-banner{display:none}}
-</style>
