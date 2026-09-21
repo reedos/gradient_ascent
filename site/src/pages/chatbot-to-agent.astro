@@ -3,21 +3,26 @@ import Base from '../layouts/Base.astro';
 import { levels } from '../lib/content';
 import { agentJourney } from '../lib/agent-journey';
 import { url } from '../lib/url';
+const bridges = ['Add relevant information', 'Organize the work into steps', 'Let the model request actions', 'Let results guide the next action', 'Optional: add specialists', 'Add continuity across sessions'];
 ---
 <Base title="From a chatbot to an always-on agent · Gradient Ascent" description="Seven simple steps explaining context, workflows, tools, agent loops, teams, and ongoing work, using one project throughout.">
   <div class="page-hero"><div class="eyebrow muted">Start with the basics</div><h1>From a chatbot to an always-on agent</h1><p>Follow one website-launch project as we add capabilities. The model is one part of the system; software around it supplies information, runs actions, and keeps work moving.</p><p>This shows how the capabilities build on one another. For historical dates, see the <a href={url('/timeline/')}>timeline</a>.</p></div>
   <div class="journey-context"><strong>Our task: help a team launch its website.</strong><p>The same task grows from a conversation into work that can continue across days. These are illustrative examples, not live agent runs.</p><p><a href={url('/levels/0/')}>Before step 1:</a> if rules, a form, or ordinary code can do the job reliably, you may not need a model.</p></div>
   <div class="journey-steps">
-    {agentJourney.map((step,i) => <section class="journey-step" id={`step-${i+1}`} style={`--step-color:var(--o${i+1})`}>
-      <header class="step-header"><div class="step-label">Level {i+1} · {levels.find(level => level.order === i+1)?.title}</div><h2 class="step-heading">{step.title}</h2></header>
+    {agentJourney.map((step,i) => <><section class="journey-step" id={`step-${i+1}`} style={`--step-color:var(--o${i+1})`}>
+      <header class="step-header"><a class="step-label" href={url(`/levels/${i+1}/`)}>Level {i+1} · {levels.find(level => level.order === i+1)?.title} <span aria-hidden="true">↗</span></a><h2 class="step-heading">{step.title}</h2></header>
       <div class="step-body">
         <p class="added">{step.added}</p>
         <figure><ol class="journey-flow" aria-label={`How step ${i+1} works`}>{step.flow.map((node,n) => <li><span>{node}</span>{n<step.flow.length-1 && <b aria-hidden="true">→</b>}</li>)}</ol>
         <figcaption>{i===4 ? 'Repeat the loop as needed, until finished, blocked, or stopped by a limit.' : i===5 ? 'Specialists can work separately and return findings; teams are an optional branch.' : i===6 ? 'A later trigger starts another session. Saved records connect the sessions.' : 'Arrows show the flow of information or work.'}</figcaption></figure>
         <dl><div><dt>On our project</dt><dd>{step.example}</dd></div><div><dt>The human role</dt><dd>{step.control}</dd></div><div><dt>What remains limited</dt><dd>{step.limit}</dd></div></dl>
-        <p class="next-reason">{step.next}</p>
       </div>
-    </section>)}
+    </section>
+    {i<6 && <div class:list={['stage-bridge', i===4 && 'optional-bridge']}>
+      <span class="bridge-arrow" aria-hidden="true">↓</span>
+      <div><strong>{bridges[i]}</strong><p>{i===5 ? 'A single agent or a team can do useful work in one session. Saved records and triggers let either return to it later.' : step.next}</p></div>
+    </div>}
+    </>)}
   </div>
   <section class="journey-ending"><h2>What actually makes it always-on?</h2><p>An agent loop decides what to do during a run. Saved state and triggers let it resume across runs. It can be one agent or a team. A scheduled sequence of fixed steps is still a workflow.</p><p>These capabilities can combine in different ways. Teams are optional: one agent can also keep working over time.</p></section>
 </Base>
@@ -28,6 +33,7 @@ p { color: var(--muted); } .journey-context p,.journey-ending p { margin: 10px 0
 .journey-step { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); margin: 12px 0; scroll-margin-top: 120px; }
 .step-header { padding: 20px 24px; }
 .step-heading { margin: 8px 0 0; font-size: 22px; font-weight: 600; line-height: 1.3; }
+.step-label:hover { text-decoration: underline; text-underline-offset: 4px; }
 .step-label { font-size: 13px; color: var(--step-color); font-weight: 600; }
 .step-body { padding: 0 24px 24px; } .added { max-width: 76ch; font-size: 16px; line-height: 1.7; }
 figure { margin: 22px 0; padding: 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
@@ -36,7 +42,11 @@ figure { margin: 22px 0; padding: 20px; border: 1px solid var(--line); border-ra
 figcaption { font-size: 12px; color: var(--muted); margin-top: 14px; }
 dl { margin: 0; } dl > div { display: grid; grid-template-columns: 155px 1fr; gap: 18px; padding: 14px 0; border-bottom: 1px solid var(--line); }
 dt { font-weight: 600; font-size: 14px; } dd { margin: 0; font-size: 14px; line-height: 1.7; color: var(--muted); }
-.next-reason { font-size: 14px; margin-top: 20px; } .step-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px; margin-top: 20px; font-size: 14px; }
+ .stage-bridge { display: flex; gap: 18px; align-items: center; padding: 16px 24px; margin: 0 0 0 24px; border-left: 2px solid var(--line); max-width: 78ch; }
+.optional-bridge { border-left-style: dashed; }
+.bridge-arrow { color: var(--accent); font-size: 26px; }
+.stage-bridge strong { font-size: 14px; }
+.stage-bridge p { font-size: 14px; line-height: 1.65; margin: 6px 0 0; }
 .journey-ending h2 { font-size: 25px; }
 @media(max-width:650px) { .step-header { padding: 18px 16px; } .step-heading { font-size: 20px; } .step-body { padding:0 16px 20px; } dl > div { grid-template-columns:1fr; gap:5px; } .journey-flow { flex-direction:column; } .journey-flow li { flex-direction:column; } .journey-flow span { width:100%; box-sizing:border-box; } .journey-flow b { transform:rotate(90deg); } }
 
