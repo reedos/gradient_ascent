@@ -176,6 +176,7 @@ export async function buildSearchDocs(): Promise<SearchDoc[]> {
   // techniques that mention one, not the view itself. Listed here by hand because that is what
   // they are: a fixed set of views, each with a sentence saying what it shows.
   const views: { id: string; title: string; summary: string; path: string }[] = [
+    {id:'chatbot-to-agent',title:'From a chatbot to an always-on agent',summary:'Seven steps through context, workflows, tools, agent loops, optional teams, and ongoing work. A beginner walkthrough with diagrams and human controls.',path:'/chatbot-to-agent/'},
     {id:'apply',title:'Project brief builder',summary:'Describe your task and desired automation for your own AI.',path:'/apply/'},
     {id:'tools',title:'Tools for your project',summary:'Agent instructions, workflows, audits, tool specifications, checks and handoffs.',path:'/tools/'},
     ...builders.map(b=>({id:'tool-'+b.slug,title:b.title,summary:b.description,path:'/tools/'+b.slug+'/'})),

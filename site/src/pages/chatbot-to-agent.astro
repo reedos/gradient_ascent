@@ -1,0 +1,53 @@
+---
+import Base from '../layouts/Base.astro';
+import { agentJourney } from '../lib/agent-journey';
+import { url } from '../lib/url';
+---
+<Base title="From a chatbot to an always-on agent · Gradient Ascent" description="Seven simple steps explaining context, workflows, tools, agent loops, teams, and ongoing work, using one project throughout.">
+  <div class="page-hero"><div class="eyebrow muted">Start with the basics</div><h1>From a chatbot to an always-on agent</h1><p>Follow one website-launch project as we add capabilities. The model is one part of the system; software around it supplies information, runs actions, and keeps work moving.</p><p>This is a conceptual walkthrough. For historical dates, see the <a href={url('/timeline/')}>timeline</a>.</p></div>
+  <div class="journey-context"><strong>Our task: help a team launch its website.</strong><p>Start with advice. Add capabilities only when the task needs them. These are illustrative examples, not live agent runs.</p><p><a href={url('/levels/0/')}>Before step 1:</a> if rules, a form, or ordinary code can do the job reliably, you may not need a model.</p></div>
+  <div class="journey-steps">
+    {agentJourney.map((step,i) => <details class="journey-step" id={`step-${i+1}`} name="agent-journey" open={i===0} style={`--step-color:var(--o${i+1})`}>
+      <summary><span class="step-number">{i+1}</span><span>{step.title}</span><span class="step-label">{step.short}</span></summary>
+      <div class="step-body">
+        <p class="added">{step.added}</p>
+        <figure><ol class="journey-flow" aria-label={`How step ${i+1} works`}>{step.flow.map((node,n) => <li><span>{node}</span>{n<step.flow.length-1 && <b aria-hidden="true">→</b>}</li>)}</ol>
+        <figcaption>{i===4 ? 'Repeat the loop as needed, until finished, blocked, or stopped by a limit.' : i===5 ? 'Specialists can work separately and return findings; teams are an optional branch.' : i===6 ? 'A later trigger starts another session. Saved records connect the sessions.' : 'Arrows show the flow of information or work.'}</figcaption></figure>
+        <dl><div><dt>On our project</dt><dd>{step.example}</dd></div><div><dt>What you control</dt><dd>{step.control}</dd></div><div><dt>What to watch for</dt><dd>{step.limit}</dd></div></dl>
+        <p class="next-reason">{step.next}</p>
+        <div class="step-actions"><a href={url(`/levels/${i+1}/`)}>Explore level {i+1} →</a>{i<6 && <a href={`#step-${i+2}`} class="next-step">Next: {agentJourney[i+1].title} →</a>}</div>
+      </div>
+    </details>)}
+  </div>
+  <section class="journey-ending"><h2>What actually makes it always-on?</h2><p>An agent loop decides what to do during a run. Saved state and triggers let it resume across runs. It can be one agent or a team. A scheduled sequence of fixed steps is still a workflow.</p><p>You can combine these patterns without adopting every step. Choose the smallest design whose results you can check.</p><a class="text-link" href={url('/worksheet/')}>Find an approach for your task →</a></section>
+</Base>
+<script>
+  function revealStep() {
+    const match = /^#step-([1-7])$/.exec(location.hash);
+    if (!match) return;
+    const step = document.getElementById(`step-${match[1]}`);
+    if (step instanceof HTMLDetailsElement) { step.open = true; requestAnimationFrame(() => step.scrollIntoView({block:'start'})); }
+  }
+  revealStep(); window.addEventListener('hashchange', revealStep);
+</script>
+<style>
+.journey-context,.journey-ending { max-width: 78ch; margin: 28px 0; font-size: 15px; line-height: 1.7; }
+p { color: var(--muted); } .journey-context p,.journey-ending p { margin: 10px 0; } a { color: var(--accent); }
+.journey-steps { max-width: 1000px; margin: 32px 0; }
+.journey-step { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); margin: 12px 0; scroll-margin-top: 120px; }
+summary { padding: 20px; cursor: pointer; display: flex; gap: 15px; align-items: center; font-size: 19px; font-weight: 600; }
+summary::after { content: '+'; margin-left: auto; color: var(--muted); } details[open] > summary::after { content: '−'; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.step-number { color: var(--step-color); } .step-label { font-size: 12px; color: var(--muted); font-weight: 400; }
+.step-body { padding: 0 24px 24px; } .added { max-width: 76ch; font-size: 16px; line-height: 1.7; }
+figure { margin: 22px 0; padding: 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+.journey-flow { list-style: none; display: flex; margin: 0; padding: 0; gap: 12px; }
+.journey-flow li { flex: 1; display: flex; gap: 12px; align-items: center; } .journey-flow span { flex: 1; border: 1px solid var(--step-color); padding: 12px; border-radius: 8px; font-size: 14px; text-align: center; } .journey-flow b { color: var(--step-color); }
+figcaption { font-size: 12px; color: var(--muted); margin-top: 14px; }
+dl { margin: 0; } dl > div { display: grid; grid-template-columns: 155px 1fr; gap: 18px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+dt { font-weight: 600; font-size: 14px; } dd { margin: 0; font-size: 14px; line-height: 1.7; color: var(--muted); }
+.next-reason { font-size: 14px; margin-top: 20px; } .step-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px; margin-top: 20px; font-size: 14px; }
+.journey-ending h2 { font-size: 25px; }
+@media(max-width:650px) { summary { padding: 16px; font-size: 17px; } .step-label { display:none; } .step-body { padding:0 16px 20px; } dl > div { grid-template-columns:1fr; gap:5px; } .journey-flow { flex-direction:column; } .journey-flow li { flex-direction:column; } .journey-flow span { width:100%; box-sizing:border-box; } .journey-flow b { transform:rotate(90deg); } }
+@media print { details::details-content { content-visibility:visible; } }
+</style>

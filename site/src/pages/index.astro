@@ -2,6 +2,7 @@
 import { usDate } from '../lib/dates';
 import Base from '../layouts/Base.astro';
 import SectionTop from '../components/SectionTop.astro';
+import AgentJourneyIntro from '../components/AgentJourneyIntro.astro';
 import MapPreview from '../components/MapPreview.astro';
 import SelectedTimeline from '../components/SelectedTimeline.astro';
 import CapabilityChart from '../components/CapabilityChart.astro';
@@ -44,6 +45,8 @@ const levelStackItems = levels.map(t => ({order:t.order,title:t.title,short:t.sh
       </div>
     </div>
   </section>
+
+  <AgentJourneyIntro />
 
   <MapPreview />
 
