@@ -19,33 +19,12 @@ This is the site's running task. Every technique page that measures anything mea
 60 questions over the same documents, so a reader can compare levels on one task instead of
 twelve different ones.
 
-## The assembled diagram
+## Example run
 
 Document Q&A is level 2, RAG, exactly as that page describes it: chunk, embed, retrieve the top
 few, ask once.
 
 <Run data={ragRun} label="Level 2 · RAG, assembled for this recipe" runKey="rag" />
-
-## Why these techniques, and why not higher
-
-Three techniques compose this recipe: <Link href="/techniques/rag/">RAG</Link> does the
-retrieval and the one cited answer; <Link href="/techniques/structured-output/">structured
-output</Link> keeps that answer in a fixed shape (text plus a citation list) so calling code
-doesn't have to parse prose; and <Link href="/techniques/evals/">evals</Link> is the
-60-question set that says whether any of it is actually working, rather than just looking
-plausible.
-
-Level 2 is enough here because most of these questions are answerable from a single search: one
-question, one set of relevant passages, one answer. Climbing to <Link
-href="/techniques/agentic-rag/">agentic RAG</Link> (level 5) buys something real: in the
-illustrated run on the home page, the model runs a second, better-targeted search once the
-first one turns out to cover length but not exclusions, and finds a fact plain RAG missed. It
-also costs about four model calls instead of one, about four times the tokens, and about three
-times the wait, per that same run. For a document set this size, that trade only pays off once
-single-search RAG is provably missing answers a second search would find, which is what the
-eval set, cut by question kind, is for.
-
-<Run data={agenticRun} label="Level 5 · Agentic RAG, for comparison" runKey="agentic-rag" accentPill />
 
 ## Walkthrough
 
@@ -95,3 +74,29 @@ comparison without claiming a score for it.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Three techniques compose this recipe: <Link href="/techniques/rag/">RAG</Link> does the
+retrieval and the one cited answer; <Link href="/techniques/structured-output/">structured
+output</Link> keeps that answer in a fixed shape (text plus a citation list) so calling code
+doesn't have to parse prose; and <Link href="/techniques/evals/">evals</Link> is the
+60-question set that says whether any of it is actually working, rather than just looking
+plausible.
+
+Level 2 is enough here because most of these questions are answerable from a single search: one
+question, one set of relevant passages, one answer. Climbing to <Link
+href="/techniques/agentic-rag/">agentic RAG</Link> (level 5) buys something real: in the
+illustrated run on the home page, the model runs a second, better-targeted search once the
+first one turns out to cover length but not exclusions, and finds a fact plain RAG missed. It
+also costs about four model calls instead of one, about four times the tokens, and about three
+times the wait, per that same run. For a document set this size, that trade only pays off once
+single-search RAG is provably missing answers a second search would find, which is what the
+eval set, cut by question kind, is for.
+
+<Run data={agenticRun} label="Level 5 · Agentic RAG, for comparison" runKey="agentic-rag" accentPill />
+
+</details>
+

@@ -28,39 +28,9 @@ resolving it. Out of scope: writing feedback for the student, a separate job onc
 designing the rubric itself; and averaging two numbers into one, which this recipe deliberately
 never does, for reasons the failure modes below spell out.
 
-## The assembled diagram
+## Example run
 
 <Run data={rubricRun} label="Level 6 · Grade against a rubric" runKey="rubric-grading" />
-
-## Why this level, and why not higher
-
-Three techniques compose this recipe. <Link href="/techniques/structured-output/">Structured
-output</Link> gets the grader's first pass into a fixed shape, a point value and a verbatim quote
-per criterion, instead of a paragraph someone has to parse back into numbers by hand.
-<Link href="/techniques/debate-review/">Review and debate</Link> is the reviewer itself: a pass
-that has not seen the grader's own reasoning and decides for itself what to check and when to
-stop, rather than running one test written before anyone had seen this submission.
-<Link href="/techniques/human-in-the-loop/">Human approval</Link> is the shape every outcome lands
-in, a proposed grade or a checkpoint, since the teacher is the one who acts on either.
-
-Checking a quote against the submission, character for character, is level 0 on its own: a
-substring test that runs in code before the reviewer ever sees a score. It catches a fabricated
-quote, but not a real one that fails to do what the rubric asks, and that gap is the whole
-argument for level 6 over level 3. A single fixed second pass, run the same way on every
-submission, can test a rubric line only in the way it was written to test it in advance: does the
-word "counterargument" appear, is there a sentence after "but." A submission can pass that test
-and still fail the rubric's actual sentence, the way this recipe's own walkthrough below does: a
-quote that is real, verbatim, and honestly not evidence of an opposing position. An independent
-reviewer that reads the rubric's own words for itself, choosing which criterion to look at rather
-than checking the one thing a fixed prompt was told to check, is what catches a misread like that.
-That choosing is what makes the reviewer's turns `decided_by: "model"`, not another fixed pass
-code already knows the shape of.
-
-The level above does not fit this job, and should not. A rejected or unevidenced criterion, or a
-verdict the round cap had to force, all go to the teacher, and even an accepted set of scores is
-only a proposal until the teacher enters it. There is no version of this recipe where a schedule,
-not the teacher, is the one who acts on a grade, so the extra cost an unattended level would add
-buys nothing this job wants.
 
 ## Walkthrough
 
@@ -187,3 +157,38 @@ graded submissions is what would produce one, and until then this recipe claims 
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Three techniques compose this recipe. <Link href="/techniques/structured-output/">Structured
+output</Link> gets the grader's first pass into a fixed shape, a point value and a verbatim quote
+per criterion, instead of a paragraph someone has to parse back into numbers by hand.
+<Link href="/techniques/debate-review/">Review and debate</Link> is the reviewer itself: a pass
+that has not seen the grader's own reasoning and decides for itself what to check and when to
+stop, rather than running one test written before anyone had seen this submission.
+<Link href="/techniques/human-in-the-loop/">Human approval</Link> is the shape every outcome lands
+in, a proposed grade or a checkpoint, since the teacher is the one who acts on either.
+
+Checking a quote against the submission, character for character, is level 0 on its own: a
+substring test that runs in code before the reviewer ever sees a score. It catches a fabricated
+quote, but not a real one that fails to do what the rubric asks, and that gap is the whole
+argument for level 6 over level 3. A single fixed second pass, run the same way on every
+submission, can test a rubric line only in the way it was written to test it in advance: does the
+word "counterargument" appear, is there a sentence after "but." A submission can pass that test
+and still fail the rubric's actual sentence, the way this recipe's own walkthrough below does: a
+quote that is real, verbatim, and honestly not evidence of an opposing position. An independent
+reviewer that reads the rubric's own words for itself, choosing which criterion to look at rather
+than checking the one thing a fixed prompt was told to check, is what catches a misread like that.
+That choosing is what makes the reviewer's turns `decided_by: "model"`, not another fixed pass
+code already knows the shape of.
+
+The level above does not fit this job, and should not. A rejected or unevidenced criterion, or a
+verdict the round cap had to force, all go to the teacher, and even an accepted set of scores is
+only a proposal until the teacher enters it. There is no version of this recipe where a schedule,
+not the teacher, is the one who acts on a grade, so the extra cost an unattended level would add
+buys nothing this job wants.
+
+</details>
+

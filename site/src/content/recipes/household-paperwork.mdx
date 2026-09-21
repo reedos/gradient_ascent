@@ -32,40 +32,9 @@ records</Link>, and the business version of the same seam is
 <Link href="/recipes/invoice-matching/">matching invoices to purchase orders</Link>. Everything
 after the record exists is this page.
 
-## The assembled diagram
+## Example run
 
 <Run data={householdRun} label="Level 0 · Household paperwork, no model" runKey="household-paperwork" />
-
-## Why this level, and why not higher
-
-<Link href="/techniques/order-zero/">Order zero</Link> is the whole recipe: the level the site
-tells you to check first, and the one most household admin actually lives at. The example is
-eleven records and eleven file names. Five functions produce the report, and every one of them is
-something a spreadsheet does natively.
-
-The window is one comparison at each end, and both ends are worth getting right: a renewal on the
-last day of the window is exactly the one worth catching, and a renewal that already happened is
-not a warning about the future.
-
-<CodeFile file="examples/household_paperwork/run.py" func="renewals_due" />
-
-The part people get wrong by hand is not the dates, it is the periods. A water bill at $91.20 a
-quarter and a broadband line at $55.00 a month are not comparable until both are a year, and
-ranking bills by the number printed on them puts the wrong one at the top. Normalizing first is
-one multiplication:
-
-<CodeFile file="examples/household_paperwork/run.py" func="yearly_cents" />
-
-Climbing a level buys nothing here. Level 1 would hand the same eleven records to a model and ask
-it for the same four answers in prose. That costs a call per report, takes a second or two, and
-introduces a failure the arithmetic does not have: a total that looks right and is not. A wrong
-total in a household budget is not caught by anyone, because nobody adds it up again by hand,
-which is why they asked in the first place. Level 2 and above answer a question this job does not
-ask: nothing here has to be searched for, because the records are eleven rows and the folder is
-eleven files.
-
-The level below does not exist. This is the floor, and the honest version of this page says so
-before it offers anything else.
 
 ## Walkthrough
 
@@ -173,3 +142,39 @@ from the same call proves nothing.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+<Link href="/techniques/order-zero/">Order zero</Link> is the whole recipe: the level the site
+tells you to check first, and the one most household admin actually lives at. The example is
+eleven records and eleven file names. Five functions produce the report, and every one of them is
+something a spreadsheet does natively.
+
+The window is one comparison at each end, and both ends are worth getting right: a renewal on the
+last day of the window is exactly the one worth catching, and a renewal that already happened is
+not a warning about the future.
+
+<CodeFile file="examples/household_paperwork/run.py" func="renewals_due" />
+
+The part people get wrong by hand is not the dates, it is the periods. A water bill at $91.20 a
+quarter and a broadband line at $55.00 a month are not comparable until both are a year, and
+ranking bills by the number printed on them puts the wrong one at the top. Normalizing first is
+one multiplication:
+
+<CodeFile file="examples/household_paperwork/run.py" func="yearly_cents" />
+
+Climbing a level buys nothing here. Level 1 would hand the same eleven records to a model and ask
+it for the same four answers in prose. That costs a call per report, takes a second or two, and
+introduces a failure the arithmetic does not have: a total that looks right and is not. A wrong
+total in a household budget is not caught by anyone, because nobody adds it up again by hand,
+which is why they asked in the first place. Level 2 and above answer a question this job does not
+ask: nothing here has to be searched for, because the records are eleven rows and the folder is
+eleven files.
+
+The level below does not exist. This is the floor, and the honest version of this page says so
+before it offers anything else.
+
+</details>
+

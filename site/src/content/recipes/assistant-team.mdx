@@ -15,38 +15,9 @@ jobs nobody asked for (a weekly pass over unpaid invoices, a morning look at tom
 and one incoming request can touch both. None of it should reach a client or an invoicing system
 without a partner's say on anything that isn't routine.
 
-## The assembled diagram
+## Example run
 
 <Run data={runData} label="Level 7 · assembled for this recipe" runKey="assistant-team" />
-
-## Why these techniques, and why not higher
-
-<Link href="/techniques/agent-teammates/">Always-on assistants</Link> is the shape each role
-takes: one narrow job, its own routines, and a trigger that is not a person typing. That last part
-is what makes this level 7 rather than level 6: as that page puts it, what separates the level is
-the trigger, not the loop. The invoicing assistant's weekly pass starts on a schedule, and what it
-does once running was not written down in advance. <Link href="/techniques/agent-graphs/">Agent
-graphs</Link> describes how a request, or a routine's tick, turns into a handoff to one assistant
-or both: a fixed roster with defined roles, not an open-ended crowd. <Link
-href="/techniques/memory/">Memory</Link> is a shared store both read before acting: a client's
-standing scheduling preference, a note about a past billing dispute. <Link
-href="/techniques/safety/">Safety</Link> is the scope check between a drafted action and anything
-going out.
-
-Two of those four sit low, deliberately. Memory is level 2: code writes every entry and code
-reads it back, and the model answers only with what it was handed. The scope check is ordinary
-code against a rule table, and has to be: a model asked whether its own draft is risky is not a
-check on that draft. What sits at level 7 is narrow: the standing triggers, and what each
-assistant decides once one fires.
-
-The composition stops short of <Link href="/techniques/organizations-swarms/">organizations of
-agents</Link> on purpose, and the reason is not size. That page's line is whether the roster
-itself (who exists, what they are working on, when a new round of work starts) gets decided
-along the way rather than set by a person and left alone. Three roles chosen by three partners are
-set. That page is also candid that the shape is mostly frontier, and that what ships today looks
-more like what this recipe already builds. The climb condition is roles that come and go with the
-work, and interactions nobody could list in advance. A consultancy this size has neither, nor
-enough concurrent independent work for a longer roster to finish anything sooner.
 
 ## Walkthrough
 
@@ -103,3 +74,37 @@ their reason, does that entry say what the draft claims. Nothing here carries a 
   a calendar, instead of one rule for both.
 - Log every hold and approval the way this site's <Link href="/techniques/ops/">operations</Link>
   topic recommends for unattended work, so a partner can audit a day nobody watched closely.
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+<Link href="/techniques/agent-teammates/">Always-on assistants</Link> is the shape each role
+takes: one narrow job, its own routines, and a trigger that is not a person typing. That last part
+is what makes this level 7 rather than level 6: as that page puts it, what separates the level is
+the trigger, not the loop. The invoicing assistant's weekly pass starts on a schedule, and what it
+does once running was not written down in advance. <Link href="/techniques/agent-graphs/">Agent
+graphs</Link> describes how a request, or a routine's tick, turns into a handoff to one assistant
+or both: a fixed roster with defined roles, not an open-ended crowd. <Link
+href="/techniques/memory/">Memory</Link> is a shared store both read before acting: a client's
+standing scheduling preference, a note about a past billing dispute. <Link
+href="/techniques/safety/">Safety</Link> is the scope check between a drafted action and anything
+going out.
+
+Two of those four sit low, deliberately. Memory is level 2: code writes every entry and code
+reads it back, and the model answers only with what it was handed. The scope check is ordinary
+code against a rule table, and has to be: a model asked whether its own draft is risky is not a
+check on that draft. What sits at level 7 is narrow: the standing triggers, and what each
+assistant decides once one fires.
+
+The composition stops short of <Link href="/techniques/organizations-swarms/">organizations of
+agents</Link> on purpose, and the reason is not size. That page's line is whether the roster
+itself (who exists, what they are working on, when a new round of work starts) gets decided
+along the way rather than set by a person and left alone. Three roles chosen by three partners are
+set. That page is also candid that the shape is mostly frontier, and that what ships today looks
+more like what this recipe already builds. The climb condition is roles that come and go with the
+work, and interactions nobody could list in advance. A consultancy this size has neither, nor
+enough concurrent independent work for a longer roster to finish anything sooner.
+
+</details>
+

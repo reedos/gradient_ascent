@@ -12,125 +12,52 @@ import HowToEval from '../../components/page/HowToEval.astro';
 import Link from '../../components/page/Link.astro';
 import trackerRun from '../../data/runs/recipe-project-tracker-upkeep.json';
 
-The same twelve-person firm keeps one document everybody looks at: a row per project, with its
-status, the next milestone and when it falls, the hours used so far, who owns it, and a line or
-two of notes somebody typed after a phone call. It is the thing people open before a client rings
-back, and it is only useful while it is true. Keeping it true is somebody's Monday morning, and
-it is the job that slips first.
+## What you’ll get
 
-That sounds like <Link href="/recipes/weekly-status-report/">the Friday report</Link> and it is
-not. A report is written once and read once; if a figure in it is a week old, it is wrong for an
-afternoon. A document has to still be true next week, and next month, which means the work is not
-producing text at all. It is reconciling what changed against what is already written: deciding
-what is new, what is stale, what conflicts with something a person put there on purpose, and
-leaving the rest alone. Most of the document does not change most weeks, and a run that rewrites
-it anyway has destroyed the one thing it was for.
+A tracker update plus a review queue showing proposed changes, their source, and the value they would replace. Confirmed fields stay untouched; stale or missing evidence is flagged.
 
-Not in scope: deciding which of two disagreeing dates is right, judging whether a project is in
-trouble, or creating the new row it proposes. A new row needs an owner and nothing here can
-supply one.
+**Inputs:** the current tracker, its field ownership and confirmation dates, source exports, and relevant inbox messages.
 
-## The assembled diagram
+**Use it when:** you need to keep an existing shared record current. For a one-off narrative, use the <Link href="/recipes/weekly-status-report/">weekly report recipe</Link>.
+
+**Boundary:** the model proposes changes but never writes them. A person resolves conflicts and approves model proposals, changes to human-written fields, and new project rows. The system does not invent owners or decide whether a project is in trouble.
+
+## Example run
 
 <Run data={trackerRun} label="Level 3 · Standing upkeep" runKey="project-tracker-upkeep" />
 
-## Why this level, and why not higher
-
-Two <Link href="/shapes/">job shapes</Link> again, and again they settle separately.
-
-The join runs the other way round from
-<Link href="/recipes/weekly-status-report/">the report's</Link>. There the model is the last step
-and writes nothing but prose, over figures code has already fixed. Here the model is the first
-step and writes nothing to the document at all. It reads the one source that is prose, the shared
-inbox, and turns each message into proposed changes; everything after it is comparison, and the
-document changes only when a person says so. Both pages put a model next to a set of records and
-neither lets it touch them, and the two seams are in opposite places for the same reason: the
-thing being protected is whichever artifact somebody else will rely on.
-
-**The reconcile half is level 0.** It is a watch, over a fixed list of sources on a schedule, and
-a calculation, because the right answer for every field is fixed by a rule. Field by field,
-against the source that owns that field: the value matches, or it differs, or nobody sent one.
-Two people given the same document and the same three exports would mark the same cells. There is
-no free text in it and nothing to weigh up. Asking a model whether anything changed would be
-asking for a comparison with a probability attached to it, which is strictly worse than the
-comparison.
-
-**The reading half is level 1 on its own, and the job as a whole is level 3.** One call per
-message, a fixed schema, one retry if the reply does not parse, and everything the call needs is
-in the message. That is a level-1 shape. What lifts the joined job is not the reading, it is where
-the output goes. Level 1's own test is that a person reads the result before it matters. Here the
-result is not read, it is applied: a value written into a document other people will act on
-without ever seeing this run. So the run stops. Anything that would overwrite a field a person
-wrote waits for a person, with the old value, the new one, the reason and the sentence it came
-from side by side. That gate is what
-<Link href="/techniques/human-in-the-loop/">human approval</Link> means on this site, and it is
-what makes this level 3.
-
-**Why not level 4.** At level 4 the model chooses an action: which record to look up, whether to
-apply something, whether to go and check. Nothing here lets it choose anything. It reads one
-message and returns proposals; code decides which project they belong to, whether the field
-exists, whether the document already says that, and whether a person has to see it. Climbing would
-mean letting the model look up the current row and decide for itself whether its proposal is news,
-which is precisely the decision this page hands to a person.
-
-**Why not level 5, and what it would take.** An agent at level 5 would chase a thread: read a
-message, notice a project it has not heard of, go looking for it, open last month's mail to work
-out whether a date moved once or twice. Every one of those is the model deciding what happens
-next. Nothing here decides anything; the source list is fixed and the schedule is a timer. If the
-job became "find out what is actually going on with this project", that is
-<Link href="/recipes/research-brief/">a research job</Link> and it costs accordingly.
-
-**And below.** If every field in the document came from a system, this is level 0 and should stay
-there: comparison, a gate for anything that overwrites a person's work, no model anywhere. The
-model is earning its place here for one reason only, that one of the sources is prose and somebody
-would otherwise read forty messages to find the four that change something.
-
 ## The four outcomes, and the one that is usually missing
 
-Code sorts every field into one of four piles, and the fourth is the one most systems do not have.
+| Outcome | Meaning | What happens |
+|---|---|---|
+| Applied | An authoritative source changes a field previously written by code | Update it and retain the old value |
+| Queued | A proposal comes from the model, conflicts with a human-written field, or needs a new row | Keep the existing value until a person decides |
+| Left alone | Current evidence confirms the existing value | Preserve the field |
+| Unconfirmed | A source is stale or no longer includes the record | Preserve the value but show its age and the missing evidence |
 
-**Applied.** A field the last run wrote, whose owning source now says something different. The
-tracker export moved the library project from design development to cost estimate out, and its
-milestone from 09/30/2026 to 10/07/2026. Both are written by code and disagreed with by the system
-of record, so both are applied, with the old value kept.
-
-**Queued.** Anything that would overwrite a field a person wrote, and everything the model
-proposed, without exception. Somebody typed 09/24/2026 into the commons project's milestone after
-a call; the export still says 09/21/2026. The document keeps what the person wrote and the
-disagreement goes in the queue. So does a project the export lists that no row covers yet, because
-a new row needs an owner.
-
-**Left alone.** Nineteen of the document's twenty-one cells, this week. That is the normal case
-and it is the whole reason the recipe exists.
-
-**Nobody confirmed it.** Not the same as left alone, and this is the pile with the failure in it.
+In the sample week, most cells stay unchanged. That is the intended behavior, not a sign that the job did nothing.
 
 ## The failure that matters: silence reads as agreement
 
-A source that stops sending looks exactly like a source that has nothing to say. In a document
-that only shows values, the two are identical, and the second one is fine while the first one
-quietly ages everything downstream of it. Nobody notices for a month, and by then the document has
-been wrong for a month in a way that leaves no trace.
+**Missing evidence is not confirmation.** Check both failure cases:
 
-It has two shapes here and both are in the sample week.
+- **A whole source stops advancing.** Do not refresh confirmation dates from an old export. Report the age of the fields it owns.
+- **One record disappears from a current source.** Keep its existing values and flag the missing record. Do not interpret an absent project as completed.
 
-A **whole source can stop advancing.** The time spreadsheet says it is current to 09/15/2026, the
-same date the previous run saw. Its rows may look identical to last week's because they are last
-week's. So nothing it feeds is marked confirmed, and every field it owns is reported with its age:
-three hours figures, the oldest fourteen days.
-
-A **single record can fall out of a source that is otherwise current.** The tracker export is
-up to date and no longer lists the bridge survey. That project did not end. A filter changed, or
-somebody archived a board. Its status stays exactly as it was, its fields are reported as aging
-with the reason, and the run says the export stopped mentioning it. A system that read a missing
-row as a finished project would have closed a live job on its own.
-
-The test that makes this a behavior rather than a sentence is the negative control: the same run
-with the spreadsheet's date moved forward and its numbers unchanged reports nothing aging at all.
-Absence and agreement look the same in the values and are different in the dates, which is why
-every cell in this document carries when it was last confirmed and by whom.
+Each cell therefore needs a last-confirmed date and source. Test the distinction with a fresh export whose values are unchanged: those fields should be confirmed, not marked stale.
 
 ## Walkthrough
+
+1. **Track ownership.** Store who last wrote each cell and when its value was confirmed.
+2. **Read messages into proposals.** The model extracts a candidate change and an exact supporting quote. Code rejects invented quotes; a real quote can still be misinterpreted.
+3. **Reconcile against owning sources.** Apply eligible code-owned changes, queue conflicts and model proposals, and identify aging fields.
+4. **Show the review queue.** Put the old value, proposed value, source quote, and reason side by side.
+5. **Apply explicit approvals.** Record approved fields as human-written. Reject conflicting approvals for the same cell rather than letting the last one win.
+
+**Sample result:** two changes applied, four queued, nineteen cells left alone, one stale source, one missing project, and six aging fields. No model proposal was applied automatically. These are illustrative fixture results.
+
+<details className="recipe-detail">
+<summary>Detailed walkthrough and implementation</summary>
 
 The document's shape is what makes the rest possible. Every cell knows who last wrote it and when:
 
@@ -172,6 +99,8 @@ and that is what stops next week's run overwriting it without asking again. And 
 changes to the same cell raises rather than letting the later one win: the queue legitimately
 holds two different answers for the commons project's milestone, the export's and the client's,
 and choosing between them is the decision being approved.
+
+</details>
 
 ## What it costs
 
@@ -293,3 +222,59 @@ nothing goes wrong.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Two <Link href="/shapes/">job shapes</Link> again, and again they settle separately.
+
+The join runs the other way round from
+<Link href="/recipes/weekly-status-report/">the report's</Link>. There the model is the last step
+and writes nothing but prose, over figures code has already fixed. Here the model is the first
+step and writes nothing to the document at all. It reads the one source that is prose, the shared
+inbox, and turns each message into proposed changes; everything after it is comparison, and the
+document changes only when a person says so. Both pages put a model next to a set of records and
+neither lets it touch them, and the two seams are in opposite places for the same reason: the
+thing being protected is whichever artifact somebody else will rely on.
+
+**The reconcile half is level 0.** It is a watch, over a fixed list of sources on a schedule, and
+a calculation, because the right answer for every field is fixed by a rule. Field by field,
+against the source that owns that field: the value matches, or it differs, or nobody sent one.
+Two people given the same document and the same three exports would mark the same cells. There is
+no free text in it and nothing to weigh up. Asking a model whether anything changed would be
+asking for a comparison with a probability attached to it, which is strictly worse than the
+comparison.
+
+**The reading half is level 1 on its own, and the job as a whole is level 3.** One call per
+message, a fixed schema, one retry if the reply does not parse, and everything the call needs is
+in the message. That is a level-1 shape. What lifts the joined job is not the reading, it is where
+the output goes. Level 1's own test is that a person reads the result before it matters. Here the
+result is not read, it is applied: a value written into a document other people will act on
+without ever seeing this run. So the run stops. Anything that would overwrite a field a person
+wrote waits for a person, with the old value, the new one, the reason and the sentence it came
+from side by side. That gate is what
+<Link href="/techniques/human-in-the-loop/">human approval</Link> means on this site, and it is
+what makes this level 3.
+
+**Why not level 4.** At level 4 the model chooses an action: which record to look up, whether to
+apply something, whether to go and check. Nothing here lets it choose anything. It reads one
+message and returns proposals; code decides which project they belong to, whether the field
+exists, whether the document already says that, and whether a person has to see it. Climbing would
+mean letting the model look up the current row and decide for itself whether its proposal is news,
+which is precisely the decision this page hands to a person.
+
+**Why not level 5, and what it would take.** An agent at level 5 would chase a thread: read a
+message, notice a project it has not heard of, go looking for it, open last month's mail to work
+out whether a date moved once or twice. Every one of those is the model deciding what happens
+next. Nothing here decides anything; the source list is fixed and the schedule is a timer. If the
+job became "find out what is actually going on with this project", that is
+<Link href="/recipes/research-brief/">a research job</Link> and it costs accordingly.
+
+**And below.** If every field in the document came from a system, this is level 0 and should stay
+there: comparison, a gate for anything that overwrites a person's work, no model anywhere. The
+model is earning its place here for one reason only, that one of the sources is prose and somebody
+would otherwise read forty messages to find the four that change something.
+
+</details>
+

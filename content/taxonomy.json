@@ -816,7 +816,7 @@
       "uses": [
         "order-zero"
       ],
-      "summary": "Renewal dates, a naming rule for the folder, totals by category and a reminder before anything auto-renews. All of it is a sort, a date subtraction and a sum, so no model is involved anywhere. Level 0 is the whole recipe, and it is where most household admin actually lives; the one part that does need a model, reading a scanned bill, is its own recipe."
+      "summary": "Organize renewal dates, file names, category totals, and reminders with ordinary code. No model is needed; extracting information from scanned bills is a separate task."
     },
     {
       "slug": "meeting-notes",
@@ -827,7 +827,7 @@
         "prompt-engineering",
         "structured-output"
       ],
-      "summary": "One call turns a transcript into decisions, owners and open questions in a fixed shape, and somebody who was in the room reads it before it goes anywhere. Everything the job needs is already in the transcript, so level 1 is enough: the shape is what makes the output usable, not a workflow around it."
+      "summary": "Turn a transcript into decisions, owners, and open questions in one model call. Someone who attended reviews the draft before it is shared."
     },
     {
       "slug": "invoice-matching",
@@ -839,7 +839,7 @@
         "structured-output",
         "human-in-the-loop"
       ],
-      "summary": "The match itself is a join on a purchase-order number and three subtractions, which is level 0 and should stay there. A model only reads the invoice the supplier sent as a PDF into the fields the join needs, and anything that does not reconcile to the cent waits for a person."
+      "summary": "Extract invoice fields, then use code to match purchase orders and compare amounts. Differences go to a person; the model never decides whether the totals reconcile."
     },
     {
       "slug": "contract-review",
@@ -851,7 +851,7 @@
         "structured-output",
         "human-in-the-loop"
       ],
-      "summary": "One call per checklist item over the same agreement, each returning the clause it found and the rule that clause breaks, merged into one list a person reads. The checklist is written down in advance and does not change from one agreement to the next, which is what keeps this at level 3."
+      "summary": "Check an agreement against a fixed checklist, with cited clauses for each finding. Merge the findings for a person to review."
     },
     {
       "slug": "incident-runbook",
@@ -863,7 +863,7 @@
         "structured-output",
         "human-in-the-loop"
       ],
-      "summary": "A fixed chain: pull the timeline out of the write-up, turn each action that would be done again into a numbered step, then check that every step names who does it and how to tell it worked. The person who ran the incident approves it before anyone follows it. The steps are known in advance, so level 3."
+      "summary": "Turn an incident write-up into a timeline and repeatable steps. Check owners and success criteria, then ask the incident lead to approve it."
     },
     {
       "slug": "storyboard-from-a-script",
@@ -874,7 +874,7 @@
         "prompt-chaining",
         "structured-output"
       ],
-      "summary": "Scenes first, then shots inside each scene, then a check in code that every line of the script is covered by a shot and every shot points back at a line. A fixed three-step chain with a person reading the result, which is level 3. Drawing the frames is a different job and this recipe does not do it."
+      "summary": "Split a script into scenes and shots, then check that every line is covered and every shot has a source. A person reviews the plan; drawing frames is a separate task."
     },
     {
       "slug": "trip-planning",
@@ -898,7 +898,7 @@
         "structured-output",
         "human-in-the-loop"
       ],
-      "summary": "Two independent passes grade the same work against the same written rubric without seeing each other's scores, and every disagreement goes to the teacher instead of being averaged away. Level 6 earns its cost here because a wrong grade is expensive to the person who receives it, and an independent second reader is what catches a misread rule."
+      "summary": "Two independent reviewers apply the same rubric. Disagreements go to the teacher rather than being averaged away."
     },
     {
       "slug": "literature-watch",
@@ -912,7 +912,7 @@
         "ops",
         "evals"
       ],
-      "summary": "The site's first worked join of two job shapes, and still the simplest one. A standing weekly watch over a fixed list of sources works out in code which records are new, which is arithmetic and calls no model: level 0. Each new record then gets one call that turns its title and abstract into three sentences, with the citation attached by code from the source record and never written by the model: level 1. Neither half needs more, so the joined job settles at level 1, below where a watch usually lands. Deciding what to look for next, or following a reference to the next paper, would be level 5 research, and this is not that."
+      "summary": "Code detects new records from fixed sources. One model call summarizes each new title and abstract; code attaches the original citation. It does not follow references or choose new searches."
     },
     {
       "slug": "weekly-status-report",
@@ -925,7 +925,7 @@
         "ops",
         "evals"
       ],
-      "summary": "The standing Friday report a small office runs on, pulled from a project tracker, a shared inbox and a spreadsheet. The assembly is level 0 and it is most of the job: pull three sources, reconcile the names they spell differently, and compute every count, date and total the report may quote. The writing is one call, level 1, handed those figures and nothing it could compute a number from. Two checks in code then read the draft in opposite directions, one for a number the model invented and one for a figure it left out, and a person reads it before it goes out."
+      "summary": "Code assembles the weekly figures; one model call drafts the report. Checks flag unsupported numbers and missing required facts, then a person reviews and sends it."
     },
     {
       "slug": "project-tracker-upkeep",
@@ -938,7 +938,7 @@
         "human-in-the-loop",
         "ops"
       ],
-      "summary": "The other half of the same office's week, and a different job from writing a report: a report is read once, a tracker has to still be true next week. Code compares every field against the source that owns it and leaves most of the document alone. A model reads the shared inbox, one call per message, and proposes changes it can quote; none of them writes, because a fact read out of a sentence is a claim and not a record. A person approves anything that overwrites a field a person wrote, which is what makes the joined job level 3. The failure it is built around is absence: a source that goes quiet reads as nothing changed and quietly ages the whole document, so silence is detected and reported rather than assumed."
+      "summary": "Keep a shared tracker current through source comparisons and a review queue. Model proposals and changes to human-written fields need approval; missing evidence is flagged."
     },
     {
       "slug": "limits-without-a-model",
@@ -948,7 +948,7 @@
       "uses": [
         "order-zero"
       ],
-      "summary": "Limits, first-pass yield, Cpk, a control chart, and the same measurements grouped by lot, by fixture, by day and by shift. No model is involved anywhere, and the pass or fail decision never should be: a wrong pass ships a bad unit. Level 0 is the whole recipe, and most of a test engineer's week is this."
+      "summary": "Use code to calculate limits, yield, process capability, and trends across lots and fixtures. The pass/fail decision stays deterministic; no model is involved."
     },
     {
       "slug": "characterize-a-design",
@@ -958,7 +958,7 @@
       "uses": [
         "order-zero"
       ],
-      "summary": "Five prototype boards, a sweep over line, load and temperature, the margin to every datasheet limit at every corner, the uncertainty budget behind each margin and the guardbanded verdict that follows from it. All of it is arithmetic: a sweep is a loop, a margin is a subtraction, a budget is a root sum of squares. The engineering-test counterpart to the production limits recipe, and level 0 is the whole recipe. This is where the numbers in a design review report come from."
+      "summary": "Sweep prototype boards across line, load, and temperature. Code calculates margins, uncertainty, and guardbanded verdicts; no model is needed."
     },
     {
       "slug": "measurement-writeup",
@@ -969,7 +969,7 @@
         "order-zero",
         "prompt-engineering"
       ],
-      "summary": "The notebook and the computed results become a characterization report a reviewer can read, which is what most people mean by writing up a design review. Code computes every number and places it; the model writes the prose around the numbers and never touches them; a check in code confirms that every figure in the draft is one code produced; a person reads it before it goes out. One call, so level 1, and the check is what makes the call safe to make."
+      "summary": "Turn computed measurements and notebook notes into a report. Code owns the figures, the model writes the prose, and a person checks the finished draft."
     },
     {
       "slug": "ask-the-datasheet",
@@ -992,7 +992,7 @@
         "structured-output",
         "human-in-the-loop"
       ],
-      "summary": "The model reads a programming manual and fills a schema: one row per range per calibration interval, ppm of reading and ppm of range, the temperature band and the coefficient outside it. Code validates the rows and computes the budget from them, and a person checks every row against the manual before anything is quoted from it. The case that matters is a right-looking number from the wrong interval or the wrong range."
+      "summary": "Extract specification rows from a manual, validate their structure, and calculate uncertainty in code. A person verifies ranges, intervals, and conditions against the source."
     },
     {
       "slug": "test-failure-triage",

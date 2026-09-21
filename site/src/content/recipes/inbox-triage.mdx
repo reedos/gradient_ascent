@@ -19,41 +19,9 @@ Inbox triage does that in three fixed steps: classify the message into one of a 
 of categories, turn it into a structured record, and file it to the matching queue. Anything the
 classifier isn't confident about, or that names a dollar amount, waits for a person first.
 
-## The assembled diagram
+## Example run
 
 <Run data={inboxRun} label="Level 3 · Sort an inbox" runKey="inbox-triage" />
-
-## Why these techniques, and why not higher
-
-Three techniques compose this recipe: <Link href="/techniques/routing/">routing</Link> reads the
-message and picks one of a handful of categories your code already wrote a handler for;
-<Link href="/techniques/structured-output/">structured output</Link> turns what the message says
-into a fixed-shape ticket record instead of prose a downstream system would have to parse;
-<Link href="/techniques/human-in-the-loop/">human approval</Link> pauses before filing anything
-the classifier wasn't confident about, or anything naming a cost.
-
-Level 3 is enough because both halves of the job are known in advance: the categories are fixed
-(billing, support, general, and a fallback for anything that fits none of them), and so is what
-happens once a message lands in one. The routing page draws exactly this line: a rule is enough
-when the categories are easy to tell apart from the wording, and a classifier earns its keep once
-the wording gets too varied for a rule to catch reliably. The function calling page states the
-same boundary from the other side: try routing first whenever the input's surface form already
-tells you which single action applies. That is this job. The label picks the queue, so a tool
-would only let the model re-make a choice your code has already made, at the cost of the extra
-call function calling's own figures show on the tool branch.
-
-The human-in-the-loop step mirrors its own example's two rules almost exactly: no confident
-category (the routing table's own fallback) or a named dollar amount (the same `high_cost` check
-that page's example uses) pauses the run. It stays a level-3 decision for the reason that page
-gives directly: your code decides when to pause, against a fixed rule, and the model is never
-asked whether a person should look. Which rule you pick is the whole of it: too loose and the gate
-waves through what most needed a look, too tight and approving turns into a reflex.
-
-Moving higher only pays off once the right queue depends on something the message's own text
-can't settle: an account lookup, or a search that might take one step or several. <Link
-href="/techniques/function-calling/">Function calling</Link> is the first of those, <Link
-href="/techniques/single-agent/">a single agent</Link> the next. Neither is needed to sort a
-message that already says everything the router needs to know.
 
 ## Walkthrough
 
@@ -108,3 +76,40 @@ No result file exists for routing, structured output or human approval yet (see
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Three techniques compose this recipe: <Link href="/techniques/routing/">routing</Link> reads the
+message and picks one of a handful of categories your code already wrote a handler for;
+<Link href="/techniques/structured-output/">structured output</Link> turns what the message says
+into a fixed-shape ticket record instead of prose a downstream system would have to parse;
+<Link href="/techniques/human-in-the-loop/">human approval</Link> pauses before filing anything
+the classifier wasn't confident about, or anything naming a cost.
+
+Level 3 is enough because both halves of the job are known in advance: the categories are fixed
+(billing, support, general, and a fallback for anything that fits none of them), and so is what
+happens once a message lands in one. The routing page draws exactly this line: a rule is enough
+when the categories are easy to tell apart from the wording, and a classifier earns its keep once
+the wording gets too varied for a rule to catch reliably. The function calling page states the
+same boundary from the other side: try routing first whenever the input's surface form already
+tells you which single action applies. That is this job. The label picks the queue, so a tool
+would only let the model re-make a choice your code has already made, at the cost of the extra
+call function calling's own figures show on the tool branch.
+
+The human-in-the-loop step mirrors its own example's two rules almost exactly: no confident
+category (the routing table's own fallback) or a named dollar amount (the same `high_cost` check
+that page's example uses) pauses the run. It stays a level-3 decision for the reason that page
+gives directly: your code decides when to pause, against a fixed rule, and the model is never
+asked whether a person should look. Which rule you pick is the whole of it: too loose and the gate
+waves through what most needed a look, too tight and approving turns into a reflex.
+
+Moving higher only pays off once the right queue depends on something the message's own text
+can't settle: an account lookup, or a search that might take one step or several. <Link
+href="/techniques/function-calling/">Function calling</Link> is the first of those, <Link
+href="/techniques/single-agent/">a single agent</Link> the next. Neither is needed to sort a
+message that already says everything the router needs to know.
+
+</details>
+

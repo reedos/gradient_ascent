@@ -21,42 +21,9 @@ reasoning here carries over; only the comparison changes, from a text diff to a 
 <Link href="/recipes/literature-watch/">A weekly watch over a growing result set</Link> works that
 version through, and joins it to a second shape.
 
-## The assembled diagram
+## Example run
 
 <Run data={runData} label="Level 3 · assembled for this recipe" runKey="nightly-monitor" />
-
-## Why these techniques, and why not higher
-
-Only one part of this job needs a model at all. Fetching each page and diffing it against last
-night's copy is ordinary code: a checksum or a text diff either finds a change or it doesn't, and
-no judgment is involved. <Link href="/techniques/structured-output/">Structured output</Link> is
-the model's entire job: given a diff code already found, decide whether it is worth a person's
-attention and write that into a fixed record (source, what changed, why it matters, a confidence
-field) rather than free text someone has to re-read. <Link href="/techniques/evals/">Evals</Link>
-turns "seems to work" into a number, and the false-positive rate is the one that decides whether
-anybody keeps opening the morning queue.
-
-That call returns one label (substantive, or cosmetic) and code looks it up in a table of two
-handlers written before the job ever ran. This is <Link href="/techniques/routing/">routing</Link>,
-level 3, and the routing page draws the line to the next level exactly there: a label your code
-branches on is not the model selecting what happens next. There is no loop, no tool the model can
-call, and nothing it decides after the label.
-
-What makes this job feel higher is real, but operational, not agency. It runs on a schedule with
-nobody watching, and it has to remember what it saw last time (one checkpoint per source) or
-every night reads as a change. <Link href="/techniques/long-horizon/">Long-running tasks</Link>,
-level 7, is where that machinery is written down, and the page to read for a checkpoint that
-survives being interrupted mid-write. But its own advice sends this job back down: a fixed
-workflow on a timer, where what runs and when is known in advance, is a scheduled job, not a
-long-running task. Borrowing a level's machinery is not the same as needing its level.
-
-Two changes would justify climbing, each with a price. If the monitor had to work out *what* to
-watch (a source with no stable page to diff, where a search has to be re-run and re-judged each
-time), searching becomes a loop and the job is <Link href="/techniques/agentic-rag/">agentic
-search</Link>, level 5, costing a varying number of calls per run instead of one per changed page.
-If the association wanted the monitor to *act* on a finding rather than queue it, that is an <Link
-href="/techniques/agent-teammates/">always-on assistant</Link>, where every action type needs a
-policy saying auto, ask or never, and the cost of getting one wrong is no longer a wasted read.
 
 ## Walkthrough
 
@@ -113,3 +80,41 @@ six months. No result file exists; this is what a run would score.
   night's copy, which is the same shape and cheaper arithmetic, and is what <Link
   href="/recipes/weekly-status-report/">the weekly status report</Link> and <Link
   href="/recipes/literature-watch/">the literature watch</Link> both do.
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Only one part of this job needs a model at all. Fetching each page and diffing it against last
+night's copy is ordinary code: a checksum or a text diff either finds a change or it doesn't, and
+no judgment is involved. <Link href="/techniques/structured-output/">Structured output</Link> is
+the model's entire job: given a diff code already found, decide whether it is worth a person's
+attention and write that into a fixed record (source, what changed, why it matters, a confidence
+field) rather than free text someone has to re-read. <Link href="/techniques/evals/">Evals</Link>
+turns "seems to work" into a number, and the false-positive rate is the one that decides whether
+anybody keeps opening the morning queue.
+
+That call returns one label (substantive, or cosmetic) and code looks it up in a table of two
+handlers written before the job ever ran. This is <Link href="/techniques/routing/">routing</Link>,
+level 3, and the routing page draws the line to the next level exactly there: a label your code
+branches on is not the model selecting what happens next. There is no loop, no tool the model can
+call, and nothing it decides after the label.
+
+What makes this job feel higher is real, but operational, not agency. It runs on a schedule with
+nobody watching, and it has to remember what it saw last time (one checkpoint per source) or
+every night reads as a change. <Link href="/techniques/long-horizon/">Long-running tasks</Link>,
+level 7, is where that machinery is written down, and the page to read for a checkpoint that
+survives being interrupted mid-write. But its own advice sends this job back down: a fixed
+workflow on a timer, where what runs and when is known in advance, is a scheduled job, not a
+long-running task. Borrowing a level's machinery is not the same as needing its level.
+
+Two changes would justify climbing, each with a price. If the monitor had to work out *what* to
+watch (a source with no stable page to diff, where a search has to be re-run and re-judged each
+time), searching becomes a loop and the job is <Link href="/techniques/agentic-rag/">agentic
+search</Link>, level 5, costing a varying number of calls per run instead of one per changed page.
+If the association wanted the monitor to *act* on a finding rather than queue it, that is an <Link
+href="/techniques/agent-teammates/">always-on assistant</Link>, where every action type needs a
+policy saying auto, ask or never, and the cost of getting one wrong is no longer a wasted read.
+
+</details>
+

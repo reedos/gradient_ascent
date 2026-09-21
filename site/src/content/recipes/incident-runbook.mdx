@@ -25,40 +25,9 @@ not decide that any step belongs in the runbook forever. A runbook drawn from a 
 a first draft, built from whatever happened to be true on one particular night, and the person who
 was there is the one who says which parts of it still hold on an ordinary day.
 
-## The assembled diagram
+## Example run
 
 <Run data={incidentRunbookRun} label="Level 3 · Draft a runbook, then approve it" runKey="incident-runbook" />
-
-## Why this level, and why not higher
-
-Three techniques compose this recipe. <Link href="/techniques/prompt-chaining/">Prompt
-chaining</Link> is the shape of the whole thing: pull the timeline out of the write-up, then turn
-what it holds into steps, two model calls in a fixed order with a check between them, never the
-model choosing what runs next. <Link href="/techniques/structured-output/">Structured
-output</Link> is what each call asks for: a timeline is a list of events with a time, an actor and
-an action, and a draft runbook is a list of steps with an action, a role and a check, both fixed
-shapes a validator can hold the reply to rather than prose a person has to parse by eye.
-<Link href="/techniques/human-in-the-loop/">Human approval</Link> is the gate at the end: every
-draft pauses for the person who ran the incident, because nothing here knows enough to ship a
-runbook on its own.
-
-Level 3 is enough because the steps are known in advance and so is their order: extract, draft,
-verify, hold. What moves between one incident and the next is only the content the model fills
-into those fixed steps, never which step runs. Level 4 would let the model decide whether to
-re-read the write-up again or look something else up before drafting, and nothing here needs that:
-one write-up, one pass, is what a person actually has. Level 5 would let the draft's own content
-decide what happens next, and it never does; the same four steps run whether the write-up is clean
-or garbled, and a bad reply is something step three reports, not something that reroutes the
-chain. Going up either level buys nothing and costs a call, a few seconds, and one more thing a
-person would have to check.
-
-Most of the checking is level 0, worth saying plainly. Assigning each event an id and joining a
-step's cited id back against the events that actually exist are a loop and a set membership check,
-the same kind of arithmetic
-<Link href="/recipes/requirements-to-test-plan/">turning requirements into a test plan</Link>
-runs to check a proposed test against a requirement. Structured output alone, with no chain and no
-check, is not enough: asking for the timeline and the runbook in one call is one long, mixed
-instruction, with nothing to stop an unusable step from reaching a person unmarked.
 
 ## Walkthrough
 
@@ -184,3 +153,39 @@ one-off nothing in code caught.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Three techniques compose this recipe. <Link href="/techniques/prompt-chaining/">Prompt
+chaining</Link> is the shape of the whole thing: pull the timeline out of the write-up, then turn
+what it holds into steps, two model calls in a fixed order with a check between them, never the
+model choosing what runs next. <Link href="/techniques/structured-output/">Structured
+output</Link> is what each call asks for: a timeline is a list of events with a time, an actor and
+an action, and a draft runbook is a list of steps with an action, a role and a check, both fixed
+shapes a validator can hold the reply to rather than prose a person has to parse by eye.
+<Link href="/techniques/human-in-the-loop/">Human approval</Link> is the gate at the end: every
+draft pauses for the person who ran the incident, because nothing here knows enough to ship a
+runbook on its own.
+
+Level 3 is enough because the steps are known in advance and so is their order: extract, draft,
+verify, hold. What moves between one incident and the next is only the content the model fills
+into those fixed steps, never which step runs. Level 4 would let the model decide whether to
+re-read the write-up again or look something else up before drafting, and nothing here needs that:
+one write-up, one pass, is what a person actually has. Level 5 would let the draft's own content
+decide what happens next, and it never does; the same four steps run whether the write-up is clean
+or garbled, and a bad reply is something step three reports, not something that reroutes the
+chain. Going up either level buys nothing and costs a call, a few seconds, and one more thing a
+person would have to check.
+
+Most of the checking is level 0, worth saying plainly. Assigning each event an id and joining a
+step's cited id back against the events that actually exist are a loop and a set membership check,
+the same kind of arithmetic
+<Link href="/recipes/requirements-to-test-plan/">turning requirements into a test plan</Link>
+runs to check a proposed test against a requirement. Structured output alone, with no chain and no
+check, is not enough: asking for the timeline and the runbook in one call is one long, mixed
+instruction, with nothing to stop an unusable step from reaching a person unmarked.
+
+</details>
+

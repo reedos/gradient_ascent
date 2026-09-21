@@ -34,40 +34,6 @@ is a `GROUP BY`, and it names the fixture before anyone opens a board. This page
 board later, where the question stops being which group moved and becomes what to measure next on
 this unit.
 
-## Level 5, and why not a fixed checklist
-
-This is level 5, an agent in a loop, because which measurement to take next depends on what the
-last one said, and a fixed order gets that wrong in both directions. Compare two boards that
-failed the same step for different reasons.
-
-SRB5030-2608-0011's log has one failure. Steps 4 and 5 (line and load regulation), 6 (efficiency)
-and 7 (ripple) all pass comfortably. That pattern, one absolute reading off and everything
-downstream of it normal, is what `failure-analysis-guide.md` section 7 calls the signature of a
-stale channel offset, not a board fault: "Only measurements that read an absolute value through
-the affected channel move, because a fixed offset cancels in the difference the regulation steps
-take".
-
-SRB5030-2608-0063 also failed VOUT on FIX-03, at -0.0300 V, logged with the note "dead. no vout at
-all, u1 not switching". Its efficiency step reads 0.00 percent against an 88 percent floor, and
-its current-limit step trips at 3.50 A, the lowest current tried. That board needs none of the
-fixture-versus-board reasoning SRB5030-2608-0011 does: the first tool call already answers it.
-
-A level 3 workflow, code deciding a fixed order in advance, could certainly encode a script: read
-the log, then always compare the DMM against the load's own terminal reading, then always check
-the calibration procedure. That order is right for 0011 and wastes two calls on 0063, where the
-two readings would simply agree near zero and the log already had the answer. Reverse it, straight
-from the log to failure analysis, and it scraps a good board to fix nothing. Which order is right
-depends on the shape of the first answer, which is what a level 5 loop is for and a checklist is
-not.
-
-The next level up, <Link href="/techniques/orchestrator-workers/">a second agent</Link> reviewing
-the first one's cause before it reaches a person, would catch a wrong read the first agent stated
-with confidence. It costs another agent's worth of calls on every board investigated, not just the
-ones where the first agent was wrong, and it duplicates a check a person already makes here: the
-proposed cause and the next measurement go to an engineer before anything about the board changes.
-That trade is worth it when a wrong diagnosis is expensive relative to a person's five minutes
-reading a trace; on this bench, it is not, so this recipe stops at level 5.
-
 ## The three classes of command, and why the envelope holds the board's limits
 
 Every command on this bench falls into one of three classes, and this recipe's agent can only
@@ -140,24 +106,6 @@ Nothing in that answer is a measurement. The two readings came from instruments,
 them is a subtraction, and the cause is a hypothesis a person confirms: a model never produces a
 reported measurement, an uncertainty, a margin or a verdict. What it produced here is an order of
 questions.
-
-## The code
-
-`run` is the loop: offer the three tools, run whichever one the model calls, hand back the
-result, and stop once the model calls none. Every tool call and the final stop are the model's
-own decision; running or refusing a tool is always code's.
-
-<CodeFile file="examples/bench_bring_up_debug_assistant/run.py" func="run" />
-
-`measure` is where a state-setting command stops. `is_read_only`, imported from
-`examples/common/bench.py`, is checked before `instrument.send` is ever called, and its result
-decides whether that call happens at all, not whether the model asked politely. Sending a command
-never touched by the check would be the actual bug; this function makes sure that path does not
-exist. It is the only check here, deliberately: the line between a query and a state change is
-written down once, in the bench module every example on this site imports, and a second copy here
-would be a second copy to keep in step.
-
-<CodeFile file="examples/bench_bring_up_debug_assistant/run.py" func="_measure" />
 
 ## What it costs
 
@@ -249,3 +197,65 @@ What does not port: the SRB-5030 itself, its command set, `SafetyEnvelope`'s 32.
 every reading in `docs/THE-BENCH.md`. A reader's own board has its own datasheet and its own
 envelope, and the fixture-versus-board reasoning above is only as good as the documents an
 assistant is actually pointed at.
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+This is level 5, an agent in a loop, because which measurement to take next depends on what the
+last one said, and a fixed order gets that wrong in both directions. Compare two boards that
+failed the same step for different reasons.
+
+SRB5030-2608-0011's log has one failure. Steps 4 and 5 (line and load regulation), 6 (efficiency)
+and 7 (ripple) all pass comfortably. That pattern, one absolute reading off and everything
+downstream of it normal, is what `failure-analysis-guide.md` section 7 calls the signature of a
+stale channel offset, not a board fault: "Only measurements that read an absolute value through
+the affected channel move, because a fixed offset cancels in the difference the regulation steps
+take".
+
+SRB5030-2608-0063 also failed VOUT on FIX-03, at -0.0300 V, logged with the note "dead. no vout at
+all, u1 not switching". Its efficiency step reads 0.00 percent against an 88 percent floor, and
+its current-limit step trips at 3.50 A, the lowest current tried. That board needs none of the
+fixture-versus-board reasoning SRB5030-2608-0011 does: the first tool call already answers it.
+
+A level 3 workflow, code deciding a fixed order in advance, could certainly encode a script: read
+the log, then always compare the DMM against the load's own terminal reading, then always check
+the calibration procedure. That order is right for 0011 and wastes two calls on 0063, where the
+two readings would simply agree near zero and the log already had the answer. Reverse it, straight
+from the log to failure analysis, and it scraps a good board to fix nothing. Which order is right
+depends on the shape of the first answer, which is what a level 5 loop is for and a checklist is
+not.
+
+The next level up, <Link href="/techniques/orchestrator-workers/">a second agent</Link> reviewing
+the first one's cause before it reaches a person, would catch a wrong read the first agent stated
+with confidence. It costs another agent's worth of calls on every board investigated, not just the
+ones where the first agent was wrong, and it duplicates a check a person already makes here: the
+proposed cause and the next measurement go to an engineer before anything about the board changes.
+That trade is worth it when a wrong diagnosis is expensive relative to a person's five minutes
+reading a trace; on this bench, it is not, so this recipe stops at level 5.
+
+</details>
+
+## Build it
+
+<details className="recipe-detail">
+<summary>Implementation details and code</summary>
+
+`run` is the loop: offer the three tools, run whichever one the model calls, hand back the
+result, and stop once the model calls none. Every tool call and the final stop are the model's
+own decision; running or refusing a tool is always code's.
+
+<CodeFile file="examples/bench_bring_up_debug_assistant/run.py" func="run" />
+
+`measure` is where a state-setting command stops. `is_read_only`, imported from
+`examples/common/bench.py`, is checked before `instrument.send` is ever called, and its result
+decides whether that call happens at all, not whether the model asked politely. Sending a command
+never touched by the check would be the actual bug; this function makes sure that path does not
+exist. It is the only check here, deliberately: the line between a query and a state change is
+written down once, in the bench module every example on this site imports, and a second copy here
+would be a second copy to keep in step.
+
+<CodeFile file="examples/bench_bring_up_debug_assistant/run.py" func="_measure" />
+
+</details>
+

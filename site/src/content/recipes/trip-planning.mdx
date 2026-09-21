@@ -31,43 +31,9 @@ connects, runs on its own for as long as the trip needs. The part that spends mo
 refund always stops, with the exact price and the cancellation terms in front of a person, before
 anything is reserved.
 
-## The assembled diagram
+## Example run
 
 <Run data={tripPlanningRun} label="Level 5 · Plan a trip and hold the bookings" runKey="trip-planning" />
-
-## Why this level, and why not higher
-
-Three techniques carry this job. <Link href="/techniques/single-agent/">Single agent</Link> is the
-loop: the model keeps calling tools and reading what comes back until it has decided what to
-reserve, rather than following a search order written down in advance.
-<Link href="/techniques/function-calling/">Function calling</Link> is the shape of what it can
-call, four fixed tools with fixed arguments. <Link href="/techniques/human-in-the-loop/">
-Human-in-the-loop</Link> is the pause on the one tool that spends money: a checkpoint a person
-approves or turns down before it ever runs.
-
-Level 5, not level 3, because the number of lookups is not knowable in advance. Sometimes the first
-route works and the first stay has a room; sometimes the cheapest route lands after the one thing
-the traveler wanted to see has closed, and the plan has to back up and check a different route or a
-different day. A fixed workflow commits to an order of searches before it has seen a single result,
-which is right for one trip and wrong for the next, the same argument
-<Link href="/recipes/bring-up-debug-assistant/">a bring-up assistant</Link> makes about a bench
-symptom: which check comes next depends on what the last one said. Level 4 is not enough either: one
-tool call and an answer forces the model to guess ahead of time how many results it will need
-before it has seen any of them.
-
-The level above would be a second agent, <Link href="/techniques/orchestrator-workers/">a lead
-agent and workers</Link>, reviewing the plan before a person sees it. That earns its cost when a
-wrong plan is expensive to catch late, or several travelers have independent legs to coordinate.
-For one trip and four tools it is another agent's worth of calls spent duplicating a check a person
-already makes at the pause. Level 7, an agent that starts work on its own, does not fit at all:
-nothing here happens while nobody is watching, and the pause exists for the moment a person is.
-
-One part of this job is level 0 on purpose. Once a booking is approved, totaling what the trip
-costs and checking that two reservations do not land at the same hour are a sum and a comparison,
-not a question for a model. The approval gate is not there because a model might get something
-wrong; it is there because a booking is expensive and hard to take back, exactly the question
-<Link href="/techniques/delegating/">deciding what to hand over</Link> asks: not "can it do this"
-but "what does it cost to be wrong here, and can it be undone."
 
 ## Walkthrough
 
@@ -188,3 +154,42 @@ this recipe, so it claims no measured score, only this description of what one w
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Three techniques carry this job. <Link href="/techniques/single-agent/">Single agent</Link> is the
+loop: the model keeps calling tools and reading what comes back until it has decided what to
+reserve, rather than following a search order written down in advance.
+<Link href="/techniques/function-calling/">Function calling</Link> is the shape of what it can
+call, four fixed tools with fixed arguments. <Link href="/techniques/human-in-the-loop/">
+Human-in-the-loop</Link> is the pause on the one tool that spends money: a checkpoint a person
+approves or turns down before it ever runs.
+
+Level 5, not level 3, because the number of lookups is not knowable in advance. Sometimes the first
+route works and the first stay has a room; sometimes the cheapest route lands after the one thing
+the traveler wanted to see has closed, and the plan has to back up and check a different route or a
+different day. A fixed workflow commits to an order of searches before it has seen a single result,
+which is right for one trip and wrong for the next, the same argument
+<Link href="/recipes/bring-up-debug-assistant/">a bring-up assistant</Link> makes about a bench
+symptom: which check comes next depends on what the last one said. Level 4 is not enough either: one
+tool call and an answer forces the model to guess ahead of time how many results it will need
+before it has seen any of them.
+
+The level above would be a second agent, <Link href="/techniques/orchestrator-workers/">a lead
+agent and workers</Link>, reviewing the plan before a person sees it. That earns its cost when a
+wrong plan is expensive to catch late, or several travelers have independent legs to coordinate.
+For one trip and four tools it is another agent's worth of calls spent duplicating a check a person
+already makes at the pause. Level 7, an agent that starts work on its own, does not fit at all:
+nothing here happens while nobody is watching, and the pause exists for the moment a person is.
+
+One part of this job is level 0 on purpose. Once a booking is approved, totaling what the trip
+costs and checking that two reservations do not land at the same hour are a sum and a comparison,
+not a question for a model. The approval gate is not there because a model might get something
+wrong; it is there because a booking is expensive and hard to take back, exactly the question
+<Link href="/techniques/delegating/">deciding what to hand over</Link> asks: not "can it do this"
+but "what does it cost to be wrong here, and can it be undone."
+
+</details>
+

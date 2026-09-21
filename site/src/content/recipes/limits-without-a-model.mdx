@@ -22,32 +22,6 @@ per step. It is one of the three ways this bench gets used, and its counterpart 
 <Link href="/recipes/characterize-a-design/">sweeping five prototypes and reporting the
 margins</Link>, which is the same arithmetic asked a different question.
 
-## Level 0, and why not higher
-
-Every question in the paragraph above is a comparison, a mean, a standard deviation or a
-`GROUP BY`. Did this unit pass: two comparisons against its own row's limits. What fraction of
-units passed: a count. Is the ripple step capable of holding its 50 mV limit: a mean, a standard
-deviation and a subtraction, which is the whole of Cpk. Did the process drift at some point: a
-mean and a standard deviation plotted against run order, which is the whole of a control chart.
-Which lot, fixture, day or shift looks different from the rest: `GROUP BY` each of the four in
-turn. None of it needs a model, and none of it may have one: a model never produces a reported
-measurement, an uncertainty, a margin or a verdict. Here the reason is the arithmetic of a defect
-rate, since a wrong pass ships a bad unit and a model right 99 times in 100 adds a one percent
-defect rate to a line that measures its own in parts per million. On five prototypes the reason
-is different and the rule is the same: a margin nobody can reproduce is what a design decision
-gets made on.
-
-A model earns a place once the job stops being arithmetic over numbers that are already there.
-<Link href="/recipes/test-failure-triage/">Sorting failing units and operator notes into known
-causes</Link> reads free text a `GROUP BY` cannot parse. <Link href="/recipes/ask-the-datasheet/">
-Answering a question from a datasheet, a test spec and a change notice</Link> resolves two
-documents that disagree. <Link href="/recipes/test-data-by-conversation/">Asking questions of a
-production log</Link> starts only once the fixed charts below have been built and a question comes
-in that none of them answers. All three cost a model call somewhere this recipe costs nothing.
-This page and <Link href="/recipes/characterize-a-design/">its engineering-test
-counterpart</Link> are the two every other engineering recipe here points back to for the part of
-the week a `GROUP BY` already does, one over a production run and one over a sweep.
-
 ## Reading the log, stepped
 
 Nothing here talks to an instrument. The four instruments that produced this log
@@ -116,35 +90,6 @@ daily means span 1.55 mV and its two shift means span 2.01 mV, against the 23.2 
 grouping moves the mean by; VOUT's daily means span about 5 mV and its shift means about 3 mV,
 against the roughly 27 mV the fixture grouping moves the mean by. Being able to say a grouping
 found nothing is as much the point of this recipe as finding the lot and the fixture were.
-
-## The code
-
-The whole pass or fail decision is two comparisons:
-
-<CodeFile file="examples/bench_limits_without_a_model/run.py" func="within_limits" />
-
-Cpk is a mean, a standard deviation and a subtraction, one-sided against whichever single limit a
-step has and the smaller of both one-sided numbers when a step has two, which is the standard
-two-sided form:
-
-<CodeFile file="examples/bench_limits_without_a_model/run.py" func="cpk" />
-
-`GROUP BY` is one function, called once each for lot, fixture, day and shift:
-
-<CodeFile file="examples/bench_limits_without_a_model/run.py" func="group_stats" />
-
-The control chart estimates its sigma from the average moving range between consecutive readings
-rather than from the sample standard deviation, which is the textbook individuals-chart
-construction and not an arbitrary alternative: a standard deviation taken over a run that already
-contains a shifted lot is inflated by that shift, and the moving range is not.
-
-<CodeFile file="examples/bench_limits_without_a_model/run.py" func="control_chart" />
-
-Every step this code takes is `decided_by: "code"` (`examples/common/trace.py` is the one
-definition of that field on this site), because there is no model anywhere in the call for one to
-decide anything. Run it yourself:
-
-<CodeFile file="examples/bench_limits_without_a_model/README.md" start={11} end={12} lang="text" expect="RIPPLE" />
 
 ## What it costs
 
@@ -235,4 +180,69 @@ finding a scheduling conflict in a calendar, reordering stock once a count falls
 and checking a bill of materials against a supplier's end-of-life list are the same job: the input
 is already structured, the right answer is fixed by a rule or a subtraction, and two people given
 the same numbers get the same answer every time. None of those needs a model either.
+
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Every question in the paragraph above is a comparison, a mean, a standard deviation or a
+`GROUP BY`. Did this unit pass: two comparisons against its own row's limits. What fraction of
+units passed: a count. Is the ripple step capable of holding its 50 mV limit: a mean, a standard
+deviation and a subtraction, which is the whole of Cpk. Did the process drift at some point: a
+mean and a standard deviation plotted against run order, which is the whole of a control chart.
+Which lot, fixture, day or shift looks different from the rest: `GROUP BY` each of the four in
+turn. None of it needs a model, and none of it may have one: a model never produces a reported
+measurement, an uncertainty, a margin or a verdict. Here the reason is the arithmetic of a defect
+rate, since a wrong pass ships a bad unit and a model right 99 times in 100 adds a one percent
+defect rate to a line that measures its own in parts per million. On five prototypes the reason
+is different and the rule is the same: a margin nobody can reproduce is what a design decision
+gets made on.
+
+A model earns a place once the job stops being arithmetic over numbers that are already there.
+<Link href="/recipes/test-failure-triage/">Sorting failing units and operator notes into known
+causes</Link> reads free text a `GROUP BY` cannot parse. <Link href="/recipes/ask-the-datasheet/">
+Answering a question from a datasheet, a test spec and a change notice</Link> resolves two
+documents that disagree. <Link href="/recipes/test-data-by-conversation/">Asking questions of a
+production log</Link> starts only once the fixed charts below have been built and a question comes
+in that none of them answers. All three cost a model call somewhere this recipe costs nothing.
+This page and <Link href="/recipes/characterize-a-design/">its engineering-test
+counterpart</Link> are the two every other engineering recipe here points back to for the part of
+the week a `GROUP BY` already does, one over a production run and one over a sweep.
+
+</details>
+
+## Build it
+
+<details className="recipe-detail">
+<summary>Implementation details and code</summary>
+
+The whole pass or fail decision is two comparisons:
+
+<CodeFile file="examples/bench_limits_without_a_model/run.py" func="within_limits" />
+
+Cpk is a mean, a standard deviation and a subtraction, one-sided against whichever single limit a
+step has and the smaller of both one-sided numbers when a step has two, which is the standard
+two-sided form:
+
+<CodeFile file="examples/bench_limits_without_a_model/run.py" func="cpk" />
+
+`GROUP BY` is one function, called once each for lot, fixture, day and shift:
+
+<CodeFile file="examples/bench_limits_without_a_model/run.py" func="group_stats" />
+
+The control chart estimates its sigma from the average moving range between consecutive readings
+rather than from the sample standard deviation, which is the textbook individuals-chart
+construction and not an arbitrary alternative: a standard deviation taken over a run that already
+contains a shifted lot is inflated by that shift, and the moving range is not.
+
+<CodeFile file="examples/bench_limits_without_a_model/run.py" func="control_chart" />
+
+Every step this code takes is `decided_by: "code"` (`examples/common/trace.py` is the one
+definition of that field on this site), because there is no model anywhere in the call for one to
+decide anything. Run it yourself:
+
+<CodeFile file="examples/bench_limits_without_a_model/README.md" start={11} end={12} lang="text" expect="RIPPLE" />
+
+</details>
 

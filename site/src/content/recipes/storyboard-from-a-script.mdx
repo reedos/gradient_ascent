@@ -28,41 +28,9 @@ fails. What this does not do: draw anything. No frame or image comes out of it, 
 generates one. It does not decide style, casting or location; a director reads the output and
 makes those calls.
 
-## The assembled diagram
+## Example run
 
 <Run data={storyboardRun} label="Level 3 · Turn a script into a shot list" runKey="storyboard-from-a-script" />
-
-## Why this level, and why not higher
-
-Two techniques compose this recipe. <Link href="/techniques/prompt-chaining/">Prompt
-chaining</Link> is the two-step sequence itself: split into scenes, then propose shots, always in
-that order, always both steps, whatever either call returns. <Link
-href="/techniques/structured-output/">Structured output</Link> is what keeps each of those two
-calls in a fixed schema, a scene number, heading and line range for the first call and a shot
-number, size, on-screen description, seconds and line range for the second, so code can validate
-the reply and retry once rather than pull the shape out of prose.
-
-Level 3 is enough because nothing after the first call has to branch. The code that asks for shots
-runs the same way whether the model found four scenes or six, and the coverage check runs the same
-way whether the model covered every line or missed one. A single call against the shot schema
-alone, level 1, structured output without the chain, could ask for a whole shot list in one shot.
-But a shot list built with no scene step has no scene structure of its own to check a shot's line
-range against, and a scene boundary that exists only inside the model's one answer is not
-something code can compare anything to afterward. The scene step is not there to make the job
-harder; it produces a second fixed structure, checked in code, that the shot step's output is then
-checked against. That is the actual argument for chaining over structured output alone here: two
-schemas, checked against each other, rather than one schema nobody can check.
-
-The level above, <Link href="/techniques/function-calling/">function calling</Link> or <Link
-href="/techniques/single-agent/">a single agent</Link>, would let the model decide something based
-on what an earlier step found: whether to re-read a scene, how many passes to take, which shot to
-revise. Nothing here asks for that. The coverage check either finds a gap or it does not, and
-fixing one means asking the model to look at that range again, which is still code choosing to
-make one more fixed call, not the model choosing to. Reaching higher buys a shot list that patches
-its own gaps automatically, at the cost of a call count that is no longer fixed, a harder thing to
-evaluate, and a loop that could keep rewriting shots until a person never sees the disagreement the
-check actually found. A person reading the report and asking for a specific fix is cheaper and more
-legible than a model deciding that under its own direction.
 
 ## Walkthrough
 
@@ -182,3 +150,40 @@ reads the report, and a false clean one is not caught until someone is standing 
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Two techniques compose this recipe. <Link href="/techniques/prompt-chaining/">Prompt
+chaining</Link> is the two-step sequence itself: split into scenes, then propose shots, always in
+that order, always both steps, whatever either call returns. <Link
+href="/techniques/structured-output/">Structured output</Link> is what keeps each of those two
+calls in a fixed schema, a scene number, heading and line range for the first call and a shot
+number, size, on-screen description, seconds and line range for the second, so code can validate
+the reply and retry once rather than pull the shape out of prose.
+
+Level 3 is enough because nothing after the first call has to branch. The code that asks for shots
+runs the same way whether the model found four scenes or six, and the coverage check runs the same
+way whether the model covered every line or missed one. A single call against the shot schema
+alone, level 1, structured output without the chain, could ask for a whole shot list in one shot.
+But a shot list built with no scene step has no scene structure of its own to check a shot's line
+range against, and a scene boundary that exists only inside the model's one answer is not
+something code can compare anything to afterward. The scene step is not there to make the job
+harder; it produces a second fixed structure, checked in code, that the shot step's output is then
+checked against. That is the actual argument for chaining over structured output alone here: two
+schemas, checked against each other, rather than one schema nobody can check.
+
+The level above, <Link href="/techniques/function-calling/">function calling</Link> or <Link
+href="/techniques/single-agent/">a single agent</Link>, would let the model decide something based
+on what an earlier step found: whether to re-read a scene, how many passes to take, which shot to
+revise. Nothing here asks for that. The coverage check either finds a gap or it does not, and
+fixing one means asking the model to look at that range again, which is still code choosing to
+make one more fixed call, not the model choosing to. Reaching higher buys a shot list that patches
+its own gaps automatically, at the cost of a call count that is no longer fixed, a harder thing to
+evaluate, and a loop that could keep rewriting shots until a person never sees the disagreement the
+check actually found. A person reading the report and asking for a specific fix is cheaper and more
+legible than a model deciding that under its own direction.
+
+</details>
+

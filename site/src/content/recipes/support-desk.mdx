@@ -18,36 +18,9 @@ Support desk composes that into one pipeline: sort the ticket, search the docume
 model reach for a tool when the ticket needs an action rather than an answer, and pause before
 anything costly goes out.
 
-## The assembled diagram
+## Example run
 
 <Run data={supportRun} label="Level 4 · Support desk" runKey="support-desk" />
-
-## Why these techniques, and why not higher
-
-Four techniques compose this recipe. <Link href="/techniques/routing/">Routing</Link> sorts the
-ticket into a fixed queue. <Link href="/techniques/rag/">RAG</Link> searches the shop's
-documentation and drafts an answer from what it finds, cited. <Link
-href="/techniques/function-calling/">Function calling</Link> is the one place this recipe climbs
-past a fixed workflow: the model is offered a tool (issue a replacement part) and decides for
-itself whether this ticket needs it, rather than your code deciding in advance from the queue
-label alone. <Link href="/techniques/human-in-the-loop/">Human approval</Link> pauses before a
-reply that used the tool goes out, since a free replacement has a real cost if the model called it
-on a ticket that didn't actually warrant one.
-
-Level 4 is the right stop, not level 3, because the thing being decided here is what function
-calling's own page says the level is for: whether *this* ticket needs a replacement shipped
-rather than an answer written is a judgment about open-ended text that a fixed rule can't make
-reliably. Routing can pick the queue; it can't decide whether to act. That one model decision is
-all this recipe adds over a plain sort-and-answer workflow, and it costs accordingly: function
-calling's own figures are two model calls on a ticket that gets a tool call, against RAG's one.
-
-It is not worth climbing to <Link href="/techniques/single-agent/">a single agent</Link> unless
-the tool decision itself needs more than one step (the function calling page states that upgrade
-condition directly): move up once the next action depends on what the last one returned, so the
-model has to choose again and decide when to stop. This desk's tool call is a single bounded
-action with a known result; nothing asks the model to check the outcome and decide again. A
-ticket that needed the model to check an order's shipping status first and act differently on
-what that showed is the case a single agent is for, at several times the cost.
 
 ## Walkthrough
 
@@ -108,3 +81,35 @@ so this recipe claims no score.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Four techniques compose this recipe. <Link href="/techniques/routing/">Routing</Link> sorts the
+ticket into a fixed queue. <Link href="/techniques/rag/">RAG</Link> searches the shop's
+documentation and drafts an answer from what it finds, cited. <Link
+href="/techniques/function-calling/">Function calling</Link> is the one place this recipe climbs
+past a fixed workflow: the model is offered a tool (issue a replacement part) and decides for
+itself whether this ticket needs it, rather than your code deciding in advance from the queue
+label alone. <Link href="/techniques/human-in-the-loop/">Human approval</Link> pauses before a
+reply that used the tool goes out, since a free replacement has a real cost if the model called it
+on a ticket that didn't actually warrant one.
+
+Level 4 is the right stop, not level 3, because the thing being decided here is what function
+calling's own page says the level is for: whether *this* ticket needs a replacement shipped
+rather than an answer written is a judgment about open-ended text that a fixed rule can't make
+reliably. Routing can pick the queue; it can't decide whether to act. That one model decision is
+all this recipe adds over a plain sort-and-answer workflow, and it costs accordingly: function
+calling's own figures are two model calls on a ticket that gets a tool call, against RAG's one.
+
+It is not worth climbing to <Link href="/techniques/single-agent/">a single agent</Link> unless
+the tool decision itself needs more than one step (the function calling page states that upgrade
+condition directly): move up once the next action depends on what the last one returned, so the
+model has to choose again and decide when to stop. This desk's tool call is a single bounded
+action with a known result; nothing asks the model to check the outcome and decide again. A
+ticket that needed the model to check an order's shipping status first and act differently on
+what that showed is the case a single agent is for, at several times the cost.
+
+</details>
+

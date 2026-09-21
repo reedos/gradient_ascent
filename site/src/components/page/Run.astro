@@ -20,4 +20,4 @@ const { data, label, runKey = 'run', accentPill = false } = Astro.props;
 const runs: RunDef[] = [{ key: runKey, label, data: data as RunData, accentPill }];
 ---
 
-<details class="optional-detail" id="a-run-step-by-step"><summary>Optional: inspect the implementation trace</summary><p>This separate, scripted trace illustrates the code example discussed in the implementation details. Start with the guided example above for the main demonstration.</p><RunDiagram runs={runs} lanes={false} client:visible /></details>
+<details class="optional-detail" id="a-run-step-by-step"><summary>Optional: inspect the implementation trace</summary><p>This separate, scripted trace illustrates the code example discussed in the implementation details. Use it to inspect individual steps, inputs, and outputs.</p><RunDiagram runs={runs} lanes={false} client:visible /></details>

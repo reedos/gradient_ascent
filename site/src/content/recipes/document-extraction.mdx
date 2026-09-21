@@ -18,33 +18,9 @@ Document extraction is that job: read the image, fill a fixed set of fields, and
 confirm the record (correcting whatever the read got wrong) before it's saved. Nothing here
 decides whether to save; that always happens once a person has looked.
 
-## The assembled diagram
+## Example run
 
 <Run data={extractionRun} label="Level 3 · Turn a form photo into a record" runKey="document-extraction" />
-
-## Why these techniques, and why not higher
-
-Three techniques compose this recipe. <Link href="/techniques/multimodal/">Multimodal</Link> reads
-the photographed form in the same one call a chat app makes when you upload an image and ask about
-it: still level 1, since sending a picture alongside text changes what's in the request, not the
-one-call shape. <Link href="/techniques/structured-output/">Structured output</Link> turns what it
-reads into the same four-field record every time, validated, with one retry if a field comes back
-malformed. <Link href="/techniques/human-in-the-loop/">Human approval</Link> is what actually
-raises this recipe to level 3: the run always pauses for a person before anything is saved, since
-a misread field here becomes a wrong record in the patient system, not a wrong answer on a screen.
-
-Nothing needs to climb past that. Saving is a fixed action your code always takes once a person
-has approved, not a choice the model makes: the boundary <Link
-href="/techniques/function-calling/">function calling</Link>'s own page draws between a tool your
-code always runs and one the model decides whether to reach for. There is no
-"whether" here. Multimodal has nothing to gain from an agent
-loop either: reading one form is one call whether or not every field is legible, and your code
-can decide in advance to re-ask on whichever field the first pass couldn't read.
-
-The gate is not optional here the way it can be elsewhere on this site. Human approval's own page
-says to skip a gate when being wrong is cheap and easy to notice after the fact; a patient record
-with the wrong birth date is neither, so this recipe pauses on every field the read could not
-reach, rather than setting a looser threshold and letting some of them through.
 
 ## Walkthrough
 
@@ -104,3 +80,32 @@ structured output or human approval yet (see `docs/EVALS.md`), so this recipe cl
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Three techniques compose this recipe. <Link href="/techniques/multimodal/">Multimodal</Link> reads
+the photographed form in the same one call a chat app makes when you upload an image and ask about
+it: still level 1, since sending a picture alongside text changes what's in the request, not the
+one-call shape. <Link href="/techniques/structured-output/">Structured output</Link> turns what it
+reads into the same four-field record every time, validated, with one retry if a field comes back
+malformed. <Link href="/techniques/human-in-the-loop/">Human approval</Link> is what actually
+raises this recipe to level 3: the run always pauses for a person before anything is saved, since
+a misread field here becomes a wrong record in the patient system, not a wrong answer on a screen.
+
+Nothing needs to climb past that. Saving is a fixed action your code always takes once a person
+has approved, not a choice the model makes: the boundary <Link
+href="/techniques/function-calling/">function calling</Link>'s own page draws between a tool your
+code always runs and one the model decides whether to reach for. There is no
+"whether" here. Multimodal has nothing to gain from an agent
+loop either: reading one form is one call whether or not every field is legible, and your code
+can decide in advance to re-ask on whichever field the first pass couldn't read.
+
+The gate is not optional here the way it can be elsewhere on this site. Human approval's own page
+says to skip a gate when being wrong is cheap and easy to notice after the fact; a patient record
+with the wrong birth date is neither, so this recipe pauses on every field the read could not
+reach, rather than setting a looser threshold and letting some of them through.
+
+</details>
+

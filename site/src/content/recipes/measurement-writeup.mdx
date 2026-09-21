@@ -19,35 +19,6 @@ characterization report somebody else can read without re-deriving any of it. Co
 decided every number in that report. What it has not decided is how to say it in sentences that
 connect one finding to the next and do not quietly drop a caveat the notebook is honest about.
 
-## Level 1, and why not higher
-
-Code computes every figure this report can quote:
-<Link href="/recipes/characterize-a-design/">the corner margin for all five boards</Link>, the
-expanded uncertainty behind the thinnest one, and the three-ambient line regulation figures and
-guardbanded verdict for the one board whose margin the measurement cannot quite decide. None of
-that arithmetic is new to this page; it is the same `dc_voltage_budget`, `combined_uncertainty`,
-`expanded_uncertainty`, `guarded_verdict` and `margin_to_limit` functions every other page on this
-bench that touches uncertainty imports rather than reimplements. A model never produces a
-reported measurement, an uncertainty, a margin or a verdict, here any more than on
-<Link href="/recipes/limits-without-a-model/">the production log</Link>, where the same rule
-shows up as a pass or a fail. This recipe's own job starts after all of that: turning the figures
-and the notebook's prose into paragraphs a reviewer reads in under a minute.
-
-That job is one model call, level 1, <Link href="/techniques/order-zero/">order zero</Link>
-composed with <Link href="/techniques/prompt-engineering/">prompt engineering</Link>. A fixed
-template could produce a report too, but a session's story does not have a fixed shape: which
-board is thinnest, whether a line regulation reading lands on a pass, a fail or a cannot-say,
-which open items still matter, all of it changes sweep to sweep, and a template that covers every
-combination is a maze of conditionals nobody checks with the rigor the arithmetic underneath it
-gets.
-
-The reasons to climb are reasons this page deliberately has none of. There is nothing to retrieve
-that is not already in the notebook and the figures, so <Link href="/techniques/rag/">RAG</Link>
-buys nothing. The output is prose a person reads directly, not a payload another program parses,
-so there is no schema for <Link href="/techniques/structured-output/">structured output</Link> to
-hold it to. Nothing here decides what happens next or calls a tool, so there is no case for an
-agent loop.
-
 ## The run, stepped
 
 `compute_results` reads `evals/bench/data/characterization-2026-09.csv` and returns the corner
@@ -94,42 +65,6 @@ comparison between ambients) gets written in words, not digits. One call, and th
 is the sentences:
 
 <CodeFile file="examples/bench_measurement_writeup/run.py" func="run" />
-
-## The check
-
-`unsupported_numbers` is the whole argument for why this one call is safe to make unattended up to
-the point a person reads the result. It scans the draft for every numeric token and returns
-whichever ones are not, character for character, one of the figures code produced:
-
-<CodeFile file="examples/bench_measurement_writeup/run.py" func="unsupported_numbers" />
-
-`tests/test_example_bench_measurement_writeup.py` runs it both ways: a clean draft, built only
-from the figures above, comes back with nothing unsupported, and the same draft with its
-uncertainty quietly rounded from 352.7 uV to a tidier 350 uV comes back naming `"350"`, the exact
-token that was never one of the figures. The check does not retry and does not repair a draft it
-rejects; `run` hands the rejected text back with the failing tokens named, so a review starts from
-the specific sentence to look at rather than from "something in here is wrong."
-
-Most of the work in writing that check is deciding what counts as one token, and the cases that
-decide it are ordinary prose, not adversarial ones. A serial number has to be an identifier and
-not three figures, or every board's ID would need pre-approving; that is what blanking
-identifier-shaped tokens does before the numeric scan, and `SRB5030-2609-0003` never reaches it.
-A date has to be one token too, or `09/14/2026` reads as 09, 14 and 2026 and a report cannot say
-when the session ran, so dates are matched first and checked whole against the sweep's own first
-and last day, which code takes off the CSV's timestamps. Everything left has to be matched to its
-own edges: `352.7uV` with no space is still the figure 352.7 and not the number 352, `350uV` is
-still an unsupported 350 rather than nothing at all, `20.4-99.9 mV` gives up both of its numbers
-and not just the first, and a figure followed by a comma is the figure. Each of those is a test in
-the file, and each of them was a way this check could have been quietly wrong while looking right.
-
-What it still cannot catch is worth stating just as plainly:
-
-- A digit buried inside a word or hyphenated onto one. `FIX99` and `degC-70` are identifier
-  shaped, so they are blanked with the serials. This is the price of not pre-approving every ID.
-- A figure spelled out. "three hundred fifty microvolts" has no digits in it to scan.
-- A right figure sitting next to the wrong claim, and a caveat the notebook states that the draft
-  drops. Neither is a number, so neither is a token. Both are in the failure modes below, and both
-  are why a person still reads the report.
 
 ## What it costs
 
@@ -226,3 +161,78 @@ pass anyway would be spending a call to guard against a risk this recipe does no
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Code computes every figure this report can quote:
+<Link href="/recipes/characterize-a-design/">the corner margin for all five boards</Link>, the
+expanded uncertainty behind the thinnest one, and the three-ambient line regulation figures and
+guardbanded verdict for the one board whose margin the measurement cannot quite decide. None of
+that arithmetic is new to this page; it is the same `dc_voltage_budget`, `combined_uncertainty`,
+`expanded_uncertainty`, `guarded_verdict` and `margin_to_limit` functions every other page on this
+bench that touches uncertainty imports rather than reimplements. A model never produces a
+reported measurement, an uncertainty, a margin or a verdict, here any more than on
+<Link href="/recipes/limits-without-a-model/">the production log</Link>, where the same rule
+shows up as a pass or a fail. This recipe's own job starts after all of that: turning the figures
+and the notebook's prose into paragraphs a reviewer reads in under a minute.
+
+That job is one model call, level 1, <Link href="/techniques/order-zero/">order zero</Link>
+composed with <Link href="/techniques/prompt-engineering/">prompt engineering</Link>. A fixed
+template could produce a report too, but a session's story does not have a fixed shape: which
+board is thinnest, whether a line regulation reading lands on a pass, a fail or a cannot-say,
+which open items still matter, all of it changes sweep to sweep, and a template that covers every
+combination is a maze of conditionals nobody checks with the rigor the arithmetic underneath it
+gets.
+
+The reasons to climb are reasons this page deliberately has none of. There is nothing to retrieve
+that is not already in the notebook and the figures, so <Link href="/techniques/rag/">RAG</Link>
+buys nothing. The output is prose a person reads directly, not a payload another program parses,
+so there is no schema for <Link href="/techniques/structured-output/">structured output</Link> to
+hold it to. Nothing here decides what happens next or calls a tool, so there is no case for an
+agent loop.
+
+</details>
+
+## Build it
+
+<details className="recipe-detail">
+<summary>Implementation details and code</summary>
+
+`unsupported_numbers` is the whole argument for why this one call is safe to make unattended up to
+the point a person reads the result. It scans the draft for every numeric token and returns
+whichever ones are not, character for character, one of the figures code produced:
+
+<CodeFile file="examples/bench_measurement_writeup/run.py" func="unsupported_numbers" />
+
+`tests/test_example_bench_measurement_writeup.py` runs it both ways: a clean draft, built only
+from the figures above, comes back with nothing unsupported, and the same draft with its
+uncertainty quietly rounded from 352.7 uV to a tidier 350 uV comes back naming `"350"`, the exact
+token that was never one of the figures. The check does not retry and does not repair a draft it
+rejects; `run` hands the rejected text back with the failing tokens named, so a review starts from
+the specific sentence to look at rather than from "something in here is wrong."
+
+Most of the work in writing that check is deciding what counts as one token, and the cases that
+decide it are ordinary prose, not adversarial ones. A serial number has to be an identifier and
+not three figures, or every board's ID would need pre-approving; that is what blanking
+identifier-shaped tokens does before the numeric scan, and `SRB5030-2609-0003` never reaches it.
+A date has to be one token too, or `09/14/2026` reads as 09, 14 and 2026 and a report cannot say
+when the session ran, so dates are matched first and checked whole against the sweep's own first
+and last day, which code takes off the CSV's timestamps. Everything left has to be matched to its
+own edges: `352.7uV` with no space is still the figure 352.7 and not the number 352, `350uV` is
+still an unsupported 350 rather than nothing at all, `20.4-99.9 mV` gives up both of its numbers
+and not just the first, and a figure followed by a comma is the figure. Each of those is a test in
+the file, and each of them was a way this check could have been quietly wrong while looking right.
+
+What it still cannot catch is worth stating just as plainly:
+
+- A digit buried inside a word or hyphenated onto one. `FIX99` and `degC-70` are identifier
+  shaped, so they are blanked with the serials. This is the price of not pre-approving every ID.
+- A figure spelled out. "three hundred fifty microvolts" has no digits in it to scan.
+- A right figure sitting next to the wrong claim, and a caveat the notebook states that the draft
+  drops. Neither is a number, so neither is a token. Both are in the failure modes below, and both
+  are why a person still reads the report.
+
+</details>
+

@@ -1,5 +1,6 @@
 ---
 import { getEntry, render } from 'astro:content';
+import PageContents from '../../components/PageContents.astro';
 import Base from '../../layouts/Base.astro';
 import Eyebrow from '../../components/Eyebrow.astro';
 import Pill from '../../components/Pill.astro';
@@ -58,9 +59,11 @@ const reviewedISO = entry ? entry.data.reviewed.toISOString().slice(0, 10) : und
 
   {
     Content ? (
-      <div class="prose">
-        <Content />
-      </div>
+      <PageContents items={(rendered?.headings ?? []).filter(h => h.depth === 2).map(h => ({ id: h.slug, label: h.text }))}>
+        <div class="prose recipe-prose">
+          <Content />
+        </div>
+      </PageContents>
     ) : (
       <p class="status-note">
         This recipe page is an outline. The assembled diagram, the walkthrough, what to measure and
@@ -130,3 +133,12 @@ const reviewedISO = entry ? entry.data.reviewed.toISOString().slice(0, 10) : und
 
   {reviewedISO && <Reviewed date={reviewedISO} mdHref={url(`/recipes/${slug}.md`)} />}
 </Base>
+
+<style is:global>
+  .recipe-prose > p { max-width: 76ch; }
+  .recipe-prose .recipe-detail, .recipe-prose .recipe-code { margin: 16px 0 24px; border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }
+  .recipe-prose details > summary { cursor: pointer; font-weight: 600; color: var(--text); font-size: 14px; }
+  .recipe-prose details[open] > summary { margin-bottom: 18px; }
+  .recipe-prose .recipe-detail > p { max-width: 76ch; }
+  .recipe-prose .recipe-code pre { margin-bottom: 0; }
+</style>

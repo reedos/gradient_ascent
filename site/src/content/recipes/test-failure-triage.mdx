@@ -33,34 +33,6 @@ and sorts it into a cause; it never produces a measurement, a margin or a verdic
 was decided by the test executive, at the fixture, against the limits in
 `evals/bench/corpus/srb5030-test-spec.md`, before any of this runs.
 
-## Why this level, and why not higher
-
-Three techniques compose this recipe: <Link href="/techniques/routing/">routing</Link> reads the
-operator's note and picks one of four causes the failure analysis guide already lists;
-<Link href="/techniques/structured-output/">structured output</Link> keeps that answer in a fixed
-shape, a cause plus the exact words that support it; and
-<Link href="/techniques/human-in-the-loop/">human approval</Link> holds every result for a person
-before it becomes a disposition. Level 3 is enough because the categories are fixed in advance and
-so is what happens once a unit lands in one, the same argument the routing page makes for choosing
-a rule or a classifier: try a rule first, and reach for a classifier once the wording varies too
-much for one to catch reliably. An operator's note is exactly that kind of wording.
-
-Most of the job is level 0 and never reaches a model. Which unit failed, and on which limit, is a
-column read out of `evals/bench/data/production-run-2026-08.csv`: 200 units, eight steps each,
-1,586 rows, already scored PASS or FAIL by the test executive. The routing table in the guide's
-section 1 is a lookup by step number, no judgment involved. And grouping the run's VOUT failures
-by fixture, or by lot, is a count and a share: `_group_signature` finds that FIX-03 carries six of
-the run's eight VOUT failures, which is `limits-without-a-model`'s whole argument playing out
-inside one recipe rather than across it.
-
-<CodeFile file="examples/bench_test_failure_triage/run.py" func="_group_signature" />
-
-Only the note is left, and only reading it needs a model. Section 8 of the guide says plainly how
-uneven that source is: most failures carry no note at all, and the ones that do range from a full
-diagnosis to a question mark. Nothing the model writes becomes a measurement, a margin or a
-verdict. A wrong cause routes a unit to the wrong first step at the bench; it does not change what
-the bench already measured.
-
 ## The walkthrough, on the bench
 
 No recorded run exists for this recipe yet, so what follows is a stepped walkthrough of the code
@@ -180,3 +152,36 @@ zero, even at the cost of more of the second, cheaper kind.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Three techniques compose this recipe: <Link href="/techniques/routing/">routing</Link> reads the
+operator's note and picks one of four causes the failure analysis guide already lists;
+<Link href="/techniques/structured-output/">structured output</Link> keeps that answer in a fixed
+shape, a cause plus the exact words that support it; and
+<Link href="/techniques/human-in-the-loop/">human approval</Link> holds every result for a person
+before it becomes a disposition. Level 3 is enough because the categories are fixed in advance and
+so is what happens once a unit lands in one, the same argument the routing page makes for choosing
+a rule or a classifier: try a rule first, and reach for a classifier once the wording varies too
+much for one to catch reliably. An operator's note is exactly that kind of wording.
+
+Most of the job is level 0 and never reaches a model. Which unit failed, and on which limit, is a
+column read out of `evals/bench/data/production-run-2026-08.csv`: 200 units, eight steps each,
+1,586 rows, already scored PASS or FAIL by the test executive. The routing table in the guide's
+section 1 is a lookup by step number, no judgment involved. And grouping the run's VOUT failures
+by fixture, or by lot, is a count and a share: `_group_signature` finds that FIX-03 carries six of
+the run's eight VOUT failures, which is `limits-without-a-model`'s whole argument playing out
+inside one recipe rather than across it.
+
+<CodeFile file="examples/bench_test_failure_triage/run.py" func="_group_signature" />
+
+Only the note is left, and only reading it needs a model. Section 8 of the guide says plainly how
+uneven that source is: most failures carry no note at all, and the ones that do range from a full
+diagnosis to a question mark. Nothing the model writes becomes a measurement, a margin or a
+verdict. A wrong cause routes a unit to the wrong first step at the bench; it does not change what
+the bench already measured.
+
+</details>
+

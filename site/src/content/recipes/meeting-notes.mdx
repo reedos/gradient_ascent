@@ -29,36 +29,9 @@ decided, or judging whether the team decided the right thing. And this recipe ca
 whether something the model calls a decision was actually agreed to in the room. Only a person who
 was there can say that, which is why one reads the notes before they go anywhere.
 
-## The assembled diagram
+## Example run
 
 <Run data={meetingNotesRun} label="Level 1 · Meeting notes, one call" runKey="meeting-notes" />
-
-## Why this level, and why not higher
-
-Two techniques compose this recipe. <Link href="/techniques/prompt-engineering/">Prompt
-engineering</Link> is the system prompt itself: a required shape instead of prose, an explicit
-line about what counts as a decision (something the room agreed to, not something raised or put
-off), and instructions for the two fields a model would otherwise be tempted to guess, the owner
-and the due date. <Link href="/techniques/structured-output/">Structured output</Link> is the
-schema, the validation and the one retry: every decision comes back as an object with the same
-four fields, code checks it against the schema before accepting anything, and a reply still
-invalid after one retry is reported as failed rather than returned as though it worked.
-
-One more check runs entirely in code, level 0, and it is the one this page is really about:
-whether a decision's quote is actually a sentence from the transcript. That needs no model at all,
-only a whitespace-normalized substring check, and it is the difference between a decision a person
-can verify at a glance and one they have to take on faith.
-
-Level 2 would add retrieval: a search over other meetings' notes before answering, so a decision
-could be checked against what this team agreed to last time, or linked to the one it changes.
-Nothing in a single transcript needs that. It would cost a second call, an index of every past
-meeting's notes to search, and a new way to be wrong, the wrong past meeting retrieved. It is worth
-adding once these notes are read against a history, not when they are written from one transcript.
-
-Level 0 on its own is not enough: which sentences in a transcript describe something the room
-actually settled, as opposed to a proposal, a question, or an idea two people talked themselves out
-of, is not a rule a regular expression can write. Speakers phrase agreement a dozen different ways
-in one meeting, and reading which one it was this time is the part of the job that needs a model.
 
 ## Walkthrough
 
@@ -169,3 +142,35 @@ check a person should run by hand, which is the same one the failure modes above
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Two techniques compose this recipe. <Link href="/techniques/prompt-engineering/">Prompt
+engineering</Link> is the system prompt itself: a required shape instead of prose, an explicit
+line about what counts as a decision (something the room agreed to, not something raised or put
+off), and instructions for the two fields a model would otherwise be tempted to guess, the owner
+and the due date. <Link href="/techniques/structured-output/">Structured output</Link> is the
+schema, the validation and the one retry: every decision comes back as an object with the same
+four fields, code checks it against the schema before accepting anything, and a reply still
+invalid after one retry is reported as failed rather than returned as though it worked.
+
+One more check runs entirely in code, level 0, and it is the one this page is really about:
+whether a decision's quote is actually a sentence from the transcript. That needs no model at all,
+only a whitespace-normalized substring check, and it is the difference between a decision a person
+can verify at a glance and one they have to take on faith.
+
+Level 2 would add retrieval: a search over other meetings' notes before answering, so a decision
+could be checked against what this team agreed to last time, or linked to the one it changes.
+Nothing in a single transcript needs that. It would cost a second call, an index of every past
+meeting's notes to search, and a new way to be wrong, the wrong past meeting retrieved. It is worth
+adding once these notes are read against a history, not when they are written from one transcript.
+
+Level 0 on its own is not enough: which sentences in a transcript describe something the room
+actually settled, as opposed to a proposal, a question, or an idea two people talked themselves out
+of, is not a rule a regular expression can write. Speakers phrase agreement a dozen different ways
+in one meeting, and reading which one it was this time is the part of the job that needs a model.
+
+</details>
+

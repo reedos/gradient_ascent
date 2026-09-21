@@ -28,34 +28,6 @@ what it was written to catch. This recipe reads the datasheet's requirements, dr
 requirement, and builds a table proving every requirement traces to a test and every test back to
 a requirement, before a person signs off on the plan.
 
-## Level 3, and why not higher
-
-Two of the four steps are level 0. Building the traceability table is a `zip` of two equal-length
-lists. Checking it is four comparisons per row: does a proposal exist, does it name the right
-requirement, is its instrument one of the four this bench has, does it carry a limit and a unit.
-`check_coverage` never calls a model and never treats what a model wrote as anything but a string
-or a number to compare. The one step that needs a model is turning a requirement's free text
-("output stays within plus or minus two percent over line, load and temperature") into a
-structured proposal naming an instrument, a measurement and a limit with its unit, the same
-paraphrase into a fixed shape <Link href="/techniques/structured-output/">structured
-output</Link>'s own page walks through.
-
-A model could also be handed the whole eight-row datasheet table at once and asked to draft the
-plan in one call. That would still be level 3: the same fixed steps run in the same order
-regardless of what comes back. What asking once per requirement buys,
-<Link href="/techniques/prompt-chaining/">prompt chaining</Link>'s own shape, is that one mangled
-reply drops one row instead of the table, and the trace shows which call a bad proposal came from.
-
-Nothing here needs level 4 or level 5. Level 4 would let the model decide whether to look something
-up before answering, but every run reads the same two documents for the same board. Level 5 would
-let one proposal's content change what happens next, and it does not: a proposal that copies a
-superseded limit changes only what the coverage check reports about that row. The order is
-fixed by code before the first model call; the coverage check is code after the last one; the
-model only ever drafts what sits between them. A drafted limit is data for the coverage check and
-not an answer, compared in code against the requirement it claims to answer and against the notice
-that supersedes it. Nothing a model writes here becomes a measurement, an uncertainty, a margin or
-a verdict, and a person, not the check and not the model, decides whether the plan is adopted.
-
 ## The run on the bench, stepped
 
 Illustrated, not measured: no recorded trace exists for this example yet (see
@@ -95,14 +67,6 @@ proposal, REQ-ILIM's instrument is corrected to TRN-2400, and REQ-VIN's upper li
 to 32.0 V, the same eight calls clear the check and `run` returns a `PendingApproval` holding all
 eight rows. A person reads it and calls `resume(pending, "approve", tracer)`; only then is the
 plan adopted, as `Answer.text`, a plain comma-separated table with every source cited.
-
-## The code
-
-<CodeFile file="examples/bench_requirements_to_test_plan/run.py" func="run" />
-
-`check_coverage` is the part that decides pass or fail:
-
-<CodeFile file="examples/bench_requirements_to_test_plan/run.py" func="check_coverage" />
 
 ## What it costs
 
@@ -208,3 +172,49 @@ requirement, building the table, and verifying coverage in code before a person 
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Two of the four steps are level 0. Building the traceability table is a `zip` of two equal-length
+lists. Checking it is four comparisons per row: does a proposal exist, does it name the right
+requirement, is its instrument one of the four this bench has, does it carry a limit and a unit.
+`check_coverage` never calls a model and never treats what a model wrote as anything but a string
+or a number to compare. The one step that needs a model is turning a requirement's free text
+("output stays within plus or minus two percent over line, load and temperature") into a
+structured proposal naming an instrument, a measurement and a limit with its unit, the same
+paraphrase into a fixed shape <Link href="/techniques/structured-output/">structured
+output</Link>'s own page walks through.
+
+A model could also be handed the whole eight-row datasheet table at once and asked to draft the
+plan in one call. That would still be level 3: the same fixed steps run in the same order
+regardless of what comes back. What asking once per requirement buys,
+<Link href="/techniques/prompt-chaining/">prompt chaining</Link>'s own shape, is that one mangled
+reply drops one row instead of the table, and the trace shows which call a bad proposal came from.
+
+Nothing here needs level 4 or level 5. Level 4 would let the model decide whether to look something
+up before answering, but every run reads the same two documents for the same board. Level 5 would
+let one proposal's content change what happens next, and it does not: a proposal that copies a
+superseded limit changes only what the coverage check reports about that row. The order is
+fixed by code before the first model call; the coverage check is code after the last one; the
+model only ever drafts what sits between them. A drafted limit is data for the coverage check and
+not an answer, compared in code against the requirement it claims to answer and against the notice
+that supersedes it. Nothing a model writes here becomes a measurement, an uncertainty, a margin or
+a verdict, and a person, not the check and not the model, decides whether the plan is adopted.
+
+</details>
+
+## Build it
+
+<details className="recipe-detail">
+<summary>Implementation details and code</summary>
+
+<CodeFile file="examples/bench_requirements_to_test_plan/run.py" func="run" />
+
+`check_coverage` is the part that decides pass or fail:
+
+<CodeFile file="examples/bench_requirements_to_test_plan/run.py" func="check_coverage" />
+
+</details>
+

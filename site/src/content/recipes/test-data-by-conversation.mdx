@@ -18,27 +18,6 @@ readings in it and nobody has asked whether any of them is impossible. Two of th
 production test and the third is engineering test, which is the point: what makes a question this
 recipe's is not the setting it came from, it is that nobody built a chart for it.
 
-## The lowest level that does it, and why not higher
-
-The model writes one short Python snippet, a sandbox runs it against the loaded tables, and the
-model turns whatever came back into a sentence. That is level 4: one real decision (what the
-snippet says), then code that always runs it and always asks for a final answer. It composes two
-techniques: writing the snippet is <Link href="/techniques/function-calling/">function calling</Link>,
-one tool, offered once; running it is <Link href="/techniques/code-execution/">code execution</Link>,
-a sandbox that never trusts the model's text on its own.
-
-It is not level 5. <Link href="/recipes/data-analysis/">Data analysis by conversation</Link> is the
-same shape with a loop around it, for a question whose second computation depends on what the first
-one showed: "how does this quarter compare to last" cannot even name its second query until the
-first one has answered. None of the three questions below works that way. Each takes one snippet
-and one look at the result, and a loop would buy nothing here but a second, unnecessary model
-call. If a reader's own questions turn out to chain, that recipe is where to go.
-
-It is also not level 0, and that is worth saying plainly: a fixed report cannot answer a question
-nobody wrote a query for yet. What is level 0 is the arithmetic inside the snippet, and the check
-that runs before any snippet does. Both are ordinary code, and neither is the model's to get right
-or wrong.
-
 ## The run on the bench, stepped
 
 **"Do the retested boards actually pass?"** Eighteen boards were pulled back for a retest on August
@@ -88,36 +67,6 @@ as the rest because the meter was left on the 100 V range, and finding that is a
 column nobody thinks to group by, which is
 <Link href="/recipes/characterize-a-design/">the engineering-test level-0 page</Link>'s work. Ask
 this recipe only what a grouping has already failed to answer.
-
-## The code, embedded
-
-The model's one decision, and what code does with it, in `run`:
-
-<CodeFile
-  file="examples/bench_test_data_by_conversation/run.py"
-  start={368}
-  end={388}
-  expect="call = first.tool_calls[0]"
-/>
-
-The sandbox itself never calls Python's own `eval`. It does call `exec`, unlike
-<Link href="/techniques/code-execution/">code execution</Link>'s own single-expression evaluator,
-but only after every node in the snippet has been walked and refused if it is not on a short
-allow-list: no import, no attribute access at all (so no `x.y`, and nothing dunder-chained off a
-literal), no `lambda`, no `while`, no function or class definitions, calls only to a fixed list of
-names, and loops nested no more than two deep:
-
-<CodeFile file="examples/bench_test_data_by_conversation/run.py" func="run_snippet" />
-
-What that grammar protects against: every classic escape this site's own tests try against it
-(`(1).__class__`, `__import__('os')`, `open(...)`, an f-string, a walrus, a `while True`) is
-refused the same way, because the node type it needs is not in the allow-list, not because the
-code recognized an attack. What it does not protect against: a snippet that runs clean and answers
-a question other than the one asked, which is why the sandbox's own output goes next to the prose
-and not instead of it, and why the loop and node caps are a coarse defense against a runaway
-snippet rather than a wall-clock timeout. A production deployment wants an OS-level sandbox around
-this too, the same point <Link href="/techniques/code-execution/">code execution</Link> makes about
-a real container.
 
 ## What it costs
 
@@ -181,3 +130,64 @@ else's; the column names; and the three tables themselves, which are `evals/benc
 invented for this site. A reader's own data has its own plausible ranges, its own known units and
 its own identities that have to hold, and the lesson of the first and third stories above is that
 those are worth checking in code before a snippet runs, on every table, not just these three.
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+The model writes one short Python snippet, a sandbox runs it against the loaded tables, and the
+model turns whatever came back into a sentence. That is level 4: one real decision (what the
+snippet says), then code that always runs it and always asks for a final answer. It composes two
+techniques: writing the snippet is <Link href="/techniques/function-calling/">function calling</Link>,
+one tool, offered once; running it is <Link href="/techniques/code-execution/">code execution</Link>,
+a sandbox that never trusts the model's text on its own.
+
+It is not level 5. <Link href="/recipes/data-analysis/">Data analysis by conversation</Link> is the
+same shape with a loop around it, for a question whose second computation depends on what the first
+one showed: "how does this quarter compare to last" cannot even name its second query until the
+first one has answered. None of the three questions below works that way. Each takes one snippet
+and one look at the result, and a loop would buy nothing here but a second, unnecessary model
+call. If a reader's own questions turn out to chain, that recipe is where to go.
+
+It is also not level 0, and that is worth saying plainly: a fixed report cannot answer a question
+nobody wrote a query for yet. What is level 0 is the arithmetic inside the snippet, and the check
+that runs before any snippet does. Both are ordinary code, and neither is the model's to get right
+or wrong.
+
+</details>
+
+## Build it
+
+<details className="recipe-detail">
+<summary>Implementation details and code</summary>
+
+The model's one decision, and what code does with it, in `run`:
+
+<CodeFile
+  file="examples/bench_test_data_by_conversation/run.py"
+  start={368}
+  end={388}
+  expect="call = first.tool_calls[0]"
+/>
+
+The sandbox itself never calls Python's own `eval`. It does call `exec`, unlike
+<Link href="/techniques/code-execution/">code execution</Link>'s own single-expression evaluator,
+but only after every node in the snippet has been walked and refused if it is not on a short
+allow-list: no import, no attribute access at all (so no `x.y`, and nothing dunder-chained off a
+literal), no `lambda`, no `while`, no function or class definitions, calls only to a fixed list of
+names, and loops nested no more than two deep:
+
+<CodeFile file="examples/bench_test_data_by_conversation/run.py" func="run_snippet" />
+
+What that grammar protects against: every classic escape this site's own tests try against it
+(`(1).__class__`, `__import__('os')`, `open(...)`, an f-string, a walrus, a `while True`) is
+refused the same way, because the node type it needs is not in the allow-list, not because the
+code recognized an attack. What it does not protect against: a snippet that runs clean and answers
+a question other than the one asked, which is why the sandbox's own output goes next to the prose
+and not instead of it, and why the loop and node caps are a coarse defense against a runaway
+snippet rather than a wall-clock timeout. A production deployment wants an OS-level sandbox around
+this too, the same point <Link href="/techniques/code-execution/">code execution</Link> makes about
+a real container.
+
+</details>
+

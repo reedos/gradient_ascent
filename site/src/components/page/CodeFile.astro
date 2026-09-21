@@ -84,13 +84,16 @@ if (expect && !snippet.includes(expect)) {
       `the range has slid and the prose now describes code that is not on screen.`,
   );
 }
+const collapsible = Astro.url.pathname.includes('/recipes/');
+const Wrapper = collapsible ? 'details' : 'div';
 const rangeLabel = s && e ? ` · lines ${s}–${e}` : '';
 ---
 
-<div class="code-file">
+<Wrapper class:list={["code-file", collapsible && "recipe-code"]}>
+  {collapsible && <summary>View code: {(func ?? cls ?? path.basename(file)).replaceAll('_', ' ')}</summary>}
   <div class="code-file-path">
     {file}
     {rangeLabel}
   </div>
   <pre><code class={`language-${lang}`}>{snippet}</code></pre>
-</div>
+</Wrapper>

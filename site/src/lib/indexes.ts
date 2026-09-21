@@ -671,7 +671,7 @@ export function flattenMdxBody(rawBody: string, where: string): string {
   text = flattenWhenNot(text, where);
   text = flattenLanes(text, where);
   // Disclosure is a browser presentation choice; Markdown retains all of its content.
-  text = text.replace(/^<details className="optional-detail">\s*$/gm, '')
+  text = text.replace(/^<details className="(?:optional-detail|recipe-detail)">\s*$/gm, '')
     .replace(/^<summary>([^<>]+)<\/summary>\s*$/gm, '### $1\n')
     .replace(/^<\/details>\s*$/gm, '');
   // Collapse the blank-line runs the passes above tend to leave behind.

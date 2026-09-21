@@ -36,54 +36,9 @@ enough has been read. Nothing here reads a full text either; it reads what the s
 nothing here is a substitute for opening the work: the digest tells a person which two items are
 worth an hour, and they spend the hour.
 
-## The assembled diagram
+## Example run
 
 <Run data={litRun} label="Level 1 · Two shapes joined" runKey="literature-watch" />
-
-## Why this level, and why not higher
-
-Two shapes, so two answers. The worksheet is walked once per half, which is what it asks for any
-job that is more than one shape, and the joined job needs whichever half is higher.
-
-**The watch half is level 0.** Walk the questions against the job of finding the records nobody
-has seen yet. The sources are a list a person wrote down once. What counts as new is a date
-comparison against the last run, and then a set difference against the titles already reported.
-There is no free text to read and no judgment to make: two people given the same five records and
-the same history would produce the same two. That is the floor, and the whole half sits on it.
-
-The shape this half belongs to usually settles at level 3, and it is worth saying why this one
-does not. A watch usually lands there because it asks a model one question about each change,
-normally whether the change matters. Here that question is the other half of the job, and once it
-is pulled out, what is left is arithmetic. Splitting the job is what made the lower answer visible;
-a single verdict over the whole thing would have said level 3 and been wrong about most of the
-work.
-
-**The read half is level 1.** Everything one summary needs is in the record handed to it. No fact
-has to be looked up, which is the question that would push it to level 2. Nothing has to pass a
-check before anyone sees it, which is what would push it to level 3: a person reads the digest
-before anything in it is cited elsewhere, and that person is the check. One call, a fixed shape,
-one retry if the reply does not parse.
-
-**So the joined job settles at level 1**, the higher of the two halves, and that is lower than
-where either shape's usual answer would have left it.
-
-**Why this is not level 5 research, and what would make it so.** A researcher at level 5 decides
-what to look for next: it reads something, notices a term it did not have, searches that, follows
-a reference, and stops when it judges it has enough. Every one of those is the model choosing what
-happens next, which is what level 5 means on this site. Nothing here chooses anything. A person
-picked the sources and the topic once, the schedule is a timer, and the code reads exactly the
-records the sources listed and no others. What would move it to level 5 is a question that cannot
-be answered item by item: whether anybody has resolved a disagreement between two papers, or what
-the current state of a subject is. Neither can be answered from a fixed source list, because
-answering them means deciding what to read next. That job is <Link
-href="/recipes/research-brief/">the research brief</Link>, and it costs accordingly. The other
-climb is level 7, where deciding what is worth watching at all becomes the standing job rather
-than a decision a person made once.
-
-Staying below level 1 is worth a moment too. If every new record is worth reading regardless, drop
-the model: the watch half alone, mailed out as a list of titles and links, is a complete and honest
-answer at level 0. The read half earns its cost only when there are more new items each week than
-a person will open, which is the reason to write three sentences about each one.
 
 ## Walkthrough
 
@@ -207,3 +162,53 @@ building one, and the split is the part worth keeping.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Two shapes, so two answers. The worksheet is walked once per half, which is what it asks for any
+job that is more than one shape, and the joined job needs whichever half is higher.
+
+**The watch half is level 0.** Walk the questions against the job of finding the records nobody
+has seen yet. The sources are a list a person wrote down once. What counts as new is a date
+comparison against the last run, and then a set difference against the titles already reported.
+There is no free text to read and no judgment to make: two people given the same five records and
+the same history would produce the same two. That is the floor, and the whole half sits on it.
+
+The shape this half belongs to usually settles at level 3, and it is worth saying why this one
+does not. A watch usually lands there because it asks a model one question about each change,
+normally whether the change matters. Here that question is the other half of the job, and once it
+is pulled out, what is left is arithmetic. Splitting the job is what made the lower answer visible;
+a single verdict over the whole thing would have said level 3 and been wrong about most of the
+work.
+
+**The read half is level 1.** Everything one summary needs is in the record handed to it. No fact
+has to be looked up, which is the question that would push it to level 2. Nothing has to pass a
+check before anyone sees it, which is what would push it to level 3: a person reads the digest
+before anything in it is cited elsewhere, and that person is the check. One call, a fixed shape,
+one retry if the reply does not parse.
+
+**So the joined job settles at level 1**, the higher of the two halves, and that is lower than
+where either shape's usual answer would have left it.
+
+**Why this is not level 5 research, and what would make it so.** A researcher at level 5 decides
+what to look for next: it reads something, notices a term it did not have, searches that, follows
+a reference, and stops when it judges it has enough. Every one of those is the model choosing what
+happens next, which is what level 5 means on this site. Nothing here chooses anything. A person
+picked the sources and the topic once, the schedule is a timer, and the code reads exactly the
+records the sources listed and no others. What would move it to level 5 is a question that cannot
+be answered item by item: whether anybody has resolved a disagreement between two papers, or what
+the current state of a subject is. Neither can be answered from a fixed source list, because
+answering them means deciding what to read next. That job is <Link
+href="/recipes/research-brief/">the research brief</Link>, and it costs accordingly. The other
+climb is level 7, where deciding what is worth watching at all becomes the standing job rather
+than a decision a person made once.
+
+Staying below level 1 is worth a moment too. If every new record is worth reading regardless, drop
+the model: the watch half alone, mailed out as a list of titles and links, is a complete and honest
+answer at level 0. The read half earns its cost only when there are more new items each week than
+a person will open, which is the reason to write three sentences about each one.
+
+</details>
+

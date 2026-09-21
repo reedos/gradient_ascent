@@ -30,41 +30,9 @@ same seam is <Link href="/recipes/household-paperwork/">a household's own paperw
 nobody is billed by a stranger for a delivery a stranger also controls the record of; a business
 needs the extra check because the two sides of the transaction don't trust each other by default.
 
-## The assembled diagram
+## Example run
 
 <Run data={invoiceRun} label="Level 3 · Match an invoice" runKey="invoice-matching" />
-
-## Why this level, and why not higher
-
-Three techniques compose this recipe. <Link href="/techniques/order-zero/">Order zero</Link> is
-the match itself: once the invoice is a record instead of a PDF, finding its purchase order and
-comparing three numbers against it is a lookup and a subtraction, the same as any other order-zero
-job. <Link href="/techniques/structured-output/">Structured output</Link> is what turns the
-invoice's free-form text into that record in the first place, with a fixed schema, a validation
-pass and one retry if the reply doesn't parse. <Link
-href="/techniques/human-in-the-loop/">Human approval</Link> is the gate: nothing that fails to
-reconcile to the cent posts on its own.
-
-Say the level-0 part plainly, because it is most of the job: the lookup and the three subtractions
-never touch a model. Quantity invoiced against quantity received, unit price invoiced against the
-price the order was placed at, and the invoice's own stated total recomputed from its own lines,
-independent of whatever the invoice claims. All three are code, checked with a zero-cent
-tolerance rather than a guessed-at cushion, because a quantity is a count and a price and a total
-are both printed on the document: any drift at all is a transcription error worth a glance, not
-rounding.
-
-<CodeFile file="examples/invoice_matching/run.py" func="_three_way_match" />
-
-Climbing to level 4 would let the model decide for itself whether a small mismatch is close
-enough to wave through, or whether to go looking for a second purchase order the invoice might
-actually belong to. That is exactly the decision this page argues a model must never make: a
-verdict on whether an invoice may be paid. It would also cost more to run and more to check, a
-second call over the same numbers to produce a judgment nobody can audit against a fixed rule
-afterward, replacing "the invoice is $0.01 over" with "the model thought $0.01 was fine this time."
-Staying below level 1, asking a person to extract every invoice by hand instead, is what accounts
-payable clerks already did before software existed for this; the schema-and-retry step is what
-makes that keying-in unnecessary at any real volume, without asking the model to also decide
-anything.
 
 ## Walkthrough
 
@@ -173,3 +141,40 @@ recipe, so it claims no score, only this method for building one.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Three techniques compose this recipe. <Link href="/techniques/order-zero/">Order zero</Link> is
+the match itself: once the invoice is a record instead of a PDF, finding its purchase order and
+comparing three numbers against it is a lookup and a subtraction, the same as any other order-zero
+job. <Link href="/techniques/structured-output/">Structured output</Link> is what turns the
+invoice's free-form text into that record in the first place, with a fixed schema, a validation
+pass and one retry if the reply doesn't parse. <Link
+href="/techniques/human-in-the-loop/">Human approval</Link> is the gate: nothing that fails to
+reconcile to the cent posts on its own.
+
+Say the level-0 part plainly, because it is most of the job: the lookup and the three subtractions
+never touch a model. Quantity invoiced against quantity received, unit price invoiced against the
+price the order was placed at, and the invoice's own stated total recomputed from its own lines,
+independent of whatever the invoice claims. All three are code, checked with a zero-cent
+tolerance rather than a guessed-at cushion, because a quantity is a count and a price and a total
+are both printed on the document: any drift at all is a transcription error worth a glance, not
+rounding.
+
+<CodeFile file="examples/invoice_matching/run.py" func="_three_way_match" />
+
+Climbing to level 4 would let the model decide for itself whether a small mismatch is close
+enough to wave through, or whether to go looking for a second purchase order the invoice might
+actually belong to. That is exactly the decision this page argues a model must never make: a
+verdict on whether an invoice may be paid. It would also cost more to run and more to check, a
+second call over the same numbers to produce a judgment nobody can audit against a fixed rule
+afterward, replacing "the invoice is $0.01 over" with "the model thought $0.01 was fine this time."
+Staying below level 1, asking a person to extract every invoice by hand instead, is what accounts
+payable clerks already did before software existed for this; the schema-and-retry step is what
+makes that keying-in unnecessary at any real volume, without asking the model to also decide
+anything.
+
+</details>
+

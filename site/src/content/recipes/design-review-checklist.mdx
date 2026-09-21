@@ -35,52 +35,6 @@ marked not met still needs a person to fix the design or waive it in writing, by
 reason; no output here marks anything waived. This checklist produces the record a person then
 acts on.
 
-## The lowest level that does it, and why not higher
-
-This is level 3. Two model calls happen every run, always in the same order, and code always
-does the same thing with whatever comes back: draft, then check, then merge. The model never
-picks the next action, so every step below is `decided_by: "code"`, the same as any other fixed
-pipeline on this site.
-
-Five of DR-0100's seven rules need no model, and code settles all five. DR-14 is the clean case:
-"A ceramic capacitor on a DC rail shall be rated at least 1.5 times the maximum steady-state rail
-voltage stated in the product's own datasheet." C1 and C2, the SRB-5030's input capacitors on
-revisions A and B, are 50 V parts. 50 / 1.5 = 33.3 V, so a 50 V part supports a 33.3 V rail and
-not a 36.0 V one: that arithmetic is exactly what ECN-2608-04 cites to justify lowering the
-board's maximum input to 32.0 V for revisions A and B. Code does the division and compares it with
-whichever ceiling governs the revision under review, using the part that revision actually
-carries: 50 V parts against the ECN's 32.0 V on revisions A and B, and revision C's 63 V parts,
-where 63 / 1.5 = 42 V, against the datasheet's 36.0 V. A model asked to do that division is only
-an added way to get 33.3 wrong.
-
-DR-10 (inductor saturation margin) and DR-20's placement thresholds are the same shape: a number
-off the bill of materials or the netlist summary, a factor or a distance the rule names, one
-comparison. The last two are not comparisons at all, and still need no model: DR-12 has no subject
-on this board, since the bill of materials lists no discrete MOSFET or diode on a DC rail, and
-DR-16's evidence is missing outright, which rule 1 records as not met. Code states both directly
-rather than dressing them up as calculations.
-
-Two rules cannot be settled that way. DR-24 sets a numeric limit (junction temperature at or below
-125 degC) but also requires the calculation shown "term by term, not as a single number", and
-disclaims one specific wrong argument by name: a design that reaches thermal shutdown in normal
-use does not meet the rule, "whatever the protection does". Telling whether submitted evidence
-argues from the computed number, rather than from the shutdown being there, needs reading. DR-30
-names several things at once (test points sized for a probe, a switch-node test point marked for
-scope use and excluded as a fixture contact, a silkscreen character that matches the assembly
-number), and checking a netlist summary against all of them is a reading task too. Those two, and
-only those two, go to a model, through
-<Link href="/techniques/structured-output/">structured output</Link> so each finding comes back
-as a rule, a status and evidence, and <Link href="/techniques/evaluator-optimizer/">evaluator
-optimizer</Link> so a second, separate pass checks each drafted finding against the rule's own
-full text before it reaches a person.
-
-Climbing to level 4 would let a model decide which rule needs a second look instead of running
-both passes on every rule; that buys nothing here, because DR-0100 does not change between boards
-and every rule is checked every time regardless. <Link href="/techniques/debate-review/">Review
-and debate</Link> (level 6) would add a third, independent reader where a wrong finding is
-expensive enough to want two model opinions to agree first. The DR-24 catch below is that kind of
-case, and a reader whose false findings hold up a real release should read that page next.
-
 ## Walkthrough
 
 No trace has been recorded for this example (see `docs/EVALS.md`), so this is an illustrated run
@@ -119,26 +73,6 @@ revision in production:
 
 The final record covers all seven rules for revision B, five checked by code and two by the two
 model passes, none of them a release decision.
-
-## The code
-
-<CodeFile file="examples/bench_design_review_checklist/run.py" func="run" />
-
-`_numeric_findings` (not shown) calls five small functions, one per rule; here is the one behind
-the walkthrough's DR-14 line, doing exactly the division above:
-
-<CodeFile file="examples/bench_design_review_checklist/run.py" func="_check_capacitor_derating" />
-
-And here is the merge that turns a rejected draft into a recorded finding rather than a corrected
-one:
-
-<CodeFile file="examples/bench_design_review_checklist/run.py" func="_merge_judgment_findings" />
-
-Run it: `python -m examples.bench_design_review_checklist --model stub:scripted`. All seven rules
-come back judged, five by code and two by the model, with DR-24's drafted "met" rejected by the
-second pass in the words the walkthrough describes. The same command with `--model stub` returns
-free text where the two model passes ask for JSON, so it prints the five numeric findings and
-stops there, which is worth seeing on its own: the code half of this checklist needs no model.
 
 ## What it costs
 
@@ -228,3 +162,79 @@ against its requirements just as well as it fits a circuit board.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+This is level 3. Two model calls happen every run, always in the same order, and code always
+does the same thing with whatever comes back: draft, then check, then merge. The model never
+picks the next action, so every step below is `decided_by: "code"`, the same as any other fixed
+pipeline on this site.
+
+Five of DR-0100's seven rules need no model, and code settles all five. DR-14 is the clean case:
+"A ceramic capacitor on a DC rail shall be rated at least 1.5 times the maximum steady-state rail
+voltage stated in the product's own datasheet." C1 and C2, the SRB-5030's input capacitors on
+revisions A and B, are 50 V parts. 50 / 1.5 = 33.3 V, so a 50 V part supports a 33.3 V rail and
+not a 36.0 V one: that arithmetic is exactly what ECN-2608-04 cites to justify lowering the
+board's maximum input to 32.0 V for revisions A and B. Code does the division and compares it with
+whichever ceiling governs the revision under review, using the part that revision actually
+carries: 50 V parts against the ECN's 32.0 V on revisions A and B, and revision C's 63 V parts,
+where 63 / 1.5 = 42 V, against the datasheet's 36.0 V. A model asked to do that division is only
+an added way to get 33.3 wrong.
+
+DR-10 (inductor saturation margin) and DR-20's placement thresholds are the same shape: a number
+off the bill of materials or the netlist summary, a factor or a distance the rule names, one
+comparison. The last two are not comparisons at all, and still need no model: DR-12 has no subject
+on this board, since the bill of materials lists no discrete MOSFET or diode on a DC rail, and
+DR-16's evidence is missing outright, which rule 1 records as not met. Code states both directly
+rather than dressing them up as calculations.
+
+Two rules cannot be settled that way. DR-24 sets a numeric limit (junction temperature at or below
+125 degC) but also requires the calculation shown "term by term, not as a single number", and
+disclaims one specific wrong argument by name: a design that reaches thermal shutdown in normal
+use does not meet the rule, "whatever the protection does". Telling whether submitted evidence
+argues from the computed number, rather than from the shutdown being there, needs reading. DR-30
+names several things at once (test points sized for a probe, a switch-node test point marked for
+scope use and excluded as a fixture contact, a silkscreen character that matches the assembly
+number), and checking a netlist summary against all of them is a reading task too. Those two, and
+only those two, go to a model, through
+<Link href="/techniques/structured-output/">structured output</Link> so each finding comes back
+as a rule, a status and evidence, and <Link href="/techniques/evaluator-optimizer/">evaluator
+optimizer</Link> so a second, separate pass checks each drafted finding against the rule's own
+full text before it reaches a person.
+
+Climbing to level 4 would let a model decide which rule needs a second look instead of running
+both passes on every rule; that buys nothing here, because DR-0100 does not change between boards
+and every rule is checked every time regardless. <Link href="/techniques/debate-review/">Review
+and debate</Link> (level 6) would add a third, independent reader where a wrong finding is
+expensive enough to want two model opinions to agree first. The DR-24 catch below is that kind of
+case, and a reader whose false findings hold up a real release should read that page next.
+
+</details>
+
+## Build it
+
+<details className="recipe-detail">
+<summary>Implementation details and code</summary>
+
+<CodeFile file="examples/bench_design_review_checklist/run.py" func="run" />
+
+`_numeric_findings` (not shown) calls five small functions, one per rule; here is the one behind
+the walkthrough's DR-14 line, doing exactly the division above:
+
+<CodeFile file="examples/bench_design_review_checklist/run.py" func="_check_capacitor_derating" />
+
+And here is the merge that turns a rejected draft into a recorded finding rather than a corrected
+one:
+
+<CodeFile file="examples/bench_design_review_checklist/run.py" func="_merge_judgment_findings" />
+
+Run it: `python -m examples.bench_design_review_checklist --model stub:scripted`. All seven rules
+come back judged, five by code and two by the model, with DR-24's drafted "met" rejected by the
+second pass in the words the walkthrough describes. The same command with `--model stub` returns
+free text where the two model passes ask for JSON, so it prints the five numeric findings and
+stops there, which is worth seeing on its own: the code half of this checklist needs no model.
+
+</details>
+

@@ -23,45 +23,6 @@ for however many readings that meter takes until it is next calibrated or its ma
 revised. `AccuracySpec` in `examples/common/bench.py` is that schema already; this recipe is what
 fills it from the manual instead of from a person typing 15 rows into it by hand.
 
-## Why this level, and why not higher
-
-Level 0 checks the extraction: shape, that all five ranges times three intervals are present
-once each, and that a range's own accuracy only gets looser from the 24 hour row through the 1
-year row, never tighter. <Link href="/techniques/structured-output/">Structured output</Link>
-holds the model to a fixed schema and retries once on a validation error, the same
-schema-then-retry pattern
-<Link href="/recipes/test-failure-triage/">test-failure-triage</Link> uses for a cause label.
-<Link href="/techniques/human-in-the-loop/">Human approval</Link> is what actually earns this
-recipe its level: `run` never returns a table anyone may use, only a proposal, and
-`confirm_table` is where a person's row-by-row read of the manual is recorded. That gate is not
-loosened here the way human approval's own page allows when being wrong is cheap and easy to
-notice after the fact. A wrong row is neither. It is a real number, shaped exactly like the row
-next to it, and it stays wrong until somebody who has read the manual says so.
-
-Nothing here climbs past level 3. There is one document, one schema and one bounded retry, and
-nothing in it chooses which step happens next from what a step found: the retry is the same call
-again with the validation error appended, and it happens at most once. Choosing the next step
-from the last one's result is the case an agent loop has to be able to make for itself, and this
-recipe cannot make it. Once the table is confirmed, every budget built from it is arithmetic:
-`price_reading` calls `combined_uncertainty` and `expanded_uncertainty`, the same functions
-<Link href="/recipes/characterize-a-design/">characterize-a-design</Link> runs on the
-characterization data, and no model runs again. A model never produces a reported measurement, an
-uncertainty, a margin or a verdict, on this page or anywhere else on this bench, and
-<Link href="/recipes/limits-without-a-model/">limits without a model</Link> is the production-test
-case of the same rule. Here a model only ever proposes what the manual's table says, and code
-decides whether that proposal is even shaped like a table before a person is asked to read it
-against the real thing.
-
-Whether drafting is worth it at all is a question with an honest smaller answer: for one meter, a
-person reading the manual closely enough to check a drafted table could have typed 15 rows into a
-spreadsheet in about the time it takes to read this section, and typing is not a slower way to
-make the identical mistake a wrong row makes. Where this earns its keep is scale a single meter
-does not have: a lab with instruments from several vendors, each with its own manual and its own
-row shape, a calibration house that reissues a table every time a meter comes back, a manual
-revision that changes a number nobody re-reads. The checking discipline, every row against the
-manual, has to stay exactly as strict per row in that world as it would for one meter; what
-drafting buys is not a lighter check, only fewer hours spent retyping tables that turn over.
-
 ## The walkthrough, on the bench
 
 No recorded run exists for this recipe yet (`docs/EVALS.md`), so what follows is worked by hand
@@ -109,25 +70,6 @@ All three rows are real rows of the identical, correctly confirmed table. `price
 the wrong one only when it is handed the wrong calibration age or the wrong range, which manual
 section 7 calls out by name as settings rather than computed values, and squarely in the user's
 hands.
-
-## The code
-
-<CodeFile file="examples/bench_accuracy_specs_from_the_manual/run.py" func="_validate_table" />
-
-`run` extracts, validates, retries once, and stops there. It returns a proposal, not a table:
-
-<CodeFile file="examples/bench_accuracy_specs_from_the_manual/run.py" func="run" />
-
-`confirm_table` is where a person's decision is actually recorded, the same shape as
-`bench_test_failure_triage`'s `confirm` and the bench's own `GuardedSupply.output_on`:
-
-<CodeFile file="examples/bench_accuracy_specs_from_the_manual/run.py" func="confirm_table" />
-
-Pricing a reading from the confirmed table calls no model. `interval_for_calibration` picks the
-row by three comparisons; `price_reading` is `dc_voltage_budget` read from this extraction's own
-table instead of the one already coded in `examples/common/bench.py`:
-
-<CodeFile file="examples/bench_accuracy_specs_from_the_manual/run.py" func="price_reading" />
 
 ## What it costs
 
@@ -213,3 +155,71 @@ a drift record should ask which of theirs plays the harder part.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Level 0 checks the extraction: shape, that all five ranges times three intervals are present
+once each, and that a range's own accuracy only gets looser from the 24 hour row through the 1
+year row, never tighter. <Link href="/techniques/structured-output/">Structured output</Link>
+holds the model to a fixed schema and retries once on a validation error, the same
+schema-then-retry pattern
+<Link href="/recipes/test-failure-triage/">test-failure-triage</Link> uses for a cause label.
+<Link href="/techniques/human-in-the-loop/">Human approval</Link> is what actually earns this
+recipe its level: `run` never returns a table anyone may use, only a proposal, and
+`confirm_table` is where a person's row-by-row read of the manual is recorded. That gate is not
+loosened here the way human approval's own page allows when being wrong is cheap and easy to
+notice after the fact. A wrong row is neither. It is a real number, shaped exactly like the row
+next to it, and it stays wrong until somebody who has read the manual says so.
+
+Nothing here climbs past level 3. There is one document, one schema and one bounded retry, and
+nothing in it chooses which step happens next from what a step found: the retry is the same call
+again with the validation error appended, and it happens at most once. Choosing the next step
+from the last one's result is the case an agent loop has to be able to make for itself, and this
+recipe cannot make it. Once the table is confirmed, every budget built from it is arithmetic:
+`price_reading` calls `combined_uncertainty` and `expanded_uncertainty`, the same functions
+<Link href="/recipes/characterize-a-design/">characterize-a-design</Link> runs on the
+characterization data, and no model runs again. A model never produces a reported measurement, an
+uncertainty, a margin or a verdict, on this page or anywhere else on this bench, and
+<Link href="/recipes/limits-without-a-model/">limits without a model</Link> is the production-test
+case of the same rule. Here a model only ever proposes what the manual's table says, and code
+decides whether that proposal is even shaped like a table before a person is asked to read it
+against the real thing.
+
+Whether drafting is worth it at all is a question with an honest smaller answer: for one meter, a
+person reading the manual closely enough to check a drafted table could have typed 15 rows into a
+spreadsheet in about the time it takes to read this section, and typing is not a slower way to
+make the identical mistake a wrong row makes. Where this earns its keep is scale a single meter
+does not have: a lab with instruments from several vendors, each with its own manual and its own
+row shape, a calibration house that reissues a table every time a meter comes back, a manual
+revision that changes a number nobody re-reads. The checking discipline, every row against the
+manual, has to stay exactly as strict per row in that world as it would for one meter; what
+drafting buys is not a lighter check, only fewer hours spent retyping tables that turn over.
+
+</details>
+
+## Build it
+
+<details className="recipe-detail">
+<summary>Implementation details and code</summary>
+
+<CodeFile file="examples/bench_accuracy_specs_from_the_manual/run.py" func="_validate_table" />
+
+`run` extracts, validates, retries once, and stops there. It returns a proposal, not a table:
+
+<CodeFile file="examples/bench_accuracy_specs_from_the_manual/run.py" func="run" />
+
+`confirm_table` is where a person's decision is actually recorded, the same shape as
+`bench_test_failure_triage`'s `confirm` and the bench's own `GuardedSupply.output_on`:
+
+<CodeFile file="examples/bench_accuracy_specs_from_the_manual/run.py" func="confirm_table" />
+
+Pricing a reading from the confirmed table calls no model. `interval_for_calibration` picks the
+row by three comparisons; `price_reading` is `dc_voltage_budget` read from this extraction's own
+table instead of the one already coded in `examples/common/bench.py`:
+
+<CodeFile file="examples/bench_accuracy_specs_from_the_manual/run.py" func="price_reading" />
+
+</details>
+

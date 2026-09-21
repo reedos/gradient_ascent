@@ -18,34 +18,9 @@ Data analysis by conversation is that job: a single agent writes and runs code a
 dataset itself, one question at a time, seeing each result before deciding whether it needs
 another pass or already has enough to answer.
 
-## The assembled diagram
+## Example run
 
 <Run data={dataAnalysisRun} label="Level 5 · Data analysis by conversation" runKey="data-analysis" />
-
-## Why these techniques, and why not lower or higher
-
-Two techniques compose this recipe. <Link href="/techniques/code-execution/">Code execution</Link>
-is the sandbox: the model writes a short piece of code, and a restricted interpreter (never the
-model itself) actually runs it and returns whatever it computed. <Link
-href="/techniques/single-agent/">A single agent</Link> is what lets that happen more than once:
-the model sees each result and decides, itself, whether another computation is needed or the
-question is already answered.
-
-Code execution alone (one write-and-run cycle, bounded from outside) would be enough if every
-question here needed exactly one computation. Some do. Many ad hoc questions don't: answering "how
-does this quarter compare to last" means computing one quarter, looking at what came back, and
-only then knowing that a second, comparable computation is needed before there's anything to
-compare. The single agent page states the condition directly (move up once the number and order
-of actions cannot be known before the model sees the question), and that is exactly what a
-"how does X compare to Y" or "what changed since last time" question does: the second step's shape
-depends on the first step's result, not on anything decided in advance.
-
-It is not worth climbing past a single agent for this job. One agent with one broad sandbox tool
-already reruns, refines and compares on its own; a second model would help only if the questions
-needed independent verification of a specific number, or spanned more data than one context window
-holds, and an ordinary ad hoc question over one spreadsheet is neither. Multiple agents would add
-cost and coordination for a comparison one agent already reaches by looking at its own last
-result.
 
 ## Walkthrough
 
@@ -111,3 +86,33 @@ any of it.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Two techniques compose this recipe. <Link href="/techniques/code-execution/">Code execution</Link>
+is the sandbox: the model writes a short piece of code, and a restricted interpreter (never the
+model itself) actually runs it and returns whatever it computed. <Link
+href="/techniques/single-agent/">A single agent</Link> is what lets that happen more than once:
+the model sees each result and decides, itself, whether another computation is needed or the
+question is already answered.
+
+Code execution alone (one write-and-run cycle, bounded from outside) would be enough if every
+question here needed exactly one computation. Some do. Many ad hoc questions don't: answering "how
+does this quarter compare to last" means computing one quarter, looking at what came back, and
+only then knowing that a second, comparable computation is needed before there's anything to
+compare. The single agent page states the condition directly (move up once the number and order
+of actions cannot be known before the model sees the question), and that is exactly what a
+"how does X compare to Y" or "what changed since last time" question does: the second step's shape
+depends on the first step's result, not on anything decided in advance.
+
+It is not worth climbing past a single agent for this job. One agent with one broad sandbox tool
+already reruns, refines and compares on its own; a second model would help only if the questions
+needed independent verification of a specific number, or spanned more data than one context window
+holds, and an ordinary ad hoc question over one spreadsheet is neither. Multiple agents would add
+cost and coordination for a comparison one agent already reaches by looking at its own last
+result.
+
+</details>
+

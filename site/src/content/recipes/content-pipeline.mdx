@@ -19,39 +19,9 @@ question. Whether every bullet made it into the draft is something plain code ca
 itself. Whether the draft's tone matches the style guide is not: that needs a second prompt,
 told the rule, checking the first prompt's work.
 
-## The assembled diagram
+## Example run
 
 <Run data={pipelineRun} label="Level 3 · Drafting with a reviewer" runKey="content-pipeline" />
-
-## Why these techniques, and why not higher
-
-Two techniques compose this recipe, in sequence rather than as alternatives. <Link
-href="/techniques/prompt-chaining/">Prompt chaining</Link> runs first: rewrite the bullets into a
-short outline, then check in plain code that every bullet's subject actually appears in it: a
-set-membership test, the same shape prompt chaining's own citation check uses, needing no second
-model call because the thing being checked is objective. <Link
-href="/techniques/evaluator-optimizer/">Write and check</Link> runs second, once there's a full
-draft: a separate prompt checks it against the style rubric, and if it fails, the draft revises
-and the check runs again, up to a fixed cap.
-
-The split matters because the two checks need different tools. Evaluator-optimizer's own page
-makes the case for using plain code wherever a check can be code: it's cheaper, always consistent,
-and doesn't need a second prompt at all. Whether the outline mentions "sync bug" is exactly that
-kind of check. Whether a sentence reads as an unapproved superlative is not. No fixed string test
-tells "amazing" from a plain factual claim in general, so that check needs a criterion specific
-enough for a second prompt to apply consistently, which is what write and check is for.
-
-Both stay level 3 because the code owns the loop in each case: a fixed number of chain steps, and
-a `while` condition and a revision cap written before either prompt runs. Handing either loop to
-the model (let it decide whether another revision is worth the cost, or how many outline passes
-to try) is what would raise this to level 5, and nothing here needs that: the criteria are fixed
-in advance, and a checker told a specific rule answers the same way on the same draft every time.
-The one real risk at this level is the one evaluator-optimizer's own page names directly: a writer
-and a checker built from the same kind of model can share a blind spot, passing a draft that's
-confidently wrong in a way neither prompt would catch. Its own upgrade path is exactly that
-failure: move to <Link href="/techniques/debate-review/">review and debate</Link> once one
-reviewer shares the author's blind spots, when a second opinion built to differ on purpose earns
-its cost.
 
 ## Walkthrough
 
@@ -103,3 +73,38 @@ technique on this task yet, so this recipe cannot claim a score for any of it.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Two techniques compose this recipe, in sequence rather than as alternatives. <Link
+href="/techniques/prompt-chaining/">Prompt chaining</Link> runs first: rewrite the bullets into a
+short outline, then check in plain code that every bullet's subject actually appears in it: a
+set-membership test, the same shape prompt chaining's own citation check uses, needing no second
+model call because the thing being checked is objective. <Link
+href="/techniques/evaluator-optimizer/">Write and check</Link> runs second, once there's a full
+draft: a separate prompt checks it against the style rubric, and if it fails, the draft revises
+and the check runs again, up to a fixed cap.
+
+The split matters because the two checks need different tools. Evaluator-optimizer's own page
+makes the case for using plain code wherever a check can be code: it's cheaper, always consistent,
+and doesn't need a second prompt at all. Whether the outline mentions "sync bug" is exactly that
+kind of check. Whether a sentence reads as an unapproved superlative is not. No fixed string test
+tells "amazing" from a plain factual claim in general, so that check needs a criterion specific
+enough for a second prompt to apply consistently, which is what write and check is for.
+
+Both stay level 3 because the code owns the loop in each case: a fixed number of chain steps, and
+a `while` condition and a revision cap written before either prompt runs. Handing either loop to
+the model (let it decide whether another revision is worth the cost, or how many outline passes
+to try) is what would raise this to level 5, and nothing here needs that: the criteria are fixed
+in advance, and a checker told a specific rule answers the same way on the same draft every time.
+The one real risk at this level is the one evaluator-optimizer's own page names directly: a writer
+and a checker built from the same kind of model can share a blind spot, passing a draft that's
+confidently wrong in a way neither prompt would catch. Its own upgrade path is exactly that
+failure: move to <Link href="/techniques/debate-review/">review and debate</Link> once one
+reviewer shares the author's blind spots, when a second opinion built to differ on purpose earns
+its cost.
+
+</details>
+

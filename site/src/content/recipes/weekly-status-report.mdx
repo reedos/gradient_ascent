@@ -12,112 +12,39 @@ import HowToEval from '../../components/page/HowToEval.astro';
 import Link from '../../components/page/Link.astro';
 import statusRun from '../../data/runs/recipe-weekly-status-report.json';
 
-The office manager at a twelve-person firm sends the same email every Friday afternoon: what
-moved this week, what is behind, and what somebody has to deal with before Monday. Putting it
-together takes an hour and a half, and almost none of that is writing. It is opening the project
-tracker and counting what closed, opening the shared client inbox and working out which threads
-have been sitting on the firm's side too long, opening the spreadsheet where somebody types the
-hours, and adding them up against what each project was budgeted. Three systems, three different
-shapes, three different degrees of trustworthiness, and one email at the end of it.
+## What you’ll get
 
-This is the job people mean when they say they want AI to do their reporting, and most of it
-turns out not to need one. The counting, the comparing and the schedule are arithmetic. What a
-model is genuinely good for here is the last twenty minutes: turning a table nobody wants to read
-into four paragraphs they will.
+A weekly email draft covering progress, overdue work, waiting client replies, and budget usage. Code calculates the figures; one model call turns them into prose; a person reviews and sends it.
 
-Not in scope: writing anything back to any of the three systems, which is
-<Link href="/recipes/project-tracker-upkeep/">a different recipe and a harder one</Link>; deciding
-whether a project is in trouble; and sending the email. The report comes out with its own
-problems named on it, and a person reads it before anyone else does.
+**Inputs:** project-tracker records, a shared inbox, a time spreadsheet, and a maintained table of project-name aliases.
 
-## The assembled diagram
+**Use it when:** the sources and report format are fixed, but readers need a narrative rather than a table. If a table is enough, omit the model.
+
+**Boundary:** this recipe does not update the source systems, decide whether a project is in trouble, or send the email.
+
+## Example run
 
 <Run data={statusRun} label="Level 1 · Standing report" runKey="weekly-status-report" />
 
-## Why this level, and why not higher
-
-This job is more than one <Link href="/shapes/">job shape</Link>, so the worksheet is walked once
-per half and the joined job takes the higher answer.
-
-The assembly half is two shapes at once, which is worth saying because the shapes are not a filing
-system with one drawer per job. It is a watch: a fixed list of sources, checked on a schedule,
-with code working out what changed since last time. It is also a calculation: the input is
-records and the right answer is fixed by arithmetic. Both descriptions are true of the same code,
-and both land it in the same place. The writing half is the third shape, turning one piece of
-text into another.
-
-That is a different join from <Link href="/recipes/literature-watch/">the literature watch</Link>,
-which is the site's other page about two shapes meeting, and the difference is worth a sentence
-because it changes what the seam protects. There the two halves run in series and the watch half
-decides how many model calls happen: five records listed, two new, two calls. Here the halves
-meet head on. Three sources fan into one set of figures, and there is exactly one call whatever
-kind of week it was, because the report is one document. The watch half is not deciding how much
-to spend. It is deciding what is true.
-
-**The assembly half is level 0.** Walk the questions against the job of working out the week's
-numbers. The sources are a list somebody wrote down once. The window is the schedule's, from the
-last report to this one. Everything after that is counting rows, comparing dates, adding hours and
-dividing by a budget. Two people handed the same three exports would produce the same 38 figures,
-which is what the floor means. Reaching for a model to read the tracker export would be asking one
-to do a lookup and a subtraction, and it would produce numbers nobody could reproduce next week.
-
-The one part of the assembly that looks like judgment is not. Three systems spell the same project
-three ways, so the names have to be reconciled before anything can be counted. That is a table a
-person wrote once, and the important behavior is what happens to a name the table does not have:
-it is reported, not attached to the nearest match and not dropped. A thread quietly filed under
-the wrong project is worse than a thread nobody counted.
-
-**The writing half is level 1.** One call, and everything it needs is in front of it. Nothing has
-to be looked up, which is the question that would push it to level 2: there is no document to
-retrieve, because the figures are the whole of the input and code computed them. Nothing has to
-pass a check before a person sees it, which is what would push it to level 3. Two checks do run,
-but they are code, they run once, and they do not retry: a draft that fails one is handed to a
-person with the failures named, not quietly repaired and sent.
-
-**So the joined job settles at level 1**, which is lower than where a watch usually lands and lower
-than most people expect for something that reads three systems.
-
-Two ways it would climb, both real. It becomes level 3 the day nobody reads the report before it
-goes out, because then the check has to stand in for the reader rather than help them. It also
-becomes level 3 the day something downstream starts parsing the prose instead of a person reading
-it, a dashboard or another program, because then a sentence is an interface and has to be right
-rather than readable. Neither is true here.
-
-It does not become level 5 by adding sources. A researcher at level 5 decides what to look at
-next; this decides nothing, because a person chose the three systems once and the schedule is a
-timer.
-
-And it is worth saying what is below. If the people receiving this would read a table, drop the
-model: the assembly half alone, mailed as a table with the overdue rows at the top, is a complete
-and honest answer at level 0, and it costs nothing to run. The call earns its place only when the
-report is read by people who will not read a table, which at a twelve-person firm is most of them.
-
 ## What makes it a standing job, and what that changes
 
-A one-off report is assembled by somebody who already knows what happened. A standing one runs
-whether or not anything interesting happened, on a day nobody chose for a reason, over sources
-nobody looked at first. Four things follow, and all four are in the code rather than in the prose.
-
-**The window comes from the schedule, not from judgment.** The run covers 09/11/2026 to
-09/18/2026 because that is where the last report stopped. A task closed on the day of the previous
-report belongs to that one. Without a fixed window, tasks get counted twice or not at all,
-depending on when somebody happened to run it.
-
-**A quiet week still produces a report.** A standing job that goes silent when nothing happened is
-indistinguishable from one that broke, and a team learns within a month to stop noticing either.
-
-**A stale source is not a quiet week.** The time spreadsheet says it is current only to
-09/15/2026, three days behind the report. Reporting zero hours for the week would be a lie code
-could have caught, so the figures carry the date the hours actually run through and the report is
-required to say so. That is a mild version of a failure that does real damage in
-<Link href="/recipes/project-tracker-upkeep/">the tracker recipe</Link>, where the same silence
-ages a document instead of spoiling one email.
-
-**Nobody is watching the inputs, so the code has to speak up.** One project name in the inbox
-matched nothing on the firm's list. In a report assembled by hand, somebody would have seen it.
-Here it is a figure like any other and it appears in the email.
+- **Use a fixed reporting window.** Start where the previous report stopped so records are neither missed nor counted twice.
+- **Report quiet weeks too.** No activity and a broken reporting job should look different.
+- **Show source freshness.** Missing or stale hours must not appear as zero hours.
+- **Flag unmatched names.** Do not guess which project an unfamiliar name belongs to.
 
 ## Walkthrough
+
+1. **Gather and reconcile.** Read the three sources and map project names using the alias table. Flag unmatched names and stale inputs.
+2. **Calculate first.** Code produces every count, date, total, and percentage, with fixed formatting.
+3. **Draft once.** Give the model the computed figures and the manager’s note. Ask it to write around the figures without changing them.
+4. **Check in both directions.** Flag numbers not present in the inputs and required figures missing from the draft. Flag short counts that the presence check cannot reliably verify.
+5. **Review and send manually.** Check that each figure belongs to the right project and claim. A valid number can still be used in a false sentence.
+
+**Sample result:** the fixture produces 38 figures, including two overdue tasks and a project at 98.3% of its hours budget. The review must also surface stale time data. These are illustrative results, not measured performance.
+
+<details className="recipe-detail">
+<summary>Detailed walkthrough and implementation</summary>
 
 Every figure is computed first, formatted once, and labeled. The format is the point: what the
 model is allowed to write is a character sequence, not a number, so nothing has to be reformatted
@@ -167,6 +94,8 @@ it cannot perform:
 
 Those four are handed to the person reading the report, which is the step this recipe ends on and
 not an optional one.
+
+</details>
 
 ## What it costs
 
@@ -276,3 +205,66 @@ show you and the thing least likely to go wrong.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+This job is more than one <Link href="/shapes/">job shape</Link>, so the worksheet is walked once
+per half and the joined job takes the higher answer.
+
+The assembly half is two shapes at once, which is worth saying because the shapes are not a filing
+system with one drawer per job. It is a watch: a fixed list of sources, checked on a schedule,
+with code working out what changed since last time. It is also a calculation: the input is
+records and the right answer is fixed by arithmetic. Both descriptions are true of the same code,
+and both land it in the same place. The writing half is the third shape, turning one piece of
+text into another.
+
+That is a different join from <Link href="/recipes/literature-watch/">the literature watch</Link>,
+which is the site's other page about two shapes meeting, and the difference is worth a sentence
+because it changes what the seam protects. There the two halves run in series and the watch half
+decides how many model calls happen: five records listed, two new, two calls. Here the halves
+meet head on. Three sources fan into one set of figures, and there is exactly one call whatever
+kind of week it was, because the report is one document. The watch half is not deciding how much
+to spend. It is deciding what is true.
+
+**The assembly half is level 0.** Walk the questions against the job of working out the week's
+numbers. The sources are a list somebody wrote down once. The window is the schedule's, from the
+last report to this one. Everything after that is counting rows, comparing dates, adding hours and
+dividing by a budget. Two people handed the same three exports would produce the same 38 figures,
+which is what the floor means. Reaching for a model to read the tracker export would be asking one
+to do a lookup and a subtraction, and it would produce numbers nobody could reproduce next week.
+
+The one part of the assembly that looks like judgment is not. Three systems spell the same project
+three ways, so the names have to be reconciled before anything can be counted. That is a table a
+person wrote once, and the important behavior is what happens to a name the table does not have:
+it is reported, not attached to the nearest match and not dropped. A thread quietly filed under
+the wrong project is worse than a thread nobody counted.
+
+**The writing half is level 1.** One call, and everything it needs is in front of it. Nothing has
+to be looked up, which is the question that would push it to level 2: there is no document to
+retrieve, because the figures are the whole of the input and code computed them. Nothing has to
+pass a check before a person sees it, which is what would push it to level 3. Two checks do run,
+but they are code, they run once, and they do not retry: a draft that fails one is handed to a
+person with the failures named, not quietly repaired and sent.
+
+**So the joined job settles at level 1**, which is lower than where a watch usually lands and lower
+than most people expect for something that reads three systems.
+
+Two ways it would climb, both real. It becomes level 3 the day nobody reads the report before it
+goes out, because then the check has to stand in for the reader rather than help them. It also
+becomes level 3 the day something downstream starts parsing the prose instead of a person reading
+it, a dashboard or another program, because then a sentence is an interface and has to be right
+rather than readable. Neither is true here.
+
+It does not become level 5 by adding sources. A researcher at level 5 decides what to look at
+next; this decides nothing, because a person chose the three systems once and the schedule is a
+timer.
+
+And it is worth saying what is below. If the people receiving this would read a table, drop the
+model: the assembly half alone, mailed as a table with the overdue rows at the top, is a complete
+and honest answer at level 0, and it costs nothing to run. The call earns its place only when the
+report is read by people who will not read a table, which at a twelve-person firm is most of them.
+
+</details>
+

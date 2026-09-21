@@ -14,36 +14,9 @@ rooftop unit, filter's fine, belt's worn and needs replacing before next visit, 
 condensate line has a slow drip near the drain pan." That note needs to become two structured
 findings a scheduling system can act on, not a paragraph someone reads later and re-types.
 
-## The assembled diagram
+## Example run
 
 <Run data={runData} label="Level 3 · assembled for this recipe" runKey="voice-notes" />
-
-## Why these techniques, and why not higher
-
-<Link href="/techniques/multimodal/">Multimodal</Link> covers turning the voice note into text:
-one request that carries the audio itself and comes back with a transcript: level 1, the same
-one-call shape as any other request, with audio where a paragraph would be.
-<Link href="/techniques/prompt-chaining/">Prompt
-chaining</Link> is the technique doing the real work after that: split the transcript into
-individual findings, in the order the technician said them, and fill a fixed record (location,
-component, condition, action needed) for each one. <Link href="/techniques/evals/">Evals</Link>
-is how "did it get this right" is measured for a job with no citation to check against, the way
-document-Q&A has.
-
-Both composed techniques put every decision in code. Transcribing is one fixed call: the code
-always makes it, once, and never asks the model whether to. Splitting the transcript into findings
-and filling each one's record is a fixed sequence too: every step runs in the same order
-regardless of what came back from the last one. Set that against the site's own thesis: this
-recipe reaches level 3 on the ladder, and yet not one step in its run is `decided_by: "model"`.
-The model only fills in what a fixed step already decided to ask it for.
-
-Climbing to <Link href="/techniques/single-agent/">a single agent</Link> would trade that
-predictability for judgment the fixed order can't offer: a note where findings interrupt each
-other ("actually, before the belt, check the filter too"), get corrected mid-sentence, or
-describe two sites in one recording. A technician who dictates cleanly, one finding after
-another, the way this recipe's illustrated run does, doesn't need a model deciding how to segment
-the note; a fixed splitter does the same job for less and never disagrees with itself about where
-one finding ends and the next begins.
 
 ## Walkthrough
 
@@ -102,3 +75,35 @@ the system admits it isn't sure of. No run of this has been scored yet.
   confidence field or validation came back low, instead of filing it straight through.
 - Delete the audio as soon as a transcript is accepted, keeping only the text and the records, so
   the system stops holding recordings of people's voices at all.
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+<Link href="/techniques/multimodal/">Multimodal</Link> covers turning the voice note into text:
+one request that carries the audio itself and comes back with a transcript: level 1, the same
+one-call shape as any other request, with audio where a paragraph would be.
+<Link href="/techniques/prompt-chaining/">Prompt
+chaining</Link> is the technique doing the real work after that: split the transcript into
+individual findings, in the order the technician said them, and fill a fixed record (location,
+component, condition, action needed) for each one. <Link href="/techniques/evals/">Evals</Link>
+is how "did it get this right" is measured for a job with no citation to check against, the way
+document-Q&A has.
+
+Both composed techniques put every decision in code. Transcribing is one fixed call: the code
+always makes it, once, and never asks the model whether to. Splitting the transcript into findings
+and filling each one's record is a fixed sequence too: every step runs in the same order
+regardless of what came back from the last one. Set that against the site's own thesis: this
+recipe reaches level 3 on the ladder, and yet not one step in its run is `decided_by: "model"`.
+The model only fills in what a fixed step already decided to ask it for.
+
+Climbing to <Link href="/techniques/single-agent/">a single agent</Link> would trade that
+predictability for judgment the fixed order can't offer: a note where findings interrupt each
+other ("actually, before the belt, check the filter too"), get corrected mid-sentence, or
+describe two sites in one recording. A technician who dictates cleanly, one finding after
+another, the way this recipe's illustrated run does, doesn't need a model deciding how to segment
+the note; a fixed splitter does the same job for less and never disagrees with itself about where
+one finding ends and the next begins.
+
+</details>
+

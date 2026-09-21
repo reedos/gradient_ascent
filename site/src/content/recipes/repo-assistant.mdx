@@ -14,36 +14,9 @@ small: a failing edge case, a typo in an error message, a function that needs a 
 The job is an assistant that reads an issue, edits the repository, runs the tests and stops with a
 branch ready for review, not one that decides what to merge.
 
-## The assembled diagram
+## Example run
 
 <Run data={runData} label="Level 5 · assembled for this recipe" runKey="repo-assistant" />
-
-## Why these techniques, and why not higher
-
-<Link href="/techniques/coding-agents/">Coding agents</Link> is the core: the model proposes an
-edit, code runs the tests, and the model reads the result and decides whether to try again or
-report what it did. <Link href="/techniques/skills/">Skills</Link> holds the maintainers' own
-conventions (a changelog format, a commit-message style, which test file pattern a given kind of
-fix uses) as short descriptions the agent reads every time and longer bodies it loads only when a
-task calls for one, rather than every convention sitting in the system prompt on every run. <Link
-href="/techniques/safety/">Safety</Link> is a code-side check between what the agent proposes and
-what happens to the repository: it reads the diff's paths and the commands the agent asked to run,
-and refuses anything outside what this task was scoped to touch.
-
-Two pieces of this sit below the agent and should stay there. The test suite is not a model at
-all; it is the signal the whole loop turns on, the same suite a maintainer runs by hand. The scope
-check is plain code reading a list, refusing by default anything nobody allowed in advance: a
-check in code, not a line in a prompt asking the model to behave.
-
-Level 5 is enough because one issue is one bounded loop: propose, test, read the result, decide
-whether to try again. What would justify <Link href="/techniques/orchestrator-workers/">a lead
-agent and workers</Link> is not a longer backlog. That page's condition is that the split cannot
-be written down before the work starts, and a queue of separate issues can be: ten known issues at
-once is <Link href="/techniques/parallelization/">parallel calls</Link>, level 3, ten copies of
-this loop with nothing to coordinate. The climb earns its cost when dividing one issue is itself a
-judgment, or when a second agent reviewing the first one's diff catches what the tests cannot:
-each costing another agent's worth of calls, spent on a conversation between two models about a
-change a maintainer is about to read anyway.
 
 ## Walkthrough
 
@@ -99,3 +72,35 @@ of, and confirm every attempt is refused. None of this has been run here.
   to, instead of fixing it once.
 - Widen the scope check from paths and commands to the size of the diff, refusing a change large
   enough that no fixed suite is good evidence it did only what the issue asked.
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+<Link href="/techniques/coding-agents/">Coding agents</Link> is the core: the model proposes an
+edit, code runs the tests, and the model reads the result and decides whether to try again or
+report what it did. <Link href="/techniques/skills/">Skills</Link> holds the maintainers' own
+conventions (a changelog format, a commit-message style, which test file pattern a given kind of
+fix uses) as short descriptions the agent reads every time and longer bodies it loads only when a
+task calls for one, rather than every convention sitting in the system prompt on every run. <Link
+href="/techniques/safety/">Safety</Link> is a code-side check between what the agent proposes and
+what happens to the repository: it reads the diff's paths and the commands the agent asked to run,
+and refuses anything outside what this task was scoped to touch.
+
+Two pieces of this sit below the agent and should stay there. The test suite is not a model at
+all; it is the signal the whole loop turns on, the same suite a maintainer runs by hand. The scope
+check is plain code reading a list, refusing by default anything nobody allowed in advance: a
+check in code, not a line in a prompt asking the model to behave.
+
+Level 5 is enough because one issue is one bounded loop: propose, test, read the result, decide
+whether to try again. What would justify <Link href="/techniques/orchestrator-workers/">a lead
+agent and workers</Link> is not a longer backlog. That page's condition is that the split cannot
+be written down before the work starts, and a queue of separate issues can be: ten known issues at
+once is <Link href="/techniques/parallelization/">parallel calls</Link>, level 3, ten copies of
+this loop with nothing to coordinate. The climb earns its cost when dividing one issue is itself a
+judgment, or when a second agent reviewing the first one's diff catches what the tests cannot:
+each costing another agent's worth of calls, spent on a conversation between two models about a
+change a maintainer is about to read anyway.
+
+</details>
+

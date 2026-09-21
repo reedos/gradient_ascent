@@ -20,39 +20,9 @@ The pipeline is three steps: extract a fixed record from the note, find the equi
 in a small graph of what the facility has, and let the model decide whether this is routine or
 needs flagging.
 
-## The assembled diagram
+## Example run
 
 <Run data={maintenanceRun} label="Level 4 · Plain-language maintenance log" runKey="maintenance-log" />
-
-## Why these techniques, and why not higher
-
-Three techniques compose this recipe. <Link href="/techniques/structured-output/">Structured
-output</Link> turns the note into a fixed record (equipment, action, a condition field, a date)
-validated before anything downstream touches it. <Link
-href="/techniques/knowledge-graphs/">Knowledge graphs</Link> is what makes "pump 3" mean something:
-a small graph walk from the named equipment to what line it's on and when it was last serviced, so
-the entry lands linked to a real history rather than as an isolated row. <Link
-href="/techniques/function-calling/">Function calling</Link> is the one place this recipe climbs
-past a fixed pipeline: the model is offered two tools (log it routinely, or flag it for review)
-and decides which one this note actually calls for.
-
-That decision is why level 4, not level 2, is the honest floor here. Structured output and
-knowledge graphs alone would produce a well-formed, well-linked record every time, but they'd file
-"smelled hot" with the same routine handling as "replaced the belt": neither technique reads for
-risk, only for fields and connections. Function calling's own page draws the boundary this recipe
-needs: the model is offered a schema-shaped action and decides on its own whether to reach for it.
-Structured output's page draws the same contrast from its own side: at level 4 the model
-additionally decides *whether* to use a shape at all, not just what goes in it. A fixed keyword
-list could
-catch a few obvious cases, but "starting to smell hot" is exactly the open-ended phrasing such a
-list can't be written to catch reliably in advance.
-
-It isn't worth climbing past that single decision. The model acts once, on one note, with
-everything it needs already in the extracted record and the graph walk; nothing here asks it to
-check a result and decide again. A facility that wanted the model to weigh a piece of equipment's
-full service history against similar recent notes elsewhere before deciding (several lookups,
-each depending on the last) is the case a single agent is for, at real added cost for a decision
-this recipe currently makes in one call.
 
 ## Walkthrough
 
@@ -106,3 +76,38 @@ task yet, so this recipe cannot claim a score for any of it.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Three techniques compose this recipe. <Link href="/techniques/structured-output/">Structured
+output</Link> turns the note into a fixed record (equipment, action, a condition field, a date)
+validated before anything downstream touches it. <Link
+href="/techniques/knowledge-graphs/">Knowledge graphs</Link> is what makes "pump 3" mean something:
+a small graph walk from the named equipment to what line it's on and when it was last serviced, so
+the entry lands linked to a real history rather than as an isolated row. <Link
+href="/techniques/function-calling/">Function calling</Link> is the one place this recipe climbs
+past a fixed pipeline: the model is offered two tools (log it routinely, or flag it for review)
+and decides which one this note actually calls for.
+
+That decision is why level 4, not level 2, is the honest floor here. Structured output and
+knowledge graphs alone would produce a well-formed, well-linked record every time, but they'd file
+"smelled hot" with the same routine handling as "replaced the belt": neither technique reads for
+risk, only for fields and connections. Function calling's own page draws the boundary this recipe
+needs: the model is offered a schema-shaped action and decides on its own whether to reach for it.
+Structured output's page draws the same contrast from its own side: at level 4 the model
+additionally decides *whether* to use a shape at all, not just what goes in it. A fixed keyword
+list could
+catch a few obvious cases, but "starting to smell hot" is exactly the open-ended phrasing such a
+list can't be written to catch reliably in advance.
+
+It isn't worth climbing past that single decision. The model acts once, on one note, with
+everything it needs already in the extracted record and the graph walk; nothing here asks it to
+check a result and decide again. A facility that wanted the model to weigh a piece of equipment's
+full service history against similar recent notes elsewhere before deciding (several lookups,
+each depending on the last) is the case a single agent is for, at real added cost for a decision
+this recipe currently makes in one call.
+
+</details>
+

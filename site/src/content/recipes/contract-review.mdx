@@ -26,38 +26,9 @@ does not draft a counter-clause, does not negotiate, does not read anything the 
 ask about, and it is not legal advice: the output is a list of things for a person to look at,
 never a recommendation to sign, walk away, or accept a term as written.
 
-## The assembled diagram
+## Example run
 
 <Run data={contractReviewRun} label="Level 3 · Check an agreement against a checklist" runKey="contract-review" />
-
-## Why this level, and why not higher
-
-Three techniques compose this recipe: <Link href="/techniques/parallelization/">parallelization</Link>
-sends one call per checklist rule, all at once, each seeing only that rule and the agreement;
-<Link href="/techniques/structured-output/">structured output</Link> keeps every reply in the same
-fixed shape, a status from a closed set, the clause number it relies on, and a verbatim quote from
-that clause; <Link href="/techniques/human-in-the-loop/">human approval</Link> holds every finding
-except a plain "meets" for a person before anything happens to it.
-
-Level 3 is enough because the checklist is exactly as fixed as a job like this gets: a team writes
-it down once, and it does not change from one agreement to the next, which is
-<Link href="/shapes/#review-against-criteria">check a piece of work against written rules</Link>'s
-own definition of the shape. Climbing to level 4 would let a model read the checklist and decide
-for itself which rules apply, or how many calls to make; that buys nothing here, since all six
-rules always apply and always get checked, and a model quietly deciding one does not is one more
-way to be wrong, on exactly the agreement where skipping mattered.
-
-The level below is where this recipe differs from its nearest sibling. <Link
-href="/recipes/design-review-checklist/">Checking a design against a review checklist</Link>
-settles five of its seven rules with arithmetic: a capacitor's voltage rating or a saturation
-margin is a number compared against a number, and code makes that comparison with no model
-involved. Nothing on a contract checklist is like that. A payment-term limit sounds arithmetic,
-thirty days against forty-five, but the forty-five is not sitting in a spreadsheet cell; it is
-inside a sentence somebody has to read out of legal prose first, and so is every other rule here:
-liability cap, notice period, assignment, governing law, data deletion are all questions about
-what a clause says, not questions a formula answers. That is why this page has no level-0 half to
-hand back to code, unlike its engineering sibling: reading is the entire job, and code only checks
-that what came back is real, never answers any of the six questions itself.
 
 ## Walkthrough
 
@@ -186,3 +157,37 @@ accumulate.
 
 {/* The reviewed date is rendered by recipes/[slug].astro from this file's frontmatter, last on
     the page. Do not repeat it here. */}
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+Three techniques compose this recipe: <Link href="/techniques/parallelization/">parallelization</Link>
+sends one call per checklist rule, all at once, each seeing only that rule and the agreement;
+<Link href="/techniques/structured-output/">structured output</Link> keeps every reply in the same
+fixed shape, a status from a closed set, the clause number it relies on, and a verbatim quote from
+that clause; <Link href="/techniques/human-in-the-loop/">human approval</Link> holds every finding
+except a plain "meets" for a person before anything happens to it.
+
+Level 3 is enough because the checklist is exactly as fixed as a job like this gets: a team writes
+it down once, and it does not change from one agreement to the next, which is
+<Link href="/shapes/#review-against-criteria">check a piece of work against written rules</Link>'s
+own definition of the shape. Climbing to level 4 would let a model read the checklist and decide
+for itself which rules apply, or how many calls to make; that buys nothing here, since all six
+rules always apply and always get checked, and a model quietly deciding one does not is one more
+way to be wrong, on exactly the agreement where skipping mattered.
+
+The level below is where this recipe differs from its nearest sibling. <Link
+href="/recipes/design-review-checklist/">Checking a design against a review checklist</Link>
+settles five of its seven rules with arithmetic: a capacitor's voltage rating or a saturation
+margin is a number compared against a number, and code makes that comparison with no model
+involved. Nothing on a contract checklist is like that. A payment-term limit sounds arithmetic,
+thirty days against forty-five, but the forty-five is not sitting in a spreadsheet cell; it is
+inside a sentence somebody has to read out of legal prose first, and so is every other rule here:
+liability cap, notice period, assignment, governing law, data deletion are all questions about
+what a clause says, not questions a formula answers. That is why this page has no level-0 half to
+hand back to code, unlike its engineering sibling: reading is the entire job, and code only checks
+that what came back is real, never answers any of the six questions itself.
+
+</details>
+

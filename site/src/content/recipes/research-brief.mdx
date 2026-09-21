@@ -15,45 +15,9 @@ Nobody wants prose that sounds right; they want every claim traceable to somethi
 open. That is a research brief: search public sources, draft from them, and check that every
 claim still says what its source says before anyone reads it.
 
-## The assembled diagram
+## Example run
 
 <Run data={runData} label="Level 5 · assembled for this recipe" runKey="research-brief" />
-
-## Why these techniques, and why not higher
-
-<Link href="/techniques/agentic-rag/">Agentic RAG</Link> runs the search side: the agent decides
-what to search for, opens a source before relying on it, and decides for itself when it has
-enough to draft from. <Link href="/techniques/evaluator-optimizer/">Write and check</Link> sits
-between the draft and the reader: a second prompt reads one drafted sentence and the section it
-cites, and answers one question: does that section say this?
-
-Single-pass <Link href="/techniques/rag/">RAG</Link> (level 2) is not enough on its own because a
-brief's claims rarely come from one search. "What changed" needs at least two queries (the
-current rule, and what it replaced), and the second query depends on what the first one turned
-up, which is the same reason the RAG page gives for climbing to agentic RAG at all.
-
-Two parts of the checking stay below the model entirely, and should. Plain code confirms that
-every citation resolves to a section this run actually opened, which catches an invented
-identifier outright and costs nothing. It is the same check write and check's own example runs. Code
-also owns the loop: how many times a sentence may come back, and what happens when that cap is
-reached with it still unsupported.
-
-What is left for a model is one fixed question, asked the same way every time, and that is what
-settles the level. <Link href="/techniques/debate-review/">Review and debate</Link>, level 6, is a
-reviewer that is itself an agent: it picks what to check and goes looking with retrieval of its
-own. That page's own advice is to try write and check first when the thing you would check is one
-fixed, testable question, and "does this section support this sentence" is exactly that question.
-So the highest level this job needs is level 5, and it needs it for the searching, not the
-checking.
-
-The climb to a reviewing agent has a specific trigger, and it is not volume. It is the failure a
-fixed question cannot state: a source nobody thought to search for, or a sentence its cited
-section technically supports and still misleads. Catching those needs a reviewer that chooses
-what to look at, and the cost stops being one short call per claim and becomes however many turns
-it decides to take, up to a cap. <Link href="/techniques/orchestrator-workers/">A lead agent and
-workers</Link> is a different climb, and its condition is that the split itself cannot be written
-down in advance. A short brief's split can be: if the sections are known, running them at once is
-<Link href="/techniques/parallelization/">parallel calls</Link>, one level down and cheaper.
 
 ## Walkthrough
 
@@ -106,3 +70,44 @@ has been scored; no result file for this recipe exists.
   needing facts joined across many sources.
 - Add <Link href="/techniques/human-in-the-loop/">human approval</Link> before the brief goes out,
   for a topic where a caught citation is not the only thing worth a second look.
+## Design choices
+
+<details className="recipe-detail">
+<summary>Why this level, and when to use another approach</summary>
+
+<Link href="/techniques/agentic-rag/">Agentic RAG</Link> runs the search side: the agent decides
+what to search for, opens a source before relying on it, and decides for itself when it has
+enough to draft from. <Link href="/techniques/evaluator-optimizer/">Write and check</Link> sits
+between the draft and the reader: a second prompt reads one drafted sentence and the section it
+cites, and answers one question: does that section say this?
+
+Single-pass <Link href="/techniques/rag/">RAG</Link> (level 2) is not enough on its own because a
+brief's claims rarely come from one search. "What changed" needs at least two queries (the
+current rule, and what it replaced), and the second query depends on what the first one turned
+up, which is the same reason the RAG page gives for climbing to agentic RAG at all.
+
+Two parts of the checking stay below the model entirely, and should. Plain code confirms that
+every citation resolves to a section this run actually opened, which catches an invented
+identifier outright and costs nothing. It is the same check write and check's own example runs. Code
+also owns the loop: how many times a sentence may come back, and what happens when that cap is
+reached with it still unsupported.
+
+What is left for a model is one fixed question, asked the same way every time, and that is what
+settles the level. <Link href="/techniques/debate-review/">Review and debate</Link>, level 6, is a
+reviewer that is itself an agent: it picks what to check and goes looking with retrieval of its
+own. That page's own advice is to try write and check first when the thing you would check is one
+fixed, testable question, and "does this section support this sentence" is exactly that question.
+So the highest level this job needs is level 5, and it needs it for the searching, not the
+checking.
+
+The climb to a reviewing agent has a specific trigger, and it is not volume. It is the failure a
+fixed question cannot state: a source nobody thought to search for, or a sentence its cited
+section technically supports and still misleads. Catching those needs a reviewer that chooses
+what to look at, and the cost stops being one short call per claim and becomes however many turns
+it decides to take, up to a cap. <Link href="/techniques/orchestrator-workers/">A lead agent and
+workers</Link> is a different climb, and its condition is that the split itself cannot be written
+down in advance. A short brief's split can be: if the sections are known, running them at once is
+<Link href="/techniques/parallelization/">parallel calls</Link>, one level down and cheaper.
+
+</details>
+
