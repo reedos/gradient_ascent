@@ -4,15 +4,15 @@
 
   const main = document.querySelector('main');
   const tooltip = document.querySelector<HTMLElement>('#acronym-tooltip')!;
-  // Never rewrite code, links, form controls, or framework-managed interactive content.
-  const excluded = 'a,button,abbr,code,pre,kbd,samp,script,style,svg,math,textarea,input,select,summary,nav,astro-island,[contenteditable],[data-no-acronyms]';
+  // Keep titles, navigation, code, and interactive content free of definition controls.
+  const excluded = 'h1,h2,h3,h4,h5,h6,[role=heading],a,button,abbr,code,pre,kbd,samp,script,style,svg,math,textarea,input,select,summary,nav,astro-island,[contenteditable],[data-no-acronyms]';
   if (main) {
     const walker = document.createTreeWalker(main, NodeFilter.SHOW_TEXT);
     const nodes: Text[] = [];
     while (walker.nextNode()) {
       const node = walker.currentNode as Text;
       if (node.parentElement && !node.parentElement.closest(excluded) &&
-          node.parentElement.closest('p,li,td,th,dd,figcaption,h1,h2,h3,h4,h5,h6,.test-harness')) nodes.push(node);
+          node.parentElement.closest('p,li,td,th,dd,figcaption,.test-harness')) nodes.push(node);
     }
     for (const node of nodes) {
       const text = node.data;
@@ -38,7 +38,7 @@
 
   // Keep links as links; a separate button supplies touch and keyboard access to the definition.
   main?.querySelectorAll<HTMLAnchorElement>('a').forEach(link => {
-    if (link.closest('nav,astro-island,[data-no-acronyms]') || !link.closest('p,li,td,th,h1,h2,h3,h4,figcaption')) return;
+    if (link.closest('h1,h2,h3,h4,h5,h6,[role=heading],nav,astro-island,[data-no-acronyms]') || !link.closest('p,li,td,th,figcaption')) return;
     const matches = acronymMatches(link.textContent ?? '');
     const primary = matches.find(m => m.key === 'GraphRAG' || m.key === 'RAG') ?? matches[0];
     const unique = primary ? [primary.key] : [];
