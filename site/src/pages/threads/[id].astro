@@ -6,6 +6,7 @@
 // own level, since a thread has no single level of its own).
 import { getEntry, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import GraphEngineering from '../../components/GraphEngineering.astro';
 import ApplyConcept from '../../components/ApplyConcept.astro';
 import PageContents from '../../components/PageContents.astro';
 import ConceptWalkthrough from '../../components/page/ConceptWalkthrough.astro';
@@ -64,6 +65,7 @@ const reviewedISO = entry ? entry.data.reviewed.toISOString().slice(0, 10) : und
   ]}>
   <div id="concept-overview"></div>
   <Connection title="The organizing sentence" color="var(--ot)">{thread.line}</Connection>
+  {id === 'graph-engineering' && <GraphEngineering />}
   <ConceptWalkthrough slug={id!} />
 
   <ApplyConcept slug={id!} title={thread.title} kind="threads" />
