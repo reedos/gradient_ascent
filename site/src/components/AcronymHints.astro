@@ -12,7 +12,7 @@
     while (walker.nextNode()) {
       const node = walker.currentNode as Text;
       if (node.parentElement && !node.parentElement.closest(excluded) &&
-          node.parentElement.closest('p,li,td,th,dd,figcaption,.test-harness')) nodes.push(node);
+          node.parentElement.closest('p,li,td,th,dd,figcaption,.test-harness,[data-definition-text]')) nodes.push(node);
     }
     for (const node of nodes) {
       const text = node.data;

@@ -57,7 +57,7 @@ const levelStackItems = levels.map(t => ({order:t.order,title:t.title,short:t.sh
     <p class="comparison-question"><strong>The question:</strong> “How long is the warranty on the DW-480, and what voids it?”</p>
     <div class="home-comparison">
       <article>
-        <div class="eyebrow" style="color:var(--o2)">Level 2 · RAG</div>
+        <div class="eyebrow" data-definition-text style="color:var(--o2)">Level 2 · RAG</div>
         <h3>Search once, then answer</h3>
         <ol class="mini-flow" aria-label="Fixed retrieval workflow"><li>Question</li><li>Retrieve passages</li><li>Draft answer</li></ol>
         <p>Your code sets the search and passes the retrieved passages to the model.</p>
@@ -66,7 +66,7 @@ const levelStackItems = levels.map(t => ({order:t.order,title:t.title,short:t.sh
         <a href={url('/techniques/rag/#guided-example')}>Explore the RAG guided example &rarr;</a>
       </article>
       <article>
-        <div class="eyebrow" style="color:var(--o5)">Level 5 · Agentic RAG</div>
+        <div class="eyebrow" data-definition-text style="color:var(--o5)">Level 5 · Agentic RAG</div>
         <h3>Search, inspect, and follow up</h3>
         <ol class="mini-flow" aria-label="Model-directed retrieval workflow"><li>Search</li><li>Inspect evidence</li><li>Follow up or answer</li></ol>
         <p>The model chooses follow-up searches and which documents to open, within tool permissions and run limits.</p>

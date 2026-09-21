@@ -34,7 +34,7 @@ const readingTerms: Record<string, [string, string]> = {
     "The repeating cycle behind every agent: the model proposes one action from what it currently sees, your code carries it out, and the result goes back to the model, until the model itself decides to stop."
   ],
   "agentic RAG": [
-    "Agentic RAG",
+    "Agentic retrieval-augmented generation",
     "Retrieval where the model, not your code, decides how many times to search, what to search for next, and when it has read enough to answer, instead of searching once and answering once."
   ],
   "checkpoint": [
