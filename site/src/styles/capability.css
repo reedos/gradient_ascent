@@ -14,9 +14,8 @@
 .cap-front-dot { fill: var(--text) }
 .cap-record { cursor: pointer; outline: none }
 .cap-record-hit { fill: transparent }
-.cap-record:hover .cap-record-hit, .cap-record:focus-visible .cap-record-hit, .cap-record[aria-pressed="true"] .cap-record-hit { stroke: var(--accent); stroke-width: 1.5; fill: var(--panel); fill-opacity: .35 }
+.cap-record:focus-visible .cap-record-hit { stroke: var(--text); stroke-width: 1.5 }
 .cap-callout { pointer-events: none }
-.cap-label-leader { stroke: var(--muted); stroke-width: 1 }
 .cap-inspector { margin-top: 14px; display: flex; align-items: center; gap: 18px; border-top: 1px solid var(--line); padding-top: 12px }
 .cap-inspector label { display: grid; gap: 5px; flex-shrink: 0; font-size: 11px; color: var(--muted) }
 .cap-record-select { max-width: 100%; padding: 7px 28px 7px 9px; background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 6px; font: 500 13px var(--font) }

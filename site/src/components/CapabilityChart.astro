@@ -145,10 +145,8 @@ const charts = [
       {named.map((p,i) => {
         const x = r1(sx(scale, yearOf(p.date)));
         const y = r1(sy(scale, p.eci));
-        const below = p.name === 'Claude Fable 5';
         return <g class="cap-callout">
-          {below && <line class="cap-label-leader" x1={x} x2={x-6} y1={y+7} y2={y+24} />}
-          <text class="cap-name" x={x + (mobile && i===0 ? 6 : -6)} y={y + (below ? 38 : -8)} text-anchor={mobile && i===0?'start':'end'}>{p.name.replace(/ \(.*\)$/, '')}</text>
+          <text class="cap-name" x={x + (mobile && i===0 ? 6 : -6)} y={y - (p === top ? 28 : 8)} text-anchor={mobile && i===0?'start':'end'}>{p.name === 'Claude Fable 5' ? 'Fable 5' : p.name.replace(/ \(.*\)$/, '')}</text>
         </g>;
       })}
 
