@@ -67,5 +67,16 @@ const ogImage = new URL(url('/og.png'), Astro.site).toString();
     </aside>
     <Footer />
     <AcronymHints />
+    <script is:inline>
+      // Only count the public site, including when a production build is previewed locally.
+      if (location.origin === 'https://reedos.github.io' &&
+          (location.pathname === '/gradient_ascent' || location.pathname.startsWith('/gradient_ascent/'))) {
+        const counter = document.createElement('script');
+        counter.async = true;
+        counter.src = 'https://gc.zgo.at/count.js';
+        counter.dataset.goatcounter = 'https://reedos.goatcounter.com/count';
+        document.body.appendChild(counter);
+      }
+    </script>
   </body>
 </html>
