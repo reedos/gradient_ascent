@@ -5,26 +5,25 @@ import { agentJourney } from '../lib/agent-journey';
 import { url } from '../lib/url';
 const bridges = ['Add relevant information', 'Organize the work into steps', 'Let the model request actions', 'Let results guide the next action', 'Optional: add specialists', 'Add continuity across sessions'];
 ---
-<Base title="From a chatbot to an always-on agent · Gradient Ascent" description="Seven simple steps explaining context, workflows, tools, agent loops, teams, and ongoing work, using one project throughout.">
-  <div class="page-hero"><div class="eyebrow muted">Start with the basics</div><h1>From a chatbot to an always-on agent</h1><p>Follow one website-launch project as we add capabilities. The model is one part of the system; software around it supplies information, runs actions, and keeps work moving.</p><p>This shows how the capabilities build on one another. For historical dates, see the <a href={url('/timeline/')}>timeline</a>.</p></div>
-  <div class="journey-context"><strong>Our task: help a team launch its website.</strong><p>The same task grows from a conversation into work that can continue across days. These are illustrative examples, not live agent runs.</p><p><a href={url('/levels/0/')}>Before step 1:</a> if rules, a form, or ordinary code can do the job reliably, you may not need a model.</p></div>
+<Base title="From a chatbot to an always-on agent · Gradient Ascent" description="How conversational language models expanded into systems with retrieval, workflows, tools, agent loops, coordination, and persistent operation.">
+  <div class="page-hero"><div class="eyebrow muted">Start with the basics</div><h1>From a chatbot to an always-on agent</h1><p>Modern AI chatbots put language models inside a conversation. Retrieval, workflows, tool interfaces, agent loops, and persistent infrastructure expanded what these systems could do—from generating a reply to carrying out work across sessions.</p><p>These developments overlapped and still coexist; they were not seven clean historical eras. The levels below explain the architectural changes. For dated milestones, see the <a href={url('/timeline/')}>timeline</a>.</p></div>
   <div class="journey-steps">
     {agentJourney.map((step,i) => <><section class="journey-step" id={`step-${i+1}`} style={`--step-color:var(--o${i+1})`}>
       <header class="step-header"><a class="step-label" href={url(`/levels/${i+1}/`)}>Level {i+1} · {levels.find(level => level.order === i+1)?.title} <span aria-hidden="true">↗</span></a><h2 class="step-heading">{step.title}</h2></header>
       <div class="step-body">
         <p class="added">{step.added}</p>
-        <figure><ol class="journey-flow" aria-label={`How step ${i+1} works`}>{step.flow.map((node,n) => <li><span>{node}</span>{n<step.flow.length-1 && <b aria-hidden="true">→</b>}</li>)}</ol>
+        <figure><ol class="journey-flow" aria-label={`Level ${i+1} architecture`}>{step.flow.map((node,n) => <li><span>{node}</span>{n<step.flow.length-1 && <b aria-hidden="true">→</b>}</li>)}</ol>
         <figcaption>{i===4 ? 'Repeat the loop as needed, until finished, blocked, or stopped by a limit.' : i===5 ? 'Specialists can work separately and return findings; teams are an optional branch.' : i===6 ? 'A later trigger starts another session. Saved records connect the sessions.' : 'Arrows show the flow of information or work.'}</figcaption></figure>
-        <dl><div><dt>On our project</dt><dd>{step.example}</dd></div><div><dt>The human role</dt><dd>{step.control}</dd></div><div><dt>What remains limited</dt><dd>{step.limit}</dd></div></dl>
+        <dl><div><dt>What changed</dt><dd>{step.shift}</dd></div><div><dt>What this does not mean</dt><dd>{step.limit}</dd></div></dl>
       </div>
     </section>
     {i<6 && <div class:list={['stage-bridge', i===4 && 'optional-bridge']}>
       <span class="bridge-arrow" aria-hidden="true">↓</span>
-      <div><strong>{bridges[i]}</strong><p>{i===5 ? 'A single agent or a team can do useful work in one session. Saved records and triggers let either return to it later.' : step.next}</p></div>
+      <div><strong>{bridges[i]}</strong><p>{step.next}</p></div>
     </div>}
     </>)}
   </div>
-  <section class="journey-ending"><h2>What actually makes it always-on?</h2><p>An agent loop decides what to do during a run. Saved state and triggers let it resume across runs. It can be one agent or a team. A scheduled sequence of fixed steps is still a workflow.</p><p>These capabilities can combine in different ways. Teams are optional: one agent can also keep working over time.</p></section>
+  <section class="journey-ending"><h2>The evolution is in the whole system</h2><p>More capable models are part of the story. The other part is the software around them: information access, action interfaces, control loops, coordination, and persistence. Together, these turn conversational output into work that can continue over time.</p><p>These capabilities can combine in different ways. Teams are optional: one agent can also keep working over time.</p></section>
 </Base>
 <style>
 .journey-context,.journey-ending { max-width: 78ch; margin: 28px 0; font-size: 15px; line-height: 1.7; }
