@@ -30,5 +30,6 @@ the built pages. `docs/WRITING-A-TECHNIQUE-PAGE.md` and `docs/WRITING-A-TEARDOWN
 a page is put together and sourced. Examples are standard-library Python and run on the stub
 model with no network.
 
-Every page is marked Draft until a recorded run and a scored result exist for it. Please do not
+Every page is marked Sourced until a recorded run and a scored result exist for it; only then
+is it Measured. Please do not
 add measured numbers without the run that produced them.

@@ -1,7 +1,7 @@
 ---
 import { timeline, milestone, formatDate, decimalYear, shifts, asOf } from '../lib/timeline';
 import { levels } from '../lib/content';
-import { selections } from '../lib/timeline-selections';
+import { selections, shiftLabels } from '../lib/timeline-selections';
 import { url } from '../lib/url';
 interface Props { variant?: 'home' | 'page' }
 const { variant = 'home' } = Astro.props;
@@ -37,7 +37,7 @@ const ticks = [2019, 2021, 2023, 2025, 2027];
             <span class="review-connection" aria-hidden="true" style={`left:${pct(r.paper)}%;width:${pct(r.eventDate)-pct(r.paper)}%`}></span>
             <span class="paper-dot" aria-hidden="true" style={`left:${pct(r.paper)}%`}></span>
             <a class="event-link" href={`#milestone-level-${r.level}`} aria-label={`${r.title}: ${r.event}, ${formatDate(r.eventDate.date,r.eventDate.precision)}. Show details`} style={`left:${pct(r.eventDate)}%`}>
-              <span class="event-label">{r.level === 3 ? 'Zapier + OpenAI' : r.title}{r.level === 6 && <small>Subagents documented · Jun 2025</small>}</span><span class="event-dot" aria-hidden="true"></span>
+              <span class="event-label">{r.short ?? r.title}{r.subtitle && <small>{r.subtitle} · {formatDate(r.eventDate.date.slice(0,7),'month')}</small>}</span><span class="event-dot" aria-hidden="true"></span>
             </a>
           </div>
         </div>
@@ -50,8 +50,8 @@ const ticks = [2019, 2021, 2023, 2025, 2027];
     <h2 id="model-shifts-title">Across all levels · changes in the models</h2>
     <div class="shift-grid">{shifts.map(s => {
       const m = milestone(s.milestone)!;
-      const label = s.id === 'system-one-models' ? 'Typed decision models (Jev)' : s.title;
-      const summary = s.id === 'system-one-models' ? 'TypeSafe introduced Jev in early access on September 15, 2026: a model that returns typed decisions with probabilities rather than generated text. “System One” is TypeSafe’s name for its proposed model category.' : s.summary;
+      const label = shiftLabels[s.id]?.label ?? s.title;
+      const summary = shiftLabels[s.id]?.summary ?? s.summary;
       return <details class="shift-detail" id={s.id}><summary>{label} <span>· {formatDate(m.date.slice(0,7),'month')}</span></summary><p>{summary} <a href={m.source.url}>Source ↗</a></p></details>;
     })}</div>
   </section>
@@ -61,8 +61,8 @@ const ticks = [2019, 2021, 2023, 2025, 2027];
   {rows.map(r => <details id={`milestone-level-${r.level}`} style={`--c:var(--o${r.level})`}>
     <summary><span class="note-level">{r.level} · {r.name}</span><span>{r.title}</span><span class="note-event">{r.event}</span></summary>
     <div class="note-body"><p>{r.note}</p>
-      <p><strong>Marked event:</strong> {r.level === 3 ? 'Available by ' : ''}{formatDate(r.eventDate.date,r.eventDate.precision)} · <a href={r.eventDate.source.archive_url ?? r.eventDate.source.url}>{r.eventDate.source.title} ↗</a></p>
-      {r.level === 2 && <p><strong>Early behavior:</strong> <a href="https://www.cognitiverevolution.ai/in-search-of-truth-w-aravind-srinivas-of-perplexity-ai/">Founder interview describing the first Perplexity Ask ↗</a>.</p>}
+      <p><strong>Marked event:</strong> {r.datePrefix ? `${r.datePrefix} ` : ''}{formatDate(r.eventDate.date,r.eventDate.precision)} · <a href={r.eventDate.source.archive_url ?? r.eventDate.source.url}>{r.eventDate.source.title} ↗</a></p>
+      {r.evidence && <p><strong>{r.evidence.label}:</strong> <a href={r.evidence.url}>{r.evidence.text} ↗</a>.</p>}
       <p><strong>Foundational publication:</strong> <a href={r.paper.source.url}>{r.paper.title} ↗</a> · {formatDate(r.paper.date,r.paper.precision)}. This is a reference point, not a claim to the first use of the idea.</p>
       {r.eventDate.opened && <p><strong>Later access:</strong> {r.eventDate.opened.text}, {formatDate(r.eventDate.opened.date,r.eventDate.opened.precision)}.</p>}
     </div>

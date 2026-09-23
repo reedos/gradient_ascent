@@ -1,13 +1,17 @@
 # Build the Astro site and deploy it to GitHub Pages.
 #
 # MANUAL ONLY, ON PURPOSE. The only trigger is workflow_dispatch: this workflow never runs on a
-# push, on a schedule, or on a merge. A deploy is a decision: every page is still `draft`, and
+# push, on a schedule, or on a merge. A deploy is a decision: no page is `measured` yet, and
 # dispatching by hand is a perfectly good way to publish a site that changes a few times a month.
 # Run it with `gh workflow run pages.yml` or from the Actions tab.
 #
 # Before the first dispatch, confirm `site` and `base` in site/astro.config.mjs match the
 # repository this is running in. A wrong base path builds green and breaks every link except the
 # home page's.
+#
+# A deploy also waits for `checks` on the same commit and refuses to run unless it passed. Two
+# authors push to main; on 09/20-09/21/2026 eight red commits deployed because nothing tied the
+# two workflows together.
 
 name: pages
 
@@ -15,6 +19,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
   pages: write
   id-token: write
@@ -26,7 +31,27 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  checks-passed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for checks on this commit, and require success
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Poll for up to 20 minutes: a deploy dispatched right after a push finds checks running.
+          for i in $(seq 1 40); do
+            run=$(gh api "repos/${{ github.repository }}/actions/workflows/checks.yml/runs?head_sha=${{ github.sha }}&per_page=1"               --jq '.workflow_runs[0] | "\(.status) \(.conclusion)"')
+            echo "checks on ${{ github.sha }}: ${run:-none yet}"
+            case "$run" in
+              "completed success") exit 0 ;;
+              completed*) echo "::error::checks did not pass on this commit; fix them before deploying"; exit 1 ;;
+            esac
+            sleep 30
+          done
+          echo "::error::checks did not finish within 20 minutes"; exit 1
+
   build:
+    needs: checks-passed
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository
