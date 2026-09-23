@@ -227,6 +227,27 @@ class CachingModelTests(unittest.TestCase):
         self.assertEqual(len(calls), 2)
 
 
+class RescoreTests(unittest.TestCase):
+    """`--rescore` re-grades cached answers after a grading fix. A plain re-run from cache would
+    write the time it took to read the cache over the real run's wall time."""
+
+    def test_a_rescore_never_asks_the_model_for_an_answer(self) -> None:
+        from examples.common.model import Message
+
+        stand_in = eval_run.CacheOnly(StubModel(lambda m, t: StubResponse(text="new"), model_id="stub-x"))
+        with self.assertRaises(RuntimeError):
+            stand_in.complete([Message(role="user", content="a prompt nobody cached")])
+
+    def test_a_rescore_keeps_the_runs_own_timing_date_and_commit(self) -> None:
+        previous = {"run_date": "2026-09-23T07:00:00+00:00", "commit": "abc1234", "wall_time_s": 598.4, "tokens_in": 10, "tokens_out": 20}
+        rescored = eval_run.carry_run_fields({"wall_time_s": 3.1, "commit": "def5678", "score_overall": 0.9}, previous)
+        self.assertEqual(rescored["wall_time_s"], 598.4)
+        self.assertEqual(rescored["commit"], "abc1234")
+        self.assertEqual(rescored["run_date"], previous["run_date"])
+        self.assertEqual(rescored["score_overall"], 0.9)
+        self.assertIn("date", rescored["rescored"])
+
+
 class EmptyCompletionTests(unittest.TestCase):
     def test_an_empty_reply_is_counted_as_a_setup_failure_on_the_result(self) -> None:
         """An empty reply is graded as a wrong answer, which a score cannot tell apart from a real

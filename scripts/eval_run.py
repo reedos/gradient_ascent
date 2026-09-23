@@ -576,6 +576,36 @@ class EmptyWatch:
         return completion
 
 
+class CacheOnly:
+    """Stands in for the answering model under `--rescore`: every answer must come from the
+    cache. A cache miss means the question's prompt changed since the run, so its answer would be
+    new work with no timing behind it, and the rescore refuses rather than mix the two."""
+
+    def __init__(self, inner: Model) -> None:
+        self.model_id = inner.model_id
+        self.settings = getattr(inner, "settings", None)
+
+    def complete(self, messages, *, tools=None, schema=None, max_tokens=1024) -> Completion:
+        raise RuntimeError(
+            "--rescore found an answer that is not in the cache; its prompt changed since the run. "
+            "Run the example again instead."
+        )
+
+
+# The fields a rescore takes from the run that produced the answers: when and on what code the
+# answers were generated, and what generating them cost. Only the grading is new.
+RUN_FIELDS = ("run_date", "commit", "wall_time_s", "tokens_in", "tokens_out", "embedder_id")
+
+
+def carry_run_fields(summary: dict, previous: dict) -> dict:
+    """The rescored summary, with the original run's own fields and a record of the rescore."""
+    for key in RUN_FIELDS:
+        if key in previous:
+            summary[key] = previous[key]
+    summary["rescored"] = {"date": datetime.now(timezone.utc).isoformat(timespec="seconds"), "commit": git_commit()}
+    return summary
+
+
 class CountingModel:
     """Wraps a `Model` and adds up what it spent. Used for the grader.
 
@@ -984,6 +1014,12 @@ def build_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--grader", default=None, help="model spec for rubric grading; defaults to --model")
     parser.add_argument("--review-seed", type=int, default=0, help="seed for the 10%% hand-check sample")
     parser.add_argument("--allow-stub", action="store_true")
+    parser.add_argument(
+        "--rescore",
+        action="store_true",
+        help="re-grade answers already in the cache, keeping the earlier run's timing, tokens, date "
+        "and commit; refuses if any answer is not cached",
+    )
     return parser.parse_args(argv)
 
 
@@ -1029,7 +1065,7 @@ def main(argv: list[str]) -> int:
         print(f"Setup error: {exc}", file=sys.stderr)
         return 2
     raw_model = build_model(args.model, stub=generic_stub_model())
-    model = CachingModel(raw_model, args.cache_dir)
+    model = CachingModel(CacheOnly(raw_model) if args.rescore else raw_model, args.cache_dir)
     grader: Model | None = None
     if any(q["grading"] == "rubric" for q in questions):
         grader_spec = args.grader or args.model
@@ -1055,6 +1091,12 @@ def main(argv: list[str]) -> int:
             if summary["interrupted"]:
                 return 130
             continue
+        if args.rescore:
+            previous_path = args.out / name / f"{_safe_name(summary['model_id'])}.json"
+            if not previous_path.is_file():
+                print(f"[{name}] --rescore needs the earlier result file at {previous_path}", file=sys.stderr)
+                return 2
+            summary = carry_run_fields(summary, json.loads(previous_path.read_text(encoding="utf-8")))
         out_path = write_result(summary, args.out)
         if summary["interrupted"]:
             # Ctrl+C. Write what finished, say so in plain words, and stop: do not roll on to the
