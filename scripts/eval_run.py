@@ -493,21 +493,24 @@ class CachingModel:
     def __init__(self, inner: Model, cache_dir: Path) -> None:
         self.inner = inner
         self.model_id = inner.model_id
+        # A backend's own settings (Ollama's context size and reasoning allowance) change what it
+        # returns for the same prompt, so they are part of the cache key when the backend has any.
+        self.settings = getattr(inner, "settings", None)
         self._dir = cache_dir / re.sub(r"[^A-Za-z0-9_.-]", "_", inner.model_id)
         self._dir.mkdir(parents=True, exist_ok=True)
         self.hits = 0
         self.misses = 0
 
     def _digest(self, messages: list[Message], tools: list[dict] | None, schema: dict | None, max_tokens: int) -> str:
-        payload = json.dumps(
-            {
-                "messages": [{"role": m.role, "content": content_payload(m.content)} for m in messages],
-                "tools": tools,
-                "schema": schema,
-                "max_tokens": max_tokens,
-            },
-            sort_keys=True,
-        )
+        key: dict = {
+            "messages": [{"role": m.role, "content": content_payload(m.content)} for m in messages],
+            "tools": tools,
+            "schema": schema,
+            "max_tokens": max_tokens,
+        }
+        if self.settings is not None:
+            key["settings"] = self.settings
+        payload = json.dumps(key, sort_keys=True)
         return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
     def complete(
@@ -542,6 +545,33 @@ class CachingModel:
             encoding="utf-8",
             newline="\n",
         )
+        return completion
+
+
+class EmptyWatch:
+    """Wraps the answering model and counts completions that came back with no text and no tool
+    call. An empty completion is a failure of the setup (most often a reasoning model that spent
+    its whole output cap before answering), not an answer, but the grader cannot tell the two
+    apart and scores it wrong. `empty_completions` on the result file must be 0 before a score is
+    read."""
+
+    def __init__(self, inner: Model) -> None:
+        self.inner = inner
+        self.model_id = inner.model_id
+        self.settings = getattr(inner, "settings", None)
+        self.empty = 0
+
+    def complete(
+        self,
+        messages: list[Message],
+        *,
+        tools: list[dict] | None = None,
+        schema: dict | None = None,
+        max_tokens: int = 1024,
+    ) -> Completion:
+        completion = self.inner.complete(messages, tools=tools, schema=schema, max_tokens=max_tokens)
+        if not completion.text.strip() and not completion.tool_calls:
+            self.empty += 1
         return completion
 
 
@@ -747,6 +777,7 @@ def run_example(
     `main`), kept separate so tests can pass a scripted `StubModel` directly.
     """
     run_fn, level = load_run_fn(name)
+    model = watched = EmptyWatch(model)
     counted_grader = CountingModel(grader) if grader is not None else None
     grader = counted_grader or grader
     results: list[QuestionResult] = []
@@ -813,6 +844,8 @@ def run_example(
         budget_tokens=budget_tokens,
     )
     summary["interrupted"] = interrupted
+    summary["empty_completions"] = watched.empty
+    summary["model_settings"] = watched.settings
     summary["embedder_id"] = embedder.model_id if embedder is not None and name in EMBEDDING_EXAMPLES else None
     # Kept separate from `tokens_in`/`tokens_out`, which are the technique's own cost and the only
     # ones a page may quote. The grader's cost is real money on a metered run and belongs on the

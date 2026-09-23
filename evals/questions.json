@@ -3,8 +3,8 @@
   "corpus_dir": "evals/corpus",
   "kinds": ["lookup", "multi_hop", "numeric", "unanswerable", "conflicting"],
   "abstain_patterns": [
-    "\\b(?:do|does|did) not (?:say|state|specify|mention|give|list|provide|include|rate|publish|record)",
-    "\\b(?:don't|doesn't|didn't) (?:say|state|specify|mention|give|list|provide|include)",
+    "\\b(?:do|does|did) not (?:say|state|specify|mention|give|list|provide|include|rate|publish|record|contain|cover|address|discuss)",
+    "\\b(?:don't|doesn't|didn't) (?:say|state|specify|mention|give|list|provide|include|contain|cover|address|discuss)",
     "\\bnot (?:stated|given|specified|mentioned|listed|provided|published|documented|available|found)\\b",
     "\\bno (?:information|figure|number|mention|data|rating|price|weight|capacity|record|answer)\\b",
     "\\b(?:cannot|can't|could not|couldn't|unable to) (?:be )?(?:determined|determine|answer|answered|find|found|tell)\\b",
@@ -35,7 +35,7 @@
       "kind": "lookup",
       "question": "How many cubic feet is the DR-520 dryer's drum?",
       "answer": "7.8 cubic feet.",
-      "accept": ["7\\.8 cubic (foot|feet)"],
+      "accept": ["\\b7\\.8[- ]?(?:cubic (?:foot|feet)|cu\\.? ?ft\\b)"],
       "must_cite": ["dr520-manual#1"],
       "grading": "exact"
     },
@@ -71,7 +71,7 @@
       "kind": "lookup",
       "question": "How long is the DW-300's Quick Wash cycle?",
       "answer": "30 minutes.",
-      "accept": ["30 minutes"],
+      "accept": ["\\b30[- ]?(?:minutes|mins?\\b)"],
       "must_cite": ["dw300-manual#3"],
       "grading": "exact"
     },
@@ -98,7 +98,7 @@
       "kind": "lookup",
       "question": "What is the maximum drain hose length for a dishwasher installation?",
       "answer": "8 feet.",
-      "accept": ["8 feet"],
+      "accept": ["\\b8[- ]?(?:feet|foot|ft\\b)"],
       "must_cite": ["installation-guide#3"],
       "grading": "exact"
     },
@@ -226,7 +226,7 @@
       "question": "The installation guide requires one cycle to be run on a new dryer before regular use. Which cycle, and how long does it take on a DR-520?",
       "answer": "One Air Fluff cycle, which runs 20 minutes on the DR-520.",
       "accept": ["Air Fluff"],
-      "require": ["20 minutes"],
+      "require": ["\\b20[- ]?(?:minutes|mins?\\b)"],
       "must_cite": ["installation-guide#6", "dr520-manual#3"],
       "grading": "exact"
     },
@@ -277,7 +277,7 @@
       "kind": "numeric",
       "question": "How many gallons of water does a DW-300 use over 10 Normal cycles?",
       "answer": "32 gallons.",
-      "accept": ["32 gallons"],
+      "accept": ["\\b32[- ]?(?:gallons|gal\\b)"],
       "must_cite": ["dw300-manual#3"],
       "grading": "exact",
       "inputs": {"gallons_per_normal_cycle": 3.2, "cycles": 10},
@@ -316,7 +316,7 @@
       "kind": "numeric",
       "question": "Over 20 Normal cycles each, how many more gallons does a DW-300 use than a DW-480?",
       "answer": "4 gallons ((3.2 - 3.0) x 20).",
-      "accept": ["4 gallons"],
+      "accept": ["\\b4[- ]?(?:gallons|gal\\b)"],
       "must_cite": ["dw300-manual#3", "dw480-manual#3"],
       "grading": "exact",
       "inputs": {"dw300_gal": 3.2, "dw480_gal": 3.0, "cycles": 20},
@@ -355,7 +355,7 @@
       "kind": "numeric",
       "question": "How many minutes longer is the DW-480's Heavy cycle than the DW-300's Heavy cycle?",
       "answer": "10 minutes (140 - 130).",
-      "accept": ["10 minutes"],
+      "accept": ["\\b10[- ]?(?:minutes|mins?\\b)"],
       "must_cite": ["dw300-manual#3", "dw480-manual#3"],
       "grading": "exact",
       "inputs": {"dw480_heavy": 140, "dw300_heavy": 130},
@@ -368,7 +368,7 @@
       "kind": "numeric",
       "question": "A DR-520 runs a Normal cycle (42 minutes) twice and a Steam Refresh cycle (20 minutes) once in one day. How many total minutes of cycles is that?",
       "answer": "104 minutes (42 x 2 + 20).",
-      "accept": ["104 minutes"],
+      "accept": ["\\b104[- ]?(?:minutes|mins?\\b)"],
       "must_cite": ["dr520-manual#3"],
       "grading": "exact",
       "inputs": {"normal_minutes": 42, "normal_runs": 2, "steam_minutes": 20},
@@ -613,7 +613,7 @@
       "kind": "conflicting",
       "question": "What is the maximum allowed vent run for a DR-520 installation?",
       "answer": "25 feet, per Service Bulletin SB-2026-07 (2026-06-01), which supersedes the DR-520 owner's manual's 35-foot figure (revision 2024-03-01).",
-      "accept": ["25 feet"],
+      "accept": ["\\b25[- ]?(?:feet|foot|ft\\b)"],
       "must_cite": ["dr520-manual#4", "service-bulletin#2"],
       "grading": "exact"
     },
@@ -631,7 +631,7 @@
       "kind": "conflicting",
       "question": "For a DR-520, is the maximum vent run 35 feet or 25 feet, and why do the documents differ?",
       "answer": "25 feet is current. The DR-520 owner's manual (2024-03-01) originally published 35 feet; Service Bulletin SB-2026-07 (2026-06-01) revised it down to 25 feet after field reports of reduced airflow, and a later bulletin supersedes the manual.",
-      "accept": ["25 feet", "35 feet"],
+      "accept": ["\\b25[- ]?(?:feet|foot|ft\\b)", "\\b35[- ]?(?:feet|foot|ft\\b)"],
       "must_cite": ["dr520-manual#4", "service-bulletin#2"],
       "grading": "rubric",
       "rubric": [
@@ -645,7 +645,7 @@
       "kind": "conflicting",
       "question": "Which document represents the current, authoritative maximum vent run for the DR-520?",
       "answer": "Service Bulletin SB-2026-07 (2026-06-01); it explicitly supersedes the DR-520 owner's manual and the Installation Guide on this figure.",
-      "accept": ["supersedes", "25 feet"],
+      "accept": ["supersedes", "\\b25[- ]?(?:feet|foot|ft\\b)"],
       "must_cite": ["dr520-manual#4", "service-bulletin#2"],
       "grading": "rubric",
       "rubric": [
@@ -658,7 +658,7 @@
       "kind": "conflicting",
       "question": "An installer follows the 2024 DR-520 owner's manual and installs 35 feet of vent. Is this correct per current guidance?",
       "answer": "No. The 2026 service bulletin lowered the DR-520 maximum to 25 feet, superseding the manual's 35-foot figure, so a 35-foot run no longer meets specification.",
-      "accept": ["25 feet"],
+      "accept": ["\\b25[- ]?(?:feet|foot|ft\\b)"],
       "must_cite": ["dr520-manual#4", "service-bulletin#2"],
       "grading": "rubric",
       "rubric": [
@@ -711,7 +711,7 @@
       "kind": "conflicting",
       "question": "What is the difference, in feet, between the DR-520 manual's original maximum vent run and the figure in Service Bulletin SB-2026-07?",
       "answer": "10 feet (35 - 25).",
-      "accept": ["10 feet"],
+      "accept": ["\\b10[- ]?(?:feet|foot|ft\\b)"],
       "must_cite": ["dr520-manual#4", "service-bulletin#2"],
       "grading": "exact",
       "corpus_inputs": ["35 feet", "25 feet"]
@@ -734,7 +734,7 @@
       "kind": "conflicting",
       "question": "A DR-520 installed in 2025 has a 30-foot vent run with 3 elbows. Does it meet the current maximum vent run specification?",
       "answer": "No. Even though 3 elbows is within the current 3-elbow limit, 30 feet exceeds the current 25-foot maximum set by Service Bulletin SB-2026-07.",
-      "accept": ["25[- ](feet|foot)"],
+      "accept": ["\\b25[- ]?(?:feet|foot|ft\\b)"],
       "must_cite": ["dr520-manual#4", "service-bulletin#2"],
       "grading": "rubric",
       "rubric": [
@@ -747,7 +747,7 @@
       "kind": "conflicting",
       "question": "What was the DR-520's maximum vent run according to its original owner's manual, before the 2026 revision?",
       "answer": "35 feet, with up to 4 elbows.",
-      "accept": ["35 feet"],
+      "accept": ["\\b35[- ]?(?:feet|foot|ft\\b)"],
       "must_cite": ["dr520-manual#4"],
       "grading": "exact"
     }

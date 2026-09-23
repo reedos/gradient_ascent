@@ -66,12 +66,18 @@ Check, in this order:
    The cache means you only pay for what the first run did not reach.
 3. `"ungraded": 0`: every `lookup` question is `exact`-graded, so anything ungraded means a
    question is mis-tagged in `evals/questions.json`, not that the model did badly.
-4. `"model_decided_steps": 0`: `rag` is level 2. Nonzero means either the example changed or the
+4. `"empty_completions": 0`: a nonzero count means the model returned no text at all, most often
+   a reasoning model that spent its whole output cap thinking before it answered. Each one is
+   graded as a wrong answer, so the score is not readable until this is 0. `OllamaModel` adds
+   `reasoning_allowance` (recorded under `"model_settings"`) above every caller's cap for this
+   reason; raise it and re-run rather than reading the score. The first live run on 09/22/2026
+   lost 3 of 12 answers this way before the allowance existed.
+5. `"model_decided_steps": 0`: `rag` is level 2. Nonzero means either the example changed or the
    rule in `examples/common/trace.py` broke; stop and find out which before reading further.
-5. `"citation_coverage"`: the share of `must_cite` sections the answers actually cited. Compare
+6. `"citation_coverage"`: the share of `must_cite` sections the answers actually cited. Compare
    with `"retrieval_coverage"`: high retrieval coverage and low citation coverage means
    required sources reached the workflow but were not cited in its final answer.
-6. `"score_overall"`: read it last. It is the least informative number until you trust the five
+7. `"score_overall"`: read it last. It is the least informative number until you trust the six
    above it.
 
 Do not publish anything off this run. One example, one kind, one model is a smoke test.
@@ -101,7 +107,7 @@ from an unchecked grader is worse than no score, because it looks like a measure
 python scripts/eval_run.py --example rag --model ollama:<your-tag> --embedder ollama:<embedding-tag> --grader ollama:<your-tag> --budget-tokens 100000
 ```
 
-Check the same six things, plus `score_by_kind.unanswerable`: it is gated in code before any
+Check the same seven things, plus `score_by_kind.unanswerable`: it is gated in code before any
 grader sees it, so a low score there is a hallucination rate, not a grader's opinion.
 
 ## Step 4: record the trace

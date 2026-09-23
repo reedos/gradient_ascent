@@ -243,6 +243,12 @@ def _ollama_message(message: Message) -> dict:
 
 DEFAULT_NUM_CTX = 8192
 
+# Tokens a reasoning model may spend before its first visible one, on top of what the caller asked
+# for. Ollama counts hidden reasoning against `num_predict`, so a caller's `max_tokens=500` can be
+# used up entirely by reasoning: the reply comes back with `done_reason: length` and no text. The
+# first live run lost 3 of 12 answers that way, and each was scored as a wrong answer.
+DEFAULT_REASONING_ALLOWANCE = 4096
+
 
 class OllamaModel:
     """Calls a local Ollama server's `/api/chat`. Never pulls a model automatically.
@@ -252,13 +258,26 @@ class OllamaModel:
     front of a long prompt: a RAG run would score badly because the model never saw the sources,
     and the chart would read that as the technique failing. Anything measured here must be
     measured at a context size the result file can state.
+
+    `num_predict` is the caller's `max_tokens` plus `reasoning_allowance`, for the same reason: a
+    reasoning model spends hidden tokens first, and a cap sized for the visible answer alone can
+    leave nothing for it. `settings` records both numbers so a result file can state them.
     """
 
-    def __init__(self, tag: str, *, host: str = "http://127.0.0.1:11434", num_ctx: int = DEFAULT_NUM_CTX) -> None:
+    def __init__(
+        self,
+        tag: str,
+        *,
+        host: str = "http://127.0.0.1:11434",
+        num_ctx: int = DEFAULT_NUM_CTX,
+        reasoning_allowance: int = DEFAULT_REASONING_ALLOWANCE,
+    ) -> None:
         self.model_id = f"ollama:{tag}"
         self._tag = tag
         self._host = host.rstrip("/")
         self._num_ctx = num_ctx
+        self._reasoning_allowance = reasoning_allowance
+        self.settings = {"num_ctx": num_ctx, "reasoning_allowance": reasoning_allowance}
 
     def complete(
         self,
@@ -268,7 +287,7 @@ class OllamaModel:
         schema: dict | None = None,
         max_tokens: int = 1024,
     ) -> Completion:
-        options: dict = {"num_predict": max_tokens, "num_ctx": self._num_ctx}
+        options: dict = {"num_predict": max_tokens + self._reasoning_allowance, "num_ctx": self._num_ctx}
         payload: dict = {
             "model": self._tag,
             "messages": [_ollama_message(m) for m in messages],

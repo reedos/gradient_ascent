@@ -586,10 +586,27 @@ class BackendRequestShapeTests(unittest.TestCase):
         with unittest.mock.patch.object(model_mod, "_post_json", fake_post):
             model.complete([model_mod.Message(role="user", content="hi")], max_tokens=64)
         self.assertEqual(sent["payload"]["options"]["num_ctx"], model_mod.DEFAULT_NUM_CTX)
-        self.assertEqual(sent["payload"]["options"]["num_predict"], 64)
+        self.assertEqual(sent["payload"]["options"]["num_predict"], 64 + model_mod.DEFAULT_REASONING_ALLOWANCE)
         self.assertFalse(sent["payload"]["stream"])
         self.assertEqual(sent["url"], "http://127.0.0.1:11434/api/chat")
         self.assertGreater(sent["timeout"], 0)
+
+    def test_ollama_leaves_room_for_reasoning_above_the_callers_cap(self) -> None:
+        """A reasoning model spends hidden tokens against `num_predict` before its first visible
+        one. With `num_predict` equal to the caller's cap, the first live run got empty replies
+        (`done_reason: length`) on 3 of 12 questions. The allowance is added, not substituted, and
+        is recorded in `settings` so a result file can state it."""
+        sent = {}
+
+        def fake_post(url, payload, *, timeout=60):
+            sent["payload"] = payload
+            return {"message": {"content": "ok"}}
+
+        model = model_mod.OllamaModel("llama3.1", reasoning_allowance=0)
+        with unittest.mock.patch.object(model_mod, "_post_json", fake_post):
+            model.complete([model_mod.Message(role="user", content="hi")], max_tokens=64)
+        self.assertEqual(sent["payload"]["options"]["num_predict"], 64)
+        self.assertEqual(model.settings, {"num_ctx": model_mod.DEFAULT_NUM_CTX, "reasoning_allowance": 0})
 
     def test_the_ollama_embedder_returns_unit_vectors_like_the_stub_does(self) -> None:
         """`Embedder` promises unit vectors and the RAG page's Build it lane says so in prose,

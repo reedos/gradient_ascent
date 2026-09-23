@@ -210,6 +210,45 @@ class CachingModelTests(unittest.TestCase):
         self.assertNotEqual(a.text, b.text)
         self.assertEqual(caching.misses, 2)
 
+    def test_backend_settings_are_part_of_the_cache_key(self) -> None:
+        """Raising Ollama's reasoning allowance changes what comes back for the same prompt. If
+        the key ignored it, a re-run after the fix would replay the old empty replies."""
+        from examples.common.model import Message
+
+        messages = [Message(role="user", content="same prompt")]
+        calls = []
+        tight = StubModel(lambda m, t: (calls.append(1), StubResponse(text=""))[1], model_id="stub-settings")
+        tight.settings = {"reasoning_allowance": 0}
+        roomy = StubModel(lambda m, t: (calls.append(1), StubResponse(text="44 dBA"))[1], model_id="stub-settings")
+        roomy.settings = {"reasoning_allowance": 4096}
+        eval_run.CachingModel(tight, self._tmp).complete(messages, max_tokens=50)
+        again = eval_run.CachingModel(roomy, self._tmp).complete(messages, max_tokens=50)
+        self.assertEqual(again.text, "44 dBA")
+        self.assertEqual(len(calls), 2)
+
+
+class EmptyCompletionTests(unittest.TestCase):
+    def test_an_empty_reply_is_counted_as_a_setup_failure_on_the_result(self) -> None:
+        """An empty reply is graded as a wrong answer, which a score cannot tell apart from a real
+        one. The result file counts them so a reader knows the score is not yet readable."""
+        model = StubModel(lambda m, t: StubResponse(text=""), model_id="stub-empty")
+        model.settings = {"reasoning_allowance": 0}
+        summary = eval_run.run_example(
+            "one_call", model=model, embedder=StubEmbedder(), grader=None,
+            questions=_tiny_questions()[:2], stub=True, dry=False,
+        )
+        self.assertEqual(summary["empty_completions"], 2)
+        self.assertEqual(summary["model_settings"], {"reasoning_allowance": 0})
+
+    def test_a_real_reply_is_not_counted(self) -> None:
+        model = StubModel(lambda m, t: StubResponse(text="Every 30 cycles."), model_id="stub-full")
+        summary = eval_run.run_example(
+            "one_call", model=model, embedder=StubEmbedder(), grader=None,
+            questions=_tiny_questions()[:1], stub=True, dry=False,
+        )
+        self.assertEqual(summary["empty_completions"], 0)
+        self.assertIsNone(summary["model_settings"])
+
 
 class BudgetStopTests(unittest.TestCase):
     def test_budget_stop_writes_a_partial_result(self) -> None:
@@ -429,6 +468,24 @@ class UnanswerableGateTests(unittest.TestCase):
                 eval_run.abstention_failure(q, q["answer"]),
                 f"{q['id']}: its own reference answer fails the abstention gate",
             )
+
+    def test_an_abbreviated_unit_is_the_same_answer_and_a_longer_number_is_not(self) -> None:
+        """The first live run worked C09 out as "35 ft - 25 ft = 10 ft" and failed, because the
+        pattern only took "10 feet". The number must still stand alone: "110 ft" is not 10."""
+        c09 = next(q for q in eval_run.load_questions(ROOT / "evals" / "questions.json") if q["id"] == "C09")
+        self.assertTrue(eval_run.grade_exact(c09, "35 ft - 25 ft = 10 ft"))
+        self.assertFalse(eval_run.grade_exact(c09, "The difference is 110 ft."))
+
+    def test_a_plain_the_sources_do_not_contain_refusal_passes_every_gate(self) -> None:
+        """The first live run (09/22/2026) answered 11 of 12 unanswerable questions with a clean
+        refusal worded "The provided sources do not contain ...", and the gate failed all 11
+        because "contain" was not in its verb list: the result read as a 92% invention rate."""
+        for q in eval_run.load_questions(ROOT / "evals" / "questions.json", kind="unanswerable"):
+            for text in (
+                "The provided sources do not contain any information about that.",
+                "The documents don't cover this.",
+            ):
+                self.assertFalse(eval_run.abstention_failure(q, text), f"{q['id']}: a clean refusal failed the gate: {text!r}")
 
     def test_a_plausible_invention_fails_each_real_unanswerable_question(self) -> None:
         inventions = {
