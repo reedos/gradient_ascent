@@ -1,8 +1,9 @@
 # Feedback and corrections
 
 The quickest way to help is to tell us what is wrong. Every page on the site has a feedback link
-at the bottom that opens [the feedback form](https://github.com/reedos/gradient_ascent/issues/new?template=feedback.yml)
-with the page already filled in. You need a GitHub account; nothing else.
+at the bottom that opens [the feedback form](https://docs.google.com/forms/d/e/1FAIpQLSezLxgDBSuN4o5v6o6B9uAFvKK5BS3r4ZBnGJBZYzLgu-dllg/viewform)
+with the page already filled in. It needs no account. To discuss something in public, open
+[a GitHub issue](https://github.com/reedos/gradient_ascent/issues/new?template=feedback.yml) instead.
 
 ## What makes a correction easy to accept
 

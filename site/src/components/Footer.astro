@@ -6,7 +6,7 @@ import Logo from './Logo.astro';
 import { asOf, levels, tracks, threads } from '../lib/content';
 import { url } from '../lib/url';
 import { buildNav, type NavLevel, type NavTrack } from '../lib/nav';
-import { REPO_URL } from '../lib/site';
+import { REPO_URL, FEEDBACK_FORM_URL } from '../lib/site';
 
 const navLevels: NavLevel[] = levels.map((l) => ({ order: l.order, title: l.title, short: l.short, slugs: l.pages.map((p) => p.slug) }));
 const navTracks: NavTrack[] = tracks.map((t) => ({ id: t.id, title: t.title, slugs: (t.pages ?? []).map((p) => p.slug) }));
@@ -45,7 +45,7 @@ const groups = buildNav(navLevels, navTracks, threads.map((t) => ({ id: t.id, ti
     <a href={url('/method/')}>Sources &amp; methodology</a>
     <a href={REPO_URL} rel="noopener">Source on GitHub ↗</a>
     <a href={url('/llms.txt')}>Use with your AI</a>
-    <a href={`${REPO_URL}/issues/new?template=feedback.yml`} rel="noopener">Suggest a correction ↗</a>
+    <a href={FEEDBACK_FORM_URL} rel="noopener">Suggest a correction ↗</a>
   </nav>
 
   <p class="project-attribution"><strong>An independent project by Reed Cameron Osaki.</strong></p>

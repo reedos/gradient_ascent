@@ -13,7 +13,7 @@ enough.
 but not a guarantee of error-free content, and with no recorded run and scored result file behind them.
 The September 21 quality update adds six practical recipe examples and recorded local-model smoke trials under `examples/practical_labs/validation/`. These are synthetic implementation checks, not a benchmark or evidence that all technique pages are measured. See
 [What is and is not real yet](#what-is-and-is-not-real-yet). Found something wrong? Every page has a feedback link, or open
-[the feedback form](https://github.com/reedos/gradient_ascent/issues/new?template=feedback.yml);
+[the feedback form](https://docs.google.com/forms/d/e/1FAIpQLSezLxgDBSuN4o5v6o6B9uAFvKK5BS3r4ZBnGJBZYzLgu-dllg/viewform) (no account needed);
 see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Get it running

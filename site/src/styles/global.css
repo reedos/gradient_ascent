@@ -453,6 +453,7 @@ main { max-width: 1392px; margin: auto; padding: 0 48px; min-height: 60vh }
 .page-feedback { max-width: 1296px; margin: 56px auto 0; padding: 22px 26px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); display: flex; align-items: center; justify-content: space-between; gap: 18px 32px; flex-wrap: wrap }
 .page-feedback p { font-size: 13px; color: var(--muted); max-width: 64ch; line-height: 1.6 }
 .page-feedback p b { display: block; color: var(--text); font: 550 15px var(--display); letter-spacing: -.3px; margin-bottom: 2px }
+.page-feedback p a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px }
 .page-feedback-link { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; border: 1px solid var(--accent); border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--text); transition: background .15s }
 .page-feedback-link:hover { background: color-mix(in srgb, var(--accent) 18%, transparent) }
 @media (max-width: 1400px) { .page-feedback { margin-left: 48px; margin-right: 48px } }

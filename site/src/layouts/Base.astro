@@ -5,7 +5,7 @@ import AcronymHints from '../components/AcronymHints.astro';
 import '../styles/global.css';
 import '../styles/print.css'; // finish-indexes: the print handout stylesheet, see its own file comment
 import { url } from '../lib/url';
-import { feedbackUrl, INDEXABLE } from '../lib/site';
+import { feedbackUrl, issueUrl, INDEXABLE } from '../lib/site';
 
 interface Props {
   title: string;
@@ -16,7 +16,8 @@ interface Props {
 }
 const { title, description, noCanonical = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
-const feedback = feedbackUrl(canonical, title);
+const feedback = feedbackUrl(canonical);
+const issue = issueUrl(canonical, title);
 // Link previews need an absolute image URL; most scrapers will not resolve a relative one.
 const ogImage = new URL(url('/og.png'), Astro.site).toString();
 ---
@@ -61,7 +62,9 @@ const ogImage = new URL(url('/og.png'), Astro.site).toString();
     <aside class="page-feedback" aria-label="Feedback on this page">
       <p>
         <b>Something wrong, unclear or missing on this page?</b>
-        Every claim here is meant to be checked against its source. If one is off, say so.
+        Every claim here is meant to be checked against its source. If one is off, say so. The form
+        needs no account and is hosted by Google Forms. To discuss it in public instead,
+        <a href={issue} rel="noopener">open a GitHub issue</a>.
       </p>
       <a class="page-feedback-link" href={feedback} rel="noopener">Give feedback on this page <span aria-hidden="true">&rarr;</span></a>
     </aside>

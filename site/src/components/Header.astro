@@ -10,7 +10,7 @@ import Logo from './Logo.astro';
 import { url } from '../lib/url';
 import { levels, tracks, threads } from '../lib/content';
 import { buildNav, navContext, railItems, isCurrent, type NavLevel, type NavTrack } from '../lib/nav';
-import { REPO_URL } from '../lib/site';
+import { REPO_URL, FEEDBACK_FORM_URL } from '../lib/site';
 import '../styles/header.css';
 
 const base = import.meta.env.BASE_URL;
@@ -28,7 +28,7 @@ const railGroup = groups.find((g) => g.id === ctx.group);
 // marker) takes that level's hue, so the section you are in is visible before you read a word.
 const sectionStyle = ctx.level !== undefined ? `--sec:var(--o${ctx.level})` : undefined;
 const onSearch = path.startsWith('/search/');
-const feedbackHref = `${REPO_URL}/issues/new?template=feedback.yml`;
+const feedbackHref = FEEDBACK_FORM_URL;
 ---
 <header class="site-header" style={sectionStyle}>
   <div class="header-inner">
