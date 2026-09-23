@@ -1,0 +1,177 @@
+{
+  "example": "agentic_rag",
+  "level": 5,
+  "model_id": "ollama:muse-glimmer:30b-q4_K_M-dflash",
+  "recorded_at": "2026-09-23T08:20:33+00:00",
+  "illustrative": false,
+  "stub": false,
+  "commit": "e55ed2e",
+  "model_decided_steps": 4,
+  "steps": [
+    {
+      "i": 0,
+      "kind": "code",
+      "decided_by": "code",
+      "title": "Build prompt with tool definitions",
+      "detail": "search, read",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "ms": 0.0,
+      "edge": "solid"
+    },
+    {
+      "i": 1,
+      "kind": "model",
+      "decided_by": "model",
+      "title": "Model calls tool(s)",
+      "detail": "search({\"query\": \"DW-300 drain pump part price\"}), search({\"query\": \"DW-300 drain pump replacement warranty\"}), search({\"query\": \"DW300 drain pump part number\"})",
+      "tokens_in": 559,
+      "tokens_out": 247,
+      "ms": 2170.3188,
+      "edge": "dashed"
+    },
+    {
+      "i": 2,
+      "kind": "code",
+      "decided_by": "code",
+      "title": "Run tool: search",
+      "detail": "dw300-manual#8: Replacement Parts\nparts-list#2: Dishwasher Parts\ndw480-manual#8: Replacement Parts",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "ms": 0.0,
+      "edge": "solid"
+    },
+    {
+      "i": 3,
+      "kind": "code",
+      "decided_by": "code",
+      "title": "Run tool: search",
+      "detail": "dw300-manual#8: Replacement Parts\nparts-list#2: Dishwasher Parts\ndw480-manual#8: Replacement Parts",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "ms": 0.0,
+      "edge": "solid"
+    },
+    {
+      "i": 4,
+      "kind": "code",
+      "decided_by": "code",
+      "title": "Run tool: search",
+      "detail": "dw300-manual#8: Replacement Parts\ndw480-manual#8: Replacement Parts\nparts-list#2: Dishwasher Parts",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "ms": 0.0,
+      "edge": "solid"
+    },
+    {
+      "i": 5,
+      "kind": "model",
+      "decided_by": "model",
+      "title": "Model calls tool(s)",
+      "detail": "read({\"cite\": \"dw300-manual#8\"}), read({\"cite\": \"parts-list#2\"})",
+      "tokens_in": 843,
+      "tokens_out": 134,
+      "ms": 960.7453,
+      "edge": "dashed"
+    },
+    {
+      "i": 6,
+      "kind": "code",
+      "decided_by": "code",
+      "title": "Run tool: read",
+      "detail": "[dw300-manual#8] Replacement Parts\nThe DW-300 heating element is a 750W unit, part number HLV-4471. The DW-300 drain pump is part\nnumber HLV-2201. The DW-300 door latch switch is part number HLV-7701.",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "ms": 0.0,
+      "edge": "solid"
+    },
+    {
+      "i": 7,
+      "kind": "code",
+      "decided_by": "code",
+      "title": "Run tool: read",
+      "detail": "[parts-list#2] Dishwasher Parts\n- HLV-4471, Heating Element (750W), $38.50, fits DW-300.\n- HLV-4472, Heating Element (900W), $41.00, fits DW-480.\n- HLV-2201, Drain Pump, $46.00, fits DW-300.\n- HLV-220",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "ms": 0.0,
+      "edge": "solid"
+    },
+    {
+      "i": 8,
+      "kind": "model",
+      "decided_by": "model",
+      "title": "Model calls tool(s)",
+      "detail": "search({\"query\": \"DW-300 warranty owner installation repair\"}), search({\"query\": \"Halvorsen warranty self repair\"})",
+      "tokens_in": 1175,
+      "tokens_out": 117,
+      "ms": 1036.6691,
+      "edge": "dashed"
+    },
+    {
+      "i": 9,
+      "kind": "code",
+      "decided_by": "code",
+      "title": "Run tool: search",
+      "detail": "warranty-policy#4: Unauthorized Repair or Modification\ndw480-manual#4: Installation Requirements\ndw300-manual#4: Installation Requirements",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "ms": 0.0,
+      "edge": "solid"
+    },
+    {
+      "i": 10,
+      "kind": "code",
+      "decided_by": "code",
+      "title": "Run tool: search",
+      "detail": "warranty-policy#4: Unauthorized Repair or Modification\ndw300-manual#9: Warranty and Safety\ndw480-manual#9: Warranty and Safety",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "ms": 0.0,
+      "edge": "solid"
+    },
+    {
+      "i": 11,
+      "kind": "model",
+      "decided_by": "model",
+      "title": "Model calls tool(s)",
+      "detail": "read({\"cite\": \"warranty-policy#4\"}), read({\"cite\": \"dw300-manual#9\"})",
+      "tokens_in": 1370,
+      "tokens_out": 95,
+      "ms": 651.6878,
+      "edge": "dashed"
+    },
+    {
+      "i": 12,
+      "kind": "code",
+      "decided_by": "code",
+      "title": "Run tool: read",
+      "detail": "[warranty-policy#4] Unauthorized Repair or Modification\nAny repair, part substitution, or modification performed by anyone other than an authorized\nHalvorsen service provider voids the remainder of th",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "ms": 0.0,
+      "edge": "solid"
+    },
+    {
+      "i": 13,
+      "kind": "code",
+      "decided_by": "code",
+      "title": "Run tool: read",
+      "detail": "[dw300-manual#9] Warranty and Safety\nThe DW-300 is covered by Halvorsen's standard warranty; see `warranty-policy.md` for full terms\nand exclusions. Do not remove the rating label. Keep children away ",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "ms": 0.0,
+      "edge": "solid"
+    },
+    {
+      "i": 14,
+      "kind": "model",
+      "decided_by": "code",
+      "title": "Force a final answer",
+      "detail": "token budget reached: 4540 >= 4000",
+      "tokens_in": 685,
+      "tokens_out": 500,
+      "ms": 3259.3949,
+      "edge": "solid"
+    }
+  ]
+}

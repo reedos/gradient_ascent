@@ -1,8 +1,25 @@
 {
   "version": 1,
-  "as_of": "2026-09-22",
+  "as_of": "2026-09-23",
   "note": "What changed on this site, and why it matters to somebody reading it. Newest first. Entries are written for a reader, not for whoever made the change: they say what is different and what it is good for, never what a commit did. Every entry links the pages it touched. Several entries can share a date; within a date, file order is the order shown. docs/CHANGES.md says how to add one.",
   "changes": [
+    {
+      "id": "agentic-rag-measured",
+      "date": "2026-09-23",
+      "title": "Agentic RAG is measured, beside RAG",
+      "what": "The agentic RAG page now shows a scored run on the same 60 questions and the same model as the RAG page, and both pages set the two side by side: correct answers by kind of question, and cost per question.",
+      "why": "It tests the claim the page makes about itself: that searching again after reading pays for its extra cost on questions that need two documents. It also shows how often the loop's token budget, not the model, ended the search.",
+      "pages": [
+        {
+          "label": "Agentic RAG",
+          "path": "/techniques/agentic-rag/"
+        },
+        {
+          "label": "Retrieval-augmented generation",
+          "path": "/techniques/rag/"
+        }
+      ]
+    },
     {
       "id": "rag-measured",
       "date": "2026-09-22",

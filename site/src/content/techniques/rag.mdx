@@ -194,11 +194,11 @@ those to still make sense.
 
 ## Cost and latency
 
-<MeasuredCost page="rag" level={2} />
+<MeasuredCost page="rag" level={2} compare="agentic-rag" compareLabel="Agentic RAG (level 5)" />
 
 One model call per question, always: the pipeline's code makes exactly one. Agentic RAG, the
-level 5 version, makes several and has not been measured yet, so any comparison with it on this
-site is still an illustration.
+level 5 version, makes several; both were run on the same questions and model, and the line above
+compares them.
 
 <span id="how-to-eval-it"></span>
 
@@ -217,7 +217,7 @@ used together, which is exactly what single-pass retrieval struggles with. Confl
 questions need the answer to notice two chunks disagree, not just cite whichever one the search
 ranked first.
 
-<MeasuredResult page="rag" level={2} />
+<MeasuredResult page="rag" level={2} compare="agentic-rag" compareLabel="Agentic RAG (level 5)" />
 
 The misses sit where single-pass retrieval predicts. Most multi-hop answers were honest: they
 said the documents did not cover part of the question, because the one search never reached the

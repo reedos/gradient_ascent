@@ -104,5 +104,11 @@ const traceUrl = `${REPO_URL}/blob/main/examples/${m.entry.example}/trace.json`;
   .measured-note { font-size: 13px; color: var(--muted); line-height: 1.7; max-width: 75ch }
   .measured-links { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 13px }
   .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap }
-  @media (max-width: 420px) { .measured-checks { grid-template-columns: repeat(2, minmax(0, 1fr)) } .measured-kinds td:last-child { width: 26% } }
+  .measured-kinds th { overflow-wrap: normal; word-break: normal; hyphens: none }
+  .measured-vs + p { margin-top: 6px }
+  @media (max-width: 560px) {
+    .measured-kinds tr > :last-child { display: none }
+    .measured-kinds td:nth-child(2), .measured-kinds td.other { width: auto; padding-left: 10px }
+  }
+  @media (max-width: 420px) { .measured-checks { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
 </style>

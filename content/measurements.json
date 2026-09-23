@@ -15,7 +15,11 @@
       }
     }
   },
-  "classes": ["Small local (about 8B)", "Large local (about 30B)", "Frontier API"],
+  "classes": [
+    "Small local (about 8B)",
+    "Large local (about 30B)",
+    "Frontier API"
+  ],
   "results": [
     {
       "page": "rag",
@@ -23,7 +27,15 @@
       "model": "ollama:muse-glimmer:30b-q4_K_M-dflash",
       "grader": "ollama:muse-glimmer:30b-q4_K_M-dflash",
       "grader_sample_checked": "2026-09-23",
-      "grader_note": "A person read every answer scored wrong. All 13 are wrong by their rubric or pattern, with one caveat: C06 asks which two documents disagree, and the answer also named the Installation Guide, which does carry the old figure. The question undercounts; the score keeps C06 as wrong rather than change a question after seeing the answers."
+      "grader_note": "All 14 answers scored wrong were read, and each is wrong by its rubric or pattern. The closest calls: C06 names all three documents that disagree and quotes the bulletin superseding the others, but never says which figure is correct, which its rubric asks for; U10 refuses correctly but assumes a child lock exists."
+    },
+    {
+      "page": "agentic-rag",
+      "example": "agentic_rag",
+      "model": "ollama:muse-glimmer:30b-q4_K_M-dflash",
+      "grader": "ollama:muse-glimmer:30b-q4_K_M-dflash",
+      "grader_sample_checked": "2026-09-23",
+      "grader_note": "All 5 answers scored wrong were read, and each is wrong by its rubric or pattern. Three say outright that the section they needed was found but not yet read when the token budget forced an answer; one never reached the warranty terms; and M04 never says the DW-300 has no leak sensor, which its rubric requires."
     }
   ]
 }

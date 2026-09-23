@@ -1,0 +1,1412 @@
+{
+  "budget_tokens": 900000,
+  "citation_coverage": 0.9116,
+  "citation_hit_rate": 0.8367,
+  "commit": "e55ed2e",
+  "dry": false,
+  "embedder_id": null,
+  "empty_completions": 0,
+  "example": "agentic_rag",
+  "forced_finals": 38,
+  "grader_calls": 28,
+  "grader_tokens_in": 13726,
+  "grader_tokens_out": 12257,
+  "interrupted": false,
+  "model_decided_steps": 225,
+  "model_id": "ollama:muse-glimmer:30b-q4_K_M-dflash",
+  "model_settings": {
+    "num_ctx": 8192,
+    "reasoning_allowance": 4096
+  },
+  "partial": false,
+  "questions": [
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dw300-manual#1",
+        "specs-comparison#2"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "L01",
+      "kind": "lookup",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dw300-manual#1",
+        "specs-comparison#2"
+      ],
+      "tokens_in": 3604,
+      "tokens_out": 537,
+      "tool_calls": 5,
+      "wall_s": 4.467234099982306
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dw480-manual#2",
+        "specs-comparison#2"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "L02",
+      "kind": "lookup",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dw480-manual#2",
+        "dw480-manual#3",
+        "specs-comparison#2"
+      ],
+      "tokens_in": 4587,
+      "tokens_out": 1136,
+      "tool_calls": 9,
+      "wall_s": 9.21922369999811
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr520-manual#1",
+        "specs-comparison#3"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "L03",
+      "kind": "lookup",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr520-manual#1",
+        "specs-comparison#3"
+      ],
+      "tokens_in": 4167,
+      "tokens_out": 765,
+      "tool_calls": 7,
+      "wall_s": 6.003544399980456
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr210-manual#2",
+        "installation-guide#2"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "L04",
+      "kind": "lookup",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr210-manual#1",
+        "dr210-manual#2",
+        "installation-guide#2",
+        "specs-comparison#3"
+      ],
+      "tokens_in": 4790,
+      "tokens_out": 1182,
+      "tool_calls": 10,
+      "wall_s": 9.1203269000398
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "care-and-cleaning-guide#1",
+        "dw300-manual#6"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "L05",
+      "kind": "lookup",
+      "model_decided_steps": 3,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "care-and-cleaning-guide#1",
+        "dw300-manual#6"
+      ],
+      "tokens_in": 2579,
+      "tokens_out": 567,
+      "tool_calls": 5,
+      "wall_s": 4.429600500036031
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "troubleshooting#3"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "L06",
+      "kind": "lookup",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr210-manual#6",
+        "troubleshooting#3"
+      ],
+      "tokens_in": 3616,
+      "tokens_out": 565,
+      "tool_calls": 5,
+      "wall_s": 4.817354199942201
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dw300-manual#3"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "L07",
+      "kind": "lookup",
+      "model_decided_steps": 3,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dw300-manual#3"
+      ],
+      "tokens_in": 2331,
+      "tokens_out": 490,
+      "tool_calls": 4,
+      "wall_s": 4.205385599983856
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "care-and-cleaning-guide#4",
+        "parts-list#4"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "L08",
+      "kind": "lookup",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "care-and-cleaning-guide#4",
+        "parts-list#4"
+      ],
+      "tokens_in": 3448,
+      "tokens_out": 806,
+      "tool_calls": 5,
+      "wall_s": 6.520366100012325
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "warranty-policy#1"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "L09",
+      "kind": "lookup",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr210-manual#1",
+        "dw300-manual#1",
+        "warranty-policy#1",
+        "warranty-policy#2"
+      ],
+      "tokens_in": 4742,
+      "tokens_out": 1206,
+      "tool_calls": 9,
+      "wall_s": 9.447392000001855
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dw300-manual#4",
+        "installation-guide#3"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "L10",
+      "kind": "lookup",
+      "model_decided_steps": 3,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dw300-manual#4",
+        "installation-guide#3"
+      ],
+      "tokens_in": 2504,
+      "tokens_out": 570,
+      "tool_calls": 5,
+      "wall_s": 4.578340300009586
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dw480-manual#5",
+        "troubleshooting#2"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "L11",
+      "kind": "lookup",
+      "model_decided_steps": 5,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dw480-manual#5",
+        "dw480-manual#7",
+        "troubleshooting#2"
+      ],
+      "tokens_in": 5341,
+      "tokens_out": 966,
+      "tool_calls": 8,
+      "wall_s": 7.215754300006665
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr210-manual#2"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "L12",
+      "kind": "lookup",
+      "model_decided_steps": 3,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr210-manual#2"
+      ],
+      "tokens_in": 2284,
+      "tokens_out": 308,
+      "tool_calls": 4,
+      "wall_s": 2.6451230000238866
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dw480-manual#8",
+        "parts-list#2",
+        "parts-list#5"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "M01",
+      "kind": "multi_hop",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dw480-manual#8",
+        "parts-list#2",
+        "parts-list#5"
+      ],
+      "tokens_in": 4466,
+      "tokens_out": 1256,
+      "tool_calls": 7,
+      "wall_s": 9.46035910001956
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr210-manual#7",
+        "parts-list#3"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "M02",
+      "kind": "multi_hop",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr210-manual#7",
+        "parts-list#3"
+      ],
+      "tokens_in": 4047,
+      "tokens_out": 1166,
+      "tool_calls": 6,
+      "wall_s": 9.135608799988404
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr210-manual#8",
+        "recall-notice#1",
+        "recall-notice#2",
+        "recall-notice#4"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "M03",
+      "kind": "multi_hop",
+      "model_decided_steps": 3,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr210-manual#8",
+        "recall-notice#1",
+        "recall-notice#2",
+        "recall-notice#4"
+      ],
+      "tokens_in": 2818,
+      "tokens_out": 1114,
+      "tool_calls": 7,
+      "wall_s": 7.789194399956614
+    },
+    {
+      "citation_hit": 0.6666666666666666,
+      "citations": [
+        "dw300-manual#7",
+        "troubleshooting#2"
+      ],
+      "correct": false,
+      "forced_final": false,
+      "id": "M04",
+      "kind": "multi_hop",
+      "model_decided_steps": 3,
+      "retrieval_hit": 0.6666666666666666,
+      "retrieved_sources": [
+        "dw300-manual#7",
+        "troubleshooting#2"
+      ],
+      "tokens_in": 2587,
+      "tokens_out": 972,
+      "tool_calls": 5,
+      "wall_s": 6.876466499990784
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr210-manual#7",
+        "dr210-manual#9",
+        "parts-list#3",
+        "warranty-policy#2",
+        "warranty-policy#5"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "M05",
+      "kind": "multi_hop",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr210-manual#7",
+        "dr210-manual#9",
+        "parts-list#3",
+        "warranty-policy#2",
+        "warranty-policy#5"
+      ],
+      "tokens_in": 4968,
+      "tokens_out": 1550,
+      "tool_calls": 10,
+      "wall_s": 11.319122100016102
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr210-manual#9",
+        "recall-notice#1",
+        "recall-notice#2",
+        "recall-notice#4",
+        "warranty-policy#1",
+        "warranty-policy#2",
+        "warranty-policy#3"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "M06",
+      "kind": "multi_hop",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr210-manual#9",
+        "recall-notice#1",
+        "recall-notice#2",
+        "recall-notice#4",
+        "warranty-policy#1",
+        "warranty-policy#2",
+        "warranty-policy#3"
+      ],
+      "tokens_in": 5208,
+      "tokens_out": 1869,
+      "tool_calls": 10,
+      "wall_s": 14.06202770001255
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dw480-manual#6",
+        "specs-comparison#2"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "M07",
+      "kind": "multi_hop",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dw300-manual#6",
+        "dw480-manual#6",
+        "specs-comparison#2"
+      ],
+      "tokens_in": 4825,
+      "tokens_out": 1205,
+      "tool_calls": 10,
+      "wall_s": 9.044273399980739
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "care-and-cleaning-guide#2",
+        "dw300-manual#3"
+      ],
+      "correct": false,
+      "forced_final": true,
+      "id": "M08",
+      "kind": "multi_hop",
+      "model_decided_steps": 4,
+      "retrieval_hit": 0.5,
+      "retrieved_sources": [
+        "care-and-cleaning-guide#2",
+        "dw300-manual#2"
+      ],
+      "tokens_in": 4258,
+      "tokens_out": 1862,
+      "tool_calls": 8,
+      "wall_s": 15.186752100009471
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr520-manual#3",
+        "installation-guide#6"
+      ],
+      "correct": false,
+      "forced_final": true,
+      "id": "M09",
+      "kind": "multi_hop",
+      "model_decided_steps": 4,
+      "retrieval_hit": 0.5,
+      "retrieved_sources": [
+        "installation-guide#6"
+      ],
+      "tokens_in": 4675,
+      "tokens_out": 2426,
+      "tool_calls": 11,
+      "wall_s": 19.491987599991262
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dw300-manual#1",
+        "dw480-manual#5"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "M10",
+      "kind": "multi_hop",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dw300-manual#1",
+        "dw480-manual#5"
+      ],
+      "tokens_in": 4426,
+      "tokens_out": 991,
+      "tool_calls": 9,
+      "wall_s": 7.5333318000193685
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dw300-manual#8",
+        "dw300-manual#9",
+        "parts-list#2",
+        "warranty-policy#4"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "M11",
+      "kind": "multi_hop",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dw300-manual#8",
+        "dw300-manual#9",
+        "parts-list#2",
+        "warranty-policy#2",
+        "warranty-policy#4"
+      ],
+      "tokens_in": 5072,
+      "tokens_out": 1420,
+      "tool_calls": 11,
+      "wall_s": 10.756537800072692
+    },
+    {
+      "citation_hit": 0.5,
+      "citations": [
+        "dw300-manual#7",
+        "troubleshooting#2",
+        "troubleshooting#5",
+        "warranty-policy#4"
+      ],
+      "correct": false,
+      "forced_final": true,
+      "id": "M12",
+      "kind": "multi_hop",
+      "model_decided_steps": 4,
+      "retrieval_hit": 0.5,
+      "retrieved_sources": [
+        "dw300-manual#7",
+        "troubleshooting#2",
+        "troubleshooting#5"
+      ],
+      "tokens_in": 4499,
+      "tokens_out": 1818,
+      "tool_calls": 8,
+      "wall_s": 14.398142800084315
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dw300-manual#3",
+        "specs-comparison#2"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "N01",
+      "kind": "numeric",
+      "model_decided_steps": 3,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dw300-manual#3",
+        "specs-comparison#2"
+      ],
+      "tokens_in": 2526,
+      "tokens_out": 593,
+      "tool_calls": 5,
+      "wall_s": 4.871252999990247
+    },
+    {
+      "citation_hit": 0.5,
+      "citations": [
+        "specs-comparison#1",
+        "specs-comparison#2",
+        "specs-comparison#4"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "N02",
+      "kind": "numeric",
+      "model_decided_steps": 4,
+      "retrieval_hit": 0.5,
+      "retrieved_sources": [
+        "specs-comparison#1",
+        "specs-comparison#2",
+        "specs-comparison#4"
+      ],
+      "tokens_in": 5125,
+      "tokens_out": 1536,
+      "tool_calls": 10,
+      "wall_s": 11.332477900083177
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dw300-manual#3",
+        "dw480-manual#3"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "N03",
+      "kind": "numeric",
+      "model_decided_steps": 3,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dw300-manual#3",
+        "dw480-manual#3",
+        "specs-comparison#1",
+        "specs-comparison#4"
+      ],
+      "tokens_in": 3975,
+      "tokens_out": 1347,
+      "tool_calls": 11,
+      "wall_s": 9.787750400020741
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dw300-manual#3",
+        "dw480-manual#3",
+        "specs-comparison#2"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "N04",
+      "kind": "numeric",
+      "model_decided_steps": 3,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dw300-manual#3",
+        "dw480-manual#3",
+        "specs-comparison#2"
+      ],
+      "tokens_in": 2903,
+      "tokens_out": 1024,
+      "tool_calls": 7,
+      "wall_s": 7.355381099972874
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dw300-manual#8",
+        "dw480-manual#8",
+        "parts-list#2"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "N05",
+      "kind": "numeric",
+      "model_decided_steps": 3,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dw300-manual#8",
+        "dw480-manual#8",
+        "parts-list#2"
+      ],
+      "tokens_in": 2874,
+      "tokens_out": 1113,
+      "tool_calls": 7,
+      "wall_s": 8.53312110004481
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr210-manual#7",
+        "parts-list#3"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "N06",
+      "kind": "numeric",
+      "model_decided_steps": 3,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr210-manual#7",
+        "parts-list#3",
+        "parts-list#5"
+      ],
+      "tokens_in": 2709,
+      "tokens_out": 767,
+      "tool_calls": 6,
+      "wall_s": 5.464098499971442
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dw300-manual#3",
+        "dw480-manual#3"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "N07",
+      "kind": "numeric",
+      "model_decided_steps": 3,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dw300-manual#3",
+        "dw480-manual#3"
+      ],
+      "tokens_in": 2711,
+      "tokens_out": 682,
+      "tool_calls": 6,
+      "wall_s": 5.0323701000306755
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr520-manual#3"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "N08",
+      "kind": "numeric",
+      "model_decided_steps": 3,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr520-manual#3"
+      ],
+      "tokens_in": 2424,
+      "tokens_out": 869,
+      "tool_calls": 4,
+      "wall_s": 6.572681599995121
+    },
+    {
+      "citation_hit": 0.5,
+      "citations": [
+        "specs-comparison#1",
+        "specs-comparison#2",
+        "specs-comparison#4"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "N09",
+      "kind": "numeric",
+      "model_decided_steps": 3,
+      "retrieval_hit": 0.5,
+      "retrieved_sources": [
+        "specs-comparison#1",
+        "specs-comparison#2",
+        "specs-comparison#4"
+      ],
+      "tokens_in": 2768,
+      "tokens_out": 954,
+      "tool_calls": 6,
+      "wall_s": 7.090917799971066
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dw300-manual#3"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "N10",
+      "kind": "numeric",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dw300-manual#3"
+      ],
+      "tokens_in": 3958,
+      "tokens_out": 926,
+      "tool_calls": 7,
+      "wall_s": 7.465173100004904
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr520-manual#2",
+        "specs-comparison#3"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "N11",
+      "kind": "numeric",
+      "model_decided_steps": 3,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr520-manual#2",
+        "specs-comparison#3"
+      ],
+      "tokens_in": 2472,
+      "tokens_out": 646,
+      "tool_calls": 5,
+      "wall_s": 4.621536700055003
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr210-manual#7",
+        "dr520-manual#7",
+        "parts-list#3"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "N12",
+      "kind": "numeric",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr210-manual#7",
+        "dr520-manual#7",
+        "parts-list#3",
+        "parts-list#4",
+        "parts-list#5"
+      ],
+      "tokens_in": 5409,
+      "tokens_out": 1592,
+      "tool_calls": 11,
+      "wall_s": 11.377268100040965
+    },
+    {
+      "citation_hit": null,
+      "citations": [
+        "dw480-manual#1",
+        "dw480-manual#8"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "U01",
+      "kind": "unanswerable",
+      "model_decided_steps": 4,
+      "retrieval_hit": null,
+      "retrieved_sources": [
+        "dw480-manual#1",
+        "dw480-manual#8"
+      ],
+      "tokens_in": 4241,
+      "tokens_out": 1205,
+      "tool_calls": 8,
+      "wall_s": 9.875739099923521
+    },
+    {
+      "citation_hit": null,
+      "citations": [
+        "care-and-cleaning-guide#3",
+        "dr520-manual#1",
+        "dr520-manual#4",
+        "dr520-manual#7",
+        "parts-list#3",
+        "service-bulletin#1",
+        "service-bulletin#2",
+        "troubleshooting#3"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "U02",
+      "kind": "unanswerable",
+      "model_decided_steps": 4,
+      "retrieval_hit": null,
+      "retrieved_sources": [
+        "dr520-manual#1"
+      ],
+      "tokens_in": 4402,
+      "tokens_out": 1143,
+      "tool_calls": 9,
+      "wall_s": 9.391732399933971
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "specs-comparison#3"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "U03",
+      "kind": "unanswerable",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr210-manual#2",
+        "specs-comparison#3",
+        "specs-comparison#5"
+      ],
+      "tokens_in": 4360,
+      "tokens_out": 794,
+      "tool_calls": 8,
+      "wall_s": 6.340134700061753
+    },
+    {
+      "citation_hit": null,
+      "citations": [
+        "dw300-manual#1",
+        "dw300-manual#8",
+        "parts-list#5"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "U04",
+      "kind": "unanswerable",
+      "model_decided_steps": 4,
+      "retrieval_hit": null,
+      "retrieved_sources": [
+        "dw300-manual#1",
+        "dw300-manual#8",
+        "parts-list#5"
+      ],
+      "tokens_in": 5358,
+      "tokens_out": 2083,
+      "tool_calls": 13,
+      "wall_s": 17.00734170002397
+    },
+    {
+      "citation_hit": null,
+      "citations": [
+        "care-and-cleaning-guide#4",
+        "dr520-manual#1",
+        "dw300-manual#5",
+        "dw480-manual#1",
+        "dw480-manual#8",
+        "parts-list#4"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "U05",
+      "kind": "unanswerable",
+      "model_decided_steps": 5,
+      "retrieval_hit": null,
+      "retrieved_sources": [
+        "parts-list#4"
+      ],
+      "tokens_in": 5306,
+      "tokens_out": 1403,
+      "tool_calls": 9,
+      "wall_s": 10.964183400035836
+    },
+    {
+      "citation_hit": null,
+      "citations": [
+        "recall-notice#5",
+        "troubleshooting#5",
+        "warranty-policy#7"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "U06",
+      "kind": "unanswerable",
+      "model_decided_steps": 4,
+      "retrieval_hit": null,
+      "retrieved_sources": [
+        "warranty-policy#7"
+      ],
+      "tokens_in": 4050,
+      "tokens_out": 1241,
+      "tool_calls": 9,
+      "wall_s": 9.650290800025687
+    },
+    {
+      "citation_hit": null,
+      "citations": [
+        "dr210-manual#3",
+        "dr210-manual#9",
+        "dr520-manual#8",
+        "dw300-manual#9",
+        "dw480-manual#9",
+        "installation-guide#4",
+        "service-bulletin#1"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "U07",
+      "kind": "unanswerable",
+      "model_decided_steps": 5,
+      "retrieval_hit": null,
+      "retrieved_sources": [
+        "dr210-manual#3",
+        "installation-guide#4"
+      ],
+      "tokens_in": 5249,
+      "tokens_out": 1606,
+      "tool_calls": 8,
+      "wall_s": 13.587553600082174
+    },
+    {
+      "citation_hit": null,
+      "citations": [
+        "care-and-cleaning-guide#5",
+        "dw480-manual#6"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "U08",
+      "kind": "unanswerable",
+      "model_decided_steps": 4,
+      "retrieval_hit": null,
+      "retrieved_sources": [
+        "care-and-cleaning-guide#5",
+        "dw480-manual#6"
+      ],
+      "tokens_in": 4519,
+      "tokens_out": 1808,
+      "tool_calls": 10,
+      "wall_s": 14.425366100040264
+    },
+    {
+      "citation_hit": null,
+      "citations": [
+        "dw300-manual#5",
+        "dw480-manual#1",
+        "dw480-manual#3",
+        "parts-list#4"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "U09",
+      "kind": "unanswerable",
+      "model_decided_steps": 4,
+      "retrieval_hit": null,
+      "retrieved_sources": [
+        "dw480-manual#1"
+      ],
+      "tokens_in": 4216,
+      "tokens_out": 1433,
+      "tool_calls": 8,
+      "wall_s": 12.018862099968828
+    },
+    {
+      "citation_hit": null,
+      "citations": [
+        "dw480-manual#1",
+        "dw480-manual#7"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "U10",
+      "kind": "unanswerable",
+      "model_decided_steps": 4,
+      "retrieval_hit": null,
+      "retrieved_sources": [
+        "dw480-manual#1",
+        "dw480-manual#7"
+      ],
+      "tokens_in": 4154,
+      "tokens_out": 1183,
+      "tool_calls": 7,
+      "wall_s": 9.78458849992603
+    },
+    {
+      "citation_hit": null,
+      "citations": [
+        "dr210-manual#8",
+        "recall-notice#1",
+        "recall-notice#2",
+        "service-bulletin#1",
+        "service-bulletin#3"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "U11",
+      "kind": "unanswerable",
+      "model_decided_steps": 4,
+      "retrieval_hit": null,
+      "retrieved_sources": [
+        "recall-notice#1",
+        "recall-notice#2"
+      ],
+      "tokens_in": 4966,
+      "tokens_out": 1956,
+      "tool_calls": 11,
+      "wall_s": 15.502091599977575
+    },
+    {
+      "citation_hit": null,
+      "citations": [
+        "dw480-manual#1",
+        "dw480-manual#2",
+        "specs-comparison#2"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "U12",
+      "kind": "unanswerable",
+      "model_decided_steps": 4,
+      "retrieval_hit": null,
+      "retrieved_sources": [
+        "dw480-manual#1",
+        "dw480-manual#2",
+        "dw480-manual#8",
+        "specs-comparison#2"
+      ],
+      "tokens_in": 4815,
+      "tokens_out": 963,
+      "tool_calls": 10,
+      "wall_s": 7.966213300009258
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr520-manual#4",
+        "service-bulletin#2"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "C01",
+      "kind": "conflicting",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr520-manual#4",
+        "service-bulletin#2"
+      ],
+      "tokens_in": 3563,
+      "tokens_out": 1075,
+      "tool_calls": 5,
+      "wall_s": 8.011920099961571
+    },
+    {
+      "citation_hit": 0.5,
+      "citations": [
+        "service-bulletin#2"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "C02",
+      "kind": "conflicting",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr520-manual#4",
+        "installation-guide#4",
+        "service-bulletin#2"
+      ],
+      "tokens_in": 5175,
+      "tokens_out": 1565,
+      "tool_calls": 10,
+      "wall_s": 11.748349899891764
+    },
+    {
+      "citation_hit": 0.5,
+      "citations": [
+        "dr210-manual#4",
+        "installation-guide#4",
+        "service-bulletin#1",
+        "service-bulletin#2"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "C03",
+      "kind": "conflicting",
+      "model_decided_steps": 4,
+      "retrieval_hit": 0.5,
+      "retrieved_sources": [
+        "dr210-manual#4",
+        "installation-guide#4",
+        "service-bulletin#1",
+        "service-bulletin#2",
+        "service-bulletin#4"
+      ],
+      "tokens_in": 5423,
+      "tokens_out": 1918,
+      "tool_calls": 10,
+      "wall_s": 13.790361099992879
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr520-manual#4",
+        "service-bulletin#1",
+        "service-bulletin#2"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "C04",
+      "kind": "conflicting",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr520-manual#4",
+        "service-bulletin#1",
+        "service-bulletin#2"
+      ],
+      "tokens_in": 4126,
+      "tokens_out": 1567,
+      "tool_calls": 9,
+      "wall_s": 10.70831180003006
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr520-manual#4",
+        "service-bulletin#2"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "C05",
+      "kind": "conflicting",
+      "model_decided_steps": 3,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr520-manual#4",
+        "service-bulletin#2"
+      ],
+      "tokens_in": 2642,
+      "tokens_out": 970,
+      "tool_calls": 5,
+      "wall_s": 7.130576899973676
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr520-manual#1",
+        "dr520-manual#4",
+        "installation-guide#1",
+        "service-bulletin#1",
+        "service-bulletin#2"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "C06",
+      "kind": "conflicting",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr520-manual#1",
+        "dr520-manual#4",
+        "installation-guide#1",
+        "service-bulletin#1",
+        "service-bulletin#2"
+      ],
+      "tokens_in": 5164,
+      "tokens_out": 2303,
+      "tool_calls": 11,
+      "wall_s": 15.833201200002804
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr210-manual#4",
+        "service-bulletin#1",
+        "service-bulletin#2"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "C07",
+      "kind": "conflicting",
+      "model_decided_steps": 3,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr210-manual#4",
+        "dr520-manual#4",
+        "service-bulletin#1",
+        "service-bulletin#2"
+      ],
+      "tokens_in": 3109,
+      "tokens_out": 1277,
+      "tool_calls": 8,
+      "wall_s": 8.702972600003704
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr520-manual#4",
+        "service-bulletin#1",
+        "service-bulletin#2"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "C08",
+      "kind": "conflicting",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr520-manual#4",
+        "service-bulletin#1",
+        "service-bulletin#2",
+        "service-bulletin#4"
+      ],
+      "tokens_in": 4813,
+      "tokens_out": 1561,
+      "tool_calls": 7,
+      "wall_s": 11.354145599994808
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr520-manual#4",
+        "service-bulletin#2"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "C09",
+      "kind": "conflicting",
+      "model_decided_steps": 4,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr520-manual#4",
+        "service-bulletin#1",
+        "service-bulletin#2"
+      ],
+      "tokens_in": 4669,
+      "tokens_out": 1225,
+      "tool_calls": 11,
+      "wall_s": 8.734963599941693
+    },
+    {
+      "citation_hit": 1.0,
+      "citations": [
+        "dr520-manual#4",
+        "installation-guide#4",
+        "service-bulletin#1",
+        "service-bulletin#2"
+      ],
+      "correct": true,
+      "forced_final": false,
+      "id": "C10",
+      "kind": "conflicting",
+      "model_decided_steps": 3,
+      "retrieval_hit": 1.0,
+      "retrieved_sources": [
+        "dr520-manual#4",
+        "installation-guide#4",
+        "service-bulletin#1",
+        "service-bulletin#2"
+      ],
+      "tokens_in": 3137,
+      "tokens_out": 1278,
+      "tool_calls": 8,
+      "wall_s": 9.119423800031655
+    },
+    {
+      "citation_hit": 0.5,
+      "citations": [
+        "service-bulletin#1",
+        "service-bulletin#2"
+      ],
+      "correct": true,
+      "forced_final": true,
+      "id": "C11",
+      "kind": "conflicting",
+      "model_decided_steps": 4,
+      "retrieval_hit": 0.5,
+      "retrieved_sources": [
+        "service-bulletin#1",
+        "service-bulletin#2"
+      ],
+      "tokens_in": 4858,
+      "tokens_out": 2007,
+      "tool_calls": 11,
+      "wall_s": 15.039446200011298
+    },
+    {
+      "citation_hit": 0.0,
+      "citations": [
+        "dr210-manual#4",
+        "dr520-manual#1",
+        "installation-guide#4",
+        "service-bulletin#1",
+        "service-bulletin#2"
+      ],
+      "correct": false,
+      "forced_final": true,
+      "id": "C12",
+      "kind": "conflicting",
+      "model_decided_steps": 4,
+      "retrieval_hit": 0.0,
+      "retrieved_sources": [
+        "dr520-manual#1"
+      ],
+      "tokens_in": 4203,
+      "tokens_out": 2488,
+      "tool_calls": 8,
+      "wall_s": 20.157155900029466
+    }
+  ],
+  "questions_run": 60,
+  "questions_total": 60,
+  "retrieval_coverage": 0.9014,
+  "run_date": "2026-09-23T08:17:32+00:00",
+  "score_by_kind": {
+    "conflicting": {
+      "n": 12,
+      "score": 0.9167,
+      "ungraded": 0
+    },
+    "lookup": {
+      "n": 12,
+      "score": 1.0,
+      "ungraded": 0
+    },
+    "multi_hop": {
+      "n": 12,
+      "score": 0.6667,
+      "ungraded": 0
+    },
+    "numeric": {
+      "n": 12,
+      "score": 1.0,
+      "ungraded": 0
+    },
+    "unanswerable": {
+      "n": 12,
+      "score": 1.0,
+      "ungraded": 0
+    }
+  },
+  "score_overall": 0.9167,
+  "scoring_version": 2,
+  "stub": false,
+  "tokens_in": 242214,
+  "tokens_out": 74848,
+  "tool_calls": 476,
+  "ungraded": 0,
+  "wall_time_s": 574.072
+}

@@ -268,7 +268,7 @@
           "slug": "agentic-rag",
           "title": "Agentic RAG and deep research",
           "summary": "An agent that runs its own searches until it has an answer.",
-          "status": "sourced"
+          "status": "measured"
         },
         {
           "slug": "coding-agents",

@@ -24,7 +24,8 @@ import Lanes from '../../components/page/Lanes.astro';
 import Lane from '../../components/page/Lane.astro';
 import WhenNot from '../../components/page/WhenNot.astro';
 import FailureModes from '../../components/page/FailureModes.astro';
-import CostStrip from '../../components/page/CostStrip.astro';
+import MeasuredCost from '../../components/page/MeasuredCost.astro';
+import MeasuredResult from '../../components/page/MeasuredResult.astro';
 import HowToEval from '../../components/page/HowToEval.astro';
 import RunIt from '../../components/page/RunIt.astro';
 import TryIt from '../../components/page/TryIt.astro';
@@ -47,7 +48,7 @@ multi-step research" and return a listing of every search made along the way<Cit
 cases the model chooses the next query and when to stop; your code still runs every search and can
 cut the loop off with a hard cap regardless of what the model would have done next.
 
-This page provides primary references and illustrative examples. The examples are scripted, not measured model runs; source references do not establish the correctness of every implementation or outcome.
+This page is measured: the cost and the score under How to Evaluate It come from a recorded run of this example on a real model, beside the RAG page's run on the same model and questions, and hold for that model's class. The step-through just below is still a scripted illustration, and source references do not establish the correctness of every implementation or outcome.
 
 
 <Run data={agenticRagRun} label="Level 5 · Agentic RAG" runKey="agentic-rag" />
@@ -171,19 +172,13 @@ number of searches cannot be fixed in advance.
 
 ## Cost and latency
 
-<CostStrip
-  stats={[
-    { label: 'Model calls, illustrated run', value: '4' },
-    { label: 'Tokens in, illustrated run', value: '~3,910' },
-    { label: 'Tokens out, illustrated run', value: '~88' },
-    { label: 'Wall time, illustrated run', value: '~2.6s' },
-  ]}
-  comparedTo={{
-    label: 'RAG (level 2), one call',
-    note: 'About four model calls instead of one, about four times the tokens, and about three times the wait, in the illustrated run compared on the home page. Anthropic separately reports that in its data agents typically use about 4x more tokens than chat interactions, and multi-agent systems about 15x more than chats; those are Anthropic\'s figures, not ones measured here.',
-  }}
-  level={5}
-/>
+<MeasuredCost page="agentic-rag" level={5} compare="rag" compareLabel="RAG (level 2)" />
+
+Most of the extra input is the loop itself: every step sends the whole conversation again,
+searches and read sections included, so the prompt grows with each round. Anthropic separately
+reports that in its data agents typically use about 4x more tokens than chat interactions, and
+multi-agent systems about 15x more than chats; those are Anthropic's figures, not ones measured
+here.
 
 <span id="how-to-eval-it"></span>
 
@@ -201,9 +196,21 @@ lookup question that RAG already answers in one call is the wrong place to look 
 advantage; if the extra cost does not show up as a better score on multi-hop and conflicting
 questions specifically, it is not paying for itself.
 
-No result file exists for agentic RAG yet, so this page cannot say a number for any of it. Run
-`python scripts/eval_run.py --example agentic_rag --model <spec> --dry` to project the cost of a
-real run before spending anything on one.
+<MeasuredResult page="agentic-rag" level={5} compare="rag" compareLabel="RAG (level 2)" />
+
+On this model the extra cost paid for itself where this page said it should: most of the
+multi-hop questions single-pass RAG missed, the loop answered, because after reading one section
+it searched again for the next. The other kinds moved less, since RAG already did well on them.
+
+Most loops did not stop on their own. The token budget in `run` ended most questions and forced
+an answer from whatever had been read so far, and three of the answers this run got wrong say so
+outright: the section they needed had turned up in a search but had not been read yet. Whether a
+larger budget would answer more is not tested here. The budget is the setting that trades cost
+for completeness, and a real deployment has to choose it.
+
+To run it yourself, `python scripts/eval_run.py --example agentic_rag --model <spec> --dry`
+projects the cost first; `docs/FIRST-LIVE-RUN.md` is the full sequence and the checks to read
+before the score.
 
 </HowToEval>
 

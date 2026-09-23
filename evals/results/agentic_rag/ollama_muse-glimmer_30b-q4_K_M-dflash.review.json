@@ -1,0 +1,32 @@
+[
+  {
+    "answer": "Based on the documentation that is accessible in the search results, no stacking kit for mounting a dryer above a washing machine is listed.\n\nThe Universal Accessories section that was retrieved is:\n\n* HLV-9001, Rinse Aid Dispenser Refill Kit, $6.50, fits DW-300 and DW-480.\n* HLV-9002, Dryer Vent Cleaning Kit, $19.99, fits DR-210 and DR-520.\n\nparts-list#4\n\nNo stacking / dryer-above-washer mounting kit is shown in the Universal Accessories listing, and the searched manuals / guides \u2014 e.g. parts-list#4: Universal Accessories; care-and-cleaning-guide#4: Dryer Vent Cleaning; dw480-manual#1: Overview; dw300-manual#5: Loading and Detergent; dr520-manual#1: Overview; dw480-manual#8: Replacement Parts \u2014 do not return a stacking kit reference in the results retrieved.",
+    "id": "U05",
+    "question": "Is a stacking kit available for mounting a Halvorsen dryer above a washing machine?",
+    "rubric": [
+      "States a stacking kit is not mentioned in the documents",
+      "Does not claim one exists or does not exist as a product fact"
+    ],
+    "verdict": true
+  },
+  {
+    "answer": "No. The 2026 bulletin is limited to the DR-520.\n\n* Service Bulletin SB-2026-07:\n  * \u201cSubject: revised maximum vent run for the DR-520 dryer.\u201d [service-bulletin#1]\n  * \u201cThis bulletin revises the maximum vent run specification for the DR-520 dryer. It does not affect the DR-210, and it does not affect either dishwasher model.\u201d [service-bulletin#1]\n\nRevised specification:\n\n* \u201cThe DR-210 vent specification is not affected by this bulletin and remains 35 feet with up to 4 elbows, as published in the DR-210 owner's manual.\u201d [service-bulletin#2]\n\nDR-210 venting as published:\n\n* \u201cThe DR-210 vents through 4-inch rigid metal duct. The maximum total vent run is 35 feet, with up to 4 elbows in the run, following the general venting rule in `installation-guide.md`. This figure has not been revised for the DR-210.\u201d [dr210-manual#4]",
+    "id": "C07",
+    "question": "Is the DR-210's maximum vent run affected by the 2026 service bulletin about DR-520 venting?",
+    "rubric": [
+      "States the DR-210 is not affected by the bulletin",
+      "States the DR-210 maximum remains 35 feet with up to 4 elbows"
+    ],
+    "verdict": true
+  },
+  {
+    "answer": "No. The current specification for the DR-520 is more restrictive than the specification that was in the 2024/2023 manuals.\n\n* Service Bulletin SB-2026-07 is a revision of the DR-520 vent limit:\n\n> \u201cThis bulletin revises the maximum vent run specification for the DR-520 dryer.\u201d [service-bulletin#1]\n\nRevised limit:\n\n> \u201cThe maximum vent run for the DR-520, using 4-inch rigid metal duct, is now 25 feet, with up to 3 elbows counted against that length.\u201d [service-bulletin#2]\n\n> \u201cThis supersedes the 35-foot, 4-elbow figure published in the DR-520 owner's manual (revision 2024-03-01) and in the Installation Guide (revision 2023-09-01).\u201d [service-bulletin#2]\n\nA 30-ft run exceeds the now-current 25-ft maximum, even though 3 elbows is within the \u201cup to 3 elbows counted against that length\u201d allowance. The DR-210 is not affected by the bulletin.\n\nUnder the pre-revision manuals in effect at the time of a 2025 installation the 30 ft / 3-elbow run would have been within the then-published 35 ft / 4-elbow limit, but it does not meet the current 25 ft limit.",
+    "id": "C11",
+    "question": "A DR-520 installed in 2025 has a 30-foot vent run with 3 elbows. Does it meet the current maximum vent run specification?",
+    "rubric": [
+      "States the installation does not meet current specification",
+      "Identifies the 30-foot run as exceeding the current 25-foot maximum"
+    ],
+    "verdict": true
+  }
+]

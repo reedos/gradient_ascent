@@ -99,9 +99,9 @@ exactly one per run, and level 5 records one per tool call plus one for the stop
 
 Almost everything here was built without calling a model. That means:
 
-- **Measured:** the RAG page. Its score and cost come from a committed result file in
-  `evals/results/rag/` and a recorded `examples/rag/trace.json`, on one model class (large local,
-  about 30B). `content/measurements.json` lists every measured result and the model behind it.
+- **Measured:** the RAG and agentic RAG pages. Their scores and costs come from committed result
+  files in `evals/results/` and recorded `trace.json` files, on one model class (large local, about
+  30B), run on the same questions and model so the two pages can be compared. `content/measurements.json` lists every measured result and the model behind it.
 - **Real:** the examples, which run end to end against `StubModel`; the tests; the validator; the
   synthetic corpus and the 60 questions; the site and its written pages.
 - **Not real:** every other number on the site. Those cost strips are illustrative and say so
