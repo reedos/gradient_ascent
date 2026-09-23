@@ -15,10 +15,43 @@ definition -- the cap is the code's -- so it records `decided_by="code"` and tak
 """
 from __future__ import annotations
 
-from examples.common.model import Completion, Message, Model
+from examples.common.model import Completion, Message, Model, ToolCall, content_text, with_ids
 from examples.common.trace import Tracer
 
 FINAL_TURN = "Give your final answer now. Do not call a tool."
+
+
+def assistant_turn(completion: Completion, step: int) -> tuple[Message, list[ToolCall]]:
+    """The model's tool-calling reply as a real assistant turn, plus its calls with ids.
+
+    The calls go back into the conversation as tool calls, not as text describing them. Text such
+    as "[called search(...)]" is something a model can copy: the first live run of agentic RAG
+    wrote its next call as that text, and the loop took it for the final answer.
+    """
+    calls = with_ids(list(completion.tool_calls), prefix=f"step{step}")
+    return Message(role="assistant", content=completion.text, tool_calls=tuple(calls)), calls
+
+
+def as_text_history(messages: list[Message]) -> list[Message]:
+    """The same conversation with tool turns written out as plain text, for a call that offers no
+    tools. The Messages API refuses tool-call turns in a request that defines no tools, and once
+    the loop is over there is no next call for a model to imitate the text in."""
+    out: list[Message] = []
+    for m in messages:
+        if m.tool_calls:
+            calls = "; ".join(f"{c.name} with {c.arguments}" for c in m.tool_calls)
+            text = content_text(m.content)
+            out.append(Message(role="assistant", content=(text + "\n" if text else "") + f"(Tools I called: {calls}.)"))
+        elif m.role == "tool":
+            out.append(Message(role="user", content=f"{m.tool_name} returned: {content_text(m.content)}"))
+        else:
+            out.append(m)
+    return out
+
+
+def tool_result(call: ToolCall, text: str) -> Message:
+    """One tool's output as a tool-result turn, paired with the call that asked for it."""
+    return Message(role="tool", content=text, tool_call_id=call.id, tool_name=call.name)
 FORCE_TITLE = "Force a final answer"
 
 
@@ -61,6 +94,6 @@ def force_final(
     budget did, and a trace that scored this as a model decision would credit the model with a
     stop it never made. `reason` becomes the step's detail, so the trace says which cap bit.
     """
-    completion = model.complete(messages + [Message(role="user", content=FINAL_TURN)], max_tokens=max_tokens)
+    completion = model.complete(as_text_history(messages) + [Message(role="user", content=FINAL_TURN)], max_tokens=max_tokens)
     record_completion(tracer, decided_by="code", title=FORCE_TITLE, completion=completion, detail=reason)
     return completion

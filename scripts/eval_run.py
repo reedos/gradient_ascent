@@ -57,11 +57,12 @@ from examples.common.model import (  # noqa: E402
     ToolCall,
     build_embedder,
     build_model,
-    content_payload,
     content_text,
     count_tokens,
+    message_payload,
 )
 from examples.common.trace import Tracer, git_commit  # noqa: E402
+from examples.common.agent_loop import FORCE_TITLE  # noqa: E402
 from examples.common.types import Answer  # noqa: E402
 
 # The examples this runner scores. An example belongs here when it does the question set's own
@@ -503,7 +504,7 @@ class CachingModel:
 
     def _digest(self, messages: list[Message], tools: list[dict] | None, schema: dict | None, max_tokens: int) -> str:
         key: dict = {
-            "messages": [{"role": m.role, "content": content_payload(m.content)} for m in messages],
+            "messages": [message_payload(m) for m in messages],
             "tools": tools,
             "schema": schema,
             "max_tokens": max_tokens,
@@ -750,6 +751,7 @@ class QuestionResult:
     wall_s: float
     tool_calls: int
     model_decided_steps: int
+    forced_final: bool = False
     retrieval_hit: float | None = None
     citations: list[str] = field(default_factory=list)
     retrieved_sources: list[str] = field(default_factory=list)
@@ -813,6 +815,7 @@ def run_example(
                 wall_s=wall_s,
                 tool_calls=_tool_call_count(tracer),
                 model_decided_steps=tracer.model_decided_count(),
+                forced_final=any(step.title == FORCE_TITLE for step in tracer.steps),
                 retrieval_hit=retrieval_hit(question, answer),
                 citations=answer.citations,
                 retrieved_sources=answer.retrieved_sources,
@@ -909,6 +912,8 @@ def _summarize(
         "wall_time_s": round(sum(r.wall_s for r in results), 3),
         "tool_calls": sum(r.tool_calls for r in results),
         "model_decided_steps": sum(r.model_decided_steps for r in results),
+        # Questions where a cap in the code (steps or tokens), not the model, ended the loop.
+        "forced_finals": sum(1 for r in results if r.forced_final),
         "questions": [asdict(r) for r in results],
     }
 

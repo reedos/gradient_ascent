@@ -21,7 +21,7 @@ import json
 from dataclasses import asdict, dataclass
 from typing import Literal
 
-from examples.common.agent_loop import force_final
+from examples.common.agent_loop import assistant_turn, force_final, tool_result
 from examples.common.model import Message, Model, ToolCall
 from examples.common.trace import Tracer
 from examples.common.types import Answer
@@ -231,9 +231,10 @@ def run(
             detail=calls_desc, tokens_in=completion.tokens_in,
             tokens_out=completion.tokens_out, ms=completion.ms,
         )
-        messages.append(Message(role="assistant", content=f"[called {calls_desc}]"))
+        turn, calls = assistant_turn(completion, len(messages))
+        messages.append(turn)
 
-        for call in completion.tool_calls:
+        for call in calls:
             if call.name == "book":
                 booking = _booking_call(call)
                 tracer.record(
@@ -243,7 +244,7 @@ def run(
                 return PendingBooking(request=request, call=booking, fingerprint=_fingerprint(booking))
             result_text = _run_read_only(call)
             tracer.record(kind="code", decided_by="code", title=f"Run tool: {call.name}", detail=result_text[:200])
-            messages.append(Message(role="user", content=f"Result of {call.name}: {result_text}"))
+            messages.append(tool_result(call, result_text))
 
         if tokens_used >= max_tokens:
             final = force_final(messages, model, tracer, reason=f"token budget reached: {tokens_used} >= {max_tokens}", max_tokens=400)

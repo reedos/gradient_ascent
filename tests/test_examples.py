@@ -678,6 +678,46 @@ class BackendRequestShapeTests(unittest.TestCase):
         self.assertIn("Result of search: a", payload["messages"][2]["content"])
         self.assertIn("Result of read: b", payload["messages"][2]["content"])
 
+    def _tool_history(self):
+        call = model_mod.ToolCall(name="search", arguments={"query": "vent"}, id="toolu_1")
+        return [
+            model_mod.Message(role="system", content="be brief"),
+            model_mod.Message(role="user", content="What is the DR-520 vent limit?"),
+            model_mod.Message(role="assistant", content="", tool_calls=(call,)),
+            model_mod.Message(role="tool", content="service-bulletin#2: Revised limit", tool_call_id="toolu_1", tool_name="search"),
+        ]
+
+    def test_claude_sends_tool_calls_as_tool_use_and_results_as_tool_result(self) -> None:
+        """The first live agentic run found the model copying tool calls written back as text. A
+        tool turn must reach the API as the API's own blocks, paired by id."""
+        model = model_mod.ClaudeModel("claude-sonnet-5", api_key="test-key-not-real")
+        messages = model.build_payload(self._tool_history(), tools=[{"name": "search", "parameters": {}}])["messages"]
+        self.assertEqual([m["role"] for m in messages], ["user", "assistant", "user"])
+        self.assertEqual(messages[1]["content"], [{"type": "tool_use", "id": "toolu_1", "name": "search", "input": {"query": "vent"}}])
+        self.assertEqual(messages[2]["content"][0]["type"], "tool_result")
+        self.assertEqual(messages[2]["content"][0]["tool_use_id"], "toolu_1")
+
+    def test_ollama_sends_tool_calls_and_tool_results_in_its_own_shape(self) -> None:
+        shaped = [model_mod._ollama_message(m) for m in self._tool_history()]
+        self.assertEqual(shaped[2]["tool_calls"], [{"function": {"name": "search", "arguments": {"query": "vent"}}}])
+        self.assertEqual(shaped[3], {"role": "tool", "content": "service-bulletin#2: Revised limit", "tool_name": "search"})
+        self.assertNotIn("[called", json.dumps(shaped))
+
+    def test_the_forced_final_call_sends_tool_turns_as_plain_text(self) -> None:
+        """The last call offers no tools, and the Messages API refuses tool blocks in a request
+        that defines none, so the history is written out as text for that one call."""
+        from examples.common.agent_loop import as_text_history
+
+        flat = as_text_history(self._tool_history())
+        self.assertFalse(any(m.tool_calls or m.role == "tool" for m in flat))
+        self.assertIn("search returned: service-bulletin#2", model_mod.content_text(flat[3].content))
+
+    def test_no_agent_loop_writes_a_tool_call_back_as_text(self) -> None:
+        for name in ("agentic_rag", "single_agent", "agent_harness", "bench_bring_up_debug_assistant", "trip_planning"):
+            source = (ROOT / "examples" / name / "run.py").read_text(encoding="utf-8")
+            self.assertNotIn('content=f"[called', source, name)
+            self.assertNotIn('content=f"Result of', source, name)
+
     def test_claude_does_not_drop_a_requested_output_schema(self) -> None:
         model = model_mod.ClaudeModel("claude-sonnet-5", api_key="test-key-not-real")
         payload = model.build_payload(

@@ -62,15 +62,29 @@ Content = str | list[Part]
 
 
 @dataclass(frozen=True)
-class Message:
-    role: str  # "system" | "user" | "assistant" | "tool"
-    content: Content  # plain text, or a list of parts for a multimodal request
-
-
-@dataclass(frozen=True)
 class ToolCall:
     name: str
     arguments: dict
+    # Pairs a call with its result. The Messages API requires it; Ollama returns one on newer
+    # servers. Backends fill it in when the provider does not, so a loop can always rely on it.
+    id: str = ""
+
+
+@dataclass(frozen=True)
+class Message:
+    """One turn. Two turn shapes exist for agent loops, and they are real turns in both wire
+    formats rather than text a model could imitate:
+
+    - an assistant turn that called tools: `role="assistant"`, `tool_calls` set, `content` the
+      model's text alongside the calls (often empty);
+    - a tool result: `role="tool"`, `tool_call_id` and `tool_name` naming the call it answers.
+    """
+
+    role: str  # "system" | "user" | "assistant" | "tool"
+    content: Content  # plain text, or a list of parts for a multimodal request
+    tool_calls: tuple[ToolCall, ...] = ()
+    tool_call_id: str = ""
+    tool_name: str = ""
 
 
 @dataclass(frozen=True)
@@ -141,6 +155,24 @@ def content_text(content: Content) -> str:
     return "\n".join(pieces)
 
 
+def message_payload(message: Message) -> dict:
+    """A JSON-safe rendering of a whole message, for cache keys. Tool-call fields appear only when
+    set, so a plain message renders exactly as it did before they existed."""
+    out: dict = {"role": message.role, "content": content_payload(message.content)}
+    if message.tool_calls:
+        out["tool_calls"] = [asdict(c) for c in message.tool_calls]
+    if message.tool_call_id:
+        out["tool_call_id"] = message.tool_call_id
+    if message.tool_name:
+        out["tool_name"] = message.tool_name
+    return out
+
+
+def with_ids(calls: list[ToolCall], prefix: str = "call") -> list[ToolCall]:
+    """Give every call an id, keeping any the provider supplied."""
+    return [c if c.id else ToolCall(name=c.name, arguments=c.arguments, id=f"{prefix}_{i}") for i, c in enumerate(calls)]
+
+
 def content_payload(content: Content) -> str | list[dict]:
     """A JSON-safe rendering of message content, for cache keys and trace files. Neutral: this
     is this repo's own shape, not any provider's wire format."""
@@ -150,7 +182,13 @@ def content_payload(content: Content) -> str | list[dict]:
 
 
 def _messages_tokens(messages: list[Message]) -> int:
-    return sum(count_tokens(content_text(m.content)) for m in messages)
+    """Tokens a model is sent: each message's text, plus the name and arguments of any tool call
+    it carries, which a provider sends too."""
+    return sum(
+        count_tokens(content_text(m.content))
+        + sum(count_tokens(c.name + " " + json.dumps(c.arguments, sort_keys=True)) for c in m.tool_calls)
+        for m in messages
+    )
 
 
 @dataclass(frozen=True)
@@ -215,6 +253,16 @@ def _ollama_message(message: Message) -> dict:
     an `images` array of base64-encoded strings alongside the text. There is no documented audio
     field, so an `AudioPart` raises instead of being dropped or guessed at.
     """
+    if message.role == "tool":
+        # Ollama's documented tool-result turn: role "tool", the result as content, and the name
+        # of the tool that produced it.
+        return {"role": "tool", "content": content_text(message.content), "tool_name": message.tool_name}
+    if message.tool_calls:
+        return {
+            "role": "assistant",
+            "content": content_text(message.content),
+            "tool_calls": [{"function": {"name": c.name, "arguments": c.arguments}} for c in message.tool_calls],
+        }
     if isinstance(message.content, str):
         return {"role": message.role, "content": message.content}
     text: list[str] = []
@@ -300,10 +348,13 @@ class OllamaModel:
             payload["format"] = schema
         data = _post_json(f"{self._host}/api/chat", payload, timeout=120)
         message = data.get("message", {})
-        tool_calls = [
-            ToolCall(name=c["function"]["name"], arguments=c["function"].get("arguments", {}))
-            for c in message.get("tool_calls", []) or []
-        ]
+        tool_calls = with_ids(
+            [
+                ToolCall(name=c["function"]["name"], arguments=c["function"].get("arguments", {}), id=str(c.get("id") or ""))
+                for c in message.get("tool_calls", []) or []
+            ],
+            prefix=f"ollama_{len(messages)}",
+        )
         text = message.get("content", "")
         return Completion(
             text=text,
@@ -392,7 +443,19 @@ def _anthropic_messages(messages: list[Message]) -> list[dict]:
         if message.role == "system":
             continue
         role = "assistant" if message.role == "assistant" else "user"
-        content = _anthropic_content(message.content)
+        if message.role == "tool":
+            # A tool result is a `tool_result` block inside a user turn, paired by id with the
+            # `tool_use` block of the assistant turn that asked for it.
+            content: str | list[dict] = [
+                {"type": "tool_result", "tool_use_id": message.tool_call_id, "content": content_text(message.content)}
+            ]
+        elif message.tool_calls:
+            text = content_text(message.content)
+            content = ([{"type": "text", "text": text}] if text else []) + [
+                {"type": "tool_use", "id": c.id, "name": c.name, "input": c.arguments} for c in message.tool_calls
+            ]
+        else:
+            content = _anthropic_content(message.content)
         if out and out[-1]["role"] == role:
             out[-1]["content"] = _join_anthropic_content(out[-1]["content"], content)
         else:
@@ -556,7 +619,7 @@ class ClaudeModel:
         ms = (time.perf_counter() - start) * 1000
         text = "".join(block["text"] for block in data.get("content", []) if block.get("type") == "text")
         tool_calls = [
-            ToolCall(name=block["name"], arguments=block.get("input", {}))
+            ToolCall(name=block["name"], arguments=block.get("input", {}), id=block.get("id", ""))
             for block in data.get("content", [])
             if block.get("type") == "tool_use"
         ]

@@ -190,7 +190,7 @@ class TripPlanningExampleTests(unittest.TestCase):
         tracer = _tracer()
         pending = run(SAMPLE_INPUT, model, tracer)
         self.assertEqual(tracer.model_decided_count(), 4)
-        self.assertEqual(tracer.tokens_in_total(), 1009)
+        self.assertEqual(tracer.tokens_in_total(), 957)
         self.assertEqual(tracer.tokens_out_total(), 37)
         answer = approve(pending, "approve", tracer)
         self.assertIn("89.00", answer.text)

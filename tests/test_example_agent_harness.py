@@ -46,7 +46,7 @@ def _scripted_responder(messages, tools):
     actually left in the messages it was handed -- the same messages `run` builds, after
     `context_policy` has had its say. Nothing here knows which policy is in effect."""
     del tools
-    called = [m for m in messages if m.role == "assistant" and content_text(m.content).startswith("[called")]
+    called = [m for m in messages if m.tool_calls]
     if len(called) == 0:
         return StubResponse(tool_calls=[ToolCall(name="search", arguments={"query": "DW-300 warranty term"})])
     if len(called) == 1:
@@ -120,10 +120,11 @@ class HarnessChangesTheOutcomeTests(unittest.TestCase):
 
 
 class ContextPolicyNeverTrimsTheQuestionTests(unittest.TestCase):
-    """What a context policy must never drop. `trim_to_budget` decides what is a tool result by
-    reading how a user message opens, and the question is a user message, so a question that
-    happens to start with the same words was being replaced by the placeholder: the model was
-    then asked to answer something it could no longer see, and answered anyway."""
+    """What a context policy must never drop. `trim_to_budget` once decided what was a tool result
+    by reading how a user message opened, and the question is a user message, so a question that
+    happened to start with the same words was replaced by the placeholder: the model was then
+    asked to answer something it could no longer see, and answered anyway. It now goes by the
+    `tool` role; these tests keep the question that caused it."""
 
     QUESTION_THAT_LOOKS_LIKE_A_TOOL_RESULT = (
         "Result of last week's service call: what does the DW-300's drain pump cost?"
@@ -133,12 +134,18 @@ class ContextPolicyNeverTrimsTheQuestionTests(unittest.TestCase):
         messages = [
             Message(role="system", content="You answer questions about appliances."),
             Message(role="user", content=self.QUESTION_THAT_LOOKS_LIKE_A_TOOL_RESULT),
-            Message(role="assistant", content="[called search({'query': 'drain pump'})]"),
-            Message(role="user", content="Result of search: " + "filler text " * 200),
+            Message(
+                role="assistant",
+                content="",
+                tool_calls=(ToolCall(name="search", arguments={"query": "drain pump"}, id="call_0"),),
+            ),
+            Message(role="tool", content="filler text " * 200, tool_call_id="call_0", tool_name="search"),
         ]
         trimmed = trim_to_budget(15)(messages)
         self.assertEqual(content_text(trimmed[1].content), self.QUESTION_THAT_LOOKS_LIKE_A_TOOL_RESULT)
         self.assertIn("trimmed by the context policy", content_text(trimmed[3].content))
+        # the placeholder still answers the call it replaced, so the history stays well formed
+        self.assertEqual((trimmed[3].role, trimmed[3].tool_call_id), ("tool", "call_0"))
 
     def test_the_model_is_still_shown_that_question_on_every_call_of_a_real_run(self) -> None:
         seen: list[list[str]] = []
@@ -146,7 +153,7 @@ class ContextPolicyNeverTrimsTheQuestionTests(unittest.TestCase):
         def responder(messages, tools):
             del tools
             seen.append([content_text(m.content) for m in messages])
-            called = [m for m in messages if m.role == "assistant" and content_text(m.content).startswith("[called")]
+            called = [m for m in messages if m.tool_calls]
             if not called:
                 return StubResponse(tool_calls=[ToolCall(name="search", arguments={"query": "drain pump"})])
             return StubResponse(text="$46.00.")
@@ -168,8 +175,12 @@ class ContextPolicyNeverTrimsTheQuestionTests(unittest.TestCase):
         messages = [
             Message(role="system", content="You answer questions about appliances."),
             Message(role="user", content="What does the DW-300's drain pump cost?"),
-            Message(role="assistant", content="[called search({'query': 'drain pump'})]"),
-            Message(role="user", content="Result of search: " + "filler text " * 200),
+            Message(
+                role="assistant",
+                content="",
+                tool_calls=(ToolCall(name="search", arguments={"query": "drain pump"}, id="call_0"),),
+            ),
+            Message(role="tool", content="filler text " * 200, tool_call_id="call_0", tool_name="search"),
         ]
         trimmed = trim_to_budget(15)(messages)
         self.assertIn("trimmed by the context policy", content_text(trimmed[3].content))

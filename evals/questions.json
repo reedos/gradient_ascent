@@ -669,13 +669,13 @@
     {
       "id": "C06",
       "kind": "conflicting",
-      "question": "Which two documents disagree about the DR-520's maximum vent run, and what is the date of each?",
-      "answer": "The DR-520 owner's manual (revision 2024-03-01, 35 feet) and Service Bulletin SB-2026-07 (issued 2026-06-01, 25 feet); the bulletin is newer and governs.",
+      "question": "Which documents disagree about the DR-520's maximum vent run, and what is the date of each?",
+      "answer": "Service Bulletin SB-2026-07 (issued 2026-06-01, 25 feet) disagrees with the DR-520 owner's manual (revision 2024-03-01, 35 feet) and the Installation Guide (revision 2023-09-01, 35 feet); the bulletin is newer and governs.",
       "accept": ["2024-03-01", "2026-06-01"],
       "must_cite": ["service-bulletin#1", "service-bulletin#2"],
       "grading": "rubric",
       "rubric": [
-        "Names the DR-520 owner's manual and Service Bulletin SB-2026-07 as the two disagreeing documents",
+        "Names Service Bulletin SB-2026-07 as disagreeing with the DR-520 owner's manual; also naming the Installation Guide is correct, not an error",
         "Gives the manual's date (2024-03-01) and the bulletin's date (2026-06-01)",
         "States the bulletin, being newer, is the correct figure"
       ]

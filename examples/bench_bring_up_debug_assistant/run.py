@@ -29,7 +29,7 @@ from pathlib import Path
 
 from evals.bench import BENCH_CORPUS_DIR, PRODUCTION_CSV
 from evals.corpus import Section, load_sections
-from examples.common.agent_loop import force_final
+from examples.common.agent_loop import assistant_turn, force_final, tool_result
 from examples.common.bench import Approval, Bench, GuardedLoad, GuardedSupply, SafetyEnvelope, is_read_only
 from examples.common.model import Message, Model, ToolCall
 from examples.common.tools import read_section
@@ -213,14 +213,15 @@ def run(
             tokens_out=completion.tokens_out,
             ms=completion.ms,
         )
-        messages.append(Message(role="assistant", content=f"[called {calls_desc}]"))
-        for call in completion.tool_calls:
+        turn, calls = assistant_turn(completion, len(messages))
+        messages.append(turn)
+        for call in calls:
             result_text, cites = _run_tool(call, log_path, sections, bench)
             citations.extend(cites)
             refused = result_text.startswith("refused:")
             title = "Refuse a command that sets state" if refused else f"Run tool: {call.name}"
             tracer.record(kind="code", decided_by="code", title=title, detail=result_text[:200])
-            messages.append(Message(role="user", content=f"Result of {call.name}: {result_text}"))
+            messages.append(tool_result(call, result_text))
 
         if tokens_used >= max_tokens:
             final = force_final(

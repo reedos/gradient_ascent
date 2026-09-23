@@ -14,7 +14,7 @@ import json
 from pathlib import Path
 
 from evals.corpus import DEFAULT_CORPUS_DIR, Section, load_sections
-from examples.common.agent_loop import force_final
+from examples.common.agent_loop import assistant_turn, force_final, tool_result
 from examples.common import tools as toolkit
 from examples.common.model import Embedder, Message, Model, ToolCall
 from examples.common.trace import Tracer
@@ -83,12 +83,13 @@ def run(
             tokens_out=completion.tokens_out,
             ms=completion.ms,
         )
-        messages.append(Message(role="assistant", content=f"[called {calls_desc}]"))
-        for call in completion.tool_calls:
+        turn, calls = assistant_turn(completion, len(messages))
+        messages.append(turn)
+        for call in calls:
             result_text, cites = _run_tool(call, sections)
             citations.extend(cites)
             tracer.record(kind="code", decided_by="code", title=f"Run tool: {call.name}", detail=result_text[:200])
-            messages.append(Message(role="user", content=f"Result of {call.name}: {result_text}"))
+            messages.append(tool_result(call, result_text))
 
         if tokens_used >= max_tokens:
             final = force_final(messages, model, tracer, reason=f"token budget reached: {tokens_used} >= {max_tokens}", max_tokens=400)

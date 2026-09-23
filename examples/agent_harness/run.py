@@ -21,7 +21,7 @@ from typing import Callable
 
 from evals.corpus import DEFAULT_CORPUS_DIR, Section, load_sections
 from examples.common import tools as toolkit
-from examples.common.agent_loop import force_final, record_completion
+from examples.common.agent_loop import assistant_turn, force_final, record_completion, tool_result
 from examples.common.model import Embedder, Message, Model, ToolCall, content_text, count_tokens
 from examples.common.trace import Tracer
 from examples.common.types import Answer
@@ -79,14 +79,13 @@ def trim_to_budget(budget_tokens: int) -> ContextPolicy:
     clearing and compaction -- this one trims by a plain token count to keep the point readable
     in a few lines.
 
-    The question is a user message too, and a tool result is recognized here by how its text
-    opens. So the search starts after the first assistant turn: a question that happens to begin
-    "Result of ..." is never trimmed, because a policy that drops the question leaves the model
-    answering something it can no longer see."""
+    A tool result is recognized by its role, `tool`, never by how its text opens: the question is
+    a user message, so a policy that matched on text could drop a question that happened to begin
+    "Result of ...", leaving the model answering something it can no longer see. A trimmed result
+    keeps its call id, because every tool call in the history still needs an answer."""
 
     def policy(messages: list[Message]) -> list[Message]:
-        first_turn = next((i for i, m in enumerate(messages) if m.role == "assistant"), len(messages))
-        result_idx = [i for i, m in enumerate(messages) if i > first_turn and m.role == "user" and _is_tool_result(m)]
+        result_idx = [i for i, m in enumerate(messages) if _is_tool_result(m)]
         kept: set[int] = set()
         used = 0
         for i in reversed(result_idx):
@@ -98,7 +97,14 @@ def trim_to_budget(budget_tokens: int) -> ContextPolicy:
         out = []
         for i, m in enumerate(messages):
             if i in result_idx and i not in kept:
-                out.append(Message(role="user", content="[earlier tool result trimmed by the context policy]"))
+                out.append(
+                    Message(
+                        role="tool",
+                        content="[earlier tool result trimmed by the context policy]",
+                        tool_call_id=m.tool_call_id,
+                        tool_name=m.tool_name,
+                    )
+                )
             else:
                 out.append(m)
         return out
@@ -107,7 +113,7 @@ def trim_to_budget(budget_tokens: int) -> ContextPolicy:
 
 
 def _is_tool_result(message: Message) -> bool:
-    return isinstance(message.content, str) and message.content.startswith("Result of ")
+    return message.role == "tool"
 
 
 # A hook sees a tool call the model already chose and decides whether it may run. Returning
@@ -165,13 +171,14 @@ def run(
 
         calls_desc = ", ".join(f"{c.name}({c.arguments})" for c in completion.tool_calls)
         record_completion(tracer, decided_by="model", title="Model picks an action", completion=completion, detail=calls_desc)
-        messages.append(Message(role="assistant", content=f"[called {calls_desc}]"))
+        turn, calls = assistant_turn(completion, len(messages))
+        messages.append(turn)
 
-        for call in completion.tool_calls:
+        for call in calls:
             allowed, reason = hook(call)
             if not allowed:
                 tracer.record(kind="code", decided_by="code", title="Hook vetoes the call", detail=reason)
-                messages.append(Message(role="user", content=f"Denied: {call.name} -- {reason}"))
+                messages.append(tool_result(call, f"Denied: {reason}"))
                 continue
             if call.name not in registry.allowed:
                 result_text, cites = toolkit.unknown_tool(call.name)
@@ -179,7 +186,7 @@ def run(
                 result_text, cites = registry.call(call, sections)
             citations.extend(cites)
             tracer.record(kind="code", decided_by="code", title=f"Run tool: {call.name}", detail=result_text[:200])
-            messages.append(Message(role="user", content=f"Result of {call.name}: {result_text}"))
+            messages.append(tool_result(call, result_text))
 
         if tokens_used >= max_tokens:
             reason = f"token budget reached: {tokens_used} >= {max_tokens}"
