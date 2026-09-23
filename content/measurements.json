@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "about": "The measured results a page may state. A page is `measured` in taxonomy.json only when it has an entry here, the result file and trace it names are committed, and the grader sample was read by a person. Every number a page prints about a run comes from the result file itself, never from this file.",
+  "models": {
+    "ollama:muse-glimmer:30b-q4_K_M-dflash": {
+      "name": "Muse Glimmer 30B",
+      "maker": "Meta",
+      "class": "Large local (about 30B)",
+      "how_run": "Open weights at 4-bit (Q4_K_M), run on one local GPU through Ollama. The tag is a local build of muse-glimmer:30b.",
+      "source": {
+        "title": "muse-glimmer",
+        "publisher": "Ollama library",
+        "url": "https://ollama.com/library/muse-glimmer",
+        "accessed": "2026-09-22"
+      }
+    }
+  },
+  "classes": ["Small local (about 8B)", "Large local (about 30B)", "Frontier API"],
+  "results": [
+    {
+      "page": "rag",
+      "example": "rag",
+      "model": "ollama:muse-glimmer:30b-q4_K_M-dflash",
+      "grader": "ollama:muse-glimmer:30b-q4_K_M-dflash",
+      "grader_sample_checked": "2026-09-23",
+      "grader_note": "A person read every answer scored wrong. All 13 are wrong by their rubric or pattern, with one caveat: C06 asks which two documents disagree, and the answer also named the Installation Guide, which does carry the old figure. The question undercounts; the score keeps C06 as wrong rather than change a question after seeing the answers."
+    }
+  ]
+}

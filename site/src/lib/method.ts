@@ -70,7 +70,7 @@ export function methodSections(abs: (path: string) => string): MethodSection[] {
           kind: 'ul',
           items: [
             '**Fit the outcome and working experience.** Prefer simplicity among approaches that satisfy the requested automation, quality, and human effort. Levels describe autonomy; they do not rank which solution is best.',
-            '**Measure before claiming.** A page may say a level helps only when a committed result file shows it. No result file exists yet, so nothing on the site reports a measured number.',
+            '**Measure before claiming.** A page may say a level helps only when a committed result file shows it. A page marked Measured prints its result, the model it ran on and the class of that model; every other number on the site is an illustration and says so.',
             '**Name real things.** Every technique is tied to the models, products and tools that use it. Names come from a dated registry with sources.',
             '**Show how it works.** Concept pages include diagrams and practical examples. Stepped traces are illustrations unless explicitly backed by a recorded run; runnable examples let readers inspect the mechanics.',
             '**State the costs and the failures.** Each page lists the cost in tokens and time, the common failure modes, and how to test for them.',

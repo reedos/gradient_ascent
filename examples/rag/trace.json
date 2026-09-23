@@ -1,0 +1,67 @@
+{
+  "example": "rag",
+  "level": 2,
+  "model_id": "ollama:muse-glimmer:30b-q4_K_M-dflash",
+  "recorded_at": "2026-09-23T06:46:46+00:00",
+  "illustrative": false,
+  "stub": false,
+  "commit": "a3876e7",
+  "model_decided_steps": 0,
+  "steps": [
+    {
+      "i": 0,
+      "kind": "code",
+      "decided_by": "code",
+      "title": "Chunk corpus",
+      "detail": "79 sections",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "ms": 0.0,
+      "edge": "solid"
+    },
+    {
+      "i": 1,
+      "kind": "code",
+      "decided_by": "code",
+      "title": "Embed and retrieve top-k",
+      "detail": "dw480-manual#9, warranty-policy#1, warranty-policy#2, care-and-cleaning-guide#2",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "ms": 0.0,
+      "edge": "solid"
+    },
+    {
+      "i": 2,
+      "kind": "code",
+      "decided_by": "code",
+      "title": "Build prompt with sources",
+      "detail": "4 sources",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "ms": 0.0,
+      "edge": "solid"
+    },
+    {
+      "i": 3,
+      "kind": "model",
+      "decided_by": "code",
+      "title": "Ask the model for a cited answer",
+      "detail": "The DW-480 is covered by Halvorsen\u2019s standard warranty.\n\n* Full coverage: Halvorsen covers parts and labor in full for 2 years from the original date of purchase, for defects in materials or workmansh",
+      "tokens_in": 471,
+      "tokens_out": 1216,
+      "ms": 8626.8331,
+      "edge": "solid"
+    },
+    {
+      "i": 4,
+      "kind": "code",
+      "decided_by": "code",
+      "title": "Parse citations",
+      "detail": "care-and-cleaning-guide#2, dw480-manual#9, warranty-policy#1, warranty-policy#2",
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "ms": 0.0,
+      "edge": "solid"
+    }
+  ]
+}

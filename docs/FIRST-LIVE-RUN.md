@@ -239,8 +239,11 @@ A page may be published when every one of these is true. There is no partial ver
 5. **The grader sample for that run was hand-checked**, if any of its questions were
    rubric-graded.
 6. **Every registry entry the page cites is `verified: true`**, with a source and a checked date.
-7. **The page's `status` in `content/taxonomy.json` changes to `published` in the same commit**
-   as the trace and the result file, so the three cannot drift apart.
+7. **The page's `status` in `content/taxonomy.json` changes to `measured` in the same commit**
+   as the trace, the result file and its entry in `content/measurements.json` (the model, its
+   class, and the date a person read the grader's verdicts), so they cannot drift apart.
+   `tests/test_measurements.py` checks all of it, and the page prints its numbers with
+   `<MeasuredResult>` and `<MeasuredCost>`, which read the result file at build time.
 
 Until then, the run diagrams on the site carry `"illustrative": true`, which is what the site
 uses to refuse to present them as measurements. Do not remove that flag from a file that is still

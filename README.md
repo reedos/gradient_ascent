@@ -97,13 +97,15 @@ exactly one per run, and level 5 records one per tool call plus one for the stop
 
 ## What is and is not real yet
 
-Everything here was built without calling a model, local or remote. That means:
+Almost everything here was built without calling a model. That means:
 
+- **Measured:** the RAG page. Its score and cost come from a committed result file in
+  `evals/results/rag/` and a recorded `examples/rag/trace.json`, on one model class (large local,
+  about 30B). `content/measurements.json` lists every measured result and the model behind it.
 - **Real:** the examples, which run end to end against `StubModel`; the tests; the validator; the
-  synthetic corpus and the 60 questions; the site and all 98 written pages.
-- **Not real:** every number on the site. The cost strips are illustrative and say so above the
-  numbers. Every run diagram carries `"illustrative": true`. No example has a recorded
-  `trace.json`, and `evals/results/` is empty.
+  synthetic corpus and the 60 questions; the site and its written pages.
+- **Not real:** every other number on the site. Those cost strips are illustrative and say so
+  above the numbers, and every run diagram carries `"illustrative": true`.
 - **Projected, not measured:** the token figures in `evals/budget.json`, which come from
   `eval_run.py --dry`, a token counter, not a model.
 

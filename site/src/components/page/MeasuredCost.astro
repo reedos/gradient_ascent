@@ -1,0 +1,16 @@
+---
+// The cost strip for a measured page: per-question tokens and wall time read from the committed
+// result file, with a caption naming the run, the model and its class.
+import CostStrip from './CostStrip.astro';
+import { measurementFor } from '../../lib/results-data';
+import { costStats, costCaption } from '../../lib/results';
+
+interface Props {
+  page: string;
+  level?: number;
+}
+const { page, level } = Astro.props;
+const m = measurementFor(page);
+---
+
+<CostStrip stats={costStats(m)} caption={costCaption(m)} illustrative={false} level={level} />

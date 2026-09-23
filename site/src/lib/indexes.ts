@@ -17,6 +17,9 @@ import { examplesForTechnique, recipeExampleMarkdown } from './recipe-examples';
 import { getCollection, getEntry } from 'astro:content';
 import { url } from './url';
 import { parseLiteral } from './literal';
+import { measurementFor } from './results-data';
+import { measurementMarkdown, costStats, costCaption } from './results';
+import { REPO_URL } from './site';
 import {
   techniqueBySlug,
   levels,
@@ -575,6 +578,26 @@ function flattenCostStrip(text: string, where: string): string {
   );
 }
 
+function flattenMeasured(text: string, where: string): string {
+  let out = replaceAllTags(
+    text,
+    'MeasuredResult',
+    (m) => measurementMarkdown(measurementFor(attrString(parseAttrs(m.attrsRaw), 'page') ?? ''), REPO_URL),
+    where,
+  );
+  out = replaceAllTags(
+    out,
+    'MeasuredCost',
+    (m) => {
+      const measured = measurementFor(attrString(parseAttrs(m.attrsRaw), 'page') ?? '');
+      const stats = costStats(measured).map((s) => `- **${s.label}:** ${s.value}`).join('\n');
+      return `\n_${costCaption(measured)}_\n\n${stats}\n`;
+    },
+    where,
+  );
+  return out;
+}
+
 function flattenRunIt(text: string, where: string): string {
   return replaceAllTags(
     text,
@@ -666,6 +689,7 @@ export function flattenMdxBody(rawBody: string, where: string): string {
   text = replaceAllTags(text, 'DutHarnessLesson', () => `\n**Overview:** ${dutOverview.overview}\n\n**Task:** ${dutOverview.task}\n\n**What to look for:** ${dutOverview.outcome}\n\n**Adapt it:** ${dutOverview.transfer}\n` + '\n**Guided walkthrough:** Follow the DUT project through context, plan, approval, generation, non-hardware checks, and human handoff. Change a missing requirement or new-helper condition, then decide whether a new helper needs separate approval. Responses and check results are scripted illustrations, not model calls or executed validation.\n', where);
   text = replaceAllTags(text, 'TestAutomationHarness', () => '\n**Architecture:** User supplies reusable CLAUDE.md instructions and a DUT-specific DUT_BRIEF.md, plus access to framework documentation, source, past projects, and a template → agent asks questions and drafts PROJECT_PLAN.md → user approval → agent produces Python files, YAML/JSON configuration, Markdown documentation including PROJECT_STATUS.md, and non-hardware check results → user reviews and tests on real instruments → logs and observations return to the agent for revision and status updates. Brief, plan, and status filenames are example conventions. Permissions are configured separately from Markdown. Framework changes and new project-local tools require explicit approval; read-only framework access remains to be confirmed. Intended controls around each action: guardrails inspect proposed actions and generated files; permissions and sandboxing restrict execution; observability records edits, commands, approvals, check results, and blocked actions; stop controls bound revision work. Human review evaluates requirements, framework reuse, and approval compliance. The approved plan, relevant files, and feedback become context for the next call.\n', where);
   text = flattenFailureModes(text, where);
+  text = flattenMeasured(text, where);
   text = flattenCostStrip(text, where);
   text = flattenRunIt(text, where);
   text = flattenTryIt(text, where);

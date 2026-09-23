@@ -355,6 +355,7 @@ main { max-width: 1392px; margin: auto; padding: 0 48px; min-height: 60vh }
 .failure-mode dl { margin: 0; display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 4px 16px }
 .failure-mode dt { font: 600 10px var(--font); letter-spacing: 1px; text-transform: uppercase; color: var(--muted) }
 .failure-mode dd { margin: 0 0 6px; font-size: 12.5px; color: var(--muted); line-height: 1.7 }
+.cost-measured { border-left-color: var(--accent) }
 .cost-strip { display: flex; flex-wrap: wrap; gap: 26px 34px; margin: 16px 0 }
 .cost-stat b { display: block; font: 550 27px var(--display); letter-spacing: -1px; color: var(--text); font-variant-numeric: tabular-nums }
 .cost-stat span { font-size: 11px; color: var(--muted) }

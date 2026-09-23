@@ -1,0 +1,32 @@
+[
+  {
+    "answer": "The provided sources do not contain any information about stacking kits for mounting a Halvorsen dryer above a washing machine.\n\nSources:\n",
+    "id": "U05",
+    "question": "Is a stacking kit available for mounting a Halvorsen dryer above a washing machine?",
+    "rubric": [
+      "States a stacking kit is not mentioned in the documents",
+      "Does not claim one exists or does not exist as a product fact"
+    ],
+    "verdict": true
+  },
+  {
+    "answer": "No. Service Bulletin SB-2026-07 is about a revised maximum vent run for the DR-520 dryer and it does not affect the DR-210.\n\n* \u201cThis bulletin revises the maximum vent run specification for the DR-520 dryer. It does not affect the DR-210, and it does not affect either dishwasher model.\u201d \n* \u201cThe DR-210 vent specification is not affected by this bulletin and remains 35 feet with up to 4 elbows, as published in the DR-210 owner's manual.\u201d\n\nSources: service-bulletin#1, service-bulletin#2",
+    "id": "C07",
+    "question": "Is the DR-210's maximum vent run affected by the 2026 service bulletin about DR-520 venting?",
+    "rubric": [
+      "States the DR-210 is not affected by the bulletin",
+      "States the DR-210 maximum remains 35 feet with up to 4 elbows"
+    ],
+    "verdict": true
+  },
+  {
+    "answer": "No. The current specification for the DR-520 supersedes the owner's manual figure.\n\nThe DR-520 owner's manual originally published a maximum of 35 feet with up to 4 elbows, and noted to check for a newer service bulletin before relying on that figure:\n* \u201cAlways check for a newer service bulletin before relying on this figure; a bulletin can supersede it for a specific model.\u201d dr520-manual#4\n\nThe revised specification is:\n* \u201cThe maximum vent run for the DR-520, using 4-inch rigid metal duct, is now 25 feet, with up to 3 elbows counted against that length. This supersedes the 35-foot, 4-elbow figure published in the DR-520 owner's manual (revision 2024-03-01) and in the Installation Guide (revision 2023-09-01).\u201d service-bulletin#2\n\nA 30-foot run exceeds the revised 25-foot maximum. The elbow count of 3 is within the revised up-to-3 elbow allowance, but the length is not.\n\nFor an existing DR-520 installation:\n* \u201cFor an existing DR-520 installation with a vent run longer than 25 feet, have the vent inspected by authorized service; a long run does not require immediate replacement but can produce error code F5 (airflow restriction) as described in `troubleshooting.md`.\u201d service-bulletin#4\n\nSources: dr520-manual#4, service-bulletin#2, service-bulletin#4",
+    "id": "C11",
+    "question": "A DR-520 installed in 2025 has a 30-foot vent run with 3 elbows. Does it meet the current maximum vent run specification?",
+    "rubric": [
+      "States the installation does not meet current specification",
+      "Identifies the 30-foot run as exceeding the current 25-foot maximum"
+    ],
+    "verdict": true
+  }
+]

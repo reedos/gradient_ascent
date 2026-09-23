@@ -121,7 +121,7 @@
           "slug": "rag",
           "title": "Retrieval-augmented generation (RAG)",
           "summary": "Searching your documents and giving the results to the model.",
-          "status": "sourced"
+          "status": "measured"
         },
         {
           "slug": "knowledge-graphs",

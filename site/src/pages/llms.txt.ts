@@ -36,10 +36,10 @@ export const GET: APIRoute = async ({ site }) => {
   lines.push(`> How a level is defined: ${taxonomy.level_rule}`);
   lines.push('');
   lines.push(
-    '> Status: technique, topic and recipe pages are SOURCED — written with primary references, not guaranteed error-free, ' +
-      'but with no recorded run and no scored result file behind those legacy pages. Outside these example validation records, the guide does not report ' +
-      'a measured number. Every cost strip and every stepped trace is an illustration and is ' +
-      'labeled as one.',
+    '> Status: most technique, topic and recipe pages are SOURCED — written with primary references, not guaranteed error-free, ' +
+      'but with no recorded run and no scored result file behind them. A page marked MEASURED prints a committed result file, ' +
+      'the model it ran on and that model\'s class, and holds only for that class. Every other cost strip and every stepped ' +
+      'trace is an illustration and is labeled as one.',
   );
   lines.push('');
 

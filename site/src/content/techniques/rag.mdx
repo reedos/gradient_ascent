@@ -25,7 +25,8 @@ import Lanes from '../../components/page/Lanes.astro';
 import Lane from '../../components/page/Lane.astro';
 import WhenNot from '../../components/page/WhenNot.astro';
 import FailureModes from '../../components/page/FailureModes.astro';
-import CostStrip from '../../components/page/CostStrip.astro';
+import MeasuredCost from '../../components/page/MeasuredCost.astro';
+import MeasuredResult from '../../components/page/MeasuredResult.astro';
 import HowToEval from '../../components/page/HowToEval.astro';
 import RunIt from '../../components/page/RunIt.astro';
 import TryIt from '../../components/page/TryIt.astro';
@@ -50,7 +51,7 @@ The simple pipeline sits at level 2 because code determines how context is selec
 chooses successive searches, this site calls that <Link href="/techniques/agentic-rag/">agentic
 RAG</Link>. Both approaches augment generation with retrieved information.
 
-This page provides primary references and illustrative examples. The examples are scripted, not measured model runs; source references do not establish the correctness of every implementation or outcome.
+This page is measured: the cost and the score under How to Evaluate It come from a recorded run of this example on a real model, and hold for that model's class. The step-through just below is still a scripted illustration, and source references do not establish the correctness of every implementation or outcome.
 
 
 <Run data={ragRun} label="Level 2 · RAG" runKey="rag" />
@@ -193,19 +194,11 @@ those to still make sense.
 
 ## Cost and latency
 
-<CostStrip
-  stats={[
-    { label: 'Model calls, one question', value: '1' },
-    { label: 'Tokens in', value: '~1,850' },
-    { label: 'Tokens out', value: '~64' },
-    { label: 'Wall time', value: '~2.1s' },
-  ]}
-  comparedTo={{
-    label: 'agentic RAG (level 5)',
-    note: 'About four model calls instead of one, about four times the tokens, and about three times the wait, in the illustrated run compared on the home page.',
-  }}
-  level={2}
-/>
+<MeasuredCost page="rag" level={2} />
+
+One model call per question, always: the pipeline's code makes exactly one. Agentic RAG, the
+level 5 version, makes several and has not been measured yet, so any comparison with it on this
+site is still an illustration.
 
 <span id="how-to-eval-it"></span>
 
@@ -224,9 +217,17 @@ used together, which is exactly what single-pass retrieval struggles with. Confl
 questions need the answer to notice two chunks disagree, not just cite whichever one the search
 ranked first.
 
-No result file exists for RAG yet (see `docs/EVALS.md`), so this page cannot say a number for
-any of it. Run `python scripts/eval_run.py --example rag --model <spec> --dry` to project the
-cost of a real run before spending anything on one.
+<MeasuredResult page="rag" level={2} />
+
+The misses sit where single-pass retrieval predicts. Most multi-hop answers were honest: they
+said the documents did not cover part of the question, because the one search never reached the
+second document it needed. The worst miss is the other kind. Asked whether a drive belt is
+covered eighteen months after purchase, the model found the two-year warranty, never saw the
+exclusion for wear parts, and said yes. That is the case the page's failure modes warn about: a
+fluent answer built only from what retrieval happened to return.
+
+To run it yourself, `python scripts/eval_run.py --example rag --model <spec> --dry` projects the
+cost first; `docs/FIRST-LIVE-RUN.md` is the full sequence and the checks to read before the score.
 
 </HowToEval>
 

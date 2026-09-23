@@ -18,10 +18,12 @@ interface Props {
   stats: Stat[];
   comparedTo?: CompareTo;
   illustrative?: boolean;
+  /** Printed above the numbers when they are measured: which run, which model, which class. */
+  caption?: string;
   /** Tier order 0..7, tints the compare block the way the rest of the page's level does. */
   level?: number;
 }
-const { stats, comparedTo, illustrative = true, level } = Astro.props;
+const { stats, comparedTo, illustrative = true, caption, level } = Astro.props;
 const color = typeof level === 'number' ? `var(--o${level})` : undefined;
 ---
 
@@ -34,6 +36,7 @@ const color = typeof level === 'number' ? `var(--o${level})` : undefined;
     </p>
   )
 }
+{!illustrative && caption && <p class="cost-illustrative cost-measured">{caption}</p>}
 <div class="cost-strip">
   {
     stats.map((s) => (
