@@ -102,16 +102,6 @@ class TimelinePageTests(unittest.TestCase):
         self.assertGreater(checked, 0, "sanity: at least one marked date should exist in the data")
         self.assertEqual(missing, [], f"marked dates not found rendered in the timeline page: {missing}")
 
-    def test_a_missing_mark_renders_no_single_date_not_a_blank_cell(self) -> None:
-        has_a_null_mark = any(
-            value is None
-            for entry in self.levels
-            for key, value in entry.items()
-            if key not in NON_MARK_LEVEL_KEYS
-        )
-        self.assertTrue(has_a_null_mark, "sanity: the data should have at least one null marked date to check this against")
-        self.assertIn("No single date", self.html_raw)
-
     def test_no_negative_interval_is_ever_printed(self) -> None:
         # A reversed interval (the product came first / the later level arrived first) must show
         # as a positive number of months with words explaining the direction, never a bare
@@ -119,21 +109,22 @@ class TimelinePageTests(unittest.TestCase):
         negatives = re.findall(r"-\d+\s*mo\b", self.html_unescaped)
         self.assertEqual(negatives, [], f"raw negative month figures found on the timeline page: {negatives}")
 
-    def test_every_level_note_is_rendered_verbatim(self) -> None:
-        notes = [entry["note"] for entry in self.levels if entry.get("note")]
-        self.assertGreater(len(notes), 0, "sanity: the data should have at least one level note to check this against")
-        missing = [n for n in notes if n not in self.html_unescaped]
-        self.assertEqual(missing, [], f"level notes not found verbatim on the timeline page: {missing}")
+    # -- the reasoning behind each mark stays public -----------------------------------------------
+    # The compact timeline approved on 09/20/2026 shows one selected milestone per level and no
+    # longer prints the level notes, the candidates or "No single date" on the page. The audit
+    # trail still has to reach readers, so the published data file must carry all of it.
 
-    # -- the candidates behind each mark, and archive captures -----------------------------------
-
-    def test_every_candidate_reason_is_rendered(self) -> None:
-        # A marked date is a choice between dated candidates. The losing candidates and the
-        # one-line reason each lost must reach the page, not sit unread in content/timeline.json.
-        reasons = [c["why"] for entry in self.levels for c in entry.get("candidates", [])]
+    def test_the_published_data_carries_every_level_note_and_candidate_reason(self) -> None:
+        published = json.loads((DIST / "data" / "timeline.json").read_text(encoding="utf-8"))
+        levels = {entry["level"]: entry for entry in published["levels"]}
+        notes = [entry for entry in self.levels if entry.get("note")]
+        reasons = [(entry["level"], c["why"]) for entry in self.levels for c in entry.get("candidates", [])]
+        self.assertGreater(len(notes), 0, "sanity: the data should have at least one level note")
         self.assertGreater(len(reasons), 0, "sanity: the data should record candidates for its marks")
-        missing = [r for r in reasons if r not in self.html_unescaped]
-        self.assertEqual(missing, [], f"candidate reasons not found on the timeline page: {missing}")
+        for entry in notes:
+            self.assertEqual(levels[entry["level"]].get("note"), entry["note"], f"level {entry['level']} note missing from /data/timeline.json")
+        for level, why in reasons:
+            self.assertIn(why, [c["why"] for c in levels[level].get("candidates", [])], f"level {level} candidate reason missing from /data/timeline.json")
 
     def test_every_archive_capture_is_linked(self) -> None:
         # Where a maker's page would not open and the site read the Internet Archive's capture of
@@ -191,29 +182,20 @@ class TimelinePageTests(unittest.TestCase):
 
     # -- accessibility wiring -----------------------------------------------------------------------
 
-    def test_the_chart_names_itself_and_says_where_the_text_version_is(self) -> None:
-        """`role="img"` makes the chart one graphic to assistive technology, so its accessible
-        name is the whole of what a screen-reader user gets from it. It has to say that the
-        milestones are listed as text below, because that is where they have to go for them."""
-        m = re.search(r'<div class="tl-chart"[^>]*aria-label="([^"]+)"', self.html_raw)
-        self.assertIsNotNone(m, "the chart has no accessible name")
-        label = m.group(1)
-        self.assertIn("listed as text below", label, f"the chart's name does not point at the list: {label!r}")
+    def test_every_chart_event_names_its_date_and_opens_a_note_that_exists(self) -> None:
+        """The chart's product marks are real links, so each is one tab stop with an accessible
+        name that carries the milestone and its date, and each opens a note on the same page."""
+        links = re.findall(r'<a class="event-link" href="#([^"]+)" aria-label="([^"]+)"', self.html_raw)
+        self.assertEqual(len(links), len([e for e in self.levels if e["level"] > 0]), "one event link per level above 0")
+        for target, label in links:
+            self.assertIn(f'id="{target}"', self.html_raw, f"event link points at a missing note: #{target}")
+            self.assertRegex(html.unescape(label), r"\d{4}", f"event link name carries no date: {label!r}")
 
-    def test_the_chart_holds_no_tab_stops_of_its_own(self) -> None:
-        """An audit (wave 6) found `role="img"` wrapped around 451 focusable descendants: 96
-        focusable dots and their tooltip links. ARIA seals a `role="img"` subtree, so a keyboard
-        user crossed 451 stops that no screen reader announced. The dots are not focusable now
-        and the tooltip links are out of the tab order; every one of those links is on the
-        milestone's own entry in the list below. The chart itself stays focusable because it
-        scrolls sideways.
-        """
-        start = self.html_raw.index('<div class="tl-chart"')
-        end = self.html_raw.index('id="timeline-list-heading"') if 'id="timeline-list-heading"' in self.html_raw else len(self.html_raw)
-        chart = self.html_raw[start:end]
-        # One stop: the scrollable chart container itself.
-        self.assertEqual(chart.count('tabindex="0"'), 1, "something inside the chart is focusable again")
-        self.assertNotIn('<a href', chart.split('tl-tip-links')[0][200:], "a link crept back into the chart's own markup")
+    def test_no_graphic_role_hides_focusable_content(self) -> None:
+        """An audit (wave 6) found `role="img"` wrapped around 451 focusable descendants. ARIA
+        seals a `role="img"` subtree, so a keyboard user crossed stops no screen reader announced."""
+        chart = self.html_raw[self.html_raw.index('class="review-timeline"'):self.html_raw.index('id="timeline-list-heading"')]
+        self.assertNotIn('role="img"', chart, "a graphic role came back around the chart's links")
 
 
 class TimelineHomeStripTests(unittest.TestCase):
@@ -225,19 +207,14 @@ class TimelineHomeStripTests(unittest.TestCase):
 
     def test_home_page_contains_the_timeline_strip(self) -> None:
         self.assertIn('id="timeline"', self.html_raw, "home page has no #timeline section")
-        self.assertIn('class="tls"', self.html_raw, "home page does not render the compact timeline strip")
+        self.assertIn('class="review-timeline"', self.html_raw, "home page does not render the compact timeline")
 
-    def test_timeline_strip_sits_after_the_climb_curve_and_before_the_thesis(self) -> None:
-        climb_idx = self.html_raw.find('id="climb-curve"')
+    def test_timeline_sits_before_the_capability_chart(self) -> None:
         strip_idx = self.html_raw.find('id="timeline"')
-        thesis_idx = self.html_raw.find('class="stack-thesis"')
-        self.assertGreater(climb_idx, -1, "climb curve section not found")
-        self.assertGreater(strip_idx, -1, "timeline strip section not found")
-        self.assertGreater(thesis_idx, -1, "thesis line not found")
-        self.assertTrue(
-            climb_idx < strip_idx < thesis_idx,
-            f"expected climb-curve < timeline strip < thesis, got positions {climb_idx}, {strip_idx}, {thesis_idx}",
-        )
+        capability_idx = self.html_raw.find('id="capability"')
+        self.assertGreater(strip_idx, -1, "timeline section not found")
+        self.assertGreater(capability_idx, -1, "capability section not found")
+        self.assertLess(strip_idx, capability_idx, "the timeline should come before the capability chart it dates")
 
     def test_home_strip_links_to_the_full_timeline(self) -> None:
         self.assertIn('href="/gradient_ascent/timeline/"', self.html_raw)

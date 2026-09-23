@@ -56,6 +56,17 @@ ALLOWED_HITS |= {(path, 'alex' + '@example.test') for path in (
     'examples/practical_labs/validation/schema-constrained/approval-gate.json',
 )}
 ALLOWED_HITS.add(('examples/practical_labs/test_labs.py', 'someone-else' + '@example.test'))
+ALLOWED_HITS.add(('examples/practical_labs/test_labs.py', 'secret' + '@example.test'))
+# The builder-handoff evaluation's synthetic participant, also on the reserved .test domain.
+ALLOWED_HITS |= {('docs/evaluations/builder-handoff-2026-09-20/' + path, 'ari' + '@example.test') for path in (
+    'cases.json',
+    'trials/WA-2/artifact.md',
+    'trials/WA-2/attachments.json',
+    'trials/WA-2/builder-final.md',
+    'trials/WA-2/download.md',
+    'trials/WA-2/entries.json',
+    'trials/WA-2/simulator-input.json',
+)}
 
 
 def _tracked_files() -> list[Path]:

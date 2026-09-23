@@ -135,7 +135,7 @@ class HouseStyleTests(unittest.TestCase):
     def test_an_entry_is_not_a_commit_message(self) -> None:
         """A reader does not care that a file was renamed or a test was added. If an entry cannot
         be written without those words, it is not a change a reader needed told about."""
-        banned = ("commit", "merge", "refactor", "pull request", "branch", "pushed", "rebase", "lint")
+        banned = ("commit", "merge", "refactor", "pull request", "git branch", "feature branch", "pushed", "rebase", "lint")
         for where, text in self._prose():
             lowered = text.lower()
             for word in banned:

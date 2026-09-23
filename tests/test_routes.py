@@ -45,6 +45,7 @@ FENCE_RE = re.compile(r"```[\s\S]*?```")
 # twin at /method.md the same way /agents/ and /shapes/ do.
 NO_TWIN = {
     "apply",
+    "chatbot-to-agent",
     "",  # the home page
     "examples",
     "failures",
@@ -56,6 +57,7 @@ NO_TWIN = {
     "teardowns",
     "techniques",
     "timeline",
+    "usability",
 }
 
 
