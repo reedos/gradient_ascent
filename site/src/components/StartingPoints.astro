@@ -1,0 +1,79 @@
+---
+// The home page's two starting points: one for readers new to AI, one for readers building
+// something. Each is a short ordered path through pages that already exist.
+import { url } from '../lib/url';
+
+const doors = [
+  {
+    id: 'new-to-ai',
+    hue: 'var(--o2)',
+    eyebrow: 'New to AI',
+    title: 'Understand what these systems are',
+    lede: 'No background needed. See how a chatbot grows into an agent, then find the level that fits your own work.',
+    steps: [
+      { href: '/chatbot-to-agent/', title: 'From a chatbot to an always-on agent', text: 'What each level adds, one step at a time.' },
+      { href: '/examples/', title: 'Follow a worked example', text: 'One task, the decisions it needs, and what can go wrong.' },
+      { href: '/worksheet/', title: 'Find your level', text: 'A few questions about your task point to the smallest design that fits.' },
+      { href: '/glossary/', title: 'Look up a term', text: 'Every word this site uses, in plain language.' },
+    ],
+    cta: { href: '/chatbot-to-agent/', label: 'Start the walkthrough' },
+  },
+  {
+    id: 'building',
+    hue: 'var(--o5)',
+    eyebrow: 'Building something',
+    title: 'Choose a design and hand it off',
+    lede: 'Name the kind of job, pick the smallest level that does it, and give your own model a brief it can act on.',
+    steps: [
+      { href: '/shapes/', title: 'What kind of job is it?', text: 'Job shapes with the level each usually needs, and when to go lower or higher.' },
+      { href: '/recipes/#engineering', title: 'Recipes for engineers', text: 'Test automation, measurement, design and software, worked on one bench.' },
+      { href: '/techniques/', title: 'Techniques in depth', text: 'Code, failure modes, costs and how to evaluate each pattern.' },
+      { href: '/apply/', title: 'Create a project brief', text: 'For your own model or agent, with this guide as its reference.' },
+    ],
+    cta: { href: '/shapes/', label: 'Describe your job' },
+  },
+];
+---
+<section class="section starting-points" id="start-here" aria-labelledby="start-here-title">
+  <h2 id="start-here-title" class="visually-hidden">Where to start</h2>
+  <div class="doors">
+    {doors.map((d) => (
+      <article class="door" id={d.id} style={`--c:${d.hue}`} aria-labelledby={`${d.id}-title`}>
+        <div class="eyebrow"><span class="dot"></span>{d.eyebrow}</div>
+        <h3 id={`${d.id}-title`}>{d.title}</h3>
+        <p class="lede">{d.lede}</p>
+        <ol class="steps">
+          {d.steps.map((s) => (
+            <li>
+              <a href={url(s.href)}>
+                <span class="step-title">{s.title}</span>
+                <span class="step-text">{s.text}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+        <a class="door-cta" href={url(d.cta.href)}>{d.cta.label} <span aria-hidden="true">&rarr;</span></a>
+      </article>
+    ))}
+  </div>
+</section>
+
+<style>
+  .doors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px }
+  .door { position: relative; display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: clamp(22px, 2.6vw, 34px); background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden }
+  .door::before { content: ''; position: absolute; inset: 0 0 auto; height: 2px; background: var(--c) }
+  .door .eyebrow { color: var(--c) }
+  .door h3 { font-size: clamp(21px, 2.2vw, 25px); line-height: 1.25; letter-spacing: -.5px }
+  .lede { color: var(--muted); font-size: 15px; line-height: 1.6; max-width: 52ch }
+  .steps { list-style: none; counter-reset: step; margin: 4px 0 0; padding: 0; display: grid; gap: 2px }
+  .steps li { counter-increment: step }
+  .steps a { display: grid; grid-template-columns: 26px minmax(0, 1fr); column-gap: 12px; padding: 11px 12px 11px 0; border-top: 1px solid var(--line); color: var(--text) }
+  .steps a::before { content: counter(step); grid-row: span 2; align-self: start; width: 22px; height: 22px; margin-top: 1px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--c) 55%, transparent); border-radius: 50%; font-size: 11px; font-weight: 600; color: var(--c) }
+  .step-title { font-size: 14px; font-weight: 600 }
+  .step-text { font-size: 13px; color: var(--muted); line-height: 1.5 }
+  .steps a:hover .step-title, .steps a:focus-visible .step-title { color: var(--c); text-decoration: underline; text-underline-offset: 3px }
+  .door-cta { margin-top: auto; align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; height: 38px; padding: 0 16px; border: 1px solid var(--c); border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--text); transition: background .15s }
+  .door-cta:hover { background: color-mix(in srgb, var(--c) 16%, transparent) }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap }
+  @media (max-width: 800px) { .doors { grid-template-columns: 1fr } }
+</style>

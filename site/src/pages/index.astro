@@ -4,6 +4,7 @@ import Base from '../layouts/Base.astro';
 import SectionTop from '../components/SectionTop.astro';
 import AgentJourneyIntro from '../components/AgentJourneyIntro.astro';
 import MapPreview from '../components/MapPreview.astro';
+import StartingPoints from '../components/StartingPoints.astro';
 import SelectedTimeline from '../components/SelectedTimeline.astro';
 import CapabilityChart from '../components/CapabilityChart.astro';
 import LevelStack from '../components/islands/LevelStack';
@@ -25,8 +26,8 @@ const levelStackItems = levels.map(t => ({order:t.order,title:t.title,short:t.sh
         eight levels by how much the model decides for itself.
       </p>
       <div class="hero-actions">
-        <a class="button" href={url('/apply/')}>Use this site with your AI <span aria-hidden="true">&rarr;</span></a>
-        <a class="text-link" href={url('/examples/')}>Explore a task <span aria-hidden="true">&rarr;</span></a>
+        <a class="button" href={url('/chatbot-to-agent/')}>New to AI? Start here <span aria-hidden="true">&rarr;</span></a>
+        <a class="text-link" href={url('/shapes/')}>Building something? Describe the job <span aria-hidden="true">&rarr;</span></a>
       </div>
       <div class="hero-meta">
         <span>{counts.techniques} techniques</span>
@@ -46,11 +47,12 @@ const levelStackItems = levels.map(t => ({order:t.order,title:t.title,short:t.sh
     </div>
   </section>
 
+  <StartingPoints />
+
   <AgentJourneyIntro />
 
   <MapPreview />
 
-  <section class="section" id="start-here"><SectionTop eyebrow="Start here" title="What brings you here?" aside="You do not need to study every level before applying an idea. Choose an entry point and follow the links that fit your task." /><div class="featured-examples"><article><h3>Understand</h3><p>Browse concepts, see visual explanations, and explore how they connect.</p><a href={url('/techniques/')}>Explore concepts &rarr;</a></article><article><h3>Explore a task</h3><p>Follow an example with evidence, decisions, and tradeoffs.</p><a href={url('/examples/')}>Browse worked examples &rarr;</a></article><article><h3>Apply</h3><p>Create a brief or prepare instructions, a workflow, or checks for your own agent.</p><a href={url('/tools/')}>Find a project tool &rarr;</a></article></div></section>
   <section class="section" id="example">
     <SectionTop
       eyebrow="Worked example"
@@ -100,8 +102,7 @@ const levelStackItems = levels.map(t => ({order:t.order,title:t.title,short:t.sh
 
 <style>
   .comparison-question { padding: 20px 24px; background: var(--panel2); border-left: 3px solid var(--accent); margin-bottom: 20px; font-size: 17px }
-  .home-comparison, .featured-examples { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px }
-  .featured-examples { grid-template-columns: repeat(3, minmax(0, 1fr)) }
+  .home-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px }
   article { padding: clamp(20px, 2.5vw, 32px); background: var(--panel); border: 1px solid var(--line); border-radius: 12px; display: flex; flex-direction: column; gap: 16px; min-width: 0 }
   h3 { font-size: 23px; line-height: 1.3; letter-spacing: -.5px }
   article p { color: var(--muted); font-size: 15px }
@@ -114,6 +115,5 @@ const levelStackItems = levels.map(t => ({order:t.order,title:t.title,short:t.sh
   .sample-result strong { font-size: 12px; color: var(--text) }
   .sample-result p { margin-top: 6px }
   .comparison-note { margin-top: 18px; color: var(--muted); font-size: 13px }
-  @media (max-width: 900px) { .featured-examples { grid-template-columns: 1fr } }
   @media (max-width: 700px) { .home-comparison { grid-template-columns: 1fr } }
 </style>
