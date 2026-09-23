@@ -18,7 +18,7 @@ import { getCollection, getEntry } from 'astro:content';
 import { url } from './url';
 import { parseLiteral } from './literal';
 import { measurementFor } from './results-data';
-import { measurementMarkdown, costStats, costCaption } from './results';
+import { measurementMarkdown, costStats, costCaption, compareWith, costComparedTo } from './results';
 import { REPO_URL } from './site';
 import {
   techniqueBySlug,
@@ -582,16 +582,25 @@ function flattenMeasured(text: string, where: string): string {
   let out = replaceAllTags(
     text,
     'MeasuredResult',
-    (m) => measurementMarkdown(measurementFor(attrString(parseAttrs(m.attrsRaw), 'page') ?? ''), REPO_URL),
+    (m) => {
+      const attrs = parseAttrs(m.attrsRaw);
+      const measured = measurementFor(attrString(attrs, 'page') ?? '');
+      const other = attrString(attrs, 'compare');
+      const cmp = other ? compareWith(measured, measurementFor(other), attrString(attrs, 'compareLabel') ?? other) : undefined;
+      return measurementMarkdown(measured, REPO_URL, cmp);
+    },
     where,
   );
   out = replaceAllTags(
     out,
     'MeasuredCost',
     (m) => {
-      const measured = measurementFor(attrString(parseAttrs(m.attrsRaw), 'page') ?? '');
+      const attrs = parseAttrs(m.attrsRaw);
+      const measured = measurementFor(attrString(attrs, 'page') ?? '');
       const stats = costStats(measured).map((s) => `- **${s.label}:** ${s.value}`).join('\n');
-      return `\n_${costCaption(measured)}_\n\n${stats}\n`;
+      const other = attrString(attrs, 'compare');
+      const cmp = other ? costComparedTo(measured, compareWith(measured, measurementFor(other), attrString(attrs, 'compareLabel') ?? other)) : undefined;
+      return `\n_${costCaption(measured)}_\n\n${stats}\n` + (cmp ? `\n**Compared with ${cmp.label}.** ${cmp.note}\n` : '');
     },
     where,
   );

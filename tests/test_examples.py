@@ -710,7 +710,10 @@ class BackendRequestShapeTests(unittest.TestCase):
 
         flat = as_text_history(self._tool_history())
         self.assertFalse(any(m.tool_calls or m.role == "tool" for m in flat))
-        self.assertIn("search returned: service-bulletin#2", model_mod.content_text(flat[3].content))
+        self.assertIn("What search returned:\nservice-bulletin#2", model_mod.content_text(flat[-1].content))
+        # nothing about the calls is written in the model's own voice: the first version put
+        # "(Tools I called: ...)" in an assistant turn, and the model answered with that line
+        self.assertEqual([m.role for m in flat], ["system", "user", "user"])
 
     def test_no_agent_loop_writes_a_tool_call_back_as_text(self) -> None:
         for name in ("agentic_rag", "single_agent", "agent_harness", "bench_bring_up_debug_assistant", "trip_planning"):

@@ -4,7 +4,7 @@
   "note": "Token ceilings projected by the dry run, never measured. Live runs record what they actually spent on their result files in evals/results/. Pass a cap to the runner with --budget-tokens; nothing here is read automatically. The model id in `source` does not change these figures: a dry run counts prompt tokens with count_tokens and reports each call's requested max_tokens, neither of which depends on which model was asked for. tests/test_budget_is_current.py re-runs the projection and fails if any number here has drifted, which is how this file went a day stale before.",
   "questions": 60,
   "scored_examples": 18,
-  "dry_run_total_tokens": 3022733,
+  "dry_run_total_tokens": 3012653,
   "default_cap_per_example_tokens": 120000,
   "why_the_default_is_low": "Deliberately below the projected ceiling of six of the eighteen examples. A cap that stops a run is a partial result you can raise and resume from cache; a cap that never bites is not a budget. Start here, read the partial, raise it for the example you actually want.",
   "recommended_cap_per_example_tokens": {

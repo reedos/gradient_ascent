@@ -3,16 +3,20 @@
 // score readable, the model and its class, and links to the committed files. Every number is read
 // from the result file by lib/results-data.ts; nothing here is typed by hand.
 import { measurementFor } from '../../lib/results-data';
-import { percent, graderName, resultFileName } from '../../lib/results';
+import { percent, graderName, resultFileName, compareWith } from '../../lib/results';
 import { usDate } from '../../lib/dates';
 import { REPO_URL } from '../../lib/site';
 
 interface Props {
   page: string;
   level?: number;
+  /** Another measured page run on the same model and questions, shown alongside. */
+  compare?: string;
+  compareLabel?: string;
 }
-const { page, level } = Astro.props;
+const { page, level, compare, compareLabel } = Astro.props;
 const m = measurementFor(page);
+const cmp = compare ? compareWith(m, measurementFor(compare), compareLabel ?? compare) : undefined;
 const r = m.result;
 const hue = typeof level === 'number' ? `var(--o${level})` : 'var(--accent)';
 const resultUrl = `${REPO_URL}/blob/main/evals/results/${m.entry.example}/${resultFileName(m.entry.model)}`;
@@ -23,6 +27,7 @@ const traceUrl = `${REPO_URL}/blob/main/examples/${m.entry.example}/trace.json`;
   <div class="measured-head">
     <div class="eyebrow"><span class="dot"></span>Measured result</div>
     <h3 id={`measured-${page}`}><b>{m.correct}</b> of {m.total} correct</h3>
+    {cmp && <p class="measured-vs">{cmp.label}: {cmp.other.correct} of {cmp.other.total} on the same questions, same model.</p>}
     <p>
       On the site's {m.total}-question set, run {usDate(r.run_date.slice(0, 10))} with
       {' '}<a href={m.model.source.url} rel="noopener">{m.model.name}</a> by {m.model.maker}, a model in the
@@ -32,15 +37,22 @@ const traceUrl = `${REPO_URL}/blob/main/examples/${m.entry.example}/trace.json`;
 
   <table class="measured-kinds">
     <caption class="visually-hidden">Correct answers by question kind</caption>
-    <thead><tr><th scope="col">Question kind</th><th scope="col">Correct</th><th scope="col"><span class="visually-hidden">Share</span></th></tr></thead>
+    <thead><tr><th scope="col">Question kind</th><th scope="col">{cmp ? 'This page' : 'Correct'}</th>{cmp && <th scope="col">{cmp.label}</th>}<th scope="col"><span class="visually-hidden">Share</span></th></tr></thead>
     <tbody>
-      {m.kinds.map((k) => (
-        <tr>
-          <th scope="row">{k.label}</th>
-          <td>{k.correct} of {k.n}</td>
-          <td aria-hidden="true"><span class="bar"><i style={`width:${(k.correct / k.n) * 100}%`}></i></span></td>
-        </tr>
-      ))}
+      {m.kinds.map((k) => {
+        const other = cmp?.rows.find((row) => row.label === k.label);
+        return (
+          <tr>
+            <th scope="row">{k.label}</th>
+            <td>{k.correct} of {k.n}</td>
+            {other && <td class="other">{other.otherCorrect} of {other.n}</td>}
+            <td aria-hidden="true">
+              <span class="bar"><i style={`width:${(k.correct / k.n) * 100}%`}></i></span>
+              {other && <span class="bar other-bar"><i style={`width:${(other.otherCorrect / other.n) * 100}%`}></i></span>}
+            </td>
+          </tr>
+        );
+      })}
     </tbody>
   </table>
 
@@ -49,6 +61,7 @@ const traceUrl = `${REPO_URL}/blob/main/examples/${m.entry.example}/trace.json`;
     <div><dt>Citation coverage</dt><dd>{percent(r.citation_coverage)}</dd><p>of the sections the questions need were cited in the answer</p></div>
     <div><dt>Model-decided steps</dt><dd>{r.model_decided_steps}</dd><p>{r.model_decided_steps === 0 ? 'code chose every step; the model only wrote the answer' : 'steps where the model chose what happened next'}</p></div>
     <div><dt>Empty or ungraded</dt><dd>{(r.empty_completions ?? 0) + r.ungraded}</dd><p>answers the score could not read</p></div>
+    {r.forced_finals !== undefined && <div><dt>Ended by a cap</dt><dd>{r.forced_finals}</dd><p>questions where the code's step or token budget stopped the loop</p></div>}
   </dl>
 
   <p class="measured-note">
@@ -74,11 +87,16 @@ const traceUrl = `${REPO_URL}/blob/main/examples/${m.entry.example}/trace.json`;
   .measured-kinds th, .measured-kinds td { padding: 9px 0; border-top: 1px solid var(--line); text-align: left; font-weight: 400 }
   .measured-kinds th[scope='row'] { padding-right: 14px }
   .measured-kinds thead th { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); border-top: 0; padding-top: 0 }
-  .measured-kinds td:nth-child(2) { width: 90px; font-variant-numeric: tabular-nums; white-space: nowrap }
-  .measured-kinds td:nth-child(3) { width: 42% }
+  .measured-kinds td { font-variant-numeric: tabular-nums; white-space: nowrap }
+  .measured-kinds td:nth-child(2), .measured-kinds td.other { width: 90px }
+  .measured-kinds td.other { color: var(--muted) }
+  .measured-vs { margin: 0; color: var(--muted); font-size: 14px }
+  .other-bar { margin-top: 4px }
+  .other-bar i { background: var(--muted); opacity: .55 }
+  .measured-kinds td:last-child { width: 38% }
   .bar { display: block; height: 6px; border-radius: 3px; background: var(--panel2); overflow: hidden }
   .bar i { display: block; height: 100%; background: var(--c) }
-  .measured-checks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 0 }
+  .measured-checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin: 0 }
   .measured-checks div { padding: 12px 14px; background: var(--panel2); border-radius: 7px; min-width: 0 }
   .measured-checks dt { font-size: 10px; letter-spacing: .8px; text-transform: uppercase; color: var(--muted) }
   .measured-checks dd { margin: 4px 0 2px; font: 550 22px var(--display); font-variant-numeric: tabular-nums }
@@ -86,6 +104,5 @@ const traceUrl = `${REPO_URL}/blob/main/examples/${m.entry.example}/trace.json`;
   .measured-note { font-size: 13px; color: var(--muted); line-height: 1.7; max-width: 75ch }
   .measured-links { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 13px }
   .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap }
-  @media (max-width: 800px) { .measured-checks { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
-  @media (max-width: 420px) { .measured-kinds td:nth-child(3) { width: 30% } }
+  @media (max-width: 420px) { .measured-checks { grid-template-columns: repeat(2, minmax(0, 1fr)) } .measured-kinds td:last-child { width: 26% } }
 </style>

@@ -37,6 +37,8 @@ export interface ResultFile {
   wall_time_s: number;
   ungraded: number;
   empty_completions?: number;
+  /** Questions a cap in the code (steps or tokens), not the model, ended. Loops only. */
+  forced_finals?: number;
   grader_calls: number;
   model_settings?: { num_ctx?: number; reasoning_allowance?: number } | null;
 }
@@ -150,22 +152,65 @@ export function costCaption(m: Measurement): string {
   );
 }
 
+export interface Comparison {
+  /** How the other page is named in the comparison, e.g. "RAG (level 2)". */
+  label: string;
+  other: Measurement;
+  rows: { label: string; correct: number; otherCorrect: number; n: number }[];
+}
+
+/**
+ * The same questions, the same model, two techniques. Refuses anything else: a comparison across
+ * models or question sets would credit the technique with a difference the model or the questions
+ * made, which is the claim this site's measurement design forbids.
+ */
+export function compareWith(m: Measurement, other: Measurement, label: string): Comparison {
+  if (other.entry.model !== m.entry.model) throw new Error(`compare ${m.entry.page} with ${other.entry.page}: different models`);
+  if (other.result.questions_total !== m.result.questions_total) throw new Error(`compare ${m.entry.page} with ${other.entry.page}: different question sets`);
+  const rows = m.kinds.map((k) => {
+    const o = other.kinds.find((x) => x.key === k.key);
+    if (!o) throw new Error(`compare ${m.entry.page} with ${other.entry.page}: ${k.key} is missing from one run`);
+    return { label: k.label, correct: k.correct, otherCorrect: o.correct, n: k.n };
+  });
+  return { label, other, rows };
+}
+
+/** The cost strip's comparison line, both sides read from their result files. */
+export function costComparedTo(m: Measurement, c: Comparison): { label: string; note: string } {
+  const a = m.perQuestion;
+  const b = c.other.perQuestion;
+  return {
+    label: `${c.label}, same model`,
+    note:
+      `Per question, ${c.label} took ${thousands(b.tokensIn)} tokens in, ${thousands(b.tokensOut)} out and ` +
+      `${b.seconds.toFixed(1)}s on ${m.model.name}; this page took ${thousands(a.tokensIn)} in, ` +
+      `${thousands(a.tokensOut)} out and ${a.seconds.toFixed(1)}s, on the same ${m.result.questions_run} questions.`,
+  };
+}
+
 /** The whole result as plain Markdown, for the page's `.md` twin. No `<` or `>` anywhere. */
-export function measurementMarkdown(m: Measurement, repoUrl: string): string {
+export function measurementMarkdown(m: Measurement, repoUrl: string, c?: Comparison): string {
   const r = m.result;
+  const table = c
+    ? [
+        `| Question kind | This page | ${c.label}, same model |`,
+        '| --- | --- | --- |',
+        ...c.rows.map((k) => `| ${k.label} | ${k.correct} of ${k.n} | ${k.otherCorrect} of ${k.n} |`),
+      ]
+    : ['| Question kind | Correct |', '| --- | --- |', ...m.kinds.map((k) => `| ${k.label} | ${k.correct} of ${k.n} |`)];
   const lines = [
     `### Measured result: ${m.model.name}`,
     '',
     `**${m.correct} of ${m.total} correct** on the site's ${m.total}-question set, run ${usDate(r.run_date.slice(0, 10))} with ${m.model.name} by ${m.model.maker}, a model in the ${m.model.class} class. ${m.model.how_run}`,
     '',
-    '| Question kind | Correct |',
-    '| --- | --- |',
-    ...m.kinds.map((k) => `| ${k.label} | ${k.correct} of ${k.n} |`),
+    ...(c ? [`${c.label} scored ${c.other.correct} of ${c.other.total} on the same questions with the same model.`, ''] : []),
+    ...table,
     '',
     `- **Retrieval coverage:** ${pct(r.retrieval_coverage)} of the sections the questions need reached the prompt.`,
     `- **Citation coverage:** ${pct(r.citation_coverage)} of the sections the questions need were cited in the answer.`,
     `- **Model-decided steps:** ${r.model_decided_steps}. ${r.model_decided_steps === 0 ? 'Code chose every step; the model only wrote the answer.' : 'Steps where the model chose what happened next.'}`,
     `- **Empty replies:** ${r.empty_completions ?? 0}. **Ungraded answers:** ${r.ungraded}.`,
+    ...(r.forced_finals !== undefined ? [`- **Ended by a cap:** ${r.forced_finals} of ${r.questions_run} questions, where the step or token budget in the code stopped the loop and forced an answer.`] : []),
     `- **Grader:** ${graderName(m)}, on ${r.grader_calls} rubric questions, the rest by exact match. Checked by a person on ${usDate(m.entry.grader_sample_checked)}: ${m.entry.grader_note}`,
     '',
     m.classesNotRun.length

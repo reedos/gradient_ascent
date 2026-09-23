@@ -5,11 +5,12 @@
   "abstain_patterns": [
     "\\b(?:do|does|did) not (?:say|state|specify|mention|give|list|provide|include|rate|publish|record|contain|cover|address|discuss)",
     "\\b(?:don't|doesn't|didn't) (?:say|state|specify|mention|give|list|provide|include|contain|cover|address|discuss)",
-    "\\bnot (?:stated|given|specified|mentioned|listed|provided|published|documented|available|found)\\b",
-    "\\bno (?:information|figure|number|mention|data|rating|price|weight|capacity|record|answer)\\b",
-    "\\b(?:cannot|can't|could not|couldn't|unable to) (?:be )?(?:determined|determine|answer|answered|find|found|tell)\\b",
+    "\\bnot (?:stated|given|specified|mentioned|listed|provided|published|documented|available|found|shown|included|present|covered)\\b",
+    "\\bno (?:retrievable |documented |published )?(?:information|figure|number|mention|data|rating|price|weight|capacity|record|answer|specification)\\b",
+    "\\b(?:cannot|can't|could not|couldn't|unable to) (?:be )?(?:determined|determine|answer|answered|find|found|tell|provide|give|confirm|verify)\\b",
     "\\b(?:is|are) silent\\b",
-    "\\bnothing in (?:the|these) documents\\b"
+    "\\bnothing in (?:the|these) documents\\b",
+    "\\bno \\b(?:\\S+ ){0,10}(?:is|are) (?:listed|given|stated|shown|mentioned|documented)\\b"
   ],
   "questions": [
     {
@@ -44,7 +45,7 @@
       "kind": "lookup",
       "question": "What electrical circuit does a DR-210 dryer require?",
       "answer": "A dedicated 240V, 30A circuit.",
-      "accept": ["240V,? ?30A"],
+      "accept": ["240 ?V,? ?30 ?A"],
       "must_cite": ["dr210-manual#2"],
       "grading": "exact"
     },
@@ -394,7 +395,7 @@
       "kind": "numeric",
       "question": "How many DW-300 Quick Wash cycles (30 minutes each), run back-to-back, fit into a 180-minute window?",
       "answer": "6 cycles (180 / 30).",
-      "accept": ["6 (cycles|Quick Wash)"],
+      "accept": ["\\b6 (?:back-to-back |consecutive |full )?(?:Quick Wash )?cycles\\b|\\b6 Quick Wash"],
       "must_cite": ["dw300-manual#3"],
       "grading": "exact",
       "inputs": {"window_minutes": 180, "cycle_minutes": 30},

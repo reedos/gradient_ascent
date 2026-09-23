@@ -3,14 +3,17 @@
 // result file, with a caption naming the run, the model and its class.
 import CostStrip from './CostStrip.astro';
 import { measurementFor } from '../../lib/results-data';
-import { costStats, costCaption } from '../../lib/results';
+import { costStats, costCaption, compareWith, costComparedTo } from '../../lib/results';
 
 interface Props {
   page: string;
   level?: number;
+  compare?: string;
+  compareLabel?: string;
 }
-const { page, level } = Astro.props;
+const { page, level, compare, compareLabel } = Astro.props;
 const m = measurementFor(page);
+const comparedTo = compare ? costComparedTo(m, compareWith(m, measurementFor(compare), compareLabel ?? compare)) : undefined;
 ---
 
-<CostStrip stats={costStats(m)} caption={costCaption(m)} illustrative={false} level={level} />
+<CostStrip stats={costStats(m)} caption={costCaption(m)} illustrative={false} level={level} comparedTo={comparedTo} />

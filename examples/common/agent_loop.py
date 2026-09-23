@@ -34,16 +34,20 @@ def assistant_turn(completion: Completion, step: int) -> tuple[Message, list[Too
 
 def as_text_history(messages: list[Message]) -> list[Message]:
     """The same conversation with tool turns written out as plain text, for a call that offers no
-    tools. The Messages API refuses tool-call turns in a request that defines no tools, and once
-    the loop is over there is no next call for a model to imitate the text in."""
+    tools. The Messages API refuses tool-call turns in a request that defines no tools.
+
+    Tool calls are dropped and each result becomes user-side material, "What search returned:
+    ...". Nothing about a call is written in the model's own voice: the first version wrote
+    "(Tools I called: ...)" as an assistant turn, and the model answered with that same line.
+    """
     out: list[Message] = []
     for m in messages:
         if m.tool_calls:
-            calls = "; ".join(f"{c.name} with {c.arguments}" for c in m.tool_calls)
             text = content_text(m.content)
-            out.append(Message(role="assistant", content=(text + "\n" if text else "") + f"(Tools I called: {calls}.)"))
+            if text.strip():
+                out.append(Message(role="assistant", content=text))
         elif m.role == "tool":
-            out.append(Message(role="user", content=f"{m.tool_name} returned: {content_text(m.content)}"))
+            out.append(Message(role="user", content=f"What {m.tool_name} returned:\n{content_text(m.content)}"))
         else:
             out.append(m)
     return out

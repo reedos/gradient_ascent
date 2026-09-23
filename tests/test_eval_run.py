@@ -476,6 +476,24 @@ class UnanswerableGateTests(unittest.TestCase):
         self.assertTrue(eval_run.grade_exact(c09, "35 ft - 25 ft = 10 ft"))
         self.assertFalse(eval_run.grade_exact(c09, "The difference is 110 ft."))
 
+    def test_the_answers_the_first_agentic_run_gave_are_graded_as_what_they_are(self) -> None:
+        """Real answers from the first agentic_rag run (09/23/2026) that the grading misread: two
+        correct answers worded differently, and four clean refusals. Each is paired with the
+        invention a pattern must still catch."""
+        qs = {q["id"]: q for q in eval_run.load_questions(ROOT / "evals" / "questions.json")}
+        self.assertTrue(eval_run.grade_exact(qs["L04"], "**Dedicated 240 V, 30 A circuit** with a 4-wire power cord"))
+        self.assertTrue(eval_run.grade_exact(qs["N10"], "180 min / 30 min = 6 back-to-back Quick Wash cycles"))
+        self.assertFalse(eval_run.grade_exact(qs["N10"], "16 back-to-back Quick Wash cycles"))
+        refusals = {
+            "U02": "there is no retrievable specification for a maximum stacking height",
+            "U05": "No stacking kit for mounting a dryer above a washing machine is listed in the documentation.",
+            "U06": "a customer support phone number for Halvorsen is not shown in the retrieved material.",
+            "U12": "the shipping weight is not shown in the returned excerpts. I cannot provide a reliable figure.",
+        }
+        for qid, text in refusals.items():
+            self.assertFalse(eval_run.abstention_failure(qs[qid], text), f"{qid}: a clean refusal failed the gate")
+        self.assertTrue(eval_run.abstention_failure(qs["U06"], "It is not shown here, but call 555-201-3040."))
+
     def test_a_plain_the_sources_do_not_contain_refusal_passes_every_gate(self) -> None:
         """The first live run (09/22/2026) answered 11 of 12 unanswerable questions with a clean
         refusal worded "The provided sources do not contain ...", and the gate failed all 11

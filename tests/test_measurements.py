@@ -85,6 +85,20 @@ class MeasurementEntryTests(unittest.TestCase):
             if trace["level"] <= 3:
                 # Levels 0-3: code chooses every step (examples/common/trace.py).
                 self.assertEqual(set(decided), {"code"}, f"{where}: a model chose a step at level {trace['level']}")
+            else:
+                # Levels 4 and up exist because the model chooses what happens next.
+                self.assertIn("model", decided, f"{where}: no model-decided step at level {trace['level']}")
+
+    def test_a_loop_result_says_how_many_questions_a_cap_ended(self) -> None:
+        """A loop the code's budget cut off is scored like one the model finished. The count has
+        to be on the result so the page can say how often the budget, not the model, stopped it."""
+        for entry in MEASUREMENTS["results"]:
+            trace = json.loads((ROOT / "examples" / entry["example"] / "trace.json").read_text(encoding="utf-8"))
+            if trace["level"] < 4:
+                continue
+            path = ROOT / "evals" / "results" / entry["example"] / f"{_safe_name(entry['model'])}.json"
+            result = json.loads(path.read_text(encoding="utf-8"))
+            self.assertIn("forced_finals", result, f"{entry['page']}: result predates forced_finals; re-run it")
 
 
 if __name__ == "__main__":
