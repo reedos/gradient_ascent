@@ -1,2 +1,4 @@
 User-agent: *
-Disallow: /
+Allow: /
+
+Sitemap: https://reedos.dev/gradient_ascent/sitemap-index.xml

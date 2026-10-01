@@ -26,7 +26,7 @@ from tests.test_indexes import DIST, _skip_if_no_dist
 ROOT = Path(__file__).resolve().parent.parent
 TAXONOMY_PATH = ROOT / "content" / "taxonomy.json"
 
-SITE_ORIGIN = "https://reedos.github.io"
+SITE_ORIGIN = "https://reedos.dev"
 BASE = "/gradient_ascent"
 
 # href= and src= on anything: links, stylesheets, scripts, images, the canonical tag, the feed.

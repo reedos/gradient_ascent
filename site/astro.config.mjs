@@ -3,11 +3,16 @@ import { defineConfig } from 'astro/config';
 
 import mdx from '@astrojs/mdx';
 import preact from '@astrojs/preact';
+import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://reedos.github.io',
+  // The custom domain (reedos.dev) on the reedos.github.io user site, set up 10/01/2026 when the
+  // site opened to search and AI crawlers. The old reedos.github.io/gradient_ascent URLs 301
+  // here, so every absolute URL this site emits (canonical, og:url, the sitemap, the Atom feed,
+  // llms.txt) should point at the domain readers and crawlers actually land on.
+  site: 'https://reedos.dev',
   base: '/gradient_ascent/',
   trailingSlash: 'always',
   output: 'static',
@@ -22,7 +27,20 @@ export default defineConfig({
   // Preact + compat in place of React (2026-09-18 experiment): the three islands (LevelStack,
   // LevelExplorer, RunDiagram) import from 'react' unchanged; compat mode aliases those imports
   // to preact/compat so the components don't need touching. See the project plan Task 4.2.
-  integrations: [mdx(), preact({ compat: true })],
+  integrations: [
+    mdx(),
+    preact({ compat: true }),
+    // Only the real pages: everything that builds to a directory with its own index.html (the
+    // site's trailingSlash: 'always' convention). This drops the Markdown twins (.md), the
+    // data/API endpoints (.json, .xml, .txt — llms.txt, llms-full.txt, changes.xml, search-index
+    // and data/*.json), and /pilot/*, which are redirects rather than pages.
+    sitemap({
+      filter: (page) => {
+        const path = new URL(page).pathname;
+        return path.endsWith('/') && !path.startsWith('/gradient_ascent/pilot/');
+      },
+    }),
+  ],
 
   vite: {
     plugins: [tailwindcss()],

@@ -72,7 +72,7 @@ const ogImage = new URL(url('/og.png'), Astro.site).toString();
     <AcronymHints />
     <script is:inline>
       // Only count the public site, including when a production build is previewed locally.
-      if (location.origin === 'https://reedos.github.io' &&
+      if (location.origin === 'https://reedos.dev' &&
           (location.pathname === '/gradient_ascent' || location.pathname.startsWith('/gradient_ascent/'))) {
         const counter = document.createElement('script');
         counter.async = true;

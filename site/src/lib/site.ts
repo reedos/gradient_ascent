@@ -3,12 +3,13 @@
 export const REPO_URL = 'https://github.com/reedos/gradient_ascent';
 
 /**
- * Whether search engines may index the site. False while every page is a draft: the site is
- * reachable by link, not yet offered to search. A robots.txt under a project path
+ * Whether search engines may index the site. Was false while every page was a draft: the site
+ * was reachable by link, not offered to search. A robots.txt under a project path
  * (/gradient_ascent/robots.txt) is not read by crawlers, which only look at the host root, so
- * the page-level meta tag is what actually does this. Set to true to open the site to search.
+ * the page-level meta tag is what actually does this. Opened to search and AI crawlers
+ * 10/01/2026, once the site was live at the reedos.dev custom domain.
  */
-export const INDEXABLE = false;
+export const INDEXABLE = true;
 
 /**
  * The no-account feedback form (a Google Form; responses go to the maintainer's sheet). Its
