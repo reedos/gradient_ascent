@@ -20,6 +20,7 @@ const feedback = feedbackUrl(canonical);
 const issue = issueUrl(canonical, title);
 // Link previews need an absolute image URL; most scrapers will not resolve a relative one.
 const ogImage = new URL(url('/og.png'), Astro.site).toString();
+const CF_BEACON_TAG = '<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon=\'{"token": "7d357826b1264eb38e3db3ba16dd8319"}\'></script>';
 ---
 <!doctype html>
 <html lang="en">
@@ -52,6 +53,11 @@ const ogImage = new URL(url('/og.png'), Astro.site).toString();
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;550;600;650&family=Manrope:wght@450;500;550;750&display=swap"
     />
     <meta name="generator" content={Astro.generator} />
+    {/* Cloudflare Web Analytics. Token is public by design (approved 2026-10-01). Emitted
+        unconditionally (build-time, not origin-gated like GoatCounter below): dev/preview
+        servers loading it too is acceptable. set:html keeps the markup byte-exact -- Astro would
+        otherwise HTML-escape the quotes inside data-cf-beacon. */}
+    <Fragment set:html={CF_BEACON_TAG} />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
