@@ -24,20 +24,20 @@ If a required page or tool cannot be accessed, report that limitation. Never cla
 
 | Tool | Interactive form | Intended handoff |
 | --- | --- | --- |
-| Agent instructions | https://reedos.github.io/gradient_ascent/tools/agent-instructions/ | Draft project instructions for refinement into AGENTS.md or CLAUDE.md |
-| Workflow designer | https://reedos.github.io/gradient_ascent/tools/workflow/ | An end-to-end workflow specification |
-| Definition of done | https://reedos.github.io/gradient_ascent/tools/definition-of-done/ | Observable acceptance criteria |
-| Existing-workflow audit | https://reedos.github.io/gradient_ascent/tools/workflow-audit/ | A diagnosis and prioritized improvements |
-| Tool specification | https://reedos.github.io/gradient_ascent/tools/tool-specification/ | A scoped specification for a reusable tool |
-| Project handoff | https://reedos.github.io/gradient_ascent/tools/project-handoff/ | A continuation brief distinguishing completed and unverified work |
+| Agent instructions | https://reedos.dev/gradient_ascent/tools/agent-instructions/ | Draft project instructions for refinement into AGENTS.md or CLAUDE.md |
+| Workflow designer | https://reedos.dev/gradient_ascent/tools/workflow/ | An end-to-end workflow specification |
+| Definition of done | https://reedos.dev/gradient_ascent/tools/definition-of-done/ | Observable acceptance criteria |
+| Existing-workflow audit | https://reedos.dev/gradient_ascent/tools/workflow-audit/ | A diagnosis and prioritized improvements |
+| Tool specification | https://reedos.dev/gradient_ascent/tools/tool-specification/ | A scoped specification for a reusable tool |
+| Project handoff | https://reedos.dev/gradient_ascent/tools/project-handoff/ | A continuation brief distinguishing completed and unverified work |
 
-The project brief at https://reedos.github.io/gradient_ascent/apply/ is an additional regression target. Include the wildlife case there, since it motivated improvements to automation guidance.
+The project brief at https://reedos.dev/gradient_ascent/apply/ is an additional regression target. Include the wildlife case there, since it motivated improvements to automation guidance.
 
 Model reference entry points:
 
-- https://reedos.github.io/gradient_ascent/agents.md
-- https://reedos.github.io/gradient_ascent/llms.txt
-- https://reedos.github.io/gradient_ascent/tools.md
+- https://reedos.dev/gradient_ascent/agents.md
+- https://reedos.dev/gradient_ascent/llms.txt
+- https://reedos.dev/gradient_ascent/tools.md
 
 ## Roles and context isolation
 

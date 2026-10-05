@@ -10,7 +10,7 @@ Observe whether a newcomer can find one useful concept, explain it, and create a
 
 Invite 3–5 people unfamiliar with the site, including everyday and technical users and at least one phone user. This is a proposed first batch for finding problems, not a representative statistical sample. Use their normal device. Allow about 20 minutes, with permission to stop at any time. Do not request personal files, account access, or confidential project details. Ask permission before recording; handwritten anonymous notes are enough.
 
-Record the date, site commit/version, device/browser, relevant AI experience, and whether the person has seen the site. Use anonymous participant IDs. Start on https://reedos.github.io/gradient_ascent/ with no prior explanation of its navigation or taxonomy.
+Record the date, site commit/version, device/browser, relevant AI experience, and whether the person has seen the site. Use anonymous participant IDs. Start on https://reedos.dev/gradient_ascent/ with no prior explanation of its navigation or taxonomy.
 
 ## Facilitator script
 

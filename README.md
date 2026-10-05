@@ -7,7 +7,7 @@ enough.
 
 **Every way to work with AI, from a question to a workforce.**
 
-**Read it: https://reedos.github.io/gradient_ascent/**
+**Read it: https://reedos.dev/gradient_ascent/**
 
 **Status: live and in development.** Concept pages are `sourced`: written with primary references,
 but not a guarantee of error-free content, and with no recorded run and scored result file behind them.
@@ -18,26 +18,28 @@ see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Get it running
 
-For a guided introduction, start at [Learn step by step](https://reedos.github.io/gradient_ascent/learn/):
-18 lessons across six stages, with prefilled English messages, progressively displayed scripted replies,
-follow-ups, six projects, and ZIP downloads. Configuration exercises are optional. Drafts and progress
-stay in the reader's browser. No live model is called; editing a message does not change its scripted
-reply. The teaching order is separate from the autonomy levels.
+For a guided introduction, start at [From chatbot to agent](https://reedos.dev/gradient_ascent/chatbot-to-agent/).
+Then explore the [worked examples](https://reedos.dev/gradient_ascent/examples/) to see
+how a task, its evidence, and the model’s decisions fit together. The former `/learn/`
+route redirects to the examples directory; the old 18-lesson learning flow is retired.
+The examples distinguish scripted demonstrations from recorded model runs.
 
 Two toolchains, no shared setup. The Python side is stdlib only: there is nothing to install, no
 virtual environment, and no `requirements.txt`. Python 3.11 or newer; Node 22.12 or newer.
 
 ```
-git clone <this repository> && cd gradient_ascent
+git clone https://github.com/reedos/gradient_ascent.git
+cd gradient_ascent
 
 python scripts/validate.py                    # the content files: 8 levels, 49 techniques, the registry
 python -m unittest discover -s tests          # the Python suite, seconds (some skip until the site is built)
 
-cd site && npm ci && npm run build            # the site, into site/dist/
-npm run dev                                   # or serve it at localhost:4321
+npm --prefix site ci
+npm --prefix site run build                  # the site, into site/dist/
+npm --prefix site run dev                    # or serve it at localhost:4321
 ```
 
-Run an example against a stub model (no network, no API key, no local model):
+From the repository root, run an example against a stub model (no network, no API key, no local model):
 
 ```
 python -m examples.rag --model stub:scripted
