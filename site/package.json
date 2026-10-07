@@ -20,7 +20,7 @@
     "@astrojs/sitemap": "^3.7.4",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.3",
-    "preact": "^10.29.8",
+    "preact": "^11.0.0",
     "tailwindcss": "^4.3.3"
   },
   "allowScripts": {
