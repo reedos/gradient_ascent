@@ -65,7 +65,7 @@ jobs:
           cache-dependency-path: site/package-lock.json
 
       - name: Set up Python for example downloads
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.13'
 
