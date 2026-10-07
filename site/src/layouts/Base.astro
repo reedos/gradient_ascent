@@ -27,7 +27,7 @@ const CF_BEACON_TAG = '<script defer src="https://static.cloudflareinsights.com/
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#0c0f17" />
+    <meta name="theme-color" content="#000000" />
     <title>{title}</title>
     <meta name="description" content={description} />
     {!noCanonical && <link rel="canonical" href={canonical} />}
@@ -46,11 +46,10 @@ const CF_BEACON_TAG = '<script defer src="https://static.cloudflareinsights.com/
     <meta name="twitter:image" content={ogImage} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    {/* Only the font weights actually set in the stylesheets or an island's inline style are
-        requested: DM Sans 400/500/550/600/650 and Manrope 450/500/550/750. */}
+    {/* Shared explainer typography: condensed display, sans text, mono labels. */}
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;550;600;650&family=Manrope:wght@450;500;550;750&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;450;500;550;600;650;750&display=swap"
     />
     <meta name="generator" content={Astro.generator} />
     {/* Cloudflare Web Analytics. Token is public by design (approved 2026-10-01). Emitted

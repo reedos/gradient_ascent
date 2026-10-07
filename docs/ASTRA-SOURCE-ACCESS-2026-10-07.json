@@ -1,0 +1,4225 @@
+{
+  "date": "10/07/2026",
+  "scope": "Access only. Retrieval is not verification of claims, quotations, dates or benchmark comparability.",
+  "sources": [
+    {
+      "url": "https://blog.google/innovation-and-ai/products/gemini-app/next-evolution-gemini-app/",
+      "where": [
+        "site/src/content/teardowns/agent-teammate.mdx",
+        "site/src/content/techniques/agent-teammates.mdx",
+        "timeline.json milestone gemini-spark-2026",
+        "landscape.json gemini-spark"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://blog.google/innovation-and-ai/products/gemini-app/gemini-spark-updates-june-2026/",
+      "where": [
+        "site/src/content/teardowns/agent-teammate.mdx",
+        "timeline.json milestone gemini-spark-subscribers-2026"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://support.claude.com/en/articles/12138966-release-notes",
+      "where": [
+        "site/src/content/teardowns/agent-teammate.mdx",
+        "timeline.json milestone claude-cowork-2026",
+        "timeline.json milestone claude-cowork-remote-2026"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://claude.com/blog/cowork-is-now-claude",
+      "where": [
+        "site/src/content/teardowns/agent-teammate.mdx",
+        "site/src/content/techniques/agent-teammates.mdx",
+        "timeline.json milestone claude-cowork-merge-2026",
+        "landscape.json claude-cowork"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://x.ai/news/introducing-grok-bot",
+      "where": [
+        "site/src/content/teardowns/agent-teammate.mdx",
+        "site/src/content/techniques/agent-teammates.mdx",
+        "timeline.json milestone grok-bot-2026",
+        "landscape.json grok-bot"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/",
+      "where": [
+        "site/src/content/teardowns/agent-teammate.mdx",
+        "site/src/content/techniques/agent-teammates.mdx",
+        "site/src/content/techniques/debate-review.mdx",
+        "timeline.json milestone muse-2026",
+        "landscape.json muse"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/NousResearch/hermes-agent",
+      "where": [
+        "site/src/content/teardowns/agent-teammate.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://hermes-agent.nousresearch.com/",
+      "where": [
+        "site/src/content/teardowns/agent-teammate.mdx",
+        "site/src/content/techniques/agent-teammates.mdx",
+        "landscape.json hermes-agent"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/openclaw/openclaw",
+      "where": [
+        "site/src/content/teardowns/agent-teammate.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.perplexity.ai/help-center/en/articles/10352895-how-does-perplexity-work",
+      "where": [
+        "site/src/content/teardowns/answer-engine.mdx"
+      ],
+      "status": "denied",
+      "http": 403
+    },
+    {
+      "url": "https://www.perplexity.ai/help-center/en/articles/10354917-what-is-an-answer-engine-and-how-does-perplexity-work-as-one",
+      "where": [
+        "site/src/content/teardowns/answer-engine.mdx",
+        "landscape.json perplexity"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://www.perplexity.ai/help-center/en/articles/10352901-what-is-perplexity-pro",
+      "where": [
+        "site/src/content/teardowns/answer-engine.mdx"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://docs.claude.com/en/docs/agents-and-tools/tool-use/computer-use-tool",
+      "where": [
+        "site/src/content/teardowns/browser-agent.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/tools-computer-use",
+      "where": [
+        "site/src/content/teardowns/browser-agent.mdx",
+        "site/src/content/techniques/computer-use.mdx",
+        "landscape.json openai-computer-use"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://ai.google.dev/gemini-api/docs/computer-use",
+      "where": [
+        "site/src/content/teardowns/browser-agent.mdx",
+        "landscape.json gemini-computer-use"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.browserbase.com/introduction/what-is-browserbase",
+      "where": [
+        "site/src/content/teardowns/browser-agent.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://claude.com/product/claude-code",
+      "where": [
+        "site/src/content/teardowns/coding-agent.mdx",
+        "landscape.json claude-code"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://code.claude.com/docs/en/agent-sdk/agent-loop",
+      "where": [
+        "site/src/content/teardowns/coding-agent.mdx",
+        "site/src/content/techniques/agent-harness.mdx",
+        "site/src/content/techniques/coding-agents.mdx",
+        "site/src/content/techniques/single-agent.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://code.claude.com/docs/en/subagents",
+      "where": [
+        "site/src/content/teardowns/coding-agent.mdx",
+        "site/src/content/techniques/orchestrator-workers.mdx",
+        "site/src/content/techniques/parallelization.mdx",
+        "landscape.json claude-code-subagents"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
+      "where": [
+        "site/src/content/teardowns/coding-agent.mdx",
+        "site/src/content/techniques/skills.mdx",
+        "landscape.json agent-skills",
+        "frontier.json level 5 a-skill-you-have-not-read"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://code.claude.com/docs/en/skills",
+      "where": [
+        "site/src/content/teardowns/coding-agent.mdx",
+        "site/src/content/techniques/skills.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://code.claude.com/docs/en/checkpointing",
+      "where": [
+        "site/src/content/teardowns/coding-agent.mdx",
+        "site/src/content/techniques/coding-agents.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://learn.chatgpt.com/codex/sandboxing",
+      "where": [
+        "site/src/content/teardowns/coding-agent.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://learn.chatgpt.com/codex/agent-approvals-security",
+      "where": [
+        "site/src/content/teardowns/coding-agent.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://cursor.com/docs/agent/tools/search",
+      "where": [
+        "site/src/content/teardowns/coding-agent.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://cursor.com/docs/agent/overview",
+      "where": [
+        "site/src/content/teardowns/coding-agent.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.anthropic.com/engineering/multi-agent-research-system",
+      "where": [
+        "site/src/content/teardowns/deep-research-mode.mdx",
+        "site/src/content/techniques/agentic-rag.mdx",
+        "site/src/content/techniques/orchestrator-workers.mdx",
+        "timeline.json milestone anthropic-multiagent-research-2025",
+        "frontier.json level 6 parallel-or-consistent"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://gemini.google/overview/deep-research/",
+      "where": [
+        "site/src/content/teardowns/deep-research-mode.mdx",
+        "site/src/content/techniques/agentic-rag.mdx",
+        "landscape.json gemini-deep-research"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openai.com/index/introducing-deep-research/",
+      "where": [
+        "site/src/content/teardowns/deep-research-mode.mdx",
+        "timeline.json milestone chatgpt-deep-research-2025",
+        "landscape.json chatgpt-deep-research"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.perplexity.ai/hub/blog/introducing-perplexity-deep-research",
+      "where": [
+        "site/src/content/teardowns/deep-research-mode.mdx",
+        "landscape.json perplexity-deep-research"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://claude.com/blog/research",
+      "where": [
+        "site/src/content/teardowns/deep-research-mode.mdx",
+        "timeline.json milestone claude-research-2025",
+        "timeline.json milestone claude-research-launch-2025",
+        "landscape.json claude-research"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://blog.google/products/gemini/google-gemini-deep-research/",
+      "where": [
+        "site/src/content/teardowns/deep-research-mode.mdx",
+        "timeline.json milestone gemini-deep-research-2024"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/deep-research",
+      "where": [
+        "site/src/content/teardowns/deep-research-mode.mdx",
+        "site/src/content/techniques/agentic-rag.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-architecture",
+      "where": [
+        "site/src/content/teardowns/workplace-assistant.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/microsoftsearch/semantic-index-for-copilot",
+      "where": [
+        "site/src/content/teardowns/workplace-assistant.mdx",
+        "site/src/content/techniques/embeddings-search.mdx",
+        "landscape.json m365-semantic-index"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.glean.com/product/workplace-search",
+      "where": [
+        "site/src/content/teardowns/workplace-assistant.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.glean.com/product/knowledge-graph",
+      "where": [
+        "site/src/content/teardowns/workplace-assistant.mdx",
+        "landscape.json glean-enterprise-graph"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2106.09685",
+      "where": [
+        "site/src/content/techniques/adaptation.mdx",
+        "site/src/content/techniques/fine-tuning.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.together.ai/docs/fine-tuning/data-preparation",
+      "where": [
+        "site/src/content/techniques/adaptation.mdx",
+        "site/src/content/techniques/fine-tuning.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/supervised-fine-tuning#distilling-from-a-larger-model",
+      "where": [
+        "site/src/content/techniques/adaptation.mdx",
+        "site/src/content/techniques/distillation.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/reinforcement-fine-tuning",
+      "where": [
+        "site/src/content/techniques/adaptation.mdx",
+        "site/src/content/techniques/fine-tuning.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/stanfordnlp/dspy",
+      "where": [
+        "site/src/content/techniques/adaptation.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/argilla-io/distilabel",
+      "where": [
+        "site/src/content/techniques/adaptation.mdx",
+        "site/src/content/techniques/synthetic-data.mdx",
+        "landscape.json distilabel"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openai.github.io/openai-agents-python/handoffs/",
+      "where": [
+        "site/src/content/techniques/agent-graphs.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://a2a-protocol.org/v1.0.0/",
+      "where": [
+        "site/src/content/techniques/agent-graphs.mdx",
+        "landscape.json a2a"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/microsoft/agent-framework",
+      "where": [
+        "site/src/content/techniques/agent-graphs.mdx",
+        "landscape.json ms-agent-framework"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.anthropic.com/engineering/building-effective-agents",
+      "where": [
+        "site/src/content/techniques/agent-harness.mdx",
+        "site/src/content/techniques/delegating.mdx",
+        "site/src/content/techniques/evaluator-optimizer.mdx",
+        "site/src/content/techniques/human-in-the-loop.mdx",
+        "site/src/content/techniques/operator-craft.mdx",
+        "site/src/content/techniques/orchestrator-workers.mdx",
+        "site/src/content/techniques/parallelization.mdx",
+        "site/src/content/techniques/prompt-chaining.mdx",
+        "site/src/content/techniques/reviewing.mdx",
+        "site/src/content/techniques/routing.mdx",
+        "site/src/content/techniques/single-agent.mdx",
+        "timeline.json milestone building-effective-agents-2024"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+      "where": [
+        "site/src/content/techniques/agent-harness.mdx",
+        "site/src/content/techniques/long-horizon.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://claude.com/blog/getting-started-with-loops",
+      "where": [
+        "site/src/content/techniques/agent-harness.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openai.github.io/openai-agents-python/running_agents/",
+      "where": [
+        "site/src/content/techniques/agent-harness.mdx",
+        "site/src/content/techniques/single-agent.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/sandboxing",
+      "where": [
+        "site/src/content/techniques/agent-harness.mdx",
+        "site/src/content/techniques/coding-agents.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/agent-approvals-security",
+      "where": [
+        "site/src/content/techniques/agent-harness.mdx",
+        "site/src/content/techniques/coding-agents.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://code.claude.com/docs/en/how-claude-code-works",
+      "where": [
+        "site/src/content/techniques/agent-harness.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openclaw.ai/",
+      "where": [
+        "site/src/content/techniques/agent-teammates.mdx",
+        "landscape.json openclaw"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openrouter.ai/",
+      "where": [
+        "site/src/content/techniques/ai-gateways.mdx",
+        "landscape.json openrouter"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.litellm.ai/docs/",
+      "where": [
+        "site/src/content/techniques/ai-gateways.mdx",
+        "landscape.json litellm"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.cloudflare.com/ai-gateway/",
+      "where": [
+        "site/src/content/techniques/ai-gateways.mdx",
+        "landscape.json cloudflare-ai-gateway"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+      "where": [
+        "site/src/content/techniques/briefing.mdx",
+        "site/src/content/techniques/delegating.mdx",
+        "site/src/content/techniques/operator-craft.mdx",
+        "site/src/content/techniques/trust.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/prompt-engineering",
+      "where": [
+        "site/src/content/techniques/briefing.mdx",
+        "site/src/content/techniques/operator-craft.mdx",
+        "site/src/content/techniques/prompt-engineering.mdx",
+        "landscape.json openai-prompt-engineering-guide"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/models/sonnet-5/overview",
+      "where": [
+        "site/src/content/techniques/chat.mdx",
+        "landscape.json claude-sonnet-5"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://claude.com/product/overview",
+      "where": [
+        "site/src/content/techniques/chat.mdx",
+        "landscape.json claude-app"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs",
+      "where": [
+        "site/src/content/techniques/chat.mdx",
+        "landscape.json openai-api"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://ollama.com/",
+      "where": [
+        "site/src/content/techniques/chat.mdx",
+        "site/src/content/techniques/local-inference.mdx",
+        "site/src/content/techniques/ops.mdx",
+        "landscape.json ollama"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.github.com/en/copilot/using-github-copilot/getting-code-suggestions-in-your-ide-with-github-copilot",
+      "where": [
+        "site/src/content/techniques/chat.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://cursor.com/docs/tab",
+      "where": [
+        "site/src/content/techniques/chat.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.github.com/en/copilot/concepts/completions/code-suggestions",
+      "where": [
+        "site/src/content/techniques/chat.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool",
+      "where": [
+        "site/src/content/techniques/code-execution.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/tools-code-interpreter",
+      "where": [
+        "site/src/content/techniques/code-execution.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://e2b.dev",
+      "where": [
+        "site/src/content/techniques/code-execution.mdx",
+        "landscape.json e2b"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://agents.md/",
+      "where": [
+        "site/src/content/techniques/coding-agents.mdx",
+        "site/src/content/techniques/skills.mdx",
+        "landscape.json agents-md"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool",
+      "where": [
+        "site/src/content/techniques/computer-use.mdx",
+        "landscape.json claude-computer-use",
+        "frontier.json level 4 the-screen-gives-orders"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://web.archive.org/web/20260916022019id_/https://ai.google.dev/gemini-api/docs/computer-use",
+      "where": [
+        "site/src/content/techniques/computer-use.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
+      "where": [
+        "site/src/content/techniques/context-engineering.mdx",
+        "site/src/content/techniques/cost-optimization.mdx",
+        "site/src/content/techniques/ops.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/prompt-caching",
+      "where": [
+        "site/src/content/techniques/context-engineering.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.trychroma.com/research/context-rot",
+      "where": [
+        "site/src/content/techniques/context-engineering.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.anthropic.com/engineering/contextual-retrieval",
+      "where": [
+        "site/src/content/techniques/context-engineering.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://support.claude.com/en/articles/9517075-what-are-projects",
+      "where": [
+        "site/src/content/techniques/context-engineering.mdx",
+        "site/src/content/techniques/rag.mdx",
+        "landscape.json claude-projects"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/batch",
+      "where": [
+        "site/src/content/techniques/cost-optimization.mdx",
+        "site/src/content/techniques/ops.mdx",
+        "site/src/content/techniques/parallelization.mdx",
+        "landscape.json openai-batch-api"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2305.14325",
+      "where": [
+        "site/src/content/techniques/debate-review.mdx",
+        "timeline.json milestone multiagent-debate-paper-2023"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2306.05685",
+      "where": [
+        "site/src/content/techniques/debate-review.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://genai.owasp.org/llmrisk/llm01-prompt-injection/",
+      "where": [
+        "site/src/content/techniques/delegating.mdx",
+        "site/src/content/techniques/guardrails.mdx",
+        "site/src/content/techniques/safety.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.anthropic.com/legal/commercial-terms",
+      "where": [
+        "site/src/content/techniques/distillation.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://ai.google.dev/gemini-api/terms",
+      "where": [
+        "site/src/content/techniques/distillation.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2501.12948",
+      "where": [
+        "site/src/content/techniques/distillation.mdx",
+        "timeline.json milestone deepseek-r1-2025"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openai.com/policies/business-terms/",
+      "where": [
+        "site/src/content/techniques/distillation.mdx"
+      ],
+      "status": "denied",
+      "http": 403
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/embeddings",
+      "where": [
+        "site/src/content/techniques/embeddings-search.mdx",
+        "landscape.json text-embedding-3"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.cohere.com/docs/rerank",
+      "where": [
+        "site/src/content/techniques/embeddings-search.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/pgvector/pgvector",
+      "where": [
+        "site/src/content/techniques/embeddings-search.mdx",
+        "landscape.json pgvector"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://deepmind.google/models/gemini-robotics/",
+      "where": [
+        "site/src/content/techniques/embodied.mdx",
+        "landscape.json gemini-robotics"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/NVIDIA/Isaac-GR00T",
+      "where": [
+        "site/src/content/techniques/embodied.mdx",
+        "landscape.json gr00t"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.pi.website/blog/pi0",
+      "where": [
+        "site/src/content/techniques/embodied.mdx",
+        "timeline.json milestone pi0-2024",
+        "landscape.json pi0"
+      ],
+      "status": "denied",
+      "http": 429
+    },
+    {
+      "url": "https://www.pi.website/blog/pi07",
+      "where": [
+        "site/src/content/techniques/embodied.mdx",
+        "timeline.json milestone pi0-7-2026",
+        "landscape.json pi0-7"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://www.figure.ai/news/introducing-figure-03",
+      "where": [
+        "site/src/content/techniques/embodied.mdx",
+        "landscape.json figure"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.1x.tech/neo",
+      "where": [
+        "site/src/content/techniques/embodied.mdx",
+        "landscape.json neo"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.promptfoo.dev/docs/intro/",
+      "where": [
+        "site/src/content/techniques/eval-frameworks.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.braintrust.dev/docs",
+      "where": [
+        "site/src/content/techniques/eval-frameworks.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.braintrust.dev/docs/sdks/typescript/related/autoevals/overview",
+      "where": [
+        "site/src/content/techniques/eval-frameworks.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.braintrust.dev/docs/admin/self-hosting",
+      "where": [
+        "site/src/content/techniques/eval-frameworks.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.langchain.com/langsmith/observability",
+      "where": [
+        "site/src/content/techniques/eval-frameworks.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.langchain.com/langsmith/evaluation-concepts",
+      "where": [
+        "site/src/content/techniques/eval-frameworks.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/confident-ai/deepeval",
+      "where": [
+        "site/src/content/techniques/eval-frameworks.mdx",
+        "landscape.json deepeval"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/vibrantlabsai/ragas",
+      "where": [
+        "site/src/content/techniques/eval-frameworks.mdx",
+        "landscape.json ragas"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/deprecations",
+      "where": [
+        "site/src/content/techniques/eval-frameworks.mdx",
+        "landscape.json openai-evals"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.promptfoo.dev/blog/promptfoo-joining-openai/",
+      "where": [
+        "site/src/content/techniques/eval-frameworks.mdx",
+        "landscape.json promptfoo"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.langchain.com/langsmith/evaluate-complex-agent",
+      "where": [
+        "site/src/content/techniques/eval-frameworks.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": true
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests",
+      "where": [
+        "site/src/content/techniques/evals.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/graders",
+      "where": [
+        "site/src/content/techniques/evals.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.langchain.com/langsmith/evaluation",
+      "where": [
+        "site/src/content/techniques/evals.mdx",
+        "landscape.json langsmith"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.braintrust.dev/docs/evaluate",
+      "where": [
+        "site/src/content/techniques/evals.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://dspy.ai/current/diving-deeper/choosing-an-optimizer/",
+      "where": [
+        "site/src/content/techniques/evaluator-optimizer.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.together.ai/docs/fine-tuning/overview",
+      "where": [
+        "site/src/content/techniques/fine-tuning.mdx",
+        "landscape.json together-fine-tuning"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/model-optimization",
+      "where": [
+        "site/src/content/techniques/fine-tuning.mdx",
+        "landscape.json openai-fine-tuning"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/supervised-fine-tuning",
+      "where": [
+        "site/src/content/techniques/fine-tuning.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
+      "where": [
+        "site/src/content/techniques/function-calling.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls",
+      "where": [
+        "site/src/content/techniques/function-calling.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/parallel-tool-use",
+      "where": [
+        "site/src/content/techniques/function-calling.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/function-calling",
+      "where": [
+        "site/src/content/techniques/function-calling.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://web.archive.org/web/20260915180415id_/https://ai.google.dev/gemini-api/docs/function-calling",
+      "where": [
+        "site/src/content/techniques/function-calling.mdx"
+      ],
+      "status": "unavailable",
+      "detail": "TimeoutError",
+      "follow_up": "Second approach (web reader) also failed; no more attempts."
+    },
+    {
+      "url": "https://web.archive.org/web/20260918151544id_/https://help.openai.com/en/articles/20001519-custom-gpt-retirement-and-migration-faq",
+      "where": [
+        "site/src/content/techniques/function-calling.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/NVIDIA-NeMo/Guardrails",
+      "where": [
+        "site/src/content/techniques/guardrails.mdx",
+        "site/src/content/techniques/safety.mdx",
+        "landscape.json nemo-guardrails"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/guardrails-ai/guardrails",
+      "where": [
+        "site/src/content/techniques/guardrails.mdx",
+        "landscape.json guardrails-ai"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.lakera.ai/docs/quickstart",
+      "where": [
+        "site/src/content/techniques/guardrails.mdx",
+        "landscape.json lakera-guard"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://huggingface.co/meta-llama/Llama-Guard-4-12B",
+      "where": [
+        "site/src/content/techniques/guardrails.mdx",
+        "site/src/content/techniques/safety.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://typesafe.ai/blog/introducing-system-one-models-and-jev",
+      "where": [
+        "site/src/content/techniques/guardrails.mdx",
+        "site/src/content/techniques/routing.mdx",
+        "site/src/content/techniques/structured-output.mdx",
+        "timeline.json milestone jev-2026",
+        "landscape.json jev"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.microsoft.com/en-us/power-platform/products/power-automate",
+      "where": [
+        "site/src/content/techniques/human-in-the-loop.mdx",
+        "landscape.json power-automate"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://jules.google/",
+      "where": [
+        "site/src/content/techniques/human-in-the-loop.mdx",
+        "landscape.json jules"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://cline.bot/",
+      "where": [
+        "site/src/content/techniques/human-in-the-loop.mdx",
+        "landscape.json cline"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.langchain.com/oss/python/langchain/human-in-the-loop",
+      "where": [
+        "site/src/content/techniques/human-in-the-loop.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/build-with-claude/thinking",
+      "where": [
+        "site/src/content/techniques/inference-time-reasoning.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://ai.google.dev/gemini-api/docs/thinking",
+      "where": [
+        "site/src/content/techniques/inference-time-reasoning.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/reasoning",
+      "where": [
+        "site/src/content/techniques/inference-time-reasoning.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2203.11171",
+      "where": [
+        "site/src/content/techniques/inference-time-reasoning.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://microsoft.github.io/graphrag/",
+      "where": [
+        "site/src/content/techniques/knowledge-graphs.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://neo4j.com/use-cases/knowledge-graph/",
+      "where": [
+        "site/src/content/techniques/knowledge-graphs.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.microsoft.com/en-us/research/blog/lazygraphrag-setting-a-new-standard-for-quality-and-cost/",
+      "where": [
+        "site/src/content/techniques/knowledge-graphs.mdx",
+        "landscape.json lazygraphrag"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.glean.com/enterprise-context/enterprise-graph",
+      "where": [
+        "site/src/content/techniques/knowledge-graphs.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp",
+      "where": [
+        "site/src/content/techniques/local-inference.mdx",
+        "landscape.json llama-cpp"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/README.md",
+      "where": [
+        "site/src/content/techniques/local-inference.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.vllm.ai/en/latest/",
+      "where": [
+        "site/src/content/techniques/local-inference.mdx",
+        "landscape.json vllm"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.vllm.ai/en/latest/features/speculative_decoding/",
+      "where": [
+        "site/src/content/techniques/local-inference.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md",
+      "where": [
+        "site/src/content/techniques/local-inference.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.devin.ai/get-started/first-run",
+      "where": [
+        "site/src/content/techniques/long-horizon.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.devin.ai/product-guides/session-insights",
+      "where": [
+        "site/src/content/techniques/long-horizon.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.temporal.io/evaluate/understanding-temporal",
+      "where": [
+        "site/src/content/techniques/long-horizon.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.inngest.com/docs/learn/how-functions-are-executed",
+      "where": [
+        "site/src/content/techniques/long-horizon.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.letta.com/v1-sdk/memory/archival-memory",
+      "where": [
+        "site/src/content/techniques/long-horizon.mdx",
+        "site/src/content/techniques/memory.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://modelcontextprotocol.io/docs/2026-07-28/learn/architecture",
+      "where": [
+        "site/src/content/techniques/mcp.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://modelcontextprotocol.io/docs/2026-07-28/learn/server-concepts",
+      "where": [
+        "site/src/content/techniques/mcp.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28/server/tools",
+      "where": [
+        "site/src/content/techniques/mcp.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28/basic/transports",
+      "where": [
+        "site/src/content/techniques/mcp.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http",
+      "where": [
+        "site/src/content/techniques/mcp.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28/changelog",
+      "where": [
+        "site/src/content/techniques/mcp.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2575",
+      "where": [
+        "site/src/content/techniques/mcp.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2567",
+      "where": [
+        "site/src/content/techniques/mcp.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://modelcontextprotocol.io/development/roadmap",
+      "where": [
+        "site/src/content/techniques/mcp.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization",
+      "where": [
+        "site/src/content/techniques/mcp.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28/server/resources#security-considerations",
+      "where": [
+        "site/src/content/techniques/mcp.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://support.claude.com/en/articles/11817273-use-claude-s-chat-search-and-memory-to-build-on-previous-context",
+      "where": [
+        "site/src/content/techniques/memory.mdx",
+        "landscape.json claude-memory"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/mem0ai/mem0",
+      "where": [
+        "site/src/content/techniques/memory.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/build-with-claude/vision",
+      "where": [
+        "site/src/content/techniques/multimodal.mdx",
+        "frontier.json level 1 where-and-how-many"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://ai.google.dev/gemini-api/docs/audio",
+      "where": [
+        "site/src/content/techniques/multimodal.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/image-generation",
+      "where": [
+        "site/src/content/techniques/multimodal.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://deepmind.google/models/veo/",
+      "where": [
+        "site/src/content/techniques/multimodal.mdx",
+        "landscape.json veo"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://spec.c2pa.org/specifications/specifications/2.2/specs/C2PA_Specification.html",
+      "where": [
+        "site/src/content/techniques/multimodal.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://opentelemetry.io/docs/concepts/signals/traces/",
+      "where": [
+        "site/src/content/techniques/observability.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://opentelemetry.io/docs/concepts/sampling/",
+      "where": [
+        "site/src/content/techniques/observability.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-spans.md",
+      "where": [
+        "site/src/content/techniques/observability.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://opentelemetry.io/docs/specs/semconv/general/attribute-requirement-level/",
+      "where": [
+        "site/src/content/techniques/observability.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2019.00225/full",
+      "where": [
+        "site/src/content/techniques/operator-craft.mdx",
+        "site/src/content/techniques/reviewing.mdx",
+        "site/src/content/techniques/trust.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/api/rate-limits",
+      "where": [
+        "site/src/content/techniques/ops.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://opentelemetry.io/docs/what-is-opentelemetry/",
+      "where": [
+        "site/src/content/techniques/ops.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/crewAIInc/crewAI",
+      "where": [
+        "site/src/content/techniques/orchestrator-workers.mdx",
+        "landscape.json crewai"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/microsoft/autogen",
+      "where": [
+        "site/src/content/techniques/orchestrator-workers.mdx",
+        "landscape.json autogen"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.elastic.co/elasticsearch",
+      "where": [
+        "site/src/content/techniques/order-zero.mdx",
+        "landscape.json elasticsearch"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://opensearch.org/",
+      "where": [
+        "site/src/content/techniques/order-zero.mdx",
+        "landscape.json opensearch"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://scikit-learn.org/stable/",
+      "where": [
+        "site/src/content/techniques/order-zero.mdx",
+        "landscape.json scikit-learn"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://xgboost.readthedocs.io/en/stable/",
+      "where": [
+        "site/src/content/techniques/order-zero.mdx",
+        "landscape.json xgboost"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2304.03442",
+      "where": [
+        "site/src/content/techniques/organizations-swarms.mdx",
+        "timeline.json milestone generative-agents-paper-2023"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2308.00352",
+      "where": [
+        "site/src/content/techniques/organizations-swarms.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/FoundationAgents/MetaGPT",
+      "where": [
+        "site/src/content/techniques/organizations-swarms.mdx",
+        "landscape.json metagpt"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2606.07937",
+      "where": [
+        "site/src/content/techniques/organizations-swarms.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://replit.com/blog/introducing-agent-4-built-for-creativity",
+      "where": [
+        "site/src/content/techniques/parallelization.mdx",
+        "landscape.json replit-agent"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/build-with-claude/batch-processing",
+      "where": [
+        "site/src/content/techniques/parallelization.mdx",
+        "landscape.json anthropic-batch-api"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://ai.google.dev/gemini-api/docs/batch-api",
+      "where": [
+        "site/src/content/techniques/parallelization.mdx",
+        "landscape.json gemini-batch-api"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://n8n.io",
+      "where": [
+        "site/src/content/techniques/prompt-chaining.mdx",
+        "landscape.json n8n"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://temporal.io",
+      "where": [
+        "site/src/content/techniques/prompt-chaining.mdx",
+        "landscape.json temporal"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview",
+      "where": [
+        "site/src/content/techniques/prompt-engineering.mdx",
+        "landscape.json anthropic-prompt-engineering-overview"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://ai.google.dev/gemini-api/docs/prompting-strategies",
+      "where": [
+        "site/src/content/techniques/prompt-engineering.mdx",
+        "landscape.json gemini-prompt-design-strategies"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2310.03714",
+      "where": [
+        "site/src/content/techniques/prompt-optimization.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/stanfordnlp/dspy/blob/main/docs/docs/learn/optimization/optimizers.md",
+      "where": [
+        "site/src/content/techniques/prompt-optimization.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://claude.com/blog/prompt-improver",
+      "where": [
+        "site/src/content/techniques/prompt-optimization.mdx",
+        "landscape.json anthropic-prompt-improver"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2005.11401",
+      "where": [
+        "site/src/content/techniques/rag.mdx",
+        "timeline.json milestone rag-paper-2020"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/tools-file-search",
+      "where": [
+        "site/src/content/techniques/rag.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.anthropic.com/news/challenges-in-red-teaming-ai-systems",
+      "where": [
+        "site/src/content/techniques/red-teaming.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://genai.owasp.org/2025/01/22/announcing-the-owasp-gen-ai-red-teaming-guide/",
+      "where": [
+        "site/src/content/techniques/red-teaming.mdx"
+      ],
+      "status": "denied",
+      "http": 403
+    },
+    {
+      "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "where": [
+        "site/src/content/techniques/red-teaming.mdx",
+        "site/src/content/techniques/safety.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/microsoft/PyRIT",
+      "where": [
+        "site/src/content/techniques/red-teaming.mdx",
+        "landscape.json pyrit"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://airc.nist.gov/airmf-resources/airmf/5-sec-core/",
+      "where": [
+        "site/src/content/techniques/red-teaming.mdx",
+        "site/src/content/techniques/safety.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2509.04664",
+      "where": [
+        "site/src/content/techniques/reviewing.mdx",
+        "frontier.json level 1 hallucination-is-structural"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://zapier.com/features/paths",
+      "where": [
+        "site/src/content/techniques/routing.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/aurelio-labs/semantic-router",
+      "where": [
+        "site/src/content/techniques/routing.mdx",
+        "landscape.json semantic-router"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://privacy.claude.com/en/articles/10023548-how-long-do-you-store-my-data",
+      "where": [
+        "site/src/content/techniques/safety.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/your-data",
+      "where": [
+        "site/src/content/techniques/safety.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://zapier.com/legal/data-privacy",
+      "where": [
+        "site/src/content/techniques/safety.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developer.chrome.com/docs/webstore/program-policies/limited-use",
+      "where": [
+        "site/src/content/techniques/safety.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2210.03629",
+      "where": [
+        "site/src/content/techniques/single-agent.mdx",
+        "timeline.json milestone react-paper-2022"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2305.04091",
+      "where": [
+        "site/src/content/techniques/single-agent.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/structured-outputs",
+      "where": [
+        "site/src/content/techniques/structured-output.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": true
+    },
+    {
+      "url": "https://ai.google.dev/gemini-api/docs/structured-output",
+      "where": [
+        "site/src/content/techniques/structured-output.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs",
+      "where": [
+        "site/src/content/techniques/structured-output.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://pydantic.dev/docs/validation/latest/get-started/",
+      "where": [
+        "site/src/content/techniques/structured-output.mdx",
+        "landscape.json pydantic"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2212.10560",
+      "where": [
+        "site/src/content/techniques/synthetic-data.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2305.17493",
+      "where": [
+        "site/src/content/techniques/synthetic-data.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2509.08010",
+      "where": [
+        "site/src/content/techniques/trust.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/realtime-conversations",
+      "where": [
+        "site/src/content/techniques/voice-agents.mdx",
+        "landscape.json openai-realtime"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://web.archive.org/web/20260915171334id_/https://ai.google.dev/gemini-api/docs/live-api",
+      "where": [
+        "site/src/content/techniques/voice-agents.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.livekit.io/agents/logic/turns/",
+      "where": [
+        "site/src/content/techniques/voice-agents.mdx",
+        "frontier.json level 5 interrupted-by-nothing"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://elevenlabs.io/docs/eleven-agents/legal/disclosure-requirement",
+      "where": [
+        "site/src/content/techniques/voice-agents.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/voice-agents",
+      "where": [
+        "site/src/content/techniques/voice-agents.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.langchain.com/oss/python/langgraph/graph-api",
+      "where": [
+        "site/src/content/techniques/workflow-graphs.mdx",
+        "site/src/content/threads/graph-engineering.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://dify.ai/",
+      "where": [
+        "site/src/content/techniques/workflow-graphs.mdx",
+        "landscape.json dify"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents",
+      "where": [
+        "site/src/content/threads/checking-the-work.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents",
+      "where": [
+        "site/src/content/threads/what-the-model-sees.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools",
+      "where": [
+        "site/src/content/threads/who-approves-what.mdx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://courses.cs.umbc.edu/331/papers/eliza.html",
+      "where": [
+        "timeline.json milestone eliza-1966"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.elastic.co/search-labs/blog/elasticsearch-history-15-years",
+      "where": [
+        "timeline.json milestone elasticsearch-first-release"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://scikit-learn.org/stable/about.html",
+      "where": [
+        "timeline.json milestone scikit-learn-first-release"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/1603.02754",
+      "where": [
+        "timeline.json milestone xgboost-paper"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/1706.03762",
+      "where": [
+        "timeline.json milestone attention-is-all-you-need"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://api.github.com/repos/huggingface/transformers",
+      "where": [
+        "timeline.json milestone transformers-library-2018"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openai.com/index/better-language-models/",
+      "where": [
+        "timeline.json milestone gpt-2-post-2019"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://aidungeon2.blogspot.com/2019/12/ai-dungeon-2-is-released-play-ai.html",
+      "where": [
+        "timeline.json milestone ai-dungeon-2-2019"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2005.14165",
+      "where": [
+        "timeline.json milestone gpt-3-few-shot"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openai.com/index/openai-api/",
+      "where": [
+        "timeline.json milestone gpt-3-api-2020"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://arxiv.org/abs/2201.11903",
+      "where": [
+        "timeline.json milestone chain-of-thought-prompting"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2203.02155",
+      "where": [
+        "timeline.json milestone instructgpt-rlhf"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openai.com/index/chatgpt/",
+      "where": [
+        "timeline.json milestone chatgpt-launch"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://arxiv.org/abs/2303.08774",
+      "where": [
+        "timeline.json milestone gpt-4-launch"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/changelog",
+      "where": [
+        "timeline.json milestone gpt-4o-launch",
+        "timeline.json milestone structured-outputs-api",
+        "timeline.json milestone gpt-6-astra",
+        "timeline.json milestone embeddings-v3-2024",
+        "timeline.json milestone prompt-caching-2024",
+        "timeline.json milestone openai-batch-api-2024",
+        "timeline.json milestone openai-responses-api-2025",
+        "timeline.json milestone openai-realtime-api-2024"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openai.com/index/learning-to-reason-with-llms/",
+      "where": [
+        "timeline.json milestone o1-reasoning-models"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://ai.google.dev/gemini-api/docs/changelog",
+      "where": [
+        "timeline.json milestone gemini-31-pro-2026",
+        "landscape.json gemini-3.1-pro",
+        "landscape.json gemini-3.8-flash",
+        "landscape.json gemini-3.5-flash-lite"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://api-docs.deepseek.com/news/news260910/",
+      "where": [
+        "timeline.json milestone deepseek-v41-flash-2026",
+        "landscape.json deepseek-v4",
+        "landscape.json deepseek-v4.1-flash"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://api.github.com/repos/facebookresearch/faiss",
+      "where": [
+        "timeline.json milestone faiss-first-release-2017"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openai.com/index/introducing-text-and-code-embeddings/",
+      "where": [
+        "timeline.json milestone openai-embeddings-2022"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://api.github.com/repos/run-llama/llama_index",
+      "where": [
+        "timeline.json milestone llamaindex-2022"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://neeva.com/blog/introducing-neevaai",
+      "where": [
+        "timeline.json milestone neeva-ai-2023"
+      ],
+      "status": "unavailable",
+      "detail": "URLError",
+      "follow_up": "Second approach (web reader) also failed; no more attempts."
+    },
+    {
+      "url": "https://blogs.microsoft.com/blog/2023/02/07/reinventing-search-with-a-new-ai-powered-microsoft-bing-and-edge-your-copilot-for-the-web/",
+      "where": [
+        "timeline.json milestone bing-ai-search-2023"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://blogs.microsoft.com/blog/2023/05/04/announcing-the-next-wave-of-ai-innovation-with-microsoft-bing-and-edge/",
+      "where": [
+        "timeline.json milestone bing-open-preview-2023"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.anthropic.com/news/100k-context-windows",
+      "where": [
+        "timeline.json milestone claude-100k-context-2023"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.microsoft.com/en-us/research/blog/graphrag-unlocking-llm-discovery-on-narrative-private-data/",
+      "where": [
+        "timeline.json milestone graphrag-2024"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openai.com/index/memory-and-new-controls-for-chatgpt/",
+      "where": [
+        "timeline.json milestone chatgpt-memory-2024"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://blog.google/innovation-and-ai/products/google-gemini-next-generation-model-february-2024/",
+      "where": [
+        "timeline.json milestone gemini-15-million-context-2024"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://blog.google/innovation-and-ai/products/gemini-notebook/notebooklm-gemini-notebook/",
+      "where": [
+        "timeline.json milestone gemini-notebook-rename-2026",
+        "landscape.json gemini-notebook"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2110.01691",
+      "where": [
+        "timeline.json milestone ai-chains-paper-2021"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://pypi.org/project/langchain/#history",
+      "where": [
+        "timeline.json milestone langchain-release-2022"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://zapier.com/apps/chatgpt/integrations",
+      "where": [
+        "timeline.json milestone zapier-openai-2022"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://blogs.microsoft.com/blog/2023/03/16/introducing-microsoft-365-copilot-your-copilot-for-work/",
+      "where": [
+        "timeline.json milestone m365-copilot-2023"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://techcommunity.microsoft.com/blog/microsoft-copilot-blog/microsoft-365-copilot-is-generally-available/3969331",
+      "where": [
+        "timeline.json milestone m365-copilot-ga-2023"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://pypi.org/project/semantic-router/#history",
+      "where": [
+        "timeline.json milestone semantic-router-2023"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.microsoft.com/en-us/power-platform/blog/power-automate/ai-builder-gpt-prompts-are-generally-available/",
+      "where": [
+        "timeline.json milestone power-automate-gpt-prompts-2023"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.langchain.com/blog/langgraph",
+      "where": [
+        "timeline.json milestone langgraph-launch-2024"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.langchain.com/blog/making-it-easier-to-build-human-in-the-loop-agents-with-interrupt",
+      "where": [
+        "timeline.json milestone langgraph-interrupt-2024"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://flowiseai.com/sunset",
+      "where": [
+        "timeline.json milestone flowise-sunset-2026",
+        "landscape.json flowise"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2205.00445",
+      "where": [
+        "timeline.json milestone mrkl-paper-2022"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2302.04761",
+      "where": [
+        "timeline.json milestone toolformer-paper-2023"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openai.com/index/chatgpt-plugins/",
+      "where": [
+        "timeline.json milestone chatgpt-plugins-2023"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://help.openai.com/en/articles/6825453-chatgpt-release-notes",
+      "where": [
+        "timeline.json milestone chatgpt-plugins-beta-2023"
+      ],
+      "status": "denied",
+      "http": 403
+    },
+    {
+      "url": "https://openai.com/index/function-calling-and-other-api-updates/",
+      "where": [
+        "timeline.json milestone openai-function-calling-2023"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://blog.google/products-and-platforms/products/gemini/google-bard-new-features-update-sept-2023/",
+      "where": [
+        "timeline.json milestone bard-extensions-2023"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.anthropic.com/news/3-5-models-and-computer-use",
+      "where": [
+        "timeline.json milestone computer-use-2024"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://claude.com/blog/analysis-tool",
+      "where": [
+        "timeline.json milestone claude-analysis-tool-2024"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.anthropic.com/news/model-context-protocol",
+      "where": [
+        "timeline.json milestone mcp-launch-2024"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://api.github.com/repos/Significant-Gravitas/AutoGPT",
+      "where": [
+        "timeline.json milestone autogpt-2023"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://agentgpt.reworkd.ai/",
+      "where": [
+        "timeline.json milestone agentgpt-2023"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://cognition.com/blog/introducing-devin",
+      "where": [
+        "timeline.json milestone devin-2024"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://replit.com/blog/introducing-replit-agent",
+      "where": [
+        "timeline.json milestone replit-agent-2024"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://cognition.com/blog/devin-generally-available",
+      "where": [
+        "timeline.json milestone devin-ga-2024"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openai.com/index/introducing-operator/",
+      "where": [
+        "timeline.json milestone operator-2025"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://www.anthropic.com/news/claude-3-7-sonnet",
+      "where": [
+        "timeline.json milestone claude-code-2025"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openai.com/index/introducing-chatgpt-agent/",
+      "where": [
+        "timeline.json milestone chatgpt-agent-2025"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://claude.com/blog/skills",
+      "where": [
+        "timeline.json milestone agent-skills-2025"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/",
+      "where": [
+        "timeline.json milestone antigravity-cli-2026",
+        "landscape.json gemini-cli"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2303.17760",
+      "where": [
+        "timeline.json milestone camel-paper-2023"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://api.github.com/repos/microsoft/autogen",
+      "where": [
+        "timeline.json milestone autogen-release-2023"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.genspark.ai/blog/genspark-intro",
+      "where": [
+        "timeline.json milestone genspark-2024"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/",
+      "where": [
+        "timeline.json milestone a2a-protocol-2025"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://x.ai/news/grok-4",
+      "where": [
+        "timeline.json milestone grok-4-heavy-2025",
+        "landscape.json grok-heavy"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://manus.im/about",
+      "where": [
+        "timeline.json milestone manus-2025",
+        "landscape.json manus"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://deepmind.google/blog/gemini-robotics-brings-ai-into-the-physical-world/",
+      "where": [
+        "timeline.json milestone gemini-robotics-2025"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://api.github.com/repos/NousResearch/hermes-agent",
+      "where": [
+        "timeline.json milestone hermes-agent-2025"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://api.github.com/repos/openclaw/openclaw",
+      "where": [
+        "timeline.json milestone openclaw-2025"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openai.com/chatgpt-work/",
+      "where": [
+        "timeline.json milestone chatgpt-work-2026",
+        "landscape.json chatgpt-work"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://stripe.com/sessions/2024/a-blueprint-for-ai-acceleration",
+      "where": [
+        "timeline.json milestone perplexity-ask-2022"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://metr.org/blog/2026-1-29-time-horizon-1-1/",
+      "where": [
+        "timeline.json measure metr-time-horizon-original",
+        "timeline.json measure metr-time-horizon-1-1-post-2023"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openai.com/index/gpt-6-astra/",
+      "where": [
+        "landscape.json gpt-6-astra"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://openai.com/index/gpt-5-6/",
+      "where": [
+        "landscape.json gpt-5.6-sol",
+        "landscape.json gpt-5.6-terra",
+        "landscape.json gpt-5.6-luna"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://openai.com/index/introducing-gpt-oss/",
+      "where": [
+        "landscape.json gpt-oss"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/models/opus-5/overview",
+      "where": [
+        "landscape.json claude-opus-5"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/models/haiku-4-5/overview",
+      "where": [
+        "landscape.json claude-haiku-4.5"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://deepmind.google/models/gemma/gemma-4/",
+      "where": [
+        "landscape.json gemma"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.x.ai/developers/grok-4-6",
+      "where": [
+        "landscape.json grok-4.6"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developer.meta.com/ai/models/muse-spark/",
+      "where": [
+        "landscape.json muse-spark"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://ai.meta.com/blog/llama-4-multimodal-intelligence/",
+      "where": [
+        "landscape.json llama"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/QwenLM/Qwen3.8",
+      "where": [
+        "landscape.json qwen3.8"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.z.ai/release-notes/new-released",
+      "where": [
+        "landscape.json glm-5.3"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/MoonshotAI/Kimi-K3",
+      "where": [
+        "landscape.json kimi-k3"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.mistral.ai/models",
+      "where": [
+        "landscape.json mistral-small-4"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://mistral.ai/news/mistral-3/",
+      "where": [
+        "landscape.json mistral-large-3"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://azure.microsoft.com/en-us/products/phi",
+      "where": [
+        "landscape.json phi"
+      ],
+      "status": "unavailable",
+      "detail": "TimeoutError",
+      "follow_up": "Retrieved with web reader on 10/07/2026 after a non-permission transport failure."
+    },
+    {
+      "url": "https://nvidianews.nvidia.com/news/nvidia-debuts-nemotron-3-family-of-open-models",
+      "where": [
+        "landscape.json nemotron"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.cohere.com/docs/command-a-plus",
+      "where": [
+        "landscape.json command"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/models/whisper-1",
+      "where": [
+        "landscape.json whisper"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/models/sora-2",
+      "where": [
+        "landscape.json sora"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://deepmind.google/models/imagen/",
+      "where": [
+        "landscape.json imagen"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://bfl.ai/models",
+      "where": [
+        "landscape.json flux"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.mongodb.com/docs/voyageai/models/",
+      "where": [
+        "landscape.json voyage-embed"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.cohere.com/docs/cohere-embed",
+      "where": [
+        "landscape.json cohere-embed"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://huggingface.co/nomic-ai/nomic-embed-text-v2-moe",
+      "where": [
+        "landscape.json nomic-embed"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://bge-model.com/bge/bge_m3.html",
+      "where": [
+        "landscape.json bge"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://stability.ai/stable-image",
+      "where": [
+        "landscape.json stable-diffusion-3.5"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://suno.com/",
+      "where": [
+        "landscape.json suno"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://runway.com/",
+      "where": [
+        "landscape.json runway-gen"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://help.openai.com/en/articles/9260256-chatgpt-capabilities-overview",
+      "where": [
+        "landscape.json chatgpt"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://gemini.google/overview/",
+      "where": [
+        "landscape.json gemini-app"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://grok.com",
+      "where": [
+        "landscape.json grok"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://ai.meta.com/meta-ai/",
+      "where": [
+        "landscape.json meta-ai"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.microsoft.com/en-us/microsoft-365/microsoft-copilot",
+      "where": [
+        "landscape.json microsoft-copilot"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://mistral.ai/products/vibe/",
+      "where": [
+        "landscape.json le-chat"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.deepseek.com/en/",
+      "where": [
+        "landscape.json deepseek-chat"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.midjourney.com/",
+      "where": [
+        "landscape.json midjourney"
+      ],
+      "status": "denied",
+      "http": 403
+    },
+    {
+      "url": "https://elevenlabs.io",
+      "where": [
+        "landscape.json elevenlabs"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://help.openai.com/en/articles/10169521-projects-in-chatgpt",
+      "where": [
+        "landscape.json chatgpt-projects"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://help.openai.com/en/articles/8590148-memory-faq",
+      "where": [
+        "landscape.json chatgpt-memory"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://www.glean.com",
+      "where": [
+        "landscape.json glean"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.notion.com/product/ai",
+      "where": [
+        "landscape.json notion-ai"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview",
+      "where": [
+        "landscape.json m365-copilot"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://zapier.com",
+      "where": [
+        "landscape.json zapier"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.make.com",
+      "where": [
+        "landscape.json make"
+      ],
+      "status": "denied",
+      "http": 403
+    },
+    {
+      "url": "https://www.langflow.org/blog/big-news-for-langflow",
+      "where": [
+        "landscape.json langflow"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.gumloop.com/",
+      "where": [
+        "landscape.json gumloop"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://help.openai.com/en/articles/8437071-data-analysis-with-chatgpt",
+      "where": [
+        "landscape.json chatgpt-data-analysis"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://help.openai.com/en/articles/20001519-custom-gpt-retirement-and-migration-faq",
+      "where": [
+        "landscape.json custom-gpts"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://support.claude.com/en/articles/11596036-anthropic-connectors-directory-faq",
+      "where": [
+        "landscape.json claude-connectors"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://support.google.com/gemini/answer/13695044",
+      "where": [
+        "landscape.json gemini-apps"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/codex/cli",
+      "where": [
+        "landscape.json codex"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://cursor.com/blog/joining-spacex",
+      "where": [
+        "landscape.json cursor"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/features/copilot",
+      "where": [
+        "landscape.json github-copilot"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://x.ai/news/grok-build-cli",
+      "where": [
+        "landscape.json grok-build"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://cognition.com/",
+      "where": [
+        "landscape.json devin"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://devin.ai/blog/windsurf-is-now-devin-desktop",
+      "where": [
+        "landscape.json windsurf"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://aider.chat/",
+      "where": [
+        "landscape.json aider"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://x.ai/news/grok-3",
+      "where": [
+        "landscape.json grok-deepsearch"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://help.openai.com/en/articles/20001274",
+      "where": [
+        "landscape.json chatgpt-voice"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://gemini.google/overview/gemini-live/",
+      "where": [
+        "landscape.json gemini-live"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://stripe.com/payments/link",
+      "where": [
+        "landscape.json link"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026003952/tsla-20251231.htm",
+      "where": [
+        "landscape.json optimus"
+      ],
+      "status": "denied",
+      "http": 403
+    },
+    {
+      "url": "https://zed.dev",
+      "where": [
+        "landscape.json zed"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": true
+    },
+    {
+      "url": "https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html",
+      "where": [
+        "landscape.json regex"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.iso.org/standard/76583.html",
+      "where": [
+        "landscape.json sql"
+      ],
+      "status": "denied",
+      "http": 403
+    },
+    {
+      "url": "https://spacy.io/",
+      "where": [
+        "landscape.json spacy"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/home",
+      "where": [
+        "landscape.json claude-api"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://ai.google.dev/gemini-api/docs",
+      "where": [
+        "landscape.json gemini-api"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://lmstudio.ai/careers",
+      "where": [
+        "landscape.json lm-studio"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://huggingface.co/docs/transformers/index",
+      "where": [
+        "landscape.json transformers"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://python.useinstructor.com/",
+      "where": [
+        "landscape.json instructor"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://dottxt-ai.github.io/outlines/latest/",
+      "where": [
+        "landscape.json outlines"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.llamaindex.ai/",
+      "where": [
+        "landscape.json llamaindex"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.langchain.com/",
+      "where": [
+        "landscape.json langchain"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://haystack.deepset.ai/",
+      "where": [
+        "landscape.json haystack"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.pinecone.io/",
+      "where": [
+        "landscape.json pinecone"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://weaviate.io/",
+      "where": [
+        "landscape.json weaviate"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://qdrant.tech/",
+      "where": [
+        "landscape.json qdrant"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.trychroma.com/",
+      "where": [
+        "landscape.json chroma"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://milvus.io/",
+      "where": [
+        "landscape.json milvus"
+      ],
+      "status": "unavailable",
+      "http": 302,
+      "follow_up": "Retrieved with web reader on 10/07/2026 after a non-permission transport failure."
+    },
+    {
+      "url": "https://github.com/facebookresearch/faiss",
+      "where": [
+        "landscape.json faiss"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://cohere.com/rerank",
+      "where": [
+        "landscape.json cohere-rerank"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://jina.ai/reranker/",
+      "where": [
+        "landscape.json jina-reranker"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/microsoft/graphrag",
+      "where": [
+        "landscape.json graphrag"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://neo4j.com/",
+      "where": [
+        "landscape.json neo4j"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/HKUDS/LightRAG",
+      "where": [
+        "landscape.json lightrag"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://mem0.ai/",
+      "where": [
+        "landscape.json mem0"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.getzep.com/",
+      "where": [
+        "landscape.json zep"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.letta.com/",
+      "where": [
+        "landscape.json letta"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.langchain.com/langgraph",
+      "where": [
+        "landscape.json langgraph"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.prefect.io",
+      "where": [
+        "landscape.json prefect"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://airflow.apache.org",
+      "where": [
+        "landscape.json airflow"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.inngest.com",
+      "where": [
+        "landscape.json inngest"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://dspy.ai/current/",
+      "where": [
+        "landscape.json dspy"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://modelcontextprotocol.io/docs/2026-07-28/getting-started/intro",
+      "where": [
+        "landscape.json mcp-protocol"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://modal.com",
+      "where": [
+        "landscape.json modal"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.browserbase.com",
+      "where": [
+        "landscape.json browserbase"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://playwright.dev",
+      "where": [
+        "landscape.json playwright"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://composio.dev",
+      "where": [
+        "landscape.json composio"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://code.claude.com/docs/en/agent-sdk/overview",
+      "where": [
+        "landscape.json claude-agent-sdk"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://openai.github.io/openai-agents-python/",
+      "where": [
+        "landscape.json openai-agents-sdk"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://adk.dev/",
+      "where": [
+        "landscape.json google-adk"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://pydantic.dev/docs/ai/overview/",
+      "where": [
+        "landscape.json pydantic-ai"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://huggingface.co/docs/smolagents/index",
+      "where": [
+        "landscape.json smolagents"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://ai.google.dev/gemini-api/docs/live-api",
+      "where": [
+        "landscape.json gemini-live-api"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.livekit.io/agents/",
+      "where": [
+        "landscape.json livekit-agents"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/pipecat-ai/pipecat",
+      "where": [
+        "landscape.json pipecat"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.vapi.ai/quickstart/introduction",
+      "where": [
+        "landscape.json vapi"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.langchain.com/langsmith/deployment",
+      "where": [
+        "landscape.json langgraph-platform"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.braintrust.dev/",
+      "where": [
+        "landscape.json braintrust"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://inspect.aisi.org.uk/",
+      "where": [
+        "landscape.json inspect"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/EleutherAI/lm-evaluation-harness",
+      "where": [
+        "landscape.json lm-eval-harness"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/langfuse/langfuse",
+      "where": [
+        "landscape.json langfuse"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/helicone/helicone",
+      "where": [
+        "landscape.json helicone"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://opentelemetry.io/",
+      "where": [
+        "landscape.json opentelemetry"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developer.meta.com/ai/docs/model-cards-and-prompt-formats/llama-guard-4/",
+      "where": [
+        "landscape.json llama-guard"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth",
+      "where": [
+        "landscape.json unsloth"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/axolotl-ai-cloud/axolotl",
+      "where": [
+        "landscape.json axolotl"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/huggingface/trl",
+      "where": [
+        "landscape.json trl"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/huggingface/peft",
+      "where": [
+        "landscape.json peft"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/ml-explore/mlx",
+      "where": [
+        "landscape.json mlx"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://claude.com/blog/prompt-generator",
+      "where": [
+        "landscape.json anthropic-prompt-generator"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://docs.langchain.com/oss/python/deepagents/overview",
+      "where": [
+        "landscape.json deep-agents"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/strands-agents/harness-sdk",
+      "where": [
+        "landscape.json strands-agents"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/vercel/ai",
+      "where": [
+        "landscape.json vercel-ai-sdk"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/browser-use/browser-use",
+      "where": [
+        "landscape.json browser-use"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/Arize-ai/phoenix",
+      "where": [
+        "landscape.json phoenix"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/NVIDIA/garak",
+      "where": [
+        "landscape.json garak"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://github.com/sgl-project/sglang",
+      "where": [
+        "landscape.json sglang"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://community.owasp.org/attacks/Regular_expression_Denial_of_Service_-_ReDoS",
+      "where": [
+        "frontier.json level 0 rules-that-blow-up"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://csrc.nist.gov/projects/automated-combinatorial-testing-for-software/combinatorial-methods-in-testing/interactions-involved-in-software-failures",
+      "where": [
+        "frontier.json level 0 no-exhaustive-test"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2506.08734",
+      "where": [
+        "frontier.json level 0 drift-without-labels"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2605.26128",
+      "where": [
+        "frontier.json level 1 constraint-tax"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.anthropic.com/research/reasoning-models-dont-say-think",
+      "where": [
+        "frontier.json level 1 thinking-you-can-read"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2210.07316",
+      "where": [
+        "frontier.json level 2 no-best-embedding"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2502.05167",
+      "where": [
+        "frontier.json level 2 long-context-is-not-free"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2607.04223",
+      "where": [
+        "frontier.json level 2 which-sentence-was-invented"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2605.20926",
+      "where": [
+        "frontier.json level 2 two-memories-that-disagree"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2608.14588",
+      "where": [
+        "frontier.json level 3 errors-change-shape"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2601.07206",
+      "where": [
+        "frontier.json level 3 routers-miss-the-best-branch"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2604.22891",
+      "where": [
+        "frontier.json level 3 a-judge-that-likes-its-own-work"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://airc.nist.gov/airmf-resources/playbook/map/",
+      "where": [
+        "frontier.json level 3 how-much-human-at-the-gate"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://community.owasp.org/attacks/MCP_Tool_Poisoning",
+      "where": [
+        "frontier.json level 4 vetted-server-bad-answer"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.anthropic.com/engineering/writing-tools-for-agents",
+      "where": [
+        "frontier.json level 4 arguments-that-were-guessed"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/agents/sandboxes",
+      "where": [
+        "frontier.json level 4 sandbox-is-a-choice"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/",
+      "where": [
+        "frontier.json level 4 sandbox-is-a-choice"
+      ],
+      "status": "not attempted",
+      "detail": "Host previously denied access; no retry or alternate path"
+    },
+    {
+      "url": "https://metr.org/blog/2025-06-05-recent-reward-hacking/",
+      "where": [
+        "frontier.json level 5 passing-the-check-not-the-task"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://metr.org/blog/2026-05-19-frontier-risk-report/",
+      "where": [
+        "frontier.json level 5 passing-the-check-not-the-task"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.anthropic.com/engineering/claude-code-auto-mode",
+      "where": [
+        "frontier.json level 5 which-actions-need-a-person",
+        "frontier.json level 5 which-actions-need-a-person"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://a2a-protocol.org/latest/specification/",
+      "where": [
+        "frontier.json level 6 credentials-that-travel"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2605.29800",
+      "where": [
+        "frontier.json level 6 nine-judges-two-votes"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2506.07962",
+      "where": [
+        "frontier.json level 6 nine-judges-two-votes"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/compaction",
+      "where": [
+        "frontier.json level 7 a-summary-you-cannot-read"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://support.claude.com/en/articles/14128542-let-claude-use-your-computer-in-cowork",
+      "where": [
+        "frontier.json level 7 permission-that-does-not-hold"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://www.salesforce.com/news/stories/connectivity-report-announcement-2026/",
+      "where": [
+        "frontier.json level 7 more-agents-than-governance"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://deepmind.google/blog/gemini-robotics-2-brings-whole-body-intelligence-to-robots/",
+      "where": [
+        "frontier.json level 7 will-the-robot-refuse"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    },
+    {
+      "url": "https://epoch.ai/eci",
+      "where": [
+        "capability.json"
+      ],
+      "status": "retrieved",
+      "http": 200,
+      "truncated": false
+    }
+  ]
+}

@@ -1,0 +1,4898 @@
+[
+  {
+    "route": "",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "agents/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "apply/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "changes/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "chatbot-to-agent/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "design-decisions/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "examples/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "examples/reviewer-feedback-loop/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "failures/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "glossary/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "learn/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/0/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/1/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/2/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/3/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/4/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/5/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/6/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/7/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/tracks/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "map/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "method/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "names/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/accuracy-specs-from-the-manual/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/ask-the-datasheet/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/assistant-team/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/bring-up-debug-assistant/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/characterize-a-design/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/content-pipeline/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/contract-review/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/data-analysis/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/design-review-checklist/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/document-extraction/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/document-qa/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/household-paperwork/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/inbox-triage/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/incident-runbook/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/instrument-script-from-the-manual/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/invoice-matching/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/limits-without-a-model/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/literature-watch/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/maintenance-log/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/measurement-writeup/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/meeting-notes/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/nightly-monitor/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/project-tracker-upkeep/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/repo-assistant/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/requirements-to-test-plan/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/research-brief/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/rubric-grading/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/storyboard-from-a-script/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/support-desk/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/test-data-by-conversation/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/test-failure-triage/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/trip-planning/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/voice-notes/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/weekly-status-report/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "search/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "shapes/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/agent-teammate/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/answer-engine/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/browser-agent/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/coding-agent/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/deep-research-mode/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/workplace-assistant/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/adaptation/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/agent-graphs/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/agent-harness/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/agent-teammates/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/agentic-rag/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/ai-gateways/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/briefing/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/chat/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/code-execution/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/coding-agents/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/computer-use/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/context-engineering/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/cost-optimization/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/debate-review/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/delegating/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/distillation/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/embeddings-search/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/embodied/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/eval-frameworks/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/evals/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/evaluator-optimizer/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/fine-tuning/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/function-calling/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/guardrails/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/human-in-the-loop/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/inference-time-reasoning/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/knowledge-graphs/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/local-inference/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/long-horizon/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/mcp/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/memory/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/multimodal/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/observability/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/operator-craft/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/ops/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/orchestrator-workers/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/order-zero/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/organizations-swarms/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/parallelization/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/prompt-chaining/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/prompt-engineering/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/prompt-optimization/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/rag/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/red-teaming/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/reviewing/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/routing/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/safety/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/single-agent/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/skills/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/structured-output/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/synthetic-data/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/trust/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/voice-agents/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/workflow-graphs/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "threads/checking-the-work/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "threads/graph-engineering/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "threads/what-the-model-sees/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "threads/who-approves-what/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "timeline/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/agent-instructions/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/definition-of-done/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/project-handoff/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/tool-specification/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/workflow-audit/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/workflow/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "usability/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "worksheet/",
+    "width": 360,
+    "status": 200,
+    "scrollWidth": 360,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "agents/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "apply/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "changes/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "chatbot-to-agent/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "design-decisions/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "examples/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "examples/reviewer-feedback-loop/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "failures/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "glossary/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "learn/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/0/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/1/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/2/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/3/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/4/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/5/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/6/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/7/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/tracks/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "map/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "method/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "names/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/accuracy-specs-from-the-manual/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/ask-the-datasheet/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/assistant-team/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/bring-up-debug-assistant/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/characterize-a-design/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/content-pipeline/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/contract-review/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/data-analysis/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/design-review-checklist/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/document-extraction/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/document-qa/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/household-paperwork/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/inbox-triage/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/incident-runbook/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/instrument-script-from-the-manual/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/invoice-matching/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/limits-without-a-model/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/literature-watch/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/maintenance-log/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/measurement-writeup/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/meeting-notes/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/nightly-monitor/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/project-tracker-upkeep/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/repo-assistant/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/requirements-to-test-plan/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/research-brief/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/rubric-grading/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/storyboard-from-a-script/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/support-desk/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/test-data-by-conversation/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/test-failure-triage/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/trip-planning/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/voice-notes/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/weekly-status-report/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "search/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "shapes/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/agent-teammate/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/answer-engine/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/browser-agent/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/coding-agent/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/deep-research-mode/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/workplace-assistant/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/adaptation/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/agent-graphs/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/agent-harness/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/agent-teammates/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/agentic-rag/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/ai-gateways/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/briefing/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/chat/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/code-execution/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/coding-agents/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/computer-use/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/context-engineering/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/cost-optimization/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/debate-review/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/delegating/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/distillation/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/embeddings-search/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/embodied/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/eval-frameworks/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/evals/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/evaluator-optimizer/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/fine-tuning/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/function-calling/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/guardrails/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/human-in-the-loop/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/inference-time-reasoning/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/knowledge-graphs/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/local-inference/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/long-horizon/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/mcp/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/memory/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/multimodal/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/observability/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/operator-craft/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/ops/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/orchestrator-workers/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/order-zero/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/organizations-swarms/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/parallelization/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/prompt-chaining/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/prompt-engineering/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/prompt-optimization/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/rag/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/red-teaming/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/reviewing/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/routing/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/safety/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/single-agent/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/skills/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/structured-output/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/synthetic-data/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/trust/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/voice-agents/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/workflow-graphs/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "threads/checking-the-work/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "threads/graph-engineering/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "threads/what-the-model-sees/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "threads/who-approves-what/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "timeline/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/agent-instructions/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/definition-of-done/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/project-handoff/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/tool-specification/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/workflow-audit/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/workflow/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "usability/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "worksheet/",
+    "width": 390,
+    "status": 200,
+    "scrollWidth": 390,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "agents/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "apply/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "changes/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "chatbot-to-agent/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "design-decisions/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "examples/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "examples/reviewer-feedback-loop/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "failures/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "glossary/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "learn/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/0/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/1/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/2/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/3/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/4/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/5/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/6/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/7/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/tracks/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "map/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "method/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "names/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/accuracy-specs-from-the-manual/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/ask-the-datasheet/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/assistant-team/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/bring-up-debug-assistant/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/characterize-a-design/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/content-pipeline/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/contract-review/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/data-analysis/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/design-review-checklist/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/document-extraction/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/document-qa/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/household-paperwork/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/inbox-triage/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/incident-runbook/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/instrument-script-from-the-manual/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/invoice-matching/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/limits-without-a-model/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/literature-watch/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/maintenance-log/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/measurement-writeup/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/meeting-notes/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/nightly-monitor/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/project-tracker-upkeep/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/repo-assistant/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/requirements-to-test-plan/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/research-brief/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/rubric-grading/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/storyboard-from-a-script/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/support-desk/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/test-data-by-conversation/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/test-failure-triage/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/trip-planning/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/voice-notes/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/weekly-status-report/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "search/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "shapes/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/agent-teammate/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/answer-engine/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/browser-agent/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/coding-agent/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/deep-research-mode/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/workplace-assistant/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/adaptation/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/agent-graphs/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/agent-harness/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/agent-teammates/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/agentic-rag/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/ai-gateways/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/briefing/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/chat/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/code-execution/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/coding-agents/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/computer-use/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/context-engineering/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/cost-optimization/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/debate-review/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/delegating/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/distillation/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/embeddings-search/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/embodied/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/eval-frameworks/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/evals/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/evaluator-optimizer/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/fine-tuning/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/function-calling/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/guardrails/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/human-in-the-loop/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/inference-time-reasoning/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/knowledge-graphs/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/local-inference/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/long-horizon/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/mcp/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/memory/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/multimodal/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/observability/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/operator-craft/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/ops/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/orchestrator-workers/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/order-zero/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/organizations-swarms/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/parallelization/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/prompt-chaining/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/prompt-engineering/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/prompt-optimization/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/rag/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/red-teaming/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/reviewing/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/routing/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/safety/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/single-agent/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/skills/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/structured-output/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/synthetic-data/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/trust/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/voice-agents/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/workflow-graphs/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "threads/checking-the-work/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "threads/graph-engineering/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "threads/what-the-model-sees/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "threads/who-approves-what/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "timeline/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/agent-instructions/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/definition-of-done/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/project-handoff/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/tool-specification/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/workflow-audit/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/workflow/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "usability/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "worksheet/",
+    "width": 430,
+    "status": 200,
+    "scrollWidth": 430,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "agents/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "apply/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "changes/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "chatbot-to-agent/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "design-decisions/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "examples/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "examples/reviewer-feedback-loop/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "failures/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "glossary/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "learn/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/0/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/1/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/2/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/3/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/4/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/5/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/6/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/7/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "levels/tracks/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "map/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "method/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "names/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/accuracy-specs-from-the-manual/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/ask-the-datasheet/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/assistant-team/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/bring-up-debug-assistant/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/characterize-a-design/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/content-pipeline/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/contract-review/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/data-analysis/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/design-review-checklist/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/document-extraction/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/document-qa/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/household-paperwork/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/inbox-triage/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/incident-runbook/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/instrument-script-from-the-manual/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/invoice-matching/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/limits-without-a-model/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/literature-watch/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/maintenance-log/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/measurement-writeup/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/meeting-notes/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/nightly-monitor/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/project-tracker-upkeep/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/repo-assistant/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/requirements-to-test-plan/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/research-brief/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/rubric-grading/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/storyboard-from-a-script/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/support-desk/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/test-data-by-conversation/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/test-failure-triage/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/trip-planning/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/voice-notes/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "recipes/weekly-status-report/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "search/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "shapes/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/agent-teammate/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/answer-engine/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/browser-agent/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/coding-agent/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/deep-research-mode/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "teardowns/workplace-assistant/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/adaptation/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/agent-graphs/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/agent-harness/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/agent-teammates/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/agentic-rag/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/ai-gateways/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/briefing/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/chat/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/code-execution/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/coding-agents/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/computer-use/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/context-engineering/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/cost-optimization/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/debate-review/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/delegating/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/distillation/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/embeddings-search/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/embodied/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/eval-frameworks/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/evals/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/evaluator-optimizer/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/fine-tuning/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/function-calling/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/guardrails/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/human-in-the-loop/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/inference-time-reasoning/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/knowledge-graphs/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/local-inference/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/long-horizon/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/mcp/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/memory/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/multimodal/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/observability/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/operator-craft/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/ops/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/orchestrator-workers/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/order-zero/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/organizations-swarms/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/parallelization/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/prompt-chaining/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/prompt-engineering/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/prompt-optimization/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/rag/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/red-teaming/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/reviewing/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/routing/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/safety/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/single-agent/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/skills/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/structured-output/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/synthetic-data/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/trust/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/voice-agents/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "techniques/workflow-graphs/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "threads/checking-the-work/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "threads/graph-engineering/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "threads/what-the-model-sees/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "threads/who-approves-what/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "timeline/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/agent-instructions/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/definition-of-done/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/project-handoff/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/tool-specification/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/workflow-audit/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "tools/workflow/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "usability/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  },
+  {
+    "route": "worksheet/",
+    "width": 1440,
+    "status": 200,
+    "scrollWidth": 1440,
+    "overflow": [],
+    "accent": "#e6ba82",
+    "errors": []
+  }
+]

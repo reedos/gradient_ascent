@@ -27,6 +27,7 @@ export interface ResultFile {
   partial: boolean;
   questions_run: number;
   questions_total: number;
+  questions: { id: string; kind: string; correct: boolean | null }[];
   score_overall: number | null;
   score_by_kind: Record<string, KindScore>;
   retrieval_coverage: number | null;
@@ -108,12 +109,25 @@ export function buildMeasurement(entry: MeasurementEntry, result: ResultFile): M
   if (result.empty_completions === undefined || result.empty_completions > 0) {
     throw new Error(`${where}: empty completions are ${result.empty_completions ?? 'not recorded'}`);
   }
+  if (!Array.isArray(result.questions) || !result.questions.length ||
+      result.questions.length !== result.questions_run || result.questions_run !== result.questions_total ||
+      new Set(result.questions.map(q => q.id)).size !== result.questions.length) {
+    throw new Error(`${where}: missing, duplicate or incomplete question records`);
+  }
+  for (const [key, summary] of Object.entries(result.score_by_kind)) {
+    const rows = result.questions.filter(q => q.kind === key);
+    if (rows.length !== summary.n || rows.some(q => typeof q.correct !== 'boolean') ||
+        rows.filter(q => q.correct).length !== correctIn(summary)) {
+      throw new Error(`${where}: ${key} summary disagrees with question records`);
+    }
+  }
   const kinds = KIND_LABELS.filter(([key]) => result.score_by_kind[key]?.n).map(([key, label]) => {
     const k = result.score_by_kind[key];
     return { key, label, correct: correctIn(k), n: k.n };
   });
   const correct = kinds.reduce((s, k) => s + k.correct, 0);
   const total = kinds.reduce((s, k) => s + k.n, 0);
+  if (total !== result.questions.length) throw new Error(`${where}: unknown question kind`);
   const ran = new Set(measurementEntries.filter((e) => e.page === entry.page).map((e) => models[e.model]?.class));
   const q = result.questions_run || 1;
   return {
@@ -148,7 +162,7 @@ export function costCaption(m: Measurement): string {
   return (
     `Measured: averages over the ${m.result.questions_run}-question run on ${m.model.name}, a model in the ` +
     `${m.model.class} class, on one local GPU. Tokens out include the model's hidden reasoning, ` +
-    `which it spends before answering. Holds for this model class only.`
+    `which it spends before answering. This does not establish performance for other models, even in the same class.`
   );
 }
 
@@ -167,6 +181,10 @@ export interface Comparison {
 export function compareWith(m: Measurement, other: Measurement, label: string): Comparison {
   if (other.entry.model !== m.entry.model) throw new Error(`compare ${m.entry.page} with ${other.entry.page}: different models`);
   if (other.result.questions_total !== m.result.questions_total) throw new Error(`compare ${m.entry.page} with ${other.entry.page}: different question sets`);
+  const identities = (r: ResultFile) => r.questions.map(q => `${q.id}:${q.kind}`).sort();
+  if (JSON.stringify(identities(m.result)) !== JSON.stringify(identities(other.result))) {
+    throw new Error(`compare ${m.entry.page} with ${other.entry.page}: different question identities`);
+  }
   const rows = m.kinds.map((k) => {
     const o = other.kinds.find((x) => x.key === k.key);
     if (!o) throw new Error(`compare ${m.entry.page} with ${other.entry.page}: ${k.key} is missing from one run`);
@@ -214,8 +232,8 @@ export function measurementMarkdown(m: Measurement, repoUrl: string, c?: Compari
     `- **Grader:** ${graderName(m)}, on ${r.grader_calls} rubric questions, the rest by exact match. Checked by a person on ${usDate(m.entry.grader_sample_checked)}: ${m.entry.grader_note}`,
     '',
     m.classesNotRun.length
-      ? `This holds for the ${m.model.class} class only. Not yet run: ${m.classesNotRun.join('; ')}.`
-      : 'This has been run on every model class the site measures.',
+      ? `This run does not establish performance for other models, even in the same class. Classes not yet run: ${m.classesNotRun.join('; ')}.`
+      : 'This run does not establish performance for other models, even in the same class.',
     '',
     `Result file: ${repoUrl}/blob/main/evals/results/${m.entry.example}/${resultFileName(m.entry.model)} · recorded trace: ${repoUrl}/blob/main/examples/${m.entry.example}/trace.json`,
     '',

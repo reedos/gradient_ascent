@@ -50,6 +50,22 @@ class MeasuredPagesTests(unittest.TestCase):
 
 
 class MeasurementEntryTests(unittest.TestCase):
+    def test_displayed_totals_reconcile_to_individual_question_records(self) -> None:
+        """Published cost and coverage totals must match saved rows, not another summary."""
+        for entry in MEASUREMENTS["results"]:
+            path = ROOT / "evals" / "results" / entry["example"] / f"{_safe_name(entry['model'])}.json"
+            result = json.loads(path.read_text(encoding="utf-8"))
+            rows = result["questions"]
+            with self.subTest(page=entry["page"]):
+                for field in ("tokens_in", "tokens_out", "model_decided_steps"):
+                    self.assertEqual(result[field], sum(row[field] for row in rows), field)
+                # Saved wall time is explicitly quantized to milliseconds, not scale-free data.
+                self.assertAlmostEqual(result["wall_time_s"], sum(row["wall_s"] for row in rows), delta=0.0005)
+                self.assertEqual(result["forced_finals"], sum(row["forced_final"] for row in rows))
+                for summary, field in (("retrieval_coverage", "retrieval_hit"), ("citation_coverage", "citation_hit")):
+                    values = [row[field] for row in rows if row[field] is not None]
+                    self.assertEqual(result[summary], round(sum(values) / len(values), 4), summary)
+
     def test_every_entry_points_at_a_whole_readable_result(self) -> None:
         for entry in MEASUREMENTS["results"]:
             where = f"{entry['page']} on {entry['model']}"

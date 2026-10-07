@@ -1,0 +1,11 @@
+{
+  "about": "Synthetic mutations of a recorded result. None call a model or modify the original result file.",
+  "cases": [
+    {"id": "truncated", "mutation": "drop-question", "expected": "reject"},
+    {"id": "duplicate", "mutation": "duplicate-id", "expected": "reject"},
+    {"id": "ungraded-row", "mutation": "null-verdict", "expected": "reject"},
+    {"id": "inflated-score", "mutation": "inflate-summary", "expected": "reject"},
+    {"id": "changed-set", "mutation": "replace-id", "expected": "reject-comparison"},
+    {"id": "row-order", "mutation": "reverse-rows", "expected": "accept-comparison"}
+  ]
+}
