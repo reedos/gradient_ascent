@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           # The project is stdlib-only: there is nothing to install and no requirements file.
           # 3.13 rather than the repo's own 3.14 so a runner image change cannot fail the build;
