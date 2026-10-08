@@ -1453,7 +1453,7 @@
       },
       "checked": "2026-09-18",
       "verified": true,
-      "note": "Earlier papers contain the idea without being about it. WebGPT (arXiv v1, December 17, 2021) has a model issuing search and click commands, but in a loop it ends itself, which is level 5. LaMDA (arXiv v1, January 20, 2022) routes some outputs to a calculator, a translator and a search system as one section of a dialogue paper."
+      "note": "Re-checked 10/08/2026: the v1 date 05/01/2022 matches arXiv. The router sentence and the claim that the router is a small neural network were not confirmed: the abstract page does not contain them and the PDF could not be read as text. Earlier papers contain the idea without being about it. WebGPT (arXiv v1, December 17, 2021) has a model issuing search and click commands, but in a loop it ends itself, which is level 5. LaMDA (arXiv v1, January 20, 2022) routes some outputs to a calculator, a translator and a search system as one section of a dialogue paper."
     },
     {
       "id": "toolformer-paper-2023",
@@ -2136,7 +2136,8 @@
         "publisher": "Physical Intelligence"
       },
       "checked": "2026-09-18",
-      "verified": true
+      "verified": true,
+      "note": "Re-checked 10/08/2026: the date 10/31/2024 matches the arXiv submission of the pi0 paper (2410.24164). The paper says its dexterous data covers \"7 different robot configurations and 68 tasks\", so the blog post's count of 8 robots was not confirmed by the paper, and the blog itself could not be fetched (HTTP 429, tried twice). Treat the count as the maker's blog wording."
     },
     {
       "id": "manus-2025",
