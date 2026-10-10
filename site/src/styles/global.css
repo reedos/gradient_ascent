@@ -9,44 +9,35 @@
    preflight keeps that reset and drops the unused theme and utilities layers. */
 @import "tailwindcss/preflight.css";
 
-/* Gradient Ascent's visual system: one set of tokens and components, tinted for navy neutrals
-   and a cobalt accent, with the level ramp used for gradient treatment. Ported from
-   prototype/look.src.html. The site ships ONE look: gradient on, cobalt accent, navy neutrals,
-   heat ramp. The prototype's accent/name/logo switchers are not ported; their JS is gone. */
+/* Signature tokens ported from intelligence_factory/src/styles.css.
+   Level names and numbers carry the hierarchy; amber is the only accent. */
 :root {
   color-scheme: dark;
-  --bg: #0c0f17;
-  --panel: #121622;
-  --panel2: #181d2c;
-  --line: #293047;
-  /* The edge of something you can operate: a button, a filter, a text field, a pager link.
-     WCAG 1.4.11 asks 3:1 of a UI component's boundary. `--line` is 1.29:1 on the lightest panel,
-     which is right for a hairline that only separates and wrong for an edge that tells you where
-     a control is. This clears 3:1 on all three grounds (3.48 on --bg, 3.28 on --panel, 3.05 on
-     --panel2) and keeps the same navy bias, so the design does not coarsen. Dividers keep
-     `--line`: a decorative separator is exempt, and making every hairline this heavy would
-     change the look of the whole site to fix something that is not broken. */
-  --line-control: #5c688d;
-  --text: #eceff7;
-  --muted: #9ba5bd;
-  --accent: #4f80ff;
-  --on-accent: #061033;
-  --o0: #a3b0bd;
-  --o1: #6fd3c4;
-  --o2: #8fd68a;
-  --o3: #d2d77c;
-  --o4: #e8b66d;
-  --o5: #f2a27a;
-  --o6: #ec98bc;
-  --o7: #d59af0;
-  --ot: #9ba5bd;
-  /* Logo mark gradient stops: the level ramp, bottom to top, same direction as the levels. */
-  --mk1: var(--o1);
-  --mk2: var(--o3);
-  --mk3: var(--o5);
-  --mk4: var(--o6);
-  --font: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --display: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --bg: #000;
+  --panel: #0b1015;
+  --panel2: #121920;
+  --line: rgba(240, 240, 250, 0.14);
+  --line-control: #6b747c;
+  --text: #f0f0fa;
+  --muted: #aab2b9;
+  --accent: #e6ba82;
+  --on-accent: #121920;
+  --o0: var(--accent);
+  --o1: var(--accent);
+  --o2: var(--accent);
+  --o3: var(--accent);
+  --o4: var(--accent);
+  --o5: var(--accent);
+  --o6: var(--accent);
+  --o7: var(--accent);
+  --ot: var(--muted);
+  --mk1: var(--accent);
+  --mk2: var(--accent);
+  --mk3: var(--accent);
+  --mk4: var(--accent);
+  --font: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+  --display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
 }
 
 * { box-sizing: border-box }
@@ -85,7 +76,7 @@ main { max-width: 1392px; margin: auto; padding: 0 48px; min-height: 60vh }
 .hero h1 em { font-style: normal; background: linear-gradient(90deg, var(--o1), var(--o3) 40%, var(--o5) 75%, var(--o6)); -webkit-background-clip: text; background-clip: text; color: transparent }
 .hero-description { font-size: 16px; line-height: 1.85; color: var(--muted); max-width: 470px }
 .hero-actions { display: flex; align-items: center; gap: 26px; margin-top: 30px; flex-wrap: wrap }
-.button { display: inline-flex; gap: 24px; align-items: center; border-radius: 6px; background: linear-gradient(90deg, var(--o1), var(--o3), var(--o5)); color: #0a1020; font-size: 12px; font-weight: 650; padding: 13px 20px; transition: filter .2s, transform .2s }
+.button { display: inline-flex; gap: 24px; align-items: center; border-radius: 6px; background: linear-gradient(90deg, var(--o1), var(--o3), var(--o5)); color: var(--on-accent); font-size: 12px; font-weight: 650; padding: 13px 20px; transition: filter .2s, transform .2s }
 .button:hover { filter: brightness(1.1); transform: translateY(-1px) }
 .text-link { font-size: 12px; color: var(--text) }
 .text-link span { margin-left: 12px }
@@ -468,3 +459,9 @@ main { max-width: 1392px; margin: auto; padding: 0 48px; min-height: 60vh }
 #concept-overview,#practical-guidance,#product-examples,#primary-sources,.optional-detail { scroll-margin-top:120px; }
 .prose .lane-purpose { margin:0 0 16px; font-size:14px; color:var(--muted); }
 @media print { .page-reading-order { display:none; } }
+
+/* The shared IF heading and label treatment, adapted to the guide's reading layout. */
+.eyebrow, .subhead { font-family: var(--mono); color: var(--accent); }
+.hero h1, .section-top h2, .page-hero h1 { text-transform: uppercase; letter-spacing: -.012em; }
+.hero h1 { font-size: clamp(52px, 7vw, 100px); line-height: .95; }
+.hero > *, .section-top > *, .panel-heading > * { min-width: 0; }

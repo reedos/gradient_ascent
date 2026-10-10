@@ -67,7 +67,8 @@ const traceUrl = `${REPO_URL}/blob/main/examples/${m.entry.example}/trace.json`;
   <p class="measured-note">
     Graded by {graderName(m)} on {r.grader_calls} rubric questions, the rest by exact match. Checked
     by a person on {usDate(m.entry.grader_sample_checked)}: {m.entry.grader_note}
-    {m.classesNotRun.length > 0 && <> This holds for the {m.model.class} class only. Not yet run: {m.classesNotRun.join('; ')}.</>}
+    This run does not establish performance for other models, even in the same class.
+    {m.classesNotRun.length > 0 && <> Classes not yet run: {m.classesNotRun.join('; ')}.</>}
   </p>
   <p class="measured-links">
     <a href={resultUrl} rel="noopener">Result file ↗</a>

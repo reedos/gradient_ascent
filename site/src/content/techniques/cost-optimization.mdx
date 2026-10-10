@@ -6,7 +6,7 @@ sources:
   - title: "Prompt caching"
     url: "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
     publisher: "Anthropic (Claude Platform Docs)"
-    accessed: "2026-09-19"
+    accessed: "2026-10-07"
   - title: "Batch API"
     url: "https://developers.openai.com/api/docs/guides/batch"
     publisher: "OpenAI (API documentation)"
@@ -30,7 +30,7 @@ work back to the user. The <Link href="/worksheet/">decision worksheet</Link> cl
 design; it does not establish the cheapest suitable solution. Possible levers include: a smaller model for
 questions that don't need a large one (<Link href="/techniques/routing/">routing</Link>), less
 text in the prompt (<Link href="/techniques/context-engineering/">context engineering</Link>),
-reusing a prefix instead of resending it (prompt caching), deferring work that doesn't need an
+reusing computation for a repeated prefix (prompt caching), deferring work that doesn't need an
 instant answer (batching), capping how long an answer or a loop is allowed to run, and caching a
 whole answer rather than only a prompt prefix.
 
@@ -39,9 +39,9 @@ This topic is not a level on the ladder; it applies at every level, the way
 names in general. This page goes one level deeper into each one: what it actually saves, and
 what it risks.
 
-This page is sourced, not measured: every figure below is a maker's own published rate, read off
-their page on the date given, and no lever here has been pulled on this site's own traffic and
-scored.
+This page is sourced, not measured: vendor discounts are attributed to their documentation on
+the dates given. The worked example uses synthetic prices. No lever here has been pulled on
+this site's own traffic and scored.
 
 <Lanes>
 <Lane name="use" title="Use it">
@@ -54,13 +54,12 @@ built on top of the wrong one. Answer it first.
 Once that is settled, two more levers show up as discounts on a vendor's own pricing page, and
 both are worth understanding before a bill surprises you. Caching charges more to store something
 reusable, then charges less every time it gets reused: on the Claude API as its prompt-caching
-page reads on September 19, 2026, a cache write costs "1.25 times the base input tokens price"
-for a five-minute cache and "2 times" for a one-hour one, while a cache read costs "0.1 times the
-base input tokens price"<Cite n={1}/>. Those are Anthropic's figures for Anthropic's models on
-that date and say nothing about any other provider, but the shape holds generally: a tool that
-resends the same instructions or documents in full on every call, instead of reusing them, is
-paying (and likely charging you) full price for material that has not changed since the last
-call.
+page reads on 10/07/2026, five-minute cache writes cost 1.25 times the base input rate and
+one-hour writes cost 2 times that rate. The standard cache-read multiplier is 0.1, with
+per-model exceptions: 0.025 for Claude Fable 5.1 and Mythos 5.1, and 0.05 for Opus 5.5 and Sonnet 5.5<Cite n={1}/>.
+These are Anthropic's published rates on that date. Check the model-specific table before
+estimating savings. Requests still include the repeated prefix; a cache hit reuses its
+processing rather than requiring the caller to omit that text.
 
 Batching trades a wait for a discount. OpenAI's Batch API offers a "50% cost discount compared to
 synchronous APIs" for work that "completes within 24 hours (and often more quickly)" instead of
@@ -71,10 +70,9 @@ The check that tells you whether either lever is actually saving anything: ask f
 breakdown, not just the total. Put it to the vendor in writing: "Show me, per call, which requests
 hit a cache and which were batched, against which were charged the full rate." If they cannot
 produce that split, the discount may not be reaching you even if the feature exists on paper. And
-if your own
-usage is occasional rather than steady, the honest answer is that neither lever is worth chasing:
-caching and batching both pay off on volume, and a handful of questions a week will not reach the
-point where either matters.
+if your own usage is occasional, compare the absolute saving with the effort of changing the
+workflow. Batching can still discount a small job; prompt-cache savings depend on reuse within
+the cache lifetime and the provider's eligibility rules.
 
 </Lane>
 <Lane name="build" title="Build it">
@@ -101,8 +99,9 @@ and dates its own table instead:
 <CodeFile file="examples/ops/run.py" func="load_price_table" />
 
 Measuring cost per successful task, not per call, is what keeps a cheaper-looking lever honest: a
-smaller model that answers three times before getting a question right costs more than a larger
-one that answers once, even though every individual call was cheaper. That is exactly what an
+smaller model that needs three attempts costs more than one larger-model attempt only when the
+three calls' combined cost exceeds that larger call. Retries can erase a per-call saving; they
+do not always do so. That is exactly what an
 <Link href="/techniques/evals/">eval</Link> scored on outcomes, not on call count, is built to
 catch: the site's own `citation_hit_rate` and `score_overall` fields, read alongside `tokens_in`
 and `tokens_out` from the same result file, are what a real version of this comparison would use.

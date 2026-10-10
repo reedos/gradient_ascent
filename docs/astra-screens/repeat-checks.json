@@ -1,0 +1,92 @@
+[
+  {
+    "run": 1,
+    "route": "",
+    "accent": "#e6ba82",
+    "overflow": false
+  },
+  {
+    "run": 1,
+    "route": "examples/",
+    "accent": "#e6ba82",
+    "overflow": false
+  },
+  {
+    "run": 1,
+    "route": "techniques/cost-optimization/",
+    "accent": "#e6ba82",
+    "overflow": false
+  },
+  {
+    "run": 1,
+    "route": "techniques/rag/",
+    "accent": "#e6ba82",
+    "overflow": false
+  },
+  {
+    "run": 1,
+    "route": "techniques/agentic-rag/",
+    "accent": "#e6ba82",
+    "overflow": false
+  },
+  {
+    "run": 2,
+    "route": "",
+    "accent": "#e6ba82",
+    "overflow": false
+  },
+  {
+    "run": 2,
+    "route": "examples/",
+    "accent": "#e6ba82",
+    "overflow": false
+  },
+  {
+    "run": 2,
+    "route": "techniques/cost-optimization/",
+    "accent": "#e6ba82",
+    "overflow": false
+  },
+  {
+    "run": 2,
+    "route": "techniques/rag/",
+    "accent": "#e6ba82",
+    "overflow": false
+  },
+  {
+    "run": 2,
+    "route": "techniques/agentic-rag/",
+    "accent": "#e6ba82",
+    "overflow": false
+  },
+  {
+    "run": 3,
+    "route": "",
+    "accent": "#e6ba82",
+    "overflow": false
+  },
+  {
+    "run": 3,
+    "route": "examples/",
+    "accent": "#e6ba82",
+    "overflow": false
+  },
+  {
+    "run": 3,
+    "route": "techniques/cost-optimization/",
+    "accent": "#e6ba82",
+    "overflow": false
+  },
+  {
+    "run": 3,
+    "route": "techniques/rag/",
+    "accent": "#e6ba82",
+    "overflow": false
+  },
+  {
+    "run": 3,
+    "route": "techniques/agentic-rag/",
+    "accent": "#e6ba82",
+    "overflow": false
+  }
+]

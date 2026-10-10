@@ -19,3 +19,6 @@ site/public/downloads/practical-labs/
 site/public/downloads/quality-validation.json
 site/public/downloads/quality-prototype-notes.md
 lab-state-*.sqlite
+
+# Audit scratch files and screenshots
+/work/
