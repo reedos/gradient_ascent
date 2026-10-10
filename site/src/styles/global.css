@@ -80,6 +80,7 @@ main { max-width: 1392px; margin: auto; padding: 0 48px; min-height: 60vh }
 .button:hover { filter: brightness(1.1); transform: translateY(-1px) }
 .text-link { font-size: 12px; color: var(--text) }
 .text-link span { margin-left: 12px }
+@media (max-width: 700px) { .footer-map a, .footer-links a, .footer-bottom a { display: inline-flex; align-items: center; min-height: 24px } .site-footer summary { min-height: 24px; display: list-item } .text-link { display: inline-flex; align-items: center; min-height: 24px } }
 .hero-meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 10px; color: var(--muted); margin-top: 40px; align-items: center }
 .hero-meta span + span { border-left: 1px solid var(--line); padding-left: 18px }
 .hero-art { min-width: 0; overflow: hidden }
