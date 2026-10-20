@@ -44,7 +44,7 @@ jobs:
 
       - name: Keep the report as an artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: source-check
           path: .local/research/source-check.md
