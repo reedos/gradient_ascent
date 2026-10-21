@@ -83,7 +83,7 @@ jobs:
         run: npm run build
 
       - name: Upload the built site
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           # astro.config.mjs sets output: 'static' with the default outDir.
           path: site/dist
